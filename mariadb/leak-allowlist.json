@@ -1,0 +1,50 @@
+[
+  {
+    "check": "qwenlm-url",
+    "file": "^packages/vscode-ide-companion/README\\.md$|README\\.md$",
+    "text": "MariaDB build of \\[Qwen Code\\]",
+    "reason": "Our README credits the upstream project."
+  },
+  {
+    "check": "product-name",
+    "file": "README\\.md$",
+    "text": "MariaDB build of \\[Qwen Code\\]|upstream Qwen Code",
+    "reason": "Our README credits the upstream project."
+  },
+  {
+    "check": "alibaba-host",
+    "file": "^scripts/installation/",
+    "reason": "Upstream's standalone installers for Qwen Code; not part of the CLI bundle or the extension."
+  },
+  {
+    "check": "qwenlm-url",
+    "file": "^scripts/installation/",
+    "reason": "Upstream's standalone installers for Qwen Code; not part of the CLI bundle or the extension."
+  },
+  {
+    "check": "config-dir",
+    "file": "^scripts/installation/",
+    "reason": "Upstream's standalone installers for Qwen Code; not part of the CLI bundle or the extension."
+  },
+  {
+    "check": "product-name",
+    "file": "^scripts/installation/",
+    "reason": "Upstream's standalone installers for Qwen Code; not part of the CLI bundle or the extension."
+  },
+  {
+    "check": "context-file",
+    "file": "^scripts/installation/",
+    "reason": "Upstream's standalone installers for Qwen Code; not part of the CLI bundle or the extension."
+  },
+  {
+    "check": "ignore-file",
+    "file": "^scripts/installation/",
+    "reason": "Upstream's standalone installers for Qwen Code; not part of the CLI bundle or the extension."
+  },
+  {
+    "check": "product-name",
+    "file": "NOTICES\\.txt$",
+    "text": "Qwen Code modifications to",
+    "reason": "Third-party notices credit upstream's modifications of bundled packages."
+  }
+]

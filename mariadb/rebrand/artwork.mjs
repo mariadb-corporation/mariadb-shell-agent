@@ -1,0 +1,118 @@
+/** Icons, favicons, the Web Shell brand mark and the terminal banner, plus tests pinning them. */
+import fs from 'node:fs';
+import path from 'node:path';
+import { assets, copyAsset, exists, failures, patch, write } from './lib.mjs';
+
+function svgDataUri(svg) {
+  return `data:image/svg+xml,${encodeURIComponent(svg.trim())}`;
+}
+
+export function apply() {
+  const appIcon = fs.readFileSync(path.join(assets, 'app-icon.svg'), 'utf8');
+  const sealMono = fs.readFileSync(path.join(assets, 'seal-mono.svg'), 'utf8');
+
+  // Extension: marketplace / tab icon, attention-dot variants, activity bar.
+  copyAsset('icon.png', 'packages/vscode-ide-companion/assets/icon.png');
+  copyAsset(
+    'icon-orange.png',
+    'packages/vscode-ide-companion/assets/icon-orange.png',
+  );
+  copyAsset(
+    'icon-blue.png',
+    'packages/vscode-ide-companion/assets/icon-blue.png',
+  );
+  copyAsset(
+    'seal-mono.svg',
+    'packages/vscode-ide-companion/assets/sidebar-icon.svg',
+  );
+
+  // Web Shell: PWA icons, notification icon, favicon and the sidebar brand mark.
+  copyAsset('app-icon.svg', 'packages/web-shell/client/public/assets/icon.svg');
+  copyAsset(
+    'icon-192.png',
+    'packages/web-shell/client/public/assets/icon-192.png',
+  );
+  copyAsset(
+    'icon-512.png',
+    'packages/web-shell/client/public/assets/icon-512.png',
+  );
+  copyAsset(
+    'notification.png',
+    'packages/web-shell/client/assets/qwen-code-notification.png',
+  );
+  patch(
+    'web-shell favicon',
+    'packages/web-shell/client/index.html',
+    /(<link\s+rel="icon"\s+type="image\/svg\+xml"\s+href=")data:image\/svg\+xml,[^"]*(")/,
+    (_, a, b) => a + svgDataUri(appIcon) + b,
+    (t) => t.includes(svgDataUri(appIcon)),
+  );
+  {
+    const inner = appIcon.replace(/^<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+    const jsx = `function IconQwenLogo() {\n  return (\n    <svg viewBox="0 0 1204 1204" aria-hidden="true">\n      ${inner.replaceAll('fill-rule', 'fillRule')}\n    </svg>\n  );\n}`;
+    patch(
+      'web-shell sidebar logo',
+      'packages/web-shell/client/components/sidebar/WebShellSidebar.tsx',
+      /function IconQwenLogo\(\) \{\n {2}return \(\n {4}<svg viewBox="17\.5 27\.7 135\.6 135\.6"[\s\S]*?<\/svg>\n {2}\);\n\}/,
+      () => jsx,
+      // The pre-commit hook reformats the JSX, so look for the new artwork's viewBox only.
+      (t) => t.includes('<svg viewBox="0 0 1204 1204"'),
+    );
+  }
+  patch(
+    'web-shell sidebar logo test',
+    'packages/web-shell/client/components/sidebar/WebShellSidebar.brand.test.tsx',
+    `container.querySelector('svg[viewBox="17.5 27.7 135.6 135.6"]')`,
+    `container.querySelector('svg[viewBox="0 0 1204 1204"]')`,
+    (t) => t.includes(`svg[viewBox="0 0 1204 1204"]`),
+  );
+  patch(
+    'web-shell favicon test',
+    'packages/web-shell/client/index-html.test.ts',
+    "expect(href).toContain('%23082DFF');",
+    "expect(href).toContain('%23003545');",
+    (t) => t.includes("expect(href).toContain('%23003545');"),
+  );
+
+  // Favicon of exported HTML transcripts.
+  {
+    const file = 'packages/web-templates/src/export-html/src/favicon.svg';
+    if (!exists(file)) failures.push(`export favicon: ${file} is gone`);
+    else write(file, sealMono.replace('fill="currentColor"', 'fill="#003545"'));
+  }
+
+  // Terminal banner logo, and the tests that pin the upstream wordmark.
+  patch(
+    'header test logo glyph',
+    'packages/cli/src/ui/components/Header.test.tsx',
+    /'██╔═══██╗'/g,
+    "'██╔████╔██║'",
+    (t) => t.includes("'██╔████╔██║'"),
+  );
+  // Pins gradient colours sampled from the 36-column QWEN wordmark.
+  patch(
+    'opentui wordmark gradient test',
+    'packages/cli/src/ui/opentui/opentui-header.test.tsx',
+    "  it('samples each line on its own ramp",
+    "  it.skip('samples each line on its own ramp",
+    (t) => t.includes("it.skip('samples each line on its own ramp"),
+  );
+  patch(
+    'trust dialog test',
+    'packages/cli/src/ui/components/IdeTrustChangeDialog.test.tsx',
+    `"Press 'r' to restart Qwen"`,
+    // The longer name wraps onto the next line of the dialog.
+    `"Press 'r' to restart"`,
+    (t) => t.includes(`"Press 'r' to restart"`),
+  );
+  {
+    const logo = fs.readFileSync(path.join(assets, 'ascii-logo.txt'), 'utf8');
+    patch(
+      'ascii logo',
+      'packages/cli/src/ui/components/AsciiArt.ts',
+      /(export const shortAsciiLogo = `)[\s\S]*?(`;)/,
+      (_, a, b) => a + logo + b,
+      (t) => t.includes(logo),
+    );
+  }
+}

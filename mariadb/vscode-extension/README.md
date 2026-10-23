@@ -28,8 +28,9 @@ upstream regularly.
 | `MariaDB Code: Accept Current Diff` | Accept the currently displayed diff                    |
 | `MariaDB Code: Close Diff Editor`   | Close/reject the current diff                          |
 
-Settings, commands and the configuration directory keep their upstream identifiers
-(`qwen-code.*`, `~/.qwen`), so existing Qwen Code configuration keeps working.
+Settings live in `~/.mariadb-code/settings.json` (per project: `.mariadb-code/`), project
+instructions in `MARIADB-CODE.md` (`AGENTS.md` is read too), and ignore rules in
+`.mariadb-codeignore`. The bundled CLI is also available as `mariadb-code` (short: `mdbc`).
 
 ## License
 

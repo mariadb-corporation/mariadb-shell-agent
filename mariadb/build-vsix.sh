@@ -33,4 +33,5 @@ mkdir -p mariadb/dist
 
 # The extension's prepackage step bundles the CLI and Web Shell into dist/ first.
 npm --workspace=mariadb-code run package -- ${TARGET_ARGS[@]+"${TARGET_ARGS[@]}"} --out "$OUT"
+node mariadb/check-leaks.mjs "$OUT"
 echo "built $OUT"
