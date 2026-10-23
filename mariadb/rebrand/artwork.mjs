@@ -21,8 +21,9 @@ export function apply() {
     'icon-blue.png',
     'packages/vscode-ide-companion/assets/icon-blue.png',
   );
+  // Activity bar: the MariaDB Code mark (designed for it; monochrome, the IDE tints it).
   copyAsset(
-    'seal-mono.svg',
+    'mariadb-code-ext.svg',
     'packages/vscode-ide-companion/assets/sidebar-icon.svg',
   );
 
