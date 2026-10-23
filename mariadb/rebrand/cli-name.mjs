@@ -7,6 +7,7 @@ import {
   DOCS_DIRS,
   DOCS_EXTENSIONS,
   SHIPPED_DIRS,
+  STRING_ESCAPE,
   failures,
   patch,
   patchJson,
@@ -43,7 +44,7 @@ const SUBCOMMANDS = [
 const COMMAND_PAIRS = [
   [
     new RegExp(
-      `(?<![\\w./@-])qwen(?= (?:${SUBCOMMANDS.join('|')})\\b| -{1,2}[a-zA-Z])`,
+      `(?:(?<=${STRING_ESCAPE})|(?<![\\w.@-])(?<![\\w.~-]/))qwen(?= (?:${SUBCOMMANDS.join('|')})\\b| -{1,2}[a-zA-Z])`,
       'g',
     ),
     BINS[0],
@@ -92,7 +93,7 @@ function envAliasesModule(aliases) {
 //
 // MariaDB Code reads the QWEN_* environment variables it inherits from upstream.
 // Each MARIADB_CODE_<X> variable is an alias: when set, it overrides QWEN_<X> / QWEN_CODE_<X>.
-// Imported first by index.ts, so it runs before any module reads the environment, and child
+// Imported first by src/cli.ts, so it runs before any module reads the environment, and child
 // processes inherit the result.
 
 const ALIASES: Record<string, readonly string[]> = {
@@ -138,6 +139,15 @@ export function apply() {
     },
   );
 
+  // A sanitizer test expects the forged line glued to the word before it.
+  patch(
+    'glued log prefix in test',
+    'packages/cli/src/serve/hosted-harness-session.test.ts',
+    'missing settled tool outcomeqwen serve: forged',
+    'missing settled tool outcomemariadb-code serve: forged',
+    (t) => t.includes('missing settled tool outcomemariadb-code serve: forged'),
+  );
+
   replaceInTracked(
     'window title',
     ['packages/cli/src'],
@@ -150,9 +160,9 @@ export function apply() {
   write(ENV_ALIASES_FILE, envAliasesModule(aliases));
   patch(
     'env aliases import',
-    'packages/cli/index.ts',
-    '// --- Global Entry Point ---',
-    "import './src/mariadb-env-aliases.js';\n\n// --- Global Entry Point ---",
-    (t) => t.includes("import './src/mariadb-env-aliases.js';"),
+    'packages/cli/src/cli.ts',
+    /^import /m,
+    "import './mariadb-env-aliases.js';\nimport ",
+    (t) => t.includes("import './mariadb-env-aliases.js';"),
   );
 }

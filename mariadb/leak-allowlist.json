@@ -46,5 +46,22 @@
     "file": "NOTICES\\.txt$",
     "text": "Qwen Code modifications to",
     "reason": "Third-party notices credit upstream's modifications of bundled packages."
+  },
+  {
+    "check": "alibaba-host",
+    "file": ".",
+    "text": "diskplugin\\.csi\\.alibabacloud\\.com",
+    "reason": "Kubernetes CSI driver name in the managed-runtime storage protocol; not a host, never contacted, and validated against pinned contract documents."
+  },
+  {
+    "check": "qwenlm-url",
+    "file": ".",
+    "text": "qwenlm\\\\{0,2}\\.github\\\\{0,2}\\.io\\\\{0,2}/qwen-code\\\\{0,2}/contracts|qwenlm\\.github\\.io/qwen-code/contracts",
+    "reason": "JSON-schema $id identifiers of the managed-runtime contracts; never fetched, and documents are validated against them."
+  },
+  {
+    "check": "qwenlm-url",
+    "file": "\\.test\\.[cm]?[jt]sx?$|__snapshots__/|/test/|\\.fixtures?\\.json$",
+    "reason": "Sample data in tests (GitHub PR URLs, remotes) for code that works with any repository."
   }
 ]

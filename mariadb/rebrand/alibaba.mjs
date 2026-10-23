@@ -36,22 +36,48 @@ const DOMAIN_RE = new RegExp(
   `(?<![A-Za-z0-9-])(${ALIBABA_DOMAINS.map((d) => d.split('.')[0]).join('|')})(\\\\{0,2}\\.)(com|cn|ai)(?![A-Za-z0-9-])`,
   'gi',
 );
-function neutralizeDomain(match, name, dot, tld) {
+// Not an endpoint: the Kubernetes CSI driver name in the managed-runtime storage protocol,
+// validated against pinned contract documents (allowlisted in mariadb/leak-allowlist.json).
+const CSI_DRIVER_PREFIX = 'diskplugin.csi.';
+function neutralizeDomain(match, name, dot, tld, offset, line) {
   if (!ALIBABA_DOMAINS.includes(`${name}.${tld}`.toLowerCase())) return match;
+  if (
+    line.slice(offset - CSI_DRIVER_PREFIX.length, offset) === CSI_DRIVER_PREFIX
+  )
+    return match;
   return `${name}${dot}${tld === tld.toUpperCase() ? 'INVALID' : 'invalid'}`;
 }
 
 // QwenLM's GitHub organisation, docs site and container registry: release downloads for
 // self-update, the Live host and the managed runtime, and the sandbox image.
-const QWENLM_PAIRS = [
-  [/api\.github\.com\/repos\/QwenLM\b/gi, 'api.github.invalid/repos/QwenLM'],
+// Plain and escaped spellings (`github\.com\/QwenLM` inside a regex) are matched; only the
+// top-level domain changes, so escapes stay intact.
+const sep = (ch) => '\\\\{0,2}\\' + ch;
+const urlRe = (url, { before = '', after = '' } = {}) =>
+  new RegExp(before + url.replace(/[./]/g, sep) + after, 'gi');
+const toInvalid = (m) => m.replace(/(com|io)(?=\\{0,2}\/|$)/i, 'invalid');
+export const QWENLM_PAIRS = [
+  [urlRe('api.github.com/repos/QwenLM', { after: String.raw`\b` }), toInvalid],
   [
-    /raw\.githubusercontent\.com\/QwenLM\b/gi,
-    'raw.githubusercontent.invalid/QwenLM',
+    urlRe('raw.githubusercontent.com/QwenLM', { after: String.raw`\b` }),
+    toInvalid,
   ],
-  [/(?<![\w.-])github\.com\/QwenLM\b/gi, 'github.invalid/QwenLM'],
-  [/qwenlm\.github\.io/gi, 'qwenlm.github.invalid'],
-  [/ghcr\.io\/qwenlm\b/gi, 'ghcr.invalid/qwenlm'],
+  [
+    urlRe('github.com/QwenLM', {
+      before: String.raw`(?<![\w.-])`,
+      after: String.raw`\b`,
+    }),
+    toInvalid,
+  ],
+  // Not the JSON-schema $ids of the managed-runtime contracts: identifiers, never fetched, and
+  // the contract documents are validated against them.
+  [
+    urlRe('qwenlm.github.io', {
+      after: `(?!${sep('/')}qwen-code${sep('/')}contracts)`,
+    }),
+    toInvalid,
+  ],
+  [urlRe('ghcr.io/qwenlm', { after: String.raw`\b` }), toInvalid],
 ];
 
 // Providers run by Alibaba; the rest (DeepSeek, Grok, MiniMax, Z.AI, Kimi, OpenRouter,
@@ -59,41 +85,89 @@ const QWENLM_PAIRS = [
 const DROPPED_GROUPS = ['qwencloud', 'alibaba'];
 const DROPPED_IDS = ['idealab', 'modelscope'];
 
+// QwenLM URLs in tests are mostly sample data (GitHub PR URLs, remotes) for code that works with
+// any repository; tests of the endpoints we neutralize are skipped (skipped-tests.mjs).
+const TESTS = [
+  /^(?!.*docs-contract).*\.test\.[cm]?[jt]sx?$/,
+  /__snapshots__\//,
+  /\/test\//,
+  /\.fixtures?\.json$/,
+];
+
 export function apply() {
-  replaceInTracked('alibaba hosts', SHIPPED_DIRS, [
-    [DOMAIN_RE, neutralizeDomain],
-    ...QWENLM_PAIRS,
-  ]);
+  const readme = /^packages\/vscode-ide-companion\/README\.md$/;
   replaceInTracked(
     'alibaba hosts',
     [...SHIPPED_DIRS, ...DOCS_DIRS],
-    [[DOMAIN_RE, neutralizeDomain], ...QWENLM_PAIRS],
+    [[DOMAIN_RE, neutralizeDomain]],
     {
       extensions: DOCS_EXTENSIONS,
       // Our own README, which credits the upstream project.
-      skip: [/^packages\/vscode-ide-companion\/README\.md$/],
+      skip: [readme],
+    },
+  );
+  replaceInTracked(
+    'qwenlm urls',
+    [...SHIPPED_DIRS, ...DOCS_DIRS],
+    QWENLM_PAIRS,
+    {
+      extensions: DOCS_EXTENSIONS,
+      skip: [readme, ...TESTS],
     },
   );
   // The sandbox image (config.sandboxImageUri) is QwenLM's.
-  replaceInTracked('alibaba hosts', ['package.json'], QWENLM_PAIRS, {
+  replaceInTracked('qwenlm urls', ['package.json'], QWENLM_PAIRS, {
     extensions: CODE_EXTENSIONS,
   });
 
+  // The Alibaba presets stay registered (code such as reasoning overrides and the extension's
+  // plan definitions looks them up, and their hosts no longer resolve), but no picker or provider
+  // list offers them.
+  const visible = `(p) => !${JSON.stringify(DROPPED_GROUPS).replaceAll('"', "'")}.includes(p.uiGroup ?? '') && !${JSON.stringify(DROPPED_IDS).replaceAll('"', "'")}.includes(p.id)`;
   patch(
-    'alibaba providers',
+    'provider picker groups',
     'packages/core/src/providers/all-providers.ts',
-    /export const ALL_PROVIDERS: readonly ProviderConfig\[\] = \[([\s\S]*?)\n\];/,
-    (_, list) =>
-      `const UPSTREAM_PROVIDERS: readonly ProviderConfig[] = [${list}\n];\n\n` +
-      `// MariaDB Code: no providers run by Alibaba.\n` +
-      `export const ALL_PROVIDERS: readonly ProviderConfig[] =\n` +
-      `  UPSTREAM_PROVIDERS.filter(\n` +
-      `    (p) =>\n` +
-      `      !${JSON.stringify(DROPPED_GROUPS).replaceAll('"', "'")}.includes(p.uiGroup ?? '') &&\n` +
-      `      !${JSON.stringify(DROPPED_IDS).replaceAll('"', "'")}.includes(p.id),\n` +
-      `  );`,
-    (t) => t.includes('const UPSTREAM_PROVIDERS'),
+    /export const (QWENCLOUD|ALIBABA|THIRD_PARTY)_PROVIDERS = ALL_PROVIDERS\.filter\(/g,
+    (_, group) =>
+      `export const ${group}_PROVIDERS = ALL_PROVIDERS.filter(${visible}).filter(`,
+    (t) => t.includes(`ALL_PROVIDERS.filter(${visible}).filter(`),
   );
+  patch(
+    'acp provider list',
+    'packages/cli/src/acp-integration/acpAgent.ts',
+    'providers: ALL_PROVIDERS.map((provider) =>',
+    `providers: ALL_PROVIDERS.filter(${visible}).map((provider) =>`,
+    (t) => t.includes(`providers: ALL_PROVIDERS.filter(${visible})`),
+  );
+  patch(
+    'web shell provider catalog',
+    'packages/cli/src/serve/server/auth-provider-helpers.ts',
+    'const providers = ALL_PROVIDERS.map(buildAuthProviderDescriptor);',
+    `const providers = ALL_PROVIDERS.filter(${visible}).map(buildAuthProviderDescriptor);`,
+    (t) =>
+      t.includes(
+        `ALL_PROVIDERS.filter(${visible}).map(buildAuthProviderDescriptor)`,
+      ),
+  );
+  patch(
+    'web shell provider groups',
+    'packages/cli/src/serve/server/auth-provider-helpers.ts',
+    /\n {6}\{\n {8}id: '(?:qwencloud|alibaba)',[\s\S]*?\n {6}\},/g,
+    '',
+    (t) => !/id: '(?:qwencloud|alibaba)',/.test(t),
+  );
+  for (const file of [
+    'packages/cli/src/ui/auth/AuthDialog.tsx',
+    'packages/cli/src/ui/opentui/dialogs-auth.tsx',
+  ]) {
+    patch(
+      'auth dialog main menu',
+      file,
+      /\n {2}\{\n {4}key: '(?:QWENCLOUD|ALIBABA_MODELSTUDIO)',[\s\S]*?\n {2}\},/g,
+      '',
+      (t) => !/\n {4}key: '(?:QWENCLOUD|ALIBABA_MODELSTUDIO)',/.test(t),
+    );
+  }
 
   // The extension's Coding Plan settings (provider, API key, region) only drive the Alibaba
   // Coding Plan sync; without them in the manifest the sync never runs.

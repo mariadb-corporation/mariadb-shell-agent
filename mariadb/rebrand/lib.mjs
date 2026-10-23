@@ -17,6 +17,12 @@ export const root = path.resolve(mariadbDir, '..');
 export const assets = path.join(mariadbDir, 'assets');
 
 export const PRODUCT = 'MariaDB Code';
+
+/**
+ * Regex source for a string escape in source text (`\n`, `\u2028`, `\x1b`, ...). A name right
+ * after one starts a word although the preceding character is a letter or digit.
+ */
+export const STRING_ESCAPE = String.raw`\\(?:[nrt]|u[0-9A-Fa-f]{4}|x[0-9A-Fa-f]{2})`;
 export const UPSTREAM_PRODUCT = 'Qwen Code';
 
 /** Workspace packages that end up in the CLI bundle, the VS Code extension or the Web Shell. */
@@ -38,8 +44,8 @@ export const SHIPPED_DIRS = [
   'integrations',
   'scripts',
 ];
-/** User docs: bundled into the CLI (dist/bundled/qc-helper/docs) and read by the agent. */
-export const DOCS_DIRS = ['docs/users'];
+/** Docs: docs/users is bundled into the CLI (qc-helper) for the agent; the rest is checked against the source by tests. */
+export const DOCS_DIRS = ['docs'];
 
 export const CODE_EXTENSIONS = new Set([
   '.ts',
@@ -204,4 +210,48 @@ export function rename(rule, from, to) {
   renamed.set(from, to);
   count(rule);
   changedFiles++;
+}
+
+/**
+ * Marks tests as skipped: `it(`/`test(` (or `.each(`) of each title becomes `it.skip(`; with
+ * `titles === '*'` every top-level `describe(` of the file is skipped. Titles are the literal
+ * strings in the source (for `.each`, with the %s placeholders). Fails for a missing title.
+ */
+export function skipTests(rule, file, titles) {
+  if (!exists(file)) {
+    failures.push(`${rule}: ${file} no longer exists`);
+    return;
+  }
+  const text = read(file);
+  if (titles === '*') {
+    if (!/^describe\(/m.test(text) && !/^describe\.skip\(/m.test(text)) {
+      failures.push(`${rule}: no top-level describe in ${file}`);
+    }
+    write(file, text.replace(/^describe\(/gm, 'describe.skip('));
+    count(rule);
+    return;
+  }
+  const lines = text.split('\n');
+  for (const title of titles) {
+    const at = lines.findIndex((l) =>
+      ["'", '"', '`'].some((q) => l.includes(`${q}${title}${q}`)),
+    );
+    if (at < 0) {
+      failures.push(`${rule}: test "${title}" not found in ${file}`);
+      continue;
+    }
+    // `it(`/`test(` on the title line or just above; for `.each([...])(` further up.
+    let done = false;
+    for (let i = at; i >= Math.max(0, at - 40) && !done; i--) {
+      if (/\b(?:it|test)\.skip\b/.test(lines[i])) done = true;
+      else if (/\b(?:it|test)(?:\.each)?\(/.test(lines[i])) {
+        lines[i] = lines[i].replace(/\b(it|test)((?:\.each)?\()/, '$1.skip$2');
+        done = true;
+      }
+    }
+    if (!done)
+      failures.push(`${rule}: no it()/test() found for "${title}" in ${file}`);
+  }
+  write(file, lines.join('\n'));
+  count(rule, titles.length);
 }

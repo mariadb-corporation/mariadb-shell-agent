@@ -21,11 +21,22 @@ const CHECKS = [
   },
   {
     id: 'qwenlm-url',
-    re: /github\.com\/QwenLM\b|qwenlm\.github\.io|ghcr\.io\/qwenlm\b|raw\.githubusercontent\.com\/QwenLM\b/gi,
+    re: /github\\{0,2}\.com\\{0,2}\/QwenLM\b|qwenlm\\{0,2}\.github\\{0,2}\.io|ghcr\\{0,2}\.io\\{0,2}\/qwenlm\b|raw\\{0,2}\.githubusercontent\\{0,2}\.com\\{0,2}\/QwenLM\b/gi,
   },
-  { id: 'config-dir', re: /(?<![\w.\-?)\]!])\.qwen(?![\w-])/g },
-  { id: 'context-file', re: /\bQWEN(?:\.local)?\.md\b/g },
+
+  {
+    id: 'config-dir',
+    re: /(?:(?<=\$\d|%2F|\\[nt]!?|\s-[A-Za-z])|(?<![\w.\-?)\]])(?<![\w)\]]!))\.(?:qwen|QWEN)(?![\w-])/g,
+  },
+  {
+    id: 'context-file',
+    re: /\b(?:qwen|QWEN)(?:\\{0,2}\.(?:local|LOCAL))?\\{0,2}\.(?:md|MD)\b/g,
+  },
   { id: 'ignore-file', re: /\.qwenignore\b/g },
+  {
+    id: 'regex-alternation',
+    re: /\((?:[\w-]+\|)*(?:qwen|QWEN)(?:\|[\w-]+)*\)\\\.(?:md|MD)|\\\.\((?:[\w-]+\|)*qwen(?:\|[\w-]+)*\)/g,
+  },
   { id: 'product-name', re: /\bQwen Code\b/g },
 ];
 
