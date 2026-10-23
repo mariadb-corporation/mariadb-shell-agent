@@ -85,15 +85,12 @@ export const QWENLM_PAIRS = [
 const DROPPED_GROUPS = ['qwencloud', 'alibaba'];
 const DROPPED_IDS = ['idealab', 'modelscope'];
 
-// QwenLM URLs in tests are mostly sample data (GitHub PR URLs, remotes) for code that works with
-// any repository; tests of the endpoints we neutralize are skipped (skipped-tests.mjs).
-const TESTS = [
-  /^(?!.*docs-contract).*\.test\.[cm]?[jt]sx?$/,
-  /__snapshots__\//,
-  /\/test\//,
-  /\.fixtures?\.json$/,
+// The /review tests use QwenLM GitHub URLs as sample data (PR URLs, remotes) for code that works
+// with any repository; elsewhere tests assert the product's own URLs and follow the source.
+// (sandboxed-exec.test.ts asserts the sandbox image constant, so it follows the source.)
+const SAMPLE_DATA = [
+  /^packages\/cli\/src\/commands\/review\/(?!lib\/sandboxed-exec\.test\.).*\.test\.[cm]?[jt]sx?$/,
 ];
-
 export function apply() {
   const readme = /^packages\/vscode-ide-companion\/README\.md$/;
   replaceInTracked(
@@ -112,7 +109,7 @@ export function apply() {
     QWENLM_PAIRS,
     {
       extensions: DOCS_EXTENSIONS,
-      skip: [readme, ...TESTS],
+      skip: [readme, ...SAMPLE_DATA],
     },
   );
   // The sandbox image (config.sandboxImageUri) is QwenLM's.

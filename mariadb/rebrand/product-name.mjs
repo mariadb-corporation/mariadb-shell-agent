@@ -10,7 +10,8 @@ import {
 
 // Everything shipped (CLI bundle, VS Code extension, Web Shell) and the user docs, which are
 // bundled for the agent's built-in help. Tests and snapshots follow the source.
-const DIRS = [...SHIPPED_DIRS, ...DOCS_DIRS];
+// Also the repository's own project directory (renamed later by paths.mjs), which tests read.
+const DIRS = [...SHIPPED_DIRS, ...DOCS_DIRS, '.qwen'];
 
 const SKIP = [
   // /review parses its own footers; review.mjs rebrands that module as a whole.

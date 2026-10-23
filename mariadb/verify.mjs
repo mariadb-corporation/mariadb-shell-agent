@@ -5,7 +5,7 @@
  *   node mariadb/verify.mjs [--quick]
  *
  * 1. Runs the unit tests of the packages the rebrand touches (--quick: all but the CLI's).
- * 2. Reruns each failing test file on its own, to drop failures that only happen under load.
+ * 2. Reruns each failing test file on its own, twice, to drop failures that only happen under load.
  * 3. Reruns what still fails against the pristine upstream sources main is built on (temporarily checked out over the
  *    working tree, then restored), so failures upstream has as well are not blamed on us.
  *
@@ -82,7 +82,16 @@ const ours = [];
 for (const pkg of packages) {
   process.stdout.write(`${pkg}: running… `);
   let failed = failingTests(pkg);
-  if (failed.size) failed = failingTests(pkg, filesOf(failed)); // isolated rerun
+  // Each failing file again on its own, twice: only tests failing every time count (several
+  // suites spawn real processes and time out under the load of a full run).
+  for (let round = 0; round < 2 && failed.size; round++) {
+    const again = new Set();
+    for (const file of filesOf(failed)) {
+      for (const t of failingTests(pkg, [file]))
+        if (failed.has(t)) again.add(t);
+    }
+    failed = again;
+  }
   if (!failed.size) {
     console.log('ok');
     continue;

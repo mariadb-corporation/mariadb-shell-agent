@@ -61,7 +61,7 @@
   },
   {
     "check": "qwenlm-url",
-    "file": "\\.test\\.[cm]?[jt]sx?$|__snapshots__/|/test/|\\.fixtures?\\.json$",
-    "reason": "Sample data in tests (GitHub PR URLs, remotes) for code that works with any repository."
+    "file": "^packages/cli/src/commands/review/.*\\.test\\.[cm]?[jt]sx?$",
+    "reason": "Sample data in the /review tests (GitHub PR URLs, remotes) for code that works with any repository."
   }
 ]

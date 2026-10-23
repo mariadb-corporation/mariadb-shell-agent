@@ -80,14 +80,11 @@ const SKIPPED = [
   },
   {
     reason:
-      'No QwenLM endpoints (alibaba.mjs): web fetch does not pre-approve QwenLM GitHub, /setup-github has no QwenLM workflow source.',
+      'No QwenLM endpoints (alibaba.mjs): web fetch does not pre-approve QwenLM GitHub.',
     tests: {
       'packages/core/src/tools/web-fetch-preapproved.test.ts': [
         'matches path-scoped entries only within the path prefix',
         'matches path prefixes case-insensitively',
-      ],
-      'packages/cli/src/ui/commands/setupGithubCommand.test.ts': [
-        'returns a tool action to download github workflows and handles paths',
       ],
     },
   },
