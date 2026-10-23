@@ -139,7 +139,7 @@ function replaceInTracked(pathspecs, pairs) {
 const EXTENSION_ID = 'MariaDB.mariadb-code';
 const EXTENSION_NAME = 'mariadb-code';
 const identityHits = replaceInTracked(
-  ['.', ':!*.md', ':!.github', ':!docs', ':!docs-site'],
+  ['.', ':!*.md', ':!.github', ':!docs', ':!docs-site', ':!mariadb'],
   [
     ['qwenlm.qwen-code-vscode-ide-companion', EXTENSION_ID],
     ['qwen-code-vscode-ide-companion', EXTENSION_NAME],
@@ -235,7 +235,8 @@ patch(
     'packages/web-shell/client/components/sidebar/WebShellSidebar.tsx',
     /function IconQwenLogo\(\) \{\n {2}return \(\n {4}<svg viewBox="17\.5 27\.7 135\.6 135\.6"[\s\S]*?<\/svg>\n {2}\);\n\}/,
     () => jsx,
-    (t) => t.includes(jsx),
+    // The pre-commit hook reformats the JSX, so look for the new artwork's viewBox only.
+    (t) => t.includes('<svg viewBox="0 0 1204 1204"'),
   );
 }
 
