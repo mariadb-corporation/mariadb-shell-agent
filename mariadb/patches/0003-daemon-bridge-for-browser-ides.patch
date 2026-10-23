@@ -359,7 +359,7 @@ new file mode 100644
 index 0000000000..4dfeaf18fa
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/webview/daemonFetchBridge.ts
-@@ -0,0 +1,170 @@
+@@ -0,0 +1,172 @@
 +/**
 + * @license
 + * Copyright 2026 MariaDB
@@ -466,8 +466,9 @@ index 0000000000..4dfeaf18fa
 +  if (
 +    typeof message?.type !== 'string' ||
 +    !message.type.startsWith('daemonFetch')
-+  )
++  ) {
 +    return;
++  }
 +  const id = message.data?.['id'];
 +  const entry = typeof id === 'string' ? pending.get(id) : undefined;
 +  if (!entry) return;
@@ -525,8 +526,9 @@ index 0000000000..4dfeaf18fa
 +): Promise<Response> => {
 +  if (bridgedOrigin) {
 +    const request = new Request(input, init);
-+    if (new URL(request.url).origin === bridgedOrigin)
++    if (new URL(request.url).origin === bridgedOrigin) {
 +      return bridgedFetch(request);
++    }
 +  }
 +  return nativeFetch(input, init);
 +};
