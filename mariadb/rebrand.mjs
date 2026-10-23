@@ -143,7 +143,16 @@ function replaceInTracked(pathspecs, pairs) {
 const EXTENSION_ID = 'MariaDB.mariadb-code';
 const EXTENSION_NAME = 'mariadb-code';
 const identityHits = replaceInTracked(
-  ['.', ':!*.md', ':!.github', ':!docs', ':!docs-site', ':!mariadb'],
+  [
+    '.',
+    ':!*.md',
+    ':!.github',
+    ':!docs',
+    ':!docs-site',
+    ':!mariadb',
+    // The lockfile pins a checksum of .pnpmfile.mjs; nothing depends on the extension package.
+    ':!.pnpmfile.mjs',
+  ],
   [
     ['qwenlm.qwen-code-vscode-ide-companion', EXTENSION_ID],
     ['qwen-code-vscode-ide-companion', EXTENSION_NAME],
