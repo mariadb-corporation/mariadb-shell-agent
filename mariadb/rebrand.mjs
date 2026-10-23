@@ -192,6 +192,8 @@ const phraseHits = replaceInTracked(PHRASE_DIRS, [
   // would push "completed tasks are revived" past it.
   ['or another Qwen Code session (use "to")', 'or another session (use "to")'],
   [UPSTREAM_PRODUCT, PRODUCT],
+  // The agent's self-description in the system prompt (and its snapshots).
+  [' developed by Alibaba Group, ', ' developed by MariaDB, '],
   // Bare "Qwen" naming the agent (not the model family) in visible CLI text.
   ['ask Qwen', `ask ${PRODUCT}`],
   ['How is Qwen doing', `How is ${PRODUCT} doing`],
