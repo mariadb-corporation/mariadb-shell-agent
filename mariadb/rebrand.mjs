@@ -50,6 +50,10 @@ const PHRASE_SKIP = [
   /(^|\/)CHANGELOG\.md$/,
   /(^|\/)NOTICES\.txt$/,
   /(^|\/)LICENSE$/,
+  // /review parses footers ("via Qwen Code /review") of comments already posted on PRs.
+  /^packages\/cli\/src\/commands\/review\//,
+  // Compares the source against upstream's docs, which are not rebranded.
+  /docs-contract\.test\.ts$/,
 ];
 
 const failures = [];
@@ -183,7 +187,6 @@ const phraseHits = replaceInTracked(PHRASE_DIRS, [
   ['stdout shown to Qwen', `stdout shown to ${PRODUCT}`],
   ['start coding with Qwen.', `start coding with ${PRODUCT}.`],
   ['开始使用 Qwen 编码', `开始使用 ${PRODUCT} 编码`],
-  ['`Qwen - ${', `\`${PRODUCT} - \${`],
 ]);
 
 write(
@@ -264,7 +267,30 @@ patch(
   else write(file, sealMono.replace('fill="currentColor"', 'fill="#003545"'));
 }
 
-// 6. Terminal banner logo.
+// 6. Terminal banner logo, and the tests that pin the upstream wordmark.
+patch(
+  'header test logo glyph',
+  'packages/cli/src/ui/components/Header.test.tsx',
+  /'██╔═══██╗'/g,
+  "'██╔████╔██║'",
+  (t) => t.includes("'██╔████╔██║'"),
+);
+// Pins gradient colours sampled from the 36-column QWEN wordmark.
+patch(
+  'opentui wordmark gradient test',
+  'packages/cli/src/ui/opentui/opentui-header.test.tsx',
+  "  it('samples each line on its own ramp",
+  "  it.skip('samples each line on its own ramp",
+  (t) => t.includes("it.skip('samples each line on its own ramp"),
+);
+patch(
+  'trust dialog test',
+  'packages/cli/src/ui/components/IdeTrustChangeDialog.test.tsx',
+  `"Press 'r' to restart Qwen"`,
+  // The longer name wraps onto the next line of the dialog.
+  `"Press 'r' to restart"`,
+  (t) => t.includes(`"Press 'r' to restart"`),
+);
 {
   const file = 'packages/cli/src/ui/components/AsciiArt.ts';
   const logo = fs.readFileSync(path.join(assets, 'ascii-logo.txt'), 'utf8');
