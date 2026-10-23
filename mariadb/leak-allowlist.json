@@ -63,5 +63,23 @@
     "check": "qwenlm-url",
     "file": "^packages/cli/src/commands/review/.*\\.test\\.[cm]?[jt]sx?$",
     "reason": "Sample data in the /review tests (GitHub PR URLs, remotes) for code that works with any repository."
+  },
+  {
+    "check": "alibaba-host",
+    "file": "nodemailer",
+    "text": "aliyun",
+    "reason": "nodemailer's built-in list of well-known mail services (Alibaba Cloud Mail); used only if a user configures that service for the email channel."
+  },
+  {
+    "check": "qwenlm-url",
+    "file": "(^|/)README\\.md$",
+    "text": "built by MariaDB on\\s*$|\\[Qwen Code\\]\\(https://github\\.com/QwenLM/qwen-code\\)",
+    "reason": "Our READMEs credit the upstream project."
+  },
+  {
+    "check": "product-name",
+    "file": "(^|/)README\\.md$",
+    "text": "\\[Qwen Code\\]|upstream Qwen Code",
+    "reason": "Our READMEs credit the upstream project."
   }
 ]

@@ -64,6 +64,11 @@ export function apply() {
     },
   );
 
+  // The repository README, also packaged with the CLI (dist/README.md, the npm page).
+  write(
+    'README.md',
+    fs.readFileSync(path.join(mariadbDir, 'product-README.md'), 'utf8'),
+  );
   write(
     'packages/vscode-ide-companion/README.md',
     fs.readFileSync(

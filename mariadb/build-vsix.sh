@@ -31,6 +31,9 @@ VERSION=$(node -p "require('./packages/vscode-ide-companion/package.json').versi
 OUT="$PWD/mariadb/dist/mariadb-code-$VERSION-$TARGET.vsix"
 mkdir -p mariadb/dist
 
+# esbuild never empties dist/: chunks of earlier builds would end up in the package.
+rm -rf packages/vscode-ide-companion/dist
+
 # The extension's prepackage step bundles the CLI and Web Shell into dist/ first.
 npm --workspace=mariadb-code run package -- ${TARGET_ARGS[@]+"${TARGET_ARGS[@]}"} --out "$OUT"
 node mariadb/check-leaks.mjs "$OUT"
