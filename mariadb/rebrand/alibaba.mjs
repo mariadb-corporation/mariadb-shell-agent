@@ -149,6 +149,18 @@ export function apply() {
       ),
   );
 
+  // The extension's copy of the settings schema, generated from settingsSchema.ts on install.
+  patch(
+    'settings schema json defaults',
+    'packages/vscode-ide-companion/schemas/settings.schema.json',
+    /("(?:enableAutoUpdate|usageStatisticsEnabled)": \{[^}]*?"default": )true/g,
+    '$1false',
+    (t) =>
+      !/"(?:enableAutoUpdate|usageStatisticsEnabled)": \{[^}]*?"default": true/.test(
+        t,
+      ),
+  );
+
   // npm self-update looks up the package's own name; upstream's is on npm, ours is not.
   patch(
     'dist package name',
