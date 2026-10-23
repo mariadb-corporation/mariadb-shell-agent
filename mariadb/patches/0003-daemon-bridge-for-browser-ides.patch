@@ -1,0 +1,706 @@
+Daemon requests through the extension host in browser-based IDEs
+
+The webview fetches from the daemon on the loopback of the machine running
+the extension host. In a browser-based IDE (Theia, code-server, VS Code for
+the Web) the webview runs in the user's browser, where that loopback is the
+user's own machine, and nothing forwards the port, so the shell fails with
+'Failed to load workspace'. When vscode.env.uiKind is Web, the extension
+now sends webShellBootstrap with daemonBridge: true, and the webview routes
+every fetch to the daemon's origin as messages to the extension host, which
+performs it next to the daemon and streams the response back. Only the
+daemon's origin is forwarded; the daemon stays on loopback. Local and
+remote desktop windows are unchanged. Features opening their own
+WebSockets to the daemon (terminal, live browser, voice, local files) are
+not bridged yet.
+
+diff --git a/packages/vscode-ide-companion/src/services/daemonFetchBridge.test.ts b/packages/vscode-ide-companion/src/services/daemonFetchBridge.test.ts
+new file mode 100644
+index 0000000000..c0680debd4
+--- /dev/null
++++ b/packages/vscode-ide-companion/src/services/daemonFetchBridge.test.ts
+@@ -0,0 +1,205 @@
++/**
++ * @license
++ * Copyright 2026 MariaDB
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++import http from 'node:http';
++import type { AddressInfo } from 'node:net';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++
++vi.mock('vscode', () => ({
++  env: { uiKind: 2 },
++  UIKind: { Desktop: 1, Web: 2 },
++}));
++
++import { DaemonFetchBridge, shouldBridgeDaemon } from './daemonFetchBridge.js';
++
++type Posted = { type: string; data: Record<string, unknown> };
++
++function fakeWebview() {
++  const posted: Posted[] = [];
++  return {
++    posted,
++    webview: {
++      postMessage: vi.fn(async (message: Posted) => {
++        posted.push(message);
++        return true;
++      }),
++    } as never,
++  };
++}
++
++async function settled(posted: Posted[], id: string): Promise<Posted[]> {
++  for (let i = 0; i < 200; i++) {
++    const mine = posted.filter((m) => m.data['id'] === id);
++    if (
++      mine.some(
++        (m) => m.type === 'daemonFetchEnd' || m.type === 'daemonFetchError',
++      )
++    ) {
++      return mine;
++    }
++    await new Promise((r) => setTimeout(r, 10));
++  }
++  throw new Error(`no end for ${id}`);
++}
++
++describe('DaemonFetchBridge', () => {
++  let server: http.Server;
++  let baseUrl: string;
++  let lastRequest:
++    | { method?: string; url?: string; auth?: string; body: string }
++    | undefined;
++
++  beforeEach(async () => {
++    server = http.createServer((req, res) => {
++      let body = '';
++      req.on('data', (c) => (body += c));
++      req.on('end', () => {
++        lastRequest = {
++          method: req.method,
++          url: req.url,
++          auth: req.headers.authorization,
++          body,
++        };
++        if (req.url === '/stream') {
++          res.writeHead(200, { 'content-type': 'text/event-stream' });
++          res.write('data: one\n\n');
++          setTimeout(() => res.end('data: two\n\n'), 20);
++          return;
++        }
++        res.writeHead(201, {
++          'content-type': 'application/json',
++          'x-daemon': 'yes',
++        });
++        res.end(JSON.stringify({ ok: true }));
++      });
++    });
++    await new Promise<void>((r) => server.listen(0, '127.0.0.1', r));
++    baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
++    lastRequest = undefined;
++  });
++
++  afterEach(async () => {
++    await new Promise((r) => server.close(r));
++  });
++
++  it('is used in browser-based hosts', () => {
++    expect(shouldBridgeDaemon()).toBe(true);
++  });
++
++  it('forwards a daemon request and returns status, headers and body', async () => {
++    const bridge = new DaemonFetchBridge(() => baseUrl);
++    const { posted, webview } = fakeWebview();
++    const handled = bridge.handle(
++      {
++        type: 'daemonFetch',
++        data: {
++          id: 'r1',
++          url: `${baseUrl}/workspace?x=1`,
++          method: 'POST',
++          headers: [
++            ['authorization', 'Bearer t'],
++            ['content-type', 'application/json'],
++          ],
++          body: Buffer.from('{"a":1}').toString('base64'),
++        },
++      },
++      webview,
++    );
++    expect(handled).toBe(true);
++    const messages = await settled(posted, 'r1');
++    expect(lastRequest).toEqual({
++      method: 'POST',
++      url: '/workspace?x=1',
++      auth: 'Bearer t',
++      body: '{"a":1}',
++    });
++    const head = messages.find((m) => m.type === 'daemonFetchHead')!;
++    expect(head.data['status']).toBe(201);
++    expect(head.data['headers']).toContainEqual(['x-daemon', 'yes']);
++    const body = messages
++      .filter((m) => m.type === 'daemonFetchChunk')
++      .map((m) => Buffer.from(m.data['data'] as string, 'base64').toString())
++      .join('');
++    expect(JSON.parse(body)).toEqual({ ok: true });
++    expect(messages.at(-1)!.type).toBe('daemonFetchEnd');
++  });
++
++  it('streams a response in chunks as it arrives', async () => {
++    const bridge = new DaemonFetchBridge(() => baseUrl);
++    const { posted, webview } = fakeWebview();
++    bridge.handle(
++      {
++        type: 'daemonFetch',
++        data: {
++          id: 's1',
++          url: `${baseUrl}/stream`,
++          method: 'GET',
++          headers: [],
++        },
++      },
++      webview,
++    );
++    const messages = await settled(posted, 's1');
++    const chunks = messages.filter((m) => m.type === 'daemonFetchChunk');
++    expect(chunks.length).toBeGreaterThanOrEqual(2);
++    expect(
++      chunks
++        .map((m) => Buffer.from(m.data['data'] as string, 'base64').toString())
++        .join(''),
++    ).toBe('data: one\n\ndata: two\n\n');
++  });
++
++  it('refuses anything but the daemon origin', async () => {
++    const bridge = new DaemonFetchBridge(() => baseUrl);
++    const { posted, webview } = fakeWebview();
++    bridge.handle(
++      {
++        type: 'daemonFetch',
++        data: {
++          id: 'x1',
++          url: 'http://127.0.0.1:1/other',
++          method: 'GET',
++          headers: [],
++        },
++      },
++      webview,
++    );
++    const messages = await settled(posted, 'x1');
++    expect(messages).toEqual([
++      {
++        type: 'daemonFetchError',
++        data: { id: 'x1', message: 'not a daemon URL' },
++      },
++    ]);
++    expect(lastRequest).toBeUndefined();
++  });
++
++  it('refuses everything while no daemon is bridged', async () => {
++    const bridge = new DaemonFetchBridge(() => undefined);
++    const { posted, webview } = fakeWebview();
++    bridge.handle(
++      {
++        type: 'daemonFetch',
++        data: {
++          id: 'n1',
++          url: `${baseUrl}/workspace`,
++          method: 'GET',
++          headers: [],
++        },
++      },
++      webview,
++    );
++    expect((await settled(posted, 'n1'))[0]!.type).toBe('daemonFetchError');
++    expect(lastRequest).toBeUndefined();
++  });
++
++  it('ignores unrelated messages', () => {
++    const bridge = new DaemonFetchBridge(() => baseUrl);
++    expect(
++      bridge.handle({ type: 'webShellPermissionState' }, fakeWebview().webview),
++    ).toBe(false);
++  });
++});
+diff --git a/packages/vscode-ide-companion/src/services/daemonFetchBridge.ts b/packages/vscode-ide-companion/src/services/daemonFetchBridge.ts
+new file mode 100644
+index 0000000000..eeebd96cb1
+--- /dev/null
++++ b/packages/vscode-ide-companion/src/services/daemonFetchBridge.ts
+@@ -0,0 +1,124 @@
++/**
++ * @license
++ * Copyright 2026 MariaDB
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/**
++ * Extension-host end of the webview's daemon bridge (see webview/daemonFetchBridge.ts).
++ *
++ * In a browser-based IDE the webview cannot reach the daemon on this machine's loopback, so it
++ * sends its daemon requests here as messages. They are performed next to the daemon and the
++ * response is streamed back in chunks. Only requests to the daemon's own origin are forwarded.
++ */
++
++import * as vscode from 'vscode';
++
++interface DaemonFetchRequest {
++  id: string;
++  url: string;
++  method: string;
++  headers: Array<[string, string]>;
++  body?: string;
++}
++
++/**
++ * Whether the webview should reach the daemon through the extension host: in a browser-based
++ * host (no port forwarding to the user's machine).
++ */
++export function shouldBridgeDaemon(): boolean {
++  return vscode.env.uiKind === vscode.UIKind.Web;
++}
++
++export class DaemonFetchBridge {
++  private readonly inFlight = new Map<string, AbortController>();
++
++  /** @param daemonBaseUrl the daemon address this bridge may forward to, or undefined. */
++  constructor(private readonly daemonBaseUrl: () => string | undefined) {}
++
++  /** Handles a bridge message from `webview`; returns false for any other message. */
++  handle(
++    message: { type: string; data?: unknown },
++    webview: vscode.Webview,
++  ): boolean {
++    if (message.type === 'daemonFetchAbort') {
++      const id = (message.data as { id?: unknown } | undefined)?.id;
++      if (typeof id === 'string') this.inFlight.get(id)?.abort();
++      return true;
++    }
++    if (message.type !== 'daemonFetch') return false;
++    void this.forward(message.data as DaemonFetchRequest, webview);
++    return true;
++  }
++
++  dispose(): void {
++    for (const controller of this.inFlight.values()) controller.abort();
++    this.inFlight.clear();
++  }
++
++  private async forward(
++    request: DaemonFetchRequest,
++    webview: vscode.Webview,
++  ): Promise<void> {
++    const { id } = request;
++    const post = (type: string, data: Record<string, unknown>) =>
++      webview.postMessage({ type, data: { id, ...data } }).then(
++        (delivered) => delivered,
++        () => false,
++      );
++    const baseUrl = this.daemonBaseUrl();
++    let url: URL;
++    try {
++      url = new URL(request.url);
++    } catch {
++      await post('daemonFetchError', { message: 'invalid URL' });
++      return;
++    }
++    if (!baseUrl || url.origin !== new URL(baseUrl).origin) {
++      await post('daemonFetchError', { message: 'not a daemon URL' });
++      return;
++    }
++    const controller = new AbortController();
++    this.inFlight.set(id, controller);
++    try {
++      const response = await fetch(url, {
++        method: request.method,
++        headers: request.headers,
++        body: request.body ? Buffer.from(request.body, 'base64') : undefined,
++        signal: controller.signal,
++      });
++      const headers: Array<[string, string]> = [];
++      response.headers.forEach((value, name) => headers.push([name, value]));
++      await post('daemonFetchHead', {
++        status: response.status,
++        statusText: response.statusText,
++        headers,
++      });
++      if (response.body) {
++        const reader = response.body.getReader();
++        for (;;) {
++          const { done, value } = await reader.read();
++          if (done) break;
++          // Stop reading when the webview is gone; aborting releases the daemon request.
++          if (
++            !(await post('daemonFetchChunk', {
++              data: Buffer.from(value).toString('base64'),
++            }))
++          ) {
++            controller.abort();
++            return;
++          }
++        }
++      }
++      await post('daemonFetchEnd', {});
++    } catch (error) {
++      if (!controller.signal.aborted) {
++        await post('daemonFetchError', {
++          message: error instanceof Error ? error.message : String(error),
++        });
++      }
++    } finally {
++      this.inFlight.delete(id);
++    }
++  }
++}
+diff --git a/packages/vscode-ide-companion/src/webview/daemonFetchBridge.ts b/packages/vscode-ide-companion/src/webview/daemonFetchBridge.ts
+new file mode 100644
+index 0000000000..4dfeaf18fa
+--- /dev/null
++++ b/packages/vscode-ide-companion/src/webview/daemonFetchBridge.ts
+@@ -0,0 +1,170 @@
++/**
++ * @license
++ * Copyright 2026 MariaDB
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/**
++ * Daemon requests through the extension host, for hosts whose webview cannot reach the daemon.
++ *
++ * The daemon binds the loopback of the machine running the extension host. In a browser-based
++ * IDE (Theia, code-server, VS Code for the Web) the webview runs in the user's browser, where
++ * that loopback is the user's own machine, and there is no port forwarding. When the extension
++ * host announces `daemonBridge` in `webShellBootstrap`, every `fetch` to the daemon's origin is
++ * sent as messages to the extension host, which performs it next to the daemon and streams the
++ * response back (see services/daemonFetchBridge.ts). Other requests use the browser's `fetch`.
++ *
++ * Imported first by index.tsx, so the wrapper is in place before any module keeps a reference
++ * to `fetch`.
++ */
++
++import { getVSCodeAPI } from './hooks/useVSCode.js';
++
++interface PendingResponse {
++  resolve: (response: Response) => void;
++  reject: (error: unknown) => void;
++  controller?: ReadableStreamDefaultController<Uint8Array>;
++}
++
++const nativeFetch = globalThis.fetch.bind(globalThis);
++const pending = new Map<string, PendingResponse>();
++let bridgedOrigin: string | undefined;
++let nextId = 0;
++
++function toBase64(bytes: Uint8Array): string {
++  let binary = '';
++  for (let i = 0; i < bytes.length; i += 0x8000) {
++    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
++  }
++  return btoa(binary);
++}
++
++function fromBase64(data: string): Uint8Array {
++  const binary = atob(data);
++  const bytes = new Uint8Array(binary.length);
++  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
++  return bytes;
++}
++
++function abortError(): Error {
++  return new DOMException('The operation was aborted.', 'AbortError');
++}
++
++async function bridgedFetch(request: Request): Promise<Response> {
++  const id = `daemon-fetch-${++nextId}`;
++  const vscode = getVSCodeAPI();
++  const body =
++    request.method === 'GET' || request.method === 'HEAD'
++      ? undefined
++      : new Uint8Array(await request.arrayBuffer());
++  const headers: Array<[string, string]> = [];
++  request.headers.forEach((value, name) => headers.push([name, value]));
++
++  return new Promise<Response>((resolve, reject) => {
++    const entry: PendingResponse = { resolve, reject };
++    pending.set(id, entry);
++    const onAbort = () => {
++      if (!pending.has(id)) return;
++      vscode.postMessage({ type: 'daemonFetchAbort', data: { id } });
++      entry.controller?.error(abortError());
++      entry.reject(abortError());
++      pending.delete(id);
++    };
++    if (request.signal.aborted) {
++      onAbort();
++      return;
++    }
++    request.signal.addEventListener('abort', onAbort, { once: true });
++    vscode.postMessage({
++      type: 'daemonFetch',
++      data: {
++        id,
++        url: request.url,
++        method: request.method,
++        headers,
++        body: body && body.length > 0 ? toBase64(body) : undefined,
++      },
++    });
++  });
++}
++
++function onHostMessage(event: MessageEvent): void {
++  const message = event.data as {
++    type?: string;
++    data?: Record<string, unknown>;
++  };
++  if (message?.type === 'webShellBootstrap') {
++    const baseUrl = message.data?.['baseUrl'];
++    bridgedOrigin =
++      message.data?.['daemonBridge'] === true && typeof baseUrl === 'string'
++        ? new URL(baseUrl).origin
++        : undefined;
++    return;
++  }
++  if (
++    typeof message?.type !== 'string' ||
++    !message.type.startsWith('daemonFetch')
++  )
++    return;
++  const id = message.data?.['id'];
++  const entry = typeof id === 'string' ? pending.get(id) : undefined;
++  if (!entry) return;
++  switch (message.type) {
++    case 'daemonFetchHead': {
++      const data = message.data as {
++        status: number;
++        statusText: string;
++        headers: Array<[string, string]>;
++      };
++      const nullBody = [101, 204, 205, 304].includes(data.status);
++      const stream = nullBody
++        ? null
++        : new ReadableStream<Uint8Array>({
++            start(controller) {
++              entry.controller = controller;
++            },
++          });
++      entry.resolve(
++        new Response(stream, {
++          status: data.status,
++          statusText: data.statusText,
++          headers: data.headers,
++        }),
++      );
++      if (nullBody) pending.delete(id as string);
++      break;
++    }
++    case 'daemonFetchChunk':
++      entry.controller?.enqueue(fromBase64(message.data?.['data'] as string));
++      break;
++    case 'daemonFetchEnd':
++      entry.controller?.close();
++      pending.delete(id as string);
++      break;
++    case 'daemonFetchError': {
++      const error = new TypeError(
++        `Daemon request failed: ${String(message.data?.['message'])}`,
++      );
++      if (entry.controller) entry.controller.error(error);
++      else entry.reject(error);
++      pending.delete(id as string);
++      break;
++    }
++    default:
++      break;
++  }
++}
++
++window.addEventListener('message', onHostMessage);
++
++globalThis.fetch = (
++  input: RequestInfo | URL,
++  init?: RequestInit,
++): Promise<Response> => {
++  if (bridgedOrigin) {
++    const request = new Request(input, init);
++    if (new URL(request.url).origin === bridgedOrigin)
++      return bridgedFetch(request);
++  }
++  return nativeFetch(input, init);
++};
+diff --git a/packages/vscode-ide-companion/src/webview/hooks/useVSCode.ts b/packages/vscode-ide-companion/src/webview/hooks/useVSCode.ts
+index aa051cd029..f75e45ec74 100644
+--- a/packages/vscode-ide-companion/src/webview/hooks/useVSCode.ts
++++ b/packages/vscode-ide-companion/src/webview/hooks/useVSCode.ts
+@@ -28,7 +28,7 @@ let vscodeApiInstance: VSCodeAPI | null = null;
+  * Get VS Code API instance
+  * Uses module-level cache to ensure acquireVsCodeApi() is only called once
+  */
+-function getVSCodeAPI(): VSCodeAPI {
++export function getVSCodeAPI(): VSCodeAPI {
+   if (vscodeApiInstance) {
+     return vscodeApiInstance;
+   }
+diff --git a/packages/vscode-ide-companion/src/webview/index.tsx b/packages/vscode-ide-companion/src/webview/index.tsx
+index 308a43350d..c59849fe5e 100644
+--- a/packages/vscode-ide-companion/src/webview/index.tsx
++++ b/packages/vscode-ide-companion/src/webview/index.tsx
+@@ -4,6 +4,8 @@
+  * SPDX-License-Identifier: Apache-2.0
+  */
+ 
++// First: routes daemon requests through the extension host where the webview cannot reach it.
++import './daemonFetchBridge.js';
+ import ReactDOM from 'react-dom/client';
+ import { EmbeddedApp } from './EmbeddedApp.js';
+ import { initializeWebviewLogger } from './hooks/useVSCode.js';
+diff --git a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts
+index f89982fadb..d91a0381ae 100644
+--- a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts
++++ b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts
+@@ -34,6 +34,7 @@ const {
+   mockQwenAgentManagerInstances,
+   mockClipboardWriteText,
+   mockEnvRemoteName,
++  mockEnvUiKind,
+   mockAsExternalUri,
+   mockProbePreAuthHostGateRejection,
+ } = vi.hoisted(() => ({
+@@ -114,6 +115,8 @@ const {
+   // `vscode.env.remoteName` is undefined in a local window and a string
+   // ('ssh-remote', 'dev-container', 'wsl', ...) in a remote one.
+   mockEnvRemoteName: { current: undefined as string | undefined },
++  // `vscode.env.uiKind`: 1 (Desktop) or 2 (Web, a browser-based host).
++  mockEnvUiKind: { current: 1 },
+   mockAsExternalUri: vi.fn(),
+   mockProbePreAuthHostGateRejection: vi.fn<
+     (daemonBaseUrl: string, externalAuthority: string) => Promise<boolean>
+@@ -213,10 +216,14 @@ vi.mock('vscode', () => ({
+     file: vi.fn((filePath: string) => ({ fsPath: filePath })),
+     parse: vi.fn((value: string) => ({ toString: () => value })),
+   },
++  UIKind: { Desktop: 1, Web: 2 },
+   env: {
+     get remoteName() {
+       return mockEnvRemoteName.current;
+     },
++    get uiKind() {
++      return mockEnvUiKind.current;
++    },
+     asExternalUri: mockAsExternalUri,
+     openExternal: mockOpenExternal,
+     clipboard: {
+@@ -526,6 +533,7 @@ beforeEach(() => {
+   mockClipboardWriteText.mockReset();
+   mockClipboardWriteText.mockResolvedValue(undefined);
+   mockEnvRemoteName.current = undefined;
++  mockEnvUiKind.current = 1;
+   mockAsExternalUri.mockReset();
+   mockProbePreAuthHostGateRejection.mockReset();
+   mockProbePreAuthHostGateRejection.mockResolvedValue(false);
+@@ -2650,6 +2658,25 @@ describe('WebViewProvider web-shell daemon bootstrap', () => {
+     expect(mockAsExternalUri).not.toHaveBeenCalled();
+   });
+ 
++  it('bridges daemon requests through the extension host in a browser-based host', async () => {
++    // Theia, code-server, VS Code for the Web: the webview runs in the user's
++    // browser, cannot reach this machine's loopback, and has no port forwarding.
++    mockEnvUiKind.current = 2;
++    mockEnvRemoteName.current = 'theia';
++    const setup = await setupAttachedProvider({
++      captureMessageHandler: true,
++      context: createSharedContext(),
++    });
++
++    await setup.messageHandler?.({ type: 'webShellReady' });
++
++    const [bootstrap] = bootstrapPayloads(setup.postMessage);
++    expect(bootstrap?.baseUrl).toBe('http://127.0.0.1:4101');
++    expect(bootstrap?.daemonBridge).toBe(true);
++    expect(mockAsExternalUri).not.toHaveBeenCalled();
++    expect(mockProbePreAuthHostGateRejection).not.toHaveBeenCalled();
++  });
++
+   it('re-resolves the tunnel on every bootstrap instead of caching it', async () => {
+     mockEnvRemoteName.current = 'dev-container';
+     mockAsExternalUri
+diff --git a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
+index 2a720f5b9d..f452d5e3c3 100644
+--- a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
++++ b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
+@@ -45,6 +45,10 @@ import {
+ } from '../../services/qwenDaemonProcess.js';
+ import { isLoopbackHostname } from '../../services/daemonIdeConnection.js';
+ import { probePreAuthHostGateRejection } from './preAuthHostGateProbe.js';
++import {
++  DaemonFetchBridge,
++  shouldBridgeDaemon,
++} from '../../services/daemonFetchBridge.js';
+ 
+ /** Threshold (ms) before a completed task triggers a notification. */
+ const LONG_TASK_THRESHOLD_MS = 20_000;
+@@ -145,6 +149,11 @@ export class WebViewProvider {
+   private agentInitialized = false; // Track if agent has been initialized
+   private isSyncingToVSCode = false; // Guard to prevent config change loop
+   private readonly webShellPermissionOwners = new Map<vscode.Webview, string>();
++  // Browser-based hosts: the webview reaches the daemon through this bridge.
++  private bridgedDaemonBaseUrl: string | undefined;
++  private readonly daemonFetchBridge = new DaemonFetchBridge(
++    () => this.bridgedDaemonBaseUrl,
++  );
+   // Track current ACP mode id to influence permission/diff behavior
+   private currentModeId: ApprovalModeValue | null = null;
+   private authState: boolean | null = null;
+@@ -1766,6 +1775,9 @@ export class WebViewProvider {
+     message: { type: string; data?: unknown },
+     webview: vscode.Webview,
+   ): Promise<boolean> {
++    if (this.daemonFetchBridge.handle(message, webview)) {
++      return true;
++    }
+     if (message.type === 'webShellPermissionState') {
+       const data = message.data as
+         | { pending?: unknown; requestId?: unknown }
+@@ -1899,9 +1911,13 @@ export class WebViewProvider {
+         const restoredSessionId = this.isViewHost
+           ? viewSessionId
+           : serializedSessionId;
+-        const webviewBaseUrl = await this.resolveWebviewDaemonBaseUrl(
+-          runtime.baseUrl,
+-        );
++        // In a browser-based host the webview cannot reach this machine's
++        // loopback; it sends daemon requests through the extension host.
++        const daemonBridge = shouldBridgeDaemon();
++        this.bridgedDaemonBaseUrl = daemonBridge ? runtime.baseUrl : undefined;
++        const webviewBaseUrl = daemonBridge
++          ? runtime.baseUrl
++          : await this.resolveWebviewDaemonBaseUrl(runtime.baseUrl);
+         // A remote window whose client-side forwarded port differs from the
+         // daemon's bound port gets a pre-auth 403 from the Host gate on every
+         // daemon call — bootstrapping would hand the shell a baseUrl whose
+@@ -1911,6 +1927,7 @@ export class WebViewProvider {
+         // browser can never read the 403; the extension host can, and the
+         // probe never rejects.
+         if (
++          !daemonBridge &&
+           vscode.env.remoteName &&
+           (await probePreAuthHostGateRejection(
+             runtime.baseUrl,
+@@ -1928,6 +1945,7 @@ export class WebViewProvider {
+           data: {
+             ...runtime,
+             baseUrl: webviewBaseUrl,
++            daemonBridge,
+             clientId: this.daemonClientId,
+             workspaceCwd: canonicalWorkspaceCwd,
+             // The daemon matches workspaces by canonical path, but every
+@@ -2610,6 +2628,7 @@ export class WebViewProvider {
+    * Dispose the WebView provider and clean up resources
+    */
+   dispose(): void {
++    this.daemonFetchBridge.dispose();
+     if (WebViewProvider.lastContextMenuProvider === this) {
+       WebViewProvider.lastContextMenuProvider = null;
+     }

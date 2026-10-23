@@ -1,8 +1,8 @@
 /**
  * Code changes of our own, kept as patch files in mariadb/patches/ (each starts with a short
  * explanation). They are written against the pristine upstream files and applied before the
- * other rules. A patch that no longer applies stops the run: upstream changed that code, and
- * the patch must be redone against it.
+ * other rules, with a three-way merge, so upstream edits next to a patched line merge on their
+ * own. A real conflict stops the run, and the patch must be redone against the new code.
  */
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -36,7 +36,12 @@ export function apply() {
     .filter((f) => f.endsWith('.patch'))
     .sort()) {
     const patch = path.join(dir, name);
-    if (gitApply([], patch)) count('patches');
-    else failures.push(`patch ${name} no longer applies to the upstream code`);
+    // --3way: when upstream changed neighbouring lines, merge using the blobs the patch records;
+    // stop only on a real conflict (left as conflict markers for redoing the patch).
+    if (gitApply(['--3way'], patch)) count('patches');
+    else
+      failures.push(
+        `patch ${name} conflicts with the upstream code; redo it (see mariadb/README.md)`,
+      );
   }
 }
