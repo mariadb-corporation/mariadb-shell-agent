@@ -72,14 +72,30 @@
   },
   {
     "check": "qwenlm-url",
-    "file": "(^|/)README\\.md$",
+    "file": "(^|/)[Rr][Ee][Aa][Dd][Mm][Ee]\\.md$",
     "text": "built by MariaDB on\\s*$|\\[Qwen Code\\]\\(https://github\\.com/QwenLM/qwen-code\\)",
     "reason": "Our READMEs credit the upstream project."
   },
   {
     "check": "product-name",
-    "file": "(^|/)README\\.md$",
+    "file": "(^|/)[Rr][Ee][Aa][Dd][Mm][Ee]\\.md$",
     "text": "\\[Qwen Code\\]|upstream Qwen Code",
     "reason": "Our READMEs credit the upstream project."
+  },
+  {
+    "check": "product-name",
+    "text": "Modified by Qwen Code: display-only formatItemName",
+    "file": ".",
+    "reason": "License notice in a bundled third-party library crediting upstream's modifications (see its NOTICE)."
+  },
+  {
+    "check": "qwenlm-url",
+    "file": "node_modules/@qwen-code/audio-capture/package\\.json$",
+    "reason": "Upstream's published native microphone backend, installed from npm when packaging; only its package metadata names upstream."
+  },
+  {
+    "check": "product-name",
+    "file": "node_modules/@qwen-code/audio-capture/package\\.json$",
+    "reason": "Upstream's published native microphone backend, installed from npm when packaging; only its package metadata names upstream."
   }
 ]
