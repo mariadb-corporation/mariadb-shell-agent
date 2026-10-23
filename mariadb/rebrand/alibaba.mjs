@@ -219,6 +219,53 @@ export function apply() {
     ['packages/cli/src', 'packages/core/src'],
     [[/(usageStatisticsEnabled\s*\?\?\s*)true\b/g, '$1false']],
   );
+  // Standalone entry points resolve the default through their own helper.
+  patch(
+    'telemetry default (resolver)',
+    'packages/core/src/telemetry/config.ts',
+    /(settingsValue \?\?\s*)true\b/,
+    '$1false',
+    (t) => /settingsValue \?\?\s*false\b/.test(t),
+  );
+  // Even when a user opts in, nothing names Alibaba: a neutral, unresolvable endpoint and no
+  // Alibaba analytics app id.
+  patch(
+    'telemetry endpoint',
+    'packages/core/src/telemetry/qwen-logger/qwen-logger.ts',
+    /const USAGE_STATS_HOSTNAME = '[^']*';/,
+    "const USAGE_STATS_HOSTNAME = 'usage-statistics.invalid';",
+    (t) =>
+      t.includes("const USAGE_STATS_HOSTNAME = 'usage-statistics.invalid';"),
+  );
+  replaceInTracked(
+    'telemetry endpoint',
+    ['packages/core/src/telemetry/qwen-logger'],
+    [
+      [
+        /gb4w8c3ygj-default-sea\.rum\.aliyuncs\.(?:com|invalid)/g,
+        'usage-statistics.invalid',
+      ],
+      // NO_PROXY suffix test of the upload host.
+      [/'\.rum\.aliyuncs\.(?:com|invalid)'/g, "'.invalid'"],
+    ],
+  );
+  patch(
+    'telemetry app id',
+    'packages/core/src/telemetry/qwen-logger/qwen-logger.ts',
+    /const RUN_APP_ID = '[^']*';/,
+    "const RUN_APP_ID = '';",
+    (t) => t.includes("const RUN_APP_ID = '';"),
+  );
+
+  // loadCliConfig's table test asserts the default; it now asserts ours.
+  patch(
+    'telemetry default test',
+    'packages/cli/src/config/config.test.ts',
+    "['defaults to enabled', undefined, undefined, true],",
+    "['defaults to disabled', undefined, undefined, false],",
+    (t) => t.includes("['defaults to disabled', undefined, undefined, false],"),
+  );
+
   replaceInTracked(
     'auto-update default',
     ['packages/cli/src'],

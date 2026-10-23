@@ -38,6 +38,12 @@ const CHECKS = [
     re: /\((?:[\w-]+\|)*(?:qwen|QWEN)(?:\|[\w-]+)*\)\\\.(?:md|MD)|\\\.\((?:[\w-]+\|)*qwen(?:\|[\w-]+)*\)/g,
   },
   { id: 'product-name', re: /\bQwen Code\b/g },
+  {
+    // Identifiers sent to other parties (User-Agent, MCP client name, analytics app id) and the
+    // system-wide settings paths.
+    id: 'outbound-identity',
+    re: /\bQwenCode(?=\/|-Preconnect)|qwen-cli-mcp-client|\/etc\/qwen-code|Application Support\/QwenCode|ProgramData\\{1,2}qwen-code|gb4w8c3ygj/g,
+  },
 ];
 
 const TEXT_EXT =

@@ -16,6 +16,9 @@ const SKIPPED = [
       'packages/core/src/extension/extensionManager.test.ts': [
         'keeps usage statistics enabled by default when the option is omitted',
       ],
+      'packages/core/src/telemetry/config.test.ts': [
+        'defaults to true when neither env nor settings are set',
+      ],
     },
   },
   {

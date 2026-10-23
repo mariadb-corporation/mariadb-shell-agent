@@ -21,6 +21,7 @@ import * as paths from './rebrand/paths.mjs';
 import * as cliName from './rebrand/cli-name.mjs';
 import * as extensionIds from './rebrand/extension-ids.mjs';
 import * as review from './rebrand/review.mjs';
+import * as outbound from './rebrand/outbound.mjs';
 import * as skippedTests from './rebrand/skipped-tests.mjs';
 
 // Order matters where rules overlap: later rules see the output of earlier ones.
@@ -33,6 +34,7 @@ for (const rule of [
   cliName,
   extensionIds,
   review,
+  outbound,
   skippedTests,
 ])
   rule.apply();
