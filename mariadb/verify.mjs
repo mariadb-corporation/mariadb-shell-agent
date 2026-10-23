@@ -6,7 +6,7 @@
  *
  * 1. Runs the unit tests of the packages the rebrand touches (--quick: all but the CLI's).
  * 2. Reruns each failing test file on its own, to drop failures that only happen under load.
- * 3. Reruns what still fails against pristine upstream sources (temporarily checked out over the
+ * 3. Reruns what still fails against the pristine upstream sources main is built on (temporarily checked out over the
  *    working tree, then restored), so failures upstream has as well are not blamed on us.
  *
  * Needs a clean working tree (it restores from HEAD). Exits 1 if failures remain that only the
@@ -71,6 +71,9 @@ function failingTests(pkg, files = []) {
   return failed;
 }
 
+// The upstream commit main is built on (it can be older than upstream/main, see --to).
+const base = git('merge-base', 'HEAD', 'upstream/main');
+
 const filesOf = (tests) => [
   ...new Set([...tests].map((t) => t.split(' > ')[0])),
 ];
@@ -85,7 +88,7 @@ for (const pkg of packages) {
     continue;
   }
   // Same files on pristine upstream sources.
-  git('checkout', 'upstream/main', '--', '.', ':!mariadb');
+  git('checkout', base, '--', '.', ':!mariadb');
   let upstream;
   try {
     upstream = failingTests(
