@@ -1,0 +1,344 @@
+One system prompt opening for every interaction mode
+
+The opening sentence named the mode ('a non-interactive CLI agent', 'an
+interactive CLI agent', 'a CLI agent operating through an ACP host'), so
+headless, interactive and ACP prompts differed from character 24 on and
+shared no cached prefix. The opening now says 'a CLI agent' in every mode and
+the 'Interaction mode reminder' at the end names the mode; the modes now share
+about 99% of the prompt. A test pins that.
+
+diff --git a/packages/core/src/core/__snapshots__/prompts.test.ts.snap b/packages/core/src/core/__snapshots__/prompts.test.ts.snap
+index 91cf4ff0e0..405e0ad5e7 100644
+--- a/packages/core/src/core/__snapshots__/prompts.test.ts.snap
++++ b/packages/core/src/core/__snapshots__/prompts.test.ts.snap
+@@ -1,7 +1,7 @@
+ // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+ 
+ exports[`Core System Prompt (prompts.ts) > describes the bwrap filesystem boundary and distinguishes ordinary permissions 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -138,11 +138,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Core System Prompt (prompts.ts) > should append userMemory with separator when provided 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -278,7 +278,7 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options.
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options.
+ 
+ ---
+ 
+@@ -287,7 +287,7 @@ Be extra polite."
+ `;
+ 
+ exports[`Core System Prompt (prompts.ts) > should include git instructions when in a git repo 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -441,11 +441,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Core System Prompt (prompts.ts) > should include non-sandbox instructions when SANDBOX env var is not set 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -581,11 +581,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Core System Prompt (prompts.ts) > should include sandbox-specific instructions when SANDBOX env var is set 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -721,11 +721,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Core System Prompt (prompts.ts) > should include seatbelt-specific instructions when SANDBOX env var is "sandbox-exec" 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -861,11 +861,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Core System Prompt (prompts.ts) > should not include git instructions when not in a git repo 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -1001,11 +1001,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Core System Prompt (prompts.ts) > should return the base prompt when no userMemory is provided 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -1141,11 +1141,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Core System Prompt (prompts.ts) > should return the base prompt when userMemory is empty string 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -1281,11 +1281,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Core System Prompt (prompts.ts) > should return the base prompt when userMemory is whitespace only 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -1421,11 +1421,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Model-specific tool call formats > should preserve model-specific formats with sandbox environment 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -1586,11 +1586,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Model-specific tool call formats > should preserve model-specific formats with user memory 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -1817,7 +1817,7 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options.
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options.
+ 
+ ---
+ 
+@@ -1825,7 +1825,7 @@ User prefers concise responses."
+ `;
+ 
+ exports[`Model-specific tool call formats > should use JSON format for qwen-vl model 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -1986,11 +1986,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Model-specific tool call formats > should use XML format for qwen3-coder model 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -2217,11 +2217,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Model-specific tool call formats > should use bracket format for generic models 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -2357,11 +2357,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Model-specific tool call formats > should use bracket format when no model is specified 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -2497,11 +2497,11 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+ 
+ exports[`Model-specific tool call formats > should use native Gemma 4 format for gemma4 models 1`] = `
+-"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
++"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+ 
+ # Core Mandates
+ 
+@@ -2637,5 +2637,5 @@ Added the tests; the project's test command passed.
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
++Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
+ `;
+diff --git a/packages/core/src/core/prompts.test.ts b/packages/core/src/core/prompts.test.ts
+index 1945b04f70..0e859ef2a9 100644
+--- a/packages/core/src/core/prompts.test.ts
++++ b/packages/core/src/core/prompts.test.ts
+@@ -151,7 +151,7 @@ describe('Core System Prompt (prompts.ts)', () => {
+   function expectBasePrompt(prompt: string, ...more: string[]) {
+     expect(prompt).not.toContain('---\n\n');
+     expectText(prompt, [
+-      'You are Qwen Code, an interactive CLI agent',
++      'You are Qwen Code, a CLI agent',
+       ...more,
+     ]);
+     expect(prompt).toMatchSnapshot();
+@@ -250,12 +250,32 @@ describe('Core System Prompt (prompts.ts)', () => {
+     'aligns the system prompt with %s mode',
+     (mode, role, questionGuidance) => {
+       expectText(unsandboxed({ mode }), [
+-        `You are Qwen Code, ${role}`,
++        'You are Qwen Code, a CLI agent developed by',
++        `Interaction mode reminder: You are running as ${role}.`,
+         questionGuidance,
+       ]);
+     },
+   );
+ 
++  it('shares one prompt prefix across interaction modes, for prompt caching', () => {
++    const prompts = (['interactive', 'headless', 'acp'] as const).map((mode) =>
++      unsandboxed({ mode }),
++    );
++    const common = (a: string, b: string) => {
++      let i = 0;
++      while (i < a.length && a[i] === b[i]) i++;
++      return i;
++    };
++    const shared = Math.min(
++      common(prompts[0]!, prompts[1]!),
++      common(prompts[0]!, prompts[2]!),
++    );
++    // Only the closing interaction-mode reminder and the tool examples
++    // differ; a provider's prompt cache can reuse everything before them.
++    const shortest = Math.min(...prompts.map((p) => p.length));
++    expect(shared).toBeGreaterThan(shortest * 0.95);
++  });
++
+   it('does not tell headless runs to wait for user input', () => {
+     vi.mocked(isGitRepository).mockReturnValue(true);
+     const prompt = unsandboxed({ mode: 'headless' });
+@@ -409,7 +429,7 @@ describe('Core System Prompt (prompts.ts)', () => {
+     const memory = 'This is custom user memory.\nBe extra polite.';
+     const prompt = unsandboxed({ memory });
+     expect(prompt.endsWith(`\n\n---\n\n${memory}`)).toBe(true);
+-    expect(prompt).toContain('You are Qwen Code, an interactive CLI agent'); // Ensure base prompt follows
++    expect(prompt).toContain('You are Qwen Code, a CLI agent'); // Ensure base prompt follows
+     expect(prompt).toMatchSnapshot();
+   });
+ 
+diff --git a/packages/core/src/core/prompts.ts b/packages/core/src/core/prompts.ts
+index 8d8dab48ea..be75f936c0 100644
+--- a/packages/core/src/core/prompts.ts
++++ b/packages/core/src/core/prompts.ts
+@@ -541,9 +541,12 @@ When you create a todo list:
+   // A QWEN_SYSTEM_IDENTITY_MD override is inserted verbatim, so the styled
+   // variant applies only to the default identity sentence — the override is
+   // distributor-owned wording we must not rewrite.
++  // The opening sentence is the same in every interaction mode, so headless,
++  // interactive and ACP sessions share their cached prompt prefix; the mode
++  // itself is named in the "Interaction mode reminder" at the end.
+   const coreIdentity =
+     resolveCoreIdentityOverride() ??
+-    getDefaultCoreIdentitySentence(interaction.role, Boolean(outputStyle));
++    getDefaultCoreIdentitySentence('a CLI agent', Boolean(outputStyle));
+ 
+   const toolGuidance = getToolGuidanceSection(
+     codeModeOnly,
+@@ -682,7 +685,7 @@ ${codeModeOnly ? codeModeToolCallExamples : filterToolCallExamples(getToolCallEx
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: ${interaction.questions}
++Interaction mode reminder: You are running as ${interaction.role}. ${interaction.questions}
+ `.trim();
+ }
+ 

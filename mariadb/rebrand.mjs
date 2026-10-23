@@ -13,6 +13,7 @@
  * with an error naming the rule instead of silently leaving Qwen branding in the build.
  */
 import { changed, failures, stats } from './rebrand/lib.mjs';
+import * as patches from './rebrand/patches.mjs';
 import * as identity from './rebrand/identity.mjs';
 import * as productName from './rebrand/product-name.mjs';
 import * as artwork from './rebrand/artwork.mjs';
@@ -26,6 +27,7 @@ import * as skippedTests from './rebrand/skipped-tests.mjs';
 
 // Order matters where rules overlap: later rules see the output of earlier ones.
 for (const rule of [
+  patches,
   identity,
   productName,
   artwork,

@@ -1,0 +1,91 @@
+Stable paths in the system prompt's context-file markers
+
+The '--- Context from: <path> ---' markers used path.relative(cwd, file), so a
+file under the home directory read '../../../../.qwen/...' and the system
+prompt differed per working directory, defeating provider prompt caching for
+everything after it. The markers now use the same display form as the
+announced context-file list: relative inside the CWD, '~/...' under home.
+
+diff --git a/packages/core/src/memory/memoryDiscovery.test.ts b/packages/core/src/memory/memoryDiscovery.test.ts
+index 570f7c009f..9c8cb9112b 100644
+--- a/packages/core/src/memory/memoryDiscovery.test.ts
++++ b/packages/core/src/memory/memoryDiscovery.test.ts
+@@ -130,7 +130,7 @@ describe('loadServerHierarchicalMemory', () => {
+       );
+ 
+       expect(fileCount).toEqual(1);
+-      expect(memoryContent).toContain(path.relative(cwd, filepath).toString());
++      expect(memoryContent).toContain(formatContextFileDisplayPath(filepath, cwd, homedir).toString());
+     });
+   });
+ 
+@@ -247,7 +247,7 @@ describe('loadServerHierarchicalMemory', () => {
+     );
+ 
+     expect(result).toEqual({
+-      memoryContent: `--- Context from: ${path.relative(cwd, defaultContextFile)} ---\ndefault context content\n--- End of Context from: ${path.relative(cwd, defaultContextFile)} ---`,
++      memoryContent: `--- Context from: ${formatContextFileDisplayPath(defaultContextFile, cwd, homedir)} ---\ndefault context content\n--- End of Context from: ${formatContextFileDisplayPath(defaultContextFile, cwd, homedir)} ---`,
+       fileCount: 1,
+       contextFilePaths: [
+         path.join('~', path.relative(homedir, defaultContextFile)),
+@@ -276,7 +276,7 @@ describe('loadServerHierarchicalMemory', () => {
+     );
+ 
+     expect(result).toEqual({
+-      memoryContent: `--- Context from: ${path.relative(cwd, customContextFile)} ---\ncustom context content\n--- End of Context from: ${path.relative(cwd, customContextFile)} ---`,
++      memoryContent: `--- Context from: ${formatContextFileDisplayPath(customContextFile, cwd, homedir)} ---\ncustom context content\n--- End of Context from: ${formatContextFileDisplayPath(customContextFile, cwd, homedir)} ---`,
+       fileCount: 1,
+       contextFilePaths: [
+         path.join('~', path.relative(homedir, customContextFile)),
+@@ -442,7 +442,7 @@ describe('loadServerHierarchicalMemory', () => {
+ 
+     // Subdirectory files are not loaded, only global and upward from CWD
+     expect(result).toEqual({
+-      memoryContent: `--- Context from: ${path.relative(cwd, defaultContextFile)} ---\ndefault context content\n--- End of Context from: ${path.relative(cwd, defaultContextFile)} ---\n\n--- Context from: ${path.relative(cwd, rootMemoryFile)} ---\nProject parent memory\n--- End of Context from: ${path.relative(cwd, rootMemoryFile)} ---\n\n--- Context from: ${path.relative(cwd, projectRootMemoryFile)} ---\nProject root memory\n--- End of Context from: ${path.relative(cwd, projectRootMemoryFile)} ---\n\n--- Context from: ${path.relative(cwd, cwdMemoryFile)} ---\nCWD memory\n--- End of Context from: ${path.relative(cwd, cwdMemoryFile)} ---`,
++      memoryContent: `--- Context from: ${formatContextFileDisplayPath(defaultContextFile, cwd, homedir)} ---\ndefault context content\n--- End of Context from: ${formatContextFileDisplayPath(defaultContextFile, cwd, homedir)} ---\n\n--- Context from: ${path.relative(cwd, rootMemoryFile)} ---\nProject parent memory\n--- End of Context from: ${path.relative(cwd, rootMemoryFile)} ---\n\n--- Context from: ${path.relative(cwd, projectRootMemoryFile)} ---\nProject root memory\n--- End of Context from: ${path.relative(cwd, projectRootMemoryFile)} ---\n\n--- Context from: ${path.relative(cwd, cwdMemoryFile)} ---\nCWD memory\n--- End of Context from: ${path.relative(cwd, cwdMemoryFile)} ---`,
+       fileCount: 4,
+       contextFilePaths: [
+         path.join('~', path.relative(homedir, defaultContextFile)),
+diff --git a/packages/core/src/memory/memoryDiscovery.ts b/packages/core/src/memory/memoryDiscovery.ts
+index d57eafb101..1afd65b459 100644
+--- a/packages/core/src/memory/memoryDiscovery.ts
++++ b/packages/core/src/memory/memoryDiscovery.ts
+@@ -388,19 +388,22 @@ function concatenateInstructions(
+   instructionContents: MemoryFileContent[],
+   // CWD is needed to resolve relative paths for display markers
+   currentWorkingDirectoryForDisplay: string,
++  userHomePath?: string,
+ ): string {
+   return instructionContents
+     .filter(hasAttachedContent)
+     .map((item) => {
+       const trimmedContent = (item.content as string).trim();
+-      // Sanitize the marker path: paths under attacker-influenceable
+-      // directory names could otherwise forge or hide entries in the
+-      // `/context` parser (newline/control chars break its line-oriented
+-      // markers), contradicting the sanitized announcement surface.
+-      const displayPath = stripAnsiAndControl(
+-        path.isAbsolute(item.filePath)
+-          ? path.relative(currentWorkingDirectoryForDisplay, item.filePath)
+-          : item.filePath,
++      // The same display form as the announced list: relative inside the
++      // CWD, `~/...` for files under the home directory. A cwd-relative
++      // `../../..` chain would make the system prompt differ per working
++      // directory and defeat provider prompt caching. The helper also
++      // sanitizes the path: names under attacker-influenceable directories
++      // could otherwise forge or hide entries in the `/context` parser.
++      const displayPath = formatContextFileDisplayPath(
++        item.filePath,
++        currentWorkingDirectoryForDisplay,
++        userHomePath,
+       );
+       return `--- Context from: ${displayPath} ---\n${trimmedContent}\n--- End of Context from: ${displayPath} ---`;
+     })
+@@ -600,6 +603,7 @@ export async function loadServerHierarchicalMemory(
+     combinedInstructions = concatenateInstructions(
+       contentsWithPaths,
+       currentWorkingDirectory,
++      userHomePath,
+     );
+ 
+     // Only count files that match configured memory filenames (e.g., QWEN.md),
