@@ -33,6 +33,8 @@ const PHRASE_DIRS = [
   'packages/vscode-ide-companion',
   'packages/web-shell',
   'packages/web-templates',
+  // Regenerates packages/vscode-ide-companion/schemas/settings.schema.json on install.
+  'scripts/generate-settings-schema.ts',
 ];
 const PHRASE_EXTENSIONS = new Set([
   '.ts',
