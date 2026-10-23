@@ -80,6 +80,18 @@ const SKIPPED = [
   },
   {
     reason:
+      'No app-attribution headers for OpenRouter and Requesty (alibaba.mjs).',
+    tests: {
+      'packages/core/src/providers/__tests__/presets/openrouter.test.ts': [
+        'declares customHeaders for attribution',
+      ],
+      'packages/core/src/providers/__tests__/presets/requesty.test.ts': [
+        'declares customHeaders for attribution',
+      ],
+    },
+  },
+  {
+    reason:
       'No QwenLM endpoints (alibaba.mjs): web fetch does not pre-approve QwenLM GitHub.',
     tests: {
       'packages/core/src/tools/web-fetch-preapproved.test.ts': [

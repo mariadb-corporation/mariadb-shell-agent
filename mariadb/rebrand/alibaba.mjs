@@ -153,6 +153,21 @@ export function apply() {
     '',
     (t) => !/id: '(?:qwencloud|alibaba)',/.test(t),
   );
+  // No app-attribution headers (upstream identifies itself as Qwen Code with a QwenLM link;
+  // OpenRouter publishes app rankings from them).
+  for (const file of [
+    'packages/core/src/providers/presets/openrouter.ts',
+    'packages/core/src/providers/presets/requesty.ts',
+  ]) {
+    patch(
+      'attribution headers',
+      file,
+      /\n {2}customHeaders: \{\n[^}]*\n {2}\},/,
+      '',
+      (t) => !t.includes('customHeaders:'),
+    );
+  }
+
   for (const file of [
     'packages/cli/src/ui/auth/AuthDialog.tsx',
     'packages/cli/src/ui/opentui/dialogs-auth.tsx',
