@@ -36,9 +36,15 @@ export function apply() {
       .replace(/^\.qwen\//, `${CONFIG_DIR}/`);
     if (to !== file) rename('config file names', file, to);
   }
-  replaceInTracked('config paths', [...SHIPPED_DIRS, '.qwen'], PAIRS, {
-    extensions: CODE_EXTENSIONS,
-  });
+  // eslint.config.js ignores the repository's project directory.
+  replaceInTracked(
+    'config paths',
+    [...SHIPPED_DIRS, '.qwen', 'eslint.config.js'],
+    PAIRS,
+    {
+      extensions: CODE_EXTENSIONS,
+    },
+  );
   replaceInTracked(
     'config paths',
     [...SHIPPED_DIRS, ...DOCS_DIRS, '.qwen'],
