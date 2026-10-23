@@ -1,7 +1,16 @@
 /** Icons, favicons, the Web Shell brand mark and the terminal banner, plus tests pinning them. */
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { assets, copyAsset, exists, failures, patch, write } from './lib.mjs';
+import {
+  assets,
+  copyAsset,
+  exists,
+  failures,
+  patch,
+  patchJson,
+  write,
+} from './lib.mjs';
 
 function svgDataUri(svg) {
   return `data:image/svg+xml,${encodeURIComponent(svg.trim())}`;
@@ -21,11 +30,40 @@ export function apply() {
     'icon-blue.png',
     'packages/vscode-ide-companion/assets/icon-blue.png',
   );
-  // Activity bar: the MariaDB Code mark (designed for it; monochrome, the IDE tints it).
+  // Activity bar: the MariaDB Code mark (designed for it; monochrome, the IDE tints it). It is
+  // shipped under a content-hashed name: VS Code caches the icon by URL, and installing the same
+  // extension version again would keep showing the previous artwork.
   copyAsset(
     'mariadb-code-ext.svg',
     'packages/vscode-ide-companion/assets/sidebar-icon.svg',
   );
+  {
+    const svg = fs.readFileSync(path.join(assets, 'mariadb-code-ext.svg'));
+    const hash = crypto
+      .createHash('sha256')
+      .update(svg)
+      .digest('hex')
+      .slice(0, 8);
+    const icon = `assets/activity-bar-${hash}.svg`;
+    write(`packages/vscode-ide-companion/${icon}`, svg.toString('utf8'));
+    patchJson(
+      'activity bar icon',
+      'packages/vscode-ide-companion/package.json',
+      (pkg) => {
+        const c = pkg.contributes ?? {};
+        const entries = [
+          ...(c.viewsContainers?.activitybar ?? []),
+          ...Object.values(c.views ?? {}).flat(),
+        ].filter((e) =>
+          /^assets\/(?:sidebar-icon|activity-bar-[0-9a-f]+)\.svg$/.test(
+            e.icon ?? '',
+          ),
+        );
+        if (entries.length === 0) return false;
+        for (const e of entries) e.icon = icon;
+      },
+    );
+  }
 
   // Web Shell: PWA icons, notification icon, favicon and the sidebar brand mark.
   copyAsset('app-icon.svg', 'packages/web-shell/client/public/assets/icon.svg');
