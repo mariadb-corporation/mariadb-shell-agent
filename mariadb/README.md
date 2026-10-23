@@ -100,6 +100,9 @@ plugin:mariadb-code` unpacks the newest universal build into `plugins/`, then `n
 
 ## Icons
 
-`mariadb/assets/` holds the icons, made from the MariaDB seal in
-`../mariadb-shell/docs-ref/build/img/mariadb-logo-light.png` (traced to `seal-mono.svg`):
-`app-icon.svg` (white seal on MariaDB dark teal `#003545`) and the PNG renders of it.
+`mariadb/assets/` holds the artwork:
+
+- `mariadb-code-ext.svg`: the activity-bar icon (monochrome; VS Code and Theia tint it to the theme).
+- `app-icon.svg` and its PNG renders: the extension and Web Shell icon, a white MariaDB seal on dark
+  teal `#003545`, made from `../mariadb-shell/docs-ref/build/img/mariadb-logo-light.png`.
+- `seal-mono.svg`: the traced seal (favicon of exported HTML transcripts).
