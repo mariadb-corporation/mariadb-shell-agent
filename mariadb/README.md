@@ -62,6 +62,20 @@ upstream/main (or an older upstream commit, see --to)
   isolation and then against the pristine upstream sources, and reports only the failures the
   branding causes.
 
+## Code changes of our own
+
+Changes to upstream behaviour that text rules can't express live as patch files in
+`mariadb/patches/` (each starts with a short explanation). They are written against the pristine
+upstream files and applied first, before the branding rules. When one no longer applies, the sync
+stops: redo the change on the new upstream code (`git diff` of the edited files, then the
+explanation on top) and commit the new patch.
+
+- `0001-stable-context-file-paths.patch`: `~/…` paths in the system prompt's context-file markers
+- `0002-mode-neutral-prompt-opening.patch`: one system prompt opening for headless, interactive and
+  ACP mode (prompt caching across modes)
+
+These are good candidates for upstream pull requests, which would retire the patches.
+
 ## Remotes
 
 | Remote     | URL                                             | Use                        |
