@@ -28,8 +28,10 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 - **Own code changes = patch files** in `mariadb/patches/` (explanation text above the first
   `diff --git`), written against pristine upstream, applied first with `git apply --3way`, only on a
   pristine tree (skipped when the extension manifest already has publisher `MariaDB`). A real conflict
-  stops the sync; redo the patch against the new code. Create one by editing pristine sources and
-  `git diff` (new files via `git add -N`).
+  stops the sync; redo the patch against the new code. Create one on pristine sources with the earlier
+  patches applied and staged (`git apply --3way` stages them), edit, then `git diff` against that index
+  (new files via `git add -N`); stage the result before writing the next patch. In zsh pass file lists
+  as arrays (`F=(a b); git diff -- "${F[@]}"`), a plain variable is not split into words.
   - `0001` context-file markers in the system prompt use `~/…` for home files (were cwd-relative).
   - `0002` one system prompt opening ("a CLI agent") for headless/interactive/ACP; the mode is named in
     the closing "Interaction mode reminder". Modes share ~99% of the prompt; a test pins it.
@@ -154,7 +156,7 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   commit: `alreadyDone` checks must tolerate reformatted output, and new code in patches must be
   lint-clean (curly braces, etc.); renamed directories need their `eslint.config.js` ignore entries renamed.
 - Text rules miss these spellings unless handled: property accesses (`x?.qwen`), string escapes before a
-  word (`\nqwen`, ` qwen`), regex back-references (`'$1.qwen'`), URL-encoded slashes (`%2F.qwen`),
+  word (`\nqwen`, `\u2028qwen`), regex back-references (`'$1.qwen'`), URL-encoded slashes (`%2F.qwen`),
   glued shell flags (`-o.qwen`), gitignore negations, regex alternations (`(AGENTS|QWEN)\.md`), escaped
   dots, upper/lower-case variants, words glued after sanitizing. Length-capped tests break on the longer
   names (adjust anchored numbers, don't skip).
@@ -170,3 +172,10 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   renders them blank, use Chrome (`channel: 'chrome'`). Locally the browser can reach the daemon anyway,
   so test the bridge by asserting zero direct browser requests to the daemon port.
 - The CLI bundle for quick tests: `npm run bundle` produces `dist/cli.js` (no `cli-entry.js`).
+- `.claude/` is ignored by upstream's `.gitignore`; its files are tracked, but changes need `git add -f`.
+- Measuring prompt caching: point a provider's `baseUrl` (in a temporary HOME's
+  `.mariadb-code/settings.json`) at a recording stub, run the CLI (`-p`, `--continue`, or `--acp` with a
+  small JSON-RPC client) to capture real requests, then replay them against the server with
+  `max_tokens: 1` and read `usage.prompt_tokens_details.cached_tokens`. Network behaviour: a Node
+  `--import` hook wrapping `dns.lookup` and `net.Socket.prototype.connect` logs every lookup and
+  connection.
