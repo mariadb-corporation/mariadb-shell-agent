@@ -137,7 +137,12 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
      `--continue` chains benefit).
    - Server findings: this model resumes only from saved states (end of system prompt + tools, start
      of the last message and of its final parts), so reuse snaps to those checkpoints; tool definitions
-     are rendered before the system prompt text.
+     are rendered before the system prompt text. The server keeps separate cache entries per prefix,
+     so memory extraction, headless and ACP requests no longer evict each other.
+   - A request that first differs inside the first user message (another directory of the project:
+     the cwd in the environment block; `--continue`: the missing date reminder) falls back to the
+     system + tools checkpoint. Asked the server side for checkpoints at part boundaries inside that
+     message; the prelude parts before the cwd/date are identical across directories and modes.
 2. Bridge the Web Shell WebSockets (terminal etc.) if the cloud IDE needs them.
 3. Patches 0001–0006 are candidates for upstream pull requests (QwenLM requires an approved issue
    first, small Conventional-Commits PRs, an E2E report comment; clean MariaDB wording and copyright
@@ -171,6 +176,7 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 - Theia webviews: open Theia on `localhost` (webviews use `<uuid>.webview.localhost`); Playwright's Firefox
   renders them blank, use Chrome (`channel: 'chrome'`). Locally the browser can reach the daemon anyway,
   so test the bridge by asserting zero direct browser requests to the daemon port.
+- macOS has no `timeout` command; bound test runs inside the Node script instead.
 - The CLI bundle for quick tests: `npm run bundle` produces `dist/cli.js` (no `cli-entry.js`).
 - `.claude/` is ignored by upstream's `.gitignore`; its files are tracked, but changes need `git add -f`.
 - Measuring prompt caching: point a provider's `baseUrl` (in a temporary HOME's
