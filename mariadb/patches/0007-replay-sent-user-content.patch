@@ -13,7 +13,7 @@ request. The memory catalog stays request-only, as before. Tool-result turns
 are not covered.
 
 diff --git a/packages/core/src/core/client.test.ts b/packages/core/src/core/client.test.ts
-index 60d0f4f6c7..bd38503b8c 100644
+index 60d0f4f6c7..a250602243 100644
 --- a/packages/core/src/core/client.test.ts
 +++ b/packages/core/src/core/client.test.ts
 @@ -12317,6 +12317,33 @@ Other open files:
@@ -38,7 +38,7 @@ index 60d0f4f6c7..bd38503b8c 100644
 +        const [sent, request, promptId] = recordSentUserContent.mock.calls[0]!;
 +        expect(request).toBe(recorded);
 +        expect(promptId).toBe('prompt-sent-content');
-+        expect(sent.at(-1)).toEqual({ text: 'Hi' });
++        expect(sent.at(-1)).toBe('Hi');
 +        expect(
 +          sent.some(
 +            (part: unknown) =>
@@ -50,23 +50,6 @@ index 60d0f4f6c7..bd38503b8c 100644
        it('passes a non-empty submitted prompt for UserQuery hooks', async () => {
          const mockMessageBus = promptSubmitBus({ output: undefined });
  
-@@ -14407,12 +14434,10 @@ Other open files:
-           .mockResolvedValue({ status: 'skipped', skippedReason: 'locked' });
-         const config = makeMockConfigForShutdown(
-           memoryManager({
--            scheduleMetadataMigration: vi
--              .fn()
--              .mockResolvedValue({
--                status: 'skipped',
--                skippedReason: 'complete',
--              }),
-+            scheduleMetadataMigration: vi.fn().mockResolvedValue({
-+              status: 'skipped',
-+              skippedReason: 'complete',
-+            }),
-             scheduleExtract,
-             scheduleDream,
-           }),
 diff --git a/packages/core/src/core/client.ts b/packages/core/src/core/client.ts
 index f7f346be46..53aab7011c 100644
 --- a/packages/core/src/core/client.ts
@@ -90,7 +73,7 @@ index f7f346be46..53aab7011c 100644
        pushInitiated = true;
        agentOutput.beginResponse();
 diff --git a/packages/core/src/services/chatRecordingService.test.ts b/packages/core/src/services/chatRecordingService.test.ts
-index aac11ed120..90e9f5ff3c 100644
+index aac11ed120..01ef9351df 100644
 --- a/packages/core/src/services/chatRecordingService.test.ts
 +++ b/packages/core/src/services/chatRecordingService.test.ts
 @@ -33,6 +33,7 @@ import {
@@ -101,7 +84,7 @@ index aac11ed120..90e9f5ff3c 100644
  import type { Content, Part } from '@google/genai';
  import type { FileDiff, McpAppResultDisplay } from '../tools/tools.js';
  import {
-@@ -404,6 +405,55 @@ describe('ChatRecordingService', () => {
+@@ -404,6 +405,51 @@ describe('ChatRecordingService', () => {
      });
    });
  
@@ -130,17 +113,13 @@ index aac11ed120..90e9f5ff3c 100644
 +          { recordedPart: 1 },
 +        ],
 +      });
-+      expect(
-+        buildApiHistoryFromConversation({ messages: [user, sent] }),
-+      ).toEqual([
-+        {
-+          role: 'user',
-+          parts: [
-+            { text: '<system-reminder>date</system-reminder>' },
-+            question,
-+            image,
-+          ],
-+        },
++      const [entry] = buildApiHistoryFromConversation({
++        messages: [user, sent],
++      });
++      expect(entry!.parts).toEqual([
++        { text: '<system-reminder>date</system-reminder>' },
++        question,
++        image,
 +      ]);
 +    });
 +
@@ -158,7 +137,7 @@ index aac11ed120..90e9f5ff3c 100644
      const hookText = [
        '<qwen:user-prompt-submit-context>',
 diff --git a/packages/core/src/services/chatRecordingService.ts b/packages/core/src/services/chatRecordingService.ts
-index 50d1c0ce48..9ff52ed188 100644
+index 50d1c0ce48..cdc79eb9ca 100644
 --- a/packages/core/src/services/chatRecordingService.ts
 +++ b/packages/core/src/services/chatRecordingService.ts
 @@ -28,6 +28,7 @@ import {
@@ -177,7 +156,17 @@ index 50d1c0ce48..9ff52ed188 100644
      | 'session_model'
      | 'session_approval_mode'
      | 'rewind'
-@@ -596,6 +598,15 @@ export interface NotificationRecordPayload {
+@@ -536,7 +538,8 @@ export interface ChatRecord {
+     | GoalTurnEndRecordPayload
+     | TurnResultRecordPayload
+     | AgentMessageRecordPayload
+-    | AgentMentionRecordPayload;
++    | AgentMentionRecordPayload
++    | SentUserContentRecordPayload;
+ 
+   /** Background subagent that produced this record (e.g. "explore-7f3c"). */
+   agentId?: string;
+@@ -596,6 +599,15 @@ export interface NotificationRecordPayload {
    };
  }
  
@@ -193,7 +182,7 @@ index 50d1c0ce48..9ff52ed188 100644
  export interface UserPromptRecordPayload {
    /**
     * Core/headless: submitted projection, otherwise expanded pre-hook text.
-@@ -3226,6 +3237,43 @@ export class ChatRecordingService {
+@@ -3226,6 +3238,43 @@ export class ChatRecordingService {
     * this record the transcript would never show what memory the model was
     * given — the trajectory exporter reads it back as `turn.recall`.
     */
@@ -396,6 +385,18 @@ index df4e8d304b..09b9094c24 100644
    'user_text_elements',
    'turn_result',
    'turn_attempt',
+diff --git a/packages/core/src/utils/transcript-records.test.ts b/packages/core/src/utils/transcript-records.test.ts
+index 825958810d..9ed4e00593 100644
+--- a/packages/core/src/utils/transcript-records.test.ts
++++ b/packages/core/src/utils/transcript-records.test.ts
+@@ -476,6 +476,7 @@ describe('validateTranscriptRecord', () => {
+     session_source: true,
+     session_execution_engine: true,
+     omni_recall: true,
++    sent_user_content: true,
+     session_model: true,
+     session_approval_mode: true,
+     rewind: true,
 diff --git a/packages/core/src/utils/transcript-records.ts b/packages/core/src/utils/transcript-records.ts
 index 99654e85ea..a1ec1ffff9 100644
 --- a/packages/core/src/utils/transcript-records.ts
