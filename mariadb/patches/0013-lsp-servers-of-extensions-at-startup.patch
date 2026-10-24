@@ -11,7 +11,7 @@ diff --git a/packages/core/src/config/config.test.ts b/packages/core/src/config/
 index 4ccc878378..eb2d6f1778 100644
 --- a/packages/core/src/config/config.test.ts
 +++ b/packages/core/src/config/config.test.ts
-@@ -5100,6 +5100,29 @@ describe('Server Config (config.ts)', () => {
+@@ -5100,6 +5100,26 @@ describe('Server Config (config.ts)', () => {
      await expect(lspConfig().reinitializeLsp()).resolves.toBeUndefined();
    });
  
@@ -24,10 +24,7 @@ index 4ccc878378..eb2d6f1778 100644
 +      }) as unknown as Extension;
 +    const reinitialize = vi.fn().mockResolvedValue(reconcile({}));
 +    const config = lspConfig({ reinitialize });
-+    const loaded = vi.spyOn(
-+      config.getExtensionManager(),
-+      'getLoadedExtensions',
-+    );
++    const loaded = vi.spyOn(config, 'getActiveExtensions');
 +
 +    loaded.mockReturnValue([extension()]);
 +    config.refreshLspAfterExtensionsLoaded();
