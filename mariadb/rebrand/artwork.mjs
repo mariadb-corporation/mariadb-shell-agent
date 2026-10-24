@@ -144,6 +144,57 @@ export function apply() {
     `"Press 'r' to restart"`,
     (t) => t.includes(`"Press 'r' to restart"`),
   );
+  // Web Shell welcome screen: the seal above "Welcome to MariaDB Code", and a tighter line spacing
+  // when that title wraps (narrow side panels).
+  {
+    const viewBox = sealMono.match(/viewBox="([^"]+)"/)[1];
+    const d = sealMono.match(/ d="([^"]+)"/)[1];
+    write(
+      'packages/web-shell/client/components/WelcomeSeal.tsx',
+      `/** The MariaDB seal (mariadb/assets/seal-mono.svg), in the text color. */\n` +
+        `export function WelcomeSeal({ className }: { className?: string }) {\n` +
+        `  return (\n` +
+        `    <svg className={className} viewBox="${viewBox}" aria-hidden="true">\n` +
+        `      <path\n` +
+        `        fill="currentColor"\n` +
+        `        fillRule="evenodd"\n` +
+        `        d="${d}"\n` +
+        `      />\n` +
+        `    </svg>\n` +
+        `  );\n` +
+        `}\n`,
+    );
+    patch(
+      'welcome seal',
+      'packages/web-shell/client/components/WelcomeHeader.tsx',
+      /(import styles from '\.\/WelcomeHeader\.module\.css';\n)([\s\S]*?<div className=\{styles\.header\}>\n)/,
+      (_, imp, body) =>
+        `${imp}import { WelcomeSeal } from './WelcomeSeal';\n${body}      <WelcomeSeal className={styles.seal} />\n`,
+      (t) => t.includes('<WelcomeSeal'),
+    );
+    patch(
+      'welcome title spacing',
+      'packages/web-shell/client/components/WelcomeHeader.module.css',
+      /(\.titleRow \{[^}]*?)gap: 0\.35em;([^}]*?)line-height: 40px;/,
+      (_, a, b) => `${a}gap: 0 0.35em;${b}line-height: 36px;`,
+      (t) => t.includes('gap: 0 0.35em;'),
+    );
+    patch(
+      'welcome title spacing (narrow)',
+      'packages/web-shell/client/components/WelcomeHeader.module.css',
+      /(\.titleRow \{\n {4}font-size: 26px;\n {4})line-height: 34px;/,
+      (_, a) => `${a}line-height: 30px;`,
+      (t) => t.includes('line-height: 30px;'),
+    );
+    patch(
+      'welcome seal style',
+      'packages/web-shell/client/components/WelcomeHeader.module.css',
+      /(\.subtitle \{[^}]*\}\n)/,
+      (_, a) =>
+        `${a}\n.seal {\n  width: 64px;\n  height: 64px;\n  color: var(--foreground);\n}\n`,
+      (t) => t.includes('.seal {'),
+    );
+  }
   {
     const logo = fs.readFileSync(path.join(assets, 'ascii-logo.txt'), 'utf8');
     patch(
