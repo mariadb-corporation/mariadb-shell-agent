@@ -1,7 +1,7 @@
 # MariaDB Code
 
 MariaDB Code is a fork of [Qwen Code](https://github.com/QwenLM/qwen-code) with MariaDB branding,
-including the VS Code extension (used in local VS Code and in `../mariadb-cloud-ide`). It follows
+including the VS Code extension (used in local VS Code and in `../mariadb-workbench`). It follows
 upstream closely: the fork is rebased onto upstream as soon as upstream moves.
 
 ## What differs from upstream
@@ -132,11 +132,11 @@ when the leak scan finds a new occurrence: extend a rule, or allowlist it with a
 ```sh
 corepack pnpm install --frozen-lockfile
 mariadb/build-vsix.sh             # this machine, e.g. mariadb/dist/mariadb-code-<v>-darwin-arm64.vsix
-mariadb/build-vsix.sh universal   # any platform, no node-pty: for the MariaDB Cloud IDE (Pi, arm64)
+mariadb/build-vsix.sh universal   # any platform, no node-pty: for the MariaDB Cloud Workbench (Pi, arm64)
 code --install-extension mariadb/dist/mariadb-code-<v>-darwin-arm64.vsix
 ```
 
-Each build is leak-scanned after packaging. In `../mariadb-cloud-ide`: `npm run
+Each build is leak-scanned after packaging. In `../mariadb-workbench`: `npm run
 plugin:mariadb-code` unpacks the newest universal build into `plugins/`, then `npm run deploy:pi`.
 
 ## Icons

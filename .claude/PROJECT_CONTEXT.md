@@ -4,7 +4,7 @@
 
 A fork of [Qwen Code](https://github.com/QwenLM/qwen-code) rebranded as **MariaDB Code**: the CLI
 (`mariadb-code`, short `mdbc`), the VS Code extension `MariaDB.mariadb-code` (used in desktop VS Code and
-in the Theia-based MariaDB Cloud IDE of the sibling `mariadb-cloud-ide` repository) and the daemon's Web
+in the Theia-based MariaDB Cloud Workbench of the sibling `mariadb-workbench` repository) and the daemon's Web
 Shell. The fork follows upstream closely (rebased as soon as upstream moves), ships no Alibaba endpoints and
 does not identify itself as Qwen Code to anyone. The maintenance workflow is documented for humans in
 `mariadb/README.md`.
@@ -96,8 +96,8 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   sources and reports only failures the fork causes (needs a clean tree; it `reset --hard`s).
   `mariadb/rebrand/skipped-tests.mjs` lists upstream tests of removed behaviour, grouped with reasons.
 - **Builds**: `mariadb/build-vsix.sh` (this machine, with node-pty) or `universal` (no node-pty; for the
-  Linux arm64 cloud IDE) → `mariadb/dist/`; it deletes the extension's `dist/` first (esbuild leaves stale
-  hashed chunks that would be packaged) and leak-scans the `.vsix`. In `mariadb-cloud-ide`,
+  Linux arm64 Cloud Workbench) → `mariadb/dist/`; it deletes the extension's `dist/` first (esbuild leaves stale
+  hashed chunks that would be packaged) and leak-scans the `.vsix`. In `mariadb-workbench`,
   `npm run plugin:mariadb-code` unpacks the newest universal build, `npm run deploy:pi` builds there.
 
 ## Current state
@@ -108,7 +108,7 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   daemon).
 - Known issues:
   - Upstream `main` sometimes does not compile (racing PRs); sync with `--to <last good rev>` until it does.
-  - Cloud IDE: terminal, live-browser, voice and local-files features need WebSockets the bridge does not
+  - Cloud Workbench: terminal, live-browser, voice and local-files features need WebSockets the bridge does not
     carry.
   - Theia stores view-container icon classes (`plugin-view-container-icon-<n>`, numbered by load order) in
     the browser's saved layout; after plugin changes icons can swap until F1 → Reset Workbench Layout.
@@ -152,12 +152,12 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
      drops reuse to an earlier checkpoint. Still by design: another directory of the same project
      differs at the cwd in the environment block (~75%); the first message after switching between
      headless and ACP is cold (different tool lists).
-2. Bridge the Web Shell WebSockets (terminal etc.) if the cloud IDE needs them.
+2. Bridge the Web Shell WebSockets (terminal etc.) if the Cloud Workbench needs them.
 3. Patches 0001–0008 are candidates for upstream pull requests (QwenLM requires an approved issue
    first, small Conventional-Commits PRs, an E2E report comment; clean MariaDB wording and copyright
    headers out first); accepted ones retire the patches.
 4. Sync with upstream `main` as soon as it builds again: `mariadb/sync-upstream.sh --verify --push`.
-5. Multi-user cloud IDE: one IDE instance per user (shared workspace, `~/.mariadb-code` and OS account
+5. Multi-user Cloud Workbench: one IDE instance per user (shared workspace, `~/.mariadb-code` and OS account
    otherwise); the bridge already works per extension host.
 
 ## Gotchas / things not to repeat

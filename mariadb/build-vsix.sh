@@ -2,7 +2,7 @@
 # Builds the MariaDB Code VS Code extension into mariadb/dist/.
 #
 #   mariadb/build-vsix.sh            # for this machine (e.g. darwin-arm64), with node-pty
-#   mariadb/build-vsix.sh universal  # any platform, without node-pty (MariaDB Cloud IDE on the Pi)
+#   mariadb/build-vsix.sh universal  # any platform, without node-pty (MariaDB Cloud Workbench on the Pi)
 #
 # node-pty is a native module and is only installed for the platform the build runs on, so
 # other platform-specific targets are not offered; use the universal build for them.

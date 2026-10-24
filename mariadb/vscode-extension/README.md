@@ -1,6 +1,6 @@
 # MariaDB Code Companion
 
-MariaDB Code inside Visual Studio Code (and Theia-based IDEs such as the MariaDB Cloud IDE): a chat
+MariaDB Code inside Visual Studio Code (and Theia-based IDEs such as the MariaDB Cloud Workbench): a chat
 panel, native diffs and workspace context for the MariaDB Code agent. The extension bundles the
 MariaDB Code CLI, so nothing else needs to be installed.
 
