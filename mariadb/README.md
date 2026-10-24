@@ -84,6 +84,8 @@ explanation on top) and commit the new patch.
 - `0007-replay-sent-user-content.patch`: the transcript also records each prompt as it was sent
   (with the date, plan-mode, output-style and memory-recall reminders and the IDE context), and
   `--continue`/resume replays it unchanged, so a resumed session keeps the prompt cache
+- `0008-catalog-stays-in-place.patch`: the auto-memory catalog stays in history with the message it
+  was first sent with (a new copy only when it changes) instead of moving to every newest message
 
 These are good candidates for upstream pull requests, which would retire the patches.
 
