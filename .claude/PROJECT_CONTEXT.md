@@ -107,7 +107,12 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 - **Artwork**: app icon = white MariaDB seal on `#003545` (`mariadb/assets/app-icon.svg` + PNGs); activity
   bar = `mariadb/assets/mariadb-code-ext.svg`, shipped as `assets/activity-bar-<sha8>.svg` because VS Code
   caches icons by URL and a same-version reinstall would keep the old one; MARIADB ASCII banner in
-  `mariadb/assets/ascii-logo.txt`.
+  `mariadb/assets/ascii-logo.txt`. Web Shell welcome screen (artwork rule): `WelcomeSeal.tsx` is
+  generated from `mariadb/assets/seal-mono.svg` and shown above the title (text color), the wrapped
+  title has no row gap; the product name uses mariadb.com's "Agentic Enterprise" gradient
+  (`--agent-logo-gradient` in `App.module.css`: `.themeDark` #51d9f7 → #8ce786 → #cdf70a, `.themeLight`
+  #0093c4 → #00a37a → #5c9f00, saturated shades with at least 3:1 contrast on white; the originals
+  are unreadable there).
 - **Checks**: `mariadb/check-leaks.mjs [paths|.vsix]` scans source or build output for old names, Alibaba
   and QwenLM hosts, outbound identifiers; exceptions with reasons in `mariadb/leak-allowlist.json`.
   `mariadb/verify.mjs [--quick]` runs vitest in vscode-ide-companion, web-shell, acp-bridge,
