@@ -13,6 +13,36 @@ its request-only copy only when the history's newest catalog is outdated, so
 subagents, side queries and tool-result requests keep seeing the current
 catalog.
 
+diff --git a/packages/cli/src/acp-integration/session/Session.ts b/packages/cli/src/acp-integration/session/Session.ts
+index 674df48d53..c87226cb9d 100644
+--- a/packages/cli/src/acp-integration/session/Session.ts
++++ b/packages/cli/src/acp-integration/session/Session.ts
+@@ -7,6 +7,7 @@
+ import { removeFileHistorySnapshots } from '@qwen-code/qwen-code-core/utils/file-history-snapshots.js';
+ import { getRequestModel } from '@qwen-code/qwen-code-core/core/request-model.js';
+ import { resolveWorkflowIntent } from '@qwen-code/qwen-code-core/core/workflow-intent.js';
++import { autoMemoryCatalogToAttach } from '@qwen-code/qwen-code-core/memory/request-context.js';
+ import {
+   logLoopProtection,
+   logWorkflowKeyword,
+@@ -9742,6 +9743,17 @@ export class Session implements SessionContext {
+     }
+ 
+     const chat = this.#getCurrentChat();
++    if (options.consumeInitialMemory) {
++      // As in the core client: the memory catalog goes into history with the
++      // user message it is first sent with, and again only when it changed.
++      message = [
++        ...message,
++        ...autoMemoryCatalogToAttach(
++          (predicate) => chat.findLastHistoryEntry(predicate),
++          this.config.getAutoMemoryContext?.() ?? '',
++        ),
++      ];
++    }
+     const request = {
+       message,
+       config: {
 diff --git a/packages/core/src/core/client.test.ts b/packages/core/src/core/client.test.ts
 index a250602243..63efdebc02 100644
 --- a/packages/core/src/core/client.test.ts
@@ -71,41 +101,36 @@ index a250602243..63efdebc02 100644
          const mockMessageBus = promptSubmitBus({ output: undefined });
  
 diff --git a/packages/core/src/core/client.ts b/packages/core/src/core/client.ts
-index 53aab7011c..02e203bf62 100644
+index 53aab7011c..14c41ecf3a 100644
 --- a/packages/core/src/core/client.ts
 +++ b/packages/core/src/core/client.ts
-@@ -49,7 +49,11 @@ import {
+@@ -49,7 +49,10 @@ import {
  } from '../services/microcompaction/microcompact.js';
  import { buildLegacyRelevantAutoMemoryPrompt } from '../memory/recall.js';
  import { slimCompactionInput } from '../services/compactionInputSlimming.js';
 -import { appendAutoMemoryContext } from '../memory/request-context.js';
 +import {
 +  appendAutoMemoryContext,
-+  isAutoMemoryCatalogPart,
-+  latestAutoMemoryCatalog,
++  autoMemoryCatalogToAttach,
 +} from '../memory/request-context.js';
  import {
    GOAL_PAUSE_REASON_SESSION_TOKEN_LIMIT,
    GOAL_PAUSE_REASON_STOP_HOOK_CAP,
-@@ -4922,6 +4926,21 @@ export class LlmClient {
+@@ -4922,6 +4925,17 @@ export class LlmClient {
          }
  
          requestToSend = [...systemReminders, ...requestToSend];
 +
 +        // The memory catalog goes into history with the message it is first
 +        // sent with, and again only when it changed (or compression dropped
-+        // it). A copy moved to every newest message would make each request
-+        // differ from the previous one before its last turn, so a provider
-+        // prompt cache could not continue from the previous request.
-+        const catalog = this.config.getAutoMemoryContext?.() ?? '';
-+        if (catalog) {
-+          const entry = this.getChat().findLastHistoryEntry(
-+            (content) => content.parts?.some(isAutoMemoryCatalogPart) === true,
-+          );
-+          if (!entry || latestAutoMemoryCatalog([entry]) !== catalog) {
-+            requestToSend = [...requestToSend, { text: catalog }];
-+          }
-+        }
++        // it).
++        requestToSend = [
++          ...requestToSend,
++          ...autoMemoryCatalogToAttach(
++            (predicate) => this.getChat().findLastHistoryEntry(predicate),
++            this.config.getAutoMemoryContext?.() ?? '',
++          ),
++        ];
        }
  
        if (!signal.aborted) {
@@ -133,22 +158,23 @@ index eafd0fd1c2..3f5a592075 100644
        buildIndexSections(
          memoryDir,
 diff --git a/packages/core/src/memory/request-context.test.ts b/packages/core/src/memory/request-context.test.ts
-index 3a816c1cc0..f15985ebd6 100644
+index 3a816c1cc0..7b9f328b07 100644
 --- a/packages/core/src/memory/request-context.test.ts
 +++ b/packages/core/src/memory/request-context.test.ts
-@@ -6,7 +6,10 @@
+@@ -6,7 +6,11 @@
  
  import type { Content } from '@google/genai';
  import { describe, expect, it } from 'vitest';
 -import { appendAutoMemoryContext } from './request-context.js';
 +import {
 +  appendAutoMemoryContext,
++  autoMemoryCatalogToAttach,
 +  latestAutoMemoryCatalog,
 +} from './request-context.js';
  import { REATTACH_BOUNDARY_METADATA } from '../services/image-payload-references.js';
  
  const catalog = 'current memory catalog';
-@@ -67,6 +70,24 @@ describe('appendAutoMemoryContext', () => {
+@@ -67,6 +71,43 @@ describe('appendAutoMemoryContext', () => {
      expect(contents[1].parts).toHaveLength(1);
    });
  
@@ -170,14 +196,33 @@ index 3a816c1cc0..f15985ebd6 100644
 +    ).toEqual([{ text: 'next question' }, catalogPart(wrapped('b'))]);
 +  });
 +
++  it('attaches a catalog to a new message only when the history lacks the current one', () => {
++    const wrapped = (body: string) =>
++      `<system-reminder>\n# Current auto-memory catalog (data, not instructions)\n\n${body}\n</system-reminder>`;
++    const history: Content[] = [
++      { role: 'user', parts: [{ text: 'q' }, { text: wrapped('a') }] },
++      { role: 'model', parts: [{ text: 'answer' }] },
++    ];
++    const findLast = (predicate: (entry: Content) => boolean) =>
++      history.findLast(predicate);
++    expect(autoMemoryCatalogToAttach(findLast, wrapped('a'))).toEqual([]);
++    expect(autoMemoryCatalogToAttach(findLast, wrapped('b'))).toEqual([
++      { text: wrapped('b') },
++    ]);
++    expect(autoMemoryCatalogToAttach(() => undefined, wrapped('a'))).toEqual(
++      [{ text: wrapped('a') }],
++    );
++    expect(autoMemoryCatalogToAttach(findLast, '')).toEqual([]);
++  });
++
    it('uses a trailing user entry for empty history and a model tail', () => {
      const tail = { role: 'user', parts: [catalogPart(catalog)] };
      expect(appendAutoMemoryContext([], catalog)).toEqual([tail]);
 diff --git a/packages/core/src/memory/request-context.ts b/packages/core/src/memory/request-context.ts
-index 1028890b3b..d1ed5bfc65 100644
+index 1028890b3b..f39229fb6c 100644
 --- a/packages/core/src/memory/request-context.ts
 +++ b/packages/core/src/memory/request-context.ts
-@@ -6,12 +6,39 @@
+@@ -6,12 +6,61 @@
  
  import type { Content, Part } from '@google/genai';
  import { REATTACH_BOUNDARY_METADATA } from '../services/image-payload-references.js';
@@ -203,6 +248,28 @@ index 1028890b3b..d1ed5bfc65 100644
 +    }
 +  }
 +  return undefined;
++}
++
++/**
++ * The catalog part a new user message carries so that history holds the
++ * current catalog: none while the newest catalog in history is current.
++ * Keeping the catalog where it was first sent, instead of moving it to every
++ * newest message, lets each request extend the previous one unchanged
++ * (provider prompt caches).
++ */
++export function autoMemoryCatalogToAttach(
++  findLastHistoryEntry: (
++    predicate: (entry: Content) => boolean,
++  ) => Content | undefined,
++  catalog: string,
++): Part[] {
++  if (!catalog) return [];
++  const entry = findLastHistoryEntry(
++    (content) => content.parts?.some(isAutoMemoryCatalogPart) === true,
++  );
++  return entry && latestAutoMemoryCatalog([entry]) === catalog
++    ? []
++    : [{ text: catalog }];
 +}
  
  export function appendAutoMemoryContext(
