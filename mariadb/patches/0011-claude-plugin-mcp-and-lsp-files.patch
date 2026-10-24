@@ -1,0 +1,104 @@
+Claude plugins: MCP servers from an .mcp.json path, LSP servers from a root .lsp.json
+
+A plugin.json that names its MCP servers file ("mcpServers": "./.mcp.json")
+got the whole file as its server map, so the servers ended up nested under
+one server called "mcpServers"; the file's own `mcpServers` object is used
+now (a plain map of servers still works). Claude Code also reads a root
+`.lsp.json` when plugin.json declares no lspServers; the converter now
+records that file, so the plugin's LSP servers load (with --experimental-lsp).
+
+diff --git a/packages/core/src/extension/claude-converter.test.ts b/packages/core/src/extension/claude-converter.test.ts
+index 75cb072b35..f30cc096f5 100644
+--- a/packages/core/src/extension/claude-converter.test.ts
++++ b/packages/core/src/extension/claude-converter.test.ts
+@@ -1042,6 +1042,46 @@ describe('convertClaudePluginStandalone', () => {
+     expect(exists(result.convertedDir, 'skills', 'leak.txt')).toBe(false);
+   });
+ 
++  it('reads the servers of an mcpServers file in the .mcp.json format', async () => {
++    writeRepo(
++      { name: 'dev', version: '1.0.0', mcpServers: './.mcp.json' },
++      {
++        '.mcp.json': JSON.stringify({
++          mcpServers: { mariadb: { command: 'launcher', args: [] } },
++        }),
++      },
++    );
++
++    const result = await convertStandalone(testDir);
++    expect(Object.keys(result.config.mcpServers ?? {})).toEqual(['mariadb']);
++    expect(mcpServer(result, 'mariadb')).toMatchObject({ command: 'launcher' });
++  });
++
++  it('uses a root .lsp.json when plugin.json declares no lspServers', async () => {
++    writeRepo(
++      { name: 'dev', version: '1.0.0' },
++      {
++        '.lsp.json': JSON.stringify({
++          mariadb: { command: 'lsp', extensionToLanguage: { '.sql': 'sql' } },
++        }),
++      },
++    );
++
++    const result = await convertStandalone(testDir);
++    expect(result.config.lspServers).toBe('./.lsp.json');
++    expect(exists(result.convertedDir, '.lsp.json')).toBe(true);
++  });
++
++  it('keeps declared lspServers over a root .lsp.json', async () => {
++    writeRepo(
++      { name: 'dev', version: '1.0.0', lspServers: './lsp/servers.json' },
++      { '.lsp.json': '{}', 'lsp/servers.json': '{}' },
++    );
++
++    const result = await convertStandalone(testDir);
++    expect(result.config.lspServers).toBe('./lsp/servers.json');
++  });
++
+   it('skips a .mcp.json that has no mcpServers object instead of misparsing it', async () => {
+     // No `mcpServers` key — the whole object must not be treated as the map.
+     writeRepo(
+diff --git a/packages/core/src/extension/claude-converter.ts b/packages/core/src/extension/claude-converter.ts
+index 5763b35976..e6353b866e 100644
+--- a/packages/core/src/extension/claude-converter.ts
++++ b/packages/core/src/extension/claude-converter.ts
+@@ -623,10 +623,16 @@ export async function buildQwenExtensionFromPlugin(
+     if (mcpServersPath && fs.existsSync(mcpServersPath)) {
+       try {
+         const mcpContent = fs.readFileSync(mcpServersPath, 'utf-8');
+-        mergedConfig.mcpServers = JSON.parse(mcpContent) as Record<
+-          string,
+-          MCPServerConfig
+-        >;
++        const parsed = JSON.parse(mcpContent) as Record<string, unknown>;
++        // A Claude `.mcp.json` wraps the servers in an `mcpServers` object;
++        // a plain map of servers is accepted as well.
++        const servers =
++          parsed?.['mcpServers'] &&
++          typeof parsed['mcpServers'] === 'object' &&
++          !Array.isArray(parsed['mcpServers'])
++            ? parsed['mcpServers']
++            : parsed;
++        mergedConfig.mcpServers = servers as Record<string, MCPServerConfig>;
+       } catch (error) {
+         debugLogger.warn(
+           `Failed to parse MCP servers file ${mcpServersPath}: ${error instanceof Error ? error.message : String(error)}`,
+@@ -635,6 +641,18 @@ export async function buildQwenExtensionFromPlugin(
+     }
+   }
+ 
++  // Claude Code reads LSP servers from a root `.lsp.json` when plugin.json
++  // declares none; the installed copy is read through the same path.
++  if (!mergedConfig.lspServers) {
++    const lspJsonPath = path.join(pluginSource, '.lsp.json');
++    if (
++      fs.existsSync(lspJsonPath) &&
++      realPathWithin(lspJsonPath, pluginSource)
++    ) {
++      mergedConfig.lspServers = './.lsp.json';
++    }
++  }
++
+   const tmpDir = await ExtensionStorage.createTmpDir();
+ 
+   try {

@@ -90,6 +90,9 @@ explanation on top) and commit the new patch.
 - `0009-calm-composer.patch`: no aura or glow around the focused composer and on the send button;
   the send button shows the execute bolt of the MariaDB VS Code extension instead of an arrow
 - `0010-no-open-button-in-editor-toolbars.patch`: no "MariaDB Code: Open" button in editor title bars
+- `0011-claude-plugin-mcp-and-lsp-files.patch`: Claude plugins whose plugin.json names an `.mcp.json`
+  get its servers (were nested under one server called `mcpServers`), and a root `.lsp.json` is used
+  when plugin.json declares no LSP servers
 
 These are good candidates for upstream pull requests, which would retire the patches.
 
