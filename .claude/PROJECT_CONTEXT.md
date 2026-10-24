@@ -28,10 +28,14 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 - **Own code changes = patch files** in `mariadb/patches/` (explanation text above the first
   `diff --git`), written against pristine upstream, applied first with `git apply --3way`, only on a
   pristine tree (skipped when the extension manifest already has publisher `MariaDB`). A real conflict
-  stops the sync; redo the patch against the new code. Create one on pristine sources with the earlier
-  patches applied and staged (`git apply --3way` stages them), edit, then `git diff` against that index
-  (new files via `git add -N`); stage the result before writing the next patch. In zsh pass file lists
-  as arrays (`F=(a b); git diff -- "${F[@]}"`), a plain variable is not split into words.
+  stops the sync; redo the patch against the new code. Write a new patch in a separate worktree, not in
+  the branded tree: `git worktree add --detach <dir> <upstream base>`, apply all existing patches with
+  `git apply --3way` (stages them), edit, then `git diff` against that index (new files via
+  `git add -N`) above the explanation text; prettier only the touched files and check the diff has no
+  unrelated reformatting. Then commit the patch in `mariadb/` and run `mariadb/sync-upstream.sh`. For a
+  quick test before that, `git apply` the plain diff to the branded tree and `git checkout -- packages`
+  afterwards. A hand-edited `.patch` needs its `@@` line counts adjusted. In zsh pass file lists as
+  arrays (`F=(a b); git diff -- "${F[@]}"`), a plain variable is not split into words.
   - `0001` context-file markers in the system prompt use `~/…` for home files (were cwd-relative).
   - `0002` one system prompt opening ("a CLI agent") for headless/interactive/ACP; the mode is named in
     the closing "Interaction mode reminder". Modes share ~99% of the prompt; a test pins it.
@@ -59,6 +63,21 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
     carry the current one (`autoMemoryCatalogToAttach` in `memory/request-context.ts`, used by
     `client.ts` and ACP `Session.ts` on fresh user turns), so it stays where it was first sent;
     `appendAutoMemoryContext` adds its request-only copy only when history's newest catalog is outdated.
+  - `0009` web-shell composer: no dotted aura/halo around the focused composer (`.dacAura`, `.dacHalo`
+    hidden), no glow on the send button, whose arrow is the execute bolt of the MariaDB VS Code
+    extension in `currentColor` (`SendIcon` in `ChatEditor.tsx`).
+  - `0010` no "Open" button (`openChat`) in editor title bars.
+  - `0011` Claude plugin conversion: a plugin.json `mcpServers` file path in `.mcp.json` format is
+    unwrapped (servers were nested under one server named `mcpServers`); a root `.lsp.json` becomes
+    `lspServers` when plugin.json declares none (Claude Code's convention).
+  - `0012` extension setting `mariadb-code.experimentalLsp` (off by default) adds `--experimental-lsp`
+    to the daemon (`serve`) and ACP spawns; the flag is the CLI's only LSP switch.
+  - `0013` LSP discovery runs in `loadCliConfig` before `Config.initialize()` loads extensions, so
+    extension LSP servers were never found at startup; `initialize()` now calls
+    `refreshLspAfterExtensionsLoaded()` (background `reinitializeLsp`, not awaited: server startup can
+    take minutes).
+  - `0014` extension `.lsp.json` entries with `extensionToLanguage` are keyed by server name (Claude
+    format); a project's own `.lsp.json` stays keyed by language.
 - **Alibaba removal (`alibaba.mjs`)**:
   - Alibaba-run hosts (aliyuncs, aliyun, alibabacloud, alibaba-inc, qwen.ai/.com, qwencloud(api),
     modelscope, …) get TLD `.invalid` in shipped code, tests and docs (also escaped regex spellings,
@@ -153,7 +172,8 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
      differs at the cwd in the environment block (~75%); the first message after switching between
      headless and ACP is cold (different tool lists).
 2. Bridge the Web Shell WebSockets (terminal etc.) if the Cloud Workbench needs them.
-3. Patches 0001–0008 are candidates for upstream pull requests (QwenLM requires an approved issue
+3. Patches 0001–0008 and 0011–0014 are candidates for upstream pull requests (0009/0010 are product
+   choices) (QwenLM requires an approved issue
    first, small Conventional-Commits PRs, an E2E report comment; clean MariaDB wording and copyright
    headers out first); accepted ones retire the patches.
 4. Sync with upstream `main` as soon as it builds again: `mariadb/sync-upstream.sh --verify --push`.
@@ -186,6 +206,15 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   renders them blank, use Chrome (`channel: 'chrome'`). Locally the browser can reach the daemon anyway,
   so test the bridge by asserting zero direct browser requests to the daemon port.
 - macOS has no `timeout` command; bound test runs inside the Node script instead.
+- Claude plugins install from a local clone used as marketplace: `extensions install <repo>:<plugin>
+  --consent` (MariaDB's `ai-plugins` repo: plugin `dev`). Hooks come from `hooks/hooks.json`, a `Bash`
+  matcher matches `run_shell_command` (tool-name aliases), `${CLAUDE_PLUGIN_ROOT}` is substituted. The
+  plugin's MCP/LSP launchers need `mariadb-shell` ≥ the version in `.mcp.json`; when missing they
+  download it, which exceeds the 10 s MCP startup timeout: run the launcher once by hand. Check with
+  `mcp list` and `--experimental-lsp -p "/lsp status"`.
+- The bundled Linux arm64 ripgrep (upstream `packages/core/vendor/ripgrep`, static, jemalloc) crashes on
+  16 KiB-page kernels such as the Raspberry Pi 5; the CLI falls back to a system `rg` (apt `ripgrep`),
+  else to its built-in grep.
 - The CLI bundle for quick tests: `npm run bundle` produces `dist/cli.js` (no `cli-entry.js`).
 - `.claude/` is ignored by upstream's `.gitignore`; its files are tracked, but changes need `git add -f`.
 - Measuring prompt caching: point a provider's `baseUrl` (in a temporary HOME's
