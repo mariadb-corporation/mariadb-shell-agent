@@ -1,0 +1,22 @@
+No "Open" button in editor toolbars
+
+The extension put its "Open" command (the product icon) into the title bar
+of every editor. The view is reached from the activity bar (or the secondary
+side bar) and the command palette, so the editor toolbars stay free of it.
+The diff accept/cancel buttons stay.
+
+diff --git a/packages/vscode-ide-companion/package.json b/packages/vscode-ide-companion/package.json
+index d996131d97..f66edff823 100644
+--- a/packages/vscode-ide-companion/package.json
++++ b/packages/vscode-ide-companion/package.json
+@@ -173,10 +173,6 @@
+           "command": "qwen.diff.cancel",
+           "when": "qwen.diff.isVisible",
+           "group": "navigation"
+-        },
+-        {
+-          "command": "qwen-code.openChat",
+-          "group": "navigation"
+         }
+       ]
+     },

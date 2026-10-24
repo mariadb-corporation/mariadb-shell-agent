@@ -89,6 +89,7 @@ explanation on top) and commit the new patch.
   also in ACP sessions
 - `0009-calm-composer.patch`: no aura or glow around the focused composer and on the send button;
   the send button shows the execute bolt of the MariaDB VS Code extension instead of an arrow
+- `0010-no-open-button-in-editor-toolbars.patch`: no "MariaDB Code: Open" button in editor title bars
 
 These are good candidates for upstream pull requests, which would retire the patches.
 
