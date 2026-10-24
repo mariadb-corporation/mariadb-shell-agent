@@ -39,6 +39,14 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
     messages; `src/services/daemonFetchBridge.ts` forwards only to the daemon's origin and streams the
     response back. Desktop windows are unchanged. Web Shell features with their own WebSockets
     (terminal, live browser, voice, local files) are not bridged.
+  - `0004` the main session's "Interaction mode reminder" is the first part of the startup prelude
+    (`getMainSessionInteractionModeReminder`, option `interactionModeReminderInPrelude`) instead of
+    the end of the system prompt; Arena agents keep it in the system prompt, prompt overrides get none.
+  - `0005` `getFunctionDeclarations`: revealed deferred tools follow the name-sorted rest in reveal
+    order (a `tool_search` reveal only appends).
+  - `0006` managed-memory extraction and dream start after 10 idle seconds in interactive and ACP
+    sessions (`QWEN_CODE_MEMORY_EXTRACT_IDLE_MS`); a new question restarts the wait; headless runs
+    start them at once; a pending start is dropped on shutdown.
 - **Alibaba removal (`alibaba.mjs`)**:
   - Alibaba-run hosts (aliyuncs, aliyun, alibabacloud, alibaba-inc, qwen.ai/.com, qwencloud(api),
     modelscope, …) get TLD `.invalid` in shipped code, tests and docs (also escaped regex spellings,
@@ -113,20 +121,25 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 
 ## Next steps
 
-1. Prompt-cache feedback from the local LLM server side, remaining points:
-   - memory extraction (`scheduleExtract` after each user turn in `packages/core/src/core/client.ts`)
-     must not run in parallel with the next main request: run when idle, debounce; keep its prompt
-     byte-identical; keep `memory.enableManagedAutoMemory` on by default;
-   - tools revealed via `tool_search` are inserted into the name-sorted declaration list
-     (`ToolRegistry.getFunctionDeclarations`); append them at the end instead;
-   - prelude order (point 2): upstream deliberately puts the deferred-tools reminder last (pinned by an
-     upstream test); decide from server captures whether the environment block (date + full folder
-     structure) or the deferred-tools list changes more often before changing it;
+1. Prompt caching, open points (with the local LLM server side):
+   - cross-mode reuse needs an identical tool list in every mode; headless mode leaves out tools that
+     need approval (6 vs 13 in ACP, 16 in the extension) and the system prompt gates guidance on the
+     declared tools. Declaring all tools and refusing at call time would change headless behaviour; not
+     done;
+   - prelude order: upstream deliberately puts the deferred-tools reminder last (pinned by an upstream
+     test); decide from server captures whether the environment block (date + full folder structure)
+     or the deferred-tools list changes more often before changing it;
    - possibly move the per-project memory directory path out of the middle of the auto-memory section;
-     resumed sessions (`--continue`) rebuild history without the per-turn reminders.
+   - resumed sessions (`--continue`) rebuild history without the per-turn reminders sent before;
+     persisting and replaying them was judged not worth the transcript-format change (only CLI
+     `--continue` chains benefit).
+   - Server findings: this model resumes only from saved states (end of system prompt + tools, start
+     of the last message and of its final parts), so reuse snaps to those checkpoints; tool definitions
+     are rendered before the system prompt text.
 2. Bridge the Web Shell WebSockets (terminal etc.) if the cloud IDE needs them.
-3. Offer patches 0001–0003 upstream as pull requests (AGENTS.md has upstream's PR rules); accepted ones
-   retire the patches.
+3. Patches 0001–0006 are candidates for upstream pull requests (QwenLM requires an approved issue
+   first, small Conventional-Commits PRs, an E2E report comment; clean MariaDB wording and copyright
+   headers out first); accepted ones retire the patches.
 4. Sync with upstream `main` as soon as it builds again: `mariadb/sync-upstream.sh --verify --push`.
 5. Multi-user cloud IDE: one IDE instance per user (shared workspace, `~/.mariadb-code` and OS account
    otherwise); the bridge already works per extension host.

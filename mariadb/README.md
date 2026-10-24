@@ -73,6 +73,14 @@ explanation on top) and commit the new patch.
 - `0001-stable-context-file-paths.patch`: `~/…` paths in the system prompt's context-file markers
 - `0002-mode-neutral-prompt-opening.patch`: one system prompt opening for headless, interactive and
   ACP mode (prompt caching across modes)
+- `0003-daemon-bridge-for-browser-ides.patch`: in browser-based IDEs (Theia, code-server) the webview
+  reaches the daemon through the extension host instead of the browser's own loopback
+- `0004-mode-reminder-in-prelude.patch`: the main session's interaction-mode reminder moves from the
+  system prompt into the startup prelude, so the system prompt is identical in every mode
+- `0005-append-revealed-tools.patch`: tools revealed via `tool_search` are appended to the tools block
+  instead of sorted into it
+- `0006-idle-memory-extraction.patch`: memory extraction and dream wait for an idle session (10 s,
+  `MARIADB_CODE_MEMORY_EXTRACT_IDLE_MS`) instead of running in parallel with the next question
 
 These are good candidates for upstream pull requests, which would retire the patches.
 
