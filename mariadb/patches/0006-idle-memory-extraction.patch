@@ -1,0 +1,272 @@
+Memory extraction and dream wait for an idle session
+
+Managed auto-memory extraction and dream started right after every answer.
+They are model calls of their own, so they ran in parallel with the user's
+next question (on a single-stream local server both decoded at a fraction
+of their speed) and their side prompt could take the conversation's place in
+a provider's prompt cache. Where a next question can come (interactive and
+ACP sessions) they now start only after the session has been idle for 10
+seconds (QWEN_CODE_MEMORY_EXTRACT_IDLE_MS; MARIADB_CODE_MEMORY_EXTRACT_IDLE_MS
+in MariaDB Code); a new question restarts the wait, and the next idle period
+covers both turns (extraction resumes from its cursor). Headless runs start
+them right away as before. A pending start is dropped on shutdown, like any
+new background memory work.
+
+diff --git a/packages/core/src/core/client.test.ts b/packages/core/src/core/client.test.ts
+index a5fa560c02..60d0f4f6c7 100644
+--- a/packages/core/src/core/client.test.ts
++++ b/packages/core/src/core/client.test.ts
+@@ -14396,6 +14396,91 @@ Other open files:
+       expect(scheduleDreamSpy).not.toHaveBeenCalled();
+     });
+ 
++    describe('idle wait before extraction and dream', () => {
++      const setup = (interactive: boolean) => {
++        const scheduleExtract = vi.fn().mockResolvedValue({
++          touchedTopics: [],
++          cursor: { sessionId: 'sess', updatedAt: new Date().toISOString() },
++        });
++        const scheduleDream = vi
++          .fn()
++          .mockResolvedValue({ status: 'skipped', skippedReason: 'locked' });
++        const config = makeMockConfigForShutdown(
++          memoryManager({
++            scheduleMetadataMigration: vi
++              .fn()
++              .mockResolvedValue({
++                status: 'skipped',
++                skippedReason: 'complete',
++              }),
++            scheduleExtract,
++            scheduleDream,
++          }),
++        );
++        vi.mocked(config.isInteractive).mockReturnValue(interactive);
++        const client = new LlmClient(config);
++        (
++          client as unknown as { getHistoryShallow: () => unknown[] }
++        ).getHistoryShallow = () => [];
++        const turnDone = () =>
++          (
++            client as unknown as {
++              runManagedAutoMemoryBackgroundTasks: (t: SendMessageType) => void;
++            }
++          ).runManagedAutoMemoryBackgroundTasks(SendMessageType.UserQuery);
++        const newQuestion = () =>
++          (
++            client as unknown as { clearPendingManagedMemoryRun: () => void }
++          ).clearPendingManagedMemoryRun();
++        return {
++          client,
++          scheduleExtract,
++          scheduleDream,
++          turnDone,
++          newQuestion,
++        };
++      };
++
++      beforeEach(() => vi.useFakeTimers());
++      afterEach(() => vi.useRealTimers());
++
++      it('starts right away in a headless run', () => {
++        const { scheduleExtract, scheduleDream, turnDone } = setup(false);
++        turnDone();
++        expect(scheduleExtract).toHaveBeenCalledTimes(1);
++        expect(scheduleDream).toHaveBeenCalledTimes(1);
++      });
++
++      it('waits for an idle session when a next question can come', () => {
++        const { scheduleExtract, scheduleDream, turnDone } = setup(true);
++        turnDone();
++        expect(scheduleExtract).not.toHaveBeenCalled();
++        vi.advanceTimersByTime(10_000);
++        expect(scheduleExtract).toHaveBeenCalledTimes(1);
++        expect(scheduleDream).toHaveBeenCalledTimes(1);
++      });
++
++      it('lets a new question restart the wait, then covers both turns once', () => {
++        const { scheduleExtract, turnDone, newQuestion } = setup(true);
++        turnDone();
++        vi.advanceTimersByTime(5_000);
++        newQuestion();
++        vi.advanceTimersByTime(10_000);
++        expect(scheduleExtract).not.toHaveBeenCalled();
++        turnDone();
++        vi.advanceTimersByTime(10_000);
++        expect(scheduleExtract).toHaveBeenCalledTimes(1);
++      });
++
++      it('starts nothing once shutdown is requested during the wait', () => {
++        const { client, scheduleExtract, turnDone } = setup(true);
++        turnDone();
++        client.requestShutdown();
++        vi.advanceTimersByTime(10_000);
++        expect(scheduleExtract).not.toHaveBeenCalled();
++      });
++    });
++
+     /**
+      * C2: requestShutdown() is idempotent — calling it multiple times
+      * should not throw or have side effects.
+@@ -14571,6 +14656,7 @@ function makeMockConfigForShutdown(
+     isBareMode: vi.fn().mockReturnValue(false),
+     getLlmClient: vi.fn().mockReturnValue(undefined),
+     getProjectRoot: vi.fn().mockReturnValue('/project'),
++    getExperimentalZedIntegration: vi.fn().mockReturnValue(false),
+     getSessionId: vi.fn().mockReturnValue('session-1'),
+     getMemoryManager: vi.fn().mockReturnValue(mgr),
+     getManagedAutoMemoryEnabled: vi.fn().mockReturnValue(true),
+diff --git a/packages/core/src/core/client.ts b/packages/core/src/core/client.ts
+index a39998a680..f7f346be46 100644
+--- a/packages/core/src/core/client.ts
++++ b/packages/core/src/core/client.ts
+@@ -3277,50 +3277,95 @@ export class LlmClient {
+       return;
+     }
+ 
+-    const sessionId = this.config.getSessionId();
+-    const history = this.getHistoryShallow();
+-    const extractPromise = mgr
+-      .scheduleExtract({
+-        projectRoot,
+-        sessionId,
+-        history,
+-        config: this.config,
+-      })
+-      .then((result) => result.touchedTopics.length)
+-      .catch((error: unknown) => {
+-        debugLogger.warn(
+-          'Failed to schedule managed auto-memory extraction.',
+-          error,
+-        );
+-        return 0;
+-      });
+-    this.pendingMemoryTaskPromises.push(extractPromise);
++    const run = () => {
++      const sessionId = this.config.getSessionId();
++      const history = this.getHistoryShallow();
++      const extractPromise = mgr
++        .scheduleExtract({
++          projectRoot,
++          sessionId,
++          history,
++          config: this.config,
++        })
++        .then((result) => result.touchedTopics.length)
++        .catch((error: unknown) => {
++          debugLogger.warn(
++            'Failed to schedule managed auto-memory extraction.',
++            error,
++          );
++          return 0;
++        });
++      this.pendingMemoryTaskPromises.push(extractPromise);
+ 
+-    const dreamPromise = mgr
+-      .scheduleDream({
+-        projectRoot,
+-        sessionId,
+-        config: this.config,
+-      })
+-      .then((schedResult) => {
+-        if (schedResult.status === 'scheduled' && schedResult.promise) {
+-          return schedResult.promise.then((state) => {
+-            const topics = state.metadata?.['touchedTopics'] as
+-              | string[]
+-              | undefined;
+-            return topics ? topics.length : 0;
+-          });
+-        }
+-        return 0;
+-      })
+-      .catch((error: unknown) => {
+-        debugLogger.warn(
+-          'Failed to schedule managed auto-memory dream.',
+-          error,
+-        );
+-        return 0;
+-      });
+-    this.pendingMemoryTaskPromises.push(dreamPromise);
++      const dreamPromise = mgr
++        .scheduleDream({
++          projectRoot,
++          sessionId,
++          config: this.config,
++        })
++        .then((schedResult) => {
++          if (schedResult.status === 'scheduled' && schedResult.promise) {
++            return schedResult.promise.then((state) => {
++              const topics = state.metadata?.['touchedTopics'] as
++                | string[]
++                | undefined;
++              return topics ? topics.length : 0;
++            });
++          }
++          return 0;
++        })
++        .catch((error: unknown) => {
++          debugLogger.warn(
++            'Failed to schedule managed auto-memory dream.',
++            error,
++          );
++          return 0;
++        });
++      this.pendingMemoryTaskPromises.push(dreamPromise);
++    };
++    // Extraction and dream are model calls of their own. Started right after
++    // the answer, they run in parallel with the user's next question and slow
++    // both down on a single-stream server; their side prompt can also take
++    // the conversation's place in a provider's prompt cache. Where a next
++    // question can come, they start only once the session has been idle for a
++    // while; a new question cancels the wait, and the next idle period covers
++    // both turns (extraction resumes from its cursor).
++    const idleMs = this.managedMemoryIdleDelayMs();
++    this.clearPendingManagedMemoryRun();
++    if (idleMs <= 0) {
++      run();
++      return;
++    }
++    this.pendingManagedMemoryRun = setTimeout(() => {
++      this.pendingManagedMemoryRun = undefined;
++      if (!this.shutdownRequested) run();
++    }, idleMs);
++    this.pendingManagedMemoryRun.unref?.();
++  }
++
++  private pendingManagedMemoryRun: ReturnType<typeof setTimeout> | undefined;
++
++  private clearPendingManagedMemoryRun(): void {
++    if (this.pendingManagedMemoryRun) {
++      clearTimeout(this.pendingManagedMemoryRun);
++      this.pendingManagedMemoryRun = undefined;
++    }
++  }
++
++  /**
++   * How long the session must be idle before extraction and dream start:
++   * 0 for a headless run (no next question can come), otherwise
++   * QWEN_CODE_MEMORY_EXTRACT_IDLE_MS or 10 seconds.
++   */
++  private managedMemoryIdleDelayMs(): number {
++    if (
++      !this.config.isInteractive() &&
++      resolveInteractionMode(this.config) !== 'acp'
++    ) {
++      return 0;
++    }
++    const configured = Number(process.env['QWEN_CODE_MEMORY_EXTRACT_IDLE_MS']);
++    return Number.isFinite(configured) && configured >= 0 ? configured : 10_000;
+   }
+ 
+   /**
+@@ -3672,6 +3717,10 @@ export class LlmClient {
+       SendMessageType.UserQuery,
+   ): AsyncGenerator<ServerLlmStreamEvent, Turn> {
+     const messageType = options?.type ?? SendMessageType.UserQuery;
++    // A new question while extraction waits for an idle session: wait again.
++    if (messageType === SendMessageType.UserQuery) {
++      this.clearPendingManagedMemoryRun();
++    }
+     const humanInput =
+       messageType === SendMessageType.UserQuery &&
+       !options?.isConcurrentSideQuery &&

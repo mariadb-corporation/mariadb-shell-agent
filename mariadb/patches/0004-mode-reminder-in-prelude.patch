@@ -1,0 +1,265 @@
+Interaction-mode reminder in the prelude instead of the system prompt
+
+The main session's system prompt ended with 'Interaction mode reminder: You
+are running as <role>. <question guidance>', so headless, interactive and ACP
+prompts differed at the end of the system prompt, which providers that cache
+per prefix checkpoint (end of system prompt + tools) cannot share. The main
+session now sends that reminder as the first part of its startup prelude
+(also after /clear and auto-compaction) and its system prompt is identical in
+every mode. Other users of getCoreSystemPrompt (Arena agents) keep the
+reminder in the system prompt; a configured or QWEN_SYSTEM_MD prompt gets
+none, as before.
+
+diff --git a/packages/core/src/core/client.test.ts b/packages/core/src/core/client.test.ts
+index 5bffc28268..a5fa560c02 100644
+--- a/packages/core/src/core/client.test.ts
++++ b/packages/core/src/core/client.test.ts
+@@ -3937,7 +3937,7 @@ describe('Gemini Client (client.ts)', () => {
+       expect(getInitialChatHistory).toHaveBeenLastCalledWith(
+         expect.anything(),
+         undefined,
+-        { gitStatus: 'Git snapshot A' },
++        expect.objectContaining({ gitStatus: 'Git snapshot A' }),
+       );
+ 
+       await client.addWorkingDirectoryChangedContext(
+@@ -3979,7 +3979,7 @@ describe('Gemini Client (client.ts)', () => {
+       expect(getInitialChatHistory).toHaveBeenLastCalledWith(
+         expect.anything(),
+         undefined,
+-        { gitStatus: 'Git snapshot B' },
++        expect.objectContaining({ gitStatus: 'Git snapshot B' }),
+       );
+       expect(client['getCachedGitStatus']()).toBe('Git snapshot B');
+       expect(getRecentGitStatus).toHaveBeenCalledTimes(2);
+@@ -13442,6 +13442,7 @@ Other open files:
+           agentReachable: false,
+           executionSandboxFilesystem: undefined,
+           executionSandboxBackend: undefined,
++          interactionModeReminderInPrelude: true,
+         },
+       ] as const;
+     /** generateContent args whose config carries `systemInstruction`. */
+diff --git a/packages/core/src/core/client.ts b/packages/core/src/core/client.ts
+index 5155ced8a5..a39998a680 100644
+--- a/packages/core/src/core/client.ts
++++ b/packages/core/src/core/client.ts
+@@ -89,6 +89,7 @@ import {
+   getArenaSystemReminder,
+   getCoreSystemPrompt,
+   getCustomSystemPrompt,
++  getMainSessionInteractionModeReminder,
+   getPlanModeSystemReminder,
+   resolveInteractionMode,
+   resolveMainSessionOutputStyle,
+@@ -489,6 +490,7 @@ export function getMainSessionBaseSystemPrompt(
+           executionSandboxBackend:
+             config.getShellExecutionSandbox?.()?.effectiveBackend,
+           executionSandboxNetwork: config.getShellExecutionSandbox?.()?.network,
++          interactionModeReminderInPrelude: true,
+         },
+       );
+ }
+@@ -2126,7 +2128,12 @@ export class LlmClient {
+     const [[startupContext], snapshotEntries] = await getInitialChatHistory(
+       this.config,
+       undefined,
+-      { gitStatus: this.getCachedGitStatus() },
++      {
++        gitStatus: this.getCachedGitStatus(),
++        interactionModeReminder: getMainSessionInteractionModeReminder(
++          this.config,
++        ),
++      },
+     );
+     this.seedSkillReminderDedupFromSnapshot(snapshotEntries);
+     await this.seedAgentReminderDedupFromCurrent();
+@@ -2166,7 +2173,12 @@ export class LlmClient {
+     const [[startupContext], snapshotEntries] = await getInitialChatHistory(
+       this.config,
+       undefined,
+-      { gitStatus: this.getCachedGitStatus() },
++      {
++        gitStatus: this.getCachedGitStatus(),
++        interactionModeReminder: getMainSessionInteractionModeReminder(
++          this.config,
++        ),
++      },
+     );
+     this.seedSkillReminderDedupFromSnapshot(snapshotEntries);
+     await this.seedAgentReminderDedupFromCurrent();
+@@ -2852,6 +2864,9 @@ export class LlmClient {
+         () =>
+           getInitialChatHistory(this.config, extraHistory, {
+             gitStatus: this.getCachedGitStatus(),
++            interactionModeReminder: getMainSessionInteractionModeReminder(
++              this.config,
++            ),
+           }),
+       );
+       this.config
+diff --git a/packages/core/src/core/environmentContext.test.ts b/packages/core/src/core/environmentContext.test.ts
+index 3e9a765a98..2e2741856f 100644
+--- a/packages/core/src/core/environmentContext.test.ts
++++ b/packages/core/src/core/environmentContext.test.ts
+@@ -422,6 +422,19 @@ describe('getInitialChatHistory', () => {
+     expect(history).toEqual([]);
+   });
+ 
++  it('leads the prelude with the main session interaction-mode reminder', async () => {
++    const reminder =
++      'Interaction mode reminder: You are running as a non-interactive CLI agent.';
++    const [history] = await getInitialChatHistory(
++      mockConfig as Config,
++      undefined,
++      { interactionModeReminder: reminder },
++    );
++
++    const parts = history[0]?.parts ?? [];
++    expectContains(parts[0]?.text, '<system-reminder>', reminder);
++  });
++
+   it('places deferred-tools reminder last so stable prefix stays cacheable on KV-caching servers', async () => {
+     mockToolRegistry.getDeferredToolSummary.mockReturnValue([
+       { name: 'web_fetch', description: 'Fetches web pages' },
+diff --git a/packages/core/src/core/environmentContext.ts b/packages/core/src/core/environmentContext.ts
+index 15f891916c..2987491522 100644
+--- a/packages/core/src/core/environmentContext.ts
++++ b/packages/core/src/core/environmentContext.ts
+@@ -589,6 +589,9 @@ export interface InitialChatHistoryOptions {
+   // prompt so a repository change between sessions does not invalidate the
+   // provider-cached system prompt. Subagents leave it unset.
+   gitStatus?: string | null;
++  // Main session: its interaction-mode reminder, sent here instead of in the
++  // system prompt so the system prompt is the same in every mode.
++  interactionModeReminder?: string | null;
+ }
+ 
+ /**
+@@ -634,6 +637,9 @@ export async function getInitialChatHistory(
+   // parts. Deferred-tools is last because progressive MCP discovery can
+   // change it — only the tail recomputes.
+   const reminderParts = [
++    options.interactionModeReminder
++      ? wrapSystemReminder(options.interactionModeReminder)
++      : null,
+     buildMcpServerInstructionsReminder(toolRegistry),
+     skillsResult?.reminder ?? null,
+     startupReminder,
+diff --git a/packages/core/src/core/prompts.test.ts b/packages/core/src/core/prompts.test.ts
+index 0e859ef2a9..398ad84a25 100644
+--- a/packages/core/src/core/prompts.test.ts
++++ b/packages/core/src/core/prompts.test.ts
+@@ -9,6 +9,7 @@ import {
+   assembleSystemPrompt,
+   getCoreSystemPrompt,
+   getCustomSystemPrompt,
++  getMainSessionInteractionModeReminder,
+   getManualPlanExitSystemReminder,
+   getPlanModeSystemReminder,
+   resolvePathFromEnv,
+@@ -150,10 +151,7 @@ describe('Core System Prompt (prompts.ts)', () => {
+   /** No memory separator, the default identity (plus `more`), snapshot. */
+   function expectBasePrompt(prompt: string, ...more: string[]) {
+     expect(prompt).not.toContain('---\n\n');
+-    expectText(prompt, [
+-      'You are Qwen Code, a CLI agent',
+-      ...more,
+-    ]);
++    expectText(prompt, ['You are Qwen Code, a CLI agent', ...more]);
+     expect(prompt).toMatchSnapshot();
+   }
+ 
+@@ -914,12 +912,32 @@ describe('main-session style: reminder decision matches prompt section', () => {
+         headless: 'a non-interactive CLI agent',
+         acp: 'a CLI agent operating through an ACP host',
+       } as const;
+-      expect(getMainSessionBaseSystemPrompt(makeConfig(flags))).toContain(
+-        markers[session],
++      // The main session names its mode in the startup prelude; its system
++      // prompt is the same in every mode (prompt caching).
++      expect(
++        getMainSessionInteractionModeReminder(makeConfig(flags)),
++      ).toContain(markers[session]);
++      expect(getMainSessionBaseSystemPrompt(makeConfig(flags))).not.toContain(
++        'Interaction mode reminder',
+       );
+     },
+   );
+ 
++  it('gives the main session one system prompt for every interaction mode', () => {
++    const prompts = sessions.map(([, flags]) =>
++      getMainSessionBaseSystemPrompt(makeConfig(flags)),
++    );
++    expect(new Set(prompts).size).toBe(1);
++  });
++
++  it('sends no mode reminder for a configured system prompt override', () => {
++    expect(
++      getMainSessionInteractionModeReminder(
++        makeConfig({ customPrompt: 'Custom.', interactive: true, acp: false }),
++      ),
++    ).toBeNull();
++  });
++
+   interface Case {
+     name: string;
+     customPrompt?: string;
+diff --git a/packages/core/src/core/prompts.ts b/packages/core/src/core/prompts.ts
+index be75f936c0..401144750b 100644
+--- a/packages/core/src/core/prompts.ts
++++ b/packages/core/src/core/prompts.ts
+@@ -78,6 +78,30 @@ function getInteractionModePrompt(mode: SystemPromptInteractionMode): {
+   }
+ }
+ 
++function formatInteractionModeReminder(interaction: {
++  role: string;
++  questions: string;
++}): string {
++  return `Interaction mode reminder: You are running as ${interaction.role}. ${interaction.questions}`;
++}
++
++/**
++ * The interaction-mode reminder of a main session, for its startup prelude, or
++ * null when the session's system prompt is a full override (a configured
++ * system prompt or QWEN_SYSTEM_MD), which never carried mode guidance.
++ */
++export function getMainSessionInteractionModeReminder(config: {
++  getSystemPrompt(): string | undefined;
++  getExperimentalZedIntegration(): boolean;
++  getInputFormat?(): string;
++  isInteractive(): boolean;
++}): string | null {
++  if (config.getSystemPrompt() || isSystemMdActive()) return null;
++  return formatInteractionModeReminder(
++    getInteractionModePrompt(resolveInteractionMode(config)),
++  );
++}
++
+ function getInteractiveInteractionModePrompt(): {
+   role: string;
+   questions: string;
+@@ -274,6 +298,13 @@ export interface PromptToolSurface {
+   executionSandboxFilesystem?: 'read-only' | 'workspace-write';
+   executionSandboxBackend?: 'bwrap' | 'landlock';
+   executionSandboxNetwork?: 'open' | 'closed';
++  /**
++   * The main session sends the interaction-mode reminder in its startup
++   * prelude (getMainSessionInteractionModeReminder) instead of at the end of
++   * the system prompt, so the system prompt is identical in every mode and a
++   * provider's prompt cache can share it.
++   */
++  interactionModeReminderInPrelude?: boolean;
+ }
+ 
+ /**
+@@ -685,7 +716,7 @@ ${codeModeOnly ? codeModeToolCallExamples : filterToolCallExamples(getToolCallEx
+ # Final Reminder
+ Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
+ 
+-Interaction mode reminder: You are running as ${interaction.role}. ${interaction.questions}
++${surface?.interactionModeReminderInPrelude ? '' : formatInteractionModeReminder(interaction)}
+ `.trim();
+ }
+ 

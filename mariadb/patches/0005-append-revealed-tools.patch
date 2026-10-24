@@ -1,0 +1,106 @@
+Revealed deferred tools appended to the tools block
+
+getFunctionDeclarations sorted every declared tool by name, so a deferred
+tool revealed mid-session (tool_search, plan setup) landed somewhere in the
+middle of the tools block and invalidated a provider's prompt cache for
+everything after it. The other tools stay sorted by name; revealed deferred
+tools follow in reveal order, which is still independent of registration
+order, so a reveal only appends.
+
+diff --git a/packages/core/src/tools/tool-registry.test.ts b/packages/core/src/tools/tool-registry.test.ts
+index 60fcc4ef75..4e8f1b92bd 100644
+--- a/packages/core/src/tools/tool-registry.test.ts
++++ b/packages/core/src/tools/tool-registry.test.ts
+@@ -997,15 +997,34 @@ describe('ToolRegistry', () => {
+ 
+       toolRegistry.revealDeferredTool('hidden-a');
+ 
++      // Revealed deferred tools follow the sorted rest, so a reveal only
++      // appends to the tools block (prompt caching).
+       expect(declared(toolRegistry)).toEqual([
+-        'hidden-a',
+         'visible-m',
+         'visible-z',
++        'hidden-a',
+       ]);
+       expect(toolRegistry.isDeferredToolRevealed('hidden-a')).toBe(true);
+       expect(toolRegistry.isDeferredToolRevealed('other-hidden')).toBe(false);
+     });
+ 
++    it('appends a later reveal without reordering the declared tools', () => {
++      register(
++        toolRegistry,
++        'visible-b',
++        deferred('late'),
++        'visible-a',
++        deferred('early'),
++      );
++      toolRegistry.revealDeferredTool('early');
++      const before = declared(toolRegistry);
++
++      toolRegistry.revealDeferredTool('late');
++
++      expect(before).toEqual(['visible-a', 'visible-b', 'early']);
++      expect(declared(toolRegistry)).toEqual([...before, 'late']);
++    });
++
+     it('sorts MCP declarations deterministically regardless of registration order', () => {
+       const github = () =>
+         mcp('github', 'search_issues', 'Search GitHub issues');
+@@ -1022,9 +1041,11 @@ describe('ToolRegistry', () => {
+ 
+       const namesA = declared(registryA);
+ 
++      // Revealed deferred tools are declared in reveal order, independent of
++      // the registration order.
+       expect(namesA).toEqual([
+-        'mcp__filesystem__read_tree',
+         'mcp__github__search_issues',
++        'mcp__filesystem__read_tree',
+       ]);
+       expect(declared(registryB)).toEqual(namesA);
+     });
+diff --git a/packages/core/src/tools/tool-registry.ts b/packages/core/src/tools/tool-registry.ts
+index 1b0f8d9496..5a5185efa1 100644
+--- a/packages/core/src/tools/tool-registry.ts
++++ b/packages/core/src/tools/tool-registry.ts
+@@ -1045,7 +1045,7 @@ export class ToolRegistry {
+       return this.getCodeModeFunctionDeclarations();
+     }
+     const includeDeferred = options?.includeDeferred === true;
+-    return Array.from(this.tools.values())
++    const declared = Array.from(this.tools.values())
+       .filter((tool) => this.isToolAvailable(tool.name))
+       .filter((tool) => this.isToolDeclared(tool.name))
+       .filter((tool) => this.isMemoryRecallToolDeclared(tool.name))
+@@ -1055,9 +1055,27 @@ export class ToolRegistry {
+           !this.isEffectivelyDeferred(tool) ||
+           tool.alwaysLoad ||
+           !this.isDeferredAndHidden(tool.name),
+-      )
+-      .sort(ToolRegistry.compareToolsByDeclarationName)
+-      .map((tool) => tool.schema);
++      );
++    // Deferred tools revealed during the session (tool_search, plan setup,
++    // preload) follow the name-sorted rest in reveal order: a reveal then only
++    // appends to the tools block, and a provider's prompt cache keeps the
++    // declarations before it.
++    const isAppended = (tool: AnyDeclarativeTool) =>
++      !includeDeferred &&
++      !tool.alwaysLoad &&
++      this.isEffectivelyDeferred(tool) &&
++      this.revealedDeferred.has(tool.name);
++    const revealOrder = Array.from(this.revealedDeferred);
++    return [
++      ...declared
++        .filter((tool) => !isAppended(tool))
++        .sort(ToolRegistry.compareToolsByDeclarationName),
++      ...declared
++        .filter(isAppended)
++        .sort(
++          (a, b) => revealOrder.indexOf(a.name) - revealOrder.indexOf(b.name),
++        ),
++    ].map((tool) => tool.schema);
+   }
+ 
+   /**
