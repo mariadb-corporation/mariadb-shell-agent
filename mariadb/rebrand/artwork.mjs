@@ -188,8 +188,9 @@ export function apply() {
     );
     // The product name in the welcome title takes the gradient of mariadb.com's "Agentic
     // Enterprise" heading (class text-sublime-gradient), shown there on a dark background. The dark
-    // theme (first definition) uses its colors, the light theme (second) darker shades of them
-    // (contrast above 4:1 on the white panel; the originals are 1.2-1.6:1).
+    // theme (first definition) uses its colors, the light theme (second) fully saturated, darker
+    // shades of cyan, green and lime (contrast at least 3:1 on the white panel, the minimum for large
+    // text; the originals are 1.2-1.6:1).
     const gradient = (cyan, green, lime) =>
       [
         '--agent-logo-gradient: linear-gradient(',
@@ -202,7 +203,7 @@ export function apply() {
         '  );',
       ].join('\n');
     const darkGradient = gradient('#51d9f7', '#8ce786', '#cdf70a');
-    const lightGradient = gradient('#0b85a6', '#2f8a3b', '#5f7a00');
+    const lightGradient = gradient('#0093c4', '#00a37a', '#5c9f00');
     let definition = 0;
     patch(
       'welcome title gradient',
