@@ -95,6 +95,8 @@ explanation on top) and commit the new patch.
   when plugin.json declares no LSP servers
 - `0012-extension-setting-experimental-lsp.patch`: extension setting `mariadb-code.experimentalLsp`
   (off by default) starts the daemon and ACP process with `--experimental-lsp`
+- `0013-lsp-servers-of-extensions-at-startup.patch`: LSP servers declared by extensions are found at
+  startup (discovery ran before extensions were loaded)
 
 These are good candidates for upstream pull requests, which would retire the patches.
 

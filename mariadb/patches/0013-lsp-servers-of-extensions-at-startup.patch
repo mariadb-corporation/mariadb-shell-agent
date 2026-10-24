@@ -1,0 +1,82 @@
+LSP servers declared by extensions are discovered at startup
+
+The CLI discovers LSP servers while it builds its config, before
+Config.initialize() loads the extensions, so the LSP servers of extensions
+(Claude plugins with a .lsp.json) were only found after an extension was
+installed or enabled in a running session. initialize() now discovers again
+once the extensions are loaded, when one of them declares LSP servers; the
+discovery is not awaited, since starting a server can take long.
+
+diff --git a/packages/core/src/config/config.test.ts b/packages/core/src/config/config.test.ts
+index 4ccc878378..eb2d6f1778 100644
+--- a/packages/core/src/config/config.test.ts
++++ b/packages/core/src/config/config.test.ts
+@@ -5100,6 +5100,29 @@ describe('Server Config (config.ts)', () => {
+     await expect(lspConfig().reinitializeLsp()).resolves.toBeUndefined();
+   });
+ 
++  it('discovers LSP servers again once extensions declaring them are loaded', () => {
++    const extension = (lspServers?: string) =>
++      ({
++        name: 'dev',
++        isActive: true,
++        config: { name: 'dev', version: '1.0.0', lspServers },
++      }) as unknown as Extension;
++    const reinitialize = vi.fn().mockResolvedValue(reconcile({}));
++    const config = lspConfig({ reinitialize });
++    const loaded = vi.spyOn(
++      config.getExtensionManager(),
++      'getLoadedExtensions',
++    );
++
++    loaded.mockReturnValue([extension()]);
++    config.refreshLspAfterExtensionsLoaded();
++    expect(reinitialize).not.toHaveBeenCalled();
++
++    loaded.mockReturnValue([extension('./.lsp.json')]);
++    config.refreshLspAfterExtensionsLoaded();
++    expect(reinitialize).toHaveBeenCalledOnce();
++  });
++
+   it('should delegate LSP reinitialize to the configured client', async () => {
+     const result = reconcile({ added: ['tsserver'] });
+     const reinitialize = vi.fn().mockResolvedValue(result);
+diff --git a/packages/core/src/config/config.ts b/packages/core/src/config/config.ts
+index 3b86548abf..48f706aed9 100644
+--- a/packages/core/src/config/config.ts
++++ b/packages/core/src/config/config.ts
+@@ -4238,6 +4238,7 @@ export class Config {
+       });
+     }
+     recordStartupEvent('config_initialize_extensions_initial_end');
++    this.refreshLspAfterExtensionsLoaded();
+     options?.signal?.throwIfAborted();
+     this.debugLogger.debug('Extension manager initialized');
+ 
+@@ -9200,6 +9201,26 @@ export class Config {
+       error instanceof Error ? error.message : error;
+   }
+ 
++  /**
++   * LSP discovery runs while the CLI config is built, before `initialize()`
++   * loads the extensions, so LSP servers declared by extensions (Claude
++   * plugins with a `.lsp.json`) were never found at startup. Discover again
++   * once they are loaded; not awaited, since starting a server can take long.
++   */
++  refreshLspAfterExtensionsLoaded(): void {
++    if (
++      !this.isLspEnabled() ||
++      !this.getActiveExtensions().some(
++        (extension) => extension.config?.lspServers,
++      )
++    ) {
++      return;
++    }
++    void this.reinitializeLsp().catch((error: unknown) =>
++      this.debugLogger.warn('LSP discovery for extensions failed:', error),
++    );
++  }
++
+   async reinitializeLsp(): Promise<LspServiceReinitializeResult | undefined> {
+     if (!this.isLspEnabled() || !this.lspClient?.reinitialize) {
+       return undefined;
