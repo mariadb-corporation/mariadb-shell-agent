@@ -81,6 +81,9 @@ explanation on top) and commit the new patch.
   instead of sorted into it
 - `0006-idle-memory-extraction.patch`: memory extraction and dream wait for an idle session (10 s,
   `MARIADB_CODE_MEMORY_EXTRACT_IDLE_MS`) instead of running in parallel with the next question
+- `0007-replay-sent-user-content.patch`: the transcript also records each prompt as it was sent
+  (with the date, plan-mode, output-style and memory-recall reminders and the IDE context), and
+  `--continue`/resume replays it unchanged, so a resumed session keeps the prompt cache
 
 These are good candidates for upstream pull requests, which would retire the patches.
 

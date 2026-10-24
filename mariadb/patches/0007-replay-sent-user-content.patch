@@ -1,0 +1,410 @@
+Resumed sessions replay the user content as it was sent
+
+The transcript records a user prompt before the per-turn reminders are added
+(current date, plan mode, output style, memory recall, IDE context), so
+--continue and session resume rebuilt each earlier turn without them. The
+restored prompt then differed from the live one early in the first user
+message, and a provider prompt cache could reuse only the system prompt and
+tools. The client now also records the user content of a UserQuery or Cron
+turn as it went out (system record `sent_user_content`; parts unchanged from
+the user record are stored as references, so images are not stored twice),
+and the history rebuild puts those parts back in place of the recorded
+request. The memory catalog stays request-only, as before. Tool-result turns
+are not covered.
+
+diff --git a/packages/core/src/core/client.test.ts b/packages/core/src/core/client.test.ts
+index 60d0f4f6c7..bd38503b8c 100644
+--- a/packages/core/src/core/client.test.ts
++++ b/packages/core/src/core/client.test.ts
+@@ -12317,6 +12317,33 @@ Other open files:
+         );
+       });
+ 
++      it('records the user content as sent, with the reminders added after the user record', async () => {
++        const recordUserMessage = vi.fn();
++        const recordSentUserContent = vi.fn();
++        promptSubmitBus({ output: undefined });
++        vi.mocked(mockConfig.getChatRecordingService).mockReturnValue({
++          recordUserMessage,
++          recordSentUserContent,
++          recordAttributionSnapshot: vi.fn(),
++          recordFileHistorySnapshot: vi.fn(),
++        } as unknown as ReturnType<Config['getChatRecordingService']>);
++
++        await run([{ text: 'Hi' }], 'prompt-sent-content');
++
++        const recorded = recordUserMessage.mock.calls[0]![0];
++        expect(recordSentUserContent).toHaveBeenCalledTimes(1);
++        const [sent, request, promptId] = recordSentUserContent.mock.calls[0]!;
++        expect(request).toBe(recorded);
++        expect(promptId).toBe('prompt-sent-content');
++        expect(sent.at(-1)).toEqual({ text: 'Hi' });
++        expect(
++          sent.some(
++            (part: unknown) =>
++              typeof part === 'string' && part.includes('The current date is:'),
++          ),
++        ).toBe(true);
++      });
++
+       it('passes a non-empty submitted prompt for UserQuery hooks', async () => {
+         const mockMessageBus = promptSubmitBus({ output: undefined });
+ 
+@@ -14407,12 +14434,10 @@ Other open files:
+           .mockResolvedValue({ status: 'skipped', skippedReason: 'locked' });
+         const config = makeMockConfigForShutdown(
+           memoryManager({
+-            scheduleMetadataMigration: vi
+-              .fn()
+-              .mockResolvedValue({
+-                status: 'skipped',
+-                skippedReason: 'complete',
+-              }),
++            scheduleMetadataMigration: vi.fn().mockResolvedValue({
++              status: 'skipped',
++              skippedReason: 'complete',
++            }),
+             scheduleExtract,
+             scheduleDream,
+           }),
+diff --git a/packages/core/src/core/client.ts b/packages/core/src/core/client.ts
+index f7f346be46..53aab7011c 100644
+--- a/packages/core/src/core/client.ts
++++ b/packages/core/src/core/client.ts
+@@ -5176,6 +5176,17 @@ export class LlmClient {
+       // actual history push (see `userContentPushSnapshotKey`); a
+       // client-side snapshot taken here would still cover the send-lock
+       // and compression awaits between `turn.run` and that push.
++      if (
++        messageType === SendMessageType.UserQuery ||
++        messageType === SendMessageType.Cron
++      ) {
++        // The user record holds the request without the reminders and context
++        // added above; record what the model receives so a resumed session
++        // replays the same prompt.
++        this.config
++          .getChatRecordingService()
++          ?.recordSentUserContent?.(requestToSend, request, prompt_id);
++      }
+       attachedSnapshotSource = requestToSend;
+       pushInitiated = true;
+       agentOutput.beginResponse();
+diff --git a/packages/core/src/services/chatRecordingService.test.ts b/packages/core/src/services/chatRecordingService.test.ts
+index aac11ed120..90e9f5ff3c 100644
+--- a/packages/core/src/services/chatRecordingService.test.ts
++++ b/packages/core/src/services/chatRecordingService.test.ts
+@@ -33,6 +33,7 @@ import {
+ import { MAX_RETAINED_TOOL_RESULT_DISPLAY_CHARS } from '../utils/toolResultDisplayCompaction.js';
+ import * as jsonl from '../utils/jsonl-utils.js';
+ import { computeInitialTurnFromHistory } from './session-turn-state.js';
++import { buildApiHistoryFromConversation } from './session-api-history.js';
+ import type { Content, Part } from '@google/genai';
+ import type { FileDiff, McpAppResultDisplay } from '../tools/tools.js';
+ import {
+@@ -404,6 +405,55 @@ describe('ChatRecordingService', () => {
+     });
+   });
+ 
++  describe('recordSentUserContent', () => {
++    it('records the sent parts, referring to unchanged recorded parts', async () => {
++      const question: Part = { text: 'Who are you?' };
++      const image: Part = {
++        inlineData: { mimeType: 'image/png', data: 'AAA' },
++      };
++      svc.recordUserMessage([question, image], undefined, undefined, 'p1');
++      svc.recordSentUserContent(
++        [{ text: '<system-reminder>date</system-reminder>' }, question, image],
++        [question, image],
++        'p1',
++      );
++      const [user, sent] = await flushedAll();
++
++      expect(sent.type).toBe('system');
++      expect(sent.subtype).toBe('sent_user_content');
++      expect(sent.parentUuid).toBe(user.uuid);
++      expect(sent.promptId).toBe('p1');
++      expect(sent.systemPayload).toEqual({
++        parts: [
++          { text: '<system-reminder>date</system-reminder>' },
++          { recordedPart: 0 },
++          { recordedPart: 1 },
++        ],
++      });
++      expect(
++        buildApiHistoryFromConversation({ messages: [user, sent] }),
++      ).toEqual([
++        {
++          role: 'user',
++          parts: [
++            { text: '<system-reminder>date</system-reminder>' },
++            question,
++            image,
++          ],
++        },
++      ]);
++    });
++
++    it('records nothing when the request went out unchanged', async () => {
++      svc.recordUserMessage('hello', undefined, undefined, 'p1');
++      svc.recordSentUserContent('hello', 'hello', 'p1');
++
++      expect((await flushedAll()).map((record) => record.type)).toEqual([
++        'user',
++      ]);
++    });
++  });
++
+   describe('recordUserMessage', () => {
+     const hookText = [
+       '<qwen:user-prompt-submit-context>',
+diff --git a/packages/core/src/services/chatRecordingService.ts b/packages/core/src/services/chatRecordingService.ts
+index 50d1c0ce48..9ff52ed188 100644
+--- a/packages/core/src/services/chatRecordingService.ts
++++ b/packages/core/src/services/chatRecordingService.ts
+@@ -28,6 +28,7 @@ import {
+ import { createHash, randomUUID } from 'node:crypto';
+ import { isDeepStrictEqual } from 'node:util';
+ import type {
++  Part,
+   PartListUnion,
+   Content,
+   FunctionDeclaration,
+@@ -400,6 +401,7 @@ export interface ChatRecord {
+     | 'session_source'
+     | 'session_execution_engine'
+     | 'omni_recall'
++    | 'sent_user_content'
+     | 'session_model'
+     | 'session_approval_mode'
+     | 'rewind'
+@@ -596,6 +598,15 @@ export interface NotificationRecordPayload {
+   };
+ }
+ 
++/**
++ * The user content of a turn as the model received it: the recorded request
++ * plus the reminders and context added after the user record was written.
++ * Parts unchanged from the user record are stored as references to it.
++ */
++export interface SentUserContentRecordPayload {
++  parts: Array<Part | { recordedPart: number }>;
++}
++
+ export interface UserPromptRecordPayload {
+   /**
+    * Core/headless: submitted projection, otherwise expanded pre-hook text.
+@@ -3226,6 +3237,43 @@ export class ChatRecordingService {
+    * this record the transcript would never show what memory the model was
+    * given — the trajectory exporter reads it back as `turn.recall`.
+    */
++  /**
++   * Records the user content of a UserQuery or Cron turn as it was sent.
++   * The reminders (date, plan mode, output style, memory recall) and the IDE
++   * context are added after the user record is persisted; replaying them on
++   * resume keeps the restored prompt identical to the live one, so a provider
++   * prompt cache keeps matching the whole earlier conversation.
++   */
++  recordSentUserContent(
++    sent: PartListUnion,
++    recorded: PartListUnion,
++    promptId?: string,
++  ): void {
++    try {
++      const sentParts = createUserContent(sent).parts ?? [];
++      const recordedParts = createUserContent(recorded).parts ?? [];
++      if (isDeepStrictEqual(sentParts, recordedParts)) return;
++      const payload: SentUserContentRecordPayload = {
++        parts: sentParts.map((part) => {
++          const index = recordedParts.findIndex((recordedPart) =>
++            isDeepStrictEqual(recordedPart, part),
++          );
++          // The write is queued; copy so later in-place edits of the live
++          // history cannot change what is recorded.
++          return index >= 0 ? { recordedPart: index } : structuredClone(part);
++        }),
++      };
++      this.appendRecord({
++        ...this.createBaseRecord('system'),
++        subtype: 'sent_user_content',
++        ...(promptId ? { promptId } : {}),
++        systemPayload: payload,
++      });
++    } catch (error) {
++      debugLogger.error('Error saving sent user content:', error);
++    }
++  }
++
+   recordOmniRecallReminder(payload: unknown): void {
+     try {
+       const record: ChatRecord = {
+diff --git a/packages/core/src/services/session-api-history.test.ts b/packages/core/src/services/session-api-history.test.ts
+index 14fc8ddfb6..35f325cde6 100644
+--- a/packages/core/src/services/session-api-history.test.ts
++++ b/packages/core/src/services/session-api-history.test.ts
+@@ -21,6 +21,7 @@ import { buildSessionRecoveryPlanFromApiHistory } from '../core/session-recovery
+ import {
+   buildApiHistoryFromConversation,
+   buildSessionHistoryFromConversation,
++  getApiHistoryPromptId,
+   getLastApiHistoryPromptId,
+   getLastApiPromptCancellation,
+   markApiHistoryPrompt,
+@@ -1192,3 +1193,69 @@ describe('internal Code Mode tool results', () => {
+     );
+   });
+ });
++
++describe('sent user content', () => {
++  const base = {
++    parentUuid: null,
++    sessionId: 's',
++    timestamp: 't',
++    cwd: '/',
++    version: 'v',
++  };
++  const user = (promptId?: string, subtype?: 'cron'): ChatRecord => ({
++    ...base,
++    uuid: `user-${promptId}`,
++    type: 'user',
++    ...(subtype ? { subtype } : {}),
++    ...(promptId ? { promptId } : {}),
++    message: { role: 'user', parts: [{ text: 'question' }] },
++  });
++  const sent = (promptId?: string): ChatRecord => ({
++    ...base,
++    uuid: `sent-${promptId}`,
++    type: 'system',
++    subtype: 'sent_user_content',
++    ...(promptId ? { promptId } : {}),
++    systemPayload: {
++      parts: [{ text: 'reminder' }, { recordedPart: 0 }, { text: 'recall' }],
++    },
++  });
++  const reply: ChatRecord = {
++    ...base,
++    uuid: 'reply',
++    type: 'assistant',
++    message: { role: 'model', parts: [{ text: 'answer' }] },
++  };
++  const texts = (records: ChatRecord[]) =>
++    buildApiHistoryFromConversation({ messages: records }).map((content) =>
++      content.parts?.map((part) => part.text),
++    );
++
++  it('restores the user entry as it was sent', () => {
++    expect(texts([user('p1'), sent('p1'), reply])).toEqual([
++      ['reminder', 'question', 'recall'],
++      ['answer'],
++    ]);
++    expect(texts([user(undefined, 'cron'), sent('p1')])).toEqual([
++      ['reminder', 'question', 'recall'],
++    ]);
++  });
++
++  it('keeps the recorded entry when the record belongs to another prompt', () => {
++    expect(texts([user('p1'), sent('p2')])).toEqual([['question']]);
++  });
++
++  it('keeps the recorded entry when the user entry is not the latest', () => {
++    expect(texts([user('p1'), reply, sent('p1')])).toEqual([
++      ['question'],
++      ['answer'],
++    ]);
++  });
++
++  it('keeps the prompt identity of the restored entry', () => {
++    const [entry] = buildApiHistoryFromConversation({
++      messages: [user('p1'), sent('p1')],
++    });
++    expect(getApiHistoryPromptId(entry!)).toBe('p1');
++  });
++});
+diff --git a/packages/core/src/services/session-api-history.ts b/packages/core/src/services/session-api-history.ts
+index 0aa2c83cd5..3aa44c4967 100644
+--- a/packages/core/src/services/session-api-history.ts
++++ b/packages/core/src/services/session-api-history.ts
+@@ -10,6 +10,7 @@ import type {
+   ChatCompressionRecordPayload,
+   ChatRecord,
+   GoalTurnEndRecordPayload,
++  SentUserContentRecordPayload,
+   SlashCommandRecordPayload,
+   TurnResultRecordPayload,
+ } from './chatRecordingService.js';
+@@ -360,6 +361,10 @@ export class SessionApiHistoryAccumulator {
+         }
+         return;
+       }
++      if (record.subtype === 'sent_user_content') {
++        this.applySentUserContent(record);
++        return;
++      }
+       if (!isApiHistoryCompressionCandidate(record)) return;
+       const payload = record.systemPayload as ChatCompressionRecordPayload;
+       this.compressionCandidate = payload.compressedHistory;
+@@ -418,6 +423,41 @@ export class SessionApiHistoryAccumulator {
+     this.lastMaterialRecord = record;
+   }
+ 
++  /**
++   * Restores the user entry the model received: the reminders and context
++   * that were added to the recorded request before it was sent.
++   */
++  private applySentUserContent(record: ChatRecord): void {
++    const payload = record.systemPayload as
++      | SentUserContentRecordPayload
++      | undefined;
++    const previous = this.lastMaterialRecord;
++    const entry = this.history.at(-1);
++    const recordedParts = previous?.message?.parts ?? [];
++    if (
++      !Array.isArray(payload?.parts) ||
++      previous?.type !== 'user' ||
++      (previous.subtype !== undefined && previous.subtype !== 'cron') ||
++      (previous.promptId !== undefined &&
++        previous.promptId !== record.promptId) ||
++      entry?.role !== 'user' ||
++      entry.parts?.length !== recordedParts.length
++    ) {
++      return;
++    }
++    const parts: Part[] = [];
++    for (const part of payload.parts) {
++      if ('recordedPart' in part && typeof part.recordedPart === 'number') {
++        const recordedPart = recordedParts[part.recordedPart];
++        if (!recordedPart) return;
++        parts.push(recordedPart);
++      } else {
++        parts.push(part as Part);
++      }
++    }
++    entry.parts = copyContentForApiHistory({ role: 'user', parts }).parts;
++  }
++
+   getCompletedToolCallIds(): string[] {
+     return [...this.completedToolCallIds];
+   }
+diff --git a/packages/core/src/utils/message-group-deletion.ts b/packages/core/src/utils/message-group-deletion.ts
+index df4e8d304b..09b9094c24 100644
+--- a/packages/core/src/utils/message-group-deletion.ts
++++ b/packages/core/src/utils/message-group-deletion.ts
+@@ -112,6 +112,7 @@ const GROUP_SYSTEM_SUBTYPES = new Set([
+   'ui_telemetry',
+   'at_command',
+   'omni_recall',
++  'sent_user_content',
+   'user_text_elements',
+   'turn_result',
+   'turn_attempt',
+diff --git a/packages/core/src/utils/transcript-records.ts b/packages/core/src/utils/transcript-records.ts
+index 99654e85ea..a1ec1ffff9 100644
+--- a/packages/core/src/utils/transcript-records.ts
++++ b/packages/core/src/utils/transcript-records.ts
+@@ -142,6 +142,7 @@ const KNOWN_RECORD_SUBTYPES = new Set([
+   'session_source',
+   'session_model',
+   'omni_recall',
++  'sent_user_content',
+   'session_execution_engine',
+   'session_sources_snapshot',
+   'session_approval_mode',
