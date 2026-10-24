@@ -1,0 +1,52 @@
+Calmer composer: no aura or glow, a bolt on the send button
+
+The focused composer drew a dotted aura and a glowing halo around itself and
+the send button carried a purple glow; both read as too playful for MariaDB
+Code. The focused composer keeps only its accent border, the send button has
+no shadow, and its upward arrow is replaced by the execute bolt of the
+MariaDB VS Code extension (images/light/toolbar-execute.svg), filled with
+the button's foreground color so it works in light and dark themes.
+
+diff --git a/packages/web-shell/client/components/ChatEditor.module.css b/packages/web-shell/client/components/ChatEditor.module.css
+index 254f011abb..8c7584db5e 100644
+--- a/packages/web-shell/client/components/ChatEditor.module.css
++++ b/packages/web-shell/client/components/ChatEditor.module.css
+@@ -80,8 +80,11 @@
+   );
+ }
+ 
++/* The dotted aura and halo around the focused composer are turned off; the
++   focused composer keeps only its accent border. */
+ .dacAura,
+ .dacHalo {
++  display: none;
+   pointer-events: none;
+ }
+ 
+@@ -2119,7 +2122,7 @@
+ .sendBtn:not(:disabled) {
+   border: none;
+   background: var(--agent-gray-800);
+-  box-shadow: var(--agent-purple-shadow);
++  box-shadow: none;
+   color: var(--chat-send-button-foreground);
+   cursor: pointer;
+ }
+diff --git a/packages/web-shell/client/components/ChatEditor.tsx b/packages/web-shell/client/components/ChatEditor.tsx
+index b1e27c9670..71075a5336 100644
+--- a/packages/web-shell/client/components/ChatEditor.tsx
++++ b/packages/web-shell/client/components/ChatEditor.tsx
+@@ -523,11 +523,8 @@ function SendIcon() {
+       aria-hidden="true"
+     >
+       <path
+-        d="M10 15.5v-11M5.5 9 10 4.5 14.5 9"
+-        stroke="currentColor"
+-        strokeWidth="2"
+-        strokeLinecap="round"
+-        strokeLinejoin="round"
++        d="M8.74 2L3.69 10.42H7.9L3.69 18L15.47 7.89L10.42 7.05L16.31 2Z"
++        fill="currentColor"
+       />
+     </svg>
+   );
