@@ -93,6 +93,8 @@ explanation on top) and commit the new patch.
 - `0011-claude-plugin-mcp-and-lsp-files.patch`: Claude plugins whose plugin.json names an `.mcp.json`
   get its servers (were nested under one server called `mcpServers`), and a root `.lsp.json` is used
   when plugin.json declares no LSP servers
+- `0012-extension-setting-experimental-lsp.patch`: extension setting `mariadb-code.experimentalLsp`
+  (off by default) starts the daemon and ACP process with `--experimental-lsp`
 
 These are good candidates for upstream pull requests, which would retire the patches.
 

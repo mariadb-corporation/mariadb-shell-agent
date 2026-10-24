@@ -1,0 +1,109 @@
+Extension setting for the experimental LSP support
+
+Language servers (from .lsp.json files and extensions such as Claude plugins
+with a .lsp.json) only start with --experimental-lsp, and the extension
+starts its daemon and ACP process without CLI options of the user's. The new
+setting qwen-code.experimentalLsp (off by default) adds the flag to both.
+
+diff --git a/packages/vscode-ide-companion/package.json b/packages/vscode-ide-companion/package.json
+index f66edff823..985f8215ff 100644
+--- a/packages/vscode-ide-companion/package.json
++++ b/packages/vscode-ide-companion/package.json
+@@ -224,6 +224,12 @@
+           "type": "boolean",
+           "default": true,
+           "description": "Show notifications with sound when a task completes (at least 20 seconds) or needs your attention, while you are not actively viewing the Qwen Code panel."
++        },
++        "qwen-code.experimentalLsp": {
++          "order": 5,
++          "type": "boolean",
++          "default": false,
++          "description": "Start language servers (from .lsp.json files and extensions) for the agent's code intelligence. Experimental; takes effect for newly started sessions (reload the window)."
+         }
+       }
+     },
+diff --git a/packages/vscode-ide-companion/src/services/qwenConnectionHandler.ts b/packages/vscode-ide-companion/src/services/qwenConnectionHandler.ts
+index 2a12623fab..83801f646f 100644
+--- a/packages/vscode-ide-companion/src/services/qwenConnectionHandler.ts
++++ b/packages/vscode-ide-companion/src/services/qwenConnectionHandler.ts
+@@ -86,6 +86,13 @@ export class QwenConnectionHandler {
+         proxyUrl,
+       );
+     }
++    if (
++      vscode.workspace
++        .getConfiguration('qwen-code')
++        .get<boolean>('experimentalLsp')
++    ) {
++      extraArgs.push('--experimental-lsp');
++    }
+ 
+     // Retry loop for connection.connect() to handle transient spawn failures
+     // (e.g., SIGTERM during the 1-second startup grace period)
+diff --git a/packages/vscode-ide-companion/src/services/qwenDaemonProcess.test.ts b/packages/vscode-ide-companion/src/services/qwenDaemonProcess.test.ts
+index 5be54a6dd4..84f78f4ed3 100644
+--- a/packages/vscode-ide-companion/src/services/qwenDaemonProcess.test.ts
++++ b/packages/vscode-ide-companion/src/services/qwenDaemonProcess.test.ts
+@@ -83,6 +83,26 @@ async function settle(
+   await start;
+ }
+ 
++describe('QwenDaemonProcess arguments', () => {
++  beforeEach(() => {
++    vi.clearAllMocks();
++  });
++
++  it('appends extra arguments to the serve command', async () => {
++    const child = createFakeChild();
++    spawnMock.mockReturnValueOnce(child.process);
++
++    const daemon = new QwenDaemonProcess();
++    const start = daemon.start('/cli.js', '/workspace', ['--experimental-lsp']);
++    child.emitStdout('qwen serve listening on http://127.0.0.1:4100\n');
++    await start;
++
++    const args = spawnMock.mock.calls[0]![1] as string[];
++    expect(args[1]).toBe('serve');
++    expect(args.at(-1)).toBe('--experimental-lsp');
++  });
++});
++
+ describe('QwenDaemonProcess exit notification', () => {
+   beforeEach(() => {
+     vi.clearAllMocks();
+diff --git a/packages/vscode-ide-companion/src/services/qwenDaemonProcess.ts b/packages/vscode-ide-companion/src/services/qwenDaemonProcess.ts
+index 321c97f43d..2c3d053fad 100644
+--- a/packages/vscode-ide-companion/src/services/qwenDaemonProcess.ts
++++ b/packages/vscode-ide-companion/src/services/qwenDaemonProcess.ts
+@@ -47,6 +47,7 @@ export class QwenDaemonProcess {
+   start(
+     cliEntryPath: string,
+     workspaceCwd: string,
++    extraArgs: readonly string[] = [],
+   ): Promise<QwenDaemonRuntime> {
+     // A daemon is bound to one workspace at spawn. Reusing it for a different
+     // root — which a multi-root window hits as soon as a second chat opens
+@@ -87,6 +88,7 @@ export class QwenDaemonProcess {
+           '--require-auth',
+           '--allow-origin',
+           '*',
++          ...extraArgs,
+         ],
+         {
+           cwd: workspaceCwd,
+diff --git a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
+index f452d5e3c3..97ef7f5203 100644
+--- a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
++++ b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
+@@ -1838,6 +1838,11 @@ export class WebViewProvider {
+             this.context.extensionMode,
+           ),
+           canonicalWorkspaceCwd,
++          vscode.workspace
++            .getConfiguration('qwen-code')
++            .get<boolean>('experimentalLsp')
++            ? ['--experimental-lsp']
++            : [],
+         );
+         const serializedSessionId = getRestorableDaemonSessionId(
+           this.messageHandler.getCurrentConversationId(),
