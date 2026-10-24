@@ -186,6 +186,25 @@ export function apply() {
       (_, a) => `${a}line-height: 30px;`,
       (t) => t.includes('line-height: 30px;'),
     );
+    // The product name in the welcome title takes the gradient of mariadb.com's "Agentic
+    // Enterprise" heading (class text-sublime-gradient), in the dark and the light theme.
+    const gradient = [
+      '--agent-logo-gradient: linear-gradient(',
+      '    90deg,',
+      '    #51d9f7 0%,',
+      '    25%,',
+      '    #8ce786 50%,',
+      '    75%,',
+      '    #cdf70a 100%',
+      '  );',
+    ].join('\n');
+    patch(
+      'welcome title gradient',
+      'packages/web-shell/client/App.module.css',
+      /--agent-logo-gradient: linear-gradient\([^)]*\);/g,
+      () => gradient,
+      (t) => t.split(gradient).length === 3,
+    );
     patch(
       'welcome seal style',
       'packages/web-shell/client/components/WelcomeHeader.module.css',
