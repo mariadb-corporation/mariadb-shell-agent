@@ -8,7 +8,8 @@ question and answer. The main session now attaches the catalog to the
 outgoing user or cron message only when the history does not already carry
 the current one (first turn, after a memory change, after compression drops
 it), so it stays in history where it was sent, is recorded with the sent
-content (patch 0007) and replays on resume. appendAutoMemoryContext adds
+content (patch 0007) and replays on resume. ACP sessions do the same in
+their own send path (fresh user turns). appendAutoMemoryContext adds
 its request-only copy only when the history's newest catalog is outdated, so
 subagents, side queries and tool-result requests keep seeing the current
 catalog.
