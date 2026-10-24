@@ -97,6 +97,9 @@ explanation on top) and commit the new patch.
   (off by default) starts the daemon and ACP process with `--experimental-lsp`
 - `0013-lsp-servers-of-extensions-at-startup.patch`: LSP servers declared by extensions are found at
   startup (discovery ran before extensions were loaded)
+- `0014-lsp-extension-configs-keyed-by-server.patch`: an extension's `.lsp.json` with
+  `extensionToLanguage` is keyed by server name, as in Claude plugins (`/lsp` showed the command as the
+  server and the server name as its language)
 
 These are good candidates for upstream pull requests, which would retire the patches.
 
