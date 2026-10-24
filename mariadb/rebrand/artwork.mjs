@@ -187,23 +187,31 @@ export function apply() {
       (t) => t.includes('line-height: 30px;'),
     );
     // The product name in the welcome title takes the gradient of mariadb.com's "Agentic
-    // Enterprise" heading (class text-sublime-gradient), in the dark and the light theme.
-    const gradient = [
-      '--agent-logo-gradient: linear-gradient(',
-      '    90deg,',
-      '    #51d9f7 0%,',
-      '    25%,',
-      '    #8ce786 50%,',
-      '    75%,',
-      '    #cdf70a 100%',
-      '  );',
-    ].join('\n');
+    // Enterprise" heading (class text-sublime-gradient), shown there on a dark background. The dark
+    // theme (first definition) uses its colors, the light theme (second) darker shades of them
+    // (contrast above 4:1 on the white panel; the originals are 1.2-1.6:1).
+    const gradient = (cyan, green, lime) =>
+      [
+        '--agent-logo-gradient: linear-gradient(',
+        '    90deg,',
+        `    ${cyan} 0%,`,
+        '    25%,',
+        `    ${green} 50%,`,
+        '    75%,',
+        `    ${lime} 100%`,
+        '  );',
+      ].join('\n');
+    const darkGradient = gradient('#51d9f7', '#8ce786', '#cdf70a');
+    const lightGradient = gradient('#0b85a6', '#2f8a3b', '#5f7a00');
+    let definition = 0;
     patch(
       'welcome title gradient',
       'packages/web-shell/client/App.module.css',
       /--agent-logo-gradient: linear-gradient\([^)]*\);/g,
-      () => gradient,
-      (t) => t.split(gradient).length === 3,
+      () => (definition++ === 0 ? darkGradient : lightGradient),
+      (t) =>
+        t.indexOf(darkGradient) >= 0 &&
+        t.indexOf(lightGradient) > t.indexOf(darkGradient),
     );
     patch(
       'welcome seal style',
