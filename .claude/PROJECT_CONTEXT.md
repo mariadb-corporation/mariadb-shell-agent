@@ -49,6 +49,16 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   - `0006` managed-memory extraction and dream start after 10 idle seconds in interactive and ACP
     sessions (`QWEN_CODE_MEMORY_EXTRACT_IDLE_MS`); a new question restarts the wait; headless runs
     start them at once; a pending start is dropped on shutdown.
+  - `0007` the transcript also records each UserQuery/Cron prompt as sent (system record
+    `sent_user_content`, written in `client.ts` right before `turn.run`; parts equal to the user record
+    stored as `{ recordedPart: i }`), and the history rebuild (`session-api-history.ts`) puts them back,
+    so CLI `--continue`/resume replays the reminders (date, plan mode, output style, memory recall, IDE
+    context) unchanged. Tool-result-turn reminders are not covered; ACP records only the prompt text
+    itself, so ACP session resume is unchanged.
+  - `0008` the auto-memory catalog is attached to a user message only when history does not already
+    carry the current one (`autoMemoryCatalogToAttach` in `memory/request-context.ts`, used by
+    `client.ts` and ACP `Session.ts` on fresh user turns), so it stays where it was first sent;
+    `appendAutoMemoryContext` adds its request-only copy only when history's newest catalog is outdated.
 - **Alibaba removal (`alibaba.mjs`)**:
   - Alibaba-run hosts (aliyuncs, aliyun, alibabacloud, alibaba-inc, qwen.ai/.com, qwencloud(api),
     modelscope, …) get TLD `.invalid` in shipped code, tests and docs (also escaped regex spellings,
@@ -132,19 +142,18 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
      test); decide from server captures whether the environment block (date + full folder structure)
      or the deferred-tools list changes more often before changing it;
    - possibly move the per-project memory directory path out of the middle of the auto-memory section;
-   - resumed sessions (`--continue`) rebuild history without the per-turn reminders sent before;
-     persisting and replaying them was judged not worth the transcript-format change (only CLI
-     `--continue` chains benefit).
    - Server findings: this model resumes only from saved states (end of system prompt + tools, start
-     of the last message and of its final parts), so reuse snaps to those checkpoints; tool definitions
-     are rendered before the system prompt text. The server keeps separate cache entries per prefix,
-     so memory extraction, headless and ACP requests no longer evict each other.
-   - A request that first differs inside the first user message (another directory of the project:
-     the cwd in the environment block; `--continue`: the missing date reminder) falls back to the
-     system + tools checkpoint. Asked the server side for checkpoints at part boundaries inside that
-     message; the prelude parts before the cwd/date are identical across directories and modes.
+     of the last message and of its final parts; a hint within 128 tokens after the restore point is
+     skipped), so reuse snaps to those checkpoints; tool definitions are rendered before the system
+     prompt text. The state cache holds only ~14 states, so the server will not add checkpoints (e.g.
+     at part boundaries inside the first user message); separate prefixes no longer evict each other.
+   - Requests must extend the previous request unchanged to reach ~99%: anything that moves or
+     disappears between turns (as the catalog and the unrecorded reminders did before 0007/0008)
+     drops reuse to an earlier checkpoint. Still by design: another directory of the same project
+     differs at the cwd in the environment block (~75%); the first message after switching between
+     headless and ACP is cold (different tool lists).
 2. Bridge the Web Shell WebSockets (terminal etc.) if the cloud IDE needs them.
-3. Patches 0001–0006 are candidates for upstream pull requests (QwenLM requires an approved issue
+3. Patches 0001–0008 are candidates for upstream pull requests (QwenLM requires an approved issue
    first, small Conventional-Commits PRs, an E2E report comment; clean MariaDB wording and copyright
    headers out first); accepted ones retire the patches.
 4. Sync with upstream `main` as soon as it builds again: `mariadb/sync-upstream.sh --verify --push`.
