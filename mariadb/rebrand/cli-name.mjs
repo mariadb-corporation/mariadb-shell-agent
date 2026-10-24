@@ -52,6 +52,7 @@ const COMMAND_PAIRS = [
   // yargs prints its script name in help text ("Usage: qwen [options] [command]").
   ["scriptName('qwen')", `scriptName('${BINS[0]}')`],
   ['Usage: qwen ', `Usage: ${BINS[0]} `],
+  ['qwen [query..]', `${BINS[0]} [query..]`],
   ['`qwen`', `\`${BINS[0]}\``],
   ['\\`qwen\\`', `\\\`${BINS[0]}\\\``],
 ];
