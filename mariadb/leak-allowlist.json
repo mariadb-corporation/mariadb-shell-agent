@@ -65,6 +65,11 @@
     "reason": "Sample data in the /review tests (GitHub PR URLs, remotes) for code that works with any repository."
   },
   {
+    "check": "qwenlm-url",
+    "file": "^packages/cli/src/serve/hosted-workspace-tool-turn\\.test\\.ts$",
+    "reason": "Sample data in the hosted WebFetch tests: a github.com blob URL that WebFetch rewrites to raw.githubusercontent.com, for any repository."
+  },
+  {
     "check": "alibaba-host",
     "file": "nodemailer",
     "text": "aliyun",

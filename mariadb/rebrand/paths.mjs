@@ -40,10 +40,11 @@ const PAIRS = [
   // ".qwen" as a whole path segment. Not a property (`manifest?.qwen`, `x!.qwen`), part of a
   // host name (chat.qwen.ai) or of a longer name (.qwen-session, .qwencode.*). It may follow a
   // regex back-reference (`'$1.qwen'`), a URL-encoded slash (`%2F.qwen`), an escaped newline
-  // (`'\n.qwen'`, also as the gitignore negation `'\n!.qwen'`) or a glued shell flag (`-o.qwen`).
+  // (`'\n.qwen'`, also as the gitignore negation `'\n!.qwen'`), a glued shell flag (`-o.qwen`) or
+  // git pathspec magic (`':(exclude).qwen/tmp'`).
   [
     new RegExp(
-      String.raw`(?:(?<=\$\d|%2F|${STRING_ESCAPE}!?|\s-[A-Za-z])|(?<![\w.\-?)\]])(?<![\w)\]]!))\.(qwen|QWEN)(?![\w-])`,
+      String.raw`(?:(?<=\$\d|%2F|${STRING_ESCAPE}!?|\s-[A-Za-z]|:\([a-z,]+\))|(?<![\w.\-?)\]])(?<![\w)\]]!))\.(qwen|QWEN)(?![\w-])`,
       'g',
     ),
     (_, name) => (name === 'QWEN' ? CONFIG_DIR.toUpperCase() : CONFIG_DIR),

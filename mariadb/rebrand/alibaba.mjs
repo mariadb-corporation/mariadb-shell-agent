@@ -86,10 +86,13 @@ const DROPPED_GROUPS = ['qwencloud', 'alibaba'];
 const DROPPED_IDS = ['idealab', 'modelscope'];
 
 // The /review tests use QwenLM GitHub URLs as sample data (PR URLs, remotes) for code that works
-// with any repository; elsewhere tests assert the product's own URLs and follow the source.
-// (sandboxed-exec.test.ts asserts the sandbox image constant, so it follows the source.)
+// with any repository, as do the hosted WebFetch tests (a github.com blob URL that WebFetch
+// rewrites to raw.githubusercontent.com); elsewhere tests assert the product's own URLs and
+// follow the source. (sandboxed-exec.test.ts asserts the sandbox image constant, so it follows
+// the source.)
 const SAMPLE_DATA = [
   /^packages\/cli\/src\/commands\/review\/(?!lib\/sandboxed-exec\.test\.).*\.test\.[cm]?[jt]sx?$/,
+  /^packages\/cli\/src\/serve\/hosted-workspace-tool-turn\.test\.ts$/,
 ];
 export function apply() {
   const readme = /^packages\/vscode-ide-companion\/README\.md$/;
