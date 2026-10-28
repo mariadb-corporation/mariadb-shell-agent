@@ -13,10 +13,10 @@ request. The memory catalog is not part of it (upstream keeps its snapshots
 in history and records them separately). Tool-result turns are not covered.
 
 diff --git a/packages/core/src/core/client.test.ts b/packages/core/src/core/client.test.ts
-index 727e615680..05e2204f33 100644
+index ce11efea1d..b8f97e948e 100644
 --- a/packages/core/src/core/client.test.ts
 +++ b/packages/core/src/core/client.test.ts
-@@ -13191,6 +13191,33 @@ Other open files:
+@@ -13194,6 +13194,34 @@ Other open files:
          );
        });
  
@@ -38,11 +38,12 @@ index 727e615680..05e2204f33 100644
 +        const [sent, request, promptId] = recordSentUserContent.mock.calls[0]!;
 +        expect(request).toBe(recorded);
 +        expect(promptId).toBe('prompt-sent-content');
-+        expect(sent.at(-1)).toBe('Hi');
++        expect(sent.at(-1)).toEqual({ text: 'Hi' });
++        const text = (part: unknown) =>
++          typeof part === 'string' ? part : (part as { text?: string }).text;
 +        expect(
-+          sent.some(
-+            (part: unknown) =>
-+              typeof part === 'string' && part.includes('The current date is:'),
++          sent.some((part: unknown) =>
++            text(part)?.includes('The current date is:'),
 +          ),
 +        ).toBe(true);
 +      });

@@ -13,10 +13,20 @@ them right away as before. A pending start is dropped on shutdown, like any
 new background memory work.
 
 diff --git a/packages/core/src/core/client.test.ts b/packages/core/src/core/client.test.ts
-index cb567e4b66..727e615680 100644
+index cb567e4b66..ce11efea1d 100644
 --- a/packages/core/src/core/client.test.ts
 +++ b/packages/core/src/core/client.test.ts
-@@ -15583,6 +15583,91 @@ Other open files:
+@@ -1041,6 +1041,9 @@ describe('Gemini Client (client.ts)', () => {
+   });
+ 
+   afterEach(() => {
++    // An interactive turn leaves the idle memory start pending; it must not
++    // fire into a later test's mocks.
++    client?.['clearPendingManagedMemoryRun']();
+     vi.useRealTimers();
+     vi.restoreAllMocks();
+   });
+@@ -15583,6 +15586,91 @@ Other open files:
        expect(scheduleDreamSpy).not.toHaveBeenCalled();
      });
  
@@ -108,7 +118,7 @@ index cb567e4b66..727e615680 100644
      /**
       * C2: requestShutdown() is idempotent — calling it multiple times
       * should not throw or have side effects.
-@@ -15758,6 +15843,7 @@ function makeMockConfigForShutdown(
+@@ -15758,6 +15846,7 @@ function makeMockConfigForShutdown(
      isBareMode: vi.fn().mockReturnValue(false),
      getLlmClient: vi.fn().mockReturnValue(undefined),
      getProjectRoot: vi.fn().mockReturnValue('/project'),
