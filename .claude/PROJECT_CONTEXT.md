@@ -52,8 +52,9 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
     order (a `tool_search` reveal only appends).
   - `0006` managed-memory extraction and dream start after 10 idle seconds in interactive and ACP
     sessions (`QWEN_CODE_MEMORY_EXTRACT_IDLE_MS`); a new question restarts the wait; headless runs
-    start them at once; a pending start is dropped on shutdown. Only the `client.ts` path waits: ACP's
-    default path (`Session.ts`, unified agent loop off) still schedules directly, not covered.
+    start them at once; a pending start is dropped on shutdown. ACP's default path (`Session.ts`,
+    unified agent loop off) calls the client's public `scheduleManagedMemoryRun()` and, on a fresh
+    prompt, `clearPendingManagedMemoryRun()`, so both paths share one pending start.
   - `0007` the transcript also records each UserQuery/Cron prompt as sent (system record
     `sent_user_content`, written in `client.ts` right before `turn.run`; parts equal to the user record
     stored as `{ recordedPart: i }`), and the history rebuild (`session-api-history.ts`) puts them back,
