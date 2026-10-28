@@ -52,17 +52,17 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
     order (a `tool_search` reveal only appends).
   - `0006` managed-memory extraction and dream start after 10 idle seconds in interactive and ACP
     sessions (`QWEN_CODE_MEMORY_EXTRACT_IDLE_MS`); a new question restarts the wait; headless runs
-    start them at once; a pending start is dropped on shutdown.
+    start them at once; a pending start is dropped on shutdown. Only the `client.ts` path waits: ACP's
+    default path (`Session.ts`, unified agent loop off) still schedules directly, not covered.
   - `0007` the transcript also records each UserQuery/Cron prompt as sent (system record
     `sent_user_content`, written in `client.ts` right before `turn.run`; parts equal to the user record
     stored as `{ recordedPart: i }`), and the history rebuild (`session-api-history.ts`) puts them back,
     so CLI `--continue`/resume replays the reminders (date, plan mode, output style, memory recall, IDE
     context) unchanged. Tool-result-turn reminders are not covered; ACP records only the prompt text
     itself, so ACP session resume is unchanged.
-  - `0008` the auto-memory catalog is attached to a user message only when history does not already
-    carry the current one (`autoMemoryCatalogToAttach` in `memory/request-context.ts`, used by
-    `client.ts` and ACP `Session.ts` on fresh user turns), so it stays where it was first sent;
-    `appendAutoMemoryContext` adds its request-only copy only when history's newest catalog is outdated.
+  - `0008` (catalog stays where it was first sent) retired 2026-10-28: upstream #15246 does the same
+    (marked `memory_catalog_snapshot` parts kept in history, appended only on change, recorded and
+    replayed); the number stays unused.
   - `0009` web-shell composer: no dotted aura/halo around the focused composer (`.dacAura`, `.dacHalo`
     hidden), no glow on the send button, whose arrow is the execute bolt of the MariaDB VS Code
     extension in `currentColor` (`SendIcon` in `ChatEditor.tsx`).
@@ -177,7 +177,7 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
      differs at the cwd in the environment block (~75%); the first message after switching between
      headless and ACP is cold (different tool lists).
 2. Bridge the Web Shell WebSockets (terminal etc.) if the Cloud Workbench needs them.
-3. Patches 0001–0008 and 0011–0014 are candidates for upstream pull requests (0009/0010 are product
+3. Patches 0001–0007 and 0011–0014 are candidates for upstream pull requests (0009/0010 are product
    choices) (QwenLM requires an approved issue
    first, small Conventional-Commits PRs, an E2E report comment; clean MariaDB wording and copyright
    headers out first); accepted ones retire the patches.

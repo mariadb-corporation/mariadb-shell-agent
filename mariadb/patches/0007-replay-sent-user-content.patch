@@ -9,14 +9,14 @@ tools. The client now also records the user content of a UserQuery or Cron
 turn as it went out (system record `sent_user_content`; parts unchanged from
 the user record are stored as references, so images are not stored twice),
 and the history rebuild puts those parts back in place of the recorded
-request. The memory catalog stays request-only, as before. Tool-result turns
-are not covered.
+request. The memory catalog is not part of it (upstream keeps its snapshots
+in history and records them separately). Tool-result turns are not covered.
 
 diff --git a/packages/core/src/core/client.test.ts b/packages/core/src/core/client.test.ts
-index 60d0f4f6c7..a250602243 100644
+index 727e615680..05e2204f33 100644
 --- a/packages/core/src/core/client.test.ts
 +++ b/packages/core/src/core/client.test.ts
-@@ -12317,6 +12317,33 @@ Other open files:
+@@ -13191,6 +13191,33 @@ Other open files:
          );
        });
  
@@ -51,10 +51,10 @@ index 60d0f4f6c7..a250602243 100644
          const mockMessageBus = promptSubmitBus({ output: undefined });
  
 diff --git a/packages/core/src/core/client.ts b/packages/core/src/core/client.ts
-index f7f346be46..53aab7011c 100644
+index d1e4a93fe4..5375d149d8 100644
 --- a/packages/core/src/core/client.ts
 +++ b/packages/core/src/core/client.ts
-@@ -5176,6 +5176,17 @@ export class LlmClient {
+@@ -5420,6 +5420,17 @@ export class LlmClient {
        // actual history push (see `userContentPushSnapshotKey`); a
        // client-side snapshot taken here would still cover the send-lock
        // and compression awaits between `turn.run` and that push.
@@ -73,18 +73,18 @@ index f7f346be46..53aab7011c 100644
        pushInitiated = true;
        agentOutput.beginResponse();
 diff --git a/packages/core/src/services/chatRecordingService.test.ts b/packages/core/src/services/chatRecordingService.test.ts
-index aac11ed120..01ef9351df 100644
+index c2b5137c05..03cc515bdf 100644
 --- a/packages/core/src/services/chatRecordingService.test.ts
 +++ b/packages/core/src/services/chatRecordingService.test.ts
-@@ -33,6 +33,7 @@ import {
- import { MAX_RETAINED_TOOL_RESULT_DISPLAY_CHARS } from '../utils/toolResultDisplayCompaction.js';
- import * as jsonl from '../utils/jsonl-utils.js';
- import { computeInitialTurnFromHistory } from './session-turn-state.js';
+@@ -36,6 +36,7 @@ import {
+   collectSessionTurnState,
+   computeInitialTurnFromHistory,
+ } from './session-turn-state.js';
 +import { buildApiHistoryFromConversation } from './session-api-history.js';
  import type { Content, Part } from '@google/genai';
  import type { FileDiff, McpAppResultDisplay } from '../tools/tools.js';
  import {
-@@ -404,6 +405,51 @@ describe('ChatRecordingService', () => {
+@@ -408,6 +409,51 @@ describe('ChatRecordingService', () => {
      });
    });
  
@@ -137,7 +137,7 @@ index aac11ed120..01ef9351df 100644
      const hookText = [
        '<qwen:user-prompt-submit-context>',
 diff --git a/packages/core/src/services/chatRecordingService.ts b/packages/core/src/services/chatRecordingService.ts
-index 50d1c0ce48..cdc79eb9ca 100644
+index f1d5fdc44d..a49efedac6 100644
 --- a/packages/core/src/services/chatRecordingService.ts
 +++ b/packages/core/src/services/chatRecordingService.ts
 @@ -28,6 +28,7 @@ import {
@@ -146,17 +146,17 @@ index 50d1c0ce48..cdc79eb9ca 100644
  import type {
 +  Part,
    PartListUnion,
+   Part,
    Content,
-   FunctionDeclaration,
-@@ -400,6 +401,7 @@ export interface ChatRecord {
+@@ -405,6 +406,7 @@ export interface ChatRecord {
      | 'session_source'
      | 'session_execution_engine'
      | 'omni_recall'
 +    | 'sent_user_content'
      | 'session_model'
      | 'session_approval_mode'
-     | 'rewind'
-@@ -536,7 +538,8 @@ export interface ChatRecord {
+     | 'session_workflow_mode'
+@@ -543,7 +545,8 @@ export interface ChatRecord {
      | GoalTurnEndRecordPayload
      | TurnResultRecordPayload
      | AgentMessageRecordPayload
@@ -166,7 +166,7 @@ index 50d1c0ce48..cdc79eb9ca 100644
  
    /** Background subagent that produced this record (e.g. "explore-7f3c"). */
    agentId?: string;
-@@ -596,6 +599,15 @@ export interface NotificationRecordPayload {
+@@ -603,6 +606,15 @@ export interface NotificationRecordPayload {
    };
  }
  
@@ -182,7 +182,7 @@ index 50d1c0ce48..cdc79eb9ca 100644
  export interface UserPromptRecordPayload {
    /**
     * Core/headless: submitted projection, otherwise expanded pre-hook text.
-@@ -3226,6 +3238,43 @@ export class ChatRecordingService {
+@@ -3524,6 +3536,43 @@ export class ChatRecordingService {
     * this record the transcript would never show what memory the model was
     * given — the trajectory exporter reads it back as `turn.recall`.
     */
@@ -227,19 +227,11 @@ index 50d1c0ce48..cdc79eb9ca 100644
      try {
        const record: ChatRecord = {
 diff --git a/packages/core/src/services/session-api-history.test.ts b/packages/core/src/services/session-api-history.test.ts
-index 14fc8ddfb6..35f325cde6 100644
+index d244a6d0a2..4eeeec3409 100644
 --- a/packages/core/src/services/session-api-history.test.ts
 +++ b/packages/core/src/services/session-api-history.test.ts
-@@ -21,6 +21,7 @@ import { buildSessionRecoveryPlanFromApiHistory } from '../core/session-recovery
- import {
-   buildApiHistoryFromConversation,
-   buildSessionHistoryFromConversation,
-+  getApiHistoryPromptId,
-   getLastApiHistoryPromptId,
-   getLastApiPromptCancellation,
-   markApiHistoryPrompt,
-@@ -1192,3 +1193,69 @@ describe('internal Code Mode tool results', () => {
-     );
+@@ -1359,3 +1359,69 @@ describe('prompt resolution across tool-loop continuations', () => {
+     expect(findApiHistoryPromptIndex(history, 'session########1')).toBe(-1);
    });
  });
 +
@@ -309,7 +301,7 @@ index 14fc8ddfb6..35f325cde6 100644
 +  });
 +});
 diff --git a/packages/core/src/services/session-api-history.ts b/packages/core/src/services/session-api-history.ts
-index 0aa2c83cd5..3aa44c4967 100644
+index da14663915..293f33f74e 100644
 --- a/packages/core/src/services/session-api-history.ts
 +++ b/packages/core/src/services/session-api-history.ts
 @@ -10,6 +10,7 @@ import type {
@@ -319,8 +311,8 @@ index 0aa2c83cd5..3aa44c4967 100644
 +  SentUserContentRecordPayload,
    SlashCommandRecordPayload,
    TurnResultRecordPayload,
- } from './chatRecordingService.js';
-@@ -360,6 +361,10 @@ export class SessionApiHistoryAccumulator {
+   UserPromptRecordPayload,
+@@ -425,6 +426,10 @@ export class SessionApiHistoryAccumulator {
          }
          return;
        }
@@ -331,7 +323,7 @@ index 0aa2c83cd5..3aa44c4967 100644
        if (!isApiHistoryCompressionCandidate(record)) return;
        const payload = record.systemPayload as ChatCompressionRecordPayload;
        this.compressionCandidate = payload.compressedHistory;
-@@ -418,6 +423,41 @@ export class SessionApiHistoryAccumulator {
+@@ -483,6 +488,41 @@ export class SessionApiHistoryAccumulator {
      this.lastMaterialRecord = record;
    }
  
@@ -374,7 +366,7 @@ index 0aa2c83cd5..3aa44c4967 100644
      return [...this.completedToolCallIds];
    }
 diff --git a/packages/core/src/utils/message-group-deletion.ts b/packages/core/src/utils/message-group-deletion.ts
-index df4e8d304b..09b9094c24 100644
+index 69f15e73e4..5e09cd2bbc 100644
 --- a/packages/core/src/utils/message-group-deletion.ts
 +++ b/packages/core/src/utils/message-group-deletion.ts
 @@ -112,6 +112,7 @@ const GROUP_SYSTEM_SUBTYPES = new Set([
@@ -386,22 +378,22 @@ index df4e8d304b..09b9094c24 100644
    'turn_result',
    'turn_attempt',
 diff --git a/packages/core/src/utils/transcript-records.test.ts b/packages/core/src/utils/transcript-records.test.ts
-index 825958810d..9ed4e00593 100644
+index b8dc29dcc3..4bca4796a8 100644
 --- a/packages/core/src/utils/transcript-records.test.ts
 +++ b/packages/core/src/utils/transcript-records.test.ts
-@@ -476,6 +476,7 @@ describe('validateTranscriptRecord', () => {
+@@ -477,6 +477,7 @@ describe('validateTranscriptRecord', () => {
      session_source: true,
      session_execution_engine: true,
      omni_recall: true,
 +    sent_user_content: true,
      session_model: true,
      session_approval_mode: true,
-     rewind: true,
+     session_workflow_mode: true,
 diff --git a/packages/core/src/utils/transcript-records.ts b/packages/core/src/utils/transcript-records.ts
-index 99654e85ea..a1ec1ffff9 100644
+index 64618adf83..c168cb94df 100644
 --- a/packages/core/src/utils/transcript-records.ts
 +++ b/packages/core/src/utils/transcript-records.ts
-@@ -142,6 +142,7 @@ const KNOWN_RECORD_SUBTYPES = new Set([
+@@ -144,6 +144,7 @@ const KNOWN_RECORD_SUBTYPES = new Set([
    'session_source',
    'session_model',
    'omni_recall',

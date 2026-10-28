@@ -13,10 +13,10 @@ them right away as before. A pending start is dropped on shutdown, like any
 new background memory work.
 
 diff --git a/packages/core/src/core/client.test.ts b/packages/core/src/core/client.test.ts
-index a5fa560c02..60d0f4f6c7 100644
+index cb567e4b66..727e615680 100644
 --- a/packages/core/src/core/client.test.ts
 +++ b/packages/core/src/core/client.test.ts
-@@ -14396,6 +14396,91 @@ Other open files:
+@@ -15583,6 +15583,91 @@ Other open files:
        expect(scheduleDreamSpy).not.toHaveBeenCalled();
      });
  
@@ -108,7 +108,7 @@ index a5fa560c02..60d0f4f6c7 100644
      /**
       * C2: requestShutdown() is idempotent — calling it multiple times
       * should not throw or have side effects.
-@@ -14571,6 +14656,7 @@ function makeMockConfigForShutdown(
+@@ -15758,6 +15843,7 @@ function makeMockConfigForShutdown(
      isBareMode: vi.fn().mockReturnValue(false),
      getLlmClient: vi.fn().mockReturnValue(undefined),
      getProjectRoot: vi.fn().mockReturnValue('/project'),
@@ -117,10 +117,10 @@ index a5fa560c02..60d0f4f6c7 100644
      getMemoryManager: vi.fn().mockReturnValue(mgr),
      getManagedAutoMemoryEnabled: vi.fn().mockReturnValue(true),
 diff --git a/packages/core/src/core/client.ts b/packages/core/src/core/client.ts
-index a39998a680..f7f346be46 100644
+index e57b72c781..d1e4a93fe4 100644
 --- a/packages/core/src/core/client.ts
 +++ b/packages/core/src/core/client.ts
-@@ -3277,50 +3277,95 @@ export class LlmClient {
+@@ -3375,58 +3375,103 @@ export class LlmClient {
        return;
      }
  
@@ -132,6 +132,14 @@ index a39998a680..f7f346be46 100644
 -        sessionId,
 -        history,
 -        config: this.config,
+-        ...(getExtractNoopSkipTurns() > 0 && {
+-          // The next prompt's known base; see isBelowCompactionWarn.
+-          belowCompactionWarn: isBelowCompactionWarn(
+-            this.config,
+-            this.getChat().getLastPromptTokenCount() +
+-              this.getChat().getLastOutputTokenCount(),
+-          ),
+-        }),
 -      })
 -      .then((result) => result.touchedTopics.length)
 -      .catch((error: unknown) => {
@@ -151,6 +159,14 @@ index a39998a680..f7f346be46 100644
 +          sessionId,
 +          history,
 +          config: this.config,
++          ...(getExtractNoopSkipTurns() > 0 && {
++            // The next prompt's known base; see isBelowCompactionWarn.
++            belowCompactionWarn: isBelowCompactionWarn(
++              this.config,
++              this.getChat().getLastPromptTokenCount() +
++                this.getChat().getLastOutputTokenCount(),
++            ),
++          }),
 +        })
 +        .then((result) => result.touchedTopics.length)
 +        .catch((error: unknown) => {
@@ -259,7 +275,7 @@ index a39998a680..f7f346be46 100644
    }
  
    /**
-@@ -3672,6 +3717,10 @@ export class LlmClient {
+@@ -3790,6 +3835,10 @@ export class LlmClient {
        SendMessageType.UserQuery,
    ): AsyncGenerator<ServerLlmStreamEvent, Turn> {
      const messageType = options?.type ?? SendMessageType.UserQuery;
