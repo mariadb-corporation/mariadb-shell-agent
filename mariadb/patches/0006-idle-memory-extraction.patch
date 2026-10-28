@@ -130,7 +130,7 @@ index 8f3db8b2a5..33de86eae7 100644
  
          it('wraps additionalContext in the reserved tag before sending', async () => {
 diff --git a/packages/cli/src/acp-integration/session/Session.ts b/packages/cli/src/acp-integration/session/Session.ts
-index 5e58b81498..8484499a08 100644
+index 5e58b81498..ff4567b5af 100644
 --- a/packages/cli/src/acp-integration/session/Session.ts
 +++ b/packages/cli/src/acp-integration/session/Session.ts
 @@ -324,8 +324,6 @@ import {
@@ -148,7 +148,7 @@ index 5e58b81498..8484499a08 100644
                !isRuntimeContinuation;
 +            if (isFreshUserTurn) {
 +              // A new question while extraction waits for an idle session.
-+              this.config.getLlmClient().clearPendingManagedMemoryRun();
++              this.config.getLlmClient().clearPendingManagedMemoryRun?.();
 +            }
              const strippedPromptIds = (
                isRetry ? strippedRetryEntries : (strippedOrphanEntries ?? [])
