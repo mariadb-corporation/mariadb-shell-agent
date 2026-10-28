@@ -15,6 +15,7 @@
 import { changed, failures, stats } from './rebrand/lib.mjs';
 import * as patches from './rebrand/patches.mjs';
 import * as identity from './rebrand/identity.mjs';
+import * as version from './rebrand/version.mjs';
 import * as productName from './rebrand/product-name.mjs';
 import * as artwork from './rebrand/artwork.mjs';
 import * as alibaba from './rebrand/alibaba.mjs';
@@ -29,6 +30,7 @@ import * as skippedTests from './rebrand/skipped-tests.mjs';
 for (const rule of [
   patches,
   identity,
+  version,
   productName,
   artwork,
   alibaba,

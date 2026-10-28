@@ -47,7 +47,7 @@ upstream/main (or an older upstream commit, see --to)
 ```
 
 - `mariadb/rebrand.mjs` runs the rules in `mariadb/rebrand/`, one module per topic (identity,
-  product name, artwork, alibaba, paths, cli-name, extension-ids, review, skipped-tests). Each
+  version, product name, artwork, alibaba, paths, cli-name, extension-ids, review, skipped-tests). Each
   rule fails loudly when upstream moves its anchor.
 - `mariadb/rebrand/skipped-tests.mjs` lists the upstream tests of behaviour we removed (update
   checks, usage statistics defaults, Alibaba providers in pickers, QwenLM endpoints), each group
@@ -132,6 +132,12 @@ mariadb/build-vsix.sh             # this machine, e.g. mariadb/dist/mariadb-code
 mariadb/build-vsix.sh universal   # any platform, no node-pty: for the MariaDB Cloud Workbench (Pi, arm64)
 code --install-extension mariadb/dist/mariadb-code-<v>-darwin-arm64.vsix
 ```
+
+The packages carry the fork's own version from `mariadb/VERSION` (`<v>` above; year.month.n,
+e.g. 26.10.1), set only for the build: the extension manifest during packaging, the bundled CLI
+through `MARIADB_FORK_VERSION` (`mariadb/rebrand/version.mjs`). The sources, the workspace and the
+tests keep upstream's version; the upstream base is recorded in the branding commit. Bump
+`mariadb/VERSION` for each build you hand out.
 
 Each build is leak-scanned after packaging. In `../mariadb-workbench`: `npm run
 plugin:mariadb-code` unpacks the newest universal build into `plugins/`, then `npm run deploy:pi`.

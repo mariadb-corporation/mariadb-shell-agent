@@ -120,6 +120,11 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   sdk-typescript, core, cli, reruns failing files one by one twice, reruns the rest on the upstream base
   sources and reports only failures the fork causes (needs a clean tree; it `reset --hard`s).
   `mariadb/rebrand/skipped-tests.mjs` lists upstream tests of removed behaviour, grouped with reasons.
+- **Version**: the fork's own version is `mariadb/VERSION` (year.month.n, started at 26.10.1 on
+  2026-10-28), applied only to the built packages: `build-vsix.sh` sets the extension manifest for
+  the build and exports `MARIADB_FORK_VERSION`, which `rebrand/version.mjs` makes `esbuild.config.js`
+  (CLI_VERSION) and `scripts/prepare-package.js` (dist package version) prefer. Sources, lockfile
+  and tests keep upstream's version; native optional deps (audio-capture) keep their pins.
 - **Builds**: `mariadb/build-vsix.sh` (this machine, with node-pty) or `universal` (no node-pty; for the
   Linux arm64 Cloud Workbench) → `mariadb/dist/`; it deletes the extension's `dist/` first (esbuild leaves stale
   hashed chunks that would be packaged) and leak-scans the `.vsix`. In `mariadb-workbench`,

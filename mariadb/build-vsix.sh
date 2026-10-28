@@ -27,7 +27,23 @@ esac
 grep -q '"publisher": "MariaDB"' packages/vscode-ide-companion/package.json ||
   { echo "branding not applied; run node mariadb/rebrand.mjs" >&2; exit 1; }
 
-VERSION=$(node -p "require('./packages/vscode-ide-companion/package.json').version")
+# The packages carry the fork's version (mariadb/VERSION); the sources keep upstream's. The CLI
+# bundle and its package.json take it from MARIADB_FORK_VERSION (rebrand/version.mjs), the
+# extension manifest is set to it for the build and restored afterwards.
+VERSION=$(tr -d '[:space:]' < mariadb/VERSION)
+export MARIADB_FORK_VERSION=$VERSION
+MANIFEST=packages/vscode-ide-companion/package.json
+MANIFEST_BACKUP=$(mktemp)
+cp "$MANIFEST" "$MANIFEST_BACKUP"
+trap 'cp "$MANIFEST_BACKUP" "$MANIFEST"; rm -f "$MANIFEST_BACKUP"' EXIT
+node -e '
+  const fs = require("fs");
+  const [file, version] = process.argv.slice(1);
+  const pkg = JSON.parse(fs.readFileSync(file, "utf8"));
+  pkg.version = version;
+  fs.writeFileSync(file, JSON.stringify(pkg, null, 2) + "\n");
+' "$MANIFEST" "$VERSION"
+
 OUT="$PWD/mariadb/dist/mariadb-code-$VERSION-$TARGET.vsix"
 mkdir -p mariadb/dist
 
