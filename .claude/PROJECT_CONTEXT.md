@@ -79,6 +79,8 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
     take minutes).
   - `0014` extension `.lsp.json` entries with `extensionToLanguage` are keyed by server name (Claude
     format); a project's own `.lsp.json` stays keyed by language.
+  - `0015` no "Companion extension successfully installed." notification on first activation
+    (product choice; the extension's own `showInformationMessage`, not VS Code's install notice).
 - **Alibaba removal (`alibaba.mjs`)**:
   - Alibaba-run hosts (aliyuncs, aliyun, alibabacloud, alibaba-inc, qwen.ai/.com, qwencloud(api),
     modelscope, …) get TLD `.invalid` in shipped code, tests and docs (also escaped regex spellings,
@@ -183,7 +185,7 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
      differs at the cwd in the environment block (~75%); the first message after switching between
      headless and ACP is cold (different tool lists).
 2. Bridge the Web Shell WebSockets (terminal etc.) if the Cloud Workbench needs them.
-3. Patches 0001–0007 and 0011–0014 are candidates for upstream pull requests (0009/0010 are product
+3. Patches 0001–0007 and 0011–0014 are candidates for upstream pull requests (0009/0010/0015 are product
    choices) (QwenLM requires an approved issue
    first, small Conventional-Commits PRs, an E2E report comment; clean MariaDB wording and copyright
    headers out first); accepted ones retire the patches.

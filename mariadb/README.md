@@ -97,6 +97,8 @@ explanation on top) and commit the new patch.
 - `0014-lsp-extension-configs-keyed-by-server.patch`: an extension's `.lsp.json` with
   `extensionToLanguage` is keyed by server name, as in Claude plugins (`/lsp` showed the command as the
   server and the server name as its language)
+- `0015-no-installation-greeting.patch`: no "Companion extension successfully installed." notification
+  on the extension's first activation
 
 These are good candidates for upstream pull requests, which would retire the patches.
 
