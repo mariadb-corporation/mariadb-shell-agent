@@ -137,18 +137,10 @@ index c2b5137c05..03cc515bdf 100644
      const hookText = [
        '<qwen:user-prompt-submit-context>',
 diff --git a/packages/core/src/services/chatRecordingService.ts b/packages/core/src/services/chatRecordingService.ts
-index f1d5fdc44d..a49efedac6 100644
+index f1d5fdc44d..bf8715b7e8 100644
 --- a/packages/core/src/services/chatRecordingService.ts
 +++ b/packages/core/src/services/chatRecordingService.ts
-@@ -28,6 +28,7 @@ import {
- import { createHash, randomUUID } from 'node:crypto';
- import { isDeepStrictEqual } from 'node:util';
- import type {
-+  Part,
-   PartListUnion,
-   Part,
-   Content,
-@@ -405,6 +406,7 @@ export interface ChatRecord {
+@@ -405,6 +405,7 @@ export interface ChatRecord {
      | 'session_source'
      | 'session_execution_engine'
      | 'omni_recall'
@@ -156,7 +148,7 @@ index f1d5fdc44d..a49efedac6 100644
      | 'session_model'
      | 'session_approval_mode'
      | 'session_workflow_mode'
-@@ -543,7 +545,8 @@ export interface ChatRecord {
+@@ -543,7 +544,8 @@ export interface ChatRecord {
      | GoalTurnEndRecordPayload
      | TurnResultRecordPayload
      | AgentMessageRecordPayload
@@ -166,7 +158,7 @@ index f1d5fdc44d..a49efedac6 100644
  
    /** Background subagent that produced this record (e.g. "explore-7f3c"). */
    agentId?: string;
-@@ -603,6 +606,15 @@ export interface NotificationRecordPayload {
+@@ -603,6 +605,15 @@ export interface NotificationRecordPayload {
    };
  }
  
@@ -182,7 +174,7 @@ index f1d5fdc44d..a49efedac6 100644
  export interface UserPromptRecordPayload {
    /**
     * Core/headless: submitted projection, otherwise expanded pre-hook text.
-@@ -3524,6 +3536,43 @@ export class ChatRecordingService {
+@@ -3524,6 +3535,43 @@ export class ChatRecordingService {
     * this record the transcript would never show what memory the model was
     * given — the trajectory exporter reads it back as `turn.recall`.
     */
