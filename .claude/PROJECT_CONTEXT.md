@@ -2,8 +2,8 @@
 
 ## Project
 
-A fork of [Qwen Code](https://github.com/QwenLM/qwen-code) rebranded as **MariaDB Code**: the CLI
-(`mariadb-code`, short `mdbc`), the VS Code extension `MariaDB.mariadb-code` (used in desktop VS Code and
+A fork of [Qwen Code](https://github.com/QwenLM/qwen-code) rebranded as **MariaDB Shell Agent** (named MariaDB Code until 2026-10-30; the local checkout is still `~/git/mariadb-code`, the NAS repo is `mariadb-shell-agent`; no migration from `~/.mariadb-code`): the CLI
+(`mariadb-shell-agent`, short `msa`), the VS Code extension `MariaDB.mariadb-shell-agent` (used in desktop VS Code and
 in the Theia-based MariaDB Cloud Workbench of the sibling `mariadb-workbench` repository) and the daemon's Web
 Shell. The fork follows upstream closely (rebased as soon as upstream moves), ships no Alibaba endpoints and
 does not identify itself as Qwen Code to anyone. The maintenance workflow is documented for humans in
@@ -71,7 +71,7 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   - `0011` Claude plugin conversion: a plugin.json `mcpServers` file path in `.mcp.json` format is
     unwrapped (servers were nested under one server named `mcpServers`); a root `.lsp.json` becomes
     `lspServers` when plugin.json declares none (Claude Code's convention).
-  - `0012` extension setting `mariadb-code.experimentalLsp` (off by default) adds `--experimental-lsp`
+  - `0012` extension setting `mariadb-shell-agent.experimentalLsp` (off by default) adds `--experimental-lsp`
     to the daemon (`serve`) and ACP spawns; the flag is the CLI's only LSP switch.
   - `0013` LSP discovery runs in `loadCliConfig` before `Config.initialize()` loads extensions, so
     extension LSP servers were never found at startup; `initialize()` now calls
@@ -93,22 +93,22 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   - Usage statistics and auto-update default off — two default paths each (`?? true` in config and in
     `resolveUsageStatisticsEnabled`; `enableAutoUpdate !== false` checks) plus schema defaults; the
     analytics endpoint is `usage-statistics.invalid` with an empty app id; dist npm name
-    `@mariadb/mariadb-code` (npm self-update finds nothing); no OpenRouter/Requesty attribution headers.
-- **Names**: `~/.mariadb-code` and `<project>/.mariadb-code` (the repo's own project dir is renamed too),
-  `MARIADB-CODE.md`, `.mariadb-codeignore`, commands `mariadb-code`/`mdbc` (also in help text and logs),
-  extension ids `mariadb-code.*`, terminal title "MariaDB Code - <folder>", `/review` footer.
-  `MARIADB_CODE_<X>` overrides `QWEN_<X>`/`QWEN_CODE_<X>` via a generated
+    `@mariadb/mariadb-shell-agent` (npm self-update finds nothing); no OpenRouter/Requesty attribution headers.
+- **Names**: `~/.mariadb-shell-agent` and `<project>/.mariadb-shell-agent` (the repo's own project dir is renamed too),
+  `MARIADB-SHELL-AGENT.md`, `.mariadb-shell-agentignore`, commands `mariadb-shell-agent`/`msa` (also in help text and logs),
+  extension ids `mariadb-shell-agent.*`, terminal title "MariaDB Shell Agent - <folder>", `/review` footer.
+  `MARIADB_SHELL_AGENT_<X>` overrides `QWEN_<X>`/`QWEN_CODE_<X>` via a generated
   `packages/cli/src/mariadb-env-aliases.ts`, imported first by `packages/cli/src/cli.ts` (not `index.ts`:
   `index.test.ts` loads `index.ts` with fixture modules).
-- **Outbound identity (`outbound.mjs`)**: User-Agent `MariaDBCode/<version>` (model providers,
-  preconnect), `mariadb-code` for downloads, MCP client name `mariadb-code-mcp-client-<server>`, ACP agent
-  name `mariadb-code`, system settings paths (`/etc/mariadb-code`, `ProgramData\mariadb-code`,
-  `Application Support/MariaDBCode`).
+- **Outbound identity (`outbound.mjs`)**: User-Agent `MariaDBShellAgent/<version>` (model providers,
+  preconnect), `mariadb-shell-agent` for downloads, MCP client name `mariadb-shell-agent-mcp-client-<server>`, ACP agent
+  name `mariadb-shell-agent`, system settings paths (`/etc/mariadb-shell-agent`, `ProgramData\mariadb-shell-agent`,
+  `Application Support/MariaDBShellAgent`).
 - **Kept on purpose**: `QWEN_*` variable names, internal file names inside the config dir,
   `qwen-extension.json`, Qwen model names, `<!-- qwen-review -->` markers, the `Qwen-Code-CI-Bot` login,
   license headers and NOTICE files (Apache-2.0 requires them, so the code's origin stays traceable).
 - **Artwork**: app icon = white MariaDB seal on `#003545` (`mariadb/assets/app-icon.svg` + PNGs); activity
-  bar = `mariadb/assets/mariadb-code-ext.svg`, shipped as `assets/activity-bar-<sha8>.svg` because VS Code
+  bar = `mariadb/assets/mariadb-shell-agent-ext.svg`, shipped as `assets/activity-bar-<sha8>.svg` because VS Code
   caches icons by URL and a same-version reinstall would keep the old one; MARIADB ASCII banner in
   `mariadb/assets/ascii-logo.txt`. Web Shell welcome screen (artwork rule): `WelcomeSeal.tsx` is
   generated from `mariadb/assets/seal-mono.svg` and shown above the title (text color), the wrapped
@@ -190,7 +190,7 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
    first, small Conventional-Commits PRs, an E2E report comment; clean MariaDB wording and copyright
    headers out first); accepted ones retire the patches.
 4. Sync with upstream `main` as soon as it builds again: `mariadb/sync-upstream.sh --verify --push`.
-5. Multi-user Cloud Workbench: one IDE instance per user (shared workspace, `~/.mariadb-code` and OS account
+5. Multi-user Cloud Workbench: one IDE instance per user (shared workspace, `~/.mariadb-shell-agent` and OS account
    otherwise); the bridge already works per extension host.
 
 ## Gotchas / things not to repeat
@@ -208,7 +208,7 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   dots, upper/lower-case variants, words glued after sanitizing. Length-capped tests break on the longer
   names (adjust anchored numbers, don't skip).
 - A rename must reach both writer and reader: e.g. the extension parses the daemon's
-  `mariadb-code serve listening on` line with a regex literal.
+  `mariadb-shell-agent serve listening on` line with a regex literal.
 - Don't remove Alibaba presets from `ALL_PROVIDERS`: internal code throws without them.
 - Don't treat every QwenLM URL in tests as sample data: most assert the product's own constants.
 - `.pnpmfile.mjs` must stay untouched (the lockfile pins its checksum).
@@ -231,7 +231,7 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 - The CLI bundle for quick tests: `npm run bundle` produces `dist/cli.js` (no `cli-entry.js`).
 - `.claude/` is ignored by upstream's `.gitignore`; its files are tracked, but changes need `git add -f`.
 - Measuring prompt caching: point a provider's `baseUrl` (in a temporary HOME's
-  `.mariadb-code/settings.json`) at a recording stub, run the CLI (`-p`, `--continue`, or `--acp` with a
+  `.mariadb-shell-agent/settings.json`) at a recording stub, run the CLI (`-p`, `--continue`, or `--acp` with a
   small JSON-RPC client) to capture real requests, then replay them against the server with
   `max_tokens: 1` and read `usage.prompt_tokens_details.cached_tokens`. Network behaviour: a Node
   `--import` hook wrapping `dns.lookup` and `net.Socket.prototype.connect` logs every lookup and
