@@ -1,26 +1,25 @@
-# MariaDB Code
+# MariaDB Shell Agent
 
-MariaDB Code (the product is named **MariaDB Shell Agent**; repository, command, config directory
-and extension ID keep `mariadb-code`) is a fork of [Qwen Code](https://github.com/QwenLM/qwen-code) with MariaDB branding,
+MariaDB Shell Agent (formerly MariaDB Code) is a fork of [Qwen Code](https://github.com/QwenLM/qwen-code) with MariaDB branding,
 including the VS Code extension (used in local VS Code and in `../mariadb-workbench`). It follows
 upstream closely: the fork is rebased onto upstream as soon as upstream moves.
 
 ## What differs from upstream
 
-| Area                                | MariaDB Code                                                                        | Upstream                                                 |
+| Area                                | MariaDB Shell Agent                                                                 | Upstream                                                 |
 | ----------------------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------- |
 | Name, icons, banner, Web Shell logo | MariaDB Shell Agent, MariaDB seal                                                   | Qwen Code                                                |
-| CLI command                         | `mariadb-code`, short `mdbc`                                                        | `qwen`                                                   |
-| Config directory                    | `~/.mariadb-code`, `<project>/.mariadb-code`                                        | `.qwen`                                                  |
-| Project instructions                | `MARIADB-CODE.md` (`AGENTS.md` is read too)                                         | `QWEN.md`                                                |
-| Ignore file                         | `.mariadb-codeignore`                                                               | `.qwenignore`                                            |
-| Environment                         | `MARIADB_CODE_<X>` overrides `QWEN_<X>` / `QWEN_CODE_<X>`                           | `QWEN_*` only                                            |
-| VS Code extension                   | `MariaDB.mariadb-code`, commands and settings `mariadb-code.*`                      | `qwenlm.qwen-code-vscode-ide-companion`, `qwen-code.*`   |
+| CLI command                         | `mariadb-shell-agent`, short `msa`                                                  | `qwen`                                                   |
+| Config directory                    | `~/.mariadb-shell-agent`, `<project>/.mariadb-shell-agent`                          | `.qwen`                                                  |
+| Project instructions                | `MARIADB-SHELL-AGENT.md` (`AGENTS.md` is read too)                                  | `QWEN.md`                                                |
+| Ignore file                         | `.mariadb-shell-agentignore`                                                        | `.qwenignore`                                            |
+| Environment                         | `MARIADB_SHELL_AGENT_<X>` overrides `QWEN_<X>` / `QWEN_CODE_<X>`                    | `QWEN_*` only                                            |
+| VS Code extension                   | `MariaDB.mariadb-shell-agent`, commands and settings `mariadb-shell-agent.*`        | `qwenlm.qwen-code-vscode-ide-companion`, `qwen-code.*`   |
 | Model providers offered             | DeepSeek, Grok, MiniMax, Z.AI, Kimi, OpenRouter, Requesty, custom OpenAI-compatible | also QwenCloud, Alibaba ModelStudio, Idealab, ModelScope |
 | Alibaba endpoints                   | none: every Alibaba and QwenLM host is made unresolvable (`.invalid`)               | self-update, telemetry, Qwen OAuth, …                    |
 | Usage statistics, self-update       | off by default, and nowhere to send to or download from                             | on                                                       |
 
-Not renamed: the `QWEN_*` variable names themselves (169 of them; use the `MARIADB_CODE_*`
+Not renamed: the `QWEN_*` variable names themselves (169 of them; use the `MARIADB_SHELL_AGENT_*`
 aliases), internal file names inside the config directory, `qwen-extension.json` (the extension
 manifest format), and Qwen model names.
 
@@ -81,7 +80,7 @@ explanation on top) and commit the new patch.
 - `0005-append-revealed-tools.patch`: tools revealed via `tool_search` are appended to the tools block
   instead of sorted into it
 - `0006-idle-memory-extraction.patch`: memory extraction and dream wait for an idle session (10 s,
-  `MARIADB_CODE_MEMORY_EXTRACT_IDLE_MS`) instead of running in parallel with the next question
+  `MARIADB_SHELL_AGENT_MEMORY_EXTRACT_IDLE_MS`) instead of running in parallel with the next question
 - `0007-replay-sent-user-content.patch`: the transcript also records each prompt as it was sent
   (with the date, plan-mode, output-style and memory-recall reminders and the IDE context), and
   `--continue`/resume replays it unchanged, so a resumed session keeps the prompt cache
@@ -91,7 +90,7 @@ explanation on top) and commit the new patch.
 - `0011-claude-plugin-mcp-and-lsp-files.patch`: Claude plugins whose plugin.json names an `.mcp.json`
   get its servers (were nested under one server called `mcpServers`), and a root `.lsp.json` is used
   when plugin.json declares no LSP servers
-- `0012-extension-setting-experimental-lsp.patch`: extension setting `mariadb-code.experimentalLsp`
+- `0012-extension-setting-experimental-lsp.patch`: extension setting `mariadb-shell-agent.experimentalLsp`
   (off by default) starts the daemon and ACP process with `--experimental-lsp`
 - `0013-lsp-servers-of-extensions-at-startup.patch`: LSP servers declared by extensions are found at
   startup (discovery ran before extensions were loaded)
@@ -105,10 +104,10 @@ These are good candidates for upstream pull requests, which would retire the pat
 
 ## Remotes
 
-| Remote     | URL                                             | Use                        |
-| ---------- | ----------------------------------------------- | -------------------------- |
+| Remote     | URL                                                    | Use                        |
+| ---------- | ------------------------------------------------------ | -------------------------- |
 | `NAS`      | `https://github.com/mariadb-corporation/mariadb-shell-agent` | our fork; `main` tracks it |
-| `upstream` | `https://github.com/QwenLM/qwen-code`           | fetch only (push disabled) |
+| `upstream` | `https://github.com/QwenLM/qwen-code`                  | fetch only (push disabled) |
 
 ## Sync with upstream
 
@@ -131,9 +130,9 @@ when the leak scan finds a new occurrence: extend a rule, or allowlist it with a
 
 ```sh
 corepack pnpm install --frozen-lockfile
-mariadb/build-vsix.sh             # this machine, e.g. mariadb/dist/mariadb-code-<v>-darwin-arm64.vsix
+mariadb/build-vsix.sh             # this machine, e.g. mariadb/dist/mariadb-shell-agent-<v>-darwin-arm64.vsix
 mariadb/build-vsix.sh universal   # any platform, no node-pty: for the MariaDB Cloud Workbench (Pi, arm64)
-code --install-extension mariadb/dist/mariadb-code-<v>-darwin-arm64.vsix
+code --install-extension mariadb/dist/mariadb-shell-agent-<v>-darwin-arm64.vsix
 ```
 
 The packages carry the fork's own version from `mariadb/VERSION` (`<v>` above; year.month.n,
@@ -149,7 +148,7 @@ plugin:mariadb-code` unpacks the newest universal build into `plugins/`, then `n
 
 `mariadb/assets/` holds the artwork:
 
-- `mariadb-code-ext.svg`: the activity-bar icon (monochrome; VS Code and Theia tint it to the theme).
+- `mariadb-shell-agent-ext.svg`: the activity-bar icon (monochrome; VS Code and Theia tint it to the theme).
 - `app-icon.svg` and its PNG renders: the extension and Web Shell icon, a white MariaDB seal on dark
   teal `#003545`, made from `../mariadb-shell/docs-ref/build/img/mariadb-logo-light.png`.
 - `seal-mono.svg`: the traced seal (favicon of exported HTML transcripts).

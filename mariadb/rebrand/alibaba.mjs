@@ -302,7 +302,7 @@ export function apply() {
     'dist package name',
     'scripts/prepare-package.js',
     'name: rootPackageJson.name,',
-    "name: '@mariadb/mariadb-code',",
-    (t) => t.includes("name: '@mariadb/mariadb-code',"),
+    "name: '@mariadb/mariadb-shell-agent',",
+    (t) => t.includes("name: '@mariadb/mariadb-shell-agent',"),
   );
 }

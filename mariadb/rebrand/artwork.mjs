@@ -30,15 +30,17 @@ export function apply() {
     'icon-blue.png',
     'packages/vscode-ide-companion/assets/icon-blue.png',
   );
-  // Activity bar: the MariaDB Code mark (designed for it; monochrome, the IDE tints it). It is
+  // Activity bar: the MariaDB Shell Agent mark (designed for it; monochrome, the IDE tints it). It is
   // shipped under a content-hashed name: VS Code caches the icon by URL, and installing the same
   // extension version again would keep showing the previous artwork.
   copyAsset(
-    'mariadb-code-ext.svg',
+    'mariadb-shell-agent-ext.svg',
     'packages/vscode-ide-companion/assets/sidebar-icon.svg',
   );
   {
-    const svg = fs.readFileSync(path.join(assets, 'mariadb-code-ext.svg'));
+    const svg = fs.readFileSync(
+      path.join(assets, 'mariadb-shell-agent-ext.svg'),
+    );
     const hash = crypto
       .createHash('sha256')
       .update(svg)
@@ -144,7 +146,7 @@ export function apply() {
     `"Press 'r' to restart"`,
     (t) => t.includes(`"Press 'r' to restart"`),
   );
-  // Web Shell welcome screen: the seal above "Welcome to MariaDB Code", and a tighter line spacing
+  // Web Shell welcome screen: the seal above "Welcome to MariaDB Shell Agent", and a tighter line spacing
   // when that title wraps (narrow side panels).
   {
     const viewBox = sealMono.match(/viewBox="([^"]+)"/)[1];

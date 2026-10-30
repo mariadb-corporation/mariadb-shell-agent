@@ -3,11 +3,11 @@
 MariaDB Shell Agent is an AI agent for MariaDB in the terminal and in VS Code, built by MariaDB on
 [Qwen Code](https://github.com/QwenLM/qwen-code).
 
-- Command: `mariadb-code` (short: `mdbc`)
-- Settings: `~/.mariadb-code/settings.json`, per project `.mariadb-code/settings.json`
-- Project instructions: `MARIADB-CODE.md` (`AGENTS.md` is read too)
-- Ignore rules: `.mariadb-codeignore`
-- Environment: every `QWEN_<X>` setting can also be given as `MARIADB_CODE_<X>`
+- Command: `mariadb-shell-agent` (short: `msa`)
+- Settings: `~/.mariadb-shell-agent/settings.json`, per project `.mariadb-shell-agent/settings.json`
+- Project instructions: `MARIADB-SHELL-AGENT.md` (`AGENTS.md` is read too)
+- Ignore rules: `.mariadb-shell-agentignore`
+- Environment: every `QWEN_<X>` setting can also be given as `MARIADB_SHELL_AGENT_<X>`
 
 Model providers: DeepSeek, Grok, MiniMax, Z.AI, Kimi, OpenRouter, Requesty, or any
 OpenAI-compatible endpoint (including local servers):

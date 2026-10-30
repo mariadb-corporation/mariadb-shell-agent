@@ -13,8 +13,8 @@ import {
   write,
 } from './lib.mjs';
 
-export const EXTENSION_ID = 'MariaDB.mariadb-code';
-export const EXTENSION_NAME = 'mariadb-code';
+export const EXTENSION_ID = 'MariaDB.mariadb-shell-agent';
+export const EXTENSION_NAME = 'mariadb-shell-agent';
 
 export function apply() {
   // The npm workspace name is the extension name, so build scripts that address the workspace

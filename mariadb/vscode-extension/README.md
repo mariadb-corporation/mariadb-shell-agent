@@ -28,9 +28,9 @@ on upstream regularly.
 | `MariaDB Shell Agent: Accept Current Diff` | Accept the currently displayed diff                    |
 | `MariaDB Shell Agent: Close Diff Editor`   | Close/reject the current diff                          |
 
-Settings live in `~/.mariadb-code/settings.json` (per project: `.mariadb-code/`), project
-instructions in `MARIADB-CODE.md` (`AGENTS.md` is read too), and ignore rules in
-`.mariadb-codeignore`. The bundled CLI is available as `mariadb-code` (short: `mdbc`).
+Settings live in `~/.mariadb-shell-agent/settings.json` (per project: `.mariadb-shell-agent/`), project
+instructions in `MARIADB-SHELL-AGENT.md` (`AGENTS.md` is read too), and ignore rules in
+`.mariadb-shell-agentignore`. The bundled CLI is available as `mariadb-shell-agent` (short: `msa`).
 
 ## License
 

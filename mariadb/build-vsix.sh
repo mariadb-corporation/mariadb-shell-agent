@@ -1,5 +1,5 @@
 #!/bin/bash
-# Builds the MariaDB Code VS Code extension into mariadb/dist/.
+# Builds the MariaDB Shell Agent VS Code extension into mariadb/dist/.
 #
 #   mariadb/build-vsix.sh            # for this machine (e.g. darwin-arm64), with node-pty
 #   mariadb/build-vsix.sh universal  # any platform, without node-pty (MariaDB Cloud Workbench on the Pi)
@@ -44,13 +44,13 @@ node -e '
   fs.writeFileSync(file, JSON.stringify(pkg, null, 2) + "\n");
 ' "$MANIFEST" "$VERSION"
 
-OUT="$PWD/mariadb/dist/mariadb-code-$VERSION-$TARGET.vsix"
+OUT="$PWD/mariadb/dist/mariadb-shell-agent-$VERSION-$TARGET.vsix"
 mkdir -p mariadb/dist
 
 # esbuild never empties dist/: chunks of earlier builds would end up in the package.
 rm -rf packages/vscode-ide-companion/dist
 
 # The extension's prepackage step bundles the CLI and Web Shell into dist/ first.
-npm --workspace=mariadb-code run package -- ${TARGET_ARGS[@]+"${TARGET_ARGS[@]}"} --out "$OUT"
+npm --workspace=mariadb-shell-agent run package -- ${TARGET_ARGS[@]+"${TARGET_ARGS[@]}"} --out "$OUT"
 node mariadb/check-leaks.mjs "$OUT"
 echo "built $OUT"

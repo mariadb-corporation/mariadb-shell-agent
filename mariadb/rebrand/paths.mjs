@@ -1,6 +1,6 @@
 /**
- * File and directory names users see: ~/.mariadb-code and <project>/.mariadb-code instead of
- * .qwen, MARIADB-CODE.md instead of QWEN.md, .mariadb-codeignore instead of .qwenignore.
+ * File and directory names users see: ~/.mariadb-shell-agent and <project>/.mariadb-shell-agent instead of
+ * .qwen, MARIADB-SHELL-AGENT.md instead of QWEN.md, .mariadb-shell-agentignore instead of .qwenignore.
  * Internal files inside those directories (.qwen-session, locks, ...) keep their names.
  */
 import {
@@ -15,9 +15,9 @@ import {
   trackedFiles,
 } from './lib.mjs';
 
-export const CONFIG_DIR = '.mariadb-code';
-export const CONTEXT_FILE = 'MARIADB-CODE';
-export const IGNORE_FILE = '.mariadb-codeignore';
+export const CONFIG_DIR = '.mariadb-shell-agent';
+export const CONTEXT_FILE = 'MARIADB-SHELL-AGENT';
+export const IGNORE_FILE = '.mariadb-shell-agentignore';
 
 const PAIRS = [
   [/\.qwenignore\b/g, IGNORE_FILE],

@@ -6,8 +6,8 @@ next question (on a single-stream local server both decoded at a fraction
 of their speed) and their side prompt could take the conversation's place in
 a provider's prompt cache. Where a next question can come (interactive and
 ACP sessions) they now start only after the session has been idle for 10
-seconds (QWEN_CODE_MEMORY_EXTRACT_IDLE_MS; MARIADB_CODE_MEMORY_EXTRACT_IDLE_MS
-in MariaDB Code); a new question restarts the wait, and the next idle period
+seconds (QWEN_CODE_MEMORY_EXTRACT_IDLE_MS; MARIADB_SHELL_AGENT_MEMORY_EXTRACT_IDLE_MS
+in MariaDB Shell Agent); a new question restarts the wait, and the next idle period
 covers both turns (extraction resumes from its cursor). Headless runs start
 them right away as before. A pending start is dropped on shutdown, like any
 new background memory work. ACP sessions that end a turn outside the client's

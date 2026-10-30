@@ -38,6 +38,11 @@ const CHECKS = [
     re: /\((?:[\w-]+\|)*(?:qwen|QWEN)(?:\|[\w-]+)*\)\\\.(?:md|MD)|\\\.\((?:[\w-]+\|)*qwen(?:\|[\w-]+)*\)/g,
   },
   { id: 'product-name', re: /\bQwen Code\b/g },
+  // The fork's former name (MariaDB Code, mariadb-code / mdbc, ~/.mariadb-code, MARIADB_CODE_*).
+  {
+    id: 'former-name',
+    re: /\bMariaDB ?Code\b|\bmariadb-code\b|\bMARIADB[-_]CODE\b|\bmdbc\b/gi,
+  },
   {
     // Identifiers sent to other parties (User-Agent, MCP client name, analytics app id) and the
     // system-wide settings paths.

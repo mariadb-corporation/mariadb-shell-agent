@@ -1,4 +1,4 @@
-/** "Qwen Code" → "MariaDB Code" in UI strings, prompts, locales, tests and snapshots. */
+/** "Qwen Code" → "MariaDB Shell Agent" in UI strings, prompts, locales, tests and snapshots. */
 import {
   DOCS_DIRS,
   DOCS_EXTENSIONS,

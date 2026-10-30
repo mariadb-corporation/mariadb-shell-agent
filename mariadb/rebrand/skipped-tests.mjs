@@ -1,5 +1,5 @@
 /**
- * Upstream tests of behaviour MariaDB Code deliberately does not have. Each entry names the
+ * Upstream tests of behaviour MariaDB Shell Agent deliberately does not have. Each entry names the
  * reason; a title upstream renames or deletes stops the rebrand, so the list cannot go stale.
  * Keep it short: a test that fails because a rule renamed something inconsistently is a rule bug,
  * not an entry here.

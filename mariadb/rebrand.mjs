@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Applies the MariaDB Code branding to a clean upstream Qwen Code tree.
+ * Applies the MariaDB Shell Agent branding to a clean upstream Qwen Code tree.
  *
  *   node mariadb/rebrand.mjs
  *

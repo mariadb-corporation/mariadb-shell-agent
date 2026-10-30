@@ -1,5 +1,5 @@
 /**
- * What MariaDB Code tells other parties about itself: the User-Agent sent to model providers,
+ * What MariaDB Shell Agent tells other parties about itself: the User-Agent sent to model providers,
  * GitHub and connection warm-ups, the client name sent to MCP servers, the agent name in the ACP
  * handshake, and the system-wide settings paths. Upstream names Qwen Code in all of them.
  */
@@ -18,16 +18,16 @@ export function apply() {
     [...SHIPPED_DIRS, ...DOCS_DIRS],
     [
       // `QwenCode/<version> (<os>; <arch>)` and the preconnect agent.
-      [/\bQwenCode(?=\/|-Preconnect\/)/g, 'MariaDBCode'],
+      [/\bQwenCode(?=\/|-Preconnect\/)/g, 'MariaDBShellAgent'],
       // Skill and runtime downloads (`'User-Agent': 'qwen-code'`, `` `qwen-code/${version}` ``).
-      [/('User-Agent': ['`])qwen-code(?=['`/])/g, '$1mariadb-code'],
+      [/('User-Agent': ['`])qwen-code(?=['`/])/g, '$1mariadb-shell-agent'],
       // MCP client name sent in every MCP initialize request.
-      ['qwen-cli-mcp-client-', 'mariadb-code-mcp-client-'],
+      ['qwen-cli-mcp-client-', 'mariadb-shell-agent-mcp-client-'],
       // System-wide settings (macOS, Windows, Linux).
-      ['Application Support/QwenCode', 'Application Support/MariaDBCode'],
-      ['ProgramData\\\\qwen-code', 'ProgramData\\\\mariadb-code'],
-      ['ProgramData\\qwen-code', 'ProgramData\\mariadb-code'],
-      ['/etc/qwen-code', '/etc/mariadb-code'],
+      ['Application Support/QwenCode', 'Application Support/MariaDBShellAgent'],
+      ['ProgramData\\\\qwen-code', 'ProgramData\\\\mariadb-shell-agent'],
+      ['ProgramData\\qwen-code', 'ProgramData\\mariadb-shell-agent'],
+      ['/etc/qwen-code', '/etc/mariadb-shell-agent'],
     ],
     {
       extensions: DOCS_EXTENSIONS,
@@ -38,7 +38,7 @@ export function apply() {
     'acp agent name',
     'packages/cli/src/acp-integration/acpAgent.ts',
     /(agentInfo: \{\n\s+name: )'qwen-code'/,
-    "$1'mariadb-code'",
-    (t) => /agentInfo: \{\n\s+name: 'mariadb-code'/.test(t),
+    "$1'mariadb-shell-agent'",
+    (t) => /agentInfo: \{\n\s+name: 'mariadb-shell-agent'/.test(t),
   );
 }
