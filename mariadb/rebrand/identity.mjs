@@ -5,6 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {
+  PRODUCT,
   failures,
   mariadbDir,
   patchJson,
@@ -44,13 +45,14 @@ export function apply() {
         failures.push(`extension manifest: named "${pkg.name}"`);
       }
       Object.assign(pkg, {
-        displayName: 'MariaDB Code',
+        displayName: PRODUCT,
         description:
-          'MariaDB Code with direct access to your VS Code workspace.',
+          'An AI agent for MariaDB, with direct access to your VS Code workspace.',
         publisher: 'MariaDB',
         keywords: [
           'mariadb',
-          'mariadb code',
+          'mariadb shell',
+          'mariadb shell agent',
           'ai',
           'agent',
           'cli',

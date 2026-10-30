@@ -1,15 +1,15 @@
-# MariaDB Code Companion
+# MariaDB Shell Agent
 
-MariaDB Code inside Visual Studio Code (and Theia-based IDEs such as the MariaDB Cloud Workbench): a chat
-panel, native diffs and workspace context for the MariaDB Code agent. The extension bundles the
-MariaDB Code CLI, so nothing else needs to be installed.
+An AI agent for MariaDB inside Visual Studio Code (and Theia-based IDEs such as the MariaDB Cloud
+Workbench): a chat panel, native diffs and workspace context. The extension bundles the agent's
+CLI, so nothing else needs to be installed.
 
-MariaDB Code is a MariaDB build of [Qwen Code](https://github.com/QwenLM/qwen-code), rebased on
-upstream regularly.
+MariaDB Shell Agent is a MariaDB build of [Qwen Code](https://github.com/QwenLM/qwen-code), rebased
+on upstream regularly.
 
 ## Features
 
-- **Chat panel**: open it from the MariaDB icon in the activity bar or the editor title bar
+- **Chat panel**: open it from the MariaDB icon in the activity bar or the command palette
 - **Native diffing**: review, edit and accept changes in VS Code's diff view
 - **Auto-accept edits mode**: apply changes as they are made
 - **File context**: @-mention files, attach files and images, share the active file and selection
@@ -21,16 +21,16 @@ upstream regularly.
 
 ## Commands
 
-| Command                             | Description                                            |
-| ----------------------------------- | ------------------------------------------------------ |
-| `MariaDB Code: Open`                | Open the MariaDB Code chat panel                       |
-| `MariaDB Code: Run`                 | Launch a classic terminal session with the bundled CLI |
-| `MariaDB Code: Accept Current Diff` | Accept the currently displayed diff                    |
-| `MariaDB Code: Close Diff Editor`   | Close/reject the current diff                          |
+| Command                                    | Description                                            |
+| ------------------------------------------ | ------------------------------------------------------ |
+| `MariaDB Shell Agent: Open`                | Open the MariaDB Shell Agent chat panel                |
+| `MariaDB Shell Agent: Run`                 | Launch a classic terminal session with the bundled CLI |
+| `MariaDB Shell Agent: Accept Current Diff` | Accept the currently displayed diff                    |
+| `MariaDB Shell Agent: Close Diff Editor`   | Close/reject the current diff                          |
 
 Settings live in `~/.mariadb-code/settings.json` (per project: `.mariadb-code/`), project
 instructions in `MARIADB-CODE.md` (`AGENTS.md` is read too), and ignore rules in
-`.mariadb-codeignore`. The bundled CLI is also available as `mariadb-code` (short: `mdbc`).
+`.mariadb-codeignore`. The bundled CLI is available as `mariadb-code` (short: `mdbc`).
 
 ## License
 

@@ -16,7 +16,7 @@ export const mariadbDir = path.resolve(
 export const root = path.resolve(mariadbDir, '..');
 export const assets = path.join(mariadbDir, 'assets');
 
-export const PRODUCT = 'MariaDB Code';
+export const PRODUCT = 'MariaDB Shell Agent';
 
 /**
  * Regex source for a string escape in source text (`\n`, `\u2028`, `\x1b`, ...). A name right

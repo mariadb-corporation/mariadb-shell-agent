@@ -6,6 +6,7 @@
 import {
   DOCS_DIRS,
   DOCS_EXTENSIONS,
+  PRODUCT,
   SHIPPED_DIRS,
   STRING_ESCAPE,
   failures,
@@ -155,7 +156,7 @@ export function apply() {
   replaceInTracked(
     'window title',
     ['packages/cli/src'],
-    [['Qwen - ', 'MariaDB Code - ']],
+    [['Qwen - ', `${PRODUCT} - `]],
   );
 
   const aliases = envAliases();

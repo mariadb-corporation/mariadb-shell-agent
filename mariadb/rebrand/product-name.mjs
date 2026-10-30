@@ -40,8 +40,15 @@ export function apply() {
       ['ask Qwen', `ask ${PRODUCT}`],
       ['How is Qwen doing', `How is ${PRODUCT} doing`],
       ['stdout shown to Qwen', `stdout shown to ${PRODUCT}`],
-      ['start coding with Qwen.', `start coding with ${PRODUCT}.`],
-      ['开始使用 Qwen 编码', `开始使用 ${PRODUCT} 编码`],
+      // The extension's welcome text: the agent does more than write code.
+      [
+        'Connect a model provider to start coding with Qwen.',
+        'Connect a model provider to get started.',
+      ],
+      [
+        '连接一个模型服务商，开始使用 Qwen 编码。',
+        '连接一个模型服务商即可开始使用。',
+      ],
     ],
     { skip: SKIP, extensions: DOCS_EXTENSIONS },
   );

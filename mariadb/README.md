@@ -1,6 +1,7 @@
 # MariaDB Code
 
-MariaDB Code is a fork of [Qwen Code](https://github.com/QwenLM/qwen-code) with MariaDB branding,
+MariaDB Code (the product is named **MariaDB Shell Agent**; repository, command, config directory
+and extension ID keep `mariadb-code`) is a fork of [Qwen Code](https://github.com/QwenLM/qwen-code) with MariaDB branding,
 including the VS Code extension (used in local VS Code and in `../mariadb-workbench`). It follows
 upstream closely: the fork is rebased onto upstream as soon as upstream moves.
 
@@ -8,7 +9,7 @@ upstream closely: the fork is rebased onto upstream as soon as upstream moves.
 
 | Area                                | MariaDB Code                                                                        | Upstream                                                 |
 | ----------------------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| Name, icons, banner, Web Shell logo | MariaDB Code, MariaDB seal                                                          | Qwen Code                                                |
+| Name, icons, banner, Web Shell logo | MariaDB Shell Agent, MariaDB seal                                                   | Qwen Code                                                |
 | CLI command                         | `mariadb-code`, short `mdbc`                                                        | `qwen`                                                   |
 | Config directory                    | `~/.mariadb-code`, `<project>/.mariadb-code`                                        | `.qwen`                                                  |
 | Project instructions                | `MARIADB-CODE.md` (`AGENTS.md` is read too)                                         | `QWEN.md`                                                |
@@ -86,7 +87,7 @@ explanation on top) and commit the new patch.
   `--continue`/resume replays it unchanged, so a resumed session keeps the prompt cache
 - `0009-calm-composer.patch`: no aura or glow around the focused composer and on the send button;
   the send button shows the execute bolt of the MariaDB VS Code extension instead of an arrow
-- `0010-no-open-button-in-editor-toolbars.patch`: no "MariaDB Code: Open" button in editor title bars
+- `0010-no-open-button-in-editor-toolbars.patch`: no "MariaDB Shell Agent: Open" button in editor title bars
 - `0011-claude-plugin-mcp-and-lsp-files.patch`: Claude plugins whose plugin.json names an `.mcp.json`
   get its servers (were nested under one server called `mcpServers`), and a root `.lsp.json` is used
   when plugin.json declares no LSP servers

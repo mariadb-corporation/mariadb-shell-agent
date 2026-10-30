@@ -1,6 +1,6 @@
-# MariaDB Code
+# MariaDB Shell Agent
 
-MariaDB Code is an AI coding agent for the terminal and for VS Code, built by MariaDB on
+MariaDB Shell Agent is an AI agent for MariaDB in the terminal and in VS Code, built by MariaDB on
 [Qwen Code](https://github.com/QwenLM/qwen-code).
 
 - Command: `mariadb-code` (short: `mdbc`)
@@ -29,7 +29,7 @@ OpenAI-compatible endpoint (including local servers):
 }
 ```
 
-Usage statistics and self-update are off, and MariaDB Code contacts no Alibaba services.
+Usage statistics and self-update are off, and MariaDB Shell Agent contacts no Alibaba services.
 
 How this fork is maintained (rebasing on upstream, branding rules, checks): `mariadb/README.md`.
 
