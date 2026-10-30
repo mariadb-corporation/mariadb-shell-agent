@@ -47,7 +47,7 @@ upstream/main (or an older upstream commit, see --to)
 ```
 
 - `mariadb/rebrand.mjs` runs the rules in `mariadb/rebrand/`, one module per topic (identity,
-  version, product name, artwork, alibaba, paths, cli-name, extension-ids, review, skipped-tests). Each
+  version, product name, name length, alibaba, paths, cli-name, extension-ids, review, skipped-tests). Each
   rule fails loudly when upstream moves its anchor.
 - `mariadb/rebrand/skipped-tests.mjs` lists the upstream tests of behaviour we removed (update
   checks, usage statistics defaults, Alibaba providers in pickers, QwenLM endpoints), each group
