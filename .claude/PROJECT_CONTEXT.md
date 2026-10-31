@@ -2,7 +2,8 @@
 
 ## Project
 
-A fork of [Qwen Code](https://github.com/QwenLM/qwen-code) rebranded as **MariaDB Shell Agent** (named MariaDB Code until 2026-10-30; the local checkout is still `~/git/mariadb-code`, the NAS repo is `mariadb-shell-agent`; no migration from `~/.mariadb-code`): the CLI
+A fork of [Qwen Code](https://github.com/QwenLM/qwen-code) rebranded as **MariaDB Shell Agent** (former name MariaDB Code / `mariadb-code` / `mdbc`; the NAS repo
+is `mariadb-shell-agent`; nothing migrates from `~/.mariadb-code`): the CLI
 (`mariadb-shell-agent`, short `msa`), the VS Code extension `MariaDB.mariadb-shell-agent` (used in desktop VS Code and
 in the Theia-based MariaDB Cloud Workbench of the sibling `mariadb-workbench` repository) and the daemon's Web
 Shell. The fork follows upstream closely (rebased as soon as upstream moves), ships no Alibaba endpoints and
@@ -20,7 +21,7 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   run `rebrand.mjs`, commit, `corepack pnpm install --frozen-lockfile`, leak scan, optional test gate,
   `--push` = `git push --force-with-lease NAS main` (history is rewritten every sync).
 - **`mariadb/rebrand.mjs`** runs rule modules from `mariadb/rebrand/` in order: `patches`, `identity`,
-  `product-name`, `artwork`, `alibaba`, `paths`, `cli-name`, `extension-ids`, `review`, `outbound`,
+  `version`, `product-name`, `name-length`, `artwork`, `alibaba`, `paths`, `cli-name`, `extension-ids`, `review`, `outbound`,
   `skipped-tests`. Helpers in `lib.mjs`: `patch()` must find its anchor (skips when `alreadyDone`),
   `replaceInTracked()` (string or RegExp pairs, never touches lines containing "copyright"), `rename()`
   (moves files and maps git-listed paths), `skipTests()`. A rule whose anchor upstream removed stops the
@@ -116,11 +117,12 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   (`--agent-logo-gradient` in `App.module.css`: `.themeDark` #51d9f7 → #8ce786 → #cdf70a, `.themeLight`
   #0093c4 → #00a37a → #5c9f00, saturated shades with at least 3:1 contrast on white; the originals
   are unreadable there).
-- **Checks**: `mariadb/check-leaks.mjs [paths|.vsix]` scans source or build output for old names, Alibaba
-  and QwenLM hosts, outbound identifiers; exceptions with reasons in `mariadb/leak-allowlist.json`.
+- **Checks**: `mariadb/check-leaks.mjs [paths|.vsix]` scans source or build output for old names (also the
+  former MariaDB Code names), Alibaba and QwenLM hosts, outbound identifiers; exceptions with reasons in `mariadb/leak-allowlist.json`.
   `mariadb/verify.mjs [--quick]` runs vitest in vscode-ide-companion, web-shell, acp-bridge,
   sdk-typescript, core, cli, reruns failing files one by one twice, reruns the rest on the upstream base
-  sources and reports only failures the fork causes (needs a clean tree; it `reset --hard`s).
+  sources and reports only failures the fork causes (needs a clean tree and checks out upstream files
+  mid-run, so don't edit the tree while it runs (~1 h); it `reset --hard`s at the end).
   `mariadb/rebrand/skipped-tests.mjs` lists upstream tests of removed behaviour, grouped with reasons.
 - **Version**: the fork's own version is `mariadb/VERSION` (year.month.n, started at 26.10.1 on
   2026-10-28), applied only to the built packages: `build-vsix.sh` sets the extension manifest for
@@ -130,7 +132,7 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 - **Builds**: `mariadb/build-vsix.sh` (this machine, with node-pty) or `universal` (no node-pty; for the
   Linux arm64 Cloud Workbench) → `mariadb/dist/`; it deletes the extension's `dist/` first (esbuild leaves stale
   hashed chunks that would be packaged) and leak-scans the `.vsix`. In `mariadb-workbench`,
-  `npm run plugin:mariadb-code` unpacks the newest universal build, `npm run deploy:pi` builds there.
+  `npm run plugin:mariadb-shell-agent` unpacks the newest universal build, `npm run deploy:pi` builds there.
 
 ## Current state
 
@@ -206,7 +208,10 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   word (`\nqwen`, `\u2028qwen`), regex back-references (`'$1.qwen'`), URL-encoded slashes (`%2F.qwen`),
   glued shell flags (`-o.qwen`), gitignore negations, regex alternations (`(AGENTS|QWEN)\.md`), escaped
   dots, upper/lower-case variants, words glued after sanitizing. Length-capped tests break on the longer
-  names (adjust anchored numbers, don't skip).
+  names (adjust anchored numbers, don't skip); tests where a sentence naming the product wraps, a
+  table header fits or a dialog's row count depends on it are adjusted in `rebrand/name-length.mjs`.
+- The `/review` footer rule (`review.mjs`) rewrites "Qwen<splice>Code" to "MariaDB Shell<splice>Agent";
+  `submit.test` fillers are sized to the 240-character cap, so shrink them when the name grows.
 - A rename must reach both writer and reader: e.g. the extension parses the daemon's
   `mariadb-shell-agent serve listening on` line with a regex literal.
 - Don't remove Alibaba presets from `ALL_PROVIDERS`: internal code throws without them.
