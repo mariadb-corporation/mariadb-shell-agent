@@ -250,8 +250,9 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 - Test a rule or patch change end to end in a scratch worktree: `git worktree add --detach <dir>
   <upstream base>`, copy `mariadb/` in, `node mariadb/rebrand.mjs`, run the tests; reset with
   `git reset --hard && git clean -fd` (a half-reset tree makes the patches "conflict").
-- Claude Code's auto mode blocks `git push --force-with-lease` (also `sync-upstream.sh --push`), even
-  when asked; the user runs `! git push --force-with-lease NAS main` after a local sync.
+- Claude Code's auto mode blocks `git push --force-with-lease` (also `sync-upstream.sh --push`) unless
+  the user explicitly grants force-push permission; otherwise sync locally and let the user run
+  `! git push --force-with-lease NAS main`.
 - macOS has no `timeout` command; bound test runs inside the Node script instead.
 - Claude plugins install from a local clone used as marketplace: `extensions install <repo>:<plugin>
   --consent` (MariaDB's `ai-plugins` repo: plugin `dev`). Hooks come from `hooks/hooks.json`, a `Bash`
