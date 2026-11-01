@@ -82,6 +82,21 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
     format); a project's own `.lsp.json` stays keyed by language.
   - `0015` no "Companion extension successfully installed." notification on first activation
     (product choice; the extension's own `showInformationMessage`, not VS Code's install notice).
+  - `0016` extension provider setup: nothing starts on first load; Get Started, `/auth` or the auth
+    command opens a wizard in the webview (`components/AuthWizard.tsx`, descriptors from
+    `describeWizardProvider` in `handlers/AuthMessageHandler.ts`, types in `authWizardTypes.ts`) with
+    the old QuickPick/InputBox steps (provider → protocol → API → base URL → key → models → thinking,
+    per `shouldShowStep`). Messages `authWizard` / `authWizardSubmit` / `authWizardCancel` /
+    `authWizardError` (validation, wizard stays open) / `authWizardDone` (always last); `authError`
+    also keeps it open; `WebViewProvider` replays an open wizard on `webviewReady`. Adds the core
+    preset `openai` ("OpenAI API Key", `OPENAI_API_KEY`, Responses API at `https://api.openai.com`
+    without `/v1`, default model `gpt-6.1-sol`, editable; owns only `[OpenAI] …` models, so hand-made
+    `OPENAI_API_KEY` models survive an install). Welcome title: 32px, the Web Shell product-name
+    gradient (`TITLE_GRADIENT` in `QwenOnboarding.tsx`).
+  - `0017` GPT-6 models (per developers.openai.com/api/docs/models): reasoning controls for
+    `gpt-6.1-sol` (thinking mandatory, like upstream's `gpt-6-astra`), `gpt-6.1-terra` and
+    `gpt-6-luna` (accept `none`, so thinking can be switched off); `/^gpt-6/` token limits 922K input,
+    128K output (were the generic GPT fallback, 128K/16K).
 - **Alibaba removal (`alibaba.mjs`)**:
   - Alibaba-run hosts (aliyuncs, aliyun, alibabacloud, alibaba-inc, qwen.ai/.com, qwencloud(api),
     modelscope, …) get TLD `.invalid` in shipped code, tests and docs (also escaped regex spellings,
@@ -90,7 +105,11 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   - Alibaba presets stay registered (reasoning overrides, the extension's plan definitions and web search
     look them up) but are filtered out of the picker groups, the ACP provider list, the Web Shell
     catalog and the CLI dialogs' main menus; the extension's Coding Plan settings are removed from its
-    manifest. Offered: DeepSeek, Grok, MiniMax, Z.AI, Kimi, OpenRouter, Requesty, custom.
+    manifest. Offered everywhere (CLI, Web Shell, ACP, extension wizard), in this order:
+    OpenRouter, Requesty, OpenAI, Grok, custom — `OFFERED_PROVIDER_IDS` in `alibaba.mjs` (ordered
+    allow-list) and `AUTH_WIZARD_PROVIDER_IDS` in patch 0016. DeepSeek, MiniMax, Z.AI and Kimi stay
+    registered (existing settings keep working) but are not offered; their upstream tests that walk
+    to them are in `skipped-tests.mjs`.
   - Usage statistics and auto-update default off — two default paths each (`?? true` in config and in
     `resolveUsageStatisticsEnabled`; `enableAutoUpdate !== false` checks) plus schema defaults; the
     analytics endpoint is `usage-statistics.invalid` with an empty app id; dist npm name
@@ -148,7 +167,8 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
     the browser's saved layout; after plugin changes icons can swap until F1 → Reset Workbench Layout.
   - Upstream tests that fail or flake on their own (verify attributes them to upstream): `server.test`
     route 404s under load, `acp-output` EOF, `file-verdicts` temp dir, `memoryDiscovery` ANSI stripping,
-    real-interpreter `standalone-update` tests under load.
+    real-interpreter `standalone-update` tests under load. On pristine upstream (not after the
+    rebrand) `provider-config.test` "matches a multi-baseUrl preset" fails.
 
 ## Files that matter
 
@@ -159,6 +179,8 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 - `mariadb/build-vsix.sh`, `mariadb/assets/`, `mariadb/vscode-extension/README.md` (extension README),
   `mariadb/product-README.md` (becomes the root `README.md` and the CLI package README)
 - Upstream code the rules or patches hook into: `packages/core/src/providers/all-providers.ts`,
+  `packages/core/src/core/{reasoning-effort.ts,tokenLimits.ts}` (model capabilities),
+  `packages/vscode-ide-companion/src/webview/{EmbeddedApp.tsx,handlers/AuthMessageHandler.ts}` (setup wizard),
   `packages/core/src/core/prompts.ts`, `packages/core/src/memory/memoryDiscovery.ts`,
   `packages/core/src/core/environmentContext.ts` (startup prelude order),
   `packages/core/src/telemetry/{config.ts,qwen-logger/qwen-logger.ts}`,
@@ -187,7 +209,7 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
      differs at the cwd in the environment block (~75%); the first message after switching between
      headless and ACP is cold (different tool lists).
 2. Bridge the Web Shell WebSockets (terminal etc.) if the Cloud Workbench needs them.
-3. Patches 0001–0007 and 0011–0014 are candidates for upstream pull requests (0009/0010/0015 are product
+3. Patches 0001–0007, 0011–0014 and 0017 are candidates for upstream pull requests (0009/0010/0015/0016 are product
    choices) (QwenLM requires an approved issue
    first, small Conventional-Commits PRs, an E2E report comment; clean MariaDB wording and copyright
    headers out first); accepted ones retire the patches.
@@ -223,6 +245,13 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 - Theia webviews: open Theia on `localhost` (webviews use `<uuid>.webview.localhost`); Playwright's Firefox
   renders them blank, use Chrome (`channel: 'chrome'`). Locally the browser can reach the daemon anyway,
   so test the bridge by asserting zero direct browser requests to the daemon port.
+- Extension tests import core's built `dist/`: after changing core (or after a rebrand), run
+  `npm run build` in `packages/core` first, or they test stale presets.
+- Test a rule or patch change end to end in a scratch worktree: `git worktree add --detach <dir>
+  <upstream base>`, copy `mariadb/` in, `node mariadb/rebrand.mjs`, run the tests; reset with
+  `git reset --hard && git clean -fd` (a half-reset tree makes the patches "conflict").
+- Claude Code's auto mode blocks `git push --force-with-lease` (also `sync-upstream.sh --push`), even
+  when asked; the user runs `! git push --force-with-lease NAS main` after a local sync.
 - macOS has no `timeout` command; bound test runs inside the Node script instead.
 - Claude plugins install from a local clone used as marketplace: `extensions install <repo>:<plugin>
   --consent` (MariaDB's `ai-plugins` repo: plugin `dev`). Hooks come from `hooks/hooks.json`, a `Bash`
