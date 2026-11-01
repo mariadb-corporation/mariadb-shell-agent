@@ -102,9 +102,12 @@ explanation on top) and commit the new patch.
 - `0016-provider-setup-wizard.patch`: the extension no longer starts the provider setup on its own;
   Get Started (or `/auth`) opens it as a wizard inside the view instead of VS Code QuickPicks and
   InputBoxes, offering OpenRouter, Requesty, OpenAI API Key, Grok and Custom; adds the OpenAI API Key
-  preset (id `openai`, `OPENAI_API_KEY`, OpenAI Responses API, Codex models) to core; the welcome
-  title gets the Web Shell's size and gradient. The CLI and Web Shell offer the same five providers
-  (`OFFERED_PROVIDER_IDS` in `rebrand/alibaba.mjs`)
+  preset (id `openai`, `OPENAI_API_KEY`, OpenAI Responses API, default model `gpt-6.1-sol`) to core;
+  the welcome title gets the Web Shell's size and gradient. The CLI and Web Shell offer the same five
+  providers (`OFFERED_PROVIDER_IDS` in `rebrand/alibaba.mjs`)
+- `0017-gpt-6-model-limits.patch`: reasoning controls for `gpt-6.1-sol`, `gpt-6.1-terra` and
+  `gpt-6-luna` (next to upstream's `gpt-6-astra`), and the GPT-6 token limits (922K input, 128K
+  output) instead of the generic GPT fallback
 
 These are good candidates for upstream pull requests, which would retire the patches.
 

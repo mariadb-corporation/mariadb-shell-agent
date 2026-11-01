@@ -1,0 +1,128 @@
+GPT-6 models: reasoning controls and token limits
+
+Upstream knows only gpt-6-astra, and only in reasoning-effort.ts; every
+GPT-6 model fell through to the generic GPT row in tokenLimits.ts (128K
+input, 16K output). Per https://developers.openai.com/api/docs/models:
+
+- gpt-6-astra, gpt-6.1-sol, gpt-6.1-terra, gpt-6-luna: 1.05M context,
+  922K input, 128K output. Added a `/^gpt-6/` row to both tables.
+- Sol and Astra accept efforts low…max with medium as default and no
+  `none`, so thinking is mandatory. Terra and Luna also accept `none`, so
+  thinking is on by default but can be switched off.
+
+gpt-6.1-sol is the default model of the OpenAI API Key preset (0016).
+
+diff --git a/packages/core/src/core/reasoning-effort.test.ts b/packages/core/src/core/reasoning-effort.test.ts
+index 9a7ec10e2d..e571be1507 100644
+--- a/packages/core/src/core/reasoning-effort.test.ts
++++ b/packages/core/src/core/reasoning-effort.test.ts
+@@ -60,6 +60,10 @@ describe('getGptReasoningCapabilities', () => {
+     ['openai/gpt-5.6.1:batch', REASONING_EFFORT_TIERS, 'medium', true, false],
+     ['gpt-6-astra', REASONING_EFFORT_TIERS, 'medium', true, true],
+     ['GPT-6-ASTRA', REASONING_EFFORT_TIERS, 'medium', true, true],
++    ['gpt-6.1-sol', REASONING_EFFORT_TIERS, 'medium', true, true],
++    ['openai/gpt-6.1-sol', REASONING_EFFORT_TIERS, 'medium', true, true],
++    ['gpt-6.1-terra', REASONING_EFFORT_TIERS, 'medium', true, false],
++    ['gpt-6-luna', REASONING_EFFORT_TIERS, 'medium', true, false],
+     [
+       'openai/gpt-6-astra-2026-09-03',
+       REASONING_EFFORT_TIERS,
+@@ -106,6 +110,9 @@ describe('getGptReasoningCapabilities', () => {
+     'gpt-6-astra-custom',
+     'my-gpt-6-astra',
+     'gpt-6-astra-chat-latest',
++    'gpt-6.1-sol-custom',
++    'gpt-6.1-luna',
++    'gpt-6-terra',
+     'qwen3.8-max',
+   ])('does not assign GPT reasoning controls to %s', (model) => {
+     expect(getGptReasoningCapabilities(model)).toBeUndefined();
+diff --git a/packages/core/src/core/reasoning-effort.ts b/packages/core/src/core/reasoning-effort.ts
+index 069db142bd..d8315a473e 100644
+--- a/packages/core/src/core/reasoning-effort.ts
++++ b/packages/core/src/core/reasoning-effort.ts
+@@ -132,13 +132,24 @@ export function getGptReasoningCapabilities(model: string | undefined):
+         defaultEnabled: true,
+         thinkingMandatory: false,
+       };
++    // GPT-6.x: Astra and Sol always reason; Terra and Luna also accept
++    // effort `none`, so thinking can be switched off.
+     case 'gpt-6-astra':
++    case 'gpt-6.1-sol':
+       return {
+         efforts: REASONING_EFFORT_TIERS,
+         defaultEffort: 'medium',
+         defaultEnabled: true,
+         thinkingMandatory: true,
+       };
++    case 'gpt-6-luna':
++    case 'gpt-6.1-terra':
++      return {
++        efforts: REASONING_EFFORT_TIERS,
++        defaultEffort: 'medium',
++        defaultEnabled: true,
++        thinkingMandatory: false,
++      };
+     default:
+       return undefined;
+   }
+diff --git a/packages/core/src/core/tokenLimits.test.ts b/packages/core/src/core/tokenLimits.test.ts
+index 67e758e963..a16a369e85 100644
+--- a/packages/core/src/core/tokenLimits.test.ts
++++ b/packages/core/src/core/tokenLimits.test.ts
+@@ -185,6 +185,13 @@ describe('tokenLimit', () => {
+       expect(tokenLimit('gpt-5.2-pro')).toBe(272000);
+     });
+ 
++    it('should return 922K for GPT-6.x', () => {
++      expect(tokenLimit('gpt-6-astra')).toBe(922_000);
++      expect(tokenLimit('gpt-6.1-sol')).toBe(922_000);
++      expect(tokenLimit('gpt-6.1-terra')).toBe(922_000);
++      expect(tokenLimit('openai/gpt-6-luna')).toBe(922_000);
++    });
++
+     it('should return 128K for legacy GPT (fallback)', () => {
+       expect(tokenLimit('gpt-4o')).toBe(131072);
+       expect(tokenLimit('gpt-4o-mini')).toBe(131072);
+@@ -467,6 +474,13 @@ describe('tokenLimit with output type', () => {
+       expect(tokenLimit('gpt-5-mini', 'output')).toBe(131072);
+     });
+ 
++    it('should return correct output limits for GPT-6.x', () => {
++      expect(tokenLimit('gpt-6-astra', 'output')).toBe(131072);
++      expect(tokenLimit('gpt-6.1-sol', 'output')).toBe(131072);
++      expect(tokenLimit('gpt-6.1-terra', 'output')).toBe(131072);
++      expect(tokenLimit('gpt-6-luna', 'output')).toBe(131072);
++    });
++
+     it('should return correct output limits for Gemini 3.x', () => {
+       expect(tokenLimit('gemini-3-pro-preview', 'output')).toBe(65536);
+       expect(tokenLimit('gemini-3-flash-preview', 'output')).toBe(65536);
+diff --git a/packages/core/src/core/tokenLimits.ts b/packages/core/src/core/tokenLimits.ts
+index 750f28401c..f3a27716cc 100644
+--- a/packages/core/src/core/tokenLimits.ts
++++ b/packages/core/src/core/tokenLimits.ts
+@@ -136,6 +136,7 @@ const LIMITS = {
+   '384k': 384_000, // vendor-declared decimal, DeepSeek V4 max output
+   '400k': 400_000, // vendor-declared decimal, used by OpenAI GPT-5.x
+   '512k': 524_288,
++  '922k': 922_000, // vendor-declared decimal, GPT-6.x input (1.05M total - 128K output)
+   '1m': 1_000_000,
+   // Output token limits (typically much smaller than input limits)
+   '4k': 4_096,
+@@ -246,6 +247,7 @@ const PATTERNS: Array<[RegExp, TokenCount]> = [
+   // -------------------
+   // OpenAI
+   // -------------------
++  [/^gpt-6/, LIMITS['922k']], // GPT-6.x (Astra, Sol, Terra, Luna): 922K input
+   [/^gpt-5/, LIMITS['272k']], // GPT-5.x: 272K input (400K total - 128K output)
+   [/^gpt-/, LIMITS['128k']], // GPT fallback (4o, 4.1, etc.): 128K
+   [/^o\d/, LIMITS['200k']], // o-series (o3, o4-mini, etc.): 200K
+@@ -331,6 +333,7 @@ const OUTPUT_PATTERNS: Array<[RegExp, TokenCount]> = [
+   [/^gemini-/, LIMITS['8k']], // Gemini fallback: 8K
+ 
+   // OpenAI
++  [/^gpt-6/, LIMITS['128k']], // GPT-6.x: 128K
+   [/^gpt-5/, LIMITS['128k']], // GPT-5.x: 128K
+   [/^gpt-/, LIMITS['16k']], // GPT fallback: 16K
+   [/^o\d/, LIMITS['128k']], // o-series: 128K
