@@ -77,8 +77,34 @@ const SKIPPED = [
         ['is registered, and the qwencloud group excludes Coding Plan'],
       'packages/core/src/providers/__tests__/presets/qwencloud-token-plan.test.ts':
         ['is registered in the qwencloud access-method group'],
-      'packages/vscode-ide-companion/src/webview/handlers/AuthMessageHandler.test.ts':
-        ['lists QwenCloud as the first provider group in the picker'],
+    },
+  },
+  {
+    reason:
+      'Only OpenRouter, Requesty, OpenAI, Grok and Custom are offered (OFFERED_PROVIDER_IDS in alibaba.mjs): DeepSeek and Kimi are not in the pickers or provider lists.',
+    tests: {
+      // Walks the third-party sub-menu to DeepSeek, which upstream lists first.
+      'packages/cli/src/ui/opentui/dialogs-auth.test.tsx': [
+        'applies every tick of a held Space to the same checkbox',
+        'charges the Shell title the rows it wraps into at a narrow width',
+        'clips a model label to the one physical row its charge pays',
+        'filters the recommended list from the search field one Tab away',
+        'lands the Space on the row the arrows of the same read reached',
+        'refuses the recommended rows a short region cannot paint',
+        'refuses the sub-menu keys when the region pays zero provider rows',
+        'submits the tick made in the same read as Enter',
+        'toggles the row an arrow of the same read moved to',
+        'windows the provider sub-menu from the region, so Enter only opens a painted provider',
+      ],
+      // Its core mock registers only DeepSeek.
+      'packages/cli/src/acp-integration/acpAgent.test.ts': [
+        'qwen/providers extension methods list and connect model providers',
+        'qwen/providers/list exposes API prefill for %s',
+        'qwen/providers/list includes existing provider settings',
+      ],
+      'packages/core/src/providers/__tests__/presets/moonshot.test.ts': [
+        'is registered and discoverable in the provider registry',
+      ],
     },
   },
   {

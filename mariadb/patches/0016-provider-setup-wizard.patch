@@ -1,0 +1,3183 @@
+Provider setup wizard in the view
+
+The extension started the provider setup on its own on first load, as a
+series of VS Code QuickPicks and InputBoxes. Now nothing starts until the
+user presses Get Started on the welcome page (or runs /auth or the auth
+command), and the setup runs as a wizard inside the extension's view with
+the same steps: provider, protocol, OpenAI API, base URL or endpoint, API
+key, models, advanced config. Choice steps advance on a click; input steps on
+Next or Enter, with Back and Cancel (Escape) throughout.
+
+The host still owns the provider registry and validation: `auth` sends the
+offered providers' steps as data (`authWizard`), the webview posts the
+answers (`authWizardSubmit`), and the host checks them as before, reporting a
+rejected answer as `authWizardError` (the wizard stays open and nothing is
+written) and ending every submission with `authWizardDone`. A connection
+failure (`authError`) also leaves the wizard open with its message, so the
+answers can be corrected. An open wizard is replayed when the webview
+reloads.
+
+The wizard offers OpenRouter, Requesty, OpenAI API Key, Grok (xAI) API Key
+and Custom Provider, in that order. OpenAI API Key is a new core preset
+(id `openai`, listed after Requesty): OPENAI_API_KEY for OpenAI's Responses
+API at https://api.openai.com, with gpt-6.1-sol as the editable default
+model. Its installs own only models named
+"[OpenAI] …", so models configured by hand with OPENAI_API_KEY stay.
+
+The welcome page title uses the Web Shell welcome screen's size (32px) and
+product-name gradient.
+
+diff --git a/packages/core/src/providers/__tests__/presets/openai.test.ts b/packages/core/src/providers/__tests__/presets/openai.test.ts
+new file mode 100644
+index 0000000000..f4273b0247
+--- /dev/null
++++ b/packages/core/src/providers/__tests__/presets/openai.test.ts
+@@ -0,0 +1,91 @@
++/**
++ * @license
++ * Copyright 2026 Qwen Team
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++import { describe, expect, it } from 'vitest';
++import { AuthType } from '../../../core/contentGenerator.js';
++import { openaiProvider } from '../../presets/openai.js';
++import {
++  ALL_PROVIDERS,
++  THIRD_PARTY_PROVIDERS,
++  findProviderByCredentials,
++  findProviderById,
++  getAllProviderBaseUrls,
++} from '../../all-providers.js';
++import { buildInstallPlan } from '../../provider-config.js';
++
++describe('openaiProvider', () => {
++  it('has correct provider config', () => {
++    expect(openaiProvider).toMatchObject({
++      id: 'openai',
++      label: 'OpenAI API Key',
++      protocol: AuthType.USE_OPENAI_RESPONSES,
++      baseUrl: 'https://api.openai.com',
++      envKey: 'OPENAI_API_KEY',
++      models: [{ id: 'gpt-6.1-sol' }],
++      modelsEditable: true,
++      uiGroup: 'third-party',
++    });
++  });
++
++  it('is registered right after Requesty', () => {
++    expect(findProviderById('openai')).toBe(openaiProvider);
++    expect(THIRD_PARTY_PROVIDERS).toContain(openaiProvider);
++    const ids = ALL_PROVIDERS.map((p) => p.id);
++    expect(ids.indexOf('openai')).toBe(ids.indexOf('requesty') + 1);
++    expect(getAllProviderBaseUrls()).toContain('https://api.openai.com');
++  });
++
++  it('is found by its env key + base URL credentials', () => {
++    expect(
++      findProviderByCredentials('https://api.openai.com', 'OPENAI_API_KEY')?.id,
++    ).toBe('openai');
++    // The Chat Completions endpoint of a hand-made OpenAI setup is not it.
++    expect(
++      findProviderByCredentials('https://api.openai.com/v1', 'OPENAI_API_KEY'),
++    ).toBeUndefined();
++  });
++
++  it('leaves models configured by hand with the same key alone', () => {
++    const plan = buildInstallPlan(openaiProvider, {
++      baseUrl: 'https://api.openai.com',
++      apiKey: 'sk',
++      modelIds: ['gpt-6.1-sol'],
++    });
++    const owns = plan.modelProviders?.[0]?.ownsModel;
++    expect(
++      owns?.({ id: 'gpt-5.5', name: 'gpt-5.5', envKey: 'OPENAI_API_KEY' }),
++    ).toBe(false);
++    expect(
++      owns?.({
++        id: 'gpt-5.2-codex',
++        name: '[OpenAI] gpt-5.2-codex',
++        envKey: 'OPENAI_API_KEY',
++      }),
++    ).toBe(true);
++  });
++
++  it('installs OpenAI models on the Responses wire', () => {
++    const plan = buildInstallPlan(openaiProvider, {
++      baseUrl: 'https://api.openai.com',
++      apiKey: 'sk-openai',
++      modelIds: ['gpt-6.1-sol', 'gpt-5.2-codex'],
++    });
++
++    expect(plan.authType).toBe(AuthType.USE_OPENAI_RESPONSES);
++    expect(plan.modelProviders?.[0]?.authType).toBe(AuthType.USE_OPENAI);
++    expect(plan.env).toEqual({ OPENAI_API_KEY: 'sk-openai' });
++    expect(plan.modelSelection).toMatchObject({ modelId: 'gpt-6.1-sol' });
++    const models = plan.modelProviders?.[0]?.models;
++    expect(models).toHaveLength(2);
++    expect(models?.[0]).toMatchObject({
++      id: 'gpt-6.1-sol',
++      name: '[OpenAI] gpt-6.1-sol',
++      baseUrl: 'https://api.openai.com',
++      envKey: 'OPENAI_API_KEY',
++      wireApi: 'responses',
++    });
++  });
++});
+diff --git a/packages/core/src/providers/all-providers.ts b/packages/core/src/providers/all-providers.ts
+index 0e758d3b1f..e64c21d598 100644
+--- a/packages/core/src/providers/all-providers.ts
++++ b/packages/core/src/providers/all-providers.ts
+@@ -16,6 +16,7 @@ import { tokenPlanProvider } from './presets/alibaba-token-plan.js';
+ import { alibabaStandardProvider } from './presets/alibaba-standard.js';
+ import { openRouterProvider } from './presets/openrouter.js';
+ import { requestyProvider } from './presets/requesty.js';
++import { openaiProvider } from './presets/openai.js';
+ import { deepseekProvider } from './presets/deepseek.js';
+ import { grokProvider } from './presets/grok.js';
+ import { minimaxProvider } from './presets/minimax.js';
+@@ -34,6 +35,7 @@ export {
+   alibabaStandardProvider,
+   openRouterProvider,
+   requestyProvider,
++  openaiProvider,
+   deepseekProvider,
+   grokProvider,
+   minimaxProvider,
+@@ -71,6 +73,7 @@ export const ALL_PROVIDERS: readonly ProviderConfig[] = [
+   modelscopeProvider,
+   openRouterProvider,
+   requestyProvider,
++  openaiProvider,
+   customProvider,
+ ];
+ 
+diff --git a/packages/core/src/providers/index.ts b/packages/core/src/providers/index.ts
+index a70d98f423..661d500e32 100644
+--- a/packages/core/src/providers/index.ts
++++ b/packages/core/src/providers/index.ts
+@@ -55,6 +55,7 @@ export {
+   minimaxProvider,
+   modelscopeProvider,
+   moonshotProvider,
++  openaiProvider,
+   openRouterProvider,
+   QWENCLOUD_PROVIDERS,
+   qwencloudStandardProvider,
+@@ -98,6 +99,10 @@ export {
+   OPENROUTER_ENV_KEY,
+ } from './presets/openrouter.js';
+ export { REQUESTY_BASE_URL, REQUESTY_ENV_KEY } from './presets/requesty.js';
++export {
++  OPENAI_PROVIDER_BASE_URL,
++  OPENAI_PROVIDER_ENV_KEY,
++} from './presets/openai.js';
+ 
+ // Install logic
+ export {
+diff --git a/packages/core/src/providers/presets/openai.ts b/packages/core/src/providers/presets/openai.ts
+new file mode 100644
+index 0000000000..4410a59545
+--- /dev/null
++++ b/packages/core/src/providers/presets/openai.ts
+@@ -0,0 +1,31 @@
++/**
++ * @license
++ * Copyright 2026 Qwen Team
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++import { AuthType } from '../../core/contentGenerator.js';
++import type { ProviderConfig } from '../types.js';
++
++export const OPENAI_PROVIDER_ENV_KEY = 'OPENAI_API_KEY';
++// The Responses wire appends `/v1/responses` itself (see the protocol's
++// default in provider-config.ts), so the base URL carries no `/v1`.
++export const OPENAI_PROVIDER_BASE_URL = 'https://api.openai.com';
++
++export const openaiProvider: ProviderConfig = {
++  id: 'openai',
++  label: 'OpenAI API Key',
++  description: 'Quick setup for OpenAI models with an OpenAI API key',
++  // Current OpenAI models are served on the Responses API; the install
++  // stores the models as OpenAI models with `wireApi: 'responses'`.
++  protocol: AuthType.USE_OPENAI_RESPONSES,
++  baseUrl: OPENAI_PROVIDER_BASE_URL,
++  envKey: OPENAI_PROVIDER_ENV_KEY,
++  models: [{ id: 'gpt-6.1-sol' }],
++  modelsEditable: true,
++  // Owned models need this name prefix as well as the env key, so models a
++  // user configured by hand with OPENAI_API_KEY are left alone on install.
++  modelNamePrefix: 'OpenAI',
++  documentationUrl: 'https://platform.openai.com/docs/models',
++  uiGroup: 'third-party',
++};
+diff --git a/packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx b/packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx
+index 92f1fd0c53..f6d12174a0 100644
+--- a/packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx
++++ b/packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx
+@@ -559,6 +559,147 @@ describe('EmbeddedApp host wiring', () => {
+     expect(container.textContent).toContain('Get Started');
+   });
+ 
++  describe('provider setup wizard', () => {
++    const WIZARD_PROVIDERS = [
++      {
++        id: 'openai',
++        label: 'OpenAI API Key',
++        description: 'OpenAI models',
++        wireApiProtocols: [],
++        baseUrl: { kind: 'fixed' },
++        apiKeyPlaceholder: 'sk-...',
++        advancedConfig: false,
++      },
++    ];
++
++    const postFromHost = async (data: unknown) => {
++      await act(async () => {
++        window.dispatchEvent(new MessageEvent('message', { data }));
++        await Promise.resolve();
++      });
++    };
++
++    const wizardOf = (container: HTMLElement) =>
++      container.querySelector('[data-auth-wizard]');
++
++    const submitApiKey = async (container: HTMLElement) => {
++      const option = container.querySelector<HTMLButtonElement>(
++        '[data-wizard-option]',
++      )!;
++      await act(async () => option.click());
++      const input = container.querySelector<HTMLInputElement>(
++        '[data-wizard-input]',
++      )!;
++      const setter = Object.getOwnPropertyDescriptor(
++        HTMLInputElement.prototype,
++        'value',
++      )!.set!;
++      await act(async () => {
++        setter.call(input, 'sk-openai');
++        input.dispatchEvent(new Event('input', { bubbles: true }));
++      });
++      const connect = [...container.querySelectorAll('button')].find(
++        (b) => b.textContent === 'Connect',
++      )!;
++      await act(async () => connect.click());
++    };
++
++    it('opens only from Get Started, which asks the host for the wizard', async () => {
++      await renderApp();
++      const { container } = mounted[mounted.length - 1];
++      await postFromHost({ type: 'authState', data: { authenticated: false } });
++
++      // Nothing starts on its own.
++      expect(wizardOf(container)).toBeNull();
++      expect(mocks.vscode.postMessage).not.toHaveBeenCalledWith(
++        expect.objectContaining({ type: 'auth' }),
++      );
++
++      const getStarted = [...container.querySelectorAll('button')].find(
++        (b) => b.textContent === 'Get Started',
++      )!;
++      await act(async () => getStarted.click());
++      expect(mocks.vscode.postMessage).toHaveBeenCalledWith({
++        type: 'auth',
++        data: {},
++      });
++      // Get Started stays a button; the wizard shows the progress.
++      expect(container.textContent).not.toContain('Connecting…');
++
++      await postFromHost({
++        type: 'authWizard',
++        data: { providers: WIZARD_PROVIDERS },
++      });
++      expect(wizardOf(container)?.textContent).toContain('OpenAI API Key');
++    });
++
++    it('sends the answers and closes once the host is done', async () => {
++      await renderApp();
++      const { container } = mounted[mounted.length - 1];
++      await postFromHost({ type: 'authState', data: { authenticated: false } });
++      await postFromHost({
++        type: 'authWizard',
++        data: { providers: WIZARD_PROVIDERS },
++      });
++
++      await submitApiKey(container);
++      expect(mocks.vscode.postMessage).toHaveBeenCalledWith({
++        type: 'authWizardSubmit',
++        data: { providerId: 'openai', apiKey: 'sk-openai' },
++      });
++      expect(wizardOf(container)?.textContent).toContain('Connecting…');
++
++      await postFromHost({ type: 'authSuccess', data: {} });
++      await postFromHost({ type: 'authWizardDone' });
++      expect(wizardOf(container)).toBeNull();
++    });
++
++    it('stays open with the error when connecting fails', async () => {
++      await renderApp();
++      const { container } = mounted[mounted.length - 1];
++      await postFromHost({ type: 'authState', data: { authenticated: false } });
++      await postFromHost({
++        type: 'authWizard',
++        data: { providers: WIZARD_PROVIDERS },
++      });
++
++      await submitApiKey(container);
++      await postFromHost({
++        type: 'authError',
++        data: { message: 'Authentication failed.' },
++      });
++      await postFromHost({ type: 'authWizardDone' });
++
++      expect(
++        wizardOf(container)?.querySelector('[role="alert"]')?.textContent,
++      ).toBe('Authentication failed.');
++    });
++
++    it('opens over a live session and cancels back to it', async () => {
++      await renderApp();
++      const { container } = mounted[mounted.length - 1];
++      await postFromHost({ type: 'authState', data: { authenticated: true } });
++      await postFromHost({
++        type: 'authWizard',
++        data: { providers: WIZARD_PROVIDERS },
++      });
++      expect(wizardOf(container)).not.toBeNull();
++
++      const cancel = [...container.querySelectorAll('button')].find(
++        (b) => b.textContent === 'Cancel',
++      )!;
++      await act(async () => cancel.click());
++      expect(mocks.vscode.postMessage).toHaveBeenCalledWith({
++        type: 'authWizardCancel',
++        data: {},
++      });
++      await postFromHost({ type: 'authCancelled' });
++
++      expect(wizardOf(container)).toBeNull();
++      expect(container.textContent).not.toContain('Get Started');
++    });
++  });
++
+   it('keeps an explicit active-file exclusion across editor changes', async () => {
+     await renderApp();
+ 
+diff --git a/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx b/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
+index 79c0b66b94..0cea6cdac4 100644
+--- a/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
++++ b/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
+@@ -25,6 +25,11 @@ import {
+ import { ChevronDown, FileText, LoaderCircle, Plus, X } from 'lucide-react';
+ import { useVSCode } from './hooks/useVSCode.js';
+ import { QwenOnboarding } from './components/QwenOnboarding.js';
++import { AuthWizard } from './components/AuthWizard.js';
++import type {
++  AuthWizardProvider,
++  AuthWizardSubmission,
++} from './authWizardTypes.js';
+ import { SessionHistoryDropdown } from './components/SessionHistoryDropdown.js';
+ import {
+   createChromeStrings,
+@@ -216,6 +221,13 @@ const VSCODE_EMBEDDED_CSS = `
+     background: var(--vscode-toolbar-hoverBackground);
+     outline: none;
+   }
++  .qwen-vscode-wizard-option { background: transparent; }
++  .qwen-vscode-wizard-option:hover:not(:disabled),
++  .qwen-vscode-wizard-option:focus-visible {
++    background: var(--vscode-list-hoverBackground);
++    outline: 1px solid var(--vscode-focusBorder);
++    outline-offset: -1px;
++  }
+   .qwen-vscode-toolbar-start {
+     display: inline-flex;
+     min-width: 0;
+@@ -356,6 +368,14 @@ export function EmbeddedApp() {
+   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+   const [authConnecting, setAuthConnecting] = useState(false);
+   const [authError, setAuthError] = useState<string>();
++  // The provider setup wizard (open while set), started by Get Started,
++  // /auth or the auth command.
++  const [authWizard, setAuthWizard] = useState<AuthWizardProvider[]>();
++  const [authWizardSubmitting, setAuthWizardSubmitting] = useState(false);
++  const [authWizardError, setAuthWizardError] = useState<string>();
++  // Whether the current submission failed; read by the authWizardDone
++  // handler, which runs in the message listener's closure.
++  const authWizardFailedRef = useRef(false);
+   const [hostNotice, setHostNotice] = useState<HostNotice>();
+   const [accountInfo, setAccountInfo] = useState<AccountInfo>();
+   const [insightProgress, setInsightProgress] = useState<InsightProgress>();
+@@ -877,6 +897,25 @@ export function EmbeddedApp() {
+         if (typeof text === 'string') setHostNotice({ tone: 'error', text });
+       } else if (message.type === 'accountInfo' && message.data) {
+         setAccountInfo(message.data as AccountInfo);
++      } else if (message.type === 'authWizard') {
++        const providers = (message.data as { providers?: unknown } | null)
++          ?.providers;
++        if (Array.isArray(providers)) {
++          setAuthWizard(providers as AuthWizardProvider[]);
++          setAuthWizardSubmitting(false);
++          setAuthWizardError(undefined);
++          authWizardFailedRef.current = false;
++        }
++      } else if (message.type === 'authWizardError') {
++        const text = (message.data as { message?: unknown } | null)?.message;
++        authWizardFailedRef.current = true;
++        setAuthWizardSubmitting(false);
++        setAuthConnecting(false);
++        setAuthWizardError(typeof text === 'string' ? text : t('auth.failed'));
++      } else if (message.type === 'authWizardDone') {
++        setAuthWizardSubmitting(false);
++        setAuthConnecting(false);
++        if (!authWizardFailedRef.current) setAuthWizard(undefined);
+       } else if (message.type === 'authState') {
+         const state = (message.data as { authenticated?: unknown } | null)
+           ?.authenticated;
+@@ -896,6 +935,7 @@ export function EmbeddedApp() {
+         setAuthConnecting(false);
+         setAuthError(undefined);
+         if (message.type === 'authSuccess') {
++          setAuthWizard(undefined);
+           setHostNotice({ tone: 'info', text: t('auth.signedIn') });
+         }
+       } else if (message.type === 'authCancelled') {
+@@ -905,6 +945,7 @@ export function EmbeddedApp() {
+         setAuthenticated((current) => current ?? false);
+         setAuthConnecting(false);
+         setAuthError(undefined);
++        setAuthWizard(undefined);
+         clearInsight();
+       } else if (
+         message.type === 'authError' ||
+@@ -923,6 +964,13 @@ export function EmbeddedApp() {
+         setAuthenticated(false);
+         setAuthConnecting(false);
+         setAuthError(text);
++        // An open wizard stays open with the error, so the answers can be
++        // corrected without starting over.
++        if (message.type === 'authError') {
++          authWizardFailedRef.current = true;
++          setAuthWizardSubmitting(false);
++          setAuthWizardError(text);
++        }
+         clearInsight();
+       } else if (message.type === 'insightProgress' && message.data) {
+         const data = message.data as {
+@@ -1504,8 +1552,8 @@ export function EmbeddedApp() {
+           connecting={authConnecting}
+           error={authError}
+           t={t}
++          theme={theme}
+           onGetStarted={() => {
+-            setAuthConnecting(true);
+             setAuthError(undefined);
+             vscode.postMessage({ type: 'auth', data: {} });
+           }}
+@@ -2090,6 +2138,27 @@ export function EmbeddedApp() {
+           </div>
+         </div>
+       )}
++      {authWizard && (
++        <AuthWizard
++          providers={authWizard}
++          t={t}
++          submitting={authWizardSubmitting}
++          error={authWizardError}
++          onSubmit={(submission: AuthWizardSubmission) => {
++            authWizardFailedRef.current = false;
++            setAuthWizardSubmitting(true);
++            setAuthWizardError(undefined);
++            setAuthConnecting(true);
++            setAuthError(undefined);
++            vscode.postMessage({ type: 'authWizardSubmit', data: submission });
++          }}
++          onCancel={() => {
++            setAuthWizard(undefined);
++            setAuthWizardError(undefined);
++            vscode.postMessage({ type: 'authWizardCancel', data: {} });
++          }}
++        />
++      )}
+     </div>
+   );
+ }
+diff --git a/packages/vscode-ide-companion/src/webview/authWizardTypes.ts b/packages/vscode-ide-companion/src/webview/authWizardTypes.ts
+new file mode 100644
+index 0000000000..5c8cb79998
+--- /dev/null
++++ b/packages/vscode-ide-companion/src/webview/authWizardTypes.ts
+@@ -0,0 +1,73 @@
++/**
++ * @license
++ * Copyright 2026 Qwen Team
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/**
++ * Messages of the provider setup wizard, shared by the extension host
++ * (AuthMessageHandler) and the webview (AuthWizard).
++ *
++ * The host owns the provider registry and sends each offered provider's
++ * steps as plain data (`authWizard`); the webview walks the user through
++ * them and posts the answers back (`authWizardSubmit`), which the host
++ * validates the same way before writing settings.
++ */
++
++export interface AuthWizardChoice {
++  value: string;
++  label: string;
++  description?: string;
++}
++
++export type AuthWizardWireApi = 'chat-completions' | 'responses';
++
++export type AuthWizardBaseUrl =
++  | { kind: 'fixed' }
++  | { kind: 'choice'; stepTitle: string; options: AuthWizardChoice[] }
++  | {
++      kind: 'input';
++      /**
++       * Placeholder (and value used for a blank input) per route, keyed by
++       * `authWizardRouteKey(protocol, wireApi)`.
++       */
++      placeholders: Record<string, string>;
++    };
++
++export interface AuthWizardProvider {
++  id: string;
++  label: string;
++  description: string;
++  /** Protocol step choices; absent when the provider has one protocol. */
++  protocols?: AuthWizardChoice[];
++  /**
++   * Protocols whose setup asks which OpenAI API to use. `''` stands for the
++   * provider's own protocol when there is no protocol step.
++   */
++  wireApiProtocols: string[];
++  baseUrl: AuthWizardBaseUrl;
++  apiKeyPlaceholder: string;
++  /** Default model IDs; present when the models step is shown. */
++  models?: string[];
++  /** Whether the advanced step (thinking mode) is shown. */
++  advancedConfig: boolean;
++}
++
++export interface AuthWizardSubmission {
++  providerId: string;
++  protocol?: string;
++  wireApi?: AuthWizardWireApi;
++  baseUrl?: string;
++  apiKey: string;
++  /** Comma-separated model IDs, as typed. */
++  models?: string;
++  enableThinking?: boolean;
++}
++
++/** Key of `AuthWizardBaseUrl.placeholders` for a protocol + API choice. */
++export function authWizardRouteKey(
++  protocol: string | undefined,
++  wireApi: AuthWizardWireApi | undefined,
++): string {
++  return `${protocol ?? ''}|${wireApi ?? ''}`;
++}
+diff --git a/packages/vscode-ide-companion/src/webview/components/AuthWizard.test.tsx b/packages/vscode-ide-companion/src/webview/components/AuthWizard.test.tsx
+new file mode 100644
+index 0000000000..75e22a7bcf
+--- /dev/null
++++ b/packages/vscode-ide-companion/src/webview/components/AuthWizard.test.tsx
+@@ -0,0 +1,335 @@
++/**
++ * @license
++ * Copyright 2026 Qwen Team
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/** @vitest-environment jsdom */
++
++import { act } from 'react';
++import { createRoot, type Root } from 'react-dom/client';
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { AuthWizard, getWizardSteps } from './AuthWizard.js';
++import type { AuthWizardProvider } from '../authWizardTypes.js';
++import { createChromeStrings } from '../strings.js';
++
++Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
++
++const t = createChromeStrings('en');
++
++const OPENAI: AuthWizardProvider = {
++  id: 'openai',
++  label: 'OpenAI API Key',
++  description: 'OpenAI models',
++  wireApiProtocols: [],
++  baseUrl: { kind: 'fixed' },
++  apiKeyPlaceholder: 'sk-...',
++  models: ['gpt-6.1-sol'],
++  advancedConfig: false,
++};
++
++const CUSTOM: AuthWizardProvider = {
++  id: 'custom-openai-compatible',
++  label: 'Custom Provider',
++  description: 'Anything else',
++  protocols: [
++    { value: 'openai', label: 'OpenAI Compatible' },
++    { value: 'anthropic', label: 'Anthropic' },
++  ],
++  wireApiProtocols: ['openai'],
++  baseUrl: {
++    kind: 'input',
++    placeholders: {
++      'openai|chat-completions': 'https://api.openai.com/v1',
++      'openai|responses': 'https://api.openai.com',
++      'anthropic|': 'https://api.anthropic.com/v1',
++    },
++  },
++  apiKeyPlaceholder: 'sk-...',
++  models: [],
++  advancedConfig: true,
++};
++
++const REGIONAL: AuthWizardProvider = {
++  id: 'regional',
++  label: 'Regional',
++  description: 'Two regions',
++  wireApiProtocols: [],
++  baseUrl: {
++    kind: 'choice',
++    stepTitle: 'Region',
++    options: [
++      { value: 'https://a.example.com/v1', label: 'Region A' },
++      { value: 'https://b.example.com/v1', label: 'Region B' },
++    ],
++  },
++  apiKeyPlaceholder: 'key',
++  advancedConfig: false,
++};
++
++const mounted: Array<{ container: HTMLElement; root: Root }> = [];
++
++afterEach(() => {
++  for (const { container, root } of mounted.splice(0)) {
++    act(() => root.unmount());
++    container.remove();
++  }
++});
++
++async function renderWizard(
++  props: { submitting?: boolean; error?: string } = {},
++) {
++  const onSubmit = vi.fn();
++  const onCancel = vi.fn();
++  const container = document.createElement('div');
++  document.body.appendChild(container);
++  const root = createRoot(container);
++  mounted.push({ container, root });
++  const render = async (next: { submitting?: boolean; error?: string }) =>
++    act(async () => {
++      root.render(
++        <AuthWizard
++          providers={[OPENAI, CUSTOM, REGIONAL]}
++          t={t}
++          submitting={next.submitting ?? false}
++          error={next.error}
++          onSubmit={onSubmit}
++          onCancel={onCancel}
++        />,
++      );
++    });
++  await render(props);
++  return { container, onSubmit, onCancel, rerender: render };
++}
++
++function heading(container: HTMLElement): string {
++  return container.textContent ?? '';
++}
++
++async function clickOption(container: HTMLElement, label: string) {
++  const option = [
++    ...container.querySelectorAll<HTMLButtonElement>('[data-wizard-option]'),
++  ].find((button) => button.textContent?.startsWith(label));
++  if (!option) throw new Error(`No option ${label}`);
++  await act(async () => option.click());
++}
++
++async function clickButton(container: HTMLElement, label: string) {
++  const button = [...container.querySelectorAll('button')].find(
++    (b) => b.textContent === label,
++  );
++  if (!button) throw new Error(`No button ${label}`);
++  await act(async () => button.click());
++}
++
++async function type(container: HTMLElement, value: string) {
++  const input = container.querySelector<HTMLInputElement>(
++    '[data-wizard-input]',
++  );
++  if (!input) throw new Error('No input');
++  const setter = Object.getOwnPropertyDescriptor(
++    HTMLInputElement.prototype,
++    'value',
++  )!.set!;
++  await act(async () => {
++    setter.call(input, value);
++    input.dispatchEvent(new Event('input', { bubbles: true }));
++  });
++}
++
++async function pressEnter(container: HTMLElement) {
++  const input = container.querySelector('[data-wizard-input]')!;
++  await act(async () => {
++    input.dispatchEvent(
++      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
++    );
++  });
++}
++
++describe('getWizardSteps', () => {
++  it('lists the steps the provider and the answers so far call for', () => {
++    expect(getWizardSteps(undefined, {})).toEqual(['provider']);
++    expect(getWizardSteps(OPENAI, {})).toEqual([
++      'provider',
++      'apiKey',
++      'models',
++    ]);
++    expect(getWizardSteps(CUSTOM, { protocol: 'openai' })).toEqual([
++      'provider',
++      'protocol',
++      'wireApi',
++      'baseUrl',
++      'apiKey',
++      'models',
++      'advanced',
++    ]);
++    expect(getWizardSteps(CUSTOM, { protocol: 'anthropic' })).toEqual([
++      'provider',
++      'protocol',
++      'baseUrl',
++      'apiKey',
++      'models',
++      'advanced',
++    ]);
++    expect(getWizardSteps(REGIONAL, {})).toEqual([
++      'provider',
++      'baseUrl',
++      'apiKey',
++    ]);
++  });
++});
++
++describe('AuthWizard', () => {
++  it('starts with the providers and their descriptions', async () => {
++    const { container } = await renderWizard();
++
++    expect(heading(container)).toContain('Set up a model provider');
++    expect(heading(container)).not.toContain('Step');
++    const options = [...container.querySelectorAll('[data-wizard-option]')];
++    expect(options.map((o) => o.textContent)).toEqual([
++      'OpenAI API KeyOpenAI models',
++      'Custom ProviderAnything else',
++      'RegionalTwo regions',
++    ]);
++  });
++
++  it('walks a fixed-endpoint preset through API key and models', async () => {
++    const { container, onSubmit } = await renderWizard();
++
++    await clickOption(container, 'OpenAI API Key');
++    expect(heading(container)).toContain('OpenAI API Key · Step 2 of 3');
++    expect(container.querySelector('input')?.type).toBe('password');
++
++    await type(container, 'sk-openai');
++    await pressEnter(container);
++    // The models step starts from the preset's defaults.
++    expect(container.querySelector('input')?.value).toBe('gpt-6.1-sol');
++    await clickButton(container, 'Connect');
++
++    expect(onSubmit).toHaveBeenCalledWith({
++      providerId: 'openai',
++      apiKey: 'sk-openai',
++      models: 'gpt-6.1-sol',
++    });
++  });
++
++  it('walks the custom provider through every step', async () => {
++    const { container, onSubmit } = await renderWizard();
++
++    await clickOption(container, 'Custom Provider');
++    await clickOption(container, 'OpenAI Compatible');
++    await clickOption(container, 'Responses');
++    // The base URL placeholder follows the API choice.
++    expect(container.querySelector('input')?.placeholder).toBe(
++      'https://api.openai.com',
++    );
++    await clickButton(container, 'Next');
++    await type(container, 'key');
++    await clickButton(container, 'Next');
++    await type(container, 'model-a, model-b');
++    await clickButton(container, 'Next');
++    expect(heading(container)).toContain('Enable thinking mode?');
++    await clickOption(container, 'Yes');
++
++    expect(onSubmit).toHaveBeenCalledWith({
++      providerId: 'custom-openai-compatible',
++      protocol: 'openai',
++      wireApi: 'responses',
++      baseUrl: '',
++      apiKey: 'key',
++      models: 'model-a, model-b',
++      enableThinking: true,
++    });
++  });
++
++  it('offers an endpoint choice for providers with several base URLs', async () => {
++    const { container, onSubmit } = await renderWizard();
++
++    await clickOption(container, 'Regional');
++    expect(heading(container)).toContain('Region');
++    await clickOption(container, 'Region B');
++    await type(container, 'k');
++    await clickButton(container, 'Connect');
++
++    expect(onSubmit).toHaveBeenCalledWith({
++      providerId: 'regional',
++      baseUrl: 'https://b.example.com/v1',
++      apiKey: 'k',
++    });
++  });
++
++  it('validates input steps before moving on', async () => {
++    const { container, onSubmit } = await renderWizard();
++
++    await clickOption(container, 'Custom Provider');
++    await clickOption(container, 'Anthropic');
++    await type(container, 'ftp://proxy');
++    await clickButton(container, 'Next');
++    expect(container.querySelector('[role="alert"]')?.textContent).toBe(
++      'Base URL must start with http:// or https://.',
++    );
++
++    await type(container, '');
++    await clickButton(container, 'Next');
++    await clickButton(container, 'Next');
++    expect(container.querySelector('[role="alert"]')?.textContent).toBe(
++      'This field is required',
++    );
++
++    await type(container, 'key');
++    await clickButton(container, 'Next');
++    await type(container, ' , ,');
++    await clickButton(container, 'Next');
++    expect(container.querySelector('[role="alert"]')?.textContent).toBe(
++      'Model IDs cannot be empty.',
++    );
++    expect(onSubmit).not.toHaveBeenCalled();
++  });
++
++  it('goes back keeping the answers, and resets them for another provider', async () => {
++    const { container } = await renderWizard();
++
++    await clickOption(container, 'OpenAI API Key');
++    await type(container, 'sk-openai');
++    await clickButton(container, 'Next');
++    await clickButton(container, 'Back');
++    expect(container.querySelector('input')?.value).toBe('sk-openai');
++
++    await clickButton(container, 'Back');
++    expect(
++      container.querySelector('[aria-pressed="true"]')?.textContent,
++    ).toContain('OpenAI API Key');
++    await clickOption(container, 'Regional');
++    await clickOption(container, 'Region A');
++    expect(container.querySelector('input')?.value).toBe('');
++  });
++
++  it('cancels with the button and with Escape', async () => {
++    const { container, onCancel } = await renderWizard();
++
++    await clickButton(container, 'Cancel');
++    const panel = container.querySelector('[data-auth-wizard]')!;
++    await act(async () => {
++      panel.dispatchEvent(
++        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
++      );
++    });
++
++    expect(onCancel).toHaveBeenCalledTimes(2);
++  });
++
++  it('shows the host error and locks the controls while connecting', async () => {
++    const { container, rerender } = await renderWizard();
++    await clickOption(container, 'OpenAI API Key');
++
++    await rerender({ submitting: true });
++    expect(container.querySelector('input')?.disabled).toBe(true);
++    expect(heading(container)).toContain('Connecting…');
++
++    await rerender({ error: 'Connection established but auth failed.' });
++    expect(container.querySelector('[role="alert"]')?.textContent).toBe(
++      'Connection established but auth failed.',
++    );
++    expect(container.querySelector('input')?.disabled).toBe(false);
++  });
++});
+diff --git a/packages/vscode-ide-companion/src/webview/components/AuthWizard.tsx b/packages/vscode-ide-companion/src/webview/components/AuthWizard.tsx
+new file mode 100644
+index 0000000000..9997d9a513
+--- /dev/null
++++ b/packages/vscode-ide-companion/src/webview/components/AuthWizard.tsx
+@@ -0,0 +1,587 @@
++/**
++ * @license
++ * Copyright 2026 Qwen Team
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++import { useEffect, useRef, useState } from 'react';
++import type { CSSProperties, KeyboardEvent } from 'react';
++import {
++  authWizardRouteKey,
++  type AuthWizardChoice,
++  type AuthWizardProvider,
++  type AuthWizardSubmission,
++  type AuthWizardWireApi,
++} from '../authWizardTypes.js';
++import type { ChromeStrings } from '../strings.js';
++
++type WizardStep =
++  | 'provider'
++  | 'protocol'
++  | 'wireApi'
++  | 'baseUrl'
++  | 'apiKey'
++  | 'models'
++  | 'advanced';
++
++interface WizardAnswers {
++  providerId?: string;
++  protocol?: string;
++  wireApi?: AuthWizardWireApi;
++  baseUrl: string;
++  apiKey: string;
++  models: string;
++  enableThinking?: boolean;
++}
++
++interface AuthWizardProps {
++  providers: AuthWizardProvider[];
++  t: ChromeStrings;
++  /** The answers were sent and the host is connecting. */
++  submitting: boolean;
++  /** Error reported by the host for the last submission. */
++  error?: string;
++  onSubmit: (submission: AuthWizardSubmission) => void;
++  onCancel: () => void;
++}
++
++const EMPTY_ANSWERS: WizardAnswers = { baseUrl: '', apiKey: '', models: '' };
++
++const WIRE_API_CHOICES: AuthWizardChoice[] = [
++  { value: 'chat-completions', label: 'Chat Completions' },
++  { value: 'responses', label: 'Responses' },
++];
++
++/** The steps of a provider's setup for the answers given so far. */
++export function getWizardSteps(
++  provider: AuthWizardProvider | undefined,
++  answers: Pick<WizardAnswers, 'protocol'>,
++): WizardStep[] {
++  if (!provider) return ['provider'];
++  const steps: WizardStep[] = ['provider'];
++  if (provider.protocols) steps.push('protocol');
++  if (
++    provider.wireApiProtocols.includes(
++      provider.protocols ? (answers.protocol ?? '') : '',
++    )
++  ) {
++    steps.push('wireApi');
++  }
++  if (provider.baseUrl.kind !== 'fixed') steps.push('baseUrl');
++  steps.push('apiKey');
++  if (provider.models) steps.push('models');
++  if (provider.advancedConfig) steps.push('advanced');
++  return steps;
++}
++
++function baseUrlPlaceholder(
++  provider: AuthWizardProvider,
++  answers: WizardAnswers,
++): string {
++  if (provider.baseUrl.kind !== 'input') return '';
++  return (
++    provider.baseUrl.placeholders[
++      authWizardRouteKey(answers.protocol, answers.wireApi)
++    ] ?? ''
++  );
++}
++
++const PANEL_STYLE: CSSProperties = {
++  position: 'absolute',
++  inset: 0,
++  zIndex: 30,
++  display: 'flex',
++  overflow: 'auto',
++  padding: 24,
++  background:
++    'var(--vscode-sideBar-background, var(--vscode-editor-background))',
++  color: 'var(--vscode-foreground)',
++};
++
++const OPTION_STYLE: CSSProperties = {
++  display: 'flex',
++  width: '100%',
++  flexDirection: 'column',
++  alignItems: 'flex-start',
++  gap: 2,
++  padding: '7px 10px',
++  border: '1px solid transparent',
++  borderRadius: 4,
++  // Background (and its hover) come from .qwen-vscode-wizard-option in
++  // EmbeddedApp's stylesheet: an inline value would override :hover.
++  color: 'inherit',
++  font: 'inherit',
++  textAlign: 'left',
++  cursor: 'pointer',
++};
++
++const BUTTON_STYLE: CSSProperties = {
++  display: 'inline-flex',
++  minHeight: 28,
++  alignItems: 'center',
++  justifyContent: 'center',
++  gap: 6,
++  padding: '4px 12px',
++  border: '1px solid transparent',
++  borderRadius: 4,
++  font: 'inherit',
++  cursor: 'pointer',
++};
++
++const PRIMARY_BUTTON_STYLE: CSSProperties = {
++  ...BUTTON_STYLE,
++  background: 'var(--vscode-button-background)',
++  color: 'var(--vscode-button-foreground)',
++  fontWeight: 600,
++};
++
++const SECONDARY_BUTTON_STYLE: CSSProperties = {
++  ...BUTTON_STYLE,
++  background: 'var(--vscode-button-secondaryBackground)',
++  color: 'var(--vscode-button-secondaryForeground)',
++};
++
++const INPUT_STYLE: CSSProperties = {
++  boxSizing: 'border-box',
++  width: '100%',
++  padding: '5px 8px',
++  border: '1px solid var(--vscode-input-border, transparent)',
++  borderRadius: 4,
++  background: 'var(--vscode-input-background)',
++  color: 'var(--vscode-input-foreground)',
++  font: 'inherit',
++  outlineColor: 'var(--vscode-focusBorder)',
++};
++
++/**
++ * Provider setup wizard: the steps of the former QuickPick/InputBox flow
++ * (provider, protocol, API, base URL or endpoint, API key, models, advanced
++ * config), shown inside the view. Choice steps advance on a click; input
++ * steps on Next or Enter. The last step sends the answers to the host.
++ */
++export function AuthWizard({
++  providers,
++  t,
++  submitting,
++  error,
++  onSubmit,
++  onCancel,
++}: AuthWizardProps) {
++  const [history, setHistory] = useState<WizardStep[]>(['provider']);
++  const [answers, setAnswers] = useState<WizardAnswers>(EMPTY_ANSWERS);
++  const [inputError, setInputError] = useState<string>();
++  const panelRef = useRef<HTMLDivElement>(null);
++
++  const step = history[history.length - 1];
++  const provider = providers.find((p) => p.id === answers.providerId);
++  const steps = getWizardSteps(provider, answers);
++  const stepIndex = Math.max(0, steps.indexOf(step));
++
++  // Focus the step's control (the selected choice, the first one, or the
++  // input) whenever the step changes, as the QuickPick/InputBox did.
++  useEffect(() => {
++    const panel = panelRef.current;
++    if (!panel) return;
++    const target =
++      panel.querySelector<HTMLElement>('[data-wizard-input]') ??
++      panel.querySelector<HTMLElement>(
++        '[data-wizard-option][aria-pressed="true"]',
++      ) ??
++      panel.querySelector<HTMLElement>('[data-wizard-option]');
++    target?.focus();
++  }, [step]);
++
++  const submit = (final: WizardAnswers) => {
++    const target = providers.find((p) => p.id === final.providerId);
++    if (!target) return;
++    const finalSteps = getWizardSteps(target, final);
++    onSubmit({
++      providerId: target.id,
++      ...(finalSteps.includes('protocol') ? { protocol: final.protocol } : {}),
++      ...(finalSteps.includes('wireApi') ? { wireApi: final.wireApi } : {}),
++      ...(finalSteps.includes('baseUrl') ? { baseUrl: final.baseUrl } : {}),
++      apiKey: final.apiKey,
++      ...(finalSteps.includes('models') ? { models: final.models } : {}),
++      ...(finalSteps.includes('advanced')
++        ? { enableThinking: final.enableThinking }
++        : {}),
++    });
++  };
++
++  /** Go to the step after `from` for `next`, or submit after the last one. */
++  const advance = (from: WizardStep, next: WizardAnswers) => {
++    setAnswers(next);
++    setInputError(undefined);
++    const target = providers.find((p) => p.id === next.providerId);
++    const nextSteps = getWizardSteps(target, next);
++    const following = nextSteps[nextSteps.indexOf(from) + 1];
++    if (following) {
++      setHistory((current) => [...current, following]);
++    } else {
++      submit(next);
++    }
++  };
++
++  const back = () => {
++    if (history.length <= 1) return;
++    setInputError(undefined);
++    setHistory((current) => current.slice(0, -1));
++  };
++
++  const choose = (value: string) => {
++    if (submitting) return;
++    switch (step) {
++      case 'provider': {
++        const picked = providers.find((p) => p.id === value);
++        if (!picked) return;
++        // A different provider starts its own answers.
++        const next =
++          picked.id === answers.providerId
++            ? answers
++            : {
++                ...EMPTY_ANSWERS,
++                providerId: picked.id,
++                models: picked.models?.join(',') ?? '',
++              };
++        advance(step, next);
++        return;
++      }
++      case 'protocol':
++        advance(
++          step,
++          value === answers.protocol
++            ? answers
++            : { ...answers, protocol: value, wireApi: undefined, baseUrl: '' },
++        );
++        return;
++      case 'wireApi':
++        advance(step, { ...answers, wireApi: value as AuthWizardWireApi });
++        return;
++      case 'baseUrl':
++        advance(step, { ...answers, baseUrl: value });
++        return;
++      case 'advanced':
++        advance(step, { ...answers, enableThinking: value === 'yes' });
++        return;
++      default:
++        return;
++    }
++  };
++
++  /** Validate the input step's value the way the host will, then advance. */
++  const confirmInput = () => {
++    if (submitting || !provider) return;
++    if (step === 'baseUrl') {
++      const url =
++        answers.baseUrl.trim() || baseUrlPlaceholder(provider, answers);
++      if (!/^https?:\/\//i.test(url)) {
++        setInputError(t('wizard.error.baseUrl'));
++        return;
++      }
++    } else if (step === 'apiKey') {
++      if (!answers.apiKey.trim()) {
++        setInputError(t('wizard.error.required'));
++        return;
++      }
++    } else if (step === 'models') {
++      if (!answers.models.trim()) {
++        setInputError(t('wizard.error.required'));
++        return;
++      }
++      if (!answers.models.split(',').some((id) => id.trim())) {
++        setInputError(t('wizard.error.models'));
++        return;
++      }
++    }
++    advance(step, answers);
++  };
++
++  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
++    if (event.key === 'Escape' && !submitting) {
++      event.preventDefault();
++      onCancel();
++    }
++  };
++
++  let title = '';
++  let prompt = '';
++  let choices: AuthWizardChoice[] | undefined;
++  let selected: string | undefined;
++  let input:
++    | { field: 'baseUrl' | 'apiKey' | 'models'; placeholder: string }
++    | undefined;
++
++  switch (step) {
++    case 'provider':
++      title = t('wizard.provider.title');
++      prompt = t('wizard.provider.prompt');
++      choices = providers.map((p) => ({
++        value: p.id,
++        label: p.label,
++        description: p.description,
++      }));
++      selected = answers.providerId;
++      break;
++    case 'protocol':
++      title = t('wizard.protocol.title');
++      prompt = t('wizard.protocol.prompt');
++      choices = provider?.protocols;
++      selected = answers.protocol;
++      break;
++    case 'wireApi':
++      title = t('wizard.wireApi.title');
++      prompt = t('wizard.wireApi.prompt');
++      choices = WIRE_API_CHOICES;
++      selected = answers.wireApi;
++      break;
++    case 'baseUrl':
++      if (provider?.baseUrl.kind === 'choice') {
++        title = provider.baseUrl.stepTitle;
++        prompt = t('wizard.endpoint.prompt');
++        choices = provider.baseUrl.options;
++        selected = answers.baseUrl;
++      } else {
++        title = t('wizard.baseUrl.title');
++        prompt = t('wizard.baseUrl.prompt');
++        input = {
++          field: 'baseUrl',
++          placeholder: provider ? baseUrlPlaceholder(provider, answers) : '',
++        };
++      }
++      break;
++    case 'apiKey':
++      title = t('wizard.apiKey.title');
++      prompt = t('wizard.apiKey.prompt');
++      input = {
++        field: 'apiKey',
++        placeholder: provider?.apiKeyPlaceholder ?? 'sk-...',
++      };
++      break;
++    case 'models':
++      title = t('wizard.models.title');
++      prompt = t('wizard.models.prompt');
++      input = {
++        field: 'models',
++        placeholder: provider?.models?.join(',') || 'model-name',
++      };
++      break;
++    case 'advanced':
++      title = t('wizard.advanced.title');
++      prompt = t('wizard.advanced.prompt');
++      choices = [
++        {
++          value: 'yes',
++          label: t('wizard.advanced.yes'),
++          description: t('wizard.advanced.yesDescription'),
++        },
++        {
++          value: 'no',
++          label: t('wizard.advanced.no'),
++          description: t('wizard.advanced.noDescription'),
++        },
++      ];
++      selected =
++        answers.enableThinking === undefined
++          ? undefined
++          : answers.enableThinking
++            ? 'yes'
++            : 'no';
++      break;
++    default:
++      break;
++  }
++
++  const isLastStep = stepIndex === steps.length - 1;
++  const shownError = inputError ?? error;
++  const stepLabel = t('wizard.step')
++    .replace('{current}', String(stepIndex + 1))
++    .replace('{total}', String(steps.length));
++
++  return (
++    <div
++      ref={panelRef}
++      role="dialog"
++      aria-modal="true"
++      aria-label={t('wizard.title')}
++      data-auth-wizard=""
++      style={PANEL_STYLE}
++      onKeyDown={onKeyDown}
++    >
++      <div
++        style={{
++          display: 'flex',
++          width: 'min(100%, 360px)',
++          flexDirection: 'column',
++          gap: 12,
++          margin: 'auto',
++        }}
++      >
++        <div>
++          <div
++            style={{
++              color: 'var(--vscode-descriptionForeground)',
++              fontSize: 11,
++              lineHeight: 1.45,
++            }}
++          >
++            {/* The step count is known once a provider is picked. */}
++            {provider && step !== 'provider'
++              ? `${provider.label} · ${stepLabel}`
++              : t('wizard.title')}
++          </div>
++          <div style={{ marginTop: 2, fontSize: 15, fontWeight: 600 }}>
++            {title}
++          </div>
++          <div
++            style={{
++              marginTop: 2,
++              color: 'var(--vscode-descriptionForeground)',
++              fontSize: 12,
++              lineHeight: 1.5,
++            }}
++          >
++            {prompt}
++          </div>
++        </div>
++
++        {choices && (
++          <div
++            role="group"
++            aria-label={title}
++            style={{ display: 'flex', flexDirection: 'column', gap: 2 }}
++          >
++            {choices.map((choice) => {
++              const isSelected = choice.value === selected;
++              return (
++                <button
++                  key={choice.value}
++                  type="button"
++                  data-wizard-option=""
++                  aria-pressed={isSelected}
++                  disabled={submitting}
++                  className="qwen-vscode-wizard-option"
++                  onClick={() => choose(choice.value)}
++                  style={{
++                    ...OPTION_STYLE,
++                    ...(isSelected
++                      ? {
++                          borderColor: 'var(--vscode-focusBorder)',
++                          background:
++                            'var(--vscode-list-inactiveSelectionBackground)',
++                        }
++                      : {}),
++                    cursor: submitting ? 'wait' : 'pointer',
++                  }}
++                >
++                  <span style={{ fontWeight: 600 }}>{choice.label}</span>
++                  {choice.description && (
++                    <span
++                      style={{
++                        color: 'var(--vscode-descriptionForeground)',
++                        fontSize: 11,
++                        lineHeight: 1.45,
++                      }}
++                    >
++                      {choice.description}
++                    </span>
++                  )}
++                </button>
++              );
++            })}
++          </div>
++        )}
++
++        {input && (
++          <input
++            key={input.field}
++            data-wizard-input=""
++            aria-label={title}
++            type={input.field === 'apiKey' ? 'password' : 'text'}
++            autoComplete="off"
++            spellCheck={false}
++            disabled={submitting}
++            placeholder={input.placeholder}
++            value={answers[input.field]}
++            onChange={(event) => {
++              const value = event.target.value;
++              setInputError(undefined);
++              setAnswers((current) => ({ ...current, [input.field]: value }));
++            }}
++            onKeyDown={(event) => {
++              if (event.key === 'Enter') {
++                event.preventDefault();
++                confirmInput();
++              }
++            }}
++            style={INPUT_STYLE}
++          />
++        )}
++
++        {shownError && (
++          <div
++            role="alert"
++            style={{
++              color: 'var(--vscode-errorForeground)',
++              fontSize: 11,
++              lineHeight: 1.45,
++            }}
++          >
++            {shownError}
++          </div>
++        )}
++
++        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
++          {history.length > 1 && (
++            <button
++              type="button"
++              disabled={submitting}
++              onClick={back}
++              style={{ ...SECONDARY_BUTTON_STYLE, marginRight: 'auto' }}
++            >
++              {t('wizard.back')}
++            </button>
++          )}
++          <button
++            type="button"
++            disabled={submitting}
++            onClick={onCancel}
++            style={SECONDARY_BUTTON_STYLE}
++          >
++            {t('wizard.cancel')}
++          </button>
++          {(input || (submitting && isLastStep)) && (
++            <button
++              type="button"
++              disabled={submitting}
++              onClick={confirmInput}
++              style={{
++                ...PRIMARY_BUTTON_STYLE,
++                cursor: submitting ? 'wait' : 'pointer',
++                opacity: submitting ? 0.75 : 1,
++              }}
++            >
++              {submitting && (
++                <span
++                  aria-hidden="true"
++                  style={{
++                    width: 11,
++                    height: 11,
++                    border: '2px solid currentColor',
++                    borderTopColor: 'transparent',
++                    borderRadius: '50%',
++                    animation: 'qwen-vscode-spin 0.8s linear infinite',
++                  }}
++                />
++              )}
++              {submitting
++                ? t('wizard.connecting')
++                : isLastStep
++                  ? t('wizard.connect')
++                  : t('wizard.next')}
++            </button>
++          )}
++        </div>
++      </div>
++    </div>
++  );
++}
+diff --git a/packages/vscode-ide-companion/src/webview/components/QwenOnboarding.tsx b/packages/vscode-ide-companion/src/webview/components/QwenOnboarding.tsx
+index 8bd724ea6e..455e428ba4 100644
+--- a/packages/vscode-ide-companion/src/webview/components/QwenOnboarding.tsx
++++ b/packages/vscode-ide-companion/src/webview/components/QwenOnboarding.tsx
+@@ -13,9 +13,21 @@ interface QwenOnboardingProps {
+   connecting: boolean;
+   error?: string;
+   t: ChromeStrings;
++  theme: 'light' | 'dark';
+   onGetStarted: () => void;
+ }
+ 
++/**
++ * The product name's gradient, as on the Web Shell welcome screen
++ * (`--agent-logo-gradient` in web-shell's App.module.css, which this view
++ * is not inside of).
++ */
++const TITLE_GRADIENT: Record<QwenOnboardingProps['theme'], string> = {
++  dark: 'linear-gradient(90deg, #51d9f7 0%, 25%, #8ce786 50%, 75%, #cdf70a 100%)',
++  light:
++    'linear-gradient(90deg, #0093c4 0%, 25%, #00a37a 50%, 75%, #5c9f00 100%)',
++};
++
+ const BUTTON_STYLE: CSSProperties = {
+   display: 'inline-flex',
+   width: '100%',
+@@ -34,6 +46,7 @@ export function QwenOnboarding({
+   connecting,
+   error,
+   t,
++  theme,
+   onGetStarted,
+ }: QwenOnboardingProps) {
+   return (
+@@ -67,7 +80,19 @@ export function QwenOnboarding({
+           style={{ objectFit: 'contain' }}
+         />
+         <div>
+-          <div style={{ fontSize: 17, fontWeight: 600 }}>
++          <div
++            style={{
++              fontSize: 32,
++              fontWeight: 600,
++              lineHeight: '36px',
++              letterSpacing: '-0.02em',
++              background: TITLE_GRADIENT[theme],
++              backgroundClip: 'text',
++              WebkitBackgroundClip: 'text',
++              WebkitTextFillColor: 'transparent',
++              color: 'var(--vscode-foreground)',
++            }}
++          >
+             {t('onboarding.title')}
+           </div>
+           <div
+diff --git a/packages/vscode-ide-companion/src/webview/handlers/AuthMessageHandler.test.ts b/packages/vscode-ide-companion/src/webview/handlers/AuthMessageHandler.test.ts
+index a64a7cb934..bddba79c83 100644
+--- a/packages/vscode-ide-companion/src/webview/handlers/AuthMessageHandler.test.ts
++++ b/packages/vscode-ide-companion/src/webview/handlers/AuthMessageHandler.test.ts
+@@ -6,448 +6,321 @@
+ 
+ import { beforeEach, describe, expect, it, vi } from 'vitest';
+ 
+-const { mockShowInputBox, mockShowQuickPick } = vi.hoisted(() => ({
+-  mockShowInputBox: vi.fn(),
+-  mockShowQuickPick: vi.fn(),
+-}));
+-
+-vi.mock('vscode', () => ({
+-  window: {
+-    showQuickPick: mockShowQuickPick,
+-    showInputBox: mockShowInputBox,
+-  },
+-  QuickPickItemKind: {
+-    Separator: -1,
+-    Default: 0,
+-  },
+-}));
+-
+-import { AuthMessageHandler } from './AuthMessageHandler.js';
++vi.mock('vscode', () => ({ window: {} }));
++
++import { AuthType, type ProviderConfig } from '@qwen-code/qwen-code-core';
++import {
++  AUTH_WIZARD_PROVIDER_IDS,
++  AuthMessageHandler,
++  describeWizardProvider,
++} from './AuthMessageHandler.js';
++import type {
++  AuthWizardProvider,
++  AuthWizardSubmission,
++} from '../authWizardTypes.js';
++
++function createHandler() {
++  const sendToWebView = vi.fn();
++  const handler = new AuthMessageHandler(
++    {} as never,
++    {} as never,
++    null,
++    sendToWebView,
++  );
++  const submit = vi.fn().mockResolvedValue(undefined);
++  handler.setAuthInteractiveHandler(submit);
++  return { handler, sendToWebView, submit };
++}
++
++async function openWizard(): Promise<AuthWizardProvider[]> {
++  const { handler, sendToWebView } = createHandler();
++  await handler.handle({ type: 'auth' });
++  const message = sendToWebView.mock.calls[0]?.[0] as {
++    type: string;
++    data: { providers: AuthWizardProvider[] };
++  };
++  expect(message.type).toBe('authWizard');
++  return message.data.providers;
++}
++
++async function submitAnswers(answers: Partial<AuthWizardSubmission>) {
++  const created = createHandler();
++  await created.handler.handle({ type: 'authWizardSubmit', data: answers });
++  const types = created.sendToWebView.mock.calls.map(
++    (call) => (call[0] as { type: string }).type,
++  );
++  return { ...created, types };
++}
+ 
+ describe('AuthMessageHandler', () => {
+   beforeEach(() => {
+-    vi.resetAllMocks();
++    vi.clearAllMocks();
+   });
+ 
+-  it('sends authCancelled when the provider picker is dismissed', async () => {
+-    mockShowQuickPick.mockResolvedValue(undefined);
+-    const sendToWebView = vi.fn();
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      sendToWebView,
+-    );
+-
+-    await handler.handle({ type: 'auth' });
++  describe('opening the wizard', () => {
++    it('sends the wizard instead of starting a flow of its own', async () => {
++      const { handler, sendToWebView, submit } = createHandler();
+ 
+-    expect(mockShowQuickPick).toHaveBeenCalledWith(
+-      expect.any(Array),
+-      expect.objectContaining({ ignoreFocusOut: true }),
+-    );
+-    expect(sendToWebView).toHaveBeenCalledWith({ type: 'authCancelled' });
+-  });
++      await handler.handle({ type: 'auth' });
+ 
+-  it('sends authCancelled when the api key input is dismissed mid-flow', async () => {
+-    // First pick: select provider (coding-plan)
+-    // Second pick: select base URL region
+-    mockShowQuickPick
+-      .mockResolvedValueOnce({ value: 'coding-plan' })
+-      .mockResolvedValueOnce({
+-        value: 'https://coding.dashscope.aliyuncs.com/v1',
++      expect(sendToWebView).toHaveBeenCalledTimes(1);
++      expect(sendToWebView.mock.calls[0]?.[0]).toMatchObject({
++        type: 'authWizard',
+       });
+-    // API key input: user cancels
+-    mockShowInputBox.mockResolvedValue(undefined);
+-
+-    const sendToWebView = vi.fn();
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      sendToWebView,
+-    );
+-
+-    await handler.handle({ type: 'auth' });
++      expect(submit).not.toHaveBeenCalled();
++    });
+ 
+-    expect(mockShowInputBox).toHaveBeenCalledWith(
+-      expect.objectContaining({ ignoreFocusOut: true }),
+-    );
+-    expect(sendToWebView).toHaveBeenCalledWith({ type: 'authCancelled' });
+-  });
++    it('offers OpenRouter, Requesty, OpenAI, Grok and Custom, in that order', async () => {
++      const providers = await openWizard();
++
++      expect(providers.map((p) => p.id)).toEqual([...AUTH_WIZARD_PROVIDER_IDS]);
++      expect(providers.map((p) => p.label)).toEqual([
++        'OpenRouter',
++        'Requesty',
++        'OpenAI API Key',
++        'Grok (xAI) API Key',
++        'Custom Provider',
++      ]);
++    });
+ 
+-  it('drives a fixed-baseUrl third-party provider through to authInteractiveHandler', async () => {
+-    // Provider pick → DeepSeek (fixed baseUrl, models step shown)
+-    mockShowQuickPick.mockResolvedValueOnce({ value: 'deepseek' });
+-    // API key input + comma-separated model IDs
+-    mockShowInputBox
+-      .mockResolvedValueOnce('sk-deepseek')
+-      .mockResolvedValueOnce('deepseek-v4-flash, deepseek-v4-pro');
+-
+-    const sendToWebView = vi.fn();
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      sendToWebView,
+-    );
+-    const authInteractiveHandler = vi.fn().mockResolvedValue(undefined);
+-    handler.setAuthInteractiveHandler(authInteractiveHandler);
+-
+-    await handler.handle({ type: 'auth' });
+-
+-    // No base URL picker should have been shown (DeepSeek baseUrl is a string)
+-    expect(mockShowQuickPick).toHaveBeenCalledTimes(1);
+-    expect(authInteractiveHandler).toHaveBeenCalledWith(
+-      expect.objectContaining({ id: 'deepseek' }),
+-      expect.objectContaining({
+-        baseUrl: 'https://api.deepseek.com',
+-        apiKey: 'sk-deepseek',
+-        modelIds: ['deepseek-v4-flash', 'deepseek-v4-pro'],
+-      }),
+-    );
+-    expect(sendToWebView).not.toHaveBeenCalledWith({ type: 'authCancelled' });
+-  });
++    it('describes a fixed-endpoint preset as API key + editable models', async () => {
++      const providers = await openWizard();
++      const openai = providers.find((p) => p.id === 'openai');
+ 
+-  it('sends authError and aborts when validateApiKey rejects the key', async () => {
+-    // coding-plan validateApiKey requires keys starting with sk-sp-
+-    mockShowQuickPick
+-      .mockResolvedValueOnce({ value: 'coding-plan' })
+-      .mockResolvedValueOnce({
+-        value: 'https://coding.dashscope.aliyuncs.com/v1',
++      expect(openai).toMatchObject({
++        baseUrl: { kind: 'fixed' },
++        wireApiProtocols: [],
++        models: ['gpt-6.1-sol'],
++        advancedConfig: false,
+       });
+-    mockShowInputBox.mockResolvedValueOnce('not-a-coding-plan-key');
+-
+-    const sendToWebView = vi.fn();
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      sendToWebView,
+-    );
+-    const authInteractiveHandler = vi.fn().mockResolvedValue(undefined);
+-    handler.setAuthInteractiveHandler(authInteractiveHandler);
+-
+-    await handler.handle({ type: 'auth' });
+-
+-    expect(sendToWebView).toHaveBeenCalledWith({
+-      type: 'authError',
+-      data: { message: expect.stringContaining('Coding Plan') },
++      expect(openai?.protocols).toBeUndefined();
+     });
+-    expect(authInteractiveHandler).not.toHaveBeenCalled();
+-  });
+ 
+-  it('shows a baseUrl picker for providers with BaseUrlOption arrays', async () => {
+-    // coding-plan has baseUrl: BaseUrlOption[] (China / Singapore)
+-    mockShowQuickPick
+-      .mockResolvedValueOnce({ value: 'coding-plan' })
+-      .mockResolvedValueOnce({
+-        value: 'https://coding-intl.dashscope.aliyuncs.com/v1',
++    it('describes the custom provider with every step', async () => {
++      const providers = await openWizard();
++      const custom = providers.find((p) => p.id === 'custom-openai-compatible');
++
++      // Raw AuthType strings must never reach the UI as labels.
++      expect(custom?.protocols).toEqual([
++        { value: 'openai', label: 'OpenAI Compatible' },
++        { value: 'anthropic', label: 'Anthropic' },
++        { value: 'gemini', label: 'Gemini' },
++      ]);
++      expect(custom?.wireApiProtocols).toEqual(['openai']);
++      expect(custom?.advancedConfig).toBe(true);
++      expect(custom?.models).toEqual([]);
++      // The blank-input default follows the route, including the API pick:
++      // Responses dials the /v1-less endpoint.
++      expect(custom?.baseUrl).toEqual({
++        kind: 'input',
++        placeholders: {
++          'openai|chat-completions': 'https://api.openai.com/v1',
++          'openai|responses': 'https://api.openai.com',
++          'anthropic|': 'https://api.anthropic.com/v1',
++          'gemini|': 'https://generativelanguage.googleapis.com',
++        },
+       });
+-    // User cancels at API key step to keep the test focused on the picker call
+-    mockShowInputBox.mockResolvedValueOnce(undefined);
+-
+-    const sendToWebView = vi.fn();
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      sendToWebView,
+-    );
+-
+-    await handler.handle({ type: 'auth' });
+-
+-    // Second pick is the base URL selector; verify it was shown with the
+-    // BaseUrlOption entries (China + Singapore international).
+-    const baseUrlPickerCall = mockShowQuickPick.mock.calls[1];
+-    expect(baseUrlPickerCall?.[0]).toEqual(
+-      expect.arrayContaining([
+-        expect.objectContaining({
+-          description: 'https://coding.dashscope.aliyuncs.com/v1',
+-        }),
+-        expect.objectContaining({
+-          description: 'https://coding-intl.dashscope.aliyuncs.com/v1',
+-        }),
+-      ]),
+-    );
+-  });
+-
+-  // -- Custom provider flow ------------------------------------------------
+-  // The custom provider exercises every step in runProviderSetupFlow:
+-  // protocol pick, free-form URL input + scheme validation, API key,
+-  // comma-split model IDs + empty-input guard, and advanced config.
+-
+-  it('drives custom provider through protocol + url + key + models + advanced', async () => {
+-    // 1) Provider pick → custom (custom-openai-compatible)
+-    // 2) Protocol pick → Anthropic
+-    // 3) Advanced config pick → modality-only (no thinking)
+-    mockShowQuickPick
+-      .mockResolvedValueOnce({ value: 'custom-openai-compatible' })
+-      .mockResolvedValueOnce({ value: 'anthropic' })
+-      .mockResolvedValueOnce({ value: 'no' });
+-    // URL → API key → model IDs (advanced is a separate pick already mocked)
+-    mockShowInputBox
+-      .mockResolvedValueOnce('https://my-proxy.example.com/v1')
+-      .mockResolvedValueOnce('sk-custom-anthropic')
+-      .mockResolvedValueOnce('claude-3-opus, claude-3-sonnet');
+-
+-    const sendToWebView = vi.fn();
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      sendToWebView,
+-    );
+-    const authInteractiveHandler = vi.fn().mockResolvedValue(undefined);
+-    handler.setAuthInteractiveHandler(authInteractiveHandler);
+-
+-    await handler.handle({ type: 'auth' });
+-
+-    expect(authInteractiveHandler).toHaveBeenCalledTimes(1);
+-    const [providerConfig, inputs] = authInteractiveHandler.mock.calls[0]!;
+-    expect(providerConfig.id).toBe('custom-openai-compatible');
+-    expect(inputs).toMatchObject({
+-      // Protocol from the picker is threaded through.
+-      protocol: 'anthropic',
+-      baseUrl: 'https://my-proxy.example.com/v1',
+-      apiKey: 'sk-custom-anthropic',
+-      modelIds: ['claude-3-opus', 'claude-3-sonnet'],
+     });
+-  });
+-
+-  it('labels every custom protocol option with a human-readable name', async () => {
+-    // Provider pick → custom; then cancel at the protocol pick so the test
+-    // stays focused on the items the picker was handed.
+-    mockShowQuickPick
+-      .mockResolvedValueOnce({ value: 'custom-openai-compatible' })
+-      .mockResolvedValueOnce(undefined);
+-
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      vi.fn(),
+-    );
+-
+-    await handler.handle({ type: 'auth' });
+-
+-    const protocolItems = mockShowQuickPick.mock.calls[1]?.[0] as Array<{
+-      label: string;
+-      value: string;
+-    }>;
+-    // Raw AuthType strings ('openai-responses') must never reach the UI.
+-    expect(protocolItems).toEqual(
+-      expect.arrayContaining([
+-        { label: 'OpenAI Compatible', value: 'openai' },
+-        { label: 'Anthropic', value: 'anthropic' },
+-        { label: 'Gemini', value: 'gemini' },
+-      ]),
+-    );
+-  });
+-
+-  it('rejects a non-http(s) custom base URL with authError', async () => {
+-    mockShowQuickPick
+-      .mockResolvedValueOnce({ value: 'custom-openai-compatible' })
+-      .mockResolvedValueOnce({ value: 'openai' })
+-      .mockResolvedValueOnce({ value: 'chat-completions' });
+-    // file:// URL must be rejected before reaching authInteractiveHandler.
+-    mockShowInputBox.mockResolvedValueOnce('file:///etc/passwd');
+-
+-    const sendToWebView = vi.fn();
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      sendToWebView,
+-    );
+-    const authInteractiveHandler = vi.fn().mockResolvedValue(undefined);
+-    handler.setAuthInteractiveHandler(authInteractiveHandler);
+-
+-    await handler.handle({ type: 'auth' });
+ 
+-    expect(sendToWebView).toHaveBeenCalledWith({
+-      type: 'authError',
+-      data: { message: expect.stringContaining('http') },
++    it('describes a BaseUrlOption array as an endpoint choice', () => {
++      const provider: ProviderConfig = {
++        id: 'regional',
++        label: 'Regional',
++        description: 'Two regions',
++        protocol: AuthType.USE_OPENAI,
++        baseUrl: [
++          { id: 'a', label: 'Region A', url: 'https://a.example.com/v1' },
++          { id: 'b', label: 'Region B', url: 'https://b.example.com/v1' },
++        ],
++        envKey: 'REGIONAL_API_KEY',
++        models: [{ id: 'm' }],
++        modelNamePrefix: 'Regional',
++        uiLabels: { baseUrlStepTitle: 'Region' },
++      };
++
++      expect(describeWizardProvider(provider).baseUrl).toEqual({
++        kind: 'choice',
++        stepTitle: 'Region',
++        options: [
++          {
++            value: 'https://a.example.com/v1',
++            label: 'Region A',
++            description: 'https://a.example.com/v1',
++          },
++          {
++            value: 'https://b.example.com/v1',
++            label: 'Region B',
++            description: 'https://b.example.com/v1',
++          },
++        ],
++      });
+     });
+-    expect(authInteractiveHandler).not.toHaveBeenCalled();
+   });
+ 
+-  it('falls back to the Responses default endpoint when the URL input is blank after picking Responses', async () => {
+-    // The API step's pick is part of the effective route: a blank URL after
+-    // choosing Responses must fall back to the /v1-less Responses default,
+-    // not the Chat Completions /v1 default.
+-    mockShowQuickPick
+-      .mockResolvedValueOnce({ value: 'custom-openai-compatible' })
+-      .mockResolvedValueOnce({ value: 'openai' })
+-      .mockResolvedValueOnce({ value: 'responses' })
+-      .mockResolvedValueOnce({ value: 'no' });
+-    mockShowInputBox
+-      .mockResolvedValueOnce('') // blank URL → fallback to the wire's default
+-      .mockResolvedValueOnce('sk-test')
+-      .mockResolvedValueOnce('model');
+-
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      vi.fn(),
+-    );
+-    const submit = vi.fn().mockResolvedValue(undefined);
+-    handler.setAuthInteractiveHandler(submit);
+-    await handler.handle({ type: 'auth' });
++  it('answers a cancelled wizard with authCancelled', async () => {
++    const { handler, sendToWebView } = createHandler();
+ 
+-    expect(submit).toHaveBeenCalledWith(
+-      expect.anything(),
+-      expect.objectContaining({
+-        protocol: 'openai',
+-        wireApi: 'responses',
+-        baseUrl: 'https://api.openai.com',
+-      }),
+-    );
+-  });
++    await handler.handle({ type: 'authWizardCancel' });
+ 
+-  it('collects Responses as an API choice within OpenAI setup', async () => {
+-    mockShowQuickPick
+-      .mockResolvedValueOnce({ value: 'custom-openai-compatible' })
+-      .mockResolvedValueOnce({ value: 'openai' })
+-      .mockResolvedValueOnce({ value: 'responses' })
+-      .mockResolvedValueOnce({ value: 'no' });
+-    mockShowInputBox
+-      .mockResolvedValueOnce('https://gateway.example/v1')
+-      .mockResolvedValueOnce('key')
+-      .mockResolvedValueOnce('model');
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      vi.fn(),
+-    );
+-    const submit = vi.fn().mockResolvedValue(undefined);
+-    handler.setAuthInteractiveHandler(submit);
+-    await handler.handle({ type: 'auth' });
+-    expect(submit).toHaveBeenCalledWith(
+-      expect.anything(),
+-      expect.objectContaining({
+-        protocol: 'openai',
+-        wireApi: 'responses',
+-        modelIds: ['model'],
+-      }),
+-    );
++    expect(sendToWebView).toHaveBeenCalledWith({ type: 'authCancelled' });
+   });
+ 
+-  it('falls back to the protocol-specific default when custom URL input is blank', async () => {
+-    // User picks Anthropic protocol and hits Enter on the URL with no input.
+-    mockShowQuickPick
+-      .mockResolvedValueOnce({ value: 'custom-openai-compatible' })
+-      .mockResolvedValueOnce({ value: 'anthropic' })
+-      .mockResolvedValueOnce({ value: 'no' });
+-    mockShowInputBox
+-      .mockResolvedValueOnce('') // blank URL → fallback to Anthropic default
+-      .mockResolvedValueOnce('sk-anthropic')
+-      .mockResolvedValueOnce('claude-3-opus');
+-
+-    const sendToWebView = vi.fn();
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      sendToWebView,
+-    );
+-    const authInteractiveHandler = vi.fn().mockResolvedValue(undefined);
+-    handler.setAuthInteractiveHandler(authInteractiveHandler);
++  describe('submitting answers', () => {
++    it('drives a fixed-baseUrl preset through to authInteractiveHandler', async () => {
++      const { submit, types } = await submitAnswers({
++        providerId: 'openai',
++        apiKey: '  sk-openai  ',
++        models: 'gpt-6.1-sol, gpt-5.5',
++      });
+ 
+-    await handler.handle({ type: 'auth' });
++      expect(submit).toHaveBeenCalledWith(
++        expect.objectContaining({ id: 'openai' }),
++        expect.objectContaining({
++          protocol: undefined,
++          baseUrl: 'https://api.openai.com',
++          // Trimmed, as the CLI does.
++          apiKey: 'sk-openai',
++          modelIds: ['gpt-6.1-sol', 'gpt-5.5'],
++        }),
++      );
++      expect(types).toEqual(['authWizardDone']);
++    });
+ 
+-    expect(authInteractiveHandler).toHaveBeenCalledWith(
+-      expect.objectContaining({ id: 'custom-openai-compatible' }),
+-      expect.objectContaining({
+-        // Empty input resolved to Anthropic's default, not the OpenAI one.
+-        baseUrl: 'https://api.anthropic.com/v1',
++    it('drives the custom provider through protocol + url + key + models + advanced', async () => {
++      const { submit } = await submitAnswers({
++        providerId: 'custom-openai-compatible',
+         protocol: 'anthropic',
+-      }),
+-    );
+-  });
++        baseUrl: 'https://my-proxy.example.com/v1',
++        apiKey: 'sk-custom-anthropic',
++        models: 'claude-3-opus, claude-3-sonnet',
++        enableThinking: true,
++      });
+ 
+-  it('rejects whitespace-only model IDs with authError', async () => {
+-    mockShowQuickPick
+-      .mockResolvedValueOnce({ value: 'custom-openai-compatible' })
+-      .mockResolvedValueOnce({ value: 'openai' })
+-      .mockResolvedValueOnce({ value: 'chat-completions' });
+-    mockShowInputBox
+-      .mockResolvedValueOnce('https://api.example.com/v1')
+-      .mockResolvedValueOnce('sk-test')
+-      // Only whitespace + commas — must not reach authInteractiveHandler.
+-      .mockResolvedValueOnce(' , , ,');
+-
+-    const sendToWebView = vi.fn();
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      sendToWebView,
+-    );
+-    const authInteractiveHandler = vi.fn().mockResolvedValue(undefined);
+-    handler.setAuthInteractiveHandler(authInteractiveHandler);
++      const [providerConfig, inputs] = submit.mock.calls[0]!;
++      expect(providerConfig.id).toBe('custom-openai-compatible');
++      expect(inputs).toEqual({
++        protocol: 'anthropic',
++        baseUrl: 'https://my-proxy.example.com/v1',
++        apiKey: 'sk-custom-anthropic',
++        modelIds: ['claude-3-opus', 'claude-3-sonnet'],
++        advancedConfig: { enableThinking: true },
++      });
++    });
+ 
+-    await handler.handle({ type: 'auth' });
++    it('collects Responses as an API choice within OpenAI setup', async () => {
++      const { submit } = await submitAnswers({
++        providerId: 'custom-openai-compatible',
++        protocol: 'openai',
++        wireApi: 'responses',
++        baseUrl: 'https://gateway.example/v1',
++        apiKey: 'key',
++        models: 'model',
++        enableThinking: false,
++      });
+ 
+-    expect(sendToWebView).toHaveBeenCalledWith({
+-      type: 'authError',
+-      data: { message: expect.stringContaining('Model IDs') },
++      expect(submit).toHaveBeenCalledWith(
++        expect.anything(),
++        expect.objectContaining({
++          protocol: 'openai',
++          wireApi: 'responses',
++          modelIds: ['model'],
++          advancedConfig: { enableThinking: false },
++        }),
++      );
+     });
+-    expect(authInteractiveHandler).not.toHaveBeenCalled();
+-  });
+ 
+-  it('does not send authCancelled after a validation authError (would clear the message)', async () => {
+-    // Pick custom + openai, then enter a non-http(s) URL → scheme validation
+-    // fails. The webview clears the error on authCancelled, so a validation
+-    // failure must send ONLY authError, never a trailing authCancelled.
+-    mockShowQuickPick
+-      .mockResolvedValueOnce({ value: 'custom-openai-compatible' })
+-      .mockResolvedValueOnce({ value: 'openai' })
+-      .mockResolvedValueOnce({ value: 'chat-completions' });
+-    mockShowInputBox.mockResolvedValueOnce('file:///etc/passwd');
+-
+-    const sendToWebView = vi.fn();
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      sendToWebView,
++    it.each([
++      ['openai', 'chat-completions', 'https://api.openai.com/v1'],
++      ['openai', 'responses', 'https://api.openai.com'],
++      ['anthropic', undefined, 'https://api.anthropic.com/v1'],
++    ] as const)(
++      'falls back to the %s/%s default when the URL is blank',
++      async (protocol, wireApi, expected) => {
++        const { submit } = await submitAnswers({
++          providerId: 'custom-openai-compatible',
++          protocol,
++          ...(wireApi ? { wireApi } : {}),
++          baseUrl: '  ',
++          apiKey: 'sk',
++          models: 'model',
++          enableThinking: false,
++        });
++
++        expect(submit).toHaveBeenCalledWith(
++          expect.anything(),
++          expect.objectContaining({ protocol, baseUrl: expected }),
++        );
++      },
+     );
+-    handler.setAuthInteractiveHandler(vi.fn().mockResolvedValue(undefined));
+ 
+-    await handler.handle({ type: 'auth' });
++    it.each<[string, Partial<AuthWizardSubmission>, string]>([
++      ['an unknown provider', { providerId: 'deepseek' }, 'provider'],
++      [
++        'a missing protocol',
++        { providerId: 'custom-openai-compatible' },
++        'protocol',
++      ],
++      [
++        'a missing OpenAI API',
++        { providerId: 'custom-openai-compatible', protocol: 'openai' },
++        'OpenAI API',
++      ],
++      [
++        'a non-http(s) base URL',
++        {
++          providerId: 'custom-openai-compatible',
++          protocol: 'openai',
++          wireApi: 'chat-completions',
++          baseUrl: 'file:///etc/passwd',
++        },
++        'http',
++      ],
++      ['a blank API key', { providerId: 'grok', apiKey: '   ' }, 'API key'],
++      [
++        'whitespace-only model IDs',
++        { providerId: 'grok', apiKey: 'xai', models: ' , , ,' },
++        'Model IDs',
++      ],
++      [
++        'a missing thinking choice',
++        {
++          providerId: 'custom-openai-compatible',
++          protocol: 'gemini',
++          apiKey: 'k',
++          models: 'm',
++        },
++        'thinking',
++      ],
++    ])(
++      'rejects %s in the wizard without connecting',
++      async (_name, answers, text) => {
++        const { submit, sendToWebView, types } = await submitAnswers(answers);
++
++        expect(sendToWebView).toHaveBeenCalledWith({
++          type: 'authWizardError',
++          data: { message: expect.stringContaining(text) },
++        });
++        expect(submit).not.toHaveBeenCalled();
++        // Not authError (that reports a failed connection and drops the
++        // auth state) and not authCancelled (that closes the wizard).
++        expect(types).toEqual(['authWizardError', 'authWizardDone']);
++      },
++    );
+ 
+-    const types = sendToWebView.mock.calls.map((c) => c[0]?.type);
+-    expect(types).toContain('authError');
+-    expect(types).not.toContain('authCancelled');
+-  });
++    it('reports a failing install as authError and still finishes', async () => {
++      const created = createHandler();
++      created.submit.mockRejectedValueOnce(new Error('disk full'));
+ 
+-  it('lists QwenCloud as the first provider group in the picker', async () => {
+-    mockShowQuickPick.mockResolvedValue(undefined);
+-    const sendToWebView = vi.fn();
+-    const handler = new AuthMessageHandler(
+-      {} as never,
+-      {} as never,
+-      null,
+-      sendToWebView,
+-    );
++      await created.handler.handle({
++        type: 'authWizardSubmit',
++        data: { providerId: 'openrouter', apiKey: 'sk-or', models: 'a/b' },
++      });
+ 
+-    await handler.handle({ type: 'auth' });
+-
+-    const items = mockShowQuickPick.mock.calls[0][0] as Array<{
+-      label: string;
+-      value: string;
+-      kind?: number;
+-    }>;
+-    // First separator should be QwenCloud, matching the daemon catalog order.
+-    const separators = items.filter((i) => i.kind === -1);
+-    expect(separators[0].label).toBe('QwenCloud');
+-    // QwenCloud group should contain both presets.
+-    const qwencloudItems = items.filter(
+-      (i) =>
+-        i.value === 'qwencloud-token-plan' || i.value === 'qwencloud-standard',
+-    );
+-    expect(qwencloudItems).toHaveLength(2);
++      const messages = created.sendToWebView.mock.calls.map((c) => c[0]);
++      expect(messages).toEqual([
++        { type: 'authError', data: { message: 'Auth failed: disk full' } },
++        { type: 'authWizardDone' },
++      ]);
++    });
+   });
+ });
+diff --git a/packages/vscode-ide-companion/src/webview/handlers/AuthMessageHandler.ts b/packages/vscode-ide-companion/src/webview/handlers/AuthMessageHandler.ts
+index 28888cc603..89f0a2d396 100644
+--- a/packages/vscode-ide-companion/src/webview/handlers/AuthMessageHandler.ts
++++ b/packages/vscode-ide-companion/src/webview/handlers/AuthMessageHandler.ts
+@@ -5,15 +5,11 @@
+  */
+ 
+ import { logger } from '../../utils/logger.js';
+-import * as vscode from 'vscode';
+ import { BaseMessageHandler } from './BaseMessageHandler.js';
+ import { getErrorMessage } from '../../utils/errorMessage.js';
+ import {
+-  ALL_PROVIDERS,
+-  ALIBABA_PROVIDERS,
+   AuthType,
+-  QWENCLOUD_PROVIDERS,
+-  THIRD_PARTY_PROVIDERS,
++  findProviderById,
+   shouldShowStep,
+   resolveBaseUrl,
+   resolveModelProtocol,
+@@ -24,13 +20,144 @@ import {
+   type ProviderSetupInputs,
+   type BaseUrlOption,
+ } from '@qwen-code/qwen-code-core';
++import {
++  authWizardRouteKey,
++  type AuthWizardBaseUrl,
++  type AuthWizardProvider,
++  type AuthWizardSubmission,
++  type AuthWizardWireApi,
++} from '../authWizardTypes.js';
++
++/** The providers the setup wizard offers, in display order. */
++export const AUTH_WIZARD_PROVIDER_IDS = [
++  'openrouter',
++  'requesty',
++  'openai',
++  'grok',
++  'custom-openai-compatible',
++] as const;
++
++// AuthType's raw string values ('openai' / 'anthropic' / 'gemini') are an
++// implementation detail; the wizard shows human-readable labels.
++const PROTOCOL_LABELS: Record<string, string> = {
++  [AuthType.USE_OPENAI]: 'OpenAI Compatible',
++  [AuthType.USE_ANTHROPIC]: 'Anthropic',
++  [AuthType.USE_GEMINI]: 'Gemini',
++};
++
++const WIRE_APIS: readonly AuthWizardWireApi[] = [
++  'chat-completions',
++  'responses',
++];
++
++function getWizardProviders(): ProviderConfig[] {
++  return AUTH_WIZARD_PROVIDER_IDS.map((id) => findProviderById(id)).filter(
++    (p): p is ProviderConfig => p !== undefined,
++  );
++}
++
++function hasProtocolStep(provider: ProviderConfig): boolean {
++  return (
++    shouldShowStep(provider, 'protocol') &&
++    !!provider.protocolOptions &&
++    provider.protocolOptions.length > 1
++  );
++}
++
++/**
++ * Free-form URL default for a route. The effective route includes the API
++ * step's pick: a Responses choice dials the /v1-less default endpoint, so
++ * deriving the fallback from the raw bucket protocol would persist the Chat
++ * Completions endpoint on the Responses wire. No local fallback:
++ * getDefaultBaseUrlForProtocol owns the defaults, so CLI and VS Code stay in
++ * sync.
++ */
++function getBaseUrlPlaceholder(
++  provider: ProviderConfig,
++  protocol: AuthType | undefined,
++  wireApi: ModelWireApi | undefined,
++): string {
++  const effectiveProtocol =
++    resolveModelProtocol(protocol ?? provider.protocol, { wireApi }) ??
++    protocol ??
++    provider.protocol;
++  return getDefaultBaseUrlForProtocol(effectiveProtocol);
++}
++
++/** Describe a provider's setup steps as data for the webview wizard. */
++export function describeWizardProvider(
++  provider: ProviderConfig,
++): AuthWizardProvider {
++  const protocolStep = hasProtocolStep(provider);
++  // Protocol keys as the wizard submits them: '' when there is no protocol
++  // step (the provider's own protocol applies).
++  const protocolKeys: Array<AuthType | undefined> = protocolStep
++    ? [...provider.protocolOptions!]
++    : [undefined];
++  const wireApiProtocols = protocolKeys
++    .filter((protocol) =>
++      shouldShowStep(provider, 'wireApi', protocol ?? provider.protocol),
++    )
++    .map((protocol) => protocol ?? '');
++
++  let baseUrl: AuthWizardBaseUrl = { kind: 'fixed' };
++  if (shouldShowStep(provider, 'baseUrl')) {
++    if (Array.isArray(provider.baseUrl)) {
++      baseUrl = {
++        kind: 'choice',
++        stepTitle: provider.uiLabels?.baseUrlStepTitle ?? 'Endpoint',
++        options: (provider.baseUrl as BaseUrlOption[]).map((opt) => ({
++          value: opt.url,
++          label: opt.label,
++          description: opt.url,
++        })),
++      };
++    } else {
++      const placeholders: Record<string, string> = {};
++      for (const protocol of protocolKeys) {
++        const wireApis: Array<ModelWireApi | undefined> =
++          wireApiProtocols.includes(protocol ?? '')
++            ? [...WIRE_APIS]
++            : [undefined];
++        for (const wireApi of wireApis) {
++          placeholders[authWizardRouteKey(protocol, wireApi)] =
++            getBaseUrlPlaceholder(provider, protocol, wireApi);
++        }
++      }
++      baseUrl = { kind: 'input', placeholders };
++    }
++  }
++
++  return {
++    id: provider.id,
++    label: provider.label,
++    description: provider.description,
++    ...(protocolStep
++      ? {
++          protocols: provider.protocolOptions!.map((p) => ({
++            value: String(p),
++            label: PROTOCOL_LABELS[String(p)] ?? String(p),
++          })),
++        }
++      : {}),
++    wireApiProtocols,
++    baseUrl,
++    apiKeyPlaceholder: provider.apiKeyPlaceholder ?? 'sk-...',
++    ...(shouldShowStep(provider, 'models')
++      ? { models: getDefaultModelIds(provider) }
++      : {}),
++    advancedConfig: shouldShowStep(provider, 'advancedConfig'),
++  };
++}
+ 
+ /**
+  * Auth message handler
+  * Handles all authentication-related messages.
+  *
+- * Uses the shared ProviderConfig registry from core to dynamically
+- * generate setup flows instead of hardcoding provider-specific logic.
++ * `auth` opens the provider setup wizard in the webview; the wizard's
++ * answers come back as `authWizardSubmit`. The steps are generated from the
++ * shared ProviderConfig registry in core instead of hardcoding
++ * provider-specific logic.
+  */
+ export class AuthMessageHandler extends BaseMessageHandler {
+   private authInteractiveHandler:
+@@ -38,13 +165,26 @@ export class AuthMessageHandler extends BaseMessageHandler {
+     | null = null;
+ 
+   canHandle(messageType: string): boolean {
+-    return ['auth', 'getAccountInfo'].includes(messageType);
++    return [
++      'auth',
++      'authWizardSubmit',
++      'authWizardCancel',
++      'getAccountInfo',
++    ].includes(messageType);
+   }
+ 
+   async handle(message: { type: string; data?: unknown }): Promise<void> {
+     switch (message.type) {
+       case 'auth':
+-        await this.handleAuthInteractive();
++        this.openWizard();
++        break;
++
++      case 'authWizardSubmit':
++        await this.handleWizardSubmit(message.data);
++        break;
++
++      case 'authWizardCancel':
++        this.sendToWebView({ type: 'authCancelled' });
+         break;
+ 
+       case 'getAccountInfo':
+@@ -94,137 +234,38 @@ export class AuthMessageHandler extends BaseMessageHandler {
+     }
+   }
+ 
+-  /**
+-   * Notify the webview that the interactive auth flow was dismissed.
+-   */
+-  private notifyAuthCancelled(): void {
+-    this.sendToWebView({ type: 'authCancelled' });
+-  }
+-
+-  /**
+-   * Helper: show a QuickPick and return the selected item's `value`.
+-   * Returns undefined if the user cancels.
+-   *
+-   * Items with `kind: Separator` are rendered by VSCode as non-selectable
+-   * group headers; they should be left in `items` to preserve grouping.
+-   */
+-  private async pick<T extends string>(
+-    items: Array<{
+-      label: string;
+-      description?: string;
+-      value: T;
+-      kind?: vscode.QuickPickItemKind;
+-    }>,
+-    title: string,
+-    placeHolder: string,
+-  ): Promise<T | undefined> {
+-    const choice = await vscode.window.showQuickPick(items, {
+-      title,
+-      placeHolder,
+-      ignoreFocusOut: true,
++  /** Open the setup wizard in the webview. */
++  private openWizard(): void {
++    this.sendToWebView({
++      type: 'authWizard',
++      data: { providers: getWizardProviders().map(describeWizardProvider) },
+     });
+-    if (!choice || choice.kind === vscode.QuickPickItemKind.Separator) {
+-      this.notifyAuthCancelled();
+-      return undefined;
+-    }
+-    return (choice as { value: T }).value;
+   }
+ 
+   /**
+-   * Helper: show an InputBox. Returns undefined if the user cancels.
++   * Reject a submission the wizard should have caught. The wizard stays open
++   * and shows the message; nothing was written, so the auth state is
++   * unchanged (unlike `authError`, which reports a failed connection).
+    */
+-  private async input(opts: {
+-    title: string;
+-    prompt: string;
+-    placeHolder?: string;
+-    value?: string;
+-    password?: boolean;
+-    required?: boolean;
+-  }): Promise<string | undefined> {
+-    const value = await vscode.window.showInputBox({
+-      title: opts.title,
+-      prompt: opts.prompt,
+-      placeHolder: opts.placeHolder,
+-      value: opts.value,
+-      password: opts.password ?? false,
+-      ignoreFocusOut: true,
+-      validateInput: opts.required
+-        ? (v) => (!v?.trim() ? 'This field is required' : null)
+-        : undefined,
+-    });
+-    if (value === undefined) {
+-      this.notifyAuthCancelled();
+-      return undefined;
+-    }
+-    return value;
++  private rejectSubmission(message: string): void {
++    this.sendToWebView({ type: 'authWizardError', data: { message } });
+   }
+ 
+   // ---------------------------------------------------------------------------
+-  // Main entry: dynamic provider selection from ALL_PROVIDERS
++  // Wizard submission — validated against the ProviderConfig
+   // ---------------------------------------------------------------------------
+ 
+   /**
+-   * Handle auth — full interactive auth flow.
+-   * Dynamically generates provider choices from the shared registry.
++   * Apply the wizard's answers. Always ends with `authWizardDone`: the wizard
++   * closes then unless an `authWizardError` or `authError` came first (some
++   * outcomes, such as saving service models only, send neither a success
++   * nor an error).
+    */
+-  private async handleAuthInteractive(): Promise<void> {
++  private async handleWizardSubmit(data: unknown): Promise<void> {
+     try {
+-      // Build grouped provider menu
+-      const items: Array<{
+-        label: string;
+-        description?: string;
+-        value: string;
+-        kind?: vscode.QuickPickItemKind;
+-      }> = [];
+-
+-      const addGroup = (
+-        label: string,
+-        providers: readonly ProviderConfig[],
+-      ) => {
+-        if (providers.length === 0) return;
+-        items.push({
+-          label,
+-          value: '',
+-          kind: vscode.QuickPickItemKind.Separator,
+-        });
+-        for (const p of providers) {
+-          items.push({
+-            label: p.label,
+-            description: p.description,
+-            value: p.id,
+-          });
+-        }
+-      };
+-
+-      addGroup('QwenCloud', QWENCLOUD_PROVIDERS);
+-      addGroup('Alibaba Cloud', ALIBABA_PROVIDERS);
+-      addGroup('Third Party', THIRD_PARTY_PROVIDERS);
+-
+-      // Custom provider is always last
+-      const customProviders = ALL_PROVIDERS.filter(
+-        (p) => p.uiGroup === 'custom',
++      await this.applyWizardSubmission(
++        (data ?? {}) as Partial<AuthWizardSubmission>,
+       );
+-      if (customProviders.length > 0) {
+-        addGroup('Custom', customProviders);
+-      }
+-
+-      // Pass items including separators; VSCode QuickPick renders separator
+-      // entries as non-selectable group headers (mirrors the CLI grouping).
+-      const selectedId = await this.pick(
+-        items,
+-        'Qwen Code: Select Provider',
+-        'Choose how to connect',
+-      );
+-      if (!selectedId) return;
+-
+-      const provider = ALL_PROVIDERS.find((p) => p.id === selectedId);
+-      if (!provider) {
+-        logger.error('[AuthMessageHandler] Provider not found:', selectedId);
+-        return;
+-      }
+-
+-      // Run generic setup flow
+-      await this.runProviderSetupFlow(provider);
+     } catch (error) {
+       const errorMsg = getErrorMessage(error);
+       logger.error('[AuthMessageHandler] auth failed:', error);
+@@ -232,113 +273,69 @@ export class AuthMessageHandler extends BaseMessageHandler {
+         type: 'authError',
+         data: { message: `Auth failed: ${errorMsg}` },
+       });
++    } finally {
++      this.sendToWebView({ type: 'authWizardDone' });
+     }
+   }
+ 
+-  // ---------------------------------------------------------------------------
+-  // Generic provider setup flow — driven by ProviderConfig
+-  // ---------------------------------------------------------------------------
+-
+-  private async runProviderSetupFlow(provider: ProviderConfig): Promise<void> {
+-    const flowTitle =
+-      provider.uiLabels?.flowTitle ?? `Qwen Code: ${provider.label}`;
++  private async applyWizardSubmission(
++    answers: Partial<AuthWizardSubmission>,
++  ): Promise<void> {
++    const provider = getWizardProviders().find(
++      (p) => p.id === answers.providerId,
++    );
++    if (!provider) {
++      logger.error(
++        '[AuthMessageHandler] Provider not found:',
++        answers.providerId,
++      );
++      this.rejectSubmission('Select a provider.');
++      return;
++    }
+ 
+     // Step 0: Protocol (only for providers offering multiple, e.g. custom)
+     let protocol: AuthType | undefined;
+-    if (
+-      shouldShowStep(provider, 'protocol') &&
+-      provider.protocolOptions &&
+-      provider.protocolOptions.length > 1
+-    ) {
+-      // AuthType's raw string values ('openai' / 'anthropic' / 'gemini') are
+-      // implementation detail; QuickPick should show human-readable labels.
+-      const protocolLabels: Record<string, string> = {
+-        [AuthType.USE_OPENAI]: 'OpenAI Compatible',
+-        [AuthType.USE_ANTHROPIC]: 'Anthropic',
+-        [AuthType.USE_GEMINI]: 'Gemini',
+-      };
+-      const selected = await this.pick(
+-        provider.protocolOptions.map((p) => ({
+-          label: protocolLabels[String(p)] ?? String(p),
+-          value: String(p),
+-        })),
+-        `${flowTitle}: Protocol`,
+-        'Select API protocol',
++    if (hasProtocolStep(provider)) {
++      protocol = provider.protocolOptions!.find(
++        (p) => String(p) === answers.protocol,
+       );
+-      if (!selected) return;
+-      protocol = selected as AuthType;
++      if (!protocol) {
++        this.rejectSubmission('Select an API protocol.');
++        return;
++      }
+     }
+ 
+     let wireApi: ModelWireApi | undefined;
+     if (shouldShowStep(provider, 'wireApi', protocol ?? provider.protocol)) {
+-      const selected = await this.pick(
+-        [
+-          { label: 'Chat Completions', value: 'chat-completions' },
+-          { label: 'Responses', value: 'responses' },
+-        ],
+-        `${flowTitle}: API`,
+-        'Select OpenAI API',
+-      );
+-      if (!selected) return;
+-      wireApi = selected as ModelWireApi;
++      wireApi = WIRE_APIS.find((api) => api === answers.wireApi);
++      if (!wireApi) {
++        this.rejectSubmission('Select an OpenAI API.');
++        return;
++      }
+     }
+ 
+     // Step 1: Base URL (if needed)
+     let baseUrl: string;
+     if (shouldShowStep(provider, 'baseUrl')) {
+       if (Array.isArray(provider.baseUrl)) {
+-        const options = provider.baseUrl as BaseUrlOption[];
+-        const stepTitle = provider.uiLabels?.baseUrlStepTitle ?? 'Endpoint';
+-        const selected = await this.pick(
+-          options.map((opt) => ({
+-            label: opt.label,
+-            description: opt.url,
+-            value: opt.url,
+-          })),
+-          `${flowTitle}: ${stepTitle}`,
+-          `Select ${stepTitle.toLowerCase()}`,
++        const option = (provider.baseUrl as BaseUrlOption[]).find(
++          (opt) => opt.url === answers.baseUrl,
+         );
+-        if (!selected) return;
+-        baseUrl = selected;
++        if (!option) {
++          this.rejectSubmission('Select an endpoint.');
++          return;
++        }
++        baseUrl = option.url;
+       } else {
+-        // Free-form URL input. Show a protocol-specific default as
+-        // placeholder (NOT pre-filled value) so picking Anthropic/Gemini
+-        // doesn't silently write the OpenAI endpoint when the user hits
+-        // Enter on the OpenAI default. Defaults come from core's shared
+-        // getDefaultBaseUrlForProtocol so CLI and VS Code stay in sync.
+-        // The effective route includes the API step's pick: a Responses
+-        // choice dials the /v1-less default endpoint, so deriving the
+-        // fallback from the raw bucket protocol would persist the Chat
+-        // Completions endpoint on the Responses wire.
+-        const effectiveProtocol =
+-          resolveModelProtocol(protocol ?? provider.protocol, { wireApi }) ??
+-          protocol ??
+-          provider.protocol;
+-        // No local fallback: getDefaultBaseUrlForProtocol owns the defaults.
+-        // Adding an OpenAI fallback here would silently mask a new AuthType
+-        // that core hadn't been taught about, diverging from the CLI flow
+-        // (which shows an empty placeholder + scheme error in the same case).
+-        const placeholder = getDefaultBaseUrlForProtocol(effectiveProtocol);
+-        const urlInput = await this.input({
+-          title: `${flowTitle}: Base URL`,
+-          prompt: 'Enter API base URL',
+-          placeHolder: placeholder,
+-          value: '',
+-        });
+-        if (urlInput === undefined) return;
+-        baseUrl = urlInput.trim() || placeholder;
++        // A blank input means the protocol-specific default shown as the
++        // placeholder (NOT a pre-filled value), so picking Anthropic/Gemini
++        // doesn't silently write the OpenAI endpoint.
++        const placeholder = getBaseUrlPlaceholder(provider, protocol, wireApi);
++        baseUrl = (answers.baseUrl ?? '').trim() || placeholder;
+         if (!/^https?:\/\//i.test(baseUrl)) {
+-          // authError already clears the webview's connecting state; do NOT
+-          // also send authCancelled — the webview clears the error on
+-          // cancel, so the two messages race and the error flashes away
+-          // before the user can read it. authCancelled is reserved for
+-          // user-initiated dismissals (Escape on a QuickPick/InputBox).
+-          this.sendToWebView({
+-            type: 'authError',
+-            data: {
+-              message: 'Base URL must start with http:// or https://.',
+-            },
+-          });
++          this.rejectSubmission(
++            'Base URL must start with http:// or https://.',
++          );
+           return;
+         }
+       }
+@@ -347,30 +344,21 @@ export class AuthMessageHandler extends BaseMessageHandler {
+     }
+ 
+     // Step 2: API Key
+-    const apiKeyInput = await this.input({
+-      title: `${flowTitle}: API Key`,
+-      prompt: 'Enter your API key',
+-      placeHolder: provider.apiKeyPlaceholder ?? 'sk-...',
+-      password: true,
+-      required: true,
+-    });
+-    if (!apiKeyInput) return;
+     // Trim before validation and persistence — a key pasted with trailing
+     // whitespace would otherwise be stored as-is and cause silent auth
+     // failures, and validateApiKey could reject in VS Code what the CLI
+     // (which trims) accepts.
+-    const apiKey = apiKeyInput.trim();
+-    if (!apiKey) return;
++    const apiKey = (answers.apiKey ?? '').trim();
++    if (!apiKey) {
++      this.rejectSubmission('API key is required.');
++      return;
++    }
+ 
+     // Validate API key if provider has validation
+     if (provider.validateApiKey) {
+       const validationError = provider.validateApiKey(apiKey, baseUrl);
+       if (validationError) {
+-        // No authCancelled here — see the base-URL validation note above.
+-        this.sendToWebView({
+-          type: 'authError',
+-          data: { message: validationError },
+-        });
++        this.rejectSubmission(validationError);
+         return;
+       }
+     }
+@@ -378,56 +366,27 @@ export class AuthMessageHandler extends BaseMessageHandler {
+     // Step 3: Model selection (if needed)
+     let modelIds: string[];
+     if (shouldShowStep(provider, 'models')) {
+-      const defaults = getDefaultModelIds(provider);
+-      const modelInput = await this.input({
+-        title: `${flowTitle}: Models`,
+-        prompt: 'Enter model IDs (comma-separated)',
+-        placeHolder: defaults.join(',') || 'model-name',
+-        value: defaults.join(','),
+-        required: true,
+-      });
+-      if (!modelInput) return;
+-      modelIds = modelInput
++      modelIds = (answers.models ?? '')
+         .split(',')
+         .map((id) => id.trim())
+         .filter(Boolean);
+       if (modelIds.length === 0) {
+-        // E.g. user typed only whitespace/commas like ", , ,". No
+-        // authCancelled — see the base-URL validation note above.
+-        this.sendToWebView({
+-          type: 'authError',
+-          data: { message: 'Model IDs cannot be empty.' },
+-        });
++        // E.g. user typed only whitespace/commas like ", , ,".
++        this.rejectSubmission('Model IDs cannot be empty.');
+         return;
+       }
+     } else {
+       modelIds = getDefaultModelIds(provider);
+     }
+ 
+-    // Step 4: Advanced config (if needed)
++    // Step 4: Advanced config (if needed) — the thinking mode question
+     let advancedConfig: ProviderSetupInputs['advancedConfig'];
+     if (shouldShowStep(provider, 'advancedConfig')) {
+-      // Simplified: just ask about thinking mode
+-      const enableThinking = await this.pick(
+-        [
+-          {
+-            label: 'Yes',
+-            description: 'Enable extended thinking mode',
+-            value: 'yes' as const,
+-          },
+-          {
+-            label: 'No',
+-            description: 'Standard mode',
+-            value: 'no' as const,
+-          },
+-        ],
+-        `${flowTitle}: Advanced Config`,
+-        'Enable thinking mode?',
+-      );
+-      if (!enableThinking) return;
+-      advancedConfig = {
+-        enableThinking: enableThinking === 'yes',
+-      };
++      if (typeof answers.enableThinking !== 'boolean') {
++        this.rejectSubmission('Choose whether to enable thinking mode.');
++        return;
++      }
++      advancedConfig = { enableThinking: answers.enableThinking };
+     }
+ 
+     // Submit
+@@ -435,7 +394,6 @@ export class AuthMessageHandler extends BaseMessageHandler {
+       logger.error(
+         '[AuthMessageHandler] authInteractiveHandler not set; cannot apply provider config.',
+       );
+-      // No authCancelled — see the base-URL validation note above.
+       this.sendToWebView({
+         type: 'authError',
+         data: {
+diff --git a/packages/vscode-ide-companion/src/webview/handlers/MessageRouter.ts b/packages/vscode-ide-companion/src/webview/handlers/MessageRouter.ts
+index fa4b9aa7ac..c2b5322706 100644
+--- a/packages/vscode-ide-companion/src/webview/handlers/MessageRouter.ts
++++ b/packages/vscode-ide-companion/src/webview/handlers/MessageRouter.ts
+@@ -135,7 +135,7 @@ export class MessageRouter {
+   ): void {
+     this.authHandler.setAuthInteractiveHandler(handler);
+     // SessionMessageHandler's authHandler is a simple () => Promise<void>.
+-    // Wrap so "Configure" prompts trigger the full interactive auth QuickPick.
++    // Wrap so "Configure" prompts open the provider setup wizard.
+     this.sessionHandler?.setAuthHandler?.(() =>
+       this.authHandler.handle({ type: 'auth' }),
+     );
+diff --git a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts
+index f89982fadb..12f02d284d 100644
+--- a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts
++++ b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts
+@@ -632,6 +632,40 @@ describe('WebViewProvider.attachToView', () => {
+     });
+   });
+ 
++  it('opens the setup wizard through the auth handler on the auth command', async () => {
++    const { provider } = await setupAttachedProvider();
++    const route = (
++      provider as unknown as {
++        messageHandler: { route: ReturnType<typeof vi.fn> };
++      }
++    ).messageHandler.route;
++    route.mockClear();
++
++    await provider.startInteractiveAuth();
++
++    expect(route).toHaveBeenCalledWith({ type: 'auth' });
++  });
++
++  it('replays an open setup wizard after webviewReady until it finishes', async () => {
++    const { messageHandler, postMessage, provider } =
++      await setupAttachedProvider({ captureMessageHandler: true });
++    const send = (message: unknown) =>
++      (
++        provider as unknown as { sendMessageToWebView(m: unknown): void }
++      ).sendMessageToWebView(message);
++    const wizard = { type: 'authWizard', data: { providers: [] } };
++
++    send(wizard);
++    postMessage.mockClear();
++    await messageHandler?.({ type: 'webviewReady', data: {} });
++    expect(postMessage).toHaveBeenCalledWith(wizard);
++
++    send({ type: 'authWizardDone' });
++    postMessage.mockClear();
++    await messageHandler?.({ type: 'webviewReady', data: {} });
++    expect(postMessage).not.toHaveBeenCalledWith(wizard);
++  });
++
+   it('reports clipboard copy success back to the requesting webview', async () => {
+     const { messageHandler, postMessage } = await setupAttachedProvider({
+       captureMessageHandler: true,
+diff --git a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
+index 2a720f5b9d..047f8e5697 100644
+--- a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
++++ b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
+@@ -169,10 +169,11 @@ export class WebViewProvider {
+   /** Guards against concurrent auth-restore / connection init */
+   private initializationPromise: Promise<void> | null = null;
+   private isReconnecting = false;
+-  /** Timer for the deferred auto-auth launch inside doInitializeAgentConnection */
+-  private autoAuthTimer: ReturnType<typeof setTimeout> | null = null;
+-  /** Whether an explicit interactive auth flow is currently active */
+-  private authFlowActive = false;
++  /**
++   * The provider setup wizard the webview shows (the last `authWizard`
++   * message), replayed when the webview reloads; null when it is closed.
++   */
++  private openAuthWizard: unknown = null;
+   /** Timestamp (ms) when the current agent task started (first stream chunk) */
+   private agentStartTime: number | null = null;
+   /** Current tab-dot state: null = no dot, 'orange' = task done. */
+@@ -204,7 +205,7 @@ export class WebViewProvider {
+       (message) => this.sendMessageToWebView(message),
+     );
+ 
+-    // Set auth interactive handler — interactive auth flow (QuickPick → InputBox → write settings → reconnect)
++    // Set auth interactive handler — the setup wizard's answers (wizard → write settings → reconnect)
+     this.messageHandler.setAuthInteractiveHandler(
+       async (providerConfig, inputs) => {
+         await this.handleAuthInteractive(providerConfig, inputs);
+@@ -885,26 +886,11 @@ export class WebViewProvider {
+   }
+ 
+   /**
+-   * Launch the interactive auth flow (QuickPick → InputBox → write settings → reconnect).
+-   * Guards against concurrent launches: if auto-auth was scheduled by
+-   * doInitializeAgentConnection's deferred timeout, it is cancelled first.
++   * Open the provider setup wizard in the webview (wizard → write settings →
++   * reconnect). Opening it again while it is open restarts it.
+    */
+   async startInteractiveAuth(): Promise<void> {
+-    // Cancel any pending auto-auth from doInitializeAgentConnection so we
+-    // don't end up with two overlapping auth flows.
+-    if (this.autoAuthTimer) {
+-      clearTimeout(this.autoAuthTimer);
+-      this.autoAuthTimer = null;
+-    }
+-    if (this.authFlowActive) {
+-      return;
+-    }
+-    this.authFlowActive = true;
+-    try {
+-      await this.messageHandler.route({ type: 'auth' });
+-    } finally {
+-      this.authFlowActive = false;
+-    }
++    await this.messageHandler.route({ type: 'auth' });
+   }
+ 
+   setInitialModelId(modelId: string | null | undefined): void {
+@@ -1100,7 +1086,7 @@ export class WebViewProvider {
+         // send authState message and return without creating session
+         if (connectResult.requiresAuth && !autoAuthenticate) {
+           logger.log(
+-            '[WebViewProvider] Authentication required, launching auth flow...',
++            '[WebViewProvider] Authentication required, showing onboarding...',
+           );
+           this.sendMessageToWebView({
+             type: 'authState',
+@@ -1109,21 +1095,8 @@ export class WebViewProvider {
+           // Initialize empty conversation to allow browsing history
+           await this.initializeEmptyConversation();
+ 
+-          // Auto-launch the interactive auth flow (QuickPick → InputBox)
+-          // so the user is immediately guided to configure their provider,
+-          // mirroring CLI's behavior of showing AuthDialog on first run.
+-          // Deferred to avoid conflicting with the current connection init.
+-          // The timer is stored so startInteractiveAuth() can cancel it
+-          // to prevent two overlapping auth flows.
+-          this.autoAuthTimer = setTimeout(() => {
+-            this.autoAuthTimer = null;
+-            if (!this.authFlowActive) {
+-              this.authFlowActive = true;
+-              void this.messageHandler.route({ type: 'auth' }).finally(() => {
+-                this.authFlowActive = false;
+-              });
+-            }
+-          }, 100);
++          // The onboarding screen's Get Started button opens the setup
++          // wizard; nothing starts on its own.
+           return;
+         }
+ 
+@@ -1583,6 +1556,19 @@ export class WebViewProvider {
+       data?: { authenticated?: boolean | null };
+     };
+ 
++    switch (msg.type) {
++      case 'authWizard':
++        this.openAuthWizard = message;
++        break;
++      case 'authWizardDone':
++      case 'authSuccess':
++      case 'authCancelled':
++        this.openAuthWizard = null;
++        break;
++      default:
++        break;
++    }
++
+     switch (msg.type) {
+       case 'authState':
+         if (typeof msg.data?.authenticated === 'boolean') {
+@@ -1613,6 +1599,10 @@ export class WebViewProvider {
+    * Sync important initialization state when the webview signals readiness.
+    */
+   private handleWebviewReady(): void {
++    if (this.openAuthWizard) {
++      this.sendMessageToWebView(this.openAuthWizard);
++    }
++
+     if (this.currentModeId) {
+       this.sendMessageToWebView({
+         type: 'modeChanged',
+diff --git a/packages/vscode-ide-companion/src/webview/strings.ts b/packages/vscode-ide-companion/src/webview/strings.ts
+index 78fe63475c..4e5c97e411 100644
+--- a/packages/vscode-ide-companion/src/webview/strings.ts
++++ b/packages/vscode-ide-companion/src/webview/strings.ts
+@@ -69,6 +69,35 @@ const EN = {
+   'onboarding.connecting': 'Connecting…',
+   'onboarding.providers':
+     'Supports Coding Plan, ModelStudio API Key, and OpenAI-compatible providers.',
++  'wizard.title': 'Set up a model provider',
++  'wizard.step': 'Step {current} of {total}',
++  'wizard.back': 'Back',
++  'wizard.next': 'Next',
++  'wizard.cancel': 'Cancel',
++  'wizard.connect': 'Connect',
++  'wizard.connecting': 'Connecting…',
++  'wizard.provider.title': 'Provider',
++  'wizard.provider.prompt': 'Choose how to connect',
++  'wizard.protocol.title': 'Protocol',
++  'wizard.protocol.prompt': 'Select API protocol',
++  'wizard.wireApi.title': 'API',
++  'wizard.wireApi.prompt': 'Select OpenAI API',
++  'wizard.endpoint.prompt': 'Select endpoint',
++  'wizard.baseUrl.title': 'Base URL',
++  'wizard.baseUrl.prompt': 'Enter API base URL',
++  'wizard.apiKey.title': 'API Key',
++  'wizard.apiKey.prompt': 'Enter your API key',
++  'wizard.models.title': 'Models',
++  'wizard.models.prompt': 'Enter model IDs (comma-separated)',
++  'wizard.advanced.title': 'Advanced Config',
++  'wizard.advanced.prompt': 'Enable thinking mode?',
++  'wizard.advanced.yes': 'Yes',
++  'wizard.advanced.yesDescription': 'Enable extended thinking mode',
++  'wizard.advanced.no': 'No',
++  'wizard.advanced.noDescription': 'Standard mode',
++  'wizard.error.required': 'This field is required',
++  'wizard.error.baseUrl': 'Base URL must start with http:// or https://.',
++  'wizard.error.models': 'Model IDs cannot be empty.',
+   'auth.signedIn': 'Signed in successfully.',
+   'auth.failed': 'Failed to connect to Qwen Code.',
+   'account.title': 'Account Information',
+@@ -159,6 +188,35 @@ const ZH: Record<ChromeStringKey, string> = {
+   'onboarding.connecting': '连接中…',
+   'onboarding.providers':
+     '支持 Coding Plan、百炼 API Key 以及兼容 OpenAI 的服务商。',
++  'wizard.title': '配置模型服务商',
++  'wizard.step': '第 {current} 步，共 {total} 步',
++  'wizard.back': '上一步',
++  'wizard.next': '下一步',
++  'wizard.cancel': '取消',
++  'wizard.connect': '连接',
++  'wizard.connecting': '连接中…',
++  'wizard.provider.title': '服务商',
++  'wizard.provider.prompt': '选择连接方式',
++  'wizard.protocol.title': '协议',
++  'wizard.protocol.prompt': '选择 API 协议',
++  'wizard.wireApi.title': 'API',
++  'wizard.wireApi.prompt': '选择 OpenAI API',
++  'wizard.endpoint.prompt': '选择接入点',
++  'wizard.baseUrl.title': 'Base URL',
++  'wizard.baseUrl.prompt': '输入 API Base URL',
++  'wizard.apiKey.title': 'API Key',
++  'wizard.apiKey.prompt': '输入你的 API Key',
++  'wizard.models.title': '模型',
++  'wizard.models.prompt': '输入模型 ID（以逗号分隔）',
++  'wizard.advanced.title': '高级配置',
++  'wizard.advanced.prompt': '启用思考模式？',
++  'wizard.advanced.yes': '是',
++  'wizard.advanced.yesDescription': '启用扩展思考模式',
++  'wizard.advanced.no': '否',
++  'wizard.advanced.noDescription': '标准模式',
++  'wizard.error.required': '此项为必填项',
++  'wizard.error.baseUrl': 'Base URL 必须以 http:// 或 https:// 开头。',
++  'wizard.error.models': '模型 ID 不能为空。',
+   'auth.signedIn': '登录成功。',
+   'auth.failed': '连接 Qwen Code 失败。',
+   'account.title': '账号信息',

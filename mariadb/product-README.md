@@ -9,7 +9,7 @@ MariaDB Shell Agent is an AI agent for MariaDB in the terminal and in VS Code, b
 - Ignore rules: `.mariadb-shell-agentignore`
 - Environment: every `QWEN_<X>` setting can also be given as `MARIADB_SHELL_AGENT_<X>`
 
-Model providers: DeepSeek, Grok, MiniMax, Z.AI, Kimi, OpenRouter, Requesty, or any
+Model providers: OpenRouter, Requesty, OpenAI, Grok (xAI), or any
 OpenAI-compatible endpoint (including local servers):
 
 ```json

@@ -80,10 +80,16 @@ export const QWENLM_PAIRS = [
   [urlRe('ghcr.io/qwenlm', { after: String.raw`\b` }), toInvalid],
 ];
 
-// Providers run by Alibaba; the rest (DeepSeek, Grok, MiniMax, Z.AI, Kimi, OpenRouter,
-// Requesty, custom OpenAI-compatible) stay.
-const DROPPED_GROUPS = ['qwencloud', 'alibaba'];
-const DROPPED_IDS = ['idealab', 'modelscope'];
+// The providers the pickers and provider lists offer, in this order (the extension's setup
+// wizard, patch 0016, offers the same). Alibaba's are never among them; the other presets
+// (DeepSeek, MiniMax, Z.AI, Kimi) stay registered but are not offered either.
+const OFFERED_PROVIDER_IDS = [
+  'openrouter',
+  'requesty',
+  'openai',
+  'grok',
+  'custom-openai-compatible',
+];
 
 // The /review tests use QwenLM GitHub URLs as sample data (PR URLs, remotes) for code that works
 // with any repository, as do the hosted WebFetch tests (a github.com blob URL that WebFetch
@@ -120,34 +126,33 @@ export function apply() {
     extensions: CODE_EXTENSIONS,
   });
 
-  // The Alibaba presets stay registered (code such as reasoning overrides and the extension's
-  // plan definitions looks them up, and their hosts no longer resolve), but no picker or provider
-  // list offers them.
-  const visible = `(p) => !${JSON.stringify(DROPPED_GROUPS).replaceAll('"', "'")}.includes(p.uiGroup ?? '') && !${JSON.stringify(DROPPED_IDS).replaceAll('"', "'")}.includes(p.id)`;
+  // All presets stay registered (code such as reasoning overrides and the extension's plan
+  // definitions looks them up, and the Alibaba hosts no longer resolve), but the CLI pickers, the
+  // ACP provider list and the Web Shell catalog offer only OFFERED_PROVIDER_IDS, in their order.
+  const ids = JSON.stringify(OFFERED_PROVIDER_IDS).replaceAll('"', "'");
+  const offered = `ALL_PROVIDERS.filter((p) => ${ids}.includes(p.id)).sort((a, b) => ${ids}.indexOf(a.id) - ${ids}.indexOf(b.id))`;
+  // Survives the pre-commit prettier run, which rewraps the generated expression.
+  const isOffered = (t) => t.includes('.indexOf(a.id)');
   patch(
     'provider picker groups',
     'packages/core/src/providers/all-providers.ts',
     /export const (QWENCLOUD|ALIBABA|THIRD_PARTY)_PROVIDERS = ALL_PROVIDERS\.filter\(/g,
-    (_, group) =>
-      `export const ${group}_PROVIDERS = ALL_PROVIDERS.filter(${visible}).filter(`,
-    (t) => t.includes(`ALL_PROVIDERS.filter(${visible}).filter(`),
+    (_, group) => `export const ${group}_PROVIDERS = ${offered}.filter(`,
+    isOffered,
   );
   patch(
     'acp provider list',
     'packages/cli/src/acp-integration/acpAgent.ts',
     'providers: ALL_PROVIDERS.map((provider) =>',
-    `providers: ALL_PROVIDERS.filter(${visible}).map((provider) =>`,
-    (t) => t.includes(`providers: ALL_PROVIDERS.filter(${visible})`),
+    `providers: ${offered}.map((provider) =>`,
+    isOffered,
   );
   patch(
     'web shell provider catalog',
     'packages/cli/src/serve/server/auth-provider-helpers.ts',
     'const providers = ALL_PROVIDERS.map(buildAuthProviderDescriptor);',
-    `const providers = ALL_PROVIDERS.filter(${visible}).map(buildAuthProviderDescriptor);`,
-    (t) =>
-      t.includes(
-        `ALL_PROVIDERS.filter(${visible}).map(buildAuthProviderDescriptor)`,
-      ),
+    `const providers = ${offered}.map(buildAuthProviderDescriptor);`,
+    isOffered,
   );
   patch(
     'web shell provider groups',
@@ -205,13 +210,14 @@ export function apply() {
     'extension onboarding providers',
     ['packages/vscode-ide-companion/src'],
     [
+      // The providers of the setup wizard (patch 0016).
       [
         'Supports Coding Plan, ModelStudio API Key, and OpenAI-compatible providers.',
-        'Supports DeepSeek, Kimi, OpenRouter and other OpenAI-compatible providers.',
+        'Supports OpenRouter, Requesty, OpenAI, Grok (xAI) and custom providers.',
       ],
       [
         '支持 Coding Plan、百炼 API Key 以及兼容 OpenAI 的服务商。',
-        '支持 DeepSeek、Kimi、OpenRouter 及其他兼容 OpenAI 的服务商。',
+        '支持 OpenRouter、Requesty、OpenAI、Grok (xAI) 及自定义服务商。',
       ],
     ],
   );

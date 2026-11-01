@@ -6,18 +6,18 @@ upstream closely: the fork is rebased onto upstream as soon as upstream moves.
 
 ## What differs from upstream
 
-| Area                                | MariaDB Shell Agent                                                                 | Upstream                                                 |
-| ----------------------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| Name, icons, banner, Web Shell logo | MariaDB Shell Agent, MariaDB seal                                                   | Qwen Code                                                |
-| CLI command                         | `mariadb-shell-agent`, short `msa`                                                  | `qwen`                                                   |
-| Config directory                    | `~/.mariadb-shell-agent`, `<project>/.mariadb-shell-agent`                          | `.qwen`                                                  |
-| Project instructions                | `MARIADB-SHELL-AGENT.md` (`AGENTS.md` is read too)                                  | `QWEN.md`                                                |
-| Ignore file                         | `.mariadb-shell-agentignore`                                                        | `.qwenignore`                                            |
-| Environment                         | `MARIADB_SHELL_AGENT_<X>` overrides `QWEN_<X>` / `QWEN_CODE_<X>`                    | `QWEN_*` only                                            |
-| VS Code extension                   | `MariaDB.mariadb-shell-agent`, commands and settings `mariadb-shell-agent.*`        | `qwenlm.qwen-code-vscode-ide-companion`, `qwen-code.*`   |
-| Model providers offered             | DeepSeek, Grok, MiniMax, Z.AI, Kimi, OpenRouter, Requesty, custom OpenAI-compatible | also QwenCloud, Alibaba ModelStudio, Idealab, ModelScope |
-| Alibaba endpoints                   | none: every Alibaba and QwenLM host is made unresolvable (`.invalid`)               | self-update, telemetry, Qwen OAuth, …                    |
-| Usage statistics, self-update       | off by default, and nowhere to send to or download from                             | on                                                       |
+| Area                                | MariaDB Shell Agent                                                            | Upstream                                                                                                               |
+| ----------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| Name, icons, banner, Web Shell logo | MariaDB Shell Agent, MariaDB seal                                              | Qwen Code                                                                                                              |
+| CLI command                         | `mariadb-shell-agent`, short `msa`                                             | `qwen`                                                                                                                 |
+| Config directory                    | `~/.mariadb-shell-agent`, `<project>/.mariadb-shell-agent`                     | `.qwen`                                                                                                                |
+| Project instructions                | `MARIADB-SHELL-AGENT.md` (`AGENTS.md` is read too)                             | `QWEN.md`                                                                                                              |
+| Ignore file                         | `.mariadb-shell-agentignore`                                                   | `.qwenignore`                                                                                                          |
+| Environment                         | `MARIADB_SHELL_AGENT_<X>` overrides `QWEN_<X>` / `QWEN_CODE_<X>`               | `QWEN_*` only                                                                                                          |
+| VS Code extension                   | `MariaDB.mariadb-shell-agent`, commands and settings `mariadb-shell-agent.*`   | `qwenlm.qwen-code-vscode-ide-companion`, `qwen-code.*`                                                                 |
+| Model providers offered             | OpenRouter, Requesty, OpenAI, Grok, custom (CLI, Web Shell, VS Code extension) | DeepSeek, MiniMax, Z.AI, Kimi, QwenCloud, Alibaba ModelStudio, Idealab, ModelScope, OpenRouter, Requesty, Grok, custom |
+| Alibaba endpoints                   | none: every Alibaba and QwenLM host is made unresolvable (`.invalid`)          | self-update, telemetry, Qwen OAuth, …                                                                                  |
+| Usage statistics, self-update       | off by default, and nowhere to send to or download from                        | on                                                                                                                     |
 
 Not renamed: the `QWEN_*` variable names themselves (169 of them; use the `MARIADB_SHELL_AGENT_*`
 aliases), internal file names inside the config directory, `qwen-extension.json` (the extension
@@ -99,6 +99,12 @@ explanation on top) and commit the new patch.
   server and the server name as its language)
 - `0015-no-installation-greeting.patch`: no "Companion extension successfully installed." notification
   on the extension's first activation
+- `0016-provider-setup-wizard.patch`: the extension no longer starts the provider setup on its own;
+  Get Started (or `/auth`) opens it as a wizard inside the view instead of VS Code QuickPicks and
+  InputBoxes, offering OpenRouter, Requesty, OpenAI API Key, Grok and Custom; adds the OpenAI API Key
+  preset (id `openai`, `OPENAI_API_KEY`, OpenAI Responses API, Codex models) to core; the welcome
+  title gets the Web Shell's size and gradient. The CLI and Web Shell offer the same five providers
+  (`OFFERED_PROVIDER_IDS` in `rebrand/alibaba.mjs`)
 
 These are good candidates for upstream pull requests, which would retire the patches.
 
