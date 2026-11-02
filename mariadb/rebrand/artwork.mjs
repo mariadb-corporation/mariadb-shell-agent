@@ -16,6 +16,79 @@ function svgDataUri(svg) {
   return `data:image/svg+xml,${encodeURIComponent(svg.trim())}`;
 }
 
+function pngDataUri(name) {
+  return `data:image/png;base64,${fs.readFileSync(path.join(assets, name)).toString('base64')}`;
+}
+
+const camel = (name) => name.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+
+/** `a:b; c:d` (a style attribute) as [[a, b], [c, d]]. */
+function declarations(css = '') {
+  return css
+    .split(';')
+    .map((declaration) => declaration.split(':').map((part) => part.trim()))
+    .filter(([key, value]) => key && value);
+}
+
+/**
+ * A monochrome SVG as exported by a design tool (Affinity: XML prolog, DOCTYPE, editor ids and
+ * namespaces, presentation properties in style attributes): its viewBox, the root's presentation
+ * properties as attributes, and the drawing with its own as attributes. Only plain shapes are
+ * supported; links, images or references inside the drawing stop the run.
+ */
+function svgParts(svg, name) {
+  const rootTag = svg.match(/<svg\b[^>]*>/)?.[0];
+  if (!rootTag) throw new Error(`${name}: no <svg> element`);
+  const viewBox = rootTag.match(/viewBox="([^"]+)"/)?.[1];
+  if (!viewBox) throw new Error(`${name}: the <svg> element has no viewBox`);
+  const rootAttributes = declarations(rootTag.match(/style="([^"]*)"/)?.[1]);
+  const drawing = svg
+    .slice(svg.indexOf(rootTag) + rootTag.length, svg.lastIndexOf('</svg>'))
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/\s(?:id|[\w-]+:[\w-]+)="[^"]*"/g, '')
+    .replace(/\sstyle="([^"]*)"/g, (_, css) =>
+      declarations(css)
+        .map(([key, value]) => ` ${key}="${value}"`)
+        .join(''),
+    )
+    .trim();
+  if (/url\(|<use\b|<image\b/.test(drawing))
+    throw new Error(
+      `${name}: only plain shapes are supported (no links, images or references)`,
+    );
+  return { viewBox, rootAttributes, drawing };
+}
+
+/** The elements of `drawing` as JSX, laid out the way prettier prints them. */
+function drawingJsx(drawing, indent) {
+  const lines = [];
+  let depth = 0;
+  for (const [, closing, tag, attributes, selfClosing] of drawing.matchAll(
+    /<(\/?)([\w-]+)((?:\s+[\w:-]+="[^"]*")*)\s*(\/?)>/g,
+  )) {
+    if (closing) {
+      depth--;
+      lines.push(`${' '.repeat(indent + depth * 2)}</${tag}>`);
+      continue;
+    }
+    const pad = ' '.repeat(indent + depth * 2);
+    const attrs = [...attributes.matchAll(/([\w:-]+)="([^"]*)"/g)].map(
+      ([, key, value]) => `${camel(key)}="${value}"`,
+    );
+    const end = selfClosing ? ' />' : '>';
+    const oneLine = `${pad}<${tag}${attrs.map((a) => ` ${a}`).join('')}${end}`;
+    if (oneLine.length <= 80) lines.push(oneLine);
+    else
+      lines.push(
+        `${pad}<${tag}`,
+        ...attrs.map((a) => `${pad}  ${a}`),
+        `${pad}${selfClosing ? '/>' : '>'}`,
+      );
+    if (!selfClosing) depth++;
+  }
+  return lines.join('\n');
+}
+
 export function apply() {
   const appIcon = fs.readFileSync(path.join(assets, 'app-icon.svg'), 'utf8');
   const sealMono = fs.readFileSync(path.join(assets, 'seal-mono.svg'), 'utf8');
@@ -88,38 +161,53 @@ export function apply() {
     (_, a, b) => a + svgDataUri(appIcon) + b,
     (t) => t.includes(svgDataUri(appIcon)),
   );
-  {
-    const inner = appIcon.replace(/^<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
-    const jsx = `function IconQwenLogo() {\n  return (\n    <svg viewBox="0 0 1204 1204" aria-hidden="true">\n      ${inner.replaceAll('fill-rule', 'fillRule')}\n    </svg>\n  );\n}`;
-    patch(
-      'web-shell sidebar logo',
-      'packages/web-shell/client/components/sidebar/WebShellSidebar.tsx',
-      /function IconQwenLogo\(\) \{\n {2}return \(\n {4}<svg viewBox="17\.5 27\.7 135\.6 135\.6"[\s\S]*?<\/svg>\n {2}\);\n\}/,
-      () => jsx,
-      // The pre-commit hook reformats the JSX, so look for the new artwork's viewBox only.
-      (t) => t.includes('<svg viewBox="0 0 1204 1204"'),
-    );
-  }
+  // The sidebar's built-in mark: the app icon as a PNG data URI (the artwork has gradients and
+  // embedded images, too much to inline as JSX; the Web Shell CSP allows data: images). An <img>
+  // like an operator's own logo, which the sidebar's CSS already sizes; the logo tests tell the
+  // two apart by the data URI's type.
+  const sidebarMark = pngDataUri('icon-192.png');
+  patch(
+    'web-shell sidebar logo',
+    'packages/web-shell/client/components/sidebar/WebShellSidebar.tsx',
+    /function IconQwenLogo\(\) \{\n {2}return \(\n {4}<svg viewBox="17\.5 27\.7 135\.6 135\.6"[\s\S]*?<\/svg>\n {2}\);\n\}/,
+    () =>
+      `function IconQwenLogo() {\n  return (\n    <img\n      src="${sidebarMark}"\n      alt=""\n      aria-hidden="true"\n    />\n  );\n}`,
+    (t) => t.includes(sidebarMark),
+  );
   patch(
     'web-shell sidebar logo test',
     'packages/web-shell/client/components/sidebar/WebShellSidebar.brand.test.tsx',
     `container.querySelector('svg[viewBox="17.5 27.7 135.6 135.6"]')`,
-    `container.querySelector('svg[viewBox="0 0 1204 1204"]')`,
-    (t) => t.includes(`svg[viewBox="0 0 1204 1204"]`),
+    `container.querySelector('img[src^="data:image/png;base64,"]')`,
+    (t) => t.includes(`img[src^="data:image/png;base64,"]`),
   );
+  // The favicon test pins a colour of the upstream mark; pin the app icon's viewBox instead.
+  const faviconAnchor = `expect(href).toContain('${encodeURIComponent(
+    appIcon.match(/viewBox="[^"]+"/)[0],
+  )}');`;
   patch(
     'web-shell favicon test',
     'packages/web-shell/client/index-html.test.ts',
     "expect(href).toContain('%23082DFF');",
-    "expect(href).toContain('%23003545');",
-    (t) => t.includes("expect(href).toContain('%23003545');"),
+    faviconAnchor,
+    (t) => t.includes(faviconAnchor),
   );
 
   // Favicon of exported HTML transcripts.
   {
     const file = 'packages/web-templates/src/export-html/src/favicon.svg';
     if (!exists(file)) failures.push(`export favicon: ${file} is gone`);
-    else write(file, sealMono.replace('fill="currentColor"', 'fill="#003545"'));
+    else {
+      const { viewBox, rootAttributes, drawing } = svgParts(
+        sealMono,
+        'seal-mono.svg',
+      );
+      const attrs = rootAttributes.map(([k, v]) => ` ${k}="${v}"`).join('');
+      write(
+        file,
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" fill="#003545"${attrs}>${drawing.replace(/>\s+</g, '><')}</svg>\n`,
+      );
+    }
   }
 
   // Terminal banner logo, and the tests that pin the upstream wordmark.
@@ -149,19 +237,23 @@ export function apply() {
   // Web Shell welcome screen: the seal above "Welcome to MariaDB Shell Agent", and a tighter line spacing
   // when that title wraps (narrow side panels).
   {
-    const viewBox = sealMono.match(/viewBox="([^"]+)"/)[1];
-    const d = sealMono.match(/ d="([^"]+)"/)[1];
+    const { viewBox, rootAttributes, drawing } = svgParts(
+      sealMono,
+      'seal-mono.svg',
+    );
     write(
       'packages/web-shell/client/components/WelcomeSeal.tsx',
       `/** The MariaDB seal (mariadb/assets/seal-mono.svg), in the text color. */\n` +
         `export function WelcomeSeal({ className }: { className?: string }) {\n` +
         `  return (\n` +
-        `    <svg className={className} viewBox="${viewBox}" aria-hidden="true">\n` +
-        `      <path\n` +
-        `        fill="currentColor"\n` +
-        `        fillRule="evenodd"\n` +
-        `        d="${d}"\n` +
-        `      />\n` +
+        `    <svg\n` +
+        `      className={className}\n` +
+        `      viewBox="${viewBox}"\n` +
+        `      fill="currentColor"\n` +
+        rootAttributes.map(([k, v]) => `      ${camel(k)}="${v}"\n`).join('') +
+        `      aria-hidden="true"\n` +
+        `    >\n` +
+        `${drawingJsx(drawing, 6)}\n` +
         `    </svg>\n` +
         `  );\n` +
         `}\n`,

@@ -133,7 +133,11 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 - **Kept on purpose**: `QWEN_*` variable names, internal file names inside the config dir,
   `qwen-extension.json`, Qwen model names, `<!-- qwen-review -->` markers, the `Qwen-Code-CI-Bot` login,
   license headers and NOTICE files (Apache-2.0 requires them, so the code's origin stays traceable).
-- **Artwork**: app icon = white MariaDB seal on `#003545` (`mariadb/assets/app-icon.svg` + PNGs); activity
+- **Artwork**: app icon = `mariadb/assets/app-icon.svg` + PNGs (Web Shell favicon from the SVG, sidebar
+  mark `IconQwenLogo` from `icon-192.png` as a PNG data URI: the artwork has gradients and embedded
+  images; the brand tests tell it from an operator logo by the data URI type); Affinity exports
+  are fine as they are (`svgParts` in `artwork.mjs` strips prolog, editor ids/namespaces, turns
+  styles into attributes; `seal-mono.svg` must be plain shapes, else the run stops); activity
   bar = `mariadb/assets/mariadb-shell-agent-ext.svg`, shipped as `assets/activity-bar-<sha8>.svg` because VS Code
   caches icons by URL and a same-version reinstall would keep the old one; MARIADB ASCII banner in
   `mariadb/assets/ascii-logo.txt`. Web Shell welcome screen (artwork rule): `WelcomeSeal.tsx` is

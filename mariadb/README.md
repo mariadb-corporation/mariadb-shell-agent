@@ -159,6 +159,11 @@ plugin:mariadb-code` unpacks the newest universal build into `plugins/`, then `n
 `mariadb/assets/` holds the artwork:
 
 - `mariadb-shell-agent-ext.svg`: the activity-bar icon (monochrome; VS Code and Theia tint it to the theme).
-- `app-icon.svg` and its PNG renders: the extension and Web Shell icon, a white MariaDB seal on dark
-  teal `#003545`, made from `../mariadb-shell/docs-ref/build/img/mariadb-logo-light.png`.
-- `seal-mono.svg`: the traced seal (favicon of exported HTML transcripts).
+- `app-icon.svg` and its PNG renders: the extension and Web Shell icon. The Web Shell favicon is the
+  SVG, its sidebar mark `icon-192.png` (as a data URI: the artwork is too rich to inline as JSX).
+- `seal-mono.svg`: the monochrome seal: the Web Shell welcome seal (in the text color) and the
+  favicon of exported HTML transcripts. It must be plain shapes (no gradients, images or links).
+
+SVGs can be committed as a design tool exports them: the artwork rule drops the XML prolog, editor
+ids and namespaces and turns presentation styles into attributes (`svgParts` in
+`rebrand/artwork.mjs`).
