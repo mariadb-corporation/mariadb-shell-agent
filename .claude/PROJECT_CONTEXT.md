@@ -92,7 +92,8 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
     preset `openai` ("OpenAI API Key", `OPENAI_API_KEY`, Responses API at `https://api.openai.com`
     without `/v1`, default model `gpt-6.1-sol`, editable; owns only `[OpenAI] …` models, so hand-made
     `OPENAI_API_KEY` models survive an install). Welcome title: 32px, the Web Shell product-name
-    gradient (`TITLE_GRADIENT` in `QwenOnboarding.tsx`).
+    gradient (`TITLE_GRADIENT`, exported from `QwenOnboarding.tsx`); every wizard page starts with
+    the icon and product name in that gradient, subtitled "Provider Setup Wizard" (`wizard.title`).
   - `0017` GPT-6 models (per developers.openai.com/api/docs/models): reasoning controls for
     `gpt-6.1-sol` (thinking mandatory, like upstream's `gpt-6-astra`), `gpt-6.1-terra` and
     `gpt-6-luna` (accept `none`, so thinking can be switched off); `/^gpt-6/` token limits 922K input,

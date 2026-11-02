@@ -25,7 +25,10 @@ model. Its installs own only models named
 "[OpenAI] …", so models configured by hand with OPENAI_API_KEY stay.
 
 The welcome page title uses the Web Shell welcome screen's size (32px) and
-product-name gradient.
+product-name gradient. Every wizard page starts with the same header (the
+extension icon and the product name in that gradient), subtitled "Provider
+Setup Wizard"; the step line (provider · step n of m) follows once a
+provider is picked.
 
 diff --git a/packages/core/src/providers/__tests__/presets/openai.test.ts b/packages/core/src/providers/__tests__/presets/openai.test.ts
 new file mode 100644
@@ -365,7 +368,7 @@ index 92f1fd0c53..f6d12174a0 100644
      await renderApp();
  
 diff --git a/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx b/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
-index 79c0b66b94..0cea6cdac4 100644
+index 79c0b66b94..908998f2c2 100644
 --- a/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
 +++ b/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
 @@ -25,6 +25,11 @@ import {
@@ -475,7 +478,7 @@ index 79c0b66b94..0cea6cdac4 100644
              setAuthError(undefined);
              vscode.postMessage({ type: 'auth', data: {} });
            }}
-@@ -2090,6 +2138,27 @@ export function EmbeddedApp() {
+@@ -2090,6 +2138,28 @@ export function EmbeddedApp() {
            </div>
          </div>
        )}
@@ -483,6 +486,7 @@ index 79c0b66b94..0cea6cdac4 100644
 +        <AuthWizard
 +          providers={authWizard}
 +          t={t}
++          theme={theme}
 +          submitting={authWizardSubmitting}
 +          error={authWizardError}
 +          onSubmit={(submission: AuthWizardSubmission) => {
@@ -584,10 +588,10 @@ index 0000000000..5c8cb79998
 +}
 diff --git a/packages/vscode-ide-companion/src/webview/components/AuthWizard.test.tsx b/packages/vscode-ide-companion/src/webview/components/AuthWizard.test.tsx
 new file mode 100644
-index 0000000000..75e22a7bcf
+index 0000000000..1d27942894
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/webview/components/AuthWizard.test.tsx
-@@ -0,0 +1,335 @@
+@@ -0,0 +1,338 @@
 +/**
 + * @license
 + * Copyright 2026 Qwen Team
@@ -681,6 +685,7 @@ index 0000000000..75e22a7bcf
 +        <AuthWizard
 +          providers={[OPENAI, CUSTOM, REGIONAL]}
 +          t={t}
++          theme="dark"
 +          submitting={next.submitting ?? false}
 +          error={next.error}
 +          onSubmit={onSubmit}
@@ -773,7 +778,7 @@ index 0000000000..75e22a7bcf
 +  it('starts with the providers and their descriptions', async () => {
 +    const { container } = await renderWizard();
 +
-+    expect(heading(container)).toContain('Set up a model provider');
++    expect(heading(container)).toContain('Qwen CodeProvider Setup Wizard');
 +    expect(heading(container)).not.toContain('Step');
 +    const options = [...container.querySelectorAll('[data-wizard-option]')];
 +    expect(options.map((o) => o.textContent)).toEqual([
@@ -788,6 +793,8 @@ index 0000000000..75e22a7bcf
 +
 +    await clickOption(container, 'OpenAI API Key');
 +    expect(heading(container)).toContain('OpenAI API Key · Step 2 of 3');
++    // The product header stays on top of every step.
++    expect(heading(container)).toContain('Qwen CodeProvider Setup Wizard');
 +    expect(container.querySelector('input')?.type).toBe('password');
 +
 +    await type(container, 'sk-openai');
@@ -925,10 +932,10 @@ index 0000000000..75e22a7bcf
 +});
 diff --git a/packages/vscode-ide-companion/src/webview/components/AuthWizard.tsx b/packages/vscode-ide-companion/src/webview/components/AuthWizard.tsx
 new file mode 100644
-index 0000000000..9997d9a513
+index 0000000000..e269e560b7
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/webview/components/AuthWizard.tsx
-@@ -0,0 +1,587 @@
+@@ -0,0 +1,638 @@
 +/**
 + * @license
 + * Copyright 2026 Qwen Team
@@ -945,6 +952,9 @@ index 0000000000..9997d9a513
 +  type AuthWizardWireApi,
 +} from '../authWizardTypes.js';
 +import type { ChromeStrings } from '../strings.js';
++// eslint-disable-next-line import/no-internal-modules -- bundle the extension icon into the webview
++import iconUrl from '../../../assets/icon.png';
++import { TITLE_GRADIENT } from './QwenOnboarding.js';
 +
 +type WizardStep =
 +  | 'provider'
@@ -968,6 +978,7 @@ index 0000000000..9997d9a513
 +interface AuthWizardProps {
 +  providers: AuthWizardProvider[];
 +  t: ChromeStrings;
++  theme: 'light' | 'dark';
 +  /** The answers were sent and the host is connecting. */
 +  submitting: boolean;
 +  /** Error reported by the host for the last submission. */
@@ -1093,6 +1104,7 @@ index 0000000000..9997d9a513
 +export function AuthWizard({
 +  providers,
 +  t,
++  theme,
 +  submitting,
 +  error,
 +  onSubmit,
@@ -1347,19 +1359,65 @@ index 0000000000..9997d9a513
 +          margin: 'auto',
 +        }}
 +      >
-+        <div>
-+          <div
-+            style={{
-+              color: 'var(--vscode-descriptionForeground)',
-+              fontSize: 11,
-+              lineHeight: 1.45,
-+            }}
-+          >
-+            {/* The step count is known once a provider is picked. */}
-+            {provider && step !== 'provider'
-+              ? `${provider.label} · ${stepLabel}`
-+              : t('wizard.title')}
++        <div
++          data-wizard-header=""
++          style={{
++            display: 'flex',
++            flexDirection: 'column',
++            alignItems: 'center',
++            gap: 8,
++            marginBottom: 8,
++            textAlign: 'center',
++          }}
++        >
++          <img
++            src={iconUrl}
++            alt=""
++            width={40}
++            height={40}
++            style={{ objectFit: 'contain' }}
++          />
++          <div>
++            <div
++              style={{
++                fontSize: 28,
++                fontWeight: 600,
++                lineHeight: '32px',
++                letterSpacing: '-0.02em',
++                background: TITLE_GRADIENT[theme],
++                backgroundClip: 'text',
++                WebkitBackgroundClip: 'text',
++                WebkitTextFillColor: 'transparent',
++                color: 'var(--vscode-foreground)',
++              }}
++            >
++              {t('onboarding.title')}
++            </div>
++            <div
++              style={{
++                marginTop: 4,
++                color: 'var(--vscode-descriptionForeground)',
++                fontSize: 12,
++                lineHeight: 1.5,
++              }}
++            >
++              {t('wizard.title')}
++            </div>
 +          </div>
++        </div>
++        <div>
++          {/* The step count is known once a provider is picked. */}
++          {provider && step !== 'provider' && (
++            <div
++              style={{
++                color: 'var(--vscode-descriptionForeground)',
++                fontSize: 11,
++                lineHeight: 1.45,
++              }}
++            >
++              {`${provider.label} · ${stepLabel}`}
++            </div>
++          )}
 +          <div style={{ marginTop: 2, fontSize: 15, fontWeight: 600 }}>
 +            {title}
 +          </div>
@@ -1517,7 +1575,7 @@ index 0000000000..9997d9a513
 +  );
 +}
 diff --git a/packages/vscode-ide-companion/src/webview/components/QwenOnboarding.tsx b/packages/vscode-ide-companion/src/webview/components/QwenOnboarding.tsx
-index 8bd724ea6e..455e428ba4 100644
+index 8bd724ea6e..04f0e50456 100644
 --- a/packages/vscode-ide-companion/src/webview/components/QwenOnboarding.tsx
 +++ b/packages/vscode-ide-companion/src/webview/components/QwenOnboarding.tsx
 @@ -13,9 +13,21 @@ interface QwenOnboardingProps {
@@ -1533,7 +1591,7 @@ index 8bd724ea6e..455e428ba4 100644
 + * (`--agent-logo-gradient` in web-shell's App.module.css, which this view
 + * is not inside of).
 + */
-+const TITLE_GRADIENT: Record<QwenOnboardingProps['theme'], string> = {
++export const TITLE_GRADIENT: Record<QwenOnboardingProps['theme'], string> = {
 +  dark: 'linear-gradient(90deg, #51d9f7 0%, 25%, #8ce786 50%, 75%, #cdf70a 100%)',
 +  light:
 +    'linear-gradient(90deg, #0093c4 0%, 25%, #00a37a 50%, 75%, #5c9f00 100%)',
@@ -2938,10 +2996,10 @@ index fa4b9aa7ac..c2b5322706 100644
        this.authHandler.handle({ type: 'auth' }),
      );
 diff --git a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts
-index f89982fadb..12f02d284d 100644
+index d91a0381ae..0c9348515e 100644
 --- a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts
 +++ b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts
-@@ -632,6 +632,40 @@ describe('WebViewProvider.attachToView', () => {
+@@ -640,6 +640,40 @@ describe('WebViewProvider.attachToView', () => {
      });
    });
  
@@ -2983,10 +3041,10 @@ index f89982fadb..12f02d284d 100644
      const { messageHandler, postMessage } = await setupAttachedProvider({
        captureMessageHandler: true,
 diff --git a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
-index 2a720f5b9d..047f8e5697 100644
+index 97ef7f5203..d0bc5fc8ae 100644
 --- a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
 +++ b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
-@@ -169,10 +169,11 @@ export class WebViewProvider {
+@@ -178,10 +178,11 @@ export class WebViewProvider {
    /** Guards against concurrent auth-restore / connection init */
    private initializationPromise: Promise<void> | null = null;
    private isReconnecting = false;
@@ -3002,7 +3060,7 @@ index 2a720f5b9d..047f8e5697 100644
    /** Timestamp (ms) when the current agent task started (first stream chunk) */
    private agentStartTime: number | null = null;
    /** Current tab-dot state: null = no dot, 'orange' = task done. */
-@@ -204,7 +205,7 @@ export class WebViewProvider {
+@@ -213,7 +214,7 @@ export class WebViewProvider {
        (message) => this.sendMessageToWebView(message),
      );
  
@@ -3011,7 +3069,7 @@ index 2a720f5b9d..047f8e5697 100644
      this.messageHandler.setAuthInteractiveHandler(
        async (providerConfig, inputs) => {
          await this.handleAuthInteractive(providerConfig, inputs);
-@@ -885,26 +886,11 @@ export class WebViewProvider {
+@@ -894,26 +895,11 @@ export class WebViewProvider {
    }
  
    /**
@@ -3041,7 +3099,7 @@ index 2a720f5b9d..047f8e5697 100644
    }
  
    setInitialModelId(modelId: string | null | undefined): void {
-@@ -1100,7 +1086,7 @@ export class WebViewProvider {
+@@ -1109,7 +1095,7 @@ export class WebViewProvider {
          // send authState message and return without creating session
          if (connectResult.requiresAuth && !autoAuthenticate) {
            logger.log(
@@ -3050,7 +3108,7 @@ index 2a720f5b9d..047f8e5697 100644
            );
            this.sendMessageToWebView({
              type: 'authState',
-@@ -1109,21 +1095,8 @@ export class WebViewProvider {
+@@ -1118,21 +1104,8 @@ export class WebViewProvider {
            // Initialize empty conversation to allow browsing history
            await this.initializeEmptyConversation();
  
@@ -3074,7 +3132,7 @@ index 2a720f5b9d..047f8e5697 100644
            return;
          }
  
-@@ -1583,6 +1556,19 @@ export class WebViewProvider {
+@@ -1592,6 +1565,19 @@ export class WebViewProvider {
        data?: { authenticated?: boolean | null };
      };
  
@@ -3094,7 +3152,7 @@ index 2a720f5b9d..047f8e5697 100644
      switch (msg.type) {
        case 'authState':
          if (typeof msg.data?.authenticated === 'boolean') {
-@@ -1613,6 +1599,10 @@ export class WebViewProvider {
+@@ -1622,6 +1608,10 @@ export class WebViewProvider {
     * Sync important initialization state when the webview signals readiness.
     */
    private handleWebviewReady(): void {
@@ -3106,14 +3164,14 @@ index 2a720f5b9d..047f8e5697 100644
        this.sendMessageToWebView({
          type: 'modeChanged',
 diff --git a/packages/vscode-ide-companion/src/webview/strings.ts b/packages/vscode-ide-companion/src/webview/strings.ts
-index 78fe63475c..4e5c97e411 100644
+index 78fe63475c..adae5acb5d 100644
 --- a/packages/vscode-ide-companion/src/webview/strings.ts
 +++ b/packages/vscode-ide-companion/src/webview/strings.ts
 @@ -69,6 +69,35 @@ const EN = {
    'onboarding.connecting': 'Connecting…',
    'onboarding.providers':
      'Supports Coding Plan, ModelStudio API Key, and OpenAI-compatible providers.',
-+  'wizard.title': 'Set up a model provider',
++  'wizard.title': 'Provider Setup Wizard',
 +  'wizard.step': 'Step {current} of {total}',
 +  'wizard.back': 'Back',
 +  'wizard.next': 'Next',
@@ -3149,7 +3207,7 @@ index 78fe63475c..4e5c97e411 100644
    'onboarding.connecting': '连接中…',
    'onboarding.providers':
      '支持 Coding Plan、百炼 API Key 以及兼容 OpenAI 的服务商。',
-+  'wizard.title': '配置模型服务商',
++  'wizard.title': '模型服务商设置向导',
 +  'wizard.step': '第 {current} 步，共 {total} 步',
 +  'wizard.back': '上一步',
 +  'wizard.next': '下一步',
