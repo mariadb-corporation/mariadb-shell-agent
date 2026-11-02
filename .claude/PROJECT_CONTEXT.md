@@ -35,7 +35,11 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   `git add -N`) above the explanation text; prettier only the touched files and check the diff has no
   unrelated reformatting. Then commit the patch in `mariadb/` and run `mariadb/sync-upstream.sh`. For a
   quick test before that, `git apply` the plain diff to the branded tree and `git checkout -- packages`
-  afterwards. A hand-edited `.patch` needs its `@@` line counts adjusted. In zsh pass file lists as
+  afterwards (hunks whose context the rebrand changed, e.g. in `strings.ts`, don't apply: `--exclude`
+  them and edit by hand). To change an existing patch whose files later patches don't touch, apply the
+  patches before it with `--3way` (staged), the patch itself with plain `git apply`, edit, and
+  `git diff` the patch's own file list (`git add -N .` for its new files) under its explanation text.
+  A hand-edited `.patch` needs its `@@` line counts adjusted. In zsh pass file lists as
   arrays (`F=(a b); git diff -- "${F[@]}"`), a plain variable is not split into words.
   - `0001` context-file markers in the system prompt use `~/…` for home files (were cwd-relative).
   - `0002` one system prompt opening ("a CLI agent") for headless/interactive/ACP; the mode is named in
@@ -112,7 +116,8 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
     registered (existing settings keep working) but are not offered; their upstream tests that walk
     to them are in `skipped-tests.mjs`.
   - Usage statistics and auto-update default off — two default paths each (`?? true` in config and in
-    `resolveUsageStatisticsEnabled`; `enableAutoUpdate !== false` checks) plus schema defaults; the
+    `resolveUsageStatisticsEnabled`; `enableAutoUpdate !== false` checks) plus schema defaults and the settings reference
+    (`docs/users/configuration/settings.md`, checked by `settings-docs-sync.test`); the
     analytics endpoint is `usage-statistics.invalid` with an empty app id; dist npm name
     `@mariadb/mariadb-shell-agent` (npm self-update finds nothing); no OpenRouter/Requesty attribution headers.
 - **Names**: `~/.mariadb-shell-agent` and `<project>/.mariadb-shell-agent` (the repo's own project dir is renamed too),
@@ -215,7 +220,8 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
    choices) (QwenLM requires an approved issue
    first, small Conventional-Commits PRs, an E2E report comment; clean MariaDB wording and copyright
    headers out first); accepted ones retire the patches.
-4. Sync with upstream `main` as soon as it builds again: `mariadb/sync-upstream.sh --verify --push`.
+4. Sync with upstream `main` regularly: `mariadb/sync-upstream.sh --verify` (about an hour), fix what the
+   gate attributes to the fork, rebuild both `.vsix`, then the user pushes.
 5. Multi-user Cloud Workbench: one IDE instance per user (shared workspace, `~/.mariadb-shell-agent` and OS account
    otherwise); the bridge already works per extension host.
 
@@ -255,6 +261,12 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 - Claude Code's auto mode blocks `git push --force-with-lease` (also `sync-upstream.sh --push`) unless
   the user explicitly grants force-push permission; otherwise sync locally and let the user run
   `! git push --force-with-lease NAS main`.
+- Upstream release tags (`v0.26.x`) sit on release branches, not on `main`; sync to a `main` commit,
+  which carries the same fixes (check with `git log <base>..upstream/main --grep='(#<PR>)'`).
+- Upstream tests can rely on auto-update or usage statistics defaulting on without saying so, e.g. a
+  concurrent dynamic import that misses the test's settings mock and reads empty real settings
+  (`daemon-update.test`): skip them in `skipped-tests.mjs` under the default-off reasons, don't
+  change the default.
 - macOS has no `timeout` command; bound test runs inside the Node script instead.
 - Claude plugins install from a local clone used as marketplace: `extensions install <repo>:<plugin>
   --consent` (MariaDB's `ai-plugins` repo: plugin `dev`). Hooks come from `hooks/hooks.json`, a `Bash`
