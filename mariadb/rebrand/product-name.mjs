@@ -49,6 +49,16 @@ export function apply() {
         '连接一个模型服务商，开始使用 Qwen 编码。',
         '连接一个模型服务商即可开始使用。',
       ],
+      // The Web Shell welcome subtitle (anchored to its key: CLI dialogs ask "What would you like
+      // to do?" about other things).
+      [
+        "'welcome.prompt': 'What would you like to do?'",
+        "'welcome.prompt': 'What would you like to work on?'",
+      ],
+      [
+        "'welcome.prompt': '你想构建什么？'",
+        "'welcome.prompt': '你想做些什么？'",
+      ],
     ],
     { skip: SKIP, extensions: DOCS_EXTENSIONS },
   );
