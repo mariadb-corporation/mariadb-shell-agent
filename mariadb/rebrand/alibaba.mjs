@@ -291,6 +291,20 @@ export function apply() {
       ),
   );
 
+  // The settings reference documents the same defaults (settings-docs-sync.test checks them).
+  const documentedDefault =
+    /(\| `(?:general\.enableAutoUpdate|privacy\.usageStatisticsEnabled)` +\| boolean +\|[^\n]*?\| )`true` ?/g;
+  patch(
+    'settings reference defaults',
+    'docs/users/configuration/settings.md',
+    documentedDefault,
+    (_, row) => `${row}\`false\``,
+    (t) =>
+      !/\| `(?:general\.enableAutoUpdate|privacy\.usageStatisticsEnabled)` +\|[^\n]*\| `true` *\|/.test(
+        t,
+      ),
+  );
+
   // The extension's copy of the settings schema, generated from settingsSchema.ts on install.
   patch(
     'settings schema json defaults',

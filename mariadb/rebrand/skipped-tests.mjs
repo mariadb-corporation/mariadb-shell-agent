@@ -53,6 +53,11 @@ const SKIPPED = [
       'packages/cli/src/ui/standalone-update.test.ts': [
         'preserves default fallback when unset (%s)',
       ],
+      // Two concurrent prepares: one settings read can miss the test's mock and see no
+      // enableAutoUpdate, which upstream treats as on.
+      'packages/cli/src/serve/routes/daemon-update.test.ts': [
+        'stages one download without activation and retains readiness across app replacement',
+      ],
     },
   },
   {

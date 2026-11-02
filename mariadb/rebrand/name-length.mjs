@@ -56,4 +56,14 @@ export function apply() {
     expect(screen.getByText(items[1]!.label)).not.toBeNull();
     expect(screen.queryByText(items[2]!.label)).toBeNull();`),
   );
+
+  // The bundled skills' descriptions name the product several times, so their listing in the
+  // prompt grows with the name; the budget grows by the same amount.
+  patch(
+    'name length',
+    'packages/core/src/skills/bundled-skills.integration.test.ts',
+    'const BUNDLED_LISTING_BUDGET = 6_800;',
+    'const BUNDLED_LISTING_BUDGET = 6_900;',
+    (t) => t.includes('const BUNDLED_LISTING_BUDGET = 6_900;'),
+  );
 }
