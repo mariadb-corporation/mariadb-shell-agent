@@ -4,8 +4,8 @@ An AI agent for MariaDB inside Visual Studio Code (and Theia-based IDEs such as 
 Workbench): a chat panel, native diffs and workspace context. The extension bundles the agent's
 CLI, so nothing else needs to be installed.
 
-MariaDB Shell Agent is a MariaDB build of [Qwen Code](https://github.com/QwenLM/qwen-code), rebased
-on upstream regularly.
+MariaDB Shell Agent is a MariaDB build of [Qwen Code](https://github.com/QwenLM/qwen-code), kept in
+sync with upstream.
 
 ## Features
 
