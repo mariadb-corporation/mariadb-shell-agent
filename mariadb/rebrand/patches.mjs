@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * Code changes of our own, kept as patch files in mariadb/patches/ (each starts with a short
  * explanation). They are written against the pristine upstream files and applied before the
  * other rules, with a three-way merge, so upstream edits next to a patched line merge on their

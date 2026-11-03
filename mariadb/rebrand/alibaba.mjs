@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * No Alibaba endpoints: the Alibaba-run model providers are dropped, every Alibaba or QwenLM host
  * in shipped code and docs is made unresolvable, and self-update and usage statistics are off
  * unless a user turns them on explicitly (with nowhere left to send to).

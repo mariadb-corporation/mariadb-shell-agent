@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * Upstream tests whose expectations depend on how long "Qwen Code" is: where a sentence naming it
  * wraps, or whether a table header fits. "MariaDB Shell Agent" is ten characters longer, so these
  * expectations follow the longer name. Runs after product-name.mjs, on its output.

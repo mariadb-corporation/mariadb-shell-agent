@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * The command is `mariadb-shell-agent` (short: `msa`) instead of `qwen`; the terminal title reads
  * "MariaDB Shell Agent - <folder>"; MARIADB_SHELL_AGENT_* environment variables work as aliases of the QWEN_*
  * ones the code reads.
@@ -90,7 +96,7 @@ function envAliasesModule(aliases) {
     .join('\n');
   return `/**
  * @license
- * Copyright 2026 MariaDB
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 

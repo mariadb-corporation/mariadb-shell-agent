@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * What MariaDB Shell Agent tells other parties about itself: the User-Agent sent to model providers,
  * GitHub and connection warm-ups, the client name sent to MCP servers, the agent name in the ACP
  * handshake, and the system-wide settings paths. Upstream names Qwen Code in all of them.

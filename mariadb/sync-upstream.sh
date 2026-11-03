@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (c) 2026, MariaDB plc.
+# SPDX-License-Identifier: Apache-2.0
+#
 # Rebases the fork onto the newest upstream Qwen Code and regenerates the branding commit.
 #
 #   mariadb/sync-upstream.sh [--to <upstream rev>] [--verify] [--push]

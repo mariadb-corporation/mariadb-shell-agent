@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 /**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * Test gate for the branded tree: which unit test failures does the branding cause?
  *
  *   node mariadb/verify.mjs [--quick]

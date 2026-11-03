@@ -21,7 +21,7 @@ index 0000000000..c0680debd4
 @@ -0,0 +1,205 @@
 +/**
 + * @license
-+ * Copyright 2026 MariaDB
++ * Copyright (c) 2026, MariaDB plc.
 + * SPDX-License-Identifier: Apache-2.0
 + */
 +
@@ -232,7 +232,7 @@ index 0000000000..eeebd96cb1
 @@ -0,0 +1,124 @@
 +/**
 + * @license
-+ * Copyright 2026 MariaDB
++ * Copyright (c) 2026, MariaDB plc.
 + * SPDX-License-Identifier: Apache-2.0
 + */
 +
@@ -362,7 +362,7 @@ index 0000000000..4dfeaf18fa
 @@ -0,0 +1,172 @@
 +/**
 + * @license
-+ * Copyright 2026 MariaDB
++ * Copyright (c) 2026, MariaDB plc.
 + * SPDX-License-Identifier: Apache-2.0
 + */
 +

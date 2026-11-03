@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * The /review footer ("_— <model> via MariaDB Shell Agent /review (vX)_"). The module writes the footer
  * and parses it back, also in forged, split and re-cased forms (`Qwen<!--Code`, `Qwen\nCode`,
  * `QWEN CODE`), so the whole module, its tests and the autofix workflow that re-implements the

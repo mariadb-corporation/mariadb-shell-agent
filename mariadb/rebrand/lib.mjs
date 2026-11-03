@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * Helpers shared by the rebrand rules (mariadb/rebrand/*.mjs).
  *
  * Every helper that edits an upstream file either finds its anchor or records a failure, so a
@@ -150,6 +156,11 @@ export function trackedFiles(pathspecs) {
     .split('\0')
     .filter(Boolean)
     .map((file) => renamed.get(file) ?? file);
+}
+
+/** The new names of the files moved by rename() in this run. */
+export function renamedFiles() {
+  return new Set(renamed.values());
 }
 
 /**

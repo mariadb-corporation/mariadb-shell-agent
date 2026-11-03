@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (c) 2026, MariaDB plc.
+# SPDX-License-Identifier: Apache-2.0
+#
 # Builds the MariaDB Shell Agent VS Code extension into mariadb/dist/.
 #
 #   mariadb/build-vsix.sh            # for this machine (e.g. darwin-arm64), with node-pty

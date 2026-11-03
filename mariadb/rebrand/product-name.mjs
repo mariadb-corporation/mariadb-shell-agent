@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /** "Qwen Code" → "MariaDB Shell Agent" in UI strings, prompts, locales, tests and snapshots. */
 import {
   DOCS_DIRS,

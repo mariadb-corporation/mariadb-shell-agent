@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * File and directory names users see: ~/.mariadb-shell-agent and <project>/.mariadb-shell-agent instead of
  * .qwen, MARIADB-SHELL-AGENT.md instead of QWEN.md, .mariadb-shell-agentignore instead of .qwenignore.
  * Internal files inside those directories (.qwen-session, locks, ...) keep their names.

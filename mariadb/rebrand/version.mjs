@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * Product version: the shipped packages carry the fork's own version (mariadb/VERSION), set only
  * while mariadb/build-vsix.sh builds them. The sources keep upstream's version, so the workspace,
  * the lockfile and the tests are unchanged; without MARIADB_FORK_VERSION both build scripts behave

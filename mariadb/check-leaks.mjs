@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 /**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * Finds upstream branding and Alibaba endpoints that the rebrand rules did not catch.
  *
  *   node mariadb/check-leaks.mjs                 # the branded source (shipped packages, user docs)

@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * VS Code extension identity: its own id, so it installs beside upstream's companion and never
  * offers upstream's Marketplace build as an "update".
  */

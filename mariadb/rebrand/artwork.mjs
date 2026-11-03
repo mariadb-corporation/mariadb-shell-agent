@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /** Icons, favicons, the Web Shell brand mark and the terminal banner, plus tests pinning them. */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -243,7 +249,8 @@ export function apply() {
     );
     write(
       'packages/web-shell/client/components/WelcomeSeal.tsx',
-      `/** The MariaDB seal (mariadb/assets/seal-mono.svg), in the text color. */\n` +
+      `/**\n * @license\n * Copyright (c) 2026, MariaDB plc.\n * SPDX-License-Identifier: Apache-2.0\n */\n\n` +
+        `/** The MariaDB seal (mariadb/assets/seal-mono.svg), in the text color. */\n` +
         `export function WelcomeSeal({ className }: { className?: string }) {\n` +
         `  return (\n` +
         `    <svg\n` +

@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 /**
+ * @license
+ * Copyright (c) 2026, MariaDB plc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * Applies the MariaDB Shell Agent branding to a clean upstream Qwen Code tree.
  *
  *   node mariadb/rebrand.mjs
@@ -26,6 +32,7 @@ import * as extensionIds from './rebrand/extension-ids.mjs';
 import * as review from './rebrand/review.mjs';
 import * as outbound from './rebrand/outbound.mjs';
 import * as skippedTests from './rebrand/skipped-tests.mjs';
+import * as copyright from './rebrand/copyright.mjs';
 
 // Order matters where rules overlap: later rules see the output of earlier ones.
 for (const rule of [
@@ -42,6 +49,8 @@ for (const rule of [
   review,
   outbound,
   skippedTests,
+  // Last: it marks every file the rules above changed.
+  copyright,
 ])
   rule.apply();
 
