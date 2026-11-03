@@ -142,10 +142,13 @@ const SKIPPED = [
   },
   {
     reason:
-      "Upstream's GitHub workflows are removed (github.mjs): the autofix workflow's census filter is not there to agree with.",
+      "Upstream's GitHub workflows are removed (github.mjs): these tests read the autofix and PR review workflows.",
     tests: {
       'packages/cli/src/commands/review/lib/review-footer.test.ts': [
         'agrees with the autofix census filter, which is a second spelling of the same shape',
+      ],
+      'packages/cli/src/commands/review/lib/deadline.test.ts': [
+        'the workflow exports the exact env names the gate reads',
       ],
     },
   },
