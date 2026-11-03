@@ -28,7 +28,7 @@ jobs:
     outputs:
       run: '${{ steps.bypass.outputs.run }}'
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: 'actions/checkout@v7'
         with:
           sparse-checkout: '.github/actions'
       - id: 'bypass'
@@ -43,16 +43,13 @@ jobs:
     steps:
       # Full history (without file contents until needed): the upstream commit must be an
       # ancestor, and the rebrand starts from its files.
-      - uses: 'actions/checkout@v4'
+      - uses: 'actions/checkout@v7'
         with:
           ref: '${{ github.event.pull_request.head.sha || github.sha }}'
           fetch-depth: 0
           filter: 'blob:none'
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22'
       - name: 'Install dependencies'
-        run: 'corepack pnpm install --frozen-lockfile'
+        uses: './.github/actions/pnpm-install'
       - name: 'Upstream commit is in the history'
         run: |
           upstream=$(tr -d '[:space:]' < mariadb/UPSTREAM)
@@ -102,16 +99,13 @@ jobs:
       QWEN_DEFAULT_AUTH_TYPE: ''
     steps:
       # Full history: verify.mjs reruns failing tests on the upstream commit's sources.
-      - uses: 'actions/checkout@v4'
+      - uses: 'actions/checkout@v7'
         with:
           ref: '${{ github.event.pull_request.head.sha || github.sha }}'
           fetch-depth: 0
           filter: 'blob:none'
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22'
       - name: 'Install dependencies'
-        run: 'corepack pnpm install --frozen-lockfile'
+        uses: './.github/actions/pnpm-install'
       - name: 'Unit tests (failures upstream also has are not counted)'
         env:
           PACKAGE: '${{ matrix.package }}'
