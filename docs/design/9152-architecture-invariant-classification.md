@@ -253,7 +253,7 @@ why it was deferred.**
 **Review-only.** The two-tier gate in AGENTS.md already covers this — core
 infrastructure changes require maintainer awareness. A line-count guard was
 considered and rejected (the issue itself argues against it; #4063's
-commentary and the Qwen Code review of #9152 both reject line-count lint).
+commentary and the MariaDB Shell Agent review of #9152 both reject line-count lint).
 Size is a symptom; the invariant is "don't add new responsibilities to
 Config," which is a judgment call.
 

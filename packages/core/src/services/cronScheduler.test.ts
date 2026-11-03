@@ -27,7 +27,7 @@ import { Storage } from '../config/storage.js';
 // Its `fail` runs the mutator but returns the input array, skipping the
 // tasks write (an unchanged reference is a no-op) before throwing; any
 // deletionIds tombstone still lands. removeGate injects a rejection since
-// real failures are platform-divergent (POSIX ENOTDIR for a corrupt .qwen,
+// real failures are platform-divergent (POSIX ENOTDIR for a corrupt .mariadb-shell-agent,
 // Windows ENOENT → "nothing to remove").
 const { readGate, updateGate, removeGate } = vi.hoisted(() => {
   const gate = () => ({
@@ -737,7 +737,7 @@ describe('CronScheduler', () => {
   // rm racing in-flight stamps/removals/lock release → ENOTEMPTY, so settle
   // first; rm retries cover writes outside the chains (a probe takeover's
   // lock). Reset the runtime base after settling, so no late write escapes
-  // to the real ~/.qwen.
+  // to the real ~/.mariadb-shell-agent.
   function useDurableTmpDir(prefix: string): void {
     beforeEach(async () => {
       tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), prefix));

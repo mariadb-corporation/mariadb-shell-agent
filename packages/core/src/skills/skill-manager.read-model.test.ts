@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -61,7 +62,7 @@ describe('workspace skills read model (real filesystem)', () => {
     projectRoot = await fsPromises.mkdtemp(
       path.join(os.tmpdir(), 'qwen-skill-read-model-'),
     );
-    const skillsDir = path.join(projectRoot, '.qwen', 'skills');
+    const skillsDir = path.join(projectRoot, '.mariadb-shell-agent', 'skills');
     for (let i = 0; i < SKILL_COUNT; i++) {
       const dir = path.join(skillsDir, `skill-${i}`);
       await fsPromises.mkdir(dir, { recursive: true });
@@ -118,7 +119,12 @@ describe('workspace skills read model (real filesystem)', () => {
     await manager.refreshCache();
     expect(manager.getCachedSkills('project')).toHaveLength(SKILL_COUNT);
 
-    const added = path.join(projectRoot, '.qwen', 'skills', 'skill-added');
+    const added = path.join(
+      projectRoot,
+      '.mariadb-shell-agent',
+      'skills',
+      'skill-added',
+    );
     await fsPromises.mkdir(added, { recursive: true });
     await fsPromises.writeFile(
       path.join(added, 'SKILL.md'),

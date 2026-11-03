@@ -6,7 +6,7 @@
 
 ## 问题与证据
 
-main 夜间[运行 39664846210](https://github.com/QwenLM/qwen-code/actions/runs/39664846210) 执行 52 个类、1,060 个集成用例用了 33 分 41 秒。各类报告耗时累计为 33 分 39 秒，说明实际基本串行。这个时间不包含单元测试、Maven 缓存操作和 runner 的 Java 锁等待。
+main 夜间[运行 39664846210](https://github.invalid/QwenLM/qwen-code/actions/runs/39664846210) 执行 52 个类、1,060 个集成用例用了 33 分 41 秒。各类报告耗时累计为 33 分 39 秒，说明实际基本串行。这个时间不包含单元测试、Maven 缓存操作和 runner 的 Java 锁等待。
 
 `EventTransportConsumerMySqlIT` 在缓存的 Spring context 仍然运行时删除数据库。同一次运行在后续 30 分钟产生了 7,320 次数据库不存在异常。独立的 Spring/JUnit/MySQL 脚本复现了这个生命周期问题，并验证了通过 Spring 测试生命周期关闭 context 后再删库的顺序。
 
@@ -55,4 +55,4 @@ SSH MySQL fixture 还会在数据库没有发生修改的情况下连续三次�
 
 ## 状态
 
-实现和已记录的本地检查已完成；rebase 后版本的完整验收仍等待 CI。结果及之前失败的验证轮次保留在 `.qwen/e2e-tests/mysql-ci-optimization.md`。线上 CI 耗时仍待测量，不宣称 CI 提速比例。
+实现和已记录的本地检查已完成；rebase 后版本的完整验收仍等待 CI。结果及之前失败的验证轮次保留在 `.mariadb-shell-agent/e2e-tests/mysql-ci-optimization.md`。线上 CI 耗时仍待测量，不宣称 CI 提速比例。

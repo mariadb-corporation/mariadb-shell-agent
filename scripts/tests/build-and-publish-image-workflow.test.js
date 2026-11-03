@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -262,7 +263,7 @@ describe.skipIf(!replayable)(
             INPUT_VERSION: inputVersion,
             DEDUP_LABEL: 'scope/ci-cd',
             RUN_URL:
-              'https://github.com/QwenLM/qwen-code/actions/runs/32580293377',
+              'https://github.invalid/QwenLM/qwen-code/actions/runs/32580293377',
             RUNNER_TEMP: dir,
             ...env,
           },
@@ -324,7 +325,7 @@ describe.skipIf(!replayable)(
 
     it('records the recurrence on the existing issue instead of creating', () => {
       const previousRun =
-        'https://github.com/QwenLM/qwen-code/actions/runs/32580000000';
+        'https://github.invalid/QwenLM/qwen-code/actions/runs/32580000000';
       const result = runScript({
         eventName: 'workflow_dispatch',
         inputVersion: '1.2.3',
@@ -366,7 +367,7 @@ describe.skipIf(!replayable)(
       // The new run is appended to the recorded list, newest first, instead
       // of replacing it — the previous run URL must survive.
       expect(result.body).toContain(
-        '- https://github.com/QwenLM/qwen-code/actions/runs/32580293377',
+        '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580293377',
       );
       expect(result.body).toContain(`- ${previousRun}`);
       expect(result.body.indexOf('32580293377')).toBeLessThan(
@@ -378,7 +379,7 @@ describe.skipIf(!replayable)(
       const annotation =
         'Do not republish — the npm package is broken, tracked in #9999.';
       const previousRun =
-        'https://github.com/QwenLM/qwen-code/actions/runs/32580000000';
+        'https://github.invalid/QwenLM/qwen-code/actions/runs/32580000000';
       const result = runScript({
         eventName: 'workflow_dispatch',
         inputVersion: '1.2.3',
@@ -406,7 +407,7 @@ describe.skipIf(!replayable)(
       expect(result.body).toContain(annotation);
       expect(result.body).toContain(`- ${previousRun}`);
       expect(result.body).toContain(
-        '- https://github.com/QwenLM/qwen-code/actions/runs/32580293377',
+        '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580293377',
       );
     });
 
@@ -429,7 +430,7 @@ describe.skipIf(!replayable)(
       expect(result.body).toContain('Hand-written note.');
       expect(result.body).toContain('<!-- image-build-failure:1.2.3 -->');
       expect(result.body).toContain(
-        'https://github.com/QwenLM/qwen-code/actions/runs/32580293377',
+        'https://github.invalid/QwenLM/qwen-code/actions/runs/32580293377',
       );
     });
 
@@ -448,7 +449,7 @@ describe.skipIf(!replayable)(
               '## Failed runs\n' +
               '\n' +
               '<!-- image-build-failure-occurrences -->\n' +
-              '- https://github.com/QwenLM/qwen-code/actions/runs/32580293377\n',
+              '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580293377\n',
           },
         ],
       });
@@ -463,7 +464,7 @@ describe.skipIf(!replayable)(
       const runs = Array.from(
         { length: 10 },
         (_, i) =>
-          `- https://github.com/QwenLM/qwen-code/actions/runs/3258000000${
+          `- https://github.invalid/QwenLM/qwen-code/actions/runs/3258000000${
             9 - i
           }`,
       );
@@ -488,11 +489,11 @@ describe.skipIf(!replayable)(
       expect(result.calls).toContain('gh issue edit 42');
       const bullets =
         result.body.match(
-          /^- https:\/\/github\.com\/QwenLM\/qwen-code\/actions\/runs\/\d+$/gm,
+          /^- https:\/\/github\.invalid\/QwenLM\/qwen-code\/actions\/runs\/\d+$/gm,
         ) ?? [];
       expect(bullets).toHaveLength(10);
       expect(result.body).toContain(
-        '- https://github.com/QwenLM/qwen-code/actions/runs/32580293377',
+        '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580293377',
       );
       expect(result.body).not.toContain('32580000000');
       expect(result.body.indexOf('32580293377')).toBeLessThan(
@@ -524,7 +525,7 @@ describe.skipIf(!replayable)(
       expect(result.body.match(/## Failed runs/g)).toHaveLength(1);
       expect(result.body).toContain('<!-- image-build-failure-occurrences -->');
       expect(result.body).toContain(
-        '- https://github.com/QwenLM/qwen-code/actions/runs/32580293377',
+        '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580293377',
       );
     });
 
@@ -544,7 +545,7 @@ describe.skipIf(!replayable)(
               '## Failed runs\n' +
               '\n' +
               '<!-- image-build-failure-occurrences -->\n' +
-              '- https://github.com/QwenLM/qwen-code/actions/runs/32580000000 <!-- image-build-failure:1.2.3 -->\n',
+              '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580000000 <!-- image-build-failure:1.2.3 -->\n',
           },
         ],
       });
@@ -554,7 +555,7 @@ describe.skipIf(!replayable)(
       expect(result.body).toContain('<!-- image-build-failure:1.2.3 -->');
       expect(result.body).toContain('The release build job for `1.2.3` failed');
       expect(result.body).toContain(
-        '- https://github.com/QwenLM/qwen-code/actions/runs/32580293377',
+        '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580293377',
       );
     });
 
@@ -570,7 +571,7 @@ describe.skipIf(!replayable)(
             number: 42,
             body:
               '<!-- image-build-failure-occurrences -->\n' +
-              '- https://github.com/QwenLM/qwen-code/actions/runs/32580000000\n' +
+              '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580000000\n' +
               '<!-- image-build-failure:1.2.3 -->\n',
           },
         ],
@@ -580,10 +581,10 @@ describe.skipIf(!replayable)(
       expect(result.body).toContain('The release build job for `1.2.3` failed');
       expect(result.body).toContain('<!-- image-build-failure:1.2.3 -->');
       expect(result.body).toContain(
-        '- https://github.com/QwenLM/qwen-code/actions/runs/32580000000',
+        '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580000000',
       );
       expect(result.body).toContain(
-        '- https://github.com/QwenLM/qwen-code/actions/runs/32580293377',
+        '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580293377',
       );
     });
 
@@ -601,7 +602,7 @@ describe.skipIf(!replayable)(
               '## Failed runs\n' +
               '\n' +
               '<!-- image-build-failure-occurrences -->\n' +
-              '- https://github.com/QwenLM/qwen-code/actions/runs/32580000000\n' +
+              '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580000000\n' +
               '\n' +
               '<!-- image-build-failure:1.2.3 -->\n',
           },
@@ -611,10 +612,10 @@ describe.skipIf(!replayable)(
       expect(result.calls).toContain('gh issue edit 42');
       expect(result.body).toContain('The release build job for `1.2.3` failed');
       expect(result.body).toContain(
-        '- https://github.com/QwenLM/qwen-code/actions/runs/32580000000',
+        '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580000000',
       );
       expect(result.body).toContain(
-        '- https://github.com/QwenLM/qwen-code/actions/runs/32580293377',
+        '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580293377',
       );
     });
 
@@ -622,9 +623,9 @@ describe.skipIf(!replayable)(
       const annotation =
         '- do not republish — the npm package is broken, tracked in #9999.';
       const firstRun =
-        'https://github.com/QwenLM/qwen-code/actions/runs/32580000000';
+        'https://github.invalid/QwenLM/qwen-code/actions/runs/32580000000';
       const secondRun =
-        'https://github.com/QwenLM/qwen-code/actions/runs/32580000001';
+        'https://github.invalid/QwenLM/qwen-code/actions/runs/32580000001';
       const result = runScript({
         eventName: 'workflow_dispatch',
         inputVersion: '1.2.3',
@@ -654,7 +655,7 @@ describe.skipIf(!replayable)(
       )[1];
       expect(block).toContain(`- ${firstRun}`);
       expect(block).toContain(
-        '- https://github.com/QwenLM/qwen-code/actions/runs/32580293377',
+        '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580293377',
       );
       expect(block).not.toContain('do not republish');
     });
@@ -689,7 +690,7 @@ describe.skipIf(!replayable)(
       expect(result.body).toContain('## Failed runs');
       expect(result.body).toContain('<!-- image-build-failure-occurrences -->');
       expect(result.body).toContain(
-        '- https://github.com/QwenLM/qwen-code/actions/runs/32580293377',
+        '- https://github.invalid/QwenLM/qwen-code/actions/runs/32580293377',
       );
     });
 

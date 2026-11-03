@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2855,7 +2856,7 @@ export function registerSessionRoutes(
               runtimeWorkspaceCwd: runtime.workspaceCwd,
               onError: ({ phase, sessionId, error }) => {
                 writeStderrLine(
-                  `qwen serve: ${phase}Session failed for ${safeLogValue(sessionId)}: ${safeLogValue(error)}`,
+                  `mariadb-shell-agent serve: ${phase}Session failed for ${safeLogValue(sessionId)}: ${safeLogValue(error)}`,
                 );
               },
             }),
@@ -3645,10 +3646,10 @@ export function registerSessionRoutes(
       if (worktreeMeta) {
         try {
           // Compute allowed roots for the sessionCd containment check.
-          // Narrow to <root>/.qwen/worktrees (not the whole repo) so a
-          // symlink .qwen/worktrees/task -> <repo>/src is rejected.
+          // Narrow to <root>/.mariadb-shell-agent/worktrees (not the whole repo) so a
+          // symlink .mariadb-shell-agent/worktrees/task -> <repo>/src is rejected.
           const createAllowedRoots = [
-            path.join(workspaceCwd, '.qwen', 'worktrees'),
+            path.join(workspaceCwd, '.mariadb-shell-agent', 'worktrees'),
           ];
           let createRepoTop: string | null = null;
           try {
@@ -3660,7 +3661,7 @@ export function registerSessionRoutes(
           }
           if (createRepoTop && createRepoTop !== workspaceCwd) {
             createAllowedRoots.push(
-              path.join(createRepoTop, '.qwen', 'worktrees'),
+              path.join(createRepoTop, '.mariadb-shell-agent', 'worktrees'),
             );
           }
           const expectedWorktreePath = fs.realpathSync(worktreeMeta.path);
@@ -4457,7 +4458,7 @@ export function registerSessionRoutes(
                 throw new Error('legacy sidecar belongs to another workspace');
               }
               candidateRoots = workspaceRoots.map((root) =>
-                path.join(root, '.qwen', 'worktrees'),
+                path.join(root, '.mariadb-shell-agent', 'worktrees'),
               );
               realTarget = fs.realpathSync(sidecar.worktreePath);
               const contained = candidateRoots.some((root) => {
@@ -4588,7 +4589,7 @@ export function registerSessionRoutes(
                 );
               }
               const candidateRoots = workspaceRoots.map((root) =>
-                path.join(root, '.qwen', 'worktrees'),
+                path.join(root, '.mariadb-shell-agent', 'worktrees'),
               );
               let realTarget: string;
               try {
@@ -4862,7 +4863,7 @@ export function registerSessionRoutes(
       throw invalidState('sidecar original cwd is outside the accepted roots');
     }
     const candidateRoots = workspaceRoots.map((root) =>
-      path.join(root, '.qwen', 'worktrees'),
+      path.join(root, '.mariadb-shell-agent', 'worktrees'),
     );
     let realTarget: string;
     try {
@@ -5950,7 +5951,11 @@ export function registerSessionRoutes(
                   {
                     path: worktree.path,
                     allowedRoots: [
-                      path.join(base.repoTop, '.qwen', 'worktrees'),
+                      path.join(
+                        base.repoTop,
+                        '.mariadb-shell-agent',
+                        'worktrees',
+                      ),
                     ],
                   },
                 );
@@ -10042,7 +10047,7 @@ export function registerSessionRoutes(
         }
         if (sendSessionOrganizationError(res, err)) return;
         writeStderrLine(
-          `qwen serve: failed to list sessions for workspace ${safeLogValue(
+          `mariadb-shell-agent serve: failed to list sessions for workspace ${safeLogValue(
             key,
           )} (options=${safeLogValue(
             JSON.stringify({
@@ -10178,7 +10183,7 @@ export function registerSessionRoutes(
           return;
         }
         writeStderrLine(
-          `qwen serve: failed to search sessions for workspace ${safeLogValue(
+          `mariadb-shell-agent serve: failed to search sessions for workspace ${safeLogValue(
             key,
           )}: ${safeLogValue(err instanceof Error ? err.message : String(err))}`,
         );
@@ -10435,7 +10440,7 @@ export function registerSessionRoutes(
         res.status(200).json(info);
       } catch (err) {
         writeStderrLine(
-          `qwen serve: failed to read session-info for workspace ${safeLogValue(
+          `mariadb-shell-agent serve: failed to read session-info for workspace ${safeLogValue(
             key,
           )}: ${safeLogValue(err instanceof Error ? err.message : String(err))}`,
         );

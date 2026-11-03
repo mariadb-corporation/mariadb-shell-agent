@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -69,7 +70,7 @@ describe('package asset scripts', () => {
     writeFile(
       rootDir,
       'packages/web-shell/dist/manifest.webmanifest',
-      '{"name":"Qwen Code"}',
+      '{"name":"MariaDB Shell Agent"}',
     );
     writeFile(
       rootDir,
@@ -101,7 +102,7 @@ describe('package asset scripts', () => {
     writeFile(
       rootDir,
       'packages/web-shell/dist/manifest.webmanifest',
-      '{"name":"Qwen Code"}',
+      '{"name":"MariaDB Shell Agent"}',
     );
 
     expect(() => copyBundleAssets({ root: rootDir })).not.toThrow();
@@ -111,7 +112,7 @@ describe('package asset scripts', () => {
         path.join(rootDir, 'dist/web-shell/manifest.webmanifest'),
         'utf8',
       ),
-    ).toBe('{"name":"Qwen Code"}');
+    ).toBe('{"name":"MariaDB Shell Agent"}');
     expect(existsSync(path.join(rootDir, 'dist/web-shell/sw.js'))).toBe(false);
     expect(
       console.warn.mock.calls
@@ -129,7 +130,7 @@ describe('package asset scripts', () => {
   it('emits an executable dist/cli.js — shebang plus the exec bit, once', () => {
     // shellContextEnv blanks a QWEN_CODE_CLI a POSIX shell cannot exec (no
     // shebang, or no exec bit), and `"${QWEN_CODE_CLI:-qwen}"` then silently
-    // runs whatever `qwen` the PATH resolves — a different install for every
+    // runs whatever `mariadb-shell-agent` the PATH resolves — a different install for every
     // review subcommand of a session launched off the bundle (measured on
     // three live runs). Deleting the block, dropping the chmod, or dropping
     // the already-has-a-shebang guard must not stay green.
@@ -1326,7 +1327,7 @@ syncBuiltinESMExports();
             ...process.env,
             HOME: home,
             USERPROFILE: home,
-            QWEN_HOME: path.join(home, '.qwen'),
+            QWEN_HOME: path.join(home, '.mariadb-shell-agent'),
             npm_config_cache: path.join(rootDir, 'npm-cache'),
             npm_config_prefix: path.join(rootDir, 'npm-prefix'),
             NODE_OPTIONS: '',
@@ -1689,7 +1690,7 @@ syncBuiltinESMExports();
     const rootDir = mkdtempSync(path.join(tmpdir(), 'qwen-package-assets-'));
     tempDirs.push(rootDir);
 
-    writeFile(rootDir, 'README.md', '# Qwen Code\n');
+    writeFile(rootDir, 'README.md', '# MariaDB Shell Agent\n');
     writeFile(rootDir, 'LICENSE', 'Apache-2.0\n');
     writeFile(
       rootDir,
@@ -1698,11 +1699,11 @@ syncBuiltinESMExports();
         {
           name: '@qwen-code/qwen-code',
           version: '0.17.0',
-          description: 'Qwen Code',
+          description: 'MariaDB Shell Agent',
           private: true,
           repository: {
             type: 'git',
-            url: 'https://github.com/QwenLM/qwen-code.git',
+            url: 'https://github.invalid/QwenLM/qwen-code.git',
           },
           config: {},
           engines: {

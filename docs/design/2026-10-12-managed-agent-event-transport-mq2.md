@@ -15,13 +15,13 @@
 > **Status:** Proposed phase plan. This is phase **MQ2** of the cross-node
 > EventTransport design
 > ([2026-10-04-managed-agent-event-transport](2026-10-04-managed-agent-event-transport.md),
-> §7), tracked under [#12380](https://github.com/QwenLM/qwen-code/issues/12380).
+> §7), tracked under [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380).
 > Every gate the parent design put in front of MQ2 is now closed: MQ1's seam
-> landed ([#13909](https://github.com/QwenLM/qwen-code/pull/13909)), the §5.1
+> landed ([#13909](https://github.invalid/QwenLM/qwen-code/pull/13909)), the §5.1
 > LiteTopic verification resolved at doc level
-> ([#13927](https://github.com/QwenLM/qwen-code/pull/13927)) and on a real
+> ([#13927](https://github.invalid/QwenLM/qwen-code/pull/13927)) and on a real
 > 5.5.1 staging broker, and the §11 routing and wake-carrier decisions landed
-> ([#13933](https://github.com/QwenLM/qwen-code/pull/13933)).
+> ([#13933](https://github.invalid/QwenLM/qwen-code/pull/13933)).
 
 ## Problem
 

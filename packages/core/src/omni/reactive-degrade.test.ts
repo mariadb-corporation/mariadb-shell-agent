@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -352,7 +353,7 @@ describe('observed server input limits', () => {
 describe('degradeOmniMediaAfterServerReject memory wiring (S5)', () => {
   const INFERENCE_MODEL = 'qwen4-omni-120b-think';
   const UPLOAD_MODEL = 'qwen3-omni-plus';
-  const BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+  const BASE_URL = 'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
   const API_KEY = 'test-key';
   const SOURCE_BYTES = 'original-video-bytes';
   const DEGRADED_BYTES = 'reactively-degraded-video-bytes';
@@ -410,7 +411,7 @@ describe('degradeOmniMediaAfterServerReject memory wiring (S5)', () => {
         baseUrl: BASE_URL,
         model: UPLOAD_MODEL,
       }),
-      storage: { getQwenDir: () => path.join(tmpDir, '.qwen') },
+      storage: { getQwenDir: () => path.join(tmpDir, '.mariadb-shell-agent') },
       getOmniProcessingConfig: () => ({
         transportGuardPolicies: [videoGuardPolicy()],
         limits: LIMITS,
@@ -478,7 +479,7 @@ describe('degradeOmniMediaAfterServerReject memory wiring (S5)', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'omni-reactive-'));
-    store = new OmniObjectStore(path.join(tmpDir, '.qwen'));
+    store = new OmniObjectStore(path.join(tmpDir, '.mariadb-shell-agent'));
     // The object the rejected oss:// URL maps back to, reachable through
     // the upload cache's reverse lookup exactly as in production.
     const stagedSource = path.join(tmpDir, 'movie.mkv');

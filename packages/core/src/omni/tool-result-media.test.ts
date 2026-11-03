@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -357,7 +358,7 @@ describe('processToolResultOmniMedia', () => {
   });
 
   it('keeps the part inline when staging-dir setup itself fails', async () => {
-    // ~/.qwen/omni existing as a regular FILE makes mkdir fail with ENOTDIR.
+    // ~/.mariadb-shell-agent/omni existing as a regular FILE makes mkdir fail with ENOTDIR.
     // That must degrade THIS part to inline like any other delivery failure,
     // not reject the whole call (which would report a successful tool as
     // failed).

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -31,7 +32,7 @@ export interface DashScopeUploaderOptions {
   /** DashScope API key (Bearer). */
   apiKey: string;
   /**
-   * Chat-completions base URL (e.g. https://dashscope.aliyuncs.com/compatible-mode/v1).
+   * Chat-completions base URL (e.g. https://dashscope.aliyuncs.invalid/compatible-mode/v1).
    * The uploads endpoint lives at `<origin>/api/v1/uploads`; only the origin
    * is used. Defaults to the official public endpoint when omitted — but the
    * production gate (isOmniDeliveryActive) requires a concrete DashScope
@@ -42,7 +43,7 @@ export interface DashScopeUploaderOptions {
   fetchFn?: FetchFn;
 }
 
-const DEFAULT_ORIGIN = 'https://dashscope.aliyuncs.com';
+const DEFAULT_ORIGIN = 'https://dashscope.aliyuncs.invalid';
 const GET_POLICY_TIMEOUT_MS = 30_000;
 const UPLOAD_TIMEOUT_MS = 15 * 60_000;
 /** Credential reuse window: official policy validity is 300s; 240s keeps

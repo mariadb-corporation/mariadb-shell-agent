@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -187,9 +188,9 @@ describe('projectSummary', () => {
       projectSummary({
         isPending: false,
         stage: 'completed',
-        filePath: '/tmp/QWEN.md',
+        filePath: '/tmp/MARIADB-SHELL-AGENT.md',
       }),
-    ).toContain('Saved to: /tmp/QWEN.md');
+    ).toContain('Saved to: /tmp/MARIADB-SHELL-AGENT.md');
   });
 });
 
@@ -462,7 +463,7 @@ describe('projectContextUsage', () => {
           freeSpace: 800,
           autocompactBuffer: 0,
         },
-        memoryFiles: [{ path: 'QWEN.md', tokens: 200 }],
+        memoryFiles: [{ path: 'MARIADB-SHELL-AGENT.md', tokens: 200 }],
         showDetails,
       };
       expectCoherentBreakdown(item);
@@ -470,7 +471,7 @@ describe('projectContextUsage', () => {
       expect(text).toContain('█ Memory files 200 tokens (20.0%)');
       expect(text).not.toContain('Instruction files');
       expect(text).not.toContain('Auto memory');
-      expect(text.includes('QWEN.md')).toBe(showDetails);
+      expect(text.includes('MARIADB-SHELL-AGENT.md')).toBe(showDetails);
     },
   );
 
@@ -486,7 +487,7 @@ describe('projectContextUsage', () => {
         autocompactBuffer: 0,
       },
       showDetails: true,
-      instructionFiles: [{ path: 'QWEN.md', tokens: 20 }],
+      instructionFiles: [{ path: 'MARIADB-SHELL-AGENT.md', tokens: 20 }],
       memoryFiles: [{ path: 'auto memory', tokens: 10 }],
     };
     expectCoherentBreakdown(item);
@@ -496,7 +497,7 @@ describe('projectContextUsage', () => {
     const summary = projectContextUsage({ ...item, showDetails: false });
     expect(summary).toContain('█ Instruction files 20 tokens (20.0%)');
     expect(summary).toContain('█ Auto memory 10 tokens (10.0%)');
-    expect(split).toContain('QWEN.md');
+    expect(split).toContain('MARIADB-SHELL-AGENT.md');
     expect(split).not.toContain('Memory files');
     const text = projectContextUsage({
       modelName: 'm',
@@ -690,7 +691,7 @@ describe('projectQuit', () => {
     expect(text).toContain('Agent powering down. Goodbye!');
     expect(text).toContain('Session ID: abc-123');
     expect(text).toContain('Wall Time: 5m 0s');
-    expect(text).toContain('qwen --resume abc-123');
+    expect(text).toContain('mariadb-shell-agent --resume abc-123');
   });
 
   it('falls back to the bare duration without stats', () => {
@@ -706,9 +707,11 @@ describe('extractPromptText', () => {
     // React.createElement(Text, null, '...') shape.
     const element = {
       $$typeof: Symbol.for('react.element'),
-      props: { children: 'Overwrite QWEN.md?' },
+      props: { children: 'Overwrite MARIADB-SHELL-AGENT.md?' },
     };
-    expect(extractPromptText(element)).toBe('Overwrite QWEN.md?');
+    expect(extractPromptText(element)).toBe(
+      'Overwrite MARIADB-SHELL-AGENT.md?',
+    );
     const nested = {
       props: { children: ['A ', { props: { children: 'B' } }] },
     };

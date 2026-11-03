@@ -84,7 +84,7 @@ At most 64 live invitations are retained; issuing more discards the oldest.
 
 ## Validation and acceptance
 
-Dry-run the global `qwen` baseline, then run the built daemon and browser flow.
+Dry-run the global `mariadb-shell-agent` baseline, then run the built daemon and browser flow.
 Verify default availability on non-loopback, automatic QR rotation, countdown,
 single-use and expiry rejection, no runtime bearer in the QR, independent
 device access after rotation, primary/Local Control isolation, same-origin and
@@ -92,7 +92,7 @@ cross-origin checks, wildcard address selection, and unchanged loopback flow.
 Also cover allowlisted foreign origins and configured throttling of issuance
 and invalid exchanges, including a successful retry of a throttled invitation.
 Build, typecheck, run focused tests, inspect the full diff twice, and review.
-See `.qwen/e2e-tests/web-shell-dynamic-pairing.md` for results.
+See `.mariadb-shell-agent/e2e-tests/web-shell-dynamic-pairing.md` for results.
 
 ## Open questions
 

@@ -132,7 +132,7 @@ pullRequests: DaemonGitHubPullRequest[] }`(`pullRequests` 恒在,不可用时为
 | cli       | `serve/routes/workspace-github-prs.test.ts`                    | mock core 函数:200 两形态、untrusted 403、unknown 400、cli_unavailable 502、failed 502 + 路径脱敏 |
 | sdk       | DaemonClient 测试                                              | 方法命中正确路径与 query                                                                          |
 | web-shell | `GitHubPrsDialog.test.tsx`、`GitDialog.test.tsx`、App 命令测试 | 各状态渲染、tab 切换、capability 门控、`/prs` 打开对话框                                          |
-| e2e       | `.qwen/e2e-tests/web-shell-github-prs.md`                      | 真 daemon + 本仓库(真 gh)端到端;mockDaemon 补路由                                                 |
+| e2e       | `.mariadb-shell-agent/e2e-tests/web-shell-github-prs.md`       | 真 daemon + 本仓库(真 gh)端到端;mockDaemon 补路由                                                 |
 
 ## 关键文件
 

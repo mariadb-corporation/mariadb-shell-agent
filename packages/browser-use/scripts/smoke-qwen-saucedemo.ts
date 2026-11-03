@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -100,7 +101,11 @@ await withManagedChrome('sauce', async (chrome) => {
     .toISOString()
     .replaceAll(':', '')
     .replaceAll('.', '');
-  const runRoot = join(repositoryRoot, '.qwen/e2e-tests/browser-use', runId);
+  const runRoot = join(
+    repositoryRoot,
+    '.mariadb-shell-agent/e2e-tests/browser-use',
+    runId,
+  );
   const providerLogs = join(runRoot, 'provider-logs');
   const temporaryRoot = await mkdtemp(join(tmpdir(), 'qwen-browser-use-'));
   try {

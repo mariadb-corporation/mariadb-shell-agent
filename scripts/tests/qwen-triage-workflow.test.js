@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,17 +37,23 @@ const mavenRepoProducerWorkflow = readFileSync(
 );
 const sdkJavaWorkflow = readFileSync('.github/workflows/sdk-java.yml', 'utf8');
 const prSkill = readFileSync(
-  '.qwen/skills/triage/references/pr-workflow.md',
+  '.mariadb-shell-agent/skills/triage/references/pr-workflow.md',
   'utf8',
 );
-const triageSkillDoc = readFileSync('.qwen/skills/triage/SKILL.md', 'utf8');
+const triageSkillDoc = readFileSync(
+  '.mariadb-shell-agent/skills/triage/SKILL.md',
+  'utf8',
+);
 import {
   ATTRIBUTIONS,
   VERDICTS,
   checkArtifacts,
 } from '../../scripts/verify-pr-check.mjs';
 
-const verifySkill = readFileSync('.qwen/skills/verify-pr/SKILL.md', 'utf8');
+const verifySkill = readFileSync(
+  '.mariadb-shell-agent/skills/verify-pr/SKILL.md',
+  'utf8',
+);
 const hasGnuRealpath =
   spawnSync('realpath', ['-m', '--', '/'], {
     stdio: 'ignore',
@@ -140,7 +147,7 @@ function makeGhHarness(label) {
     ].join('\n'),
     { mode: 0o755 },
   );
-  const RUN_URL = 'https://github.com/QwenLM/qwen-code/actions/runs/77';
+  const RUN_URL = 'https://github.invalid/QwenLM/qwen-code/actions/runs/77';
   const bashArgs = ['--noprofile', '--norc', '-eo', 'pipefail', '-c'];
   const run = (script, env) => {
     rmSync(bodyOut, { force: true });
@@ -331,7 +338,7 @@ describe('qwen-triage tmux workflow', () => {
   it('pins the action reinstall to the version the job already runs', () => {
     expect(workflow).toContain("id: 'ensure_qwen'");
     expect(workflow).toContain(
-      'echo "version=$(qwen --version)" >> "${GITHUB_OUTPUT}"',
+      'echo "version=$(mariadb-shell-agent --version)" >> "${GITHUB_OUTPUT}"',
     );
     expect(workflow).toContain(
       "qwen_cli_version: '${{ steps.ensure_qwen.outputs.version }}'",
@@ -844,7 +851,7 @@ describe('qwen-triage tmux workflow', () => {
           body,
         });
         const tombstone = (runId) =>
-          `${marker}\n\n✅ earlier verdict [finalize run](https://github.com/QwenLM/qwen-code/actions/runs/${runId})`;
+          `${marker}\n\n✅ earlier verdict [finalize run](https://github.invalid/QwenLM/qwen-code/actions/runs/${runId})`;
 
         // No marker yet: POST the running claim and export the created id.
         // The body must START with the lifecycle marker — the selector is
@@ -1000,11 +1007,11 @@ describe('qwen-triage tmux workflow', () => {
     expect(installStep).toContain(
       "npm install -g --registry=https://registry.npmjs.org '@qwen-code/qwen-code@latest'",
     );
-    expect(installStep).toContain('qwen --version');
+    expect(installStep).toContain('mariadb-shell-agent --version');
     expect(installStep).toContain('tmux -V');
     expect(resolverStep).not.toContain('tmux');
     expect(resolverStep).not.toContain('npm install');
-    expect(resolverStep).not.toContain('qwen --version');
+    expect(resolverStep).not.toContain('mariadb-shell-agent --version');
     expect(
       workflow.indexOf("- name: 'Resolve PR and check state'"),
     ).toBeLessThan(workflow.indexOf("- name: 'Install tmux runner tools'"));
@@ -1032,7 +1039,10 @@ describe('qwen-triage tmux workflow', () => {
     const run = (model, content) => {
       const dir = mkdtempSync(join(tmpdir(), 'triage-inject-'));
       try {
-        const target = join(dir, '.qwen/skills/triage/references');
+        const target = join(
+          dir,
+          '.mariadb-shell-agent/skills/triage/references',
+        );
         mkdirSync(target, { recursive: true });
         writeFileSync(join(target, 'pr-workflow.md'), content);
         const proc = spawnSync('bash', ['-c', portableScript], {
@@ -3875,7 +3885,9 @@ describe('qwen-triage verify hardening round 2', () => {
       ].join('\n');
       expect(classify(bigEarlyCode)).toBe('RUN');
       expect(classify('docs/a.md\nREADME.md\nassets/x.png')).toBe('NA');
-      expect(classify('.qwen/skills/verify-pr/SKILL.md')).toBe('RUN');
+      expect(classify('.mariadb-shell-agent/skills/verify-pr/SKILL.md')).toBe(
+        'RUN',
+      );
       expect(classify('.github/workflows/x.yml')).toBe('RUN');
       expect(classify('scripts/lint.js')).toBe('RUN');
     } finally {
@@ -3904,8 +3916,10 @@ describe('qwen-triage verify hardening round 2', () => {
   it('re-establishes the verifier trust boundary after the build', () => {
     const runStep = step('Run verification agent');
     const kill = runStep.indexOf('pkill -KILL -u node');
-    const repin = runStep.indexOf('git archive "$BASE_OID" -- .qwen');
-    const chown = runStep.indexOf('chown -R root:root .qwen');
+    const repin = runStep.indexOf(
+      'git archive "$BASE_OID" -- .mariadb-shell-agent',
+    );
+    const chown = runStep.indexOf('chown -R root:root .mariadb-shell-agent');
     const home = runStep.indexOf('verify-agent-home');
     const launch = runStep.indexOf('QWEN_CMD=(');
     for (const i of [kill, repin, chown, home, launch]) {
@@ -3927,24 +3941,29 @@ describe('qwen-triage verify hardening round 2', () => {
     );
   });
 
-  // Cleanups must not glob below a PR-writable path: .qwen/tmp can be a
-  // symlink, and `rm -rf .qwen/tmp/*` then deletes the target's contents.
-  it('removes .qwen/tmp itself rather than globbing through it', () => {
+  // Cleanups must not glob below a PR-writable path: .mariadb-shell-agent/tmp can be a
+  // symlink, and `rm -rf .mariadb-shell-agent/tmp/*` then deletes the target's contents.
+  it('removes .mariadb-shell-agent/tmp itself rather than globbing through it', () => {
     // Strip comment lines: the fix's own comment quotes the unsafe form.
     const code = job('verify')
       .split('\n')
       .filter((l) => !/^\s*#/.test(l))
       .join('\n');
     // No glob below a PR-writable parent, anywhere in the job...
-    expect(code).not.toContain('rm -rf .qwen/tmp/*');
+    expect(code).not.toContain('rm -rf .mariadb-shell-agent/tmp/*');
     // ...and BOTH cleanups (job start and job end) unlink a symlink rather
     // than recursing through it. PR code runs between them, so the end is
     // no safer than the start.
-    const guards = code.match(/if \[ -L \.qwen\/tmp \]; then/g) ?? [];
+    const guards =
+      code.match(/if \[ -L \.mariadb-shell-agent\/tmp \]; then/g) ?? [];
     expect(guards.length).toBe(2);
-    expect((code.match(/\[ -L \.qwen \] && rm -f \.qwen/g) ?? []).length).toBe(
-      2,
-    );
+    expect(
+      (
+        code.match(
+          /\[ -L \.mariadb-shell-agent \] && rm -f \.mariadb-shell-agent/g,
+        ) ?? []
+      ).length,
+    ).toBe(2);
   });
 
   // Status/report lifecycle is keyed on machine markers, and identity
@@ -4451,7 +4470,7 @@ describe('qwen-triage verify hardening round 2', () => {
       'ALIYUN_OSS_BUCKET: "${{ vars.ALIYUN_OSS_PR_ASSETS_BUCKET || vars.ALIYUN_OSS_BUCKET || \'qwen-code-assets\' }}"',
     );
     expect(publish).toContain(
-      "ALIYUN_OSS_PUBLIC_BASE_URL: \"${{ vars.ALIYUN_OSS_PR_ASSETS_PUBLIC_BASE_URL || (vars.ALIYUN_OSS_PR_ASSETS_BUCKET == '' && vars.ALIYUN_OSS_PUBLIC_BASE_URL) || format('https://{0}.oss-cn-hangzhou.aliyuncs.com', vars.ALIYUN_OSS_PR_ASSETS_BUCKET || vars.ALIYUN_OSS_BUCKET || 'qwen-code-assets') }}\"",
+      "ALIYUN_OSS_PUBLIC_BASE_URL: \"${{ vars.ALIYUN_OSS_PR_ASSETS_PUBLIC_BASE_URL || (vars.ALIYUN_OSS_PR_ASSETS_BUCKET == '' && vars.ALIYUN_OSS_PUBLIC_BASE_URL) || format('https://{0}.oss-cn-hangzhou.aliyuncs.invalid', vars.ALIYUN_OSS_PR_ASSETS_BUCKET || vars.ALIYUN_OSS_BUCKET || 'qwen-code-assets') }}\"",
     );
     expect(publish).toContain("OSS_UPLOAD_ATTEMPT_TIMEOUT_MS: '120000'");
   });
@@ -4992,7 +5011,9 @@ describe('qwen-triage verify hardening round 2', () => {
     // #12121: a relay on another port fails the daemon's Host allowlist,
     // and the rate-limited access log is not a request ledger.
     expect(flat).toContain('behind a port mapping and never rewrite headers');
-    expect(flat).toContain('For an emulator client of a real `qwen serve`');
+    expect(flat).toContain(
+      'For an emulator client of a real `mariadb-shell-agent serve`',
+    );
     expect(flat).toContain(
       'WebSocket `upgrade` handshake and bidirectional tunnel',
     );
@@ -5181,7 +5202,7 @@ describe('qwen-triage verify hardening round 2', () => {
         'a sanitized tree label, never a path ' +
         '(`QWEN_SANDBOX_IMAGE_TAG=<label>`; the build reads that variable, not ' +
         '`QWEN_SANDBOX_IMAGE`, and interpolates it into the tag verbatim) — and ' +
-        'inject `QWEN_SANDBOX_IMAGE=ghcr.io/qwenlm/qwen-code:<label>` per ' +
+        'inject `QWEN_SANDBOX_IMAGE=ghcr.invalid/qwenlm/qwen-code:<label>` per ' +
         "launch of that tree's cells, never as a shell-wide export, which every " +
         'later cell inherits; pass no `--sandbox-image` in those cells — the ' +
         'flag outranks the variable (the tag in `packages/cli/package.json` is ' +
@@ -5329,11 +5350,12 @@ describe('qwen-triage verify hardening round 2', () => {
     expect(targetedGates).toContain('is a semantic merge conflict');
     expect(targetedGates).toContain('`expected 112 to be 104`');
 
-    // The Android recipe lives in a reference file the restored .qwen tree
+    // The Android recipe lives in a reference file the restored .mariadb-shell-agent tree
     // carries, so the pointer must resolve.
     expect(flat).toContain('references/android.md');
     expect(flat).toContain('daemon-served Web Shell it renders');
-    const androidPath = '.qwen/skills/verify-pr/references/android.md';
+    const androidPath =
+      '.mariadb-shell-agent/skills/verify-pr/references/android.md';
     expect(existsSync(androidPath)).toBe(true);
     const androidRef = readFileSync(androidPath, 'utf8');
     const androidFlat = androidRef.replace(/\s+/g, ' ');
@@ -7188,8 +7210,8 @@ describe('qwen-triage verify publish fidelity', () => {
         VERIFY_SKILL_HASH: '0123456789ab',
       };
       const footer =
-        '_— qwen3-max via Qwen Code /verify-pr (v0.26.3; skill 0123456789ab)_';
-      const generic = '— _Qwen Code · sandboxed verification_';
+        '_— qwen3-max via MariaDB Shell Agent /verify-pr (v0.26.3; skill 0123456789ab)_';
+      const generic = '— _MariaDB Shell Agent · sandboxed verification_';
 
       const stamped = render(dir, { NAME: 'ft-on', ...attribution });
       expect(stamped.trimEnd().endsWith(footer)).toBe(true);
@@ -7203,7 +7225,7 @@ describe('qwen-triage verify publish fidelity', () => {
       };
       const plain = render(dir, { NAME: 'ft-off', ...blank });
       expect(plain.trimEnd().endsWith(generic)).toBe(true);
-      expect(plain).not.toContain('via Qwen Code /verify-pr');
+      expect(plain).not.toContain('via MariaDB Shell Agent /verify-pr');
       for (const hole of Object.keys(attribution)) {
         const partial = render(dir, {
           NAME: `ft-${hole}`,
@@ -7211,7 +7233,7 @@ describe('qwen-triage verify publish fidelity', () => {
           [hole]: '',
         });
         expect(partial.trimEnd().endsWith(generic)).toBe(true);
-        expect(partial).not.toContain('via Qwen Code /verify-pr');
+        expect(partial).not.toContain('via MariaDB Shell Agent /verify-pr');
       }
 
       // Even with the values present, a weak notice keeps the generic
@@ -7222,7 +7244,7 @@ describe('qwen-triage verify publish fidelity', () => {
         ...attribution,
       });
       expect(weak.trimEnd().endsWith(generic)).toBe(true);
-      expect(weak).not.toContain('via Qwen Code /verify-pr');
+      expect(weak).not.toContain('via MariaDB Shell Agent /verify-pr');
 
       // A downloaded artifact with no report.md is a weak notice too: the
       // body says "No report.md was found", so it must not simultaneously
@@ -7233,7 +7255,7 @@ describe('qwen-triage verify publish fidelity', () => {
       const noReport = render(dir, { NAME: 'ft-noreport', ...attribution });
       expect(noReport).toContain('No report.md was found');
       expect(noReport.trimEnd().endsWith(generic)).toBe(true);
-      expect(noReport).not.toContain('via Qwen Code /verify-pr');
+      expect(noReport).not.toContain('via MariaDB Shell Agent /verify-pr');
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -7247,7 +7269,7 @@ describe('qwen-triage verify publish fidelity', () => {
   it('threads workflow-owned attribution from the run step to the publisher', () => {
     const run = stepIn('verify', 'Run verification agent');
     expect(run).toContain(
-      'git hash-object --no-filters .qwen/skills/verify-pr/SKILL.md',
+      'git hash-object --no-filters .mariadb-shell-agent/skills/verify-pr/SKILL.md',
     );
     expect(run).toContain('echo "cli_version=$CLI_VERSION"');
     expect(run).toContain('echo "skill_hash=$SKILL_HASH"');
@@ -7256,11 +7278,11 @@ describe('qwen-triage verify publish fidelity', () => {
     // The ordering IS the security argument (review of 3108f8f24d, P2):
     // the values must be collected after the base re-pin and BEFORE the
     // agent starts. The workspace parent directory stays node-owned, so
-    // during the agent era PR code can replace the whole .qwen directory
+    // during the agent era PR code can replace the whole .mariadb-shell-agent directory
     // (mv + mkdir) without touching the root-owned files inside it; a
     // post-agent hash could then name instructions the round never loaded.
     // toContain is order-blind — these indices pin the property itself.
-    const repin = run.indexOf('chmod -R a-w,a+rX .qwen');
+    const repin = run.indexOf('chmod -R a-w,a+rX .mariadb-shell-agent');
     const cliCollect = run.indexOf('CLI_VERSION="$(timeout');
     const hashCollect = run.indexOf('SKILL_HASH="$(timeout');
     const agentStart = run.indexOf('--prompt "/verify-pr');
@@ -7311,15 +7333,15 @@ describe('qwen-triage verify publish fidelity', () => {
       'Post verification report comment',
     );
     expect(publish).toContain(
-      "printf '_— %s via Qwen Code /verify-pr (v%s; skill %s)_\\n'",
+      "printf '_— %s via MariaDB Shell Agent /verify-pr (v%s; skill %s)_\\n'",
     );
     const flat = verifySkill.replace(/\s+/g, ' ');
     expect(flat).toContain(
-      '_— <model> via Qwen Code /verify-pr (v<cli-version>; skill <skill-hash>)_',
+      '_— <model> via MariaDB Shell Agent /verify-pr (v<cli-version>; skill <skill-hash>)_',
     );
     expect(flat).toContain('$QWEN_CODE_MODEL_IDENTITY');
     expect(flat).toContain(
-      'git hash-object --no-filters .qwen/skills/verify-pr/SKILL.md',
+      'git hash-object --no-filters .mariadb-shell-agent/skills/verify-pr/SKILL.md',
     );
     // The report itself stays footer-free: both paths append at comment
     // time, so a footer written into report.md would appear twice.
@@ -7416,14 +7438,16 @@ describe('qwen-triage verify execution-time controls', () => {
       spawnSync('bash', ['-c', cmd], { cwd, encoding: 'utf8' });
     try {
       const repo = join(dir, 'repo');
-      mkdirSync(join(repo, '.qwen', 'skills'), { recursive: true });
+      mkdirSync(join(repo, '.mariadb-shell-agent', 'skills'), {
+        recursive: true,
+      });
       // Build base -> feature, then a merge commit, so HEAD^1/HEAD^2 exist
       // exactly as the merge-ref checkout produces them.
       sh(
         [
           'git init -q .',
           'git config user.email t@t && git config user.name t',
-          'echo base > f && mkdir -p .qwen/skills && echo skill > .qwen/skills/s.md',
+          'echo base > f && mkdir -p .mariadb-shell-agent/skills && echo skill > .mariadb-shell-agent/skills/s.md',
           'git add -A && git commit -qm base',
           'git checkout -q -b feature',
           'echo head > f && git commit -qam head',
@@ -7926,18 +7950,18 @@ describe('qwen-triage verify round-3 hardening', () => {
           },
         });
 
-      // .qwen itself is a symlink pointing out of the workspace.
+      // .mariadb-shell-agent itself is a symlink pointing out of the workspace.
       setup();
-      sh(`ln -s "${victim}" "${repo}/.qwen"`, dir);
+      sh(`ln -s "${victim}" "${repo}/.mariadb-shell-agent"`, dir);
       runClean();
       expect(readFileSync(join(victim, 'precious.txt'), 'utf8')).toBe(
         'keep me',
       );
 
-      // .qwen/tmp is a symlink pointing out of the workspace.
+      // .mariadb-shell-agent/tmp is a symlink pointing out of the workspace.
       setup();
-      mkdirSync(join(repo, '.qwen'), { recursive: true });
-      sh(`ln -s "${victim}" "${repo}/.qwen/tmp"`, dir);
+      mkdirSync(join(repo, '.mariadb-shell-agent'), { recursive: true });
+      sh(`ln -s "${victim}" "${repo}/.mariadb-shell-agent/tmp"`, dir);
       runClean();
       expect(readFileSync(join(victim, 'precious.txt'), 'utf8')).toBe(
         'keep me',
@@ -8024,8 +8048,12 @@ describe('qwen-triage verify round-3 hardening', () => {
     expect(runStep).toContain(
       'BASE_OID="$(cat "${RUNNER_TEMP:?}/verify-base-oid")"',
     );
-    expect(runStep).toContain('git archive "$BASE_OID" -- .qwen');
-    expect(runStep).not.toContain("git archive 'HEAD^1' -- .qwen");
+    expect(runStep).toContain(
+      'git archive "$BASE_OID" -- .mariadb-shell-agent',
+    );
+    expect(runStep).not.toContain(
+      "git archive 'HEAD^1' -- .mariadb-shell-agent",
+    );
     expect(runStep).toContain('refusing to re-pin the verifier');
   });
 
@@ -8646,7 +8674,7 @@ describe('qwen-triage tmux lane parity', () => {
     // Before the proxy and the agent launch, after the build.
     expect(sweepAt).toBeLessThan(runStep.indexOf('start_openai_proxy'));
     // The sweep must not descend through a PR-planted `tmp` symlink: the
-    // same root-owned escape the .qwen cleanup guards against.
+    // same root-owned escape the .mariadb-shell-agent cleanup guards against.
     const guardAt = runStep.indexOf('if [ -L tmp ]; then');
     expect(guardAt).toBeGreaterThan(-1);
     expect(guardAt).toBeLessThan(sweepAt);
@@ -8666,11 +8694,15 @@ describe('qwen-triage tmux lane parity', () => {
   // tree before actions/checkout cleans anything.
   it('unlinks tmux-lane symlinks instead of globbing through them', () => {
     const preCheckout = stepIn('tmux-testing', 'Clean stale review worktrees');
-    expect(preCheckout).toContain('[ -L .qwen ] && rm -f .qwen');
-    expect(preCheckout).toContain('if [ -L .qwen/tmp ]; then');
+    expect(preCheckout).toContain(
+      '[ -L .mariadb-shell-agent ] && rm -f .mariadb-shell-agent',
+    );
+    expect(preCheckout).toContain('if [ -L .mariadb-shell-agent/tmp ]; then');
     const endOfJob = stepIn('tmux-testing', 'Clean up runner workspace');
-    expect(endOfJob).toContain('[ -L .qwen ] && rm -f .qwen');
-    expect(endOfJob).toContain('if [ -L .qwen/tmp ]; then');
+    expect(endOfJob).toContain(
+      '[ -L .mariadb-shell-agent ] && rm -f .mariadb-shell-agent',
+    );
+    expect(endOfJob).toContain('if [ -L .mariadb-shell-agent/tmp ]; then');
   });
 
   // cp -r copies symlinks as symlinks, but actions/upload-artifact follows

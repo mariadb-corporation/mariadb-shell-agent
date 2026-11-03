@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,7 +27,7 @@ interface UploadCacheEntry {
 /**
  * Persistent map from object identity to a still-valid DashScope temporary
  * URL: `(sha256, model, scope) → { ossUrl, uploadedAt, expiresAt }`
- * (storage design §8). Lives at `.qwen/omni/upload-cache.json`.
+ * (storage design §8). Lives at `.mariadb-shell-agent/omni/upload-cache.json`.
  *
  * File mechanics (serialized ops, atomic writes, corrupt backup+rebuild,
  * unreadable-file no-op) live in {@link OmniJsonCacheFile}. Entry

@@ -1,5 +1,5 @@
 {
   "name": "context-example",
-  "description": "Example extension that provides additional context via QWEN.md",
+  "description": "Example extension that provides additional context via MARIADB-SHELL-AGENT.md",
   "version": "1.0.0"
 }

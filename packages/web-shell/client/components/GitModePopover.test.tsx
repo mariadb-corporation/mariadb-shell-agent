@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -84,7 +85,7 @@ describe('GitModePopover worktree selection', () => {
     expect(worktreeOption().textContent).toContain('✓');
     expect(
       document.querySelector('[data-slot="popover-content"]')?.textContent,
-    ).toContain('$ git worktree add .qwen/worktrees/<slug>');
+    ).toContain('$ git worktree add .mariadb-shell-agent/worktrees/<slug>');
     expect(
       document.querySelector('[data-testid="git-mode-confirm-worktree"]'),
     ).toBeNull();

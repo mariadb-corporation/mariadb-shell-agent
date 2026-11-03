@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -477,6 +478,7 @@ describe('validateTranscriptRecord', () => {
     session_source: true,
     session_execution_engine: true,
     omni_recall: true,
+    sent_user_content: true,
     session_model: true,
     session_approval_mode: true,
     session_workflow_mode: true,

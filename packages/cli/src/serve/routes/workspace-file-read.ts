@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -105,7 +106,7 @@ export function sendFsError(res: Response, err: unknown, route: string): void {
     return;
   }
   writeStderrLine(
-    `qwen serve: ${route} unexpected error: ${
+    `mariadb-shell-agent serve: ${route} unexpected error: ${
       err instanceof Error ? err.message : String(err)
     }`,
   );
@@ -164,7 +165,7 @@ function requireStringQuery(
       status: 400,
     });
     writeStderrLine(
-      `qwen serve: ${route} rejected request missing required ?${name}`,
+      `mariadb-shell-agent serve: ${route} rejected request missing required ?${name}`,
     );
     return null;
   }

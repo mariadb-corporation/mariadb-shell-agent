@@ -45,7 +45,7 @@ exact-version pinning, beta-tag upgrades, repeated up-to-date checks, and no npm
 requests for explicit missing paths. Unit tests cover source classification,
 registry resolution, download URLs, and daemon preflight. Run build, typecheck,
 bundle, focused tests, and two self-audit passes. Baseline and E2E evidence live
-in `.qwen/e2e-tests/unscoped-npm-extensions.md`.
+in `.mariadb-shell-agent/e2e-tests/unscoped-npm-extensions.md`.
 
 ## Risks and open questions
 

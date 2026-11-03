@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -55,7 +56,7 @@ export function createDaemonUpdateRestarter(options: {
   if (options.externalToolGuardToken) {
     env[EXTERNAL_TOOL_GUARD_TOKEN_ENV] = options.externalToolGuardToken;
   }
-  // `qwen serve` removes the Broker pair from its environment once read, and
+  // `mariadb-shell-agent serve` removes the Broker pair from its environment once read, and
   // the replacement keeps this PID, so systemd never hands it the pair again.
   if (options.managedRuntimeBrokerUrl) {
     env['QWEN_MANAGED_RUNTIME_BROKER_URL'] = options.managedRuntimeBrokerUrl;

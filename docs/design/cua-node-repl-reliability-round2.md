@@ -82,7 +82,7 @@ After each fix:
 ## Verification record
 
 The following evidence was recorded for the preceding Round 2 implementation.
-This Linux/Qwen Code SDK and Skill update does not rerun or supersede its
+This Linux/MariaDB Shell Agent SDK and Skill update does not rerun or supersede its
 Windows and model-request results. These historical results do not replace the
 release or benchmark gates below and must not be read as verification of the
 revised Skill.
@@ -118,7 +118,7 @@ revised Skill.
   Use body exactly once when `/computer-use` was loaded. Both matched the
   clean-packed artifacts byte for byte; `forceFull` appears once, and neither
   text contains benchmark, evaluator, score, historical-case, or
-  application-specific guidance. Qwen Code's focused request-assembly tests
+  application-specific guidance. MariaDB Shell Agent's focused request-assembly tests
   verify that progressively discovered MCP instructions are queued for the
   next user turn instead of being lost after the startup prelude is built.
 

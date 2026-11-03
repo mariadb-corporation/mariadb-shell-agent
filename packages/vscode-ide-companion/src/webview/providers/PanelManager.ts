@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -66,17 +67,17 @@ export class PanelManager {
       return false; // Panel already exists
     }
 
-    // First, check if there's an existing Qwen Code group
+    // First, check if there's an existing MariaDB Shell Agent group
     const existingGroup = this.findExistingQwenCodeGroup();
 
     if (existingGroup) {
-      // If Qwen Code webview already exists in a locked group, create the new panel in that same group
+      // If MariaDB Shell Agent webview already exists in a locked group, create the new panel in that same group
       logger.log(
-        '[PanelManager] Found existing Qwen Code group, creating panel in same group',
+        '[PanelManager] Found existing MariaDB Shell Agent group, creating panel in same group',
       );
       this.panel = vscode.window.createWebviewPanel(
         'qwenCode.chat',
-        'Qwen Code',
+        'MariaDB Shell Agent',
         { viewColumn: existingGroup.viewColumn, preserveFocus: false },
         {
           enableScripts: true,
@@ -90,7 +91,7 @@ export class PanelManager {
       // Track the group column hosting this panel
       this.panelGroupViewColumn = existingGroup.viewColumn;
     } else {
-      // If no existing Qwen Code group, create a new group to the right of the active editor group
+      // If no existing MariaDB Shell Agent group, create a new group to the right of the active editor group
       try {
         // Create a new group to the right of the current active group
         await vscode.commands.executeCommand('workbench.action.newGroupRight');
@@ -104,7 +105,7 @@ export class PanelManager {
           vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One;
         this.panel = vscode.window.createWebviewPanel(
           'qwenCode.chat',
-          'Qwen Code',
+          'MariaDB Shell Agent',
           { viewColumn: activeColumn, preserveFocus: false },
           {
             enableScripts: true,
@@ -125,7 +126,7 @@ export class PanelManager {
 
       this.panel = vscode.window.createWebviewPanel(
         'qwenCode.chat',
-        'Qwen Code',
+        'MariaDB Shell Agent',
         { viewColumn: newGroupColumn, preserveFocus: false },
         {
           enableScripts: true,
@@ -159,7 +160,7 @@ export class PanelManager {
   }
 
   /**
-   * Find the group and view column where the existing Qwen Code webview is located
+   * Find the group and view column where the existing MariaDB Shell Agent webview is located
    * @returns The found group and view column, or undefined if not found
    */
   private findExistingQwenCodeGroup():
@@ -175,12 +176,15 @@ export class PanelManager {
           isWebviewInput(input) &&
           input.viewType === 'mainThreadWebview-qwenCode.chat'
         ) {
-          // Found an existing Qwen Code tab
-          logger.log('[PanelManager] Found existing Qwen Code group:', {
-            viewColumn: group.viewColumn,
-            tabCount: group.tabs.length,
-            isActive: group.isActive,
-          });
+          // Found an existing MariaDB Shell Agent tab
+          logger.log(
+            '[PanelManager] Found existing MariaDB Shell Agent group:',
+            {
+              viewColumn: group.viewColumn,
+              tabCount: group.tabs.length,
+              isActive: group.isActive,
+            },
+          );
           return {
             group,
             viewColumn: group.viewColumn,

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1112,7 +1113,7 @@ export class DwsChannel extends PollingChannelBase<DwsCursor> {
     }
     try {
       if ('code' in result) {
-        const text = `Your pairing code is: ${result.code}\n\nAsk the bot operator to approve you with:\n  qwen channel pairing approve ${this.name} ${result.code}`;
+        const text = `Your pairing code is: ${result.code}\n\nAsk the bot operator to approve you with:\n  mariadb-shell-agent channel pairing approve ${this.name} ${result.code}`;
         await this.sendImText(
           chatId,
           text,

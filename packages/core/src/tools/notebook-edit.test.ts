@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -162,10 +163,10 @@ describe('NotebookEditTool', () => {
     expect(c['outputs']).toEqual([]);
   };
   const teamMemoryPath = () => {
-    fs.mkdirSync(path.join(tempDir, '.qwen', 'team-memory'), {
+    fs.mkdirSync(path.join(tempDir, '.mariadb-shell-agent', 'team-memory'), {
       recursive: true,
     });
-    return path.join('.qwen', 'team-memory', 'analysis.ipynb');
+    return path.join('.mariadb-shell-agent', 'team-memory', 'analysis.ipynb');
   };
 
   it('replaces a code cell by real ID and clears stale outputs', async () => {
@@ -824,9 +825,9 @@ describe('NotebookEditTool', () => {
   it.each([
     [
       'rejects qwenignored notebooks during validation',
-      '.qwenignore',
+      '.mariadb-shell-agentignore',
       'ignored.ipynb',
-      /ignored by \.qwenignore/,
+      /ignored by \.mariadb-shell-agentignore/,
     ],
     [
       'rejects notebooks ignored by .agentignore during validation',

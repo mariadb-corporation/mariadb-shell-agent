@@ -2,7 +2,7 @@
 
 ## Overview
 
-`packages/sdk-typescript/src/daemon/` is the **TypeScript SDK's daemon client**. It is the canonical way to connect to a running `qwen serve` daemon from any TypeScript / JavaScript host (the CLI's own TUI adapter, channel bot backends, the VS Code IDE companion, custom scripts, and server-side web backends). All other adapters depend on it.
+`packages/sdk-typescript/src/daemon/` is the **TypeScript SDK's daemon client**. It is the canonical way to connect to a running `mariadb-shell-agent serve` daemon from any TypeScript / JavaScript host (the CLI's own TUI adapter, channel bot backends, the VS Code IDE companion, custom scripts, and server-side web backends). All other adapters depend on it.
 
 The package layout is intentionally small:
 
@@ -335,7 +335,7 @@ auth provider when one is available.
 - Native `AbortController` / `AbortSignal.any` / `setTimeout`.
 - No transitive dependencies on `@qwen-code/qwen-code-core` or `@qwen-code/acp-bridge` — the SDK package is fully decoupled so external consumers do not pull in the daemon's internals.
 
-## `ui/*` subpackage ([#4328](https://github.com/QwenLM/qwen-code/pull/4328) + [#4353](https://github.com/QwenLM/qwen-code/pull/4353))
+## `ui/*` subpackage ([#4328](https://github.invalid/QwenLM/qwen-code/pull/4328) + [#4353](https://github.invalid/QwenLM/qwen-code/pull/4353))
 
 The SDK also exports `packages/sdk-typescript/src/daemon/ui/`, a host-neutral
 set of primitives that turn daemon events into transcript blocks:

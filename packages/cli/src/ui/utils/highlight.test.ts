@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -72,7 +73,7 @@ describe('parseInputForHighlighting', () => {
   // same span — a half-highlighted URL reads as "the rest will be dropped".
   it('should highlight a URL ref through its full query string', () => {
     const url =
-      'https://bucket.oss-cn-wulanchabu.aliyuncs.com/dir/%E8%BE%93%E5%87%BA.mp4' +
+      'https://bucket.oss-cn-wulanchabu.aliyuncs.invalid/dir/%E8%BE%93%E5%87%BA.mp4' +
       '?x-oss-credential=LTAI%2F20260805%2Foss&x-oss-signature=f1454dcb';
     const text = `@${url} 这个视频是谁做的`;
     expect(parseInputForHighlighting(text, 0)).toEqual([

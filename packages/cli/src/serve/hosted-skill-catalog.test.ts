@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,7 +17,7 @@ const skill = {
   name: 'code-review',
   description: 'Review <code> changes.',
   body: 'Read references/review.md before reviewing.',
-  base_directory: '.qwen/skills/code-review',
+  base_directory: '.mariadb-shell-agent/skills/code-review',
 };
 
 it.each([

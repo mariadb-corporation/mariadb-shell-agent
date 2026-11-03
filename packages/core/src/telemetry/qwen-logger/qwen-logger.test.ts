@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -214,20 +215,20 @@ describe('QwenLogger', () => {
     });
 
     it('returns no agent when a NO_PROXY suffix matches the upload host', () => {
-      process.env['NO_PROXY'] = '.rum.aliyuncs.com';
+      process.env['NO_PROXY'] = '.invalid';
 
       expect(loggerWithProxy().getProxyAgent()).toBeUndefined();
     });
 
     it('prefers lowercase no_proxy over NO_PROXY', () => {
       process.env['NO_PROXY'] = 'unrelated.example.com';
-      process.env['no_proxy'] = 'gb4w8c3ygj-default-sea.rum.aliyuncs.com';
+      process.env['no_proxy'] = 'usage-statistics.invalid';
 
       expect(loggerWithProxy().getProxyAgent()).toBeUndefined();
     });
 
     it('still proxies when a port-qualified NO_PROXY entry names another port', () => {
-      process.env['NO_PROXY'] = 'rum.aliyuncs.com:8443';
+      process.env['NO_PROXY'] = 'rum.aliyuncs.invalid:8443';
 
       expect(loggerWithProxy().getProxyAgent()).toBeDefined();
     });
@@ -785,7 +786,7 @@ describe('QwenLogger', () => {
         'should sanitize hook name to remove sensitive information',
         [
           'PreToolUse',
-          '/home/user/.qwen/hooks/check-secrets.sh --api-key=secret123',
+          '/home/user/.mariadb-shell-agent/hooks/check-secrets.sh --api-key=secret123',
           { tool_name: 'read_file' },
         ],
         'check-secrets.sh',

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1098,8 +1099,10 @@ describe('TodoWriteTool – runtime output directory', () => {
     expect(await writePath()).toContain(path.join(envRuntimeDir, 'todos'));
   });
 
-  it('should use default ~/.qwen path when no custom dir is configured', async () => {
-    expect(await writePath()).toContain(path.join('.qwen', 'todos'));
+  it('should use default ~/.mariadb-shell-agent path when no custom dir is configured', async () => {
+    expect(await writePath()).toContain(
+      path.join('.mariadb-shell-agent', 'todos'),
+    );
   });
 
   it('should check file existence in custom runtime dir for getDescription', () => {

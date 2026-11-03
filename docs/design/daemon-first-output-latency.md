@@ -41,7 +41,7 @@ QWEN_FIRST_OUTPUT_BENCHMARK=1 QWEN_SANDBOX=false BENCHMARK_CLI_PATH=... \
   npx vitest run --config integration-tests/vitest.firstoutput.config.ts
 ```
 
-Artifacts are written below `.qwen/investigations/daemon-first-output-benchmark/`, outside the integration harness's disposable run directory. This keeps successful, failed, and negative-result runs after global teardown without requiring `KEEP_OUTPUT`.
+Artifacts are written below `.mariadb-shell-agent/investigations/daemon-first-output-benchmark/`, outside the integration harness's disposable run directory. This keeps successful, failed, and negative-result runs after global teardown without requiring `KEEP_OUTPUT`.
 
 ## Measurement contract
 

@@ -23,7 +23,7 @@ Findings on removed lines are a normal review output (Agent 1b exists to
 produce them). On GitHub the pipeline has a defined relocation path; on Aone
 the behavior was undefined.
 
-## Probe (ran 2026-08-21, evidence in `.qwen/e2e-tests/aone-removed-line-anchor-probe.md`)
+## Probe (ran 2026-08-21, evidence in `.mariadb-shell-agent/e2e-tests/aone-removed-line-anchor-probe.md`)
 
 Scratch MR 29427547 of `base-biz/sqlt` (source `qwen-anchor-probe-head` →
 target `qwen-anchor-probe-base`), a one-file diff shaped so every probe is
@@ -94,7 +94,7 @@ For an Aone target, `/review --comment` inline anchoring is:
   every relocated and discarded entry, the way relocated Criticals are
   logged on GitHub.
 - **No diff, no post.** The validation reads the review's captured diff
-  (`.qwen/tmp/qwen-review-pr-<n>-diff.txt`, the file fetch-pr writes). When
+  (`.mariadb-shell-agent/tmp/qwen-review-pr-<n>-diff.txt`, the file fetch-pr writes). When
   it is absent or unreadable the Aone post refuses WHOLE — an irreversible
   write the boundary cannot vouch for is the one thing the write gate must
   not perform. The refusal names the remedy (re-run the review where the

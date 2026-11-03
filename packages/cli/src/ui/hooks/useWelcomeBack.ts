@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -99,7 +100,7 @@ export function useWelcomeBack(
 
       if (choice === 'continue' && welcomeBackInfo?.content) {
         // Create the context message to fill in the input box
-        const contextMessage = `@.qwen/PROJECT_SUMMARY.md, Based on our previous conversation,Let's continue?`;
+        const contextMessage = `@.mariadb-shell-agent/PROJECT_SUMMARY.md, Based on our previous conversation,Let's continue?`;
 
         // Set the input fill state instead of directly submitting
         setInputFillText(contextMessage);

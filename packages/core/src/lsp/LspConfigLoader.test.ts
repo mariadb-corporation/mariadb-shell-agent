@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -244,6 +245,22 @@ describe('LspConfigLoader extension configs', () => {
     expect(configs[0]?.languages).toEqual(['typescript']);
     expect(configs[0]?.command).toBe('typescript-language-server');
     expect(configs[0]?.args).toEqual(['--stdio']);
+  });
+
+  it('reads extension configs keyed by server name (Claude .lsp.json)', async () => {
+    const configs = await loader().loadExtensionConfigs([
+      tsPlugin({
+        mariadb: {
+          command: 'mariadb-lsp-launcher',
+          extensionToLanguage: { '.sql': 'sql', '.ddl': 'sql' },
+        },
+      }),
+    ]);
+
+    expect(configs).toHaveLength(1);
+    expect(configs[0]?.name).toBe('mariadb');
+    expect(configs[0]?.languages).toEqual(['sql']);
+    expect(configs[0]?.command).toBe('mariadb-lsp-launcher');
   });
 
   it('loads lspServers config from referenced file and hydrates variables', async () => {

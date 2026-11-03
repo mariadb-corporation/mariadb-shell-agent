@@ -4,7 +4,7 @@
 
 状态：已实现；macOS 复验通过；维护者报告 `d0be922868` 的真实 Linux 验收通过；真实 Windows 验收仍待完成。
 日期：2026-09-30。
-关联 issue：[#12417](https://github.com/QwenLM/qwen-code/issues/12417)。
+关联 issue：[#12417](https://github.invalid/QwenLM/qwen-code/issues/12417)。
 源码基线：3a8fd11711a10b9a2435bd0051485e31479e90ae。
 
 ## 问题与证据
@@ -14,16 +14,16 @@
 沙箱无关的设置保存，也可能让并发启动暂时丢失执行沙箱策略。
 
 独立的受控复现使用了真实基线 writer 和 reader，并调用 macOS arm64、
-Node.js 22.14.0 上的全局 qwen 0.24.6。保存前后，qwen sandbox 读到配置的
+Node.js 22.14.0 上的全局 qwen 0.24.6。保存前后，mariadb-shell-agent sandbox 读到配置的
 策略，因为所选执行沙箱需要 Linux 而以退出码 1 拒绝运行。在备份 rename
 完成后立即暂停 writer，目标文件消失，源码 reader 返回无策略；第二个
-qwen sandbox 以退出码 0 输出 "Tool execution sandbox: none"。随后恢复
+mariadb-shell-agent sandbox 以退出码 0 输出 "Tool execution sandbox: none"。随后恢复
 writer，并清理隔离的测试目录。
 
 这证明了可观测的中间状态，没有测量自然竞态频率，没有执行 Linux 上逃逸
 限制的工具，也没有验证 Windows。issue 中历史的 100 次出现 2 次记录
-未在本次重跑。复现材料保存在 .qwen/issues/issue-12417.md 和
-.qwen/e2e-tests/issue-12417-settings-gap-repro.json。
+未在本次重跑。复现材料保存在 .mariadb-shell-agent/issues/issue-12417.md 和
+.mariadb-shell-agent/e2e-tests/issue-12417-settings-gap-repro.json。
 
 ## 目标与边界
 
@@ -177,7 +177,7 @@ settings 测试的文件系统 mock 已适配私有暂存路径。
 实现后从根目录运行 build、typecheck，从 packages/cli 运行 writer、
 JSONC 编辑器、操作者设置、settings、适配器与 watcher 的定向测试。
 CLI 验证前构建 bundle。详细计划位于
-.qwen/e2e-tests/issue-12417-atomic-settings-save.md。
+.mariadb-shell-agent/e2e-tests/issue-12417-atomic-settings-save.md。
 
 验收标准：仓库自身的替换不删除目标；reader 读到完整提交的字节；helper 的
 失败路径不能回滚其他 writer（调用方显式请求的快照恢复属于独立逻辑）；
@@ -224,15 +224,15 @@ CLI 验证前构建 bundle。详细计划位于
 独立读取 2700 次：两 writer 都暂停时 100 次，释放后、第一个 writer 完成前
 2300 次。读取采样次数随进程调度变化；这是两次分别成功的运行，而非同一次
 运行的矛盾记录。PR 的 E2E 评论报告后一次，其原始结果位于
-.qwen/e2e-tests/issue-12417-pr-settings-gap-verify.json 和
-.qwen/e2e-tests/issue-12417-pr-concurrent-save-verify.json。
+.mariadb-shell-agent/e2e-tests/issue-12417-pr-settings-gap-verify.json 和
+.mariadb-shell-agent/e2e-tests/issue-12417-pr-concurrent-save-verify.json。
 初次原始证据保存在
-.qwen/e2e-tests/issue-12417-settings-gap-verify.json 和
-.qwen/e2e-tests/issue-12417-concurrent-save-verify.json，对应脚本位于
-.qwen/scripts/。
+.mariadb-shell-agent/e2e-tests/issue-12417-settings-gap-verify.json 和
+.mariadb-shell-agent/e2e-tests/issue-12417-concurrent-save-verify.json，对应脚本位于
+.mariadb-shell-agent/scripts/。
 
 2026-09-30，维护者 wenshao 提供了 [`d0be922868` 的真实 Linux 验证
-报告](https://github.com/QwenLM/qwen-code/pull/13119#issuecomment-5918187683)：
+报告](https://github.invalid/QwenLM/qwen-code/pull/13119#issuecomment-5918187683)：
 Linux 6.12/ext4、Node 22.22、真实 bubblewrap 0.12.0，使用打包后的 CLI。
 报告覆盖各 writer 检查点、进程终止注入、并发保存和实际 watcher 行为。
 保存期间已准入策略保持配置，工作区内写入成功，工作区外写入以 EROFS

@@ -13,7 +13,7 @@ Mods written for Claude Code act on the prompts a person sends:
 - A Mod attaches context the model reads beside the prompt and the person never sees, with `next({ ...e, context: [...] })`.
 - A Mod sends a prompt of its own once the session is idle, with `$.prompt.submit`.
 
-Qwen Code skips `prompt.submit` hooks at load and reports `Hooks for unsupported events will not run: prompt.submit`. A guard written there silently does not run.
+MariaDB Shell Agent skips `prompt.submit` hooks at load and reports `Hooks for unsupported events will not run: prompt.submit`. A guard written there silently does not run.
 
 ## Goals and non-goals
 

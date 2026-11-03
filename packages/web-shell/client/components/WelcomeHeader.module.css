@@ -32,11 +32,11 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.35em;
+  gap: 0 0.35em;
   color: var(--foreground);
   font-size: 32px;
   font-weight: 600;
-  line-height: 40px;
+  line-height: 36px;
   letter-spacing: -0.02em;
 }
 
@@ -55,6 +55,12 @@
   line-height: 22px;
 }
 
+.seal {
+  width: 64px;
+  height: 64px;
+  color: var(--foreground);
+}
+
 @media (max-width: 760px) {
   .header {
     padding: 16px 0 14px;
@@ -62,6 +68,6 @@
 
   .titleRow {
     font-size: 26px;
-    line-height: 34px;
+    line-height: 30px;
   }
 }

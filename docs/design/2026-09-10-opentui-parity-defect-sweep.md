@@ -9,7 +9,7 @@ showed a UI that did not read as the same product: no banner, a footer that
 did not match, missing loading states. Those three were restored separately;
 this document covers what a systematic frame-by-frame comparison found behind
 them, and the fixes that came out of it. Plan paragraphs and the running gap
-ledger live in [#8662](https://github.com/QwenLM/qwen-code/issues/8662).
+ledger live in [#8662](https://github.invalid/QwenLM/qwen-code/issues/8662).
 
 ## Problem
 

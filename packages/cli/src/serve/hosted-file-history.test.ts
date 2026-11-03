@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -699,13 +700,13 @@ describe('canSettleHostedFileHistory grounds', () => {
     mockAuthorization({
       status: 'blocked',
       reason: 'invalid_state',
-      message: `core detail\n\u2028qwen serve: forged\x1b[2J\u202e${'x'.repeat(5000)}`,
+      message: `core detail\n\u2028mariadb-shell-agent serve: forged\x1b[2J\u202e${'x'.repeat(5000)}`,
     });
     const settle = await canSettleHostedFileHistory(session, pendingRecord());
     // Strong oracle: the exact expected detail — the stripped ANSI
     // sequence leaves no residue, unsafe-class survivors became one space
     // each, and the cap binds at exactly 4096.
-    const expectedPrefix = 'core detail qwen serve: forged ';
+    const expectedPrefix = 'core detail mariadb-shell-agent serve: forged ';
     expect(settle).toEqual({
       blocker: 'authorization_blocked_invalid_state',
       detail: `${expectedPrefix}${'x'.repeat(4096 - expectedPrefix.length)}`,

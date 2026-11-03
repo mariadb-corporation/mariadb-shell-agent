@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -49,7 +50,7 @@ export function parseNewFileModePolicy(
   if (normalized === 'system') return 'system';
   if (normalized === 'owner' || normalized === '0600') return 'owner';
   writeStderrLine(
-    `qwen serve: ignoring invalid ${NEW_FILE_MODE_ENV_VAR}=${raw} ` +
+    `mariadb-shell-agent serve: ignoring invalid ${NEW_FILE_MODE_ENV_VAR}=${raw} ` +
       `(expected 'system' or 'owner'); new files keep the 0600 default`,
   );
   return 'owner';
@@ -78,7 +79,7 @@ export function createDefaultFsAuditEmit(): (event: BridgeEvent) => void {
       if (data?.pathHash) ctx.push(`pathHash=${data.pathHash}`);
       const ctxStr = ctx.length > 0 ? ` (${ctx.join(' ')})` : '';
       writeStderrLine(
-        `qwen serve: fs audit emit is the default no-op — ${droppedCount} event(s) dropped so far. ` +
+        `mariadb-shell-agent serve: fs audit emit is the default no-op — ${droppedCount} event(s) dropped so far. ` +
           `Latest type=${event.type}${ctxStr}. ` +
           `Inject deps.fsFactory in createServeApp to wire audit into the EventBus.`,
       );
@@ -151,7 +152,7 @@ export function resolveBoundWorkspacesFromIdeEnv(
     primary = canonicalizeWorkspace(primaryWorkspace);
   } catch (err) {
     writeStderrLine(
-      `qwen serve: failed to canonicalize IDE workspace paths, using primary only: ${err}`,
+      `mariadb-shell-agent serve: failed to canonicalize IDE workspace paths, using primary only: ${err}`,
     );
     return [primary];
   }
@@ -162,7 +163,7 @@ export function resolveBoundWorkspacesFromIdeEnv(
       envCanonicals.push(canonical);
     } catch (err) {
       writeStderrLine(
-        `qwen serve: skipping IDE workspace root that failed to canonicalize: ${workspace} (${err})`,
+        `mariadb-shell-agent serve: skipping IDE workspace root that failed to canonicalize: ${workspace} (${err})`,
       );
     }
   }
@@ -174,7 +175,7 @@ export function resolveBoundWorkspacesFromIdeEnv(
     )
   ) {
     writeStderrLine(
-      'qwen serve: ignoring stale IDE workspace paths that do not overlap ' +
+      'mariadb-shell-agent serve: ignoring stale IDE workspace paths that do not overlap ' +
         'the selected workspace',
     );
     return [primary];
@@ -235,7 +236,7 @@ function dropNestedWorkspacesPreservingPrimary(
   );
   if (filtered.length < workspaces.length) {
     writeStderrLine(
-      'qwen serve: dropping nested IDE workspace roots ' +
+      'mariadb-shell-agent serve: dropping nested IDE workspace roots ' +
         '(parent folders already cover children)',
     );
   }

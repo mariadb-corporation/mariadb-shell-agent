@@ -1,12 +1,12 @@
 # Channels
 
-Channels let you interact with a Qwen Code agent from messaging platforms like Telegram, WeChat, QQ, DingTalk, WeCom, or Feishu, instead of the terminal. You send messages from your phone or desktop chat app, and the agent responds just like it would in the CLI.
+Channels let you interact with a MariaDB Shell Agent agent from messaging platforms like Telegram, WeChat, QQ, DingTalk, WeCom, or Feishu, instead of the terminal. You send messages from your phone or desktop chat app, and the agent responds just like it would in the CLI.
 
 Code-hosting platforms (starting with [GitHub](./github)) and authenticated workspace accounts (starting with [DingTalk Workspace](./dws)) are also supported through channels. [Email](./email) connects a dedicated mailbox through IMAP and SMTP.
 
 ## How It Works
 
-When you run `qwen channel start`, Qwen Code:
+When you run `mariadb-shell-agent channel start`, MariaDB Shell Agent:
 
 1. Reads channel configurations from your `settings.json`
 2. Spawns a single agent process using the [Agent Client Protocol (ACP)](../../../developers/architecture.md)
@@ -18,8 +18,8 @@ All channels share one agent process with isolated sessions per user. Each chann
 ## Quick Start
 
 1. Set up a bot or authenticated workspace account (see channel-specific guides: [Telegram](./telegram), [WeChat](./weixin), [QQ Bot](./qqbot), [DingTalk](./dingtalk), [DingTalk Workspace](./dws), [WeCom](./wecom), [WeCom Callback](./wecom-callback), [Feishu](./feishu), [GitHub](./github), [Email](./email))
-2. Add the channel configuration to `~/.qwen/settings.json`
-3. Run `qwen channel start` to start all channels, or `qwen channel start <name>` for a single channel
+2. Add the channel configuration to `~/.mariadb-shell-agent/settings.json`
+3. Run `mariadb-shell-agent channel start` to start all channels, or `mariadb-shell-agent channel start <name>` for a single channel
 
 Want to connect a platform that isn't built in? See [Plugins](./plugins) to add a custom adapter as an extension.
 
@@ -160,9 +160,9 @@ The catalog is private to the exact channel, chat, and sender. Task names use 1�
 
 Named results identify their originating task: direct chats use `[task]`, while group chats use `[sender · task]`. Named text permission prompts also show the exact request ID and the corresponding `/approve <id>`, `/approve-always <id>`, and `/deny <id>` commands. The label is presentation-only and is not stored in the model transcript.
 
-One task remains selected to receive the next normal message, but other named tasks may keep running concurrently. `/session new <name>` shares the configured workspace, while `/session new <name> --worktree` creates an isolated checkout for that task under the daemon workspace's `.qwen/worktrees/` directory. The daemon verifies the persisted worktree owner before reopening the task after a restart; a missing, changed, or foreign ownership record fails closed instead of silently moving the task into the shared workspace. Creating or selecting another task does not cancel or retarget earlier work, and late results retain their originating task label. A busy task cannot be closed, but its active prompt can be cancelled with `/session cancel [<name>]` through the existing Channel cancellation behavior. Independently queued turns are not cancelled, but in `collect` dispatch mode any follow-ups buffered behind the cancelled prompt are discarded by that existing behavior. Media preparation is not targeted. Bare permission commands apply only to the selected task, while an explicit request ID can answer an owned inactive task. `/clear`, `/new`, and `/reset` also work on a selected worktree task: the task gets a fresh conversation while its worktree and files are kept. A busy worktree task refuses the reset until its prompt finishes, and a task whose worktree record was damaged reports the failure without touching files. Channel memory remains scoped to the chat rather than to a named task.
+One task remains selected to receive the next normal message, but other named tasks may keep running concurrently. `/session new <name>` shares the configured workspace, while `/session new <name> --worktree` creates an isolated checkout for that task under the daemon workspace's `.mariadb-shell-agent/worktrees/` directory. The daemon verifies the persisted worktree owner before reopening the task after a restart; a missing, changed, or foreign ownership record fails closed instead of silently moving the task into the shared workspace. Creating or selecting another task does not cancel or retarget earlier work, and late results retain their originating task label. A busy task cannot be closed, but its active prompt can be cancelled with `/session cancel [<name>]` through the existing Channel cancellation behavior. Independently queued turns are not cancelled, but in `collect` dispatch mode any follow-ups buffered behind the cancelled prompt are discarded by that existing behavior. Media preparation is not targeted. Bare permission commands apply only to the selected task, while an explicit request ID can answer an owned inactive task. `/clear`, `/new`, and `/reset` also work on a selected worktree task: the task gets a fresh conversation while its worktree and files are kept. A busy worktree task refuses the reset until its prompt finishes, and a task whose worktree record was damaged reports the failure without touching files. Channel memory remains scoped to the chat rather than to a named task.
 
-This mode is unavailable in standalone `qwen channel start`, with webhooks, with non-zero channel or group `groupHistoryLimit`, or with Channel loops. If an enabled loop already exists for that channel, the daemon worker refuses to start until the loop is disabled.
+This mode is unavailable in standalone `mariadb-shell-agent channel start`, with webhooks, with non-zero channel or group `groupHistoryLimit`, or with Channel loops. If an enabled loop already exists for that channel, the daemon worker refuses to start until the loop is disabled.
 
 ### Session Rotation
 
@@ -271,19 +271,19 @@ When `privatePolicy` is set to `"pairing"`, unknown senders go through an approv
 4. You approve them via CLI:
 
 ```bash
-qwen channel pairing approve my-channel VEQDDWXJ
+mariadb-shell-agent channel pairing approve my-channel VEQDDWXJ
 ```
 
-Once approved, the user's ID is saved to the channel's workspace-scoped allowlist (`~/.qwen/channels/<workspace-scope>/<name>-allowlist.json`) and all future messages go through normally. Pairing state is scoped per workspace, so two workspaces using the same channel name keep separate approvals.
+Once approved, the user's ID is saved to the channel's workspace-scoped allowlist (`~/.mariadb-shell-agent/channels/<workspace-scope>/<name>-allowlist.json`) and all future messages go through normally. Pairing state is scoped per workspace, so two workspaces using the same channel name keep separate approvals.
 
 ### Pairing CLI Commands
 
 ```bash
 # List pending pairing requests
-qwen channel pairing list my-channel
+mariadb-shell-agent channel pairing list my-channel
 
 # Approve a request by code
-qwen channel pairing approve my-channel <CODE>
+mariadb-shell-agent channel pairing approve my-channel <CODE>
 ```
 
 Run these from the channel's workspace directory (or pass `--cwd <dir>`) — pairing state is stored per workspace.
@@ -294,7 +294,7 @@ Run these from the channel's workspace directory (or pass `--cwd <dir>`) — pai
 - Codes expire after 1 hour
 - Maximum 3 pending requests per channel at a time, and at most one per sender — additional requests are declined until one expires or is approved
 - Users listed in `allowedUsers` in `settings.json` skip user pairing; under `groupPolicy: "pairing"`, the group itself must still be approved
-- Approved users are stored per workspace in `~/.qwen/channels/<workspace-scope>/<name>-allowlist.json` — treat this file as sensitive
+- Approved users are stored per workspace in `~/.mariadb-shell-agent/channels/<workspace-scope>/<name>-allowlist.json` — treat this file as sensitive
 
 ## Group Chats
 
@@ -313,7 +313,7 @@ Approve a group with the same CLI command used for user pairing. The pending
 request identifies the group and the member who initiated it:
 
 ```bash
-qwen channel pairing approve my-channel <CODE>
+mariadb-shell-agent channel pairing approve my-channel <CODE>
 ```
 
 Group approvals are stored by the group's chat ID in the channel's workspace scope. On GitHub and GitLab the chat ID is the repository/project path, so a rename or transfer detaches the stored approval — re-approve the group after renaming. A repo or project re-created under the same path inherits any stale approval — revoke group approvals after any rename, transfer, or deletion.
@@ -400,7 +400,7 @@ By default, Qwen ignores unmentioned group messages and does not store them as s
 - Group-level `groupHistoryLimit` overrides the channel-level value.
 - Only messages from senders the group's `senders` setting admits are persisted (all admitted group members by default) — so `senders: "open"` also widens whose messages `groupHistoryLimit` records.
 - Messages rejected by `groupPolicy` or group allowlist are not persisted.
-- Pending group history is stored as local JSONL under `~/.qwen/channels/<channel-name>-group-history.jsonl` or `$QWEN_HOME/channels/<channel-name>-group-history.jsonl`.
+- Pending group history is stored as local JSONL under `~/.mariadb-shell-agent/channels/<channel-name>-group-history.jsonl` or `$QWEN_HOME/channels/<channel-name>-group-history.jsonl`.
 - Cached messages are injected as untrusted context on the next real trigger and are not written as standalone session turns.
 
 ### How group messages are evaluated
@@ -591,49 +591,49 @@ Named-task commands work on all channel types (Telegram, WeChat, QQ, DingTalk, W
 
 ```bash
 # Start all configured channels (shared agent process)
-qwen channel start
+mariadb-shell-agent channel start
 
 # Start a single channel
-qwen channel start my-channel
+mariadb-shell-agent channel start my-channel
 
 # Check if the service is running
-qwen channel status
+mariadb-shell-agent channel status
 
 # Stop the running service
-qwen channel stop
+mariadb-shell-agent channel stop
 ```
 
-The bot runs in the foreground. Press `Ctrl+C` to stop, or use `qwen channel stop` from another terminal.
+The bot runs in the foreground. Press `Ctrl+C` to stop, or use `mariadb-shell-agent channel stop` from another terminal.
 
 ### Experimental Daemon-Managed Mode
 
-You can also run configured channels under `qwen serve`:
+You can also run configured channels under `mariadb-shell-agent serve`:
 
 ```bash
 # Start one channel under the daemon lifecycle
-qwen serve --channel my-channel
+mariadb-shell-agent serve --channel my-channel
 
 # Start all configured channels
-qwen serve --channel all
+mariadb-shell-agent serve --channel all
 
 # Or enable channels later on a token-protected daemon
-QWEN_SERVER_TOKEN=secret qwen serve
-qwen channel set my-channel --token secret
+QWEN_SERVER_TOKEN=secret mariadb-shell-agent serve
+mariadb-shell-agent channel set my-channel --token secret
 
 # Query or stop the daemon-managed selection
-qwen channel status --daemon-url http://127.0.0.1:4170 --token secret
-qwen channel stop --daemon-url http://127.0.0.1:4170 --token secret
+mariadb-shell-agent channel status --daemon-url http://127.0.0.1:4170 --token secret
+mariadb-shell-agent channel stop --daemon-url http://127.0.0.1:4170 --token secret
 ```
 
-This mode starts workspace-grouped channel worker processes owned by `qwen serve`. Workers connect back to the daemon through the SDK and use the same channel adapters. They are separate from the daemon process, so a channel adapter crash does not crash the daemon. An explicit `--channel` selection takes precedence and fails daemon startup if it cannot become ready. On a flagless boot, every trusted registered workspace's own `serve.channels` setting is restored, and a name that cannot be hosted is skipped with a log instead of stopping the others. `all` remains primary-workspace only. Registering a workspace later restores its channels too — without holding the registration open — once per daemon run, and not at all when the daemon was started with an explicit `--channel` or after `qwen channel stop`. Unlike the boot restore, one name it cannot host costs that workspace its whole list. Without any of these sources, the daemon does not load channel adapters or reserve the lease until the first `qwen channel set`, or until a workspace that configures its own `serve.channels` registers.
+This mode starts workspace-grouped channel worker processes owned by `mariadb-shell-agent serve`. Workers connect back to the daemon through the SDK and use the same channel adapters. They are separate from the daemon process, so a channel adapter crash does not crash the daemon. An explicit `--channel` selection takes precedence and fails daemon startup if it cannot become ready. On a flagless boot, every trusted registered workspace's own `serve.channels` setting is restored, and a name that cannot be hosted is skipped with a log instead of stopping the others. `all` remains primary-workspace only. Registering a workspace later restores its channels too — without holding the registration open — once per daemon run, and not at all when the daemon was started with an explicit `--channel` or after `mariadb-shell-agent channel stop`. Unlike the boot restore, one name it cannot host costs that workspace its whole list. Without any of these sources, the daemon does not load channel adapters or reserve the lease until the first `mariadb-shell-agent channel set`, or until a workspace that configures its own `serve.channels` registers.
 
 Automatic restore skips invalid startup settings and validation or lease failures that occur before workers start, while preserving unrelated settings. After a worker startup fails, the daemon continues only once cleanup succeeds. A global runtime startup timeout or an unconfirmed worker stop still follows the normal startup-failure path; the service lease remains held while worker termination is unconfirmed. Check the daemon log for messages identifying `serve.channels` when a channel does not restore.
 
 Stored startup names must be non-empty, have no leading or trailing whitespace, and contain no unsafe control or invisible characters. Invalid entries are skipped individually and logged by their array index. Startup does not rename instances or rewrite the configuration. The channel startup toggle reflects the saved setting; runtime state shows whether the channel is running.
 
-`qwen serve --channel` is not the same service as `qwen channel start`. Standalone `qwen channel start` still uses the ACP-backed channel service and can run channel configs with different `cwd` values. Daemon-managed channels require every selected channel's `cwd` to resolve to a workspace registered by the daemon. In multi-workspace mode, a selection replacement keeps workers for workspaces whose ordered channel list did not change; `all` remains primary-workspace-only.
+`mariadb-shell-agent serve --channel` is not the same service as `mariadb-shell-agent channel start`. Standalone `mariadb-shell-agent channel start` still uses the ACP-backed channel service and can run channel configs with different `cwd` values. Daemon-managed channels require every selected channel's `cwd` to resolve to a workspace registered by the daemon. In multi-workspace mode, a selection replacement keeps workers for workspaces whose ordered channel list did not change; `all` remains primary-workspace-only.
 
-Without `--daemon-url`, `qwen channel status` and `qwen channel stop` retain standalone pidfile behavior. Their `--daemon-url` variants query or stop the daemon manager. Runtime selections are not written to settings and do not survive daemon restart. If a ready worker exits unexpectedly, the daemon continues running and reports a channel-worker warning in `/daemon/status`.
+Without `--daemon-url`, `mariadb-shell-agent channel status` and `mariadb-shell-agent channel stop` retain standalone pidfile behavior. Their `--daemon-url` variants query or stop the daemon manager. Runtime selections are not written to settings and do not survive daemon restart. If a ready worker exits unexpectedly, the daemon continues running and reports a channel-worker warning in `/daemon/status`.
 
 ## Webhook-triggered tasks
 
@@ -722,10 +722,10 @@ The response returns complete platform IDs and labels. Group labels use names al
 
 These nested users are observed participants, not authoritative group membership. Only messages that pass direct/group, mention, sender, and pairing gates are recorded. Repeated observations refresh labels and timestamps; passive observation cannot detect a leave or deletion until the relationship becomes stale. Message content is never stored. The bounded registry lives under `$QWEN_HOME/channels/daemon/<workspaceHash>/observed-contacts.json`, outside the workspace checkout and partitioned per workspace. Its 500-observation limit is shared by all channels and conversations in that workspace, and observations older than 365 days are removed on the next accepted write. If the registry becomes malformed or uses an unsupported version, delete that file to reset it; accepted traffic recreates it. Webhook configuration and delivery are unchanged.
 
-Start `qwen serve` with the channel worker enabled:
+Start `mariadb-shell-agent serve` with the channel worker enabled:
 
 ```bash
-QWEN_SERVER_TOKEN="$QWEN_SERVER_TOKEN" qwen serve --require-auth --channel dingtalk-main
+QWEN_SERVER_TOKEN="$QWEN_SERVER_TOKEN" mariadb-shell-agent serve --require-auth --channel dingtalk-main
 ```
 
 Example request:
@@ -746,27 +746,27 @@ curl -X POST "http://127.0.0.1:4170/channels/dingtalk-main/webhooks/github-ci" \
   }'
 ```
 
-Webhook routes authenticate with the webhook secret header, even when `qwen serve` is running with bearer auth enabled. Do not share the daemon bearer token with webhook providers. Webhook config and `secretEnv` values are loaded when the daemon starts; restart `qwen serve` after changing webhook sources or rotating secrets. A `202 {"accepted": true}` response means the channel worker accepted ownership of the task, not that the final response has already been delivered to chat. Check daemon and channel worker logs, plus `/daemon/status`, when troubleshooting delivery failures.
+Webhook routes authenticate with the webhook secret header, even when `mariadb-shell-agent serve` is running with bearer auth enabled. Do not share the daemon bearer token with webhook providers. Webhook config and `secretEnv` values are loaded when the daemon starts; restart `mariadb-shell-agent serve` after changing webhook sources or rotating secrets. A `202 {"accepted": true}` response means the channel worker accepted ownership of the task, not that the final response has already been delivered to chat. Check daemon and channel worker logs, plus `/daemon/status`, when troubleshooting delivery failures.
 
 ### Multi-Channel Mode
 
-When you run `qwen channel start` without a name, all channels defined in `settings.json` start together sharing a single agent process. Each channel maintains its own sessions — a Telegram user and a WeChat user get separate conversations, even though they share the same agent.
+When you run `mariadb-shell-agent channel start` without a name, all channels defined in `settings.json` start together sharing a single agent process. Each channel maintains its own sessions — a Telegram user and a WeChat user get separate conversations, even though they share the same agent.
 
 Each channel uses its own `cwd` from its config, so different channels can work on different projects simultaneously.
 
 ### Service Management
 
-The channel service uses a PID file (`~/.qwen/channels/service.pid`) to track the running instance:
+The channel service uses a PID file (`~/.mariadb-shell-agent/channels/service.pid`) to track the running instance:
 
-- **Duplicate prevention**: Running `qwen channel start` while a service is already running will show an error instead of starting a second instance
-- **`qwen channel stop`**: Gracefully stops the running service from another terminal
-- **`qwen channel status`**: Shows whether the service is running, its uptime, and session counts per channel
+- **Duplicate prevention**: Running `mariadb-shell-agent channel start` while a service is already running will show an error instead of starting a second instance
+- **`mariadb-shell-agent channel stop`**: Gracefully stops the running service from another terminal
+- **`mariadb-shell-agent channel status`**: Shows whether the service is running, its uptime, and session counts per channel
 
 ### Crash Recovery
 
 If the agent process crashes unexpectedly, the channel service automatically restarts it and attempts to restore all active sessions. Users can continue their conversations without starting over.
 
-- Sessions are persisted to `~/.qwen/channels/sessions.json` while the service is running
+- Sessions are persisted to `~/.mariadb-shell-agent/channels/sessions.json` while the service is running
 - On crash: the agent restarts within 3 seconds and reloads saved sessions
 - After 3 consecutive crashes, the service exits with an error
-- On clean shutdown (Ctrl+C or `qwen channel stop`): session data is cleared — the next start is always fresh
+- On clean shutdown (Ctrl+C or `mariadb-shell-agent channel stop`): session data is cleared — the next start is always fresh

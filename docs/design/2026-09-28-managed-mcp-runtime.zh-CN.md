@@ -2,7 +2,7 @@
 
 [English](2026-09-28-managed-mcp-runtime.md) | [简体中文](2026-09-28-managed-mcp-runtime.zh-CN.md)
 
-状态：已实现私有配置；生产启用另行推进。本文实现 [#12827](https://github.com/QwenLM/qwen-code/issues/12827) 的 H1，基于 `b32f261afd` 的 H0c。本次包含实际 Hosted 调用所需的前置接线。规范依据是[扩展运行时设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-extension-runtime.md)第 4、12–14 节，以及[配置设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-config-extensions.md)第 5 节。
+状态：已实现私有配置；生产启用另行推进。本文实现 [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827) 的 H1，基于 `b32f261afd` 的 H0c。本次包含实际 Hosted 调用所需的前置接线。规范依据是[扩展运行时设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-extension-runtime.md)第 4、12–14 节，以及[配置设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-config-extensions.md)第 5 节。
 
 ## 问题与现有边界
 
@@ -59,7 +59,7 @@ Runtime 只允许目标 workspace 已配置的定义，以及 Session 已安装�
 - `packages/core/src/managed-runtime`：MCP 记录/协议、authority 接线及资源闭包。
 - `packages/cli/src/serve`：MCP Runtime 服务/路由、worker 准入、Hosted 编排和模型目录。
 - `packages/managed-agent-server` 与 `managed-agent-server`：限定范围的转发、记录物化、目录契约和测试。
-- `.qwen/e2e-tests/12827-h1.md`：基线、确定性协议测试和故障证据。
+- `.mariadb-shell-agent/e2e-tests/12827-h1.md`：基线、确定性协议测试和故障证据。
 
 ## 私有配置用法
 

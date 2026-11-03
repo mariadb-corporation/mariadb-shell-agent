@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -53,14 +54,18 @@ export function registerWorkspaceLocalOpenRoutes(
       } catch (error) {
         const detail = error instanceof Error ? error.message : String(error);
         if (error instanceof LocalPathOpenUnavailableError) {
-          writeStderrLine(`qwen serve: local path open unavailable: ${detail}`);
+          writeStderrLine(
+            `mariadb-shell-agent serve: local path open unavailable: ${detail}`,
+          );
           res.status(501).json({
             error: 'Local path open is unavailable',
             code: 'local_path_open_unavailable',
           });
           return;
         }
-        writeStderrLine(`qwen serve: local path open failed: ${detail}`);
+        writeStderrLine(
+          `mariadb-shell-agent serve: local path open failed: ${detail}`,
+        );
         res.status(500).json({
           error: 'Failed to open workspace locally',
           code: 'local_path_open_failed',

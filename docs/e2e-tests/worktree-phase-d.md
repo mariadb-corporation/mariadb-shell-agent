@@ -19,9 +19,9 @@ Phase D delivers three cross-cutting capabilities:
 ## Binaries
 
 - **Local build (Phase 6 verification)**: `node /Users/mochi/code/qwen-code/.claude/worktrees/tender-jemison-037f0a/dist/cli.js`
-- **Phase 4 dry-run baseline**: globally installed `qwen`
+- **Phase 4 dry-run baseline**: globally installed `mariadb-shell-agent`
 
-For dry-runs the globally installed `qwen` is expected to fail Groups A / E / F
+For dry-runs the globally installed `mariadb-shell-agent` is expected to fail Groups A / E / F
 because the features don't exist yet — that's the validation that the plan
 correctly detects implementation.
 
@@ -32,7 +32,7 @@ symlink) require **Phase A + B** to be present in the baseline — they exercise
 the existing `enter_worktree` tool and `agent isolation: "worktree"` parameter
 to confirm the symlink loop fires on those code paths too.
 
-The globally installed `qwen` may predate PR #4073 (Phase A+B, merged 2026-05-14)
+The globally installed `mariadb-shell-agent` may predate PR #4073 (Phase A+B, merged 2026-05-14)
 and therefore lack these tools entirely. When that is the case, E2 / E3 cannot
 validate "symlink absent because D-2 is absent" — they collapse to "tool
 absent." Add this guard at the top of each:
@@ -92,16 +92,16 @@ $QWEN --worktree "say hello and stop" \
 jq -e '.[] | select(.type=="system" and .subtype=="worktree_started") | .data.notice | test("\"[a-z]+-[a-z]+-[0-9a-f]{6}\"")' < /tmp/a1.out
 
 # The init system message's `cwd` should also point inside the worktree.
-jq -e '.[] | select(.type=="system" and .subtype=="init") | .cwd | test("/\\.qwen/worktrees/[a-z]+-[a-z]+-[0-9a-f]{6}$")' < /tmp/a1.out
+jq -e '.[] | select(.type=="system" and .subtype=="init") | .cwd | test("/\\.mariadb-shell-agent/worktrees/[a-z]+-[a-z]+-[0-9a-f]{6}$")' < /tmp/a1.out
 
-ls -d "$TEST_DIR/.qwen/worktrees/"*
+ls -d "$TEST_DIR/.mariadb-shell-agent/worktrees/"*
 ```
 
 **Expected (post-impl):**
 
 - `worktree_started` event with `.data.notice` containing the auto slug
-- Init `.cwd` ends with `.qwen/worktrees/<auto-slug>`
-- Exactly one worktree directory under `.qwen/worktrees/`
+- Init `.cwd` ends with `.mariadb-shell-agent/worktrees/<auto-slug>`
+- Exactly one worktree directory under `.mariadb-shell-agent/worktrees/`
 - Branch named `worktree-<slug>` exists (`git branch | grep worktree-`)
 
 **Expected (pre-impl baseline):** yargs rejects `--worktree` with
@@ -113,7 +113,7 @@ ls -d "$TEST_DIR/.qwen/worktrees/"*
 $QWEN --worktree my-feature "say hello and stop" \
   --approval-mode yolo --output-format json 2>/dev/null > /tmp/a2.out
 
-ls -d "$TEST_DIR/.qwen/worktrees/my-feature"
+ls -d "$TEST_DIR/.mariadb-shell-agent/worktrees/my-feature"
 git -C "$TEST_DIR" branch | grep "worktree-my-feature"
 ```
 
@@ -139,14 +139,14 @@ $QWEN --worktree "../escape" "say hi" \
   --approval-mode yolo --output-format json 2>/dev/null > /tmp/a4.out
 echo "exit=$?"
 
-ls "$TEST_DIR/.qwen/worktrees/" 2>/dev/null
+ls "$TEST_DIR/.mariadb-shell-agent/worktrees/" 2>/dev/null
 ```
 
 **Expected (post-impl):**
 
 - Process exits with non-zero status
 - Stderr or final result message mentions "invalid slug" / "not allowed"
-- `.qwen/worktrees/` directory does not exist (worktree creation never started)
+- `.mariadb-shell-agent/worktrees/` directory does not exist (worktree creation never started)
 
 ### A5: not a git repository → fail-close
 
@@ -172,7 +172,7 @@ SESSION_ID=$(uuidgen | tr '[:upper:]' '[:lower:]')
 $QWEN --worktree b1-test --session-id "$SESSION_ID" "say hi" \
   --approval-mode yolo --output-format json 2>/dev/null > /tmp/b1.out
 
-SIDECAR=~/.qwen/projects/$PROJECT_ID/chats/$SESSION_ID.worktree.json
+SIDECAR=~/.mariadb-shell-agent/projects/$PROJECT_ID/chats/$SESSION_ID.worktree.json
 jq '.slug, .worktreePath, .worktreeBranch, .originalCwd, .originalBranch, .originalHeadCommit' \
   < "$SIDECAR"
 ```
@@ -180,7 +180,7 @@ jq '.slug, .worktreePath, .worktreeBranch, .originalCwd, .originalBranch, .origi
 **Expected:**
 
 - `slug = "b1-test"`
-- `worktreePath` ends with `.qwen/worktrees/b1-test`
+- `worktreePath` ends with `.mariadb-shell-agent/worktrees/b1-test`
 - `worktreeBranch = "worktree-b1-test"`
 - `originalCwd` = `$TEST_DIR` (resolved)
 - `originalBranch = "main"`
@@ -197,7 +197,7 @@ jq -r '.[] | select(.type=="user") | .message.content[] | select(.tool_use_id !=
   < /tmp/b2.out | head -5
 ```
 
-**Expected (post-impl):** the `pwd` output equals `$TEST_DIR/.qwen/worktrees/b2-test`.
+**Expected (post-impl):** the `pwd` output equals `$TEST_DIR/.mariadb-shell-agent/worktrees/b2-test`.
 
 ### B3: `Config.targetDir` switched (Footer / status payload)
 
@@ -229,11 +229,11 @@ $QWEN --resume "$SESSION_ID" --worktree second "say hi again" \
   --approval-mode yolo --output-format json 2>/dev/null > /tmp/c1-run2.out
 
 # Sidecar should now point at "second"
-SIDECAR=~/.qwen/projects/$PROJECT_ID/chats/$SESSION_ID.worktree.json
+SIDECAR=~/.mariadb-shell-agent/projects/$PROJECT_ID/chats/$SESSION_ID.worktree.json
 jq -r '.slug' < "$SIDECAR"
 
 # Both worktree dirs should exist on disk (first was never removed, just unlinked)
-ls -d "$TEST_DIR/.qwen/worktrees/"*
+ls -d "$TEST_DIR/.mariadb-shell-agent/worktrees/"*
 ```
 
 **Expected (post-impl):**
@@ -250,12 +250,12 @@ SESSION_ID=$(uuidgen | tr '[:upper:]' '[:lower:]')
 $QWEN --worktree c2 --session-id "$SESSION_ID" "say hi" \
   --approval-mode yolo --output-format json 2>/dev/null > /tmp/c2-run1.out
 
-rm -rf "$TEST_DIR/.qwen/worktrees/c2"   # simulate user-deleted dir
+rm -rf "$TEST_DIR/.mariadb-shell-agent/worktrees/c2"   # simulate user-deleted dir
 
 $QWEN --resume "$SESSION_ID" --worktree c2-fresh "say hi" \
   --approval-mode yolo --output-format json 2>/dev/null > /tmp/c2-run2.out
 
-ls -d "$TEST_DIR/.qwen/worktrees/"*
+ls -d "$TEST_DIR/.mariadb-shell-agent/worktrees/"*
 ```
 
 **Expected (post-impl):** only `c2-fresh/` exists; sidecar updated to `c2-fresh`.
@@ -303,7 +303,7 @@ tmux send-keys -t d2 Down Down Enter
 sleep 1
 
 tmux capture-pane -t d2 -p -S -10 | grep -q "Type your message"
-ls -d "$TEST_DIR/.qwen/worktrees/d2-test"   # still exists
+ls -d "$TEST_DIR/.mariadb-shell-agent/worktrees/d2-test"   # still exists
 tmux kill-session -t d2
 ```
 
@@ -321,9 +321,9 @@ tmux send-keys -t d3 Down Enter   # select "Remove worktree and branch"
 sleep 3
 tmux kill-session -t d3
 
-ls "$TEST_DIR/.qwen/worktrees/d3-test" 2>/dev/null && echo "FAIL: dir exists"
+ls "$TEST_DIR/.mariadb-shell-agent/worktrees/d3-test" 2>/dev/null && echo "FAIL: dir exists"
 git -C "$TEST_DIR" branch | grep "worktree-d3-test" && echo "FAIL: branch exists"
-test ! -f ~/.qwen/projects/$PROJECT_ID/chats/$SESSION_ID.worktree.json && echo "PASS: sidecar gone"
+test ! -f ~/.mariadb-shell-agent/projects/$PROJECT_ID/chats/$SESSION_ID.worktree.json && echo "PASS: sidecar gone"
 ```
 
 **Expected (post-impl):** dir, branch, and sidecar all removed.
@@ -339,8 +339,8 @@ test ! -f ~/.qwen/projects/$PROJECT_ID/chats/$SESSION_ID.worktree.json && echo "
 ```bash
 mkdir -p "$TEST_DIR/node_modules"
 echo "package.json" > "$TEST_DIR/node_modules/.placeholder"
-mkdir -p "$TEST_DIR/.qwen"
-cat > "$TEST_DIR/.qwen/settings.json" <<'EOF'
+mkdir -p "$TEST_DIR/.mariadb-shell-agent"
+cat > "$TEST_DIR/.mariadb-shell-agent/settings.json" <<'EOF'
 {
   "worktree": {
     "symlinkDirectories": ["node_modules"]
@@ -355,8 +355,8 @@ EOF
 $QWEN --worktree e1-test "say hi" \
   --approval-mode yolo --output-format json 2>/dev/null > /dev/null
 
-ls -la "$TEST_DIR/.qwen/worktrees/e1-test/node_modules"
-readlink "$TEST_DIR/.qwen/worktrees/e1-test/node_modules"
+ls -la "$TEST_DIR/.mariadb-shell-agent/worktrees/e1-test/node_modules"
+readlink "$TEST_DIR/.mariadb-shell-agent/worktrees/e1-test/node_modules"
 ```
 
 **Expected (post-impl):** `node_modules` inside the worktree is a symlink
@@ -368,7 +368,7 @@ pointing to `$TEST_DIR/node_modules`.
 $QWEN "use enter_worktree to create a worktree named e2-test, then stop" \
   --approval-mode yolo --output-format json 2>/dev/null > /dev/null
 
-readlink "$TEST_DIR/.qwen/worktrees/e2-test/node_modules"
+readlink "$TEST_DIR/.mariadb-shell-agent/worktrees/e2-test/node_modules"
 ```
 
 **Expected (post-impl):** same symlink target.
@@ -386,7 +386,7 @@ jq -r '.[] | select(.type=="assistant") | .message.content[] | select(.type=="to
   < /tmp/e3.out | head -5
 
 # After execution find the agent-<7hex> worktree
-ls -la "$TEST_DIR/.qwen/worktrees/"agent-*/node_modules 2>/dev/null | head -3
+ls -la "$TEST_DIR/.mariadb-shell-agent/worktrees/"agent-*/node_modules 2>/dev/null | head -3
 ```
 
 **Expected (post-impl):** symlink exists inside the `agent-<hex>` worktree
@@ -397,13 +397,13 @@ change test).
 ### E4: missing source dir → silently skipped, worktree still created
 
 ```bash
-cat > "$TEST_DIR/.qwen/settings.json" <<'EOF'
+cat > "$TEST_DIR/.mariadb-shell-agent/settings.json" <<'EOF'
 { "worktree": { "symlinkDirectories": ["does-not-exist"] } }
 EOF
 
 $QWEN --worktree e4-test "say hi" --approval-mode yolo --output-format json 2>/dev/null > /tmp/e4.out
-ls -d "$TEST_DIR/.qwen/worktrees/e4-test"
-ls "$TEST_DIR/.qwen/worktrees/e4-test/does-not-exist" 2>/dev/null && echo "UNEXPECTED"
+ls -d "$TEST_DIR/.mariadb-shell-agent/worktrees/e4-test"
+ls "$TEST_DIR/.mariadb-shell-agent/worktrees/e4-test/does-not-exist" 2>/dev/null && echo "UNEXPECTED"
 ```
 
 **Expected (post-impl):** worktree directory exists, the missing entry is
@@ -414,13 +414,13 @@ not created inside it, process exit = 0.
 ```bash
 # Pre-create a worktree at expected slug then re-create — this is contrived
 # because Phase D paths should be fresh, but it exercises the EEXIST guard.
-mkdir -p "$TEST_DIR/.qwen/worktrees/e5-test/node_modules"
-echo "preexisting" > "$TEST_DIR/.qwen/worktrees/e5-test/node_modules/.marker"
+mkdir -p "$TEST_DIR/.mariadb-shell-agent/worktrees/e5-test/node_modules"
+echo "preexisting" > "$TEST_DIR/.mariadb-shell-agent/worktrees/e5-test/node_modules/.marker"
 
 # Force re-creation via EnterWorktreeTool (CLI would refuse "already exists")
 $QWEN "use enter_worktree with name='e5-test' to retry" --approval-mode yolo 2>/dev/null
 # either: tool errors out cleanly, OR symlink is skipped — both acceptable
-test -f "$TEST_DIR/.qwen/worktrees/e5-test/node_modules/.marker" && echo "PASS: not overwritten"
+test -f "$TEST_DIR/.mariadb-shell-agent/worktrees/e5-test/node_modules/.marker" && echo "PASS: not overwritten"
 ```
 
 **Expected (post-impl):** preexisting `.marker` survives; no symlink replaces
@@ -429,12 +429,12 @@ the dir.
 ### E6: absolute path / `../` → rejected
 
 ```bash
-cat > "$TEST_DIR/.qwen/settings.json" <<'EOF'
+cat > "$TEST_DIR/.mariadb-shell-agent/settings.json" <<'EOF'
 { "worktree": { "symlinkDirectories": ["/etc", "../escape"] } }
 EOF
 
 $QWEN --worktree e6-test "say hi" --approval-mode yolo --output-format json 2>/dev/null > /tmp/e6.out
-ls "$TEST_DIR/.qwen/worktrees/e6-test/" | head -10
+ls "$TEST_DIR/.mariadb-shell-agent/worktrees/e6-test/" | head -10
 ```
 
 **Expected (post-impl):** worktree exists; neither `etc` nor `escape` linked
@@ -453,7 +453,7 @@ inside it; debug log carries warn lines.
 TEST_DIR=$(mktemp -d -t qwen-wt-phd-pr-XXXXXX)
 TEST_DIR=$(cd "$TEST_DIR" && pwd -P)
 cd "$TEST_DIR"
-git clone --depth 1 https://github.com/QwenLM/qwen-code.git .
+git clone --depth 1 https://github.invalid/QwenLM/qwen-code.git .
 PROJECT_ID=$(node -e "console.log(process.argv[1].replace(/[^a-zA-Z0-9]/g,'-'))" "$TEST_DIR")
 ```
 
@@ -463,8 +463,8 @@ PROJECT_ID=$(node -e "console.log(process.argv[1].replace(/[^a-zA-Z0-9]/g,'-'))"
 $QWEN --worktree=#4174 "say hi" \
   --approval-mode yolo --output-format json 2>/dev/null > /tmp/f1.out
 
-ls -d "$TEST_DIR/.qwen/worktrees/pr-4174"
-git -C "$TEST_DIR/.qwen/worktrees/pr-4174" rev-parse --abbrev-ref HEAD
+ls -d "$TEST_DIR/.mariadb-shell-agent/worktrees/pr-4174"
+git -C "$TEST_DIR/.mariadb-shell-agent/worktrees/pr-4174" rev-parse --abbrev-ref HEAD
 ```
 
 **Expected (post-impl):**
@@ -476,10 +476,10 @@ git -C "$TEST_DIR/.qwen/worktrees/pr-4174" rev-parse --abbrev-ref HEAD
 ### F2: full URL form
 
 ```bash
-$QWEN --worktree "https://github.com/QwenLM/qwen-code/pull/4174" "say hi" \
+$QWEN --worktree "https://github.invalid/QwenLM/qwen-code/pull/4174" "say hi" \
   --approval-mode yolo --output-format json 2>/dev/null > /tmp/f2.out
 
-ls -d "$TEST_DIR/.qwen/worktrees/pr-4174"
+ls -d "$TEST_DIR/.mariadb-shell-agent/worktrees/pr-4174"
 ```
 
 **Expected (post-impl):** same as F1.
@@ -517,13 +517,13 @@ echo "exit=$?"
 ### F6: PR worktree gets symlinks too (cross-cut with E)
 
 ```bash
-cat > "$TEST_DIR/.qwen/settings.json" <<'EOF'
+cat > "$TEST_DIR/.mariadb-shell-agent/settings.json" <<'EOF'
 { "worktree": { "symlinkDirectories": ["node_modules"] } }
 EOF
 mkdir -p "$TEST_DIR/node_modules" && echo x > "$TEST_DIR/node_modules/.marker"
 
 $QWEN --worktree=#4174 "say hi" --approval-mode yolo --output-format json 2>/dev/null > /dev/null
-readlink "$TEST_DIR/.qwen/worktrees/pr-4174/node_modules"
+readlink "$TEST_DIR/.mariadb-shell-agent/worktrees/pr-4174/node_modules"
 ```
 
 **Expected (post-impl):** symlink target = `$TEST_DIR/node_modules`.
@@ -555,7 +555,7 @@ sleep 2
 tmux kill-session -t g1
 
 # File survived
-cat "$TEST_DIR/.qwen/worktrees/g1-test/work.txt"
+cat "$TEST_DIR/.mariadb-shell-agent/worktrees/g1-test/work.txt"
 
 # Resume reattaches
 tmux new-session -d -s g1b -x 200 -y 50 \
@@ -615,7 +615,7 @@ Run A/B/C/D/E/G in parallel; F serially after the clone setup.
 
 ## Reproduction report
 
-### Phase 4 dry-run — baseline `qwen` v0.15.11 (2026-05-20)
+### Phase 4 dry-run — baseline `mariadb-shell-agent` v0.15.11 (2026-05-20)
 
 Runtime: 3 parallel `test-engineer` agents, ~7 minutes total. Baseline lacks
 both Phase D (expected) and Phase A+B (older binary than expected — see
@@ -660,33 +660,33 @@ implementation.**
 **Date**: 2026-05-20
 **Scope**: Groups A, B, C, E, F, G (6 parallel `test-engineer` agents)
 
-| Group                              | Result                    | Notes                                                                                                                                                                                                                                                                                                                                                                                       |
-| ---------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A1 (bare flag)                     | ✅ (with doc tip)         | yargs consumes the next positional as the slug value when user passes `qwen --worktree "say hi"`; quickstart now tells users to use `=` form or put the prompt before the flag. Auto-slug feature itself confirmed via `qwen --worktree --approval-mode yolo "say hi"` → slug `bright-elm-8a4c12`, init `.cwd` ends with `.qwen/worktrees/<auto-slug>`.                                     |
-| A2 (explicit slug)                 | ✅                        | dir `.qwen/worktrees/my-feature` + branch `worktree-my-feature`                                                                                                                                                                                                                                                                                                                             |
-| A3 (= form)                        | ✅                        | identical to A2                                                                                                                                                                                                                                                                                                                                                                             |
-| A4 (invalid slug)                  | ✅                        | exit=1, message: `Worktree name may only contain letters, digits, dots, underscores, and hyphens.`, no worktree dir                                                                                                                                                                                                                                                                         |
-| A5 (non-git dir)                   | ✅                        | exit=1, message: `not a git repository. Run \`git init\` first or relaunch from inside one.`                                                                                                                                                                                                                                                                                                |
-| B1 (sidecar fields)                | ✅                        | All 6 fields present and correct; sidecar lives under worktree projectHash as designed                                                                                                                                                                                                                                                                                                      |
-| B2 (cwd switch)                    | ✅                        | `pwd` inside shell tool returned worktree path exactly                                                                                                                                                                                                                                                                                                                                      |
-| B3 (branch + cwd)                  | ✅                        | `pwd` = worktree path, `git rev-parse --abbrev-ref HEAD` = `worktree-b3-test`                                                                                                                                                                                                                                                                                                               |
-| C1 (cross-slug override)           | ❌ → **known limitation** | Sessions are bound to `projectHash(cwd)`; `--worktree second --resume <sid-from-first>` can't find the session. Documented in user docs Limitations. A future Config refactor (anchor storage at repo root) would lift this.                                                                                                                                                                |
-| C2 (stale sidecar + new worktree)  | ❌ → **same root cause**  | Same architectural constraint.                                                                                                                                                                                                                                                                                                                                                              |
-| E1 (`--worktree` symlink)          | ✅                        | `node_modules` symlinked into the new worktree                                                                                                                                                                                                                                                                                                                                              |
-| E2 (`enter_worktree` symlink)      | ✅                        | same code path via `createUserWorktree`                                                                                                                                                                                                                                                                                                                                                     |
-| E3 (agent isolation symlink)       | ⚠️ test-setup             | model committed `node_modules` (because the agent guard refused dirty state); EEXIST guard then correctly skipped the symlink. Code path is correct; for a clean E3 the test plan needs to pre-`.gitignore` `node_modules`.                                                                                                                                                                 |
-| E4 (missing source skip)           | ✅                        | worktree created, no entry, exit 0                                                                                                                                                                                                                                                                                                                                                          |
-| E5 (existing dest no overwrite)    | ✅                        | preexisting marker survived                                                                                                                                                                                                                                                                                                                                                                 |
-| E6 (absolute / `..` rejected)      | ✅                        | neither path linked                                                                                                                                                                                                                                                                                                                                                                         |
-| F1 (`--worktree=#4174` fetch)      | ✅                        | worktree dir `pr-4174/`, branch `worktree-pr-4174`, tip commit `8f4fe8e feat(cli): per-turn /diff…`; local-remote substitute (sandbox blocks real GitHub)                                                                                                                                                                                                                                   |
-| F2 (full URL form)                 | ✅                        | same result; URL parsed → PR #4174 → local origin fetch succeeded                                                                                                                                                                                                                                                                                                                           |
-| F3 (missing origin)                | ✅                        | exit=1 in 2s; message mentions adding `origin` remote                                                                                                                                                                                                                                                                                                                                       |
-| F4 (invalid PR #999999999)         | ✅                        | exit=1 in 2s; "PR does not exist on origin"; well within 35s cap                                                                                                                                                                                                                                                                                                                            |
-| F5 (malformed `#abc`)              | ✅                        | slug validation rejects `#`                                                                                                                                                                                                                                                                                                                                                                 |
-| F6 (PR worktree + symlinks)        | ✅                        | symlink `pr-4174/node_modules` → `$TEST_DIR/node_modules` confirmed                                                                                                                                                                                                                                                                                                                         |
-| G1.a (start + write + Keep)        | ✅                        | TUI flow, Footer indicator, dialog options, file persists                                                                                                                                                                                                                                                                                                                                   |
-| G1.b (`--resume … --worktree foo`) | ❌ → **fixed in this PR** | Original: `--worktree: Worktree already exists at …`. Phase 6 fix added the re-attach branch in `setupStartupWorktree`. Verified post-fix via smoke test (`--worktree foo` twice → second emits the `worktree_started` notice, no error) + new unit tests in `worktreeStartup.test.ts`.                                                                                                     |
-| G2 (relative `--mcp-config`)       | ❌ → **fixed in this PR** | Original: exit=52, `Invalid MCP configuration … is not valid JSON`. Phase 6 fix normalizes path-taking argv fields (`mcpConfig`, `openaiLoggingDir`, `jsonFile`, `inputFile`, `telemetryOutfile`, `includeDirectories`) against the launch cwd BEFORE `setupStartupWorktree` chdirs. Verified post-fix via smoke test (`--worktree foo --mcp-config ./mcp.json` → model responds normally). |
+| Group                              | Result                    | Notes                                                                                                                                                                                                                                                                                                                                                                                                |
+| ---------------------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1 (bare flag)                     | ✅ (with doc tip)         | yargs consumes the next positional as the slug value when user passes `mariadb-shell-agent --worktree "say hi"`; quickstart now tells users to use `=` form or put the prompt before the flag. Auto-slug feature itself confirmed via `mariadb-shell-agent --worktree --approval-mode yolo "say hi"` → slug `bright-elm-8a4c12`, init `.cwd` ends with `.mariadb-shell-agent/worktrees/<auto-slug>`. |
+| A2 (explicit slug)                 | ✅                        | dir `.mariadb-shell-agent/worktrees/my-feature` + branch `worktree-my-feature`                                                                                                                                                                                                                                                                                                                       |
+| A3 (= form)                        | ✅                        | identical to A2                                                                                                                                                                                                                                                                                                                                                                                      |
+| A4 (invalid slug)                  | ✅                        | exit=1, message: `Worktree name may only contain letters, digits, dots, underscores, and hyphens.`, no worktree dir                                                                                                                                                                                                                                                                                  |
+| A5 (non-git dir)                   | ✅                        | exit=1, message: `not a git repository. Run \`git init\` first or relaunch from inside one.`                                                                                                                                                                                                                                                                                                         |
+| B1 (sidecar fields)                | ✅                        | All 6 fields present and correct; sidecar lives under worktree projectHash as designed                                                                                                                                                                                                                                                                                                               |
+| B2 (cwd switch)                    | ✅                        | `pwd` inside shell tool returned worktree path exactly                                                                                                                                                                                                                                                                                                                                               |
+| B3 (branch + cwd)                  | ✅                        | `pwd` = worktree path, `git rev-parse --abbrev-ref HEAD` = `worktree-b3-test`                                                                                                                                                                                                                                                                                                                        |
+| C1 (cross-slug override)           | ❌ → **known limitation** | Sessions are bound to `projectHash(cwd)`; `--worktree second --resume <sid-from-first>` can't find the session. Documented in user docs Limitations. A future Config refactor (anchor storage at repo root) would lift this.                                                                                                                                                                         |
+| C2 (stale sidecar + new worktree)  | ❌ → **same root cause**  | Same architectural constraint.                                                                                                                                                                                                                                                                                                                                                                       |
+| E1 (`--worktree` symlink)          | ✅                        | `node_modules` symlinked into the new worktree                                                                                                                                                                                                                                                                                                                                                       |
+| E2 (`enter_worktree` symlink)      | ✅                        | same code path via `createUserWorktree`                                                                                                                                                                                                                                                                                                                                                              |
+| E3 (agent isolation symlink)       | ⚠️ test-setup             | model committed `node_modules` (because the agent guard refused dirty state); EEXIST guard then correctly skipped the symlink. Code path is correct; for a clean E3 the test plan needs to pre-`.gitignore` `node_modules`.                                                                                                                                                                          |
+| E4 (missing source skip)           | ✅                        | worktree created, no entry, exit 0                                                                                                                                                                                                                                                                                                                                                                   |
+| E5 (existing dest no overwrite)    | ✅                        | preexisting marker survived                                                                                                                                                                                                                                                                                                                                                                          |
+| E6 (absolute / `..` rejected)      | ✅                        | neither path linked                                                                                                                                                                                                                                                                                                                                                                                  |
+| F1 (`--worktree=#4174` fetch)      | ✅                        | worktree dir `pr-4174/`, branch `worktree-pr-4174`, tip commit `8f4fe8e feat(cli): per-turn /diff…`; local-remote substitute (sandbox blocks real GitHub)                                                                                                                                                                                                                                            |
+| F2 (full URL form)                 | ✅                        | same result; URL parsed → PR #4174 → local origin fetch succeeded                                                                                                                                                                                                                                                                                                                                    |
+| F3 (missing origin)                | ✅                        | exit=1 in 2s; message mentions adding `origin` remote                                                                                                                                                                                                                                                                                                                                                |
+| F4 (invalid PR #999999999)         | ✅                        | exit=1 in 2s; "PR does not exist on origin"; well within 35s cap                                                                                                                                                                                                                                                                                                                                     |
+| F5 (malformed `#abc`)              | ✅                        | slug validation rejects `#`                                                                                                                                                                                                                                                                                                                                                                          |
+| F6 (PR worktree + symlinks)        | ✅                        | symlink `pr-4174/node_modules` → `$TEST_DIR/node_modules` confirmed                                                                                                                                                                                                                                                                                                                                  |
+| G1.a (start + write + Keep)        | ✅                        | TUI flow, Footer indicator, dialog options, file persists                                                                                                                                                                                                                                                                                                                                            |
+| G1.b (`--resume … --worktree foo`) | ❌ → **fixed in this PR** | Original: `--worktree: Worktree already exists at …`. Phase 6 fix added the re-attach branch in `setupStartupWorktree`. Verified post-fix via smoke test (`--worktree foo` twice → second emits the `worktree_started` notice, no error) + new unit tests in `worktreeStartup.test.ts`.                                                                                                              |
+| G2 (relative `--mcp-config`)       | ❌ → **fixed in this PR** | Original: exit=52, `Invalid MCP configuration … is not valid JSON`. Phase 6 fix normalizes path-taking argv fields (`mcpConfig`, `openaiLoggingDir`, `jsonFile`, `inputFile`, `telemetryOutfile`, `includeDirectories`) against the launch cwd BEFORE `setupStartupWorktree` chdirs. Verified post-fix via smoke test (`--worktree foo --mcp-config ./mcp.json` → model responds normally).          |
 
 **Phase 6 net result:** 22 / 24 cases passed post-fix; 2 cases (C1/C2) hit an
 architectural limitation now documented; 1 case (E3) is a test-setup quirk,
@@ -708,7 +708,7 @@ not an implementation issue. **Ready for Phase 7 code review.**
 
 ## Reproduction report — Phase 4 dry-run (Groups F + G), 2026-05-20
 
-**Binary**: `qwen` (globally installed, v0.15.11 at `/Users/mochi/.nvm/versions/node/v22.21.1/bin/qwen`)
+**Binary**: `mariadb-shell-agent` (globally installed, v0.15.11 at `/Users/mochi/.nvm/versions/node/v22.21.1/bin/qwen`)
 **Override**: `QWEN="qwen"`
 
 ### Results table
@@ -743,6 +743,6 @@ The failure mode is uniformly at the yargs layer, not downstream. This confirms 
 
 ### SCRIPT-BUG notes for the test plan
 
-**G1 (tmux):** The tmux session command pipes through `tee` with a subshell `echo 'PROC_EXIT='$?` that captures the exit of `tee`, not of `qwen`. When the process exits instantly (as with an Unknown argument error), the session terminates before `sleep 3` finishes and the pane name `g1dry` is gone by the time `tmux capture-pane` runs, producing `can't find pane: g1dry`. Fix: use `|| true` after `tmux capture-pane`, or add a `|| sleep 0` guard; better still, for the baseline-fail case redirect stderr+stdout to a file outside tmux and check the file directly (as done here via `tee /tmp/g1_raw.out`).
+**G1 (tmux):** The tmux session command pipes through `tee` with a subshell `echo 'PROC_EXIT='$?` that captures the exit of `tee`, not of `mariadb-shell-agent`. When the process exits instantly (as with an Unknown argument error), the session terminates before `sleep 3` finishes and the pane name `g1dry` is gone by the time `tmux capture-pane` runs, producing `can't find pane: g1dry`. Fix: use `|| true` after `tmux capture-pane`, or add a `|| sleep 0` guard; better still, for the baseline-fail case redirect stderr+stdout to a file outside tmux and check the file directly (as done here via `tee /tmp/g1_raw.out`).
 
 **G2 (`--prompt-file`):** The test plan uses `--prompt-file ./relative.txt` as a combined test with `--worktree`. In the baseline, `--prompt-file` is also an unknown argument (it does not exist in v0.15.11 yargs schema either — the flag is `--prompt-interactive` / `-p`). The error lists both unknown args together. The plan should note that `--prompt-file` will need to be implemented alongside `--worktree`, or use an existing flag (e.g. pipe via stdin or use `--prompt`) for the relative-path resolution test.

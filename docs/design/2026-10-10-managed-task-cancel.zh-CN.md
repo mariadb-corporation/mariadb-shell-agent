@@ -15,7 +15,7 @@
 
 仍未完成：其余任务类型的取消路径、child 任务的输出事件，以及 channel delivery 那一半（见"后续工作"）。
 
-这是 [#12827](https://github.com/QwenLM/qwen-code/issues/12827) 的 **H4f** 切片，即 Managed Agent 提案 [#12380](https://github.com/QwenLM/qwen-code/issues/12380) 的 H 阶段，由 [#13746](https://github.com/QwenLM/qwen-code/issues/13746) 跟踪。它实现的是 [#12847](https://github.com/QwenLM/qwen-code/issues/12847) A6/A7 所要求、并由 #12998 在契约 v1.23 中定下的取消语义（[任务契约](2026-09-27-managed-agent-task-contract.zh-CN.md) 第 4.4、4.5 节）。它还补上了 #12847 B12，并回答了 [H4b](2026-10-07-managed-child-session-runtime.zh-CN.md) 的未决问题 1：运维如何关闭一个 `unknown` 投递。
+这是 [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827) 的 **H4f** 切片，即 Managed Agent 提案 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380) 的 H 阶段，由 [#13746](https://github.invalid/QwenLM/qwen-code/issues/13746) 跟踪。它实现的是 [#12847](https://github.invalid/QwenLM/qwen-code/issues/12847) A6/A7 所要求、并由 #12998 在契约 v1.23 中定下的取消语义（[任务契约](2026-09-27-managed-agent-task-contract.zh-CN.md) 第 4.4、4.5 节）。它还补上了 #12847 B12，并回答了 [H4b](2026-10-07-managed-child-session-runtime.zh-CN.md) 的未决问题 1：运维如何关闭一个 `unknown` 投递。
 
 ## 问题
 
@@ -206,7 +206,7 @@
   - `ManagedAgentApiContractTest` 覆盖两条路由：`202`、重放、跨面重放、冲突、动作拒绝、`400`（包括 WebShell 的未知字段，以及答复 `invalid_idempotency_key` 的超长 key）、`404`、租户过滤器的 `403`，以及带 `task_id` 的操作回读。
   - `PlannedTaskContractTest` 现在把两条路由钉为 `partial`，并校验 `requestId` 实例。
   - `SurfaceRegistry` 以新的规则类 `TASK_OPERATOR` 登记两条路由，`SurfaceAdmissionAcceptanceTest` 在两个面上探测：读权限之下为 `404`，reader 得 `403 task_forbidden`，OPERATOR 与 owner 级调用者被准入并得到路由自身的 `409`。同一套件还钉住保留的 key 永远不能绕过当前访问权：准入它的 OPERATOR 可以重放，降为 reader 后得到 `403 task_forbidden`，Session 删除后得到 `404 session_not_found`。
-- **真实栈**（首个改动合入之后，[#13746 上的结果](https://github.com/QwenLM/qwen-code/issues/13746#issuecomment-6100505354)）：
+- **真实栈**（首个改动合入之后，[#13746 上的结果](https://github.invalid/QwenLM/qwen-code/issues/13746#issuecomment-6100505354)）：
   - 环境：打包好的整条链路，带真实 Hosted Harness、真实 child Session、脚本化模型，Session 存储与 Harness 前各有一个可注入故障的代理。
   - 跑过的时序：
     - 取消应答丢失；

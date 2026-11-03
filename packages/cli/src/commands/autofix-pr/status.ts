@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -162,11 +163,11 @@ export function runStatus(args: {
    * `gitTrusted` false, unchecked. The daemon's listing runs on its own
    * thread, where a git command that hangs would hold every request. */
   git?: boolean;
-  /** Scan only this worktree's `.qwen/tmp`, not the whole clone. By default
+  /** Scan only this worktree's `.mariadb-shell-agent/tmp`, not the whole clone. By default
    * every worktree of the clone is scanned, so a watch is found whichever of
    * them holds it. */
   root?: string;
-  /** Scan exactly these worktrees' `.qwen/tmp`, running no git command to
+  /** Scan exactly these worktrees' `.mariadb-shell-agent/tmp`, running no git command to
    * find them: the daemon enumerates the clone's worktrees itself, on its
    * own short timeout, and passes them here. Takes precedence over `root`. */
   roots?: string[];
@@ -179,16 +180,16 @@ export function runStatus(args: {
     args.roots ??
     (args.root !== undefined ? [args.root] : cloneWorktreeRoots());
   // Only genuine, non-nested worktrees of this clone are read: a watch
-  // worktree's own `.qwen/tmp` or a foreign repository at a stale entry must
+  // worktree's own `.mariadb-shell-agent/tmp` or a foreign repository at a stale entry must
   // not forge a watch.
   const scanRoots = vouchedScanRoots(roots);
   const primary = scanRoots[0];
-  // The worktree whose `.qwen/tmp` holds each PR's state. Git forbids one
+  // The worktree whose `.mariadb-shell-agent/tmp` holds each PR's state. Git forbids one
   // branch in two worktrees, so a PR's watch lives in at most one; a stale
   // state file left in another loses to the one with a live worktree.
   const rootByPr = new Map<number, string>();
   for (const root of scanRoots) {
-    const tmp = join(root, '.qwen', 'tmp');
+    const tmp = join(root, '.mariadb-shell-agent', 'tmp');
     let found: number[];
     try {
       found = (existsSync(tmp) ? readdirSync(tmp) : [])
@@ -199,7 +200,7 @@ export function runStatus(args: {
         .filter((n) => args.pr === undefined || n === args.pr);
     } catch (err) {
       // The primary root's read failure is a real diagnostic, not an empty
-      // listing — surface it. A sibling worktree's `.qwen/tmp` may be a
+      // listing — surface it. A sibling worktree's `.mariadb-shell-agent/tmp` may be a
       // regular file or inaccessible (ENOTDIR/EACCES); that root holds no
       // readable watch, and one bad sibling must not abort the listing of
       // every other worktree's watches (a 500 for the whole clone via daemon).

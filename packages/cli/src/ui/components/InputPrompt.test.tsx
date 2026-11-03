@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 // @vitest-environment jsdom
@@ -1745,7 +1746,7 @@ describe('InputPrompt', () => {
       async () => {
         vi.mocked(clipboardUtils.clipboardHasImage).mockResolvedValue(true);
         vi.mocked(clipboardUtils.saveClipboardImage).mockResolvedValue(
-          '/Users/mochi/.qwen/tmp/clipboard-123.png',
+          '/Users/mochi/.mariadb-shell-agent/tmp/clipboard-123.png',
         );
 
         const { stdin, unmount } = renderWithProviders(
@@ -1768,7 +1769,7 @@ describe('InputPrompt', () => {
     it('should handle Cmd+V when clipboard has an image', async () => {
       vi.mocked(clipboardUtils.clipboardHasImage).mockResolvedValue(true);
       vi.mocked(clipboardUtils.saveClipboardImage).mockResolvedValue(
-        '/Users/mochi/.qwen/tmp/clipboard-456.png',
+        '/Users/mochi/.mariadb-shell-agent/tmp/clipboard-456.png',
       );
 
       const { stdin, unmount } = renderWithProviders(
@@ -1793,7 +1794,7 @@ describe('InputPrompt', () => {
         'test',
         'project',
         'src',
-        '.qwen',
+        '.mariadb-shell-agent',
         'tmp',
         'clipboard.png',
       );
@@ -1812,7 +1813,7 @@ describe('InputPrompt', () => {
 
       await waitFor(() => {
         expect(props.onSubmit).toHaveBeenCalledWith(
-          `@${path.join('.qwen', 'tmp', 'clipboard.png')}\n\ndescribe this image`,
+          `@${path.join('.mariadb-shell-agent', 'tmp', 'clipboard.png')}\n\ndescribe this image`,
           {
             deferUntilIdle: false,
             submittedPrompt: 'describe this image',
@@ -2722,7 +2723,7 @@ describe('InputPrompt', () => {
           text:
             process.platform === 'linux'
               ? 'Clipboard image paste is unavailable: no supported clipboard tool was reached. On Linux, install `wl-clipboard` (Wayland) or `xclip` (X11), or set DISPLAY/WAYLAND_DISPLAY if running headless.'
-              : 'Clipboard image paste is unavailable because the native clipboard module could not be loaded. Reinstall Qwen Code or use the npm installation method.',
+              : 'Clipboard image paste is unavailable because the native clipboard module could not be loaded. Reinstall MariaDB Shell Agent or use the npm installation method.',
         },
         expect.any(Number),
       );
@@ -2805,7 +2806,8 @@ describe('InputPrompt', () => {
     });
 
     it('should insert image path at cursor position with proper spacing', async () => {
-      const imagePath = '/Users/mochi/.qwen/tmp/clipboard-456.png';
+      const imagePath =
+        '/Users/mochi/.mariadb-shell-agent/tmp/clipboard-456.png';
       vi.mocked(clipboardUtils.clipboardHasImage).mockResolvedValue(true);
       vi.mocked(clipboardUtils.saveClipboardImage).mockResolvedValue(imagePath);
 
@@ -4066,7 +4068,13 @@ describe('InputPrompt', () => {
     const isWindows = process.platform === 'win32';
     vi.mocked(clipboardUtils.clipboardHasImage).mockResolvedValue(true);
     vi.mocked(clipboardUtils.saveClipboardImage).mockResolvedValue(
-      path.join('test', 'project', '.qwen', 'tmp', 'clipboard.png'),
+      path.join(
+        'test',
+        'project',
+        '.mariadb-shell-agent',
+        'tmp',
+        'clipboard.png',
+      ),
     );
     vi.mocked(clipboardUtils.cleanupOldClipboardImages).mockResolvedValue(
       undefined,

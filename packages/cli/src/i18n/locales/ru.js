@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Русский перевод для Qwen Code CLI
+// Русский перевод для MariaDB Shell Agent CLI
 // Ключ служит одновременно ключом перевода и текстом по умолчанию
 
 export default {
@@ -76,7 +77,7 @@ export default {
   'For a full list of shortcuts, see {{docPath}}':
     'Полный список горячих клавиш см. в {{docPath}}',
   'docs/keyboard-shortcuts.md': 'docs/keyboard-shortcuts.md',
-  'for help on Qwen Code': 'Справка по Qwen Code',
+  'for help on MariaDB Shell Agent': 'Справка по MariaDB Shell Agent',
   'show version info': 'Просмотр информации о версии',
   'submit a bug report': 'Отправка отчёта об ошибке',
   Status: 'Статус',
@@ -98,7 +99,7 @@ export default {
   // ============================================================================
   // Поля системной информации
   // ============================================================================
-  'Qwen Code': 'Qwen Code',
+  'MariaDB Shell Agent': 'MariaDB Shell Agent',
   Runtime: 'Среда выполнения',
   OS: 'ОС',
   Auth: 'Аутентификация',
@@ -114,25 +115,25 @@ export default {
   // ============================================================================
   // Команды - Общие
   // ============================================================================
-  'Analyzes the project and creates a tailored QWEN.md file.':
-    'Анализ проекта и создание адаптированного файла QWEN.md',
-  'List available Qwen Code tools. Usage: /tools [desc]':
-    'Просмотр доступных инструментов Qwen Code. Использование: /tools [desc]',
+  'Analyzes the project and creates a tailored MARIADB-SHELL-AGENT.md file.':
+    'Анализ проекта и создание адаптированного файла MARIADB-SHELL-AGENT.md',
+  'List available MariaDB Shell Agent tools. Usage: /tools [desc]':
+    'Просмотр доступных инструментов MariaDB Shell Agent. Использование: /tools [desc]',
   'Open the skills panel (browse, search, toggle, pick).':
     'Открыть панель навыков (обзор, поиск, вкл/выкл, выбор).',
   'Manage Skills': 'Управление навыками',
   'Skills configuration saved.': 'Конфигурация навыков сохранена.',
   'Skills configuration saved, but refresh failed: {{error}}. Restart to ensure the new state is applied.':
     'Конфигурация навыков сохранена, но обновление не удалось: {{error}}. Перезапустите, чтобы применить новое состояние.',
-  'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.qwen/settings.json directly to manage skills at user scope.':
-    'Рабочая область не является доверенной; настройки рабочей области игнорируются объединённой конфигурацией. Сначала выполните /trust или отредактируйте ~/.qwen/settings.json напрямую, чтобы управлять навыками на уровне пользователя.',
+  'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.mariadb-shell-agent/settings.json directly to manage skills at user scope.':
+    'Рабочая область не является доверенной; настройки рабочей области игнорируются объединённой конфигурацией. Сначала выполните /trust или отредактируйте ~/.mariadb-shell-agent/settings.json напрямую, чтобы управлять навыками на уровне пользователя.',
   'SkillManager not available.': 'SkillManager недоступен.',
   'Loading skills…': 'Загрузка навыков…',
   'Failed to load skills: {{error}}': 'Не удалось загрузить навыки: {{error}}',
   'Failed to save skills configuration: {{error}}':
     'Не удалось сохранить конфигурацию навыков: {{error}}',
-  'All available skills are disabled. Edit ~/.qwen/settings.json or .qwen/settings.json (skills.disabled) to re-enable.':
-    'Все доступные навыки отключены. Отредактируйте ~/.qwen/settings.json или .qwen/settings.json (skills.disabled), чтобы снова их включить.',
+  'All available skills are disabled. Edit ~/.mariadb-shell-agent/settings.json or .mariadb-shell-agent/settings.json (skills.disabled) to re-enable.':
+    'Все доступные навыки отключены. Отредактируйте ~/.mariadb-shell-agent/settings.json или .mariadb-shell-agent/settings.json (skills.disabled), чтобы снова их включить.',
   'Press esc to close.': 'Нажмите Esc, чтобы закрыть.',
   '{{count}} skills · ': '{{count}} навыков · ',
   '{{matched}} / {{total}} skills · ': '{{matched}} / {{total}} навыков · ',
@@ -152,7 +153,8 @@ export default {
   '↑/↓ navigate · backspace edits search':
     '↑/↓ навигация · Backspace редактирует поиск',
   Bundled: 'Встроенный',
-  'Available Qwen Code CLI tools:': 'Доступные инструменты Qwen Code CLI:',
+  'Available MariaDB Shell Agent CLI tools:':
+    'Доступные инструменты MariaDB Shell Agent CLI:',
   'No tools available': 'Нет доступных инструментов',
   'View or change the approval mode for tool usage':
     'Просмотр или изменение режима подтверждения для использования инструментов',
@@ -232,8 +234,8 @@ export default {
     'Очистить историю диалога и освободить контекст',
   'Compresses the context by replacing it with a summary.':
     'Сжатие контекста заменой на краткую сводку',
-  'open full Qwen Code documentation in your browser':
-    'Открытие полной документации Qwen Code в браузере',
+  'open full MariaDB Shell Agent documentation in your browser':
+    'Открытие полной документации MariaDB Shell Agent в браузере',
   'Configuration not available.': 'Конфигурация недоступна.',
   'Connect an LLM provider': 'Подключить провайдера LLM',
   'Copy the last AI response to clipboard (/copy N for Nth-latest)':
@@ -331,8 +333,10 @@ export default {
   // ============================================================================
   // Агенты - Мастер создания
   // ============================================================================
-  'Project Level (.qwen/agents/)': 'Уровень проекта (.qwen/agents/)',
-  'User Level (~/.qwen/agents/)': 'Уровень пользователя (~/.qwen/agents/)',
+  'Project Level (.mariadb-shell-agent/agents/)':
+    'Уровень проекта (.mariadb-shell-agent/agents/)',
+  'User Level (~/.mariadb-shell-agent/agents/)':
+    'Уровень пользователя (~/.mariadb-shell-agent/agents/)',
   '✓ Subagent Created Successfully!': '✓ Подагент успешно создан!',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     'Подагент "{{name}}" сохранен на уровне {{level}}.',
@@ -353,8 +357,8 @@ export default {
   // Агенты - Шаги мастера создания
   'Step {{n}}: Choose Location': 'Шаг {{n}}: Выберите расположение',
   'Step {{n}}: Choose Generation Method': 'Шаг {{n}}: Выберите метод генерации',
-  'Generate with Qwen Code (Recommended)':
-    'Сгенерировать с помощью Qwen Code (Рекомендуется)',
+  'Generate with MariaDB Shell Agent (Recommended)':
+    'Сгенерировать с помощью MariaDB Shell Agent (Рекомендуется)',
   'Manual Creation': 'Ручное создание',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     'Опишите, что должен делать этот подагент и когда его следует использовать. (Будьте подробны для лучших результатов)',
@@ -414,10 +418,11 @@ export default {
   // ============================================================================
   // Команды - Общие (продолжение)
   // ============================================================================
-  'View and edit Qwen Code settings': 'Просмотр и изменение настроек Qwen Code',
+  'View and edit MariaDB Shell Agent settings':
+    'Просмотр и изменение настроек MariaDB Shell Agent',
   Settings: 'Настройки',
-  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
-    'Для применения изменений необходимо перезапустить Qwen Code. Нажмите r для выхода и применения изменений.',
+  'To see changes, MariaDB Shell Agent must be restarted. Press r to exit and apply changes now.':
+    'Для применения изменений необходимо перезапустить MariaDB Shell Agent. Нажмите r для выхода и применения изменений.',
   // ============================================================================
   // Метки настроек
   // ============================================================================
@@ -441,7 +446,7 @@ export default {
   'Custom Witty Phrases': 'Пользовательские остроумные фразы',
   'Show Welcome Back Dialog': 'Показывать диалог приветствия',
   'Enable User Feedback': 'Включить отзывы пользователей',
-  'How is Qwen doing this session? (optional)':
+  'How is MariaDB Shell Agent doing this session? (optional)':
     'Как дела у Qwen в этой сессии? (необязательно)',
   Bad: 'Плохо',
   Fine: 'Нормально',
@@ -459,7 +464,7 @@ export default {
   'Load Memory From Include Directories':
     'Загружать память из включенных директорий',
   'Respect .gitignore': 'Учитывать .gitignore',
-  'Respect .qwenignore': 'Учитывать .qwenignore',
+  'Respect .mariadb-shell-agentignore': 'Учитывать .mariadb-shell-agentignore',
   'Enable Recursive File Search': 'Включить рекурсивный поиск файлов',
   'Interactive Shell (PTY)': 'Интерактивный терминал (PTY)',
   'Show Color': 'Показывать цвета',
@@ -578,8 +583,8 @@ export default {
   remote: 'удалённый',
   'This extension will add the following commands: {{commands}}.':
     'Это расширение добавит следующие команды: {{commands}}.',
-  'This extension will append info to your QWEN.md context using {{fileName}}':
-    'Это расширение добавит информацию в ваш контекст QWEN.md с помощью {{fileName}}',
+  'This extension will append info to your MARIADB-SHELL-AGENT.md context using {{fileName}}':
+    'Это расширение добавит информацию в ваш контекст MARIADB-SHELL-AGENT.md с помощью {{fileName}}',
   'This extension will install the following skills:':
     'Это расширение установит следующие навыки:',
   'This extension will install the following subagents:':
@@ -589,8 +594,8 @@ export default {
   'These workflow scripts changed since the installed version: {{names}}.':
     'Эти скрипты рабочих процессов изменились по сравнению с установленной версией: {{names}}.',
   'Installation cancelled for "{{name}}".': 'Установка "{{name}}" отменена.',
-  'You are installing an extension from {{originSource}}. Some features may not work perfectly with Qwen Code.':
-    'Вы устанавливаете расширение от {{originSource}}. Некоторые функции могут работать не идеально с Qwen Code.',
+  'You are installing an extension from {{originSource}}. Some features may not work perfectly with MariaDB Shell Agent.':
+    'Вы устанавливаете расширение от {{originSource}}. Некоторые функции могут работать не идеально с MariaDB Shell Agent.',
   '--ref and --auto-update are not applicable for marketplace extensions.':
     '--ref и --auto-update неприменимы для расширений из маркетплейса.',
   'Extension "{{name}}" installed successfully and enabled.':
@@ -698,8 +703,8 @@ export default {
     'Установить необходимый компаньон IDE для {{ideName}}',
   'enable IDE integration': 'Включение интеграции с IDE',
   'disable IDE integration': 'Отключение интеграции с IDE',
-  'IDE integration is not supported in your current environment. To use this feature, run Qwen Code in one of these supported IDEs: VS Code or VS Code forks.':
-    'Интеграция с IDE не поддерживается в вашем окружении. Для использования этой функции запустите Qwen Code в одной из поддерживаемых IDE: VS Code или форках VS Code.',
+  'IDE integration is not supported in your current environment. To use this feature, run MariaDB Shell Agent in one of these supported IDEs: VS Code or VS Code forks.':
+    'Интеграция с IDE не поддерживается в вашем окружении. Для использования этой функции запустите MariaDB Shell Agent в одной из поддерживаемых IDE: VS Code или форках VS Code.',
   'Set up GitHub Actions': 'Настройка GitHub Actions',
   'Configure terminal keybindings for multiline input (VS Code, Cursor, Windsurf, Trae)':
     'Настройка привязки клавиш терминала для многострочного ввода (VS Code, Cursor, Windsurf, Trae)',
@@ -733,7 +738,7 @@ export default {
   // ============================================================================
   // Commands - Hooks
   // ============================================================================
-  'Manage Qwen Code hooks': 'Управлять хуками Qwen Code',
+  'Manage MariaDB Shell Agent hooks': 'Управлять хуками MariaDB Shell Agent',
   'List all configured hooks': 'Показать все настроенные хуки',
   // Hooks - Dialog
   Hooks: 'Хуки',
@@ -749,8 +754,8 @@ export default {
   'No hook events found.': 'События хуков не найдены.',
   '{{count}} hook configured': '{{count}} хук настроен',
   '{{count}} hooks configured': '{{count}} хуков настроено',
-  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask Qwen Code.':
-    'Это меню только для чтения. Чтобы добавить или изменить хуки, отредактируйте settings.json напрямую или спросите Qwen Code.',
+  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask MariaDB Shell Agent.':
+    'Это меню только для чтения. Чтобы добавить или изменить хуки, отредактируйте settings.json напрямую или спросите MariaDB Shell Agent.',
   'Reopen this menu to reload hook definitions.':
     'Откройте это меню повторно, чтобы перезагрузить определения хуков.',
   'Hook controls and HTTP security settings require a restart.':
@@ -763,7 +768,7 @@ export default {
   'Configured hooks:': 'Настроенные хуки:',
   'No hooks configured for this event.':
     'Для этого события нет настроенных хуков.',
-  'To add hooks, edit settings.json directly or ask Qwen.':
+  'To add hooks, edit settings.json directly or ask MariaDB Shell Agent.':
     'Чтобы добавить хуки, отредактируйте settings.json напрямую или спросите Qwen.',
   'Enter to select · Esc to go back': 'Enter для выбора · Esc для возврата',
   // Hooks - Config Detail Step
@@ -772,7 +777,7 @@ export default {
   'Extension:': 'Расширение:',
   'Desc:': 'Описание:',
   'No hook config selected': 'Конфигурация хука не выбрана',
-  'To modify or remove this hook, edit settings.json directly or ask Qwen to help.':
+  'To modify or remove this hook, edit settings.json directly or ask MariaDB Shell Agent to help.':
     'Чтобы изменить или удалить этот хук, отредактируйте settings.json напрямую или спросите Qwen.',
   // Hooks - Disabled Step
   'Hook Configuration - Disabled': 'Конфигурация хуков - Отключено',
@@ -785,8 +790,8 @@ export default {
   'StatusLine will not be displayed': 'StatusLine не будет отображаться',
   'Tool operations will proceed without hook validation':
     'Операции инструментов будут выполняться без проверки хуков',
-  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask Qwen Code.':
-    'Чтобы снова включить хуки, удалите "disableAllHooks" из settings.json или спросите Qwen Code.',
+  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask MariaDB Shell Agent.':
+    'Чтобы снова включить хуки, удалите "disableAllHooks" из settings.json или спросите MariaDB Shell Agent.',
   // Hooks - Source
   Project: 'Проект',
   User: 'Пользователь',
@@ -807,8 +812,8 @@ export default {
   'When a slash command expands into a prompt':
     'Когда slash-команда разворачивается в промпт',
   'When a new session is started': 'При запуске новой сессии',
-  'Right before Qwen Code concludes its response':
-    'Непосредственно перед завершением ответа Qwen Code',
+  'Right before MariaDB Shell Agent concludes its response':
+    'Непосредственно перед завершением ответа MariaDB Shell Agent',
   'When a subagent (Agent tool call) is started':
     'При запуске субагента (вызов инструмента Agent)',
   'Right before a subagent concludes its response':
@@ -862,7 +867,7 @@ export default {
     'заблокировать обработку, стереть исходный промпт и показать stderr только пользователю',
   'block expanded prompt submission and show stderr to user only':
     'заблокировать отправку развернутого промпта и показать stderr только пользователю',
-  'stdout shown to Qwen': 'stdout показан Qwen',
+  'stdout shown to MariaDB Shell Agent': 'stdout показан Qwen',
   'show stderr to user only (blocking errors ignored)':
     'показать stderr только пользователю (блокирующие ошибки игнорируются)',
   'command completes successfully': 'команда успешно завершена',
@@ -1016,8 +1021,8 @@ export default {
   // =========================================================
   // Команды - Резюме
   // ============================================================================
-  'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md':
-    'Сгенерировать сводку проекта и сохранить её в .qwen/PROJECT_SUMMARY.md',
+  'Generate a project summary and save it to .mariadb-shell-agent/PROJECT_SUMMARY.md':
+    'Сгенерировать сводку проекта и сохранить её в .mariadb-shell-agent/PROJECT_SUMMARY.md',
   'No chat client available to generate summary.':
     'Нет доступного чат-клиента для генерации сводки.',
   'Already generating summary, wait for previous request to complete':
@@ -1100,8 +1105,8 @@ export default {
     'Команда /directory add не поддерживается в ограничительных профилях песочницы. Пожалуйста, используйте --include-directories при запуске сессии.',
   "Error adding '{{path}}': {{error}}":
     "Ошибка при добавлении '{{path}}': {{error}}",
-  'Successfully added QWEN.md files from the following directories if there are:\n- {{directories}}':
-    'Успешно добавлены файлы QWEN.md из следующих директорий (если они есть):\n- {{directories}}',
+  'Successfully added MARIADB-SHELL-AGENT.md files from the following directories if there are:\n- {{directories}}':
+    'Успешно добавлены файлы MARIADB-SHELL-AGENT.md из следующих директорий (если они есть):\n- {{directories}}',
   'Error refreshing memory: {{error}}':
     'Ошибка при обновлении памяти: {{error}}',
   'Successfully added directories:\n- {{directories}}':
@@ -1290,12 +1295,12 @@ export default {
   Ask: 'Спросить',
   Deny: 'Запретить',
   Workspace: 'Рабочая область',
-  "Qwen Code won't ask before using allowed tools.":
-    'Qwen Code не будет спрашивать перед использованием разрешённых инструментов.',
-  'Qwen Code will ask before using these tools.':
-    'Qwen Code спросит перед использованием этих инструментов.',
-  'Qwen Code is not allowed to use denied tools.':
-    'Qwen Code не может использовать запрещённые инструменты.',
+  "MariaDB Shell Agent won't ask before using allowed tools.":
+    'MariaDB Shell Agent не будет спрашивать перед использованием разрешённых инструментов.',
+  'MariaDB Shell Agent will ask before using these tools.':
+    'MariaDB Shell Agent спросит перед использованием этих инструментов.',
+  'MariaDB Shell Agent is not allowed to use denied tools.':
+    'MariaDB Shell Agent не может использовать запрещённые инструменты.',
   'Manage trusted directories for this workspace.':
     'Управление доверенными каталогами для этой рабочей области.',
   'Any use of the {{tool}} tool': 'Любое использование инструмента {{tool}}',
@@ -1305,9 +1310,11 @@ export default {
   'From project settings': 'Из настроек проекта',
   'From session': 'Из сессии',
   'Project settings': 'Настройки проекта',
-  'Checked in at .qwen/settings.json': 'Зафиксировано в .qwen/settings.json',
+  'Checked in at .mariadb-shell-agent/settings.json':
+    'Зафиксировано в .mariadb-shell-agent/settings.json',
   'User settings': 'Пользовательские настройки',
-  'Saved in at ~/.qwen/settings.json': 'Сохранено в ~/.qwen/settings.json',
+  'Saved in at ~/.mariadb-shell-agent/settings.json':
+    'Сохранено в ~/.mariadb-shell-agent/settings.json',
   'Add a new rule…': 'Добавить новое правило…',
   'Add {{type}} permission rule': 'Добавить {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1330,10 +1337,10 @@ export default {
   // Workspace directory management
   'Add directory…': 'Добавить каталог…',
   'Add directory to workspace': 'Добавить каталог в рабочую область',
-  'Qwen Code can read files in the workspace, and make edits when auto-accept edits is on.':
-    'Qwen Code может читать файлы в рабочей области и вносить правки, когда автоприём правок включён.',
-  'Qwen Code will be able to read files in this directory and make edits when auto-accept edits is on.':
-    'Qwen Code сможет читать файлы в этом каталоге и вносить правки, когда автоприём правок включён.',
+  'MariaDB Shell Agent can read files in the workspace, and make edits when auto-accept edits is on.':
+    'MariaDB Shell Agent может читать файлы в рабочей области и вносить правки, когда автоприём правок включён.',
+  'MariaDB Shell Agent will be able to read files in this directory and make edits when auto-accept edits is on.':
+    'MariaDB Shell Agent сможет читать файлы в этом каталоге и вносить правки, когда автоприём правок включён.',
   'Enter the path to the directory:': 'Введите путь к каталогу:',
   'Enter directory path…': 'Введите путь к каталогу…',
   'Tab to complete · Enter to add · Esc to cancel':
@@ -1742,20 +1749,20 @@ export default {
     'Используйте /bug, чтобы сообщить о проблемах разработчикам.',
   'Switch auth type quickly with /auth.':
     'Быстро переключите тип аутентификации с помощью /auth.',
-  'You can run any shell commands from Qwen Code using ! (e.g. !ls).':
-    'Вы можете выполнять любые shell-команды в Qwen Code с помощью ! (например, !ls).',
+  'You can run any shell commands from MariaDB Shell Agent using ! (e.g. !ls).':
+    'Вы можете выполнять любые shell-команды в MariaDB Shell Agent с помощью ! (например, !ls).',
   'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.':
     'Введите /, чтобы открыть меню команд; Tab автодополняет слэш-команды и сохранённые промпты.',
-  'You can resume a previous conversation by running qwen --continue or qwen --resume.':
-    'Вы можете продолжить предыдущий разговор, запустив qwen --continue или qwen --resume.',
+  'You can resume a previous conversation by running mariadb-shell-agent --continue or mariadb-shell-agent --resume.':
+    'Вы можете продолжить предыдущий разговор, запустив mariadb-shell-agent --continue или mariadb-shell-agent --resume.',
   'You can switch permission mode quickly with Shift+Tab or /approval-mode.':
     'Вы можете быстро переключать режим разрешений с помощью Shift+Tab или /approval-mode.',
   'You can switch permission mode quickly with Tab or /approval-mode.':
     'Вы можете быстро переключать режим разрешений с помощью Tab или /approval-mode.',
   'Try /insight to generate personalized insights from your chat history.':
     'Попробуйте /insight, чтобы получить персонализированные выводы из истории чатов.',
-  'Add a QWEN.md file to give Qwen Code persistent project context.':
-    'Добавьте файл QWEN.md, чтобы предоставить Qwen Code постоянный контекст проекта.',
+  'Add a MARIADB-SHELL-AGENT.md file to give MariaDB Shell Agent persistent project context.':
+    'Добавьте файл MARIADB-SHELL-AGENT.md, чтобы предоставить MariaDB Shell Agent постоянный контекст проекта.',
   'Use /btw to ask a quick side question without disrupting the conversation.':
     'Используйте /btw, чтобы задать короткий побочный вопрос, не прерывая основной разговор.',
   'Context is almost full! Run /compress now or start /new to continue.':
@@ -1869,8 +1876,8 @@ export default {
   servers: 'серверов',
   'Add MCP servers to your settings to get started.':
     'Добавьте MCP servers в настройки, чтобы начать.',
-  'Run qwen --debug to see error logs':
-    'Запустите qwen --debug для просмотра журналов ошибок',
+  'Run mariadb-shell-agent --debug to see error logs':
+    'Запустите mariadb-shell-agent --debug для просмотра журналов ошибок',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth-аутентификация',
@@ -1929,9 +1936,10 @@ export default {
     'Успешная аутентификация через Alibaba Cloud Coding Plan.',
   'Failed to authenticate with Coding Plan: {{error}}':
     'Ошибка аутентификации через Coding Plan: {{error}}',
-  '阿里云百炼 (aliyun.com)': '阿里云百炼 (aliyun.com)',
+  '阿里云百炼 (aliyun.invalid)': '阿里云百炼 (aliyun.invalid)',
   Global: 'Глобальный',
-  'Alibaba Cloud (alibabacloud.com)': 'Alibaba Cloud (alibabacloud.com)',
+  'Alibaba Cloud (alibabacloud.invalid)':
+    'Alibaba Cloud (alibabacloud.invalid)',
   'Select region for Coding Plan:': 'Выберите регион для Coding Plan:',
   'Enter your Coding Plan API key: ': 'Введите ваш API Key Coding Plan: ',
   'Select authentication method:': 'Выберите метод аутентификации:',
@@ -1940,11 +1948,11 @@ export default {
     '⚠  Метод аутентификации не настроен.\n',
   'Run one of the following commands to get started:\n':
     'Выполните одну из следующих команд для начала:\n',
-  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  qwen auth qwen-oauth     - Аутентификация через Qwen OAuth (прекращено)',
+  '  mariadb-shell-agent auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
+    '  mariadb-shell-agent auth qwen-oauth     - Аутентификация через Qwen OAuth (прекращено)',
   'Or simply run:': 'Или просто выполните:',
-  '  qwen auth                - Interactive authentication setup\n':
-    '  qwen auth                - Интерактивная настройка аутентификации\n',
+  '  mariadb-shell-agent auth                - Interactive authentication setup\n':
+    '  mariadb-shell-agent auth                - Интерактивная настройка аутентификации\n',
   '✓ Authentication Method: Qwen OAuth': '✓ Метод аутентификации: Qwen OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Тип: Бесплатный уровень (прекращено 2026-04-15)',
@@ -1962,8 +1970,8 @@ export default {
     '⚠  Метод аутентификации: Alibaba Cloud Coding Plan (Не завершён)',
   '  Issue: API key not found in environment or settings\n':
     '  Проблема: API Key не найден в окружении или настройках\n',
-  '  Run `qwen auth coding-plan` to re-configure.\n':
-    '  Выполните `qwen auth coding-plan` для повторной настройки.\n',
+  '  Run `mariadb-shell-agent auth coding-plan` to re-configure.\n':
+    '  Выполните `mariadb-shell-agent auth coding-plan` для повторной настройки.\n',
   '✓ Authentication Method: {{type}}': '✓ Метод аутентификации: {{type}}',
   '  Status: Configured\n': '  Статус: Настроено\n',
   'Failed to check authentication status: {{error}}':
@@ -1985,8 +1993,8 @@ export default {
     'Уже в режиме плана. Используйте "/plan exit" для выхода из режима плана.',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     'Не в режиме плана. Сначала используйте "/plan" для входа в режим плана.',
-  "Set up Qwen Code's status line UI":
-    'Настроить интерфейс строки состояния Qwen Code',
+  "Set up MariaDB Shell Agent's status line UI":
+    'Настроить интерфейс строки состояния MariaDB Shell Agent',
 
   // === Core: added from PR #3328 ===
   'Open the memory manager.': 'Открыть менеджер памяти.',
@@ -2196,13 +2204,14 @@ export default {
   // Update command
   'Exact-version updates require a standalone installation. Install version {{version}} manually using your installation method.':
     'Обновление до указанной версии требует автономной установки. Установите версию {{version}} вручную, используя текущий способ установки.',
-  'Check for Qwen Code updates and install if available':
-    'Проверить обновления Qwen Code и установить при наличии',
-  'Qwen Code update available! {{current}} → {{latest}}':
-    'Доступно обновление Qwen Code! {{current}} → {{latest}}',
-  'A new version of Qwen Code is available! {{current}} → {{latest}}':
-    'Доступна новая версия Qwen Code! {{current}} → {{latest}}',
-  'Qwen Code {{version}} is up to date!': 'Qwen Code {{version}} актуален!',
+  'Check for MariaDB Shell Agent updates and install if available':
+    'Проверить обновления MariaDB Shell Agent и установить при наличии',
+  'MariaDB Shell Agent update available! {{current}} → {{latest}}':
+    'Доступно обновление MariaDB Shell Agent! {{current}} → {{latest}}',
+  'A new version of MariaDB Shell Agent is available! {{current}} → {{latest}}':
+    'Доступна новая версия MariaDB Shell Agent! {{current}} → {{latest}}',
+  'MariaDB Shell Agent {{version}} is up to date!':
+    'MariaDB Shell Agent {{version}} актуален!',
   'Failed to check for updates ({{reason}}). Please check your network or registry configuration.':
     'Не удалось проверить обновления ({{reason}}). Проверьте сеть или настройки registry.',
   'Update check skipped ({{reason}}) — run /update to retry.':
@@ -2219,8 +2228,8 @@ export default {
     'Обновление загружено. Оно будет применено после выхода из этого сеанса.',
   'Update failed: {{error}}': 'Ошибка обновления: {{error}}',
   'Downloading update...': 'Загрузка обновления...',
-  'Update successful! Please restart Qwen Code to use the new version. Switching model providers before restarting may not work correctly.':
-    'Обновление успешно! Перезапустите Qwen Code, чтобы использовать новую версию. Переключение поставщиков моделей до перезапуска может работать некорректно.',
+  'Update successful! Please restart MariaDB Shell Agent to use the new version. Switching model providers before restarting may not work correctly.':
+    'Обновление успешно! Перезапустите MariaDB Shell Agent, чтобы использовать новую версию. Переключение поставщиков моделей до перезапуска может работать некорректно.',
   'Automatic update failed. Please try updating manually.':
     'Автоматическое обновление не удалось. Попробуйте обновить вручную.',
   'Automatic update failed: {{error}}. Re-run the installer to update manually.':
@@ -2246,12 +2255,12 @@ export default {
   'Run the following to update:': 'Выполните следующую команду для обновления:',
   'Unable to auto-update this standalone installation. Please reinstall from:':
     'Невозможно автоматически обновить эту автономную установку. Переустановите с:',
-  'Manual update required. Please reinstall Qwen Code.':
-    'Требуется ручное обновление. Переустановите Qwen Code.',
-  'This session uses the custom sandbox image {{image}}. Update that image and restart Qwen Code.':
-    'В этом сеансе используется пользовательский образ песочницы {{image}}. Обновите образ и перезапустите Qwen Code.',
-  'Update Qwen Code on the host, then restart the sandbox.':
-    'Обновите Qwen Code на хосте, затем перезапустите песочницу.',
+  'Manual update required. Please reinstall MariaDB Shell Agent.':
+    'Требуется ручное обновление. Переустановите MariaDB Shell Agent.',
+  'This session uses the custom sandbox image {{image}}. Update that image and restart MariaDB Shell Agent.':
+    'В этом сеансе используется пользовательский образ песочницы {{image}}. Обновите образ и перезапустите MariaDB Shell Agent.',
+  'Update MariaDB Shell Agent on the host, then restart the sandbox.':
+    'Обновите MariaDB Shell Agent на хосте, затем перезапустите песочницу.',
   'The update will be installed after you exit this session.':
     'Обновление будет установлено после выхода из этого сеанса.',
   'Run /update to install the update on the host.':

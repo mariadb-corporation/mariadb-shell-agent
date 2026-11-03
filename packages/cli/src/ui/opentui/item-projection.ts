@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -87,7 +88,7 @@ export function projectAbout(systemInfo: Record<string, unknown>): string {
   const cliVersion = String(systemInfo['cliVersion'] ?? '');
   const gitCommit = systemInfo['gitCommit'];
   addField(
-    'Qwen Code',
+    'MariaDB Shell Agent',
     cliVersion + (gitCommit ? ` (${String(gitCommit)})` : ''),
   );
   const nodeVersion = String(systemInfo['nodeVersion'] ?? '');
@@ -163,7 +164,7 @@ export function projectToolsList(
   }>,
   showDescriptions: boolean,
 ): string {
-  const lines = ['Available Qwen Code CLI tools:', ''];
+  const lines = ['Available MariaDB Shell Agent CLI tools:', ''];
   if (tools.length === 0) {
     lines.push(' No tools available');
     return lines.join('\n');
@@ -982,7 +983,7 @@ export function projectQuit(
   if (stats && stats.promptCount > 0 && config?.getChatRecordingService?.()) {
     lines.push('');
     lines.push(
-      `To continue this session, run qwen --resume ${stats.sessionId}`,
+      `To continue this session, run mariadb-shell-agent --resume ${stats.sessionId}`,
     );
   }
   return lines.join('\n');

@@ -1,8 +1,8 @@
 // ============================================================================
 // Omni 固定策略(fixedPolicy)预设 —— 覆盖设计文档 4.1–4.9 全部 9 条
 // ----------------------------------------------------------------------------
-// 用法:把 "omni" 对象合并进工作区 .qwen/settings.json(或用户级
-// ~/.qwen/settings.json)。settings 解析支持 JSONC 注释。
+// 用法:把 "omni" 对象合并进工作区 .mariadb-shell-agent/settings.json(或用户级
+// ~/.mariadb-shell-agent/settings.json)。settings 解析支持 JSONC 注释。
 //
 // 说明:
 //  - 本预设只占用 "omni.processing" 子树;omni.enabled 等其他键按需在

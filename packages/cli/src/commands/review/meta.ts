@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review meta`: the PR/repo identity facts the skill used to derive
+// `mariadb-shell-agent review meta`: the PR/repo identity facts the skill used to derive
 // with prose `gh` commands — `gh repo view --json owner,name,url` for a bare
 // PR number's owner/repo+host, and `gh pr view --json headRefOid` for the
 // live head SHA (Step 7's post target and the 422 head-drift check). One
@@ -158,7 +159,7 @@ export const metaCommand: CommandModule = {
       .option('host', {
         type: 'string',
         describe:
-          "The host the target lives on. The canonical Aone hosts (code.alibaba-inc.com / gitlab.alibaba-inc.com) select the a1 backend — a non-canonical *.alibaba-inc.com host is a GitHub Enterprise instance and stays on gh; omitted: detected from the clone's origin, else GitHub (GH_HOST, then github.com).",
+          "The host the target lives on. The canonical Aone hosts (code.alibaba-inc.invalid / gitlab.alibaba-inc.invalid) select the a1 backend — a non-canonical *.alibaba-inc.invalid host is a GitHub Enterprise instance and stays on gh; omitted: detected from the clone's origin, else GitHub (GH_HOST, then github.com).",
       }),
   handler: (argv) => {
     const prNumber = argv['pr_number'] as number | undefined;

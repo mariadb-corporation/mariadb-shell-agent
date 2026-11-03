@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -431,7 +432,7 @@ describe('loadOutputStylesFromDir', () => {
     });
 
     it('refuses a style reached through a symlinked ancestor', async () => {
-      // A checked-in `.qwen -> /outside`: a final-component lstat sees a
+      // A checked-in `.mariadb-shell-agent -> /outside`: a final-component lstat sees a
       // plain file, so only the canonical path catches it.
       await writeFiles(outside, { 'notes.md': 'Outside style' });
       const linkedDir = path.join(dir, 'styles');
@@ -453,9 +454,13 @@ describe('loadOutputStyleCatalog', () => {
     root = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-style-catalog-'));
     fakeHome = path.join(root, 'home');
     projectRoot = path.join(root, 'project');
-    vi.stubEnv('QWEN_HOME', path.join(fakeHome, '.qwen')); // undone in afterEach
-    userDir = path.join(fakeHome, '.qwen', 'output-styles');
-    projectDir = path.join(projectRoot, '.qwen', 'output-styles');
+    vi.stubEnv('QWEN_HOME', path.join(fakeHome, '.mariadb-shell-agent')); // undone in afterEach
+    userDir = path.join(fakeHome, '.mariadb-shell-agent', 'output-styles');
+    projectDir = path.join(
+      projectRoot,
+      '.mariadb-shell-agent',
+      'output-styles',
+    );
     await fs.mkdir(userDir, { recursive: true });
     await fs.mkdir(projectDir, { recursive: true });
   });
@@ -515,9 +520,12 @@ describe('loadOutputStyleCatalog', () => {
   });
 
   it('skips the project level when the project root is the home directory', async () => {
-    await fs.mkdir(path.join(fakeHome, '.qwen', 'output-styles'), {
-      recursive: true,
-    });
+    await fs.mkdir(
+      path.join(fakeHome, '.mariadb-shell-agent', 'output-styles'),
+      {
+        recursive: true,
+      },
+    );
     await writeFiles(userDir, { 'mine.md': 'Mine' });
 
     const catalog = await loadOutputStyleCatalog({ projectRoot: fakeHome });
@@ -528,7 +536,7 @@ describe('loadOutputStyleCatalog', () => {
   // The user level resolves through QWEN_HOME, so the guard that dedupes it
   // against the project level has to compare the directories actually read.
   it('reads the user level from a relocated QWEN_HOME', async () => {
-    const relocated = path.join(root, 'elsewhere', '.qwen');
+    const relocated = path.join(root, 'elsewhere', '.mariadb-shell-agent');
     vi.stubEnv('QWEN_HOME', relocated);
     await fs.mkdir(path.join(relocated, 'output-styles'), { recursive: true });
     await writeFiles(path.join(relocated, 'output-styles'), {
@@ -540,15 +548,18 @@ describe('loadOutputStyleCatalog', () => {
   });
 
   it('keeps the project level when QWEN_HOME points away from the home directory', async () => {
-    vi.stubEnv('QWEN_HOME', path.join(root, 'elsewhere', '.qwen'));
+    vi.stubEnv(
+      'QWEN_HOME',
+      path.join(root, 'elsewhere', '.mariadb-shell-agent'),
+    );
     await writeFiles(userDir, { 'homestyle.md': 'Home' });
 
     const catalog = await loadOutputStyleCatalog({ projectRoot: fakeHome });
     expect(labels(catalog)).toContain('homestyle:project');
   });
 
-  it('does not relabel user styles when QWEN_HOME is the project .qwen', async () => {
-    vi.stubEnv('QWEN_HOME', path.join(projectRoot, '.qwen'));
+  it('does not relabel user styles when QWEN_HOME is the project .mariadb-shell-agent', async () => {
+    vi.stubEnv('QWEN_HOME', path.join(projectRoot, '.mariadb-shell-agent'));
     await writeFiles(projectDir, { 'mine.md': 'Mine' });
 
     const catalog = await loadOutputStyleCatalog({ projectRoot });

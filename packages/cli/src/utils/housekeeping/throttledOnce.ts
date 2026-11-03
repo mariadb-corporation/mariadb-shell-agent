@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -43,8 +44,8 @@ export async function runThrottledOnce(
   const minIntervalMs = opts.minIntervalMs ?? ONE_DAY_MS;
   const staleLockMs = opts.staleLockMs ?? STALE_LOCK_MS;
 
-  // First-ever housekeeping pass may run before ~/.qwen/ exists. mode 0o700
-  // matches the rest of the codebase's convention for ~/.qwen/ subdirs
+  // First-ever housekeeping pass may run before ~/.mariadb-shell-agent/ exists. mode 0o700
+  // matches the rest of the codebase's convention for ~/.mariadb-shell-agent/ subdirs
   // (e.g., file-token-storage.ts, sharedTokenManager.ts) so a slow main-app
   // initialization doesn't get races us into creating a world-readable dir.
   //

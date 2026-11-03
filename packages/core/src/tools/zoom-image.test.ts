@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -301,13 +302,16 @@ describe('ZoomImageTool', () => {
     ).toThrow(/>= 0/);
   });
 
-  it('rejects a path matched by a .qwenignore pattern', async () => {
-    await fs.writeFile(path.join(root, '.qwenignore'), 'secret-*.png\n');
+  it('rejects a path matched by a .mariadb-shell-agentignore pattern', async () => {
+    await fs.writeFile(
+      path.join(root, '.mariadb-shell-agentignore'),
+      'secret-*.png\n',
+    );
     const ignoredPath = path.join(root, 'secret-image.png');
     await solid(20, 20, '#000000').png().toFile(ignoredPath);
 
     expect(() => tool.build(params(ignoredPath))).toThrow(
-      /ignored by .qwenignore pattern/i,
+      /ignored by .mariadb-shell-agentignore pattern/i,
     );
   });
 

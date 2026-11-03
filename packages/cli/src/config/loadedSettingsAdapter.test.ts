@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -258,13 +259,19 @@ describe('createLoadedSettingsAdapter', () => {
       const userHome = path.join(root, 'home');
       const workspace = path.join(root, 'workspace');
       fs.mkdirSync(userHome);
-      fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+      fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'), {
+        recursive: true,
+      });
       vi.stubEnv('QWEN_HOME', userHome);
       vi.stubEnv('RELEASED_URL', 'https://released.example/v1');
       vi.stubEnv('RELEASED_HEADER', 'test-only-header');
       vi.stubEnv('RELEASED_KEY', 'test-only-old');
       const userFile = path.join(userHome, 'settings.json');
-      const workspaceFile = path.join(workspace, '.qwen', 'settings.json');
+      const workspaceFile = path.join(
+        workspace,
+        '.mariadb-shell-agent',
+        'settings.json',
+      );
       const target = scope === SettingScope.User ? userFile : workspaceFile;
       const other = scope === SettingScope.User ? workspaceFile : userFile;
       const otherBytes = JSON.stringify({
@@ -421,11 +428,17 @@ describe('createLoadedSettingsAdapter', () => {
       const userHome = path.join(root, 'home');
       const workspace = path.join(root, 'workspace');
       fs.mkdirSync(userHome);
-      fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+      fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'), {
+        recursive: true,
+      });
       vi.stubEnv('QWEN_HOME', userHome);
       vi.stubEnv('LEGACY_SIBLING_HEADER', 'test-only-secret');
       const userFile = path.join(userHome, 'settings.json');
-      const workspaceFile = path.join(workspace, '.qwen', 'settings.json');
+      const workspaceFile = path.join(
+        workspace,
+        '.mariadb-shell-agent',
+        'settings.json',
+      );
       const sibling = {
         id: 'keep',
         baseUrl: 'https://keep.example/v1',
@@ -498,11 +511,17 @@ describe('createLoadedSettingsAdapter', () => {
       const root = fs.mkdtempSync(path.join(os.tmpdir(), 'provider-rollback-'));
       const workspace = path.join(root, 'workspace');
       const userHome = path.join(root, 'home');
-      fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+      fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'), {
+        recursive: true,
+      });
       fs.mkdirSync(userHome);
       vi.stubEnv('QWEN_HOME', userHome);
       const userFile = path.join(userHome, 'settings.json');
-      const workspaceFile = path.join(workspace, '.qwen', 'settings.json');
+      const workspaceFile = path.join(
+        workspace,
+        '.mariadb-shell-agent',
+        'settings.json',
+      );
       const originalUser =
         '{"$version":4,"modelProviders":{"openai":[{"id":"old-user"}]}}\n';
       const originalWorkspace = JSON.stringify({
@@ -569,7 +588,9 @@ describe('createLoadedSettingsAdapter', () => {
       const root = fs.mkdtempSync(path.join(os.tmpdir(), 'provider-raw-'));
       const workspace = path.join(root, 'workspace');
       const userHome = path.join(root, 'home');
-      fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+      fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'), {
+        recursive: true,
+      });
       fs.mkdirSync(userHome);
       vi.stubEnv('QWEN_HOME', userHome);
       vi.stubEnv('RECONNECT_TEST_TOKEN', 'resolved-private-token');
@@ -578,7 +599,9 @@ describe('createLoadedSettingsAdapter', () => {
       const envKey = `${generateCustomEnvKey(AuthType.USE_OPENAI, 'https://media.example/v1')}_IMAGE`;
       vi.stubEnv(envKey, 'old-service-key');
       const filename = path.join(
-        scope === SettingScope.User ? userHome : path.join(workspace, '.qwen'),
+        scope === SettingScope.User
+          ? userHome
+          : path.join(workspace, '.mariadb-shell-agent'),
         'settings.json',
       );
       const raw = {

@@ -185,9 +185,9 @@ function withoutNullishThinkingKnobs(
  * endpoint gate (tools/web-search.ts) so a new region is added in one place.
  */
 export const DASHSCOPE_REGIONAL_HOSTS: readonly string[] = [
-  'dashscope.aliyuncs.com',
-  'dashscope-intl.aliyuncs.com',
-  'dashscope-us.aliyuncs.com',
+  'dashscope.aliyuncs.invalid',
+  'dashscope-intl.aliyuncs.invalid',
+  'dashscope-us.aliyuncs.invalid',
 ];
 
 export { QWENCLOUD_MAAS_HOSTS };
@@ -203,14 +203,14 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
   /**
    * Determines whether to use the DashScope-compatible provider.
    * Covers the official regional hosts (DASHSCOPE_REGIONAL_HOSTS),
-   * Model Studio endpoints under *.maas.aliyuncs.com (workspace-dedicated
+   * Model Studio endpoints under *.maas.aliyuncs.invalid (workspace-dedicated
    * <WorkspaceId>.<region>, trial.<region> and token-plan.<region> hosts),
    * QwenCloud MaaS hosts (QWENCLOUD_MAAS_HOSTS),
-   * internal Alibaba domains (*.alibaba-inc.com, *.aliyun-inc.com),
+   * internal Alibaba domains (*.alibaba-inc.invalid, *.aliyun-inc.invalid),
    * Alibaba Cloud API Gateway domains (*.alicloudapi.com),
    * and proxy matches.
    *
-   * Note: any *.alibaba-inc.com / *.aliyun-inc.com host is treated as a
+   * Note: any *.alibaba-inc.invalid / *.aliyun-inc.invalid host is treated as a
    * DashScope-compatible endpoint by design. Keep this generic and avoid
    * embedding individual private gateway hostnames in provider detection.
    */
@@ -228,7 +228,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
 
     // Parse the URL and check hostname instead of regex to avoid ReDoS on
     // attacker-controlled baseUrl and to reject path-only matches like
-    // https://evil.example/dashscope.aliyuncs.com/...
+    // https://evil.example/dashscope.aliyuncs.invalid/...
     let hostname: string | null = null;
     try {
       hostname = new URL(normalizedBaseUrl).hostname.toLowerCase();
@@ -243,11 +243,11 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
         (host) => hostname === host || hostname.endsWith('.' + host),
       );
 
-    // Every Model Studio host under maas.aliyuncs.com serves the DashScope
+    // Every Model Studio host under maas.aliyuncs.invalid serves the DashScope
     // API: workspace-dedicated domains (the recommended production entry),
     // trial domains and Token Plan domains.
     const isMaasOrigin =
-      hostname !== null && hostname.endsWith('.maas.aliyuncs.com');
+      hostname !== null && hostname.endsWith('.maas.aliyuncs.invalid');
 
     // 千问AI平台 / QwenCloud MaaS hosts, including their `token-plan.`
     // subscription subdomains.
@@ -258,11 +258,11 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
       );
 
     // Internal Alibaba domains proxying to DashScope-compatible APIs.
-    // Covers *.alibaba-inc.com and *.aliyun-inc.com.
+    // Covers *.alibaba-inc.invalid and *.aliyun-inc.invalid.
     const isInternalOrigin =
       hostname !== null &&
-      (hostname.endsWith('.alibaba-inc.com') ||
-        hostname.endsWith('.aliyun-inc.com'));
+      (hostname.endsWith('.alibaba-inc.invalid') ||
+        hostname.endsWith('.aliyun-inc.invalid'));
 
     // Alibaba Cloud API Gateway domains proxying to DashScope-compatible
     // APIs. Covers *.alicloudapi.com.
@@ -318,7 +318,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
 
   override buildHeaders(): Record<string, string | undefined> {
     const version = this.cliConfig.getCliVersion() || 'unknown';
-    const userAgent = `QwenCode/${version} (${process.platform}; ${process.arch})`;
+    const userAgent = `MariaDBShellAgent/${version} (${process.platform}; ${process.arch})`;
     const { authType, customHeaders } = this.contentGeneratorConfig;
     const defaultHeaders: Record<string, string | undefined> = {
       'User-Agent': userAgent,
@@ -482,7 +482,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
         ...this.buildRequestMetadata(request.model, userPromptId),
         ...dashscopeExtras,
       };
-      // DashScope qwen models use top-level effort fields, not the OpenAI-style
+      // DashScope mariadb-shell-agent models use top-level effort fields, not the OpenAI-style
       // nested `reasoning` object the pipeline injects from /effort. Drop it so
       // we don't ship two competing knobs. User extra_body still wins.
       if (hasQwenEffortConfig && 'reasoning' in visionResult) {
@@ -511,7 +511,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
       ...this.buildRequestMetadata(request.model, userPromptId),
       ...dashscopeExtras,
     };
-    // DashScope qwen models use top-level effort fields, not the OpenAI-style
+    // DashScope mariadb-shell-agent models use top-level effort fields, not the OpenAI-style
     // nested `reasoning` object the pipeline injects from /effort. Drop it so
     // we don't ship two competing knobs. User extra_body still wins.
     if (hasQwenEffortConfig && 'reasoning' in result) {
@@ -774,7 +774,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
    * reached through the same endpoint has its request forwarded to that vendor's
    * own backend, `metadata` object included. Those backends type `metadata` as a
    * string, so the object fails to deserialize and the request is rejected with a
-   * flat 400, making the model unusable through Qwen Code. `metadata` is a
+   * flat 400, making the model unusable through MariaDB Shell Agent. `metadata` is a
    * platform-private tracing field (sessionId / promptId / channel) that only
    * means anything to DashScope's own inference path, so gate it on the wire model
    * the same way `buildQwenEffortConfig` gates the qwen-only thinking knobs, for

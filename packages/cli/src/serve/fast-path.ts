@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -168,7 +169,7 @@ function getRateLimitValidationError(options: ServeOptions): string | null {
       value !== undefined &&
       (!Number.isFinite(value) || !Number.isInteger(value) || value <= 0)
     ) {
-      return `qwen serve: ${name} must be a positive integer.`;
+      return `mariadb-shell-agent serve: ${name} must be a positive integer.`;
     }
   }
   if (
@@ -177,7 +178,7 @@ function getRateLimitValidationError(options: ServeOptions): string | null {
       !Number.isInteger(options.rateLimitWindowMs) ||
       options.rateLimitWindowMs < 1000)
   ) {
-    return 'qwen serve: --rate-limit-window-ms must be an integer >= 1000.';
+    return 'mariadb-shell-agent serve: --rate-limit-window-ms must be an integer >= 1000.';
   }
   return null;
 }
@@ -192,14 +193,14 @@ function getServeFastPathValidationError(
       !Number.isInteger(mcpClientBudget) ||
       mcpClientBudget <= 0)
   ) {
-    return 'qwen serve: --mcp-client-budget must be a positive integer.';
+    return 'mariadb-shell-agent serve: --mcp-client-budget must be a positive integer.';
   }
 
   if (
     parsed.options.mcpBudgetMode === 'enforce' &&
     mcpClientBudget === undefined
   ) {
-    return 'qwen serve: --mcp-budget-mode=enforce requires --mcp-client-budget=N.';
+    return 'mariadb-shell-agent serve: --mcp-budget-mode=enforce requires --mcp-client-budget=N.';
   }
 
   const maxPendingPromptsPerSession =
@@ -211,7 +212,7 @@ function getServeFastPathValidationError(
       !Number.isInteger(maxPendingPromptsPerSession) ||
       maxPendingPromptsPerSession < 0)
   ) {
-    return 'qwen serve: --max-pending-prompts-per-session must be a non-negative integer (0 / Infinity = unlimited).';
+    return 'mariadb-shell-agent serve: --max-pending-prompts-per-session must be a non-negative integer (0 / Infinity = unlimited).';
   }
 
   const compactedReplayMaxBytes = parsed.options.compactedReplayMaxBytes;
@@ -222,7 +223,7 @@ function getServeFastPathValidationError(
       compactedReplayMaxBytes > MAX_COMPACTED_REPLAY_MAX_BYTES)
   ) {
     return (
-      'qwen serve: --compacted-replay-max-bytes must be a positive ' +
+      'mariadb-shell-agent serve: --compacted-replay-max-bytes must be a positive ' +
       `safe integer in [1, ${MAX_COMPACTED_REPLAY_MAX_BYTES}].`
     );
   }
@@ -232,7 +233,7 @@ function getServeFastPathValidationError(
     maxJournalEvents !== undefined &&
     (!Number.isSafeInteger(maxJournalEvents) || maxJournalEvents < 1)
   ) {
-    return 'qwen serve: --max-journal-events must be a positive safe integer.';
+    return 'mariadb-shell-agent serve: --max-journal-events must be a positive safe integer.';
   }
 
   const maxJournalBytes = parsed.options.maxJournalBytes;
@@ -240,7 +241,7 @@ function getServeFastPathValidationError(
     maxJournalBytes !== undefined &&
     (!Number.isSafeInteger(maxJournalBytes) || maxJournalBytes < 1)
   ) {
-    return 'qwen serve: --max-journal-bytes must be a positive safe integer.';
+    return 'mariadb-shell-agent serve: --max-journal-bytes must be a positive safe integer.';
   }
 
   const memoryBudgetMb = parsed.options.memoryBudgetMb;
@@ -268,7 +269,7 @@ export async function waitForServeRuntimeOrExit(
       return;
     }
     writeStderrLine(
-      `qwen serve: runtime startup failed after listener was ready: ${
+      `mariadb-shell-agent serve: runtime startup failed after listener was ready: ${
         err instanceof Error ? err.message : String(err)
       }`,
     );
@@ -542,13 +543,13 @@ function emitHeadlessYoloWarning(
 function writeServeWarnings(parsed: ParsedServeFastPath): void {
   if (!parsed.httpBridge) {
     writeStderrLine(
-      'qwen serve: --no-http-bridge (native mode) is not yet implemented; ' +
+      'mariadb-shell-agent serve: --no-http-bridge (native mode) is not yet implemented; ' +
         'falling back to http-bridge.',
     );
   }
   if (parsed.options.token) {
     writeStderrLine(
-      'qwen serve: --token is visible in the process command line; ' +
+      'mariadb-shell-agent serve: --token is visible in the process command line; ' +
         'prefer the QWEN_SERVER_TOKEN env var for any non-trivial deployment.',
     );
   }
@@ -557,7 +558,7 @@ function writeServeWarnings(parsed: ParsedServeFastPath): void {
   if (mcpClientBudget !== undefined) {
     const resolvedMcpMode = parsed.options.mcpBudgetMode ?? 'warn';
     writeStderrLine(
-      `qwen serve: --mcp-client-budget=${mcpClientBudget} mode=${resolvedMcpMode}` +
+      `mariadb-shell-agent serve: --mcp-client-budget=${mcpClientBudget} mode=${resolvedMcpMode}` +
         (resolvedMcpMode === 'enforce'
           ? ' (servers past the cap will be refused at discovery)'
           : resolvedMcpMode === 'warn'
@@ -591,7 +592,7 @@ export async function tryRunServeFastPath(
   } catch (err) {
     if (err instanceof InvalidExecutionSandboxConfigError) throw err;
     writeStderrLine(
-      `qwen serve: fast-path bootstrap failed, falling back to full startup: ${
+      `mariadb-shell-agent serve: fast-path bootstrap failed, falling back to full startup: ${
         err instanceof Error ? err.message : String(err)
       }`,
     );
@@ -618,7 +619,7 @@ export async function tryRunServeFastPath(
       applyOpenWithAuth(parsed.options);
     } catch (err) {
       writeStderrLine(
-        `qwen serve: ${err instanceof Error ? err.message : String(err)}`,
+        `mariadb-shell-agent serve: ${err instanceof Error ? err.message : String(err)}`,
       );
       process.exit(1);
     }
@@ -641,7 +642,7 @@ export async function tryRunServeFastPath(
     await maybeOpenWebShellBrowser(handle, parsed.open, parsed.openWithAuth);
   } catch (err) {
     writeStderrLine(
-      `qwen serve: ${err instanceof Error ? err.message : String(err)}`,
+      `mariadb-shell-agent serve: ${err instanceof Error ? err.message : String(err)}`,
     );
     process.exit(1);
   }

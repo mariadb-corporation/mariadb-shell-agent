@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -151,7 +152,7 @@ export const STATUS_LINE_PRESET_ITEMS: readonly StatusLinePresetItem[] = [
   {
     id: 'qwen-version',
     label: 'qwen-version',
-    description: 'Qwen Code application version',
+    description: 'MariaDB Shell Agent application version',
   },
   {
     id: 'context-window-size',

@@ -40,10 +40,10 @@
 
 发布出去的验证评论以与 `/review` 相同的署名形状收尾：
 
-`_— <model> via Qwen Code /verify-pr (v<cli-version>; skill <skill-hash>)_`
+`_— <model> via MariaDB Shell Agent /verify-pr (v<cli-version>; skill <skill-hash>)_`
 
-- model 是本轮运行所用的身份，CLI 版本取 `qwen --version`，skill 版本取 `git hash-object --no-filters .qwen/skills/verify-pr/SKILL.md` 的前 12 个字符。用内容哈希而不是提交号：lane 的树只有 depth-2，`.qwen` 又是 `git archive` 来的，没有任何历史可达；而内容哈希恰好指名本轮实际加载的那份指令——在工作站上还包括未提交的修改。`--no-filters` 是因为 prepare 把 `.git` 留给了 node 所有，否则一个被种下的 clean filter 就能决定被哈希的内容——甚至以 root 身份执行。
-- 在 lane 里，三个值都是 run step 的 workflow 自有输出——配置的模型、runner 上的 CLI、重新钉住的 skill 文件——绝不从 agent 可写的产物树里读。它们在基线重新钉住之后、agent 启动之前采集：工作区父目录始终归 node 所有，因此 agent 运行期间 PR 代码可以整个替换 `.qwen` 目录（mv + mkdir）而不必碰里面 root 所有的文件，agent 之后再取哈希就可能指名本轮根本没加载过的指令。一条元测试钉住这个顺序，而不只是字符串。发布侧只在正文确实带有报告、且三个值都到达时才盖页脚；否则评论保留通用的 `— _Qwen Code · sandboxed verification_` 签名，各类弱通知（取消 / 基础设施故障 / 跳过 / 结果不可用 / 产物下载成功但没有报告）同样保留它：它们报告的是 lane，不是某一轮。
+- model 是本轮运行所用的身份，CLI 版本取 `mariadb-shell-agent --version`，skill 版本取 `git hash-object --no-filters .mariadb-shell-agent/skills/verify-pr/SKILL.md` 的前 12 个字符。用内容哈希而不是提交号：lane 的树只有 depth-2，`.mariadb-shell-agent` 又是 `git archive` 来的，没有任何历史可达；而内容哈希恰好指名本轮实际加载的那份指令——在工作站上还包括未提交的修改。`--no-filters` 是因为 prepare 把 `.git` 留给了 node 所有，否则一个被种下的 clean filter 就能决定被哈希的内容——甚至以 root 身份执行。
+- 在 lane 里，三个值都是 run step 的 workflow 自有输出——配置的模型、runner 上的 CLI、重新钉住的 skill 文件——绝不从 agent 可写的产物树里读。它们在基线重新钉住之后、agent 启动之前采集：工作区父目录始终归 node 所有，因此 agent 运行期间 PR 代码可以整个替换 `.mariadb-shell-agent` 目录（mv + mkdir）而不必碰里面 root 所有的文件，agent 之后再取哈希就可能指名本轮根本没加载过的指令。一条元测试钉住这个顺序，而不只是字符串。发布侧只在正文确实带有报告、且三个值都到达时才盖页脚；否则评论保留通用的 `— _MariaDB Shell Agent · sandboxed verification_` 签名，各类弱通知（取消 / 基础设施故障 / 跳过 / 结果不可用 / 产物下载成功但没有报告）同样保留它：它们报告的是 lane，不是某一轮。
 - 本地轮次从 `$QWEN_CODE_MODEL_IDENTITY`（为空则 `$QWEN_CODE_MODEL`）解析模型，两者都取不到时省略页脚——空身份比没有更糟，而且工作站轮次绝不冒用 lane 的 `sandboxed verification` 签名。
 - `report.md` 本身不带页脚：两条发布路径都在发评论时追加，写进报告里的页脚会出现两次。
 - 一条 workflow 元测试把同一模板钉在两个表面（发布侧与 skill）上，因此改了一处的措辞不会让另一处发出不同的形状。
@@ -64,7 +64,7 @@
 - 树闸门只证明源码身份。`dist/` 与 `node_modules/` 都被 gitignore，head 的干净检出仍可能带着更早提交的构建——评审中已复现：prepare 退出 0，而被忽略的构建以新 head 的名义跑旧代码。因此 install/build 的复用是有条件的：轮次必须先确立产物确为本 head 所建（否则按本地安装策略重建），prepare 的成功行也相应写成「先校验或刷新其 install/build」，而不是宣传无条件复用构建。
 - 检查器位于 CI 发布路径上。收紧一条规则，会拒绝 lane 以前接受的判定，这些轮次随之发布为「无法判定」。发布保真元测试运行的是真实脚本，包括从发布 job 检出的那组路径原样运行，所以改动检查器时要一并跑这些测试。另有一条 workflow 元测试仍把检查器的判定词表钉到发布侧的 case 标签上，任一侧新增第五个词都会让套件失败。
 - PR 标题是不可信输入且会到达维护者终端，因此在打印前剥离控制字符。
-- 这些是本地辅助脚本：lane 从基线分支钉住 `.qwen`，因此引用它们的 skill 文本要在本改动合入后才生效。
+- 这些是本地辅助脚本：lane 从基线分支钉住 `.mariadb-shell-agent`，因此引用它们的 skill 文本要在本改动合入后才生效。
 - 守卫把每个条目归一为 `id`、一个取值 `updated_at ?? submitted_at` 的时间戳、`body`，以及仅 review 才有的 `state`。只看时间戳回答不了「有没有东西变过」：对本仓库 API 实测，review 对象只有 `submitted_at`、没有 `updated_at`，而编辑正文或 dismiss 这条 review 都不会改动这个时间戳。PR 15388 上的 review 5673309455 报告的 `submitted_at` 是 2026-10-27T19:47:16Z，而它在五小时三十六分钟后的 2026-10-28T01:22:57Z 被 dismiss。时间戳仍是更早的那个值，说明 dismiss 没有动它，并且这条 review 仍报告 4838 字的正文：除了 `state`，没有任何字段记录它被 dismiss 过。正文是否也被改过则无法观测——这正是要点——而正是这次 dismiss 解开了合并闸门。三个列表都返回字符串 `body`、review 还返回字符串 `state`，因此两者都与时间戳一起参与比对；当某个条目没有 body、或某条 review 没有 state 时，整次抓取直接拒绝，而不是当作「什么都没变」去比。代价是快照文件更大——正文按原样保存，这也让轮次无需再抓一次就能读到究竟来了什么。
 - 参与比对的字段，是那些会改变「评审者说了什么、判了什么」的字段。reaction 计数与其他元数据被有意排除：整条对象比对会让一个点赞就把轮次判成 dirty，把维护者推进毫无意义的重新抓取循环。把这条边界写下来，正是为了不让字段清单每审计一轮就长一截。
 - 列表变短时只报它自己的原因加一个丢失条数，不逐条点名。实测于一个真实 PR：被截断的重新抓取先打出「列表变短」的原因，接着打出 321 行 `disappeared`，把唯一可操作的那一行埋在自己的回声里。这些 id 是截断的后果，不是独立的原因。长度相等时缺失的 id 就是全部信号，因此仍然逐条点名——另有一条 pin 专门防止这个抑制把真实删除也吞掉。

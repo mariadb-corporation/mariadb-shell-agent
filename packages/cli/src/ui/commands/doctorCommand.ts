@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -179,7 +180,7 @@ export const doctorCommand: SlashCommand = {
           if (isHighHeapPressure(latestDiagnostics)) {
             throw new Error(
               t(
-                'Heap snapshot skipped: V8 heap pressure is already high, and writing a synchronous heap snapshot could make the process unresponsive or trigger OOM. Restart Qwen Code first if it is unstable, or retry before memory pressure reaches the warning threshold.',
+                'Heap snapshot skipped: V8 heap pressure is already high, and writing a synchronous heap snapshot could make the process unresponsive or trigger OOM. Restart MariaDB Shell Agent first if it is unstable, or retry before memory pressure reaches the warning threshold.',
               ),
             );
           }
@@ -738,10 +739,10 @@ async function cpuProfileDoctorAction(
       const infoMsg =
         process.platform === 'win32'
           ? t(
-              'CPU profile was stopped externally. Check ~/.qwen/cpu-profiles/ for the output.',
+              'CPU profile was stopped externally. Check ~/.mariadb-shell-agent/cpu-profiles/ for the output.',
             )
           : t(
-              'CPU profile was stopped externally (e.g., via SIGUSR1). Check ~/.qwen/cpu-profiles/ for the output.',
+              'CPU profile was stopped externally (e.g., via SIGUSR1). Check ~/.mariadb-shell-agent/cpu-profiles/ for the output.',
             );
       if (executionMode === 'interactive') {
         context.ui.addItem({ type: 'info', text: infoMsg }, Date.now());

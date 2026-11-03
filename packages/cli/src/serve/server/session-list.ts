@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -747,7 +748,7 @@ async function loadAllPersistedSummaries(
       (sessions.length >= MAX_ORGANIZED_SESSIONS && cursor !== undefined)
     ) {
       writeStderrLine(
-        `qwen serve: organized session list truncated at ${MAX_ORGANIZED_SESSIONS} sessions`,
+        `mariadb-shell-agent serve: organized session list truncated at ${MAX_ORGANIZED_SESSIONS} sessions`,
       );
       truncated = true;
       break;
@@ -1090,7 +1091,7 @@ async function listOrganizedWorkspaceSessionsForResponse(
       readOptions.signal?.throwIfAborted();
       liveMergeFailed = true;
       writeStderrLine(
-        `qwen serve: organized session list live merge failed; using persisted sessions only: ${
+        `mariadb-shell-agent serve: organized session list live merge failed; using persisted sessions only: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );
@@ -1290,7 +1291,7 @@ async function listWorkspaceSessionsByMetadataForResponse(
       readOptions.signal?.throwIfAborted();
       liveMergeFailed = true;
       writeStderrLine(
-        `qwen serve: session metadata filter live merge failed; using persisted sessions only: ${
+        `mariadb-shell-agent serve: session metadata filter live merge failed; using persisted sessions only: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );

@@ -1,10 +1,10 @@
 {
   "name": "@qwen-code/audio-capture",
   "version": "0.26.5",
-  "description": "Native microphone capture backend for Qwen Code voice input",
+  "description": "Native microphone capture backend for MariaDB Shell Agent voice input",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/QwenLM/qwen-code.git",
+    "url": "git+https://github.invalid/QwenLM/qwen-code.git",
     "directory": "packages/audio-capture"
   },
   "type": "module",

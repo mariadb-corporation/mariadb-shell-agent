@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -485,7 +486,7 @@ export function assertValidChannelSecretUpdates(
  * loader disables the workspace scope and attributes the shared settings file
  * to the user scope. Reads and writes must resolve the same scope: otherwise a
  * redirected `QWEN_HOME` makes reads come from the user file while writes land
- * in `<workspace>/.qwen/settings.json`, a file no scope reads.
+ * in `<workspace>/.mariadb-shell-agent/settings.json`, a file no scope reads.
  */
 function channelSettingsScope(workspaceCwd: string): SettingsFile {
   const loaded = loadSettings(workspaceCwd, { skipLoadEnvironment: true });

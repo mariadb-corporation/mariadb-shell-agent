@@ -4,7 +4,7 @@
 
 Status: the frozen contract and polling JSON-RPC transport are implemented; cross-implementation interoperability has not been demonstrated. Updated 2026-10-06 (tasks moved from threads to chat sessions).
 
-This began as P1 of the [continuation architecture](https://github.com/QwenLM/qwen-code/blob/8ff056f1c7e5842393bc8d0f5b8a6ab1502462b6/docs/design/2026-09-09-agent-service-collaboration.md) and [implementation plan](https://github.com/QwenLM/qwen-code/blob/8ff056f1c7e5842393bc8d0f5b8a6ab1502462b6/docs/plans/2026-09-09-agent-service-collaboration-plan.md). It now records the contract implemented by the core workspace-agent A2A modules and the daemon transport. Code takes precedence when it differs from this document.
+This began as P1 of the [continuation architecture](https://github.invalid/QwenLM/qwen-code/blob/8ff056f1c7e5842393bc8d0f5b8a6ab1502462b6/docs/design/2026-09-09-agent-service-collaboration.md) and [implementation plan](https://github.invalid/QwenLM/qwen-code/blob/8ff056f1c7e5842393bc8d0f5b8a6ab1502462b6/docs/plans/2026-09-09-agent-service-collaboration-plan.md). It now records the contract implemented by the core workspace-agent A2A modules and the daemon transport. Code takes precedence when it differs from this document.
 
 ## 1. Frozen Version and Binding
 
@@ -59,7 +59,7 @@ Optional, with **none included in the first version**: `sendMessageStream` / `re
 
 ## 5. A Non-`_meta` Channel for Local Run Status
 
-Local ACP prompts carry run frames in `_meta`. That is the daemon's trust boundary and **is neither externally reachable nor intended to be**. External tasks use a separate channel: declare the extension URI `https://qwenlm.github.io/qwen-code/a2a/workspace-agents/v1` in `AgentCapabilities.extensions`, and put the local run status (`localStatus`), its error and token usage (`tokensUsed`) under that URI in `Task.metadata`.
+Local ACP prompts carry run frames in `_meta`. That is the daemon's trust boundary and **is neither externally reachable nor intended to be**. External tasks use a separate channel: declare the extension URI `https://qwenlm.github.invalid/qwen-code/a2a/workspace-agents/v1` in `AgentCapabilities.extensions`, and put the local run status (`localStatus`), its error and token usage (`tokensUsed`) under that URI in `Task.metadata`.
 
 Set `required: false`: clients that ignore the extension still receive correct Task / Message semantics, but cannot see usage.
 

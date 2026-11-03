@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -544,7 +545,7 @@ const SESSION_SEND_AUTH = /^Bearer ([0-9a-f]{64})$/;
 /**
  * `POST /workspaces/:workspace/agent/sessions/:sessionId/agents/:agentId/send`
  * `{ text }` — a session agent's `session_send` tool call, made by the
- * `qwen agents session-send-mcp` child of a local run (the hidden qwen
+ * `mariadb-shell-agent agents session-send-mcp` child of a local run (the hidden qwen
  * session's MCP server, or a Claude / Codex process's).
  *
  * Authenticated by the (chat session, agent) binding's bearer token (minted

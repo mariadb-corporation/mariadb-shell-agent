@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +10,7 @@
 // host flag outranks the remote-URL hint in BOTH directions), a remote URL
 // on the canonical pair, an explicit NON-Aone remote (beats the cwd
 // probe), the current clone's origin remote (the FAMILY predicate — the
-// one place a non-canonical `*.alibaba-inc.com` host still reads as
+// one place a non-canonical `*.alibaba-inc.invalid` host still reads as
 // Aone), and finally GitHub. An explicit family-but-not-canonical host is
 // a GHE instance and stays GitHub. Detection is read-only and never throws
 // — an unreadable origin simply falls through to GitHub. (There is no
@@ -30,10 +31,10 @@ export interface PlatformHint {
 }
 
 /** Hosts that identify Aone Code on the FAMILY predicate — the canonical
- *  web/git pair PLUS any `*.alibaba-inc.com` host. This is the NO-EXPLICIT-
+ *  web/git pair PLUS any `*.alibaba-inc.invalid` host. This is the NO-EXPLICIT-
  *  SIGNAL fallback predicate (the cwd origin probe) only: an EXPLICIT host
  *  or remote on a family host that is NOT the canonical pair is a GitHub
- *  Enterprise instance (`ghe.alibaba-inc.com` is the live example the write
+ *  Enterprise instance (`ghe.alibaba-inc.invalid` is the live example the write
  *  gate already refuses the family for), and routing its reads at a1 would
  *  authenticate against the wrong platform and fetch an unrelated
  *  same-numbered MR. Delegates to the remote-match predicates so every
@@ -67,7 +68,7 @@ export function detectPlatformKind(hint?: PlatformHint): PlatformKind {
   // trim, and padded hosts are a known-good input class (setGhHost trims).
   // EXPLICIT signals (a --host flag, a --remote URL) select Aone only on
   // the CANONICAL pair: the caller named the host, and a non-canonical
-  // `*.alibaba-inc.com` name is a GHE instance, not Aone — the family
+  // `*.alibaba-inc.invalid` name is a GHE instance, not Aone — the family
   // wildcard here would authenticate the review against the wrong platform
   // and read an unrelated same-numbered MR (the review skill always passes
   // --host, so this arm is the one the GHE PRs ride).

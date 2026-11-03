@@ -24,7 +24,7 @@ naming scheme.
 Rename the local `Gemini` identifiers to `Llm`, with these exceptions:
 
 1. **Memory filename** — `GeminiMdFilename` (+ `set/get/getAll/getCurrent`,
-   `GeminiMdFileCount`) is the project memory file (`QWEN.md`), a memory
+   `GeminiMdFileCount`) is the project memory file (`MARIADB-SHELL-AGENT.md`), a memory
    concept, not an LLM client. → `Memory*`. The loader
    `loadHierarchicalGeminiMemory` (a thin wrapper around core's
    `loadServerHierarchicalMemory`) belongs to the same family: →

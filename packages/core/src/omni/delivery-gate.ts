@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,7 +23,7 @@ const debugLogger = createDebugLogger('omni:delivery-gate');
  * Gate for the omni delivery path. All conditions must hold:
  *
  * 1. omni enabled (settings or QWEN_CODE_ENABLE_OMNI=1);
- * 2. trusted workspace (the pipeline writes .qwen/omni/ and uploads
+ * 2. trusted workspace (the pipeline writes .mariadb-shell-agent/omni/ and uploads
  *    workspace bytes off-machine);
  * 3. a resolved DashScope upload channel, either explicitly separated from
  *    inference or inherited from the legacy static DashScope inference

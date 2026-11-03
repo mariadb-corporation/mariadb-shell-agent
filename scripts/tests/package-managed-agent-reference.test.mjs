@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Alibaba Group Holding Limited
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -67,7 +68,7 @@ async function fixture(root) {
     'packages/managed-agent-server/distribution/systemd/qwen-managed-agent-server.service':
       '[Service]\nKillMode=process\n',
     'packages/managed-agent-server/distribution/systemd/qwen-hosted-harness.service':
-      'ExecStart=qwen serve --profile hosted-harness --no-web\n',
+      'ExecStart=mariadb-shell-agent serve --profile hosted-harness --no-web\n',
     'packages/managed-agent-server/distribution/systemd/harness.env.example':
       'QWEN_SERVER_TOKEN=\n',
     'packages/managed-agent-server/distribution/systemd/server.env.example':
@@ -570,7 +571,7 @@ test('ships systemd units with the documented kill modes', async () => {
   );
   assert.match(
     harness,
-    /^ExecStart=\/usr\/local\/bin\/qwen serve --profile hosted-harness --hostname 127\.0\.0\.1 --port 4170 --no-web$/m,
+    /^ExecStart=\/usr\/local\/bin\/mariadb-shell-agent serve --profile hosted-harness --hostname 127\.0\.0\.1 --port 4170 --no-web$/m,
   );
   assert.ok(server.endsWith('\n'));
   assert.ok(harness.endsWith('\n'));

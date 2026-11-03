@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +10,7 @@
  * One-shot development launcher for the Managed Agent dual-path Web Shell.
  *
  * Starts, from TypeScript source, with each stage serialized:
- *   - an ordinary `qwen serve` daemon (existing WebShell panels),
+ *   - an ordinary `mariadb-shell-agent serve` daemon (existing WebShell panels),
  *   - a private Hosted Harness (`--profile hosted-harness`),
  * then waits for the Spring Managed Agent Server (started separately with
  * Maven — see the env file it writes) and finally opens the Web Shell Vite
@@ -447,7 +448,7 @@ export function findWebPort(excludedPorts) {
   return findAvailablePort(DEFAULT_WEB_PORT, excludedPorts, WEB_HOST);
 }
 
-// Outside --profile hosted-harness, `qwen serve` retries EADDRINUSE by
+// Outside --profile hosted-harness, `mariadb-shell-agent serve` retries EADDRINUSE by
 // bumping even when the port was pinned, which would leave the launcher
 // polling an address the child never bound; the hosted-harness profile exits
 // instead. Either way, fail fast with a message naming the flag.

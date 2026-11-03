@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review build-test`: run the project's own build and tests over the code
+// `mariadb-shell-agent review build-test`: run the project's own build and tests over the code
 // the PR actually changed, and report what happened as data.
 //
 // Agent 7's brief was a paragraph. It named `npm run build`, then `npm test`, and
@@ -373,7 +374,7 @@ export function trimOutput(s: string): string {
  * `heapMb` is the heap a build or install command gets — see
  * `declaredBuildHeapMb` — at least: a channel that already sets more keeps
  * it, as the root build would never have run below the declared one. A Web
- * Shell review cannot set it from outside: `qwen serve` drops an inherited
+ * Shell review cannot set it from outside: `mariadb-shell-agent serve` drops an inherited
  * `NODE_OPTIONS`.
  *
  * Two channels reach a lifecycle script, and each is raised on its own,
@@ -610,7 +611,7 @@ wait "$c"`;
  * (today's behaviour), no runtime answered under `auto`, or this command's cwd
  * is not inside a review temp dir — which is the case for a `/review` of a
  * local checkout, where the tree under test IS the user's own working copy and
- * there is no `.qwen/tmp` sibling layout to mount. The `required` policy is
+ * there is no `.mariadb-shell-agent/tmp` sibling layout to mount. The `required` policy is
  * NOT handled here: refusing is the caller's decision, because only the caller
  * knows what evidence it is about to mark unavailable.
  */

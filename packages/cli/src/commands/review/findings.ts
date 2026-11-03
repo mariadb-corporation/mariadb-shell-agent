@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review findings`: the review's findings as data, and the per-finding
+// `mariadb-shell-agent review findings`: the review's findings as data, and the per-finding
 // outcome ledger `--fix` writes back into it.
 //
 // Everything else in this pipeline that matters is already a computed artifact —
@@ -364,7 +365,7 @@ function parseLocations(
  */
 export function validateFindings(raw: unknown): Finding[] {
   // Step 9 cleanup deletes the side files `--input` normally receives, but
-  // not the saved artifact (Step 8, under .qwen/reviews/) nor a surviving
+  // not the saved artifact (Step 8, under .mariadb-shell-agent/reviews/) nor a surviving
   // `--out` report — and both wrap the findings array. Accept the wrapper,
   // so a later outcome path can recover from the state that survives the
   // cleanup instead of dying on a missing findings-in.json.

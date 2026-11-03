@@ -11,7 +11,7 @@
 ## 方案
 
 产物源码继续检出发布的 `SOURCE_SHA`。另将 `github.workflow_sha` 的 `scripts` 检出到
-已有忽略规则覆盖的 `.qwen/managed-release-tools` 目录，不持久化凭据。使用此处的
+已有忽略规则覆盖的 `.mariadb-shell-agent/managed-release-tools` 目录，不持久化凭据。使用此处的
 发布辅助脚本，使旧标签补发也能运行新增预检。依赖通过根目录安装解析；源码检出、
 Git 元数据、版本和构建时间戳保持不变。
 

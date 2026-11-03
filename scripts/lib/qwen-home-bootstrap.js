@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -40,7 +41,7 @@ export function resolvePath(dir) {
  * Pre-resolves QWEN_HOME / QWEN_RUNTIME_DIR from home-scoped `.env` files so
  * that helper scripts (sandbox launcher, telemetry) agree with the main CLI's
  * `preResolveHomeEnvOverrides`. Without this, the CLI may route to a custom
- * config dir via `~/.env` while these scripts still read `~/.qwen/...`,
+ * config dir via `~/.env` while these scripts still read `~/.mariadb-shell-agent/...`,
  * splitting global state across two locations.
  *
  * Project `.env` files are deliberately excluded — only home-scoped files are
@@ -56,7 +57,7 @@ export function bootstrapHomeEnv() {
   const initialQwenHome = process.env.QWEN_HOME;
   const initialQwenDir = initialQwenHome
     ? resolvePath(initialQwenHome)
-    : path.join(os.homedir(), '.qwen');
+    : path.join(os.homedir(), '.mariadb-shell-agent');
   const candidates = [path.join(initialQwenDir, '.env')];
   if (!initialQwenHome) {
     candidates.push(path.join(os.homedir(), '.env'));

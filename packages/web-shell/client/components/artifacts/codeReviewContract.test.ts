@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// The CLI/renderer contract: the fixture is genuine `qwen review save-artifact`
+// The CLI/renderer contract: the fixture is genuine `mariadb-shell-agent review save-artifact`
 // output, generated through `buildReport(validateFindings(...))` — not a
 // hand-written copy. If the CLI's document shape or vocabulary changes,
 // regenerate the fixture and bring this parser along.
@@ -38,7 +39,7 @@ describe('code review artifact contract', () => {
       verdictLine: 'Verdict: Comment — Request changes was downgraded',
     });
     expect(reviewDocument.markdownReportPath).toBe(
-      '.qwen/reviews/contract-v1.md',
+      '.mariadb-shell-agent/reviews/contract-v1.md',
     );
 
     // The fixture exercises the whole vocabulary — every source, severity,

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,7 +37,7 @@
  *    worktree's copy (measured on a live CI review: 1 722 links). Mounting
  *    one tree would leave all of them dangling. Every tree the pipeline
  *    builds — the review worktree, `-probe`, `-base`, every `-scratch-*` —
- *    is a sibling under `.qwen/tmp`, so one mount covers both ends of every
+ *    is a sibling under `.mariadb-shell-agent/tmp`, so one mount covers both ends of every
  *    link while `<repo>/.git` stays outside it.
  * 2. **The environment is an allowlist**, not the inherited one. The PR's
  *    code gets the npm knobs the pipeline sets deliberately and nothing else.
@@ -93,7 +94,7 @@ export function runtimeClientEnv(
  * a digest would go stale in a file nobody updates, and the overrides exist
  * for anyone who needs reproducibility.
  */
-const DEFAULT_IMAGE = `ghcr.io/qwenlm/qwen-code:${CLI_VERSION}`;
+const DEFAULT_IMAGE = `ghcr.invalid/qwenlm/qwen-code:${CLI_VERSION}`;
 
 /** Container runtimes this module knows how to drive, in preference order. */
 const RUNTIMES = ['docker', 'podman'] as const;
@@ -118,7 +119,7 @@ const POLICIES: readonly string[] = ['off', 'auto', 'required'];
  * on a settings file the runner may not carry. Below it, `review.sandbox` is
  * read through {@link operatorReviewSettings}, which loads the operator scopes
  * ONLY — a repository must not be able to switch off the containment that
- * exists to contain it, and `.qwen/settings.json` is repository content the
+ * exists to contain it, and `.mariadb-shell-agent/settings.json` is repository content the
  * review reads.
  *
  * The default is `off`: today every review runs the PR's code directly, and
@@ -138,7 +139,7 @@ export function sandboxPolicy(
   //
   // Both halves are load-bearing, and the first cut had neither. `process.env`
   // is not the operator's alone: `loadEnvironment` walks up from cwd and
-  // applies `<repo>/.qwen/.env` — repository content, from the very checkout
+  // applies `<repo>/.mariadb-shell-agent/.env` — repository content, from the very checkout
   // under review, admitted by default because folder trust starts off. Letting
   // that outrank the setting made the guarantee this module advertises
   // ("a repository cannot switch off the containment that exists to contain
@@ -382,7 +383,7 @@ export function refuseUnsandboxedPhase(
   // A runtime answering is not containment. The first cut asked only whether
   // one did, and every route the container cannot actually serve still ran the
   // reviewed code with the full environment under `required`: a `/review` of a
-  // local checkout has no `.qwen/tmp` layout to mount, so `mountRootFor`
+  // local checkout has no `.mariadb-shell-agent/tmp` layout to mount, so `mountRootFor`
   // returns null, the command falls through to the direct spawn, and the
   // report is indistinguishable from a contained run. The question the policy
   // asks is whether THIS phase can be contained, and the mount is the half
@@ -458,7 +459,7 @@ export interface ContainerCommandOptions {
   cwd: string;
   /** The container's name, so a timeout can reach it — see `containerName`. */
   name: string;
-  /** The review temp dir (`<repo>/.qwen/tmp`): the mount, and the farm's far end. */
+  /** The review temp dir (`<repo>/.mariadb-shell-agent/tmp`): the mount, and the farm's far end. */
   tmpDir: string;
   kind: CommandKind;
   /**
@@ -639,14 +640,14 @@ export function containerCommandEnv(
 }
 
 /**
- * The image `qwen --sandbox` itself runs, read from the package manifest that
+ * The image `mariadb-shell-agent --sandbox` itself runs, read from the package manifest that
  * ships with this CLI (`config.sandboxImageUri`) — the same field
  * `sandboxConfig.ts` reads, so the two cannot drift.
  *
  * This is a correction, not a refinement. The first cut hardcoded
- * `ghcr.io/qwenlm/qwen-code/sandbox:latest` and its comment claimed that was
- * "the same image `qwen --sandbox` uses". It is not: the CLI's image is
- * `ghcr.io/qwenlm/qwen-code:<version>`, a different repository path and a
+ * `ghcr.invalid/qwenlm/qwen-code/sandbox:latest` and its comment claimed that was
+ * "the same image `mariadb-shell-agent --sandbox` uses". It is not: the CLI's image is
+ * `ghcr.invalid/qwenlm/qwen-code:<version>`, a different repository path and a
  * pinned tag, and the hardcoded name does not resolve at all — an anonymous
  * manifest request answers 403 where the real one answers 200. Every command
  * of an opted-in review therefore failed at image pull, which nineteen rounds
@@ -679,14 +680,14 @@ let manifestImage: string | null | undefined;
  * The image the reviewed repository's commands run in.
  *
  * Defaults to the CLI's own sandbox image, which already carries a Node
- * toolchain — literally the same image `qwen --sandbox` resolves, read from
+ * toolchain — literally the same image `mariadb-shell-agent --sandbox` resolves, read from
  * the same manifest field, so a repository that builds under one builds under
  * the other. That sentence was here before `cliSandboxImage` existed, when a
  * hardcoded name made it false; it is now a description of the code rather
  * than an intention about it.
  *
  * The parity is over the DEFAULT, not over every channel `--sandbox` reads.
- * An operator who set `QWEN_SANDBOX_IMAGE` in a user-level `~/.qwen/.env` or
+ * An operator who set `QWEN_SANDBOX_IMAGE` in a user-level `~/.mariadb-shell-agent/.env` or
  * in `settings.env` loses it here and falls back to that default: the loader
  * records every key it applies from a file without distinguishing the user's
  * own from the reviewed repository's, and this side cannot afford to guess
@@ -720,8 +721,8 @@ export function reviewSandboxImage(
     pick('QWEN_REVIEW_SANDBOX_IMAGE') ||
     pick(CUSTOM_SANDBOX_IMAGE_ENV_VAR) ||
     // The operator's own sandbox image, if they configured one for
-    // `qwen --sandbox`. Through `pick`, so a repository shipping it in its
-    // `.qwen/.env` cannot choose the image its own code runs in.
+    // `mariadb-shell-agent --sandbox`. Through `pick`, so a repository shipping it in its
+    // `.mariadb-shell-agent/.env` cannot choose the image its own code runs in.
     pick('QWEN_SANDBOX_IMAGE') ||
     manifest() ||
     DEFAULT_IMAGE

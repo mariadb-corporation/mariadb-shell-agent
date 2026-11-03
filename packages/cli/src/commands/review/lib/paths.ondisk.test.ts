@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,9 +25,12 @@ beforeEach(() => {
   root = fs.realpathSync(fs.mkdtempSync(join(tmpdir(), 'tmpdir-ondisk-')));
   cwd = process.cwd();
   process.chdir(root);
-  fs.mkdirSync(join(root, '.qwen', 'tmp', 'qwen-review-pr-8-prompts'), {
-    recursive: true,
-  });
+  fs.mkdirSync(
+    join(root, '.mariadb-shell-agent', 'tmp', 'qwen-review-pr-8-prompts'),
+    {
+      recursive: true,
+    },
+  );
 });
 
 afterEach(() => {

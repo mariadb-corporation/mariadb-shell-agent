@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -190,13 +191,13 @@ export function validateReasoningCapabilities(
   // list itself comes from the attribution leaf (#15107).
   const dashscope =
     auth === 'qwen-oauth' ||
-    /(^|\.)(dashscope(?:-intl|-us)?\.aliyuncs\.com|alibaba-inc\.com|aliyun-inc\.com|alicloudapi\.com)$/.test(
+    /(^|\.)(dashscope(?:-intl|-us)?\.aliyuncs\.invalid|alibaba-inc\.invalid|aliyun-inc\.invalid|alicloudapi\.com)$/.test(
       host,
     ) ||
     QWENCLOUD_MAAS_HOSTS.some(
       (domain) => host === domain || host.endsWith(`.${domain}`),
     ) ||
-    /^token-plan\..+\.maas\.aliyuncs\.com$/.test(host);
+    /^token-plan\..+\.maas\.aliyuncs\.invalid$/.test(host);
   const profile =
     input.profile ??
     (auth === 'gemini' || auth === 'vertex-ai'

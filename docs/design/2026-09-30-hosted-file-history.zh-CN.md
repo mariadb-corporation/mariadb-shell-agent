@@ -139,7 +139,7 @@ rewind 传入 `truncateHistory = false`。未来的保留或裁剪策略必须�
 ## 部署与升级
 
 worker 备份位于 `$QWEN_HOME/file-history/<Harness Session ID>/`
-（默认是 worker 所属 OS 用户的 `~/.qwen/file-history/`）。在 Broker 的 worker
+（默认是 worker 所属 OS 用户的 `~/.mariadb-shell-agent/file-history/`）。在 Broker 的 worker
 环境中设置绝对路径 `QWEN_HOME`，挂载 worker 用户可写的持久存储。它需要与
 Workspace 和 SQL Store 一起保留；仅持久化 Workspace 或数据库不会保存备份
 字节。重启时保留仍被引用的备份文件。缺备份会明确拒绝，修复后可重试；未知或部分
@@ -166,12 +166,12 @@ Workspace 和 SQL Store 一起保留；仅持久化 Workspace 或数据库不会
 CLI、真实 worker、Java Broker 和 HTTP Session Store 验证两个 Workspace。验证
 已有文件恢复、新建文件删除，并回归默认无工具模式与 Shell。必须通过 build、
 typecheck、bundle、定向测试和两轮干净自审。E2E 计划及实测结果保存在
-`.qwen/e2e-tests/hosted-file-history.md`。
+`.mariadb-shell-agent/e2e-tests/hosted-file-history.md`。
 
 #13124 增加非法回执及各 profile 工具说明断言，补强现有 HTTP 撤销测试中的回放键
 不匹配、冲突回放与持久 pending 状态断言。复用已有的后续撤销、Write/Edit 及
 重新加载后的回放测试。验证新回合 pending 历史守卫和派发前容量拒绝。定向计划及
-实测结果保存在 `.qwen/e2e-tests/issue-13124.md`；若改变故障门禁的执行行为，
+实测结果保存在 `.mariadb-shell-agent/e2e-tests/issue-13124.md`；若改变故障门禁的执行行为，
 仍须运行真实 Java/MySQL 门禁。
 
 本地验证已通过：build、typecheck、bundle、定向测试、打包 worker 故障探针及 Hosted

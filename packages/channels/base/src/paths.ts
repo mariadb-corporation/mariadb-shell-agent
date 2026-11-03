@@ -33,7 +33,7 @@ export function resolvePath(dir: string): string {
 /**
  * Returns the global Qwen home directory (config, credentials, etc.).
  *
- * Priority: QWEN_HOME env var > ~/.qwen
+ * Priority: QWEN_HOME env var > ~/.mariadb-shell-agent
  *
  * This mirrors packages/core Storage.getGlobalQwenDir() without importing
  * from core to avoid cross-package dependencies.
@@ -45,8 +45,8 @@ export function getGlobalQwenDir(): string {
   }
   const homeDir = os.homedir();
   return homeDir
-    ? path.join(homeDir, '.qwen')
-    : path.join(os.tmpdir(), '.qwen');
+    ? path.join(homeDir, '.mariadb-shell-agent')
+    : path.join(os.tmpdir(), '.mariadb-shell-agent');
 }
 
 /**

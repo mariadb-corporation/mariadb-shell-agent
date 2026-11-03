@@ -36,7 +36,7 @@ Java 投影有效且已批准的公开 Plan Action 时，验证其输入与 Turn
 
 ## 附件契约与模型输入
 
-扩展封闭的公开输入联合类型：`input_file` 包含 `name`、`mime_type`、UTF-8 `text`，`input_image` 包含 `mime_type` 和 base64 `data`。保留 `input_text` 与旧 `text` 行为。拒绝混用或未知字段、空附件、任意 URL、宿主机路径、二进制文件、非法 base64 和不匹配的图片签名。文本附件使用保守的文本 MIME/扩展名白名单，并拒绝 NUL。图片支持 PNG、JPEG（含 `image/jpg` 别名）、GIF 和 WebP，与普通 Qwen Code 的 `PIPELINE_IMAGE_MIME_TYPES` 保持一致。PDF、Office、音频和视频不在范围内。
+扩展封闭的公开输入联合类型：`input_file` 包含 `name`、`mime_type`、UTF-8 `text`，`input_image` 包含 `mime_type` 和 base64 `data`。保留 `input_text` 与旧 `text` 行为。拒绝混用或未知字段、空附件、任意 URL、宿主机路径、二进制文件、非法 base64 和不匹配的图片签名。文本附件使用保守的文本 MIME/扩展名白名单，并拒绝 NUL。图片支持 PNG、JPEG（含 `image/jpg` 别名）、GIF 和 WebP，与普通 MariaDB Shell Agent 的 `PIPELINE_IMAGE_MIME_TYPES` 保持一致。PDF、Office、音频和视频不在范围内。
 
 在 Managed 输入框及草稿恢复、公开 OpenAPI 契约、Java 准入与 Hosted 解析中使用相同的图片格式。接受 `GIF87a` 和 `GIF89a` 两种签名，使用 JPEG 签名校验 `image/jpg`。构建持久化输入、模型 parts 以及恢复输入框缩略图时，将 JPEG 别名规范为 `image/jpeg`，与普通图片接入及下游模型、展示要求一致。摘要、重放和投影保留原始图片字节及规范 MIME。对齐普通模型输入链路，而非其更宽的文件识别列表；BMP、TIFF、HEIC 和 SVG 图片块仍不支持。无需转码或新增存储。依赖 GIF 或 `image/jpg` 前，同步部署 UI、Java 服务与 Harness；旧校验器会拒绝这些格式。
 
@@ -68,7 +68,7 @@ Java Harness 客户端构造时会固定能力快照。如果已经协商到不�
 
 ## 验证与验收标准
 
-使用隔离 worktree、一次性 MySQL 8.4 数据库、独立端口与 Workspace，以及确定性的本地模型响应。不在用户实际 Session 做工具副作用测试，不重置实际数据库。先用全局 `qwen` dry-run E2E 计划，如实记录不支持的基线路径，再由 test-engineer 验证本地构建产物。
+使用隔离 worktree、一次性 MySQL 8.4 数据库、独立端口与 Workspace，以及确定性的本地模型响应。不在用户实际 Session 做工具副作用测试，不重置实际数据库。先用全局 `mariadb-shell-agent` dry-run E2E 计划，如实记录不支持的基线路径，再由 test-engineer 验证本地构建产物。
 
 覆盖新建/已有内置及自定义会话、三种执行权限、Plan 读取与零副作用拒绝、批准/拒绝/取消/过期、过期 CAS 与回执重放、owner/grant 隔离、Plan Action 刷新，以及决策/结果前后的崩溃恢复。确认批准后仍遵循冻结权限，旧 Action 不会解除新 Plan；回归团队成员规划与原生审批。
 

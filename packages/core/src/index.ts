@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -586,7 +587,7 @@ export * from './memory/refresh.js';
 export * from './memory/dream.js';
 export * from './memory/learn-skill-agent.js';
 // Issue : write helper for hierarchical context files,
-// re-exported so the `qwen serve` daemon can mutate workspace memory
+// re-exported so the `mariadb-shell-agent serve` daemon can mutate workspace memory
 // via `POST /workspace/memory` without depending on internal paths.
 export * from './memory/writeContextFile.js';
 

@@ -788,7 +788,7 @@ npm run lint
 ```
 
 Execute the focused plan in
-`.qwen/e2e-tests/channel-named-sessions-part3a.md`. The three-task concurrent
+`.mariadb-shell-agent/e2e-tests/channel-named-sessions-part3a.md`. The three-task concurrent
 switch/cancel plan remains deferred to Part 3B.
 
 ## Size and review strategy

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,8 +14,20 @@ interface QwenOnboardingProps {
   connecting: boolean;
   error?: string;
   t: ChromeStrings;
+  theme: 'light' | 'dark';
   onGetStarted: () => void;
 }
+
+/**
+ * The product name's gradient, as on the Web Shell welcome screen
+ * (`--agent-logo-gradient` in web-shell's App.module.css, which this view
+ * is not inside of).
+ */
+export const TITLE_GRADIENT: Record<QwenOnboardingProps['theme'], string> = {
+  dark: 'linear-gradient(90deg, #51d9f7 0%, 25%, #8ce786 50%, 75%, #cdf70a 100%)',
+  light:
+    'linear-gradient(90deg, #0093c4 0%, 25%, #00a37a 50%, 75%, #5c9f00 100%)',
+};
 
 const BUTTON_STYLE: CSSProperties = {
   display: 'inline-flex',
@@ -34,6 +47,7 @@ export function QwenOnboarding({
   connecting,
   error,
   t,
+  theme,
   onGetStarted,
 }: QwenOnboardingProps) {
   return (
@@ -61,13 +75,25 @@ export function QwenOnboarding({
       >
         <img
           src={iconUrl}
-          alt="Qwen Code"
+          alt="MariaDB Shell Agent"
           width={48}
           height={48}
           style={{ objectFit: 'contain' }}
         />
         <div>
-          <div style={{ fontSize: 17, fontWeight: 600 }}>
+          <div
+            style={{
+              fontSize: 32,
+              fontWeight: 600,
+              lineHeight: '36px',
+              letterSpacing: '-0.02em',
+              background: TITLE_GRADIENT[theme],
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              color: 'var(--vscode-foreground)',
+            }}
+          >
             {t('onboarding.title')}
           </div>
           <div

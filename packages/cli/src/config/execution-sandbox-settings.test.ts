@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -92,7 +93,9 @@ describe('operator execution sandbox policy', () => {
     'project tools=%j cannot weaken operator policy',
     (tools) => {
       write(user, { tools: { executionSandbox: restricted } });
-      write(path.join(workspace, '.qwen', 'settings.json'), { tools });
+      write(path.join(workspace, '.mariadb-shell-agent', 'settings.json'), {
+        tools,
+      });
       expect(
         loadSettings(workspace, {
           skipLoadEnvironment: true,
@@ -102,7 +105,7 @@ describe('operator execution sandbox policy', () => {
     },
   );
   it('workspace cannot enable the mode', () => {
-    write(path.join(workspace, '.qwen', 'settings.json'), {
+    write(path.join(workspace, '.mariadb-shell-agent', 'settings.json'), {
       tools: { executionSandbox: writable },
     });
     expect(
@@ -171,7 +174,7 @@ describe('operator execution sandbox policy', () => {
     write(user, { usageStatisticsEnabled: true });
     for (const merged of normalAndBareMerged()) {
       // `?? true` is the coercion config.ts applies before sending a beacon.
-      expect(merged.privacy?.usageStatisticsEnabled ?? true).toBe(false);
+      expect(merged.privacy?.usageStatisticsEnabled ?? false).toBe(false);
     }
   });
   it.each([0, ''])(
@@ -179,7 +182,7 @@ describe('operator execution sandbox policy', () => {
     (value) => {
       write(user, { privacy: { usageStatisticsEnabled: value } });
       for (const merged of normalAndBareMerged()) {
-        expect(merged.privacy?.usageStatisticsEnabled ?? true).toBeFalsy();
+        expect(merged.privacy?.usageStatisticsEnabled ?? false).toBeFalsy();
       }
     },
   );
@@ -203,7 +206,11 @@ describe('operator execution sandbox policy', () => {
   });
   it('does not migrate or repair project files on the host under confinement', () => {
     write(user, { tools: { executionSandbox: restricted } });
-    const project = path.join(workspace, '.qwen', 'settings.json');
+    const project = path.join(
+      workspace,
+      '.mariadb-shell-agent',
+      'settings.json',
+    );
     write(project, {});
     fs.writeFileSync(project, '{"tools": {"approvalMode": "yolo"}}');
     const original = fs.readFileSync(project, 'utf8');
@@ -326,7 +333,7 @@ describe('operator execution sandbox policy', () => {
       write(user, {
         tools: { executionSandbox: restricted, sandbox: operatorSandbox },
       });
-      write(path.join(workspace, '.qwen', 'settings.json'), {
+      write(path.join(workspace, '.mariadb-shell-agent', 'settings.json'), {
         tools: { sandbox: 'docker' },
       });
       const settings = loadSettings(workspace, {

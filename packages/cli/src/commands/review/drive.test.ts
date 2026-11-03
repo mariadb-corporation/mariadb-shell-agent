@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -850,7 +851,7 @@ describe('--capture', () => {
     const r = driveWithLog(
       [
         'port 8931 is in use, trying 8932...',
-        'qwen serve listening on http://127.0.0.1:8932',
+        'mariadb-shell-agent serve listening on http://127.0.0.1:8932',
         'ready',
       ].join('\n'),
       {

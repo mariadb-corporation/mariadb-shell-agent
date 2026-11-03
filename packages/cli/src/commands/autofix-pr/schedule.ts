@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -46,7 +47,7 @@ export interface ScheduledTask {
   sessionMode?: 'current';
 }
 
-/** `qwen serve` marks every child it spawns, and reclaims an idle session. */
+/** `mariadb-shell-agent serve` marks every child it spawns, and reclaims an idle session. */
 function inDaemonSession(): boolean {
   return process.env['QWEN_CODE_SERVE'] === '1';
 }
@@ -70,7 +71,7 @@ export function scheduledTask(
   if (!SESSION_ID_RE.test(state.sessionId)) {
     throw new Error(
       state.sessionId === ''
-        ? `PR #${state.prNumber} was prepared outside a Qwen Code session; a watch needs one (use --once).`
+        ? `PR #${state.prNumber} was prepared outside a MariaDB Shell Agent session; a watch needs one (use --once).`
         : `the session id ${JSON.stringify(state.sessionId)} cannot be named in a command as it is.`,
     );
   }
@@ -229,7 +230,7 @@ export const scheduleCommand: CommandModule = {
         type: 'boolean',
         default: false,
         describe:
-          "Take the user's instructions for every round from .qwen/tmp/autofix-pr-<pr>-instructions.txt",
+          "Take the user's instructions for every round from .mariadb-shell-agent/tmp/autofix-pr-<pr>-instructions.txt",
       })
       .option('again', {
         type: 'boolean',

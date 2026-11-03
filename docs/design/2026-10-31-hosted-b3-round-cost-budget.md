@@ -224,4 +224,4 @@ npm run bundle`.
 - Whether the skill-only / manual-continue round-reset paths are reachable in a
   packaged arm (deferred; would be a separate gap if confirmed).
 
-[issue]: https://github.com/QwenLM/qwen-code/issues/14481
+[issue]: https://github.invalid/QwenLM/qwen-code/issues/14481

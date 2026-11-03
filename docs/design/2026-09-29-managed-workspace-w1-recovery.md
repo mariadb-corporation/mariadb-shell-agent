@@ -5,7 +5,7 @@
 Status: W1a implementation candidate; W1b/W1c remain proposed. Linux/MySQL acceptance exists for `7c54aa78`; the birth-time identity fix and O2 integration require fresh validation.
 Research baseline: `be1ebc74d7f5b0bdce2b88a6565d4940d5a6b3c0`, 2026-09-29.
 Implementation integration baseline: main `78143fe33`, 2026-09-30; this includes initial Workspace file Turns, audited operator recovery and O2 durable remote Shell result delivery (#12894), private Hosted MCP (#12946), runtime JSON serialization (#13108) and durable permission Actions (#13101).
-Part of [proposal #12380](https://github.com/QwenLM/qwen-code/issues/12380).
+Part of [proposal #12380](https://github.invalid/QwenLM/qwen-code/issues/12380).
 The target contract is [Workspace v1.12, sections 2, 3.5 and 5](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-workspace-context.en.md).
 
 ## 1. Recommended scope
@@ -29,7 +29,7 @@ Paths and line numbers below refer to the research baseline. Initial Workspace f
 | Runtime identity  | `RuntimeScope.java:66–71`, `JdbcRepositorySupport.java:32–50` and `LocalRuntimeStore.java:365–379` include the physical cwd in identity or hashes.                                                | Moving a root requires a new placement; editing old Runtime rows in place would invalidate their evidence.                                    |
 | Hosted cold load  | `hosted-harness-session.ts:302–305,353–356` stores the Harness cwd in `managed-root`, and rejects a restore with an unsettled input or a non-OK recovery bundle.                                  | Harness cwd is not the remote Workspace identity. Executing-turn continuation remains Stage G.                                                |
 | File history      | `hosted-workspace-tool-turn.ts:67,78` explicitly provides no undo backup. The worker disables file checkpointing. Other Managed paths can record `file_history`.                                  | A `file_history` record is metadata, not all backup bytes; backups can live outside the Workspace under the Session's file-history directory. |
-| Public path       | The research baseline still gates Workspace execution; [G0 #12955](https://github.com/QwenLM/qwen-code/pull/12955) was open and only enables an initial file-tool Turn.                           | Internal W1 development can start now. Public resume and subsequent-turn acceptance need their own route integration.                         |
+| Public path       | The research baseline still gates Workspace execution; [G0 #12955](https://github.invalid/QwenLM/qwen-code/pull/12955) was open and only enables an initial file-tool Turn.                       | Internal W1 development can start now. Public resume and subsequent-turn acceptance need their own route integration.                         |
 
 Java paths above are under `packages/managed-agent-server/src/main/java/com/alibaba/qwen/code/managedagent/` or `packages/managed-agent-server/src/main/java/com/alibaba/qwen/code/runtimebroker/`. TypeScript Hosted paths are under `packages/cli/src/serve/`.
 
@@ -52,7 +52,7 @@ The merged [W0e recovery design](2026-09-27-managed-workspace-recovery.md), [tru
 | **W1b — backfill and snapshot verification** | Bounded reconstruction of recovery metadata from authority records, a versioned recovery manifest, and validation of an external snapshot/restore receipt.          | W1a plus a trusted snapshot source and private resource closure. O2 is required only when the chosen profile's accepted results use its storage. No generic backup engine.                                                                               |
 | **W1c — verified relocation**                | Offline same-host relocation of the same logical storage, a durable migration receipt and fresh Runtime installation.                                               | W1a/W1b, proof that every old writer is stopped, and an inventory showing every affected Session/profile supports relocation. Initially support Hosted relative-path file-tool Sessions only.                                                            |
 
-W1b/W1c do not complete G1/G3. [Operator recovery #12977](https://github.com/QwenLM/qwen-code/pull/12977), open at research time, releases a proven old holder while leaving its failed Turn blocked; W1 must reuse that boundary, not offer a second force-unlock path.
+W1b/W1c do not complete G1/G3. [Operator recovery #12977](https://github.invalid/QwenLM/qwen-code/pull/12977), open at research time, releases a proven old holder while leaving its failed Turn blocked; W1 must reuse that boundary, not offer a second force-unlock path.
 
 ## 5. W1a: persistent storage registration
 
@@ -195,7 +195,7 @@ V25 follows main's O2 migrations V20–V22, MCP V23 and Actions V24, and adds `m
 
 ## 10. Verification and acceptance
 
-The detailed working plan is `.qwen/e2e-tests/managed-workspace-w1-recovery.md` (ignored development artifact). The committed acceptance requirements are:
+The detailed working plan is `.mariadb-shell-agent/e2e-tests/managed-workspace-w1-recovery.md` (ignored development artifact). The committed acceptance requirements are:
 
 | Gate                       | Required observation                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -228,6 +228,6 @@ Source inspection covered Java persistence/leases/placement and TypeScript resto
 
 Earlier local verification passed focused Java, Hosted and projection/sink tests, build, typecheck, bundle, ESLint and Java Checkstyle. It covered registration/retry/fence semantics, cached new-work authorization, passive attachment, fixed-cut validation, renamed file/Shell Session history and missing retained resources. The packaged macOS/H2 E2E covered a repaired stderr seal, Harness restart, the next Turn, 100 MiB Shell output and seven Shell-producer exits; its physical guard was disabled, so that run alone is not Linux acceptance.
 
-The [maintainer's real-environment report for `7c54aa78`](https://github.com/QwenLM/qwen-code/pull/13088#issuecomment-5910509307) supplies Linux/ext4 and MySQL 8.4 evidence, including process restart, dedicated-host reboot/power-cut checks, two real Broker JVMs/workers, both claim/fence orders, pre-dispatch fencing refusal, and stale release/LOST cleanup preserving the complete storage row. Its exact-head selection passed 209 unit tests, 15 Hosted integration tests and 44 fault gates. Removing only the locked claim check failed the reverse check twice. These observations are evidence for that head, not the updated candidate.
+The [maintainer's real-environment report for `7c54aa78`](https://github.invalid/QwenLM/qwen-code/pull/13088#issuecomment-5910509307) supplies Linux/ext4 and MySQL 8.4 evidence, including process restart, dedicated-host reboot/power-cut checks, two real Broker JVMs/workers, both claim/fence orders, pre-dispatch fencing refusal, and stale release/LOST cleanup preserving the complete storage row. Its exact-head selection passed 209 unit tests, 15 Hosted integration tests and 44 fault gates. Removing only the locked claim check failed the reverse check twice. These observations are evidence for that head, not the updated candidate.
 
 The same report reproduced delete-and-backup-restore with inode reuse, motivating birth time, and marker loss during ordinary Git cleanup, motivating the storage layout rule. V25/marker v2 and the O2-integrated load path still require fresh focused tests, Linux/MySQL gates and exact-head verification. In particular, repeat the actual inode-reuse refusal, remote output closure failures before new model/prepare/execute, and successful original-receipt recovery. Public Workspace resume/next-turn admission remains separate; the ignored test plan records the remaining gates.

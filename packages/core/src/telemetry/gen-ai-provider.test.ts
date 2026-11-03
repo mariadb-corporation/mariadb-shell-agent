@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,25 +25,28 @@ describe('GenAI provider resolution', () => {
   });
 
   it.each([
-    ['https://dashscope.aliyuncs.com/compatible-mode/v1', 'dashscope'],
-    ['https://DASHSCOPE-INTL.ALIYUNCS.COM/v1/', 'dashscope'],
-    ['https://user:secret@cn-hongkong.dashscope.aliyuncs.com/v1', 'dashscope'],
-    ['https://coding.dashscope.aliyuncs.com/v1', 'dashscope'],
+    ['https://dashscope.aliyuncs.invalid/compatible-mode/v1', 'dashscope'],
+    ['https://DASHSCOPE-INTL.ALIYUNCS.INVALID/v1/', 'dashscope'],
     [
-      'https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+      'https://user:secret@cn-hongkong.dashscope.aliyuncs.invalid/v1',
       'dashscope',
     ],
-    ['https://idealab.alibaba-inc.com/api/openai/v1', 'dashscope'],
-    ['https://gateway.alibaba-inc.com/dashscope/v1', 'dashscope'],
-    ['https://model-gateway.aliyun-inc.com/dashscope/v1', 'dashscope'],
+    ['https://coding.dashscope.aliyuncs.invalid/v1', 'dashscope'],
+    [
+      'https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
+      'dashscope',
+    ],
+    ['https://idealab.alibaba-inc.invalid/api/openai/v1', 'dashscope'],
+    ['https://gateway.alibaba-inc.invalid/dashscope/v1', 'dashscope'],
+    ['https://model-gateway.aliyun-inc.invalid/dashscope/v1', 'dashscope'],
     ['https://maas.qianwenaiapi.com/compatible-mode/v1', 'dashscope'],
-    ['https://maas.qwencloudapi.com/compatible-mode/v1', 'dashscope'],
+    ['https://maas.qwencloudapi.invalid/compatible-mode/v1', 'dashscope'],
     [
       'https://token-plan.maas.qianwenaiapi.com/compatible-mode/v1',
       'dashscope',
     ],
     [
-      'https://token-plan.maas.qwencloudapi.com/compatible-mode/v1',
+      'https://token-plan.maas.qwencloudapi.invalid/compatible-mode/v1',
       'dashscope',
     ],
     ['https://example.openai.azure.com/openai/v1', 'azure.ai.openai'],
@@ -56,7 +60,7 @@ describe('GenAI provider resolution', () => {
     ['https://api.minimaxi.com/v1', 'minimax'],
     ['https://api.z.ai/api/paas/v4', 'z_ai'],
     ['https://open.bigmodel.cn/api/paas/v4', 'z_ai'],
-    ['https://api-inference.modelscope.cn/v1', 'modelscope'],
+    ['https://api-inference.modelscope.invalid/v1', 'modelscope'],
     ['https://api.xiaomimimo.com/v1', 'mimo'],
     ['https://openrouter.ai/api/v1', 'openrouter'],
     ['https://router.requesty.ai/v1', 'requesty'],
@@ -102,7 +106,7 @@ describe('GenAI provider resolution', () => {
     expect(
       resolveGenAiProviderName({
         authType: 'openai',
-        baseUrl: 'https://dashscope.aliyuncs.com.attacker.example/v1',
+        baseUrl: 'https://dashscope.aliyuncs.invalid.attacker.example/v1',
       }),
     ).toBe('openai');
     expect(
@@ -114,13 +118,13 @@ describe('GenAI provider resolution', () => {
     expect(
       resolveGenAiProviderName({
         authType: 'openai',
-        baseUrl: 'https://maas.qwencloudapi.com.attacker.example/v1',
+        baseUrl: 'https://maas.qwencloudapi.invalid.attacker.example/v1',
       }),
     ).toBe('openai');
     expect(
       resolveGenAiProviderName({
         authType: 'openai',
-        baseUrl: 'https://gateway.alibaba-inc.com.attacker.example/v1',
+        baseUrl: 'https://gateway.alibaba-inc.invalid.attacker.example/v1',
       }),
     ).toBe('openai');
     expect(

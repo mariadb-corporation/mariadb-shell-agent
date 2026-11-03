@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review scratch-tree`: a private copy of the PR head for one verifier to
+// `mariadb-shell-agent review scratch-tree`: a private copy of the PR head for one verifier to
 // mutate, so the tree everyone else is READING stays exactly as the PR left it.
 //
 // Step 4's verifier was the last review step still writing into the shared tree
@@ -405,9 +406,9 @@ function resetScratchTree(
       );
     if (commonOf(tree) !== commonOf(worktree)) return false;
     // EVERY ancestor, not just the parent. The first cut lstat'd `dirname(tree)`
-    // on the stated premise that `.qwen/tmp` is the one component above the leaf
+    // on the stated premise that `.mariadb-shell-agent/tmp` is the one component above the leaf
     // anything here can replace — which is false one hop higher: a link at
-    // `.qwen` redirects the whole path, and then every check in this gate agrees
+    // `.mariadb-shell-agent` redirects the whole path, and then every check in this gate agrees
     // with every other because they all resolve THROUGH it (measured: toplevel
     // self-equality, common-dir equality, gitdir ≠ commondir and even the
     // backpointer round-trip all pass, because the entry's own lexical path

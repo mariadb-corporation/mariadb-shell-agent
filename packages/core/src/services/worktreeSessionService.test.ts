@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -37,7 +38,7 @@ import { writeRuntimeStatus } from '../utils/runtimeStatus.js';
 
 const sample: WorktreeSession = {
   slug: 'my-feature',
-  worktreePath: '/repo/.qwen/worktrees/my-feature',
+  worktreePath: '/repo/.mariadb-shell-agent/worktrees/my-feature',
   worktreeBranch: 'worktree-my-feature',
   originalCwd: '/repo',
   originalBranch: 'main',
@@ -510,7 +511,12 @@ describe('isSessionRuntimeActive', () => {
 
   it('lets active runtime status win over a dead status found in an earlier root', async () => {
     const repoRoot = path.join(tmpDir, 'repo');
-    const worktreePath = path.join(repoRoot, '.qwen', 'worktrees', 'feature');
+    const worktreePath = path.join(
+      repoRoot,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'feature',
+    );
     await fs.mkdir(worktreePath, { recursive: true });
 
     Storage.setRuntimeBaseDir(path.join(tmpDir, 'runtime'));
@@ -738,7 +744,7 @@ describe('isSessionRuntimeActive', () => {
 });
 
 describe('restoreWorktreeContext', () => {
-  /** `sample` relocated under `<tmpDir>/<cwdName>/.qwen/worktrees/`, with its worktree dir created. */
+  /** `sample` relocated under `<tmpDir>/<cwdName>/.mariadb-shell-agent/worktrees/`, with its worktree dir created. */
   async function liveSession(
     cwdName: string,
     extra: Partial<WorktreeSession> = {},
@@ -746,7 +752,7 @@ describe('restoreWorktreeContext', () => {
     const originalCwd = path.join(tmpDir, cwdName);
     const worktreePath = path.join(
       originalCwd,
-      '.qwen',
+      '.mariadb-shell-agent',
       'worktrees',
       'my-feature',
     );
@@ -770,7 +776,7 @@ describe('restoreWorktreeContext', () => {
 
   it('returns context message + session when worktree dir is alive', async () => {
     // Build a sidecar where worktreePath sits under the structural
-    // invariant `<originalCwd>/.qwen/worktrees/<slug>` enforced by
+    // invariant `<originalCwd>/.mariadb-shell-agent/worktrees/<slug>` enforced by
     // restoreWorktreeContext (Phase C review #3256839787).
     const live = await liveSession('repo');
     await writeWorktreeSession(filePath, live);
@@ -799,7 +805,12 @@ describe('restoreWorktreeContext', () => {
     // (or a concurrent reader) can observe nlink === 2. That state carries
     // complete, fsync'd content — it must restore, not be deleted as stale.
     const liveCwd = path.join(tmpDir, 'repo-inflight');
-    const liveWorktree = path.join(liveCwd, '.qwen', 'worktrees', 'inflight');
+    const liveWorktree = path.join(
+      liveCwd,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'inflight',
+    );
     await fs.mkdir(liveWorktree, { recursive: true });
     const live: WorktreeSession = {
       ...sample,
@@ -835,7 +846,12 @@ describe('restoreWorktreeContext', () => {
     // so restore must refuse inconclusively and leave it for the next resume
     // instead of deleting it as stale.
     const liveCwd = path.join(tmpDir, 'repo-unstable');
-    const liveWorktree = path.join(liveCwd, '.qwen', 'worktrees', 'unstable');
+    const liveWorktree = path.join(
+      liveCwd,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'unstable',
+    );
     await fs.mkdir(liveWorktree, { recursive: true });
     const live: WorktreeSession = {
       ...sample,
@@ -879,7 +895,12 @@ describe('restoreWorktreeContext', () => {
     // the resume path must read it leniently or the legitimate owner loses
     // its worktree binding on every --resume.
     const liveCwd = path.join(tmpDir, 'repo-residue');
-    const liveWorktree = path.join(liveCwd, '.qwen', 'worktrees', 'residue');
+    const liveWorktree = path.join(
+      liveCwd,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'residue',
+    );
     await fs.mkdir(liveWorktree, { recursive: true });
     const live: WorktreeSession = {
       ...sample,
@@ -908,7 +929,12 @@ describe('restoreWorktreeContext', () => {
 
   it('rejects and preserves a sidecar when the marker has another owner', async () => {
     const liveCwd = path.join(tmpDir, 'repo');
-    const liveWorktree = path.join(liveCwd, '.qwen', 'worktrees', 'reowned');
+    const liveWorktree = path.join(
+      liveCwd,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'reowned',
+    );
     await fs.mkdir(liveWorktree, { recursive: true });
     const live: WorktreeSession = {
       ...sample,
@@ -945,7 +971,12 @@ describe('restoreWorktreeContext', () => {
     // already passed the containment check, so the marker is re-created
     // for the resuming session and the restore proceeds.
     const liveCwd = path.join(tmpDir, 'repo-missing');
-    const liveWorktree = path.join(liveCwd, '.qwen', 'worktrees', 'missing');
+    const liveWorktree = path.join(
+      liveCwd,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'missing',
+    );
     await fs.mkdir(liveWorktree, { recursive: true });
     const live: WorktreeSession = {
       ...sample,
@@ -973,7 +1004,12 @@ describe('restoreWorktreeContext', () => {
 
   it('rejects and preserves a sidecar when the marker is invalid', async () => {
     const liveCwd = path.join(tmpDir, 'repo-invalid');
-    const liveWorktree = path.join(liveCwd, '.qwen', 'worktrees', 'invalid');
+    const liveWorktree = path.join(
+      liveCwd,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'invalid',
+    );
     await fs.mkdir(liveWorktree, { recursive: true });
     const live: WorktreeSession = {
       ...sample,
@@ -1017,12 +1053,12 @@ describe('restoreWorktreeContext', () => {
 
   it('rejects and clears a sidecar whose worktreePath escapes the managed subtree', async () => {
     // A tampered sidecar pointing at /tmp itself (a real dir) but not
-    // under `<originalCwd>/.qwen/worktrees/` must be treated as
+    // under `<originalCwd>/.mariadb-shell-agent/worktrees/` must be treated as
     // untrusted, regardless of fs.stat success.
     const escape: WorktreeSession = {
       ...sample,
       originalCwd: tmpDir,
-      worktreePath: tmpDir, // outside .qwen/worktrees/
+      worktreePath: tmpDir, // outside .mariadb-shell-agent/worktrees/
     };
     await writeWorktreeSession(filePath, escape);
 
@@ -1035,7 +1071,7 @@ describe('restoreWorktreeContext', () => {
   });
 
   it('rejects and clears a sidecar that names the managed root itself', async () => {
-    const managedRoot = path.join(tmpDir, '.qwen', 'worktrees');
+    const managedRoot = path.join(tmpDir, '.mariadb-shell-agent', 'worktrees');
     await fs.mkdir(managedRoot, { recursive: true });
     await writeWorktreeSession(filePath, {
       ...sample,
@@ -1052,7 +1088,7 @@ describe('restoreWorktreeContext', () => {
   });
 
   it('cleans up stale sidecar when worktree dir is gone', async () => {
-    // sample.worktreePath points at /repo/.qwen/... which does not exist.
+    // sample.worktreePath points at /repo/.mariadb-shell-agent/... which does not exist.
     await writeWorktreeSession(filePath, sample);
     expect(await readWorktreeSession(filePath)).toEqual(sample);
 

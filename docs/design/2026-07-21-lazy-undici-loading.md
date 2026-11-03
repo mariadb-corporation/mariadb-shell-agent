@@ -94,7 +94,7 @@ change: process→first-session paired P50 −89.5 ms (1336.8 → 1255.2),
 candidate faster in 30/30 pairs; preheated path unchanged (P50 80.7 → 78.0);
 RSS after first session −8.1 MB. Functional gates (concurrency, telemetry
 disabled, legacy single-session) all pass. Full numbers in
-`.qwen/e2e-tests/phase3-lazy-undici-bench-results.md`.
+`.mariadb-shell-agent/e2e-tests/phase3-lazy-undici-bench-results.md`.
 
 ## Alternatives rejected
 

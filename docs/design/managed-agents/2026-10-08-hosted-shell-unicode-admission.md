@@ -4,7 +4,7 @@
 
 ## 1. Status and evidence
 
-This is the fix design for [#13010](https://github.com/QwenLM/qwen-code/issues/13010),
+This is the fix design for [#13010](https://github.invalid/QwenLM/qwen-code/issues/13010),
 dated 2026-10-08 and implemented in the local workspace. Section 9 records the
 local verification. It does not represent production release authorization, and
 the issue is not closed.
@@ -15,7 +15,7 @@ runtime acceptance passed.
 
 The issue and its full comment history were read through `gh`. The historical
 evidence is the
-[O2 round 9 report](https://github.com/QwenLM/qwen-code/pull/12894#issuecomment-5888143498)
+[O2 round 9 report](https://github.invalid/QwenLM/qwen-code/pull/12894#issuecomment-5888143498)
 on `3da25b7c`: an unpaired surrogate in Shell arguments blocked both capture
 paths, and a second Session on the same Workspace still received
 `workspace_busy` after eight minutes. That report and its log links should be
@@ -213,12 +213,12 @@ authorize rollout.
 
 Before implementation, a read-only `test-engineer` reproduces the issue with an
 independent real Java Store/Broker/Harness/worker environment on a build of main
-at that time. Try the installed global `qwen` first; when a private profile is
+at that time. Try the installed global `mariadb-shell-agent` first; when a private profile is
 unreachable, record it as unavailable and do not count it as a baseline pass.
 Use a deterministic model fixture to cover local capture and O2 separately;
 input-admission tests do not need a real OSS bucket. Save the round 9 logs and
 the new exact-head before/after results, and put the E2E plan and report in
-`.qwen/e2e-tests/`.
+`.mariadb-shell-agent/e2e-tests/`.
 
 Main implementation/test files:
 
@@ -294,8 +294,8 @@ behaviour or makes a verification claim unprovable.
 | 1     | The new auditor audit_round_1 found sequential Hook propagation before the outer check (P1) and lost callback suppression on cold recovery (P2). Added the shared Hosted validator, sequential-prefix terminal reconstruction, persisted completion decision, and the corresponding negative/compatibility witnesses.                                                               | Both accepted and revised; round 2 independently re-checked them.                          |
 | 2     | The new auditor audit_round_2 independently checked the issue/source, auditing forward behaviour and reverse compatibility/recovery negative cases. No new substantive problem was found; the round 1 revisions covered the risks. The report keeps the implementation constraints for the event return shape and nested `PermissionRequest` without widening valid Hook semantics. | Met the user's "no new problem" stop condition and ended the audit loop (max 7, actual 2). |
 
-Local audit reports: `.qwen/pr-reviews/issue-13010-design-round-1.md` and
-`.qwen/pr-reviews/issue-13010-design-round-2.md` (git-ignored working artifacts).
+Local audit reports: `.mariadb-shell-agent/pr-reviews/issue-13010-design-round-1.md` and
+`.mariadb-shell-agent/pr-reviews/issue-13010-design-round-2.md` (git-ignored working artifacts).
 
 ## 9. Implementation and local verification
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -755,7 +756,7 @@ class WriteFileToolInvocation extends BaseToolInvocation<
 }
 
 export const WRITE_FILE_ARTIFACT_DESCRIPTION =
-  'Artifact-like files such as HTML, PDF, images, notebooks, office documents, CSV, Markdown, JSON, SQL, and Python files are automatically registered as session artifacts. Set record_as_artifact=false for intermediates, such as HTML written only to print a PDF: that does not create an artifact, but one the session already has for the path is still refreshed. Files under .qwen/tmp/ are not registered. Delete intermediates when done.';
+  'Artifact-like files such as HTML, PDF, images, notebooks, office documents, CSV, Markdown, JSON, SQL, and Python files are automatically registered as session artifacts. Set record_as_artifact=false for intermediates, such as HTML written only to print a PDF: that does not create an artifact, but one the session already has for the path is still refreshed. Files under .mariadb-shell-agent/tmp/ are not registered. Delete intermediates when done.';
 
 /**
  * Implementation of the WriteFile tool logic

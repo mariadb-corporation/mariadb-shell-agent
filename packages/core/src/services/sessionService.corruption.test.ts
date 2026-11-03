@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Code
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -880,7 +881,7 @@ describe('SessionService lifecycle maintenance', () => {
       fs.writeFileSync(sourceWorktree, '{}');
       const pr = {
         number: 123,
-        url: 'https://github.com/QwenLM/qwen-code/pull/123',
+        url: 'https://github.invalid/QwenLM/qwen-code/pull/123',
         createdAt: '2026-08-28T00:00:00.000Z',
       };
       await writeSessionPrs(sourcePr, [pr]);

@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @fileoverview `qwen agents session-send-mcp --url <endpoint>` (hidden).
+ * @fileoverview `mariadb-shell-agent agents session-send-mcp --url <endpoint>` (hidden).
  *
  * A stdio MCP server the daemon hands to a session agent's program (Claude
  * Code `--mcp-config`, Codex `-c mcp_servers.*`) for one run. Its single
@@ -14,7 +15,7 @@
  * `QWEN_SESSION_SEND_TOKEN`.
  *
  * stdout is the MCP stream: nothing else may be written there. Diagnostics
- * go to stderr. The daemon spawns it as `qwen agents session-send-mcp`,
+ * go to stderr. The daemon spawns it as `mariadb-shell-agent agents session-send-mcp`,
  * which cli.ts routes straight here before normal startup (no settings,
  * banners or update checks, nothing HOME-dependent: Codex starts MCP servers
  * with a minimal environment). This module stays light because config.ts

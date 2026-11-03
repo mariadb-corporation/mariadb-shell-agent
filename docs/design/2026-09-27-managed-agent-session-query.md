@@ -4,7 +4,7 @@
 
 Status: implemented in this change
 Date: 2026-09-27
-Issue: [#12793](https://github.com/QwenLM/qwen-code/issues/12793), part of [#12380](https://github.com/QwenLM/qwen-code/issues/12380)
+Issue: [#12793](https://github.invalid/QwenLM/qwen-code/issues/12793), part of [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380)
 Builds on: [Managed Agent API Contract (Stage D1)](2026-09-27-managed-agent-api-contract.md)
 
 ## 1. Problem
@@ -25,7 +25,7 @@ get routes on both surfaces still had the following gaps:
   contract's status enum lacked.
 - Several operations did not declare error statuses that the server returns,
   so the contract test never validated those envelopes.
-- W0d ([#12797](https://github.com/QwenLM/qwen-code/pull/12797)) binds empty
+- W0d ([#12797](https://github.invalid/QwenLM/qwen-code/pull/12797)) binds empty
   Sessions to a Workspace. A bound Session's `workspace` lacked the required
   `context_revision` and `state`, which W0d recorded as gaps on the create and
   get routes.

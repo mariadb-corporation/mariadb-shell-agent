@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,7 +19,7 @@ const POLICY = {
   policy: 'cG9saWN5',
   signature: 'c2ln',
   upload_dir: 'dashscope-instant/uploads/model/abc',
-  upload_host: 'https://dashscope-instant.oss-cn-beijing.aliyuncs.com',
+  upload_host: 'https://dashscope-instant.oss-cn-beijing.aliyuncs.invalid',
   oss_access_key_id: 'STS.key',
   x_oss_object_acl: 'private',
   x_oss_forbid_overwrite: 'true',
@@ -84,7 +85,7 @@ describe('DashScopeUploader', () => {
     const fetchFn = vi.fn<FetchFn>().mockResolvedValue(policyResponse());
     const uploader = new DashScopeUploader({
       apiKey: 'sk-test',
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       fetchFn,
     });
     const policy = await uploader.getPolicy('qwen-vl-max');
@@ -92,7 +93,7 @@ describe('DashScopeUploader', () => {
 
     const [url, init] = fetchFn.mock.calls[0]!;
     const parsed = new URL(String(url));
-    expect(parsed.origin).toBe('https://dashscope.aliyuncs.com');
+    expect(parsed.origin).toBe('https://dashscope.aliyuncs.invalid');
     expect(parsed.pathname).toBe('/api/v1/uploads');
     expect(parsed.searchParams.get('action')).toBe('getPolicy');
     expect(parsed.searchParams.get('model')).toBe('qwen-vl-max');
@@ -105,12 +106,12 @@ describe('DashScopeUploader', () => {
     const fetchFn = vi.fn<FetchFn>().mockResolvedValue(policyResponse());
     const uploader = new DashScopeUploader({
       apiKey: 'k',
-      baseUrl: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
       fetchFn,
     });
     await uploader.getPolicy('m');
     const url = new URL(String(fetchFn.mock.calls[0]![0]));
-    expect(url.origin).toBe('https://dashscope-intl.aliyuncs.com');
+    expect(url.origin).toBe('https://dashscope-intl.aliyuncs.invalid');
   });
 
   it('rejects incomplete policy payloads', async () => {
@@ -254,16 +255,16 @@ describe('credential cache', () => {
     // policy is bound to the endpoint that issued it.
     const intlUploader = new DashScopeUploader({
       apiKey: 'k',
-      baseUrl: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
       fetchFn,
     });
     await intlUploader.getPolicy('model-a');
     expect(fetchFn).toHaveBeenCalledTimes(3);
     const origins = fetchFn.mock.calls.map((c) => new URL(String(c[0])).origin);
     expect(origins).toEqual([
-      'https://dashscope.aliyuncs.com',
-      'https://dashscope.aliyuncs.com',
-      'https://dashscope-intl.aliyuncs.com',
+      'https://dashscope.aliyuncs.invalid',
+      'https://dashscope.aliyuncs.invalid',
+      'https://dashscope-intl.aliyuncs.invalid',
     ]);
   });
 

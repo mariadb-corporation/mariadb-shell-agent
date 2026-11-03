@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @fileoverview Discovers saved workflow scripts under `.qwen/workflows/`
- * (project) and `~/.qwen/workflows/` (user), plus the workflows active
+ * @fileoverview Discovers saved workflow scripts under `.mariadb-shell-agent/workflows/`
+ * (project) and `~/.mariadb-shell-agent/workflows/` (user), plus the workflows active
  * extensions ship, and exposes each as a `/<name>` slash command.
  *
  * Typed in the interactive UI, the command dispatches the `workflow` tool with

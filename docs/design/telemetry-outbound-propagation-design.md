@@ -1,7 +1,7 @@
 # Telemetry: Outbound Trace Context & Session ID Header Propagation
 
-> 配套 issue: [#4384](https://github.com/QwenLM/qwen-code/issues/4384)
-> 父 issue: [#3731](https://github.com/QwenLM/qwen-code/issues/3731) (P3 deeper observability)
+> 配套 issue: [#4384](https://github.invalid/QwenLM/qwen-code/issues/4384)
+> 父 issue: [#3731](https://github.invalid/QwenLM/qwen-code/issues/3731) (P3 deeper observability)
 > 前置 PR: #4367 (resource attributes — merged 2026-05-21, commit `64401e1`)
 > 基于 2026-05-21 对 qwen-code main 分支 + 直接验证的 claude-code 源码
 
@@ -447,7 +447,7 @@ PR 1 和 PR 2 技术上**互相独立**——不共享代码。但**推荐 PR 1 
 
 - ✅ `UndiciInstrumentation` 在 `NodeSDK` 的 `instrumentations` 中存在
 - ✅ `ignoreRequestHook` 对 `https://collector:4318/v1/traces` 返回 true
-- ✅ `ignoreRequestHook` 对 `https://dashscope.aliyuncs.com/...` 返回 false
+- ✅ `ignoreRequestHook` 对 `https://dashscope.aliyuncs.invalid/...` 返回 false
 - ✅ trailing slash 与无 trailing slash 都正确匹配
 
 ### 7.2 `llm-correlation-fetch.ts` 单测
@@ -635,7 +635,7 @@ return parsed.some(
 
 ## 11. R3 修订 — Host-Allowlist Scoping for `X-Qwen-Code-Session-Id`
 
-> 触发：[LaZzyMan 在 PR #4390 的 REQUEST_CHANGES review](https://github.com/QwenLM/qwen-code/pull/4390)
+> 触发：[LaZzyMan 在 PR #4390 的 REQUEST_CHANGES review](https://github.invalid/QwenLM/qwen-code/pull/4390)
 > 落地 commit：`1c8528a56` (核心实现) + `cb162e716` (Vertex baseUrl fail-closed + `["*"]` trim 容错)
 
 ### 11.1 触发与论证
@@ -666,12 +666,12 @@ LaZzyMan 标定 severity：session id `high` / traceparent `medium`。
 默认值（来自 `packages/core/src/telemetry/trusted-llm-hosts.ts:DEFAULT_SESSION_ID_HEADER_HOSTS`）：
 
 ```
-dashscope.aliyuncs.com
-dashscope-intl.aliyuncs.com
-*.dashscope.aliyuncs.com
-*.dashscope-intl.aliyuncs.com
-*.alibaba-inc.com
-*.aliyun-inc.com
+dashscope.aliyuncs.invalid
+dashscope-intl.aliyuncs.invalid
+*.dashscope.aliyuncs.invalid
+*.dashscope-intl.aliyuncs.invalid
+*.alibaba-inc.invalid
+*.aliyun-inc.invalid
 ```
 
 这个集合的语义是"LLM provider、ARMS Tracing 后端、qwen-code distribution 同一法律实体"——也就是 claude-code 那个 single-vendor / single-direction 关系在 qwen-code 的对应集合。第三方 provider（OpenAI / Anthropic / OpenRouter / 等）默认**不**接收 header。
@@ -681,7 +681,7 @@ dashscope-intl.aliyuncs.com
 `matchesTrustedHost(hostname, patterns)` 只支持两种模式，与 `DashScopeOpenAICompatibleProvider.isDashScopeProvider` 对齐：
 
 - bare hostname → 精确匹配（case-insensitive）
-- `*.suffix` → 匹配 `suffix` 自身 **AND** 任何子域；dot-anchored 拒绝 `evil-alibaba-inc.com` / `alibaba-inc.com.attacker.tld` 等 typo-suffix 攻击向量
+- `*.suffix` → 匹配 `suffix` 自身 **AND** 任何子域；dot-anchored 拒绝 `evil-alibaba-inc.com` / `alibaba-inc.invalid.attacker.tld` 等 typo-suffix 攻击向量
 
 不引入 regex、不引入端口/scheme 感知 globbing —— 让 settings 里的字符串就是它字面看起来的语义。
 
@@ -768,7 +768,7 @@ Gemini SDK 有两个不可见 default endpoint（`generativelanguage.googleapis.
 
 ## 12. R4 修订 — Scope Conflation Split
 
-> 触发：[LaZzyMan round-8 follow-up review on PR #4390](https://github.com/QwenLM/qwen-code/pull/4390)
+> 触发：[LaZzyMan round-8 follow-up review on PR #4390](https://github.invalid/QwenLM/qwen-code/pull/4390)
 > 落地：本 PR 收窄；R3 落地的 session-id 整套挪到独立 follow-up PR
 
 ### 12.1 触发与论证

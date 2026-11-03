@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  *
  * CDP browser-level emulation layer for the Plan C "CDP tunnel" (issue #5626).
@@ -268,7 +269,7 @@ export class CdpBrowserEmulator {
           // empty-result ack keeps puppeteer from hanging on optional commands;
           // surface the unknown ones so the coverage gap stays visible.
           this.cb.log?.(
-            `qwen serve: /cdp unsupported browser-level CDP method: ${method ?? '(none)'}`,
+            `mariadb-shell-agent serve: /cdp unsupported browser-level CDP method: ${method ?? '(none)'}`,
           );
           return this.cb.reply({ id, result: {} });
       }
@@ -377,7 +378,7 @@ export class CdpBrowserEmulator {
       // with a running total so the drop stream stays diagnosable.
       if (this.droppedTabEvents === 1 || this.droppedTabEvents % 100 === 0) {
         this.cb.log?.(
-          `qwen serve: /cdp tab event "${method}" dropped (${this.droppedTabEvents} total) — no active page session (lazy-attach clients are command-only until Target.setAutoAttach)`,
+          `mariadb-shell-agent serve: /cdp tab event "${method}" dropped (${this.droppedTabEvents} total) — no active page session (lazy-attach clients are command-only until Target.setAutoAttach)`,
         );
       }
     }

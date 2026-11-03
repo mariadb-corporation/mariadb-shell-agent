@@ -1,8 +1,8 @@
-# Qwen Code Hooks
+# MariaDB Shell Agent Hooks
 
 ## Overview
 
-Qwen Code hooks provide a powerful mechanism for extending and customizing the behavior of the Qwen Code application. Hooks allow users to execute custom scripts or programs at specific points in the application lifecycle, such as before tool execution, after tool execution, at session start/end, and during other key events.
+MariaDB Shell Agent hooks provide a powerful mechanism for extending and customizing the behavior of the MariaDB Shell Agent application. Hooks allow users to execute custom scripts or programs at specific points in the application lifecycle, such as before tool execution, after tool execution, at session start/end, and during other key events.
 
 Hooks are enabled by default. You can temporarily disable all hooks by setting `disableAllHooks` to `true` in your settings file (at the top level, alongside `hooks`):
 
@@ -19,7 +19,7 @@ This disables all hooks without deleting their configurations.
 
 ## What are Hooks?
 
-Hooks are user-defined scripts or programs that are automatically executed by Qwen Code at predefined points in the application flow. They allow users to:
+Hooks are user-defined scripts or programs that are automatically executed by MariaDB Shell Agent at predefined points in the application flow. They allow users to:
 
 - Monitor and audit tool usage
 - Enforce security policies
@@ -51,7 +51,7 @@ Move an agent hook to settings if it should observe the whole session.
 
 ## Hook Types
 
-Qwen Code supports four hook executor types:
+MariaDB Shell Agent supports four hook executor types:
 
 | Type       | Description                                                                                    |
 | :--------- | :--------------------------------------------------------------------------------------------- |
@@ -91,7 +91,7 @@ Command hooks execute commands via child processes. Input JSON is passed through
         "hooks": [
           {
             "type": "command",
-            "command": "\"$QWEN_PROJECT_DIR/.qwen/hooks/security-check.sh\"",
+            "command": "\"$QWEN_PROJECT_DIR/.mariadb-shell-agent/hooks/security-check.sh\"",
             "name": "security-check",
             "timeout": 10
           }
@@ -102,7 +102,7 @@ Command hooks execute commands via child processes. Input JSON is passed through
 }
 ```
 
-`QWEN_PROJECT_DIR`, `CLAUDE_PROJECT_DIR` and `GEMINI_PROJECT_DIR` are set to the project directory in the environment of every command hook. Bash hooks read them from the environment, so double-quote them like any other shell variable, as in `"$QWEN_PROJECT_DIR/.qwen/hooks/security-check.sh"`. For cmd hooks, and for a bare `$QWEN_PROJECT_DIR` in PowerShell hooks, the variable is replaced with the quoted project directory before the command runs; `$env:QWEN_PROJECT_DIR` also works in PowerShell.
+`QWEN_PROJECT_DIR`, `CLAUDE_PROJECT_DIR` and `GEMINI_PROJECT_DIR` are set to the project directory in the environment of every command hook. Bash hooks read them from the environment, so double-quote them like any other shell variable, as in `"$QWEN_PROJECT_DIR/.mariadb-shell-agent/hooks/security-check.sh"`. For cmd hooks, and for a bare `$QWEN_PROJECT_DIR` in PowerShell hooks, the variable is replaced with the quoted project directory before the command runs; `$env:QWEN_PROJECT_DIR` also works in PowerShell.
 
 Migration: bash hooks used to have these variables replaced in the command text before the shell ran, and that replacement has been removed. A bash hook that leaves the variable unquoted in a project path containing spaces, or writes it inside single quotes such as `'$QWEN_PROJECT_DIR/hook.sh'`, must now double-quote it: `"$QWEN_PROJECT_DIR/hook.sh"`.
 
@@ -273,7 +273,7 @@ Prompt hooks use an LLM to evaluate hook input and return a decision. This is us
 1. The hook input JSON is injected into your prompt using the `$ARGUMENTS` placeholder
 2. The prompt is sent to an LLM (default: your current model)
 3. The LLM returns a JSON response with the decision
-4. Qwen Code processes the decision and continues or blocks execution accordingly
+4. MariaDB Shell Agent processes the decision and continues or blocks execution accordingly
 
 **Configuration:**
 
@@ -325,7 +325,7 @@ Prompt hooks can be used with most hook events, including:
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "You are evaluating whether Qwen Code should stop working. Context: $ARGUMENTS\n\nAnalyze the conversation and determine if:\n1. All user-requested tasks are complete\n2. Any errors need to be addressed\n3. Follow-up work is needed\n\nRespond with JSON: {\"ok\": true} to allow stopping, or {\"ok\": false, \"reason\": \"your explanation\"} to continue working.",
+            "prompt": "You are evaluating whether MariaDB Shell Agent should stop working. Context: $ARGUMENTS\n\nAnalyze the conversation and determine if:\n1. All user-requested tasks are complete\n2. Any errors need to be addressed\n3. Follow-up work is needed\n\nRespond with JSON: {\"ok\": true} to allow stopping, or {\"ok\": false, \"reason\": \"your explanation\"} to continue working.",
             "timeout": 30
           }
         ]
@@ -335,7 +335,7 @@ Prompt hooks can be used with most hook events, including:
 }
 ```
 
-When `ok` is `false`, Qwen Code will continue working and use the `reason` as context for the next response.
+When `ok` is `false`, MariaDB Shell Agent will continue working and use the `reason` as context for the next response.
 
 **Example: PreToolUse Hook**
 
@@ -362,32 +362,32 @@ When `ok` is `false`, Qwen Code will continue working and use the `reason` as co
 
 ## Hook Events
 
-Hooks fire at specific points during a Qwen Code session. Different events support different matchers to filter trigger conditions.
+Hooks fire at specific points during a MariaDB Shell Agent session. Different events support different matchers to filter trigger conditions.
 
-| Event                 | Triggered When                                                         | Matcher Target                                                   |
-| :-------------------- | :--------------------------------------------------------------------- | :--------------------------------------------------------------- |
-| `PreToolUse`          | Before tool execution                                                  | Tool id (`write_file`, `read_file`, `run_shell_command`, etc.)   |
-| `PostToolUse`         | After successful tool execution                                        | Tool id                                                          |
-| `PostToolUseFailure`  | After tool execution fails                                             | Tool id                                                          |
-| `PostToolBatch`       | Once after every tool call in a batch has resolved                     | None (always fires)                                              |
-| `UserPromptSubmit`    | Before supported model invocations                                     | None                                                             |
-| `UserPromptExpansion` | After a slash command expands into a prompt, before the prompt is sent | Command name, without the leading `/`                            |
-| `SessionStart`        | When session starts or resumes                                         | Source (`startup`, `resume`, `clear`, `compact`)                 |
-| `SessionEnd`          | When session ends                                                      | Reason (`clear`, `logout`, `prompt_input_exit`, etc.)            |
-| `SessionDelete`       | After an explicitly selected session is deleted                        | None                                                             |
-| `MessageDisplay`      | Repeatedly, as the reply streams                                       | None (always fires)                                              |
-| `Stop`                | Before the turn ends                                                   | None (always fires)                                              |
-| `StopFailure`         | When an API error or loop detection ends the turn, instead of `Stop`   | Error type (`rate_limit`, `server_error`, `loop_detected`, etc.) |
-| `SubagentStart`       | When subagent starts                                                   | Agent type (`Bash`, `Explorer`, `Plan`, etc.)                    |
-| `SubagentStop`        | When subagent stops                                                    | Agent type                                                       |
-| `PreCompact`          | Before conversation compaction                                         | Trigger (`manual`, `auto`)                                       |
-| `PostCompact`         | After conversation compaction succeeds                                 | Trigger (`manual`, `auto`)                                       |
-| `Notification`        | When notifications are sent                                            | Type (`permission_prompt`, `idle_prompt`, `auth_success`)        |
-| `PermissionRequest`   | When permission dialog is shown                                        | Tool id                                                          |
-| `PermissionDenied`    | When AUTO-mode classification denies a tool call                       | Tool id                                                          |
-| `TodoCreated`         | When a new todo item is created                                        | None (always fires)                                              |
-| `TodoCompleted`       | When a todo item is marked as completed                                | None (always fires)                                              |
-| `InstructionsLoaded`  | When a context file such as `QWEN.md`, or a file it imports, is loaded | File path of the loaded file                                     |
+| Event                 | Triggered When                                                                        | Matcher Target                                                   |
+| :-------------------- | :------------------------------------------------------------------------------------ | :--------------------------------------------------------------- |
+| `PreToolUse`          | Before tool execution                                                                 | Tool id (`write_file`, `read_file`, `run_shell_command`, etc.)   |
+| `PostToolUse`         | After successful tool execution                                                       | Tool id                                                          |
+| `PostToolUseFailure`  | After tool execution fails                                                            | Tool id                                                          |
+| `PostToolBatch`       | Once after every tool call in a batch has resolved                                    | None (always fires)                                              |
+| `UserPromptSubmit`    | Before supported model invocations                                                    | None                                                             |
+| `UserPromptExpansion` | After a slash command expands into a prompt, before the prompt is sent                | Command name, without the leading `/`                            |
+| `SessionStart`        | When session starts or resumes                                                        | Source (`startup`, `resume`, `clear`, `compact`)                 |
+| `SessionEnd`          | When session ends                                                                     | Reason (`clear`, `logout`, `prompt_input_exit`, etc.)            |
+| `SessionDelete`       | After an explicitly selected session is deleted                                       | None                                                             |
+| `MessageDisplay`      | Repeatedly, as the reply streams                                                      | None (always fires)                                              |
+| `Stop`                | Before the turn ends                                                                  | None (always fires)                                              |
+| `StopFailure`         | When an API error or loop detection ends the turn, instead of `Stop`                  | Error type (`rate_limit`, `server_error`, `loop_detected`, etc.) |
+| `SubagentStart`       | When subagent starts                                                                  | Agent type (`Bash`, `Explorer`, `Plan`, etc.)                    |
+| `SubagentStop`        | When subagent stops                                                                   | Agent type                                                       |
+| `PreCompact`          | Before conversation compaction                                                        | Trigger (`manual`, `auto`)                                       |
+| `PostCompact`         | After conversation compaction succeeds                                                | Trigger (`manual`, `auto`)                                       |
+| `Notification`        | When notifications are sent                                                           | Type (`permission_prompt`, `idle_prompt`, `auth_success`)        |
+| `PermissionRequest`   | When permission dialog is shown                                                       | Tool id                                                          |
+| `PermissionDenied`    | When AUTO-mode classification denies a tool call                                      | Tool id                                                          |
+| `TodoCreated`         | When a new todo item is created                                                       | None (always fires)                                              |
+| `TodoCompleted`       | When a todo item is marked as completed                                               | None (always fires)                                              |
+| `InstructionsLoaded`  | When a context file such as `MARIADB-SHELL-AGENT.md`, or a file it imports, is loaded | File path of the loaded file                                     |
 
 ### Matcher Patterns
 
@@ -501,7 +501,7 @@ Qwen does not control whether a hook process, endpoint, callback, or model provi
 
 Event-specific fields are added based on the hook type. `permission_mode` is the session's approval mode unless the event reports the mode that applied to it, as tool and subagent events do. `agent_id` is present only when the event fires inside a subagent; `agent_type` is reported on `SessionStart`, `SubagentStart` and `SubagentStop`. `source_type` and `source_id` appear only in ACP sessions whose client declared a session source when creating the session.
 
-Hook input is a forward-extensible JSON contract: new optional fields can be added to existing events. Consumers should ignore unknown fields. A strict decoder that rejects unknown properties must be updated to explicitly allow each new optional field before upgrading Qwen Code. For security-sensitive hooks, a decoder failure can change fail-open or fail-closed behavior, so administrators must validate the upgraded payload against the deployed hook before rollout.
+Hook input is a forward-extensible JSON contract: new optional fields can be added to existing events. Consumers should ignore unknown fields. A strict decoder that rejects unknown properties must be updated to explicitly allow each new optional field before upgrading MariaDB Shell Agent. For security-sensitive hooks, a decoder failure can change fail-open or fail-closed behavior, so administrators must validate the upgraded payload against the deployed hook before rollout.
 
 ### Hook Output Structure
 
@@ -873,7 +873,7 @@ A command hook that exits 0 with plain-text `stdout` has that text treated as `a
 {
   "hookSpecificOutput": {
     "hookEventName": "UserPromptExpansion",
-    "additionalContext": "Follow the repository's CONTRIBUTING.md when generating QWEN.md."
+    "additionalContext": "Follow the repository's CONTRIBUTING.md when generating MARIADB-SHELL-AGENT.md."
   }
 }
 ```
@@ -958,12 +958,12 @@ The hook uses the deleting runtime's normal session fields (`session_id`, `trans
 
 - **Slow hooks see fewer, newer payloads.** At most one mid-stream hook execution per message is in flight at a time; while one runs, newer debounced payloads _replace_ the queued one rather than piling up behind it. A hook slower than the debounce window therefore skips intermediate snapshots — lossless, since each payload carries the full cumulative text.
 - **`is_final` is never queued behind a stale delivery.** The final payload is dispatched the moment the message ends — alongside a still-running mid-stream execution if there is one (the one exception to the one-at-a-time rule, justified the same way: the final cumulative text strictly supersedes whatever that execution is processing). Your hook always receives the `is_final` payload, and receives it before the `Stop` hook fires. One consequence for stateful hooks: when the final execution overlaps a superseded mid-stream one, their _completion_ order is unspecified — the stale execution may finish after the final one (even after `Stop`). Treat `is_final` as terminal per `message_id` and let the cumulative text win, rather than assuming the last execution to finish carries the newest state.
-- **The turn waits for `is_final` delivery to complete — but not forever.** The turn's end (and the `Stop` hook, when it fires) waits up to 5 seconds for the final delivery to finish. A hook that completes within that budget keeps the strongest guarantee: a headless run (`qwen -p ...`) exits only after the hook finished, and the `is_final` execution completes before `Stop` starts. A slower hook still receives `is_final` first — only the wait for its completion is bounded: in the terminal UI or an ACP session the execution simply finishes in the background, while a headless run exits without waiting. The hook process is not killed on exit; it is left to finish on its own, so a script chaining `qwen -p … && next-step` can observe `next-step` starting while a slow hook is still running. Hitting this timeout prints a warning on stderr.
+- **The turn waits for `is_final` delivery to complete — but not forever.** The turn's end (and the `Stop` hook, when it fires) waits up to 5 seconds for the final delivery to finish. A hook that completes within that budget keeps the strongest guarantee: a headless run (`mariadb-shell-agent -p ...`) exits only after the hook finished, and the `is_final` execution completes before `Stop` starts. A slower hook still receives `is_final` first — only the wait for its completion is bounded: in the terminal UI or an ACP session the execution simply finishes in the background, while a headless run exits without waiting. The hook process is not killed on exit; it is left to finish on its own, so a script chaining `mariadb-shell-agent -p … && next-step` can observe `next-step` starting while a slow hook is still running. Hitting this timeout prints a warning on stderr.
 - **Cancellation behaviour depends on timing.** A turn cancelled _before `is_final` dispatches_ fires no `is_final` — the message is treated as abandoned, and a consumer that buffers until `is_final` should treat cancellation-silence as its flush/discard signal (e.g. a timeout fallback). The criterion is the abort signal's state at the moment the turn ends, not whether every chunk had already streamed — an abort landing in the brief gap before that check can still suppress `is_final` for a message whose text had, in practice, finished arriving. Cancelling _after `is_final` has dispatched_ (during the drain wait) is different: the still-running hook execution may be terminated mid-flight (SIGTERM), but the payload itself has already been delivered.
 - **`displayed_text` is provisional until `is_final`.** It reflects what has streamed so far; treat intermediate payloads as display state, not as authoritative final content.
 - **A tool-using turn produces multiple messages.** Each model call gets its own `message_id` with its own `is_final: true` firing: the text before a tool call is one message, the continuation after the tool result is another. Model calls that produce no displayed text (tool-call-only) fire nothing.
 
-**Note**: Fires in the terminal UI, headless (`-p`), and ACP (IDE/editor/`qwen serve`) sessions, with the same payload contract on every surface.
+**Note**: Fires in the terminal UI, headless (`-p`), and ACP (IDE/editor/`mariadb-shell-agent serve`) sessions, with the same payload contract on every surface.
 
 #### Stop
 
@@ -1002,7 +1002,7 @@ The `context_usage`, `context_limit`, and `input_tokens` fields allow hook scrip
 ```json
 {
   "decision": "block",
-  "reason": "Must be provided when Qwen Code is blocked from stopping"
+  "reason": "Must be provided when MariaDB Shell Agent is blocked from stopping"
 }
 ```
 
@@ -1122,7 +1122,7 @@ A command hook is left to finish if Qwen exits after dispatch; its stdout and st
 ```json
 {
   "decision": "block",
-  "reason": "Must be provided when Qwen Code is blocked from stopping"
+  "reason": "Must be provided when MariaDB Shell Agent is blocked from stopping"
 }
 ```
 
@@ -1348,7 +1348,7 @@ During the `postWrite` phase, the todo has already been persisted. Hooks may sti
 
 ```bash
 #!/bin/bash
-# ~/.qwen/hooks/todo-validator.sh
+# ~/.mariadb-shell-agent/hooks/todo-validator.sh
 # Validates todo content before creation
 
 INPUT=$(cat)
@@ -1380,7 +1380,7 @@ exit 0
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.qwen/hooks/todo-validator.sh",
+            "command": "$HOME/.mariadb-shell-agent/hooks/todo-validator.sh",
             "name": "todo-validator",
             "timeout": 5
           }
@@ -1445,7 +1445,7 @@ During the `postWrite` phase, the todo has already been persisted. Hooks may sti
 
 ```bash
 #!/bin/bash
-# ~/.qwen/hooks/todo-completion-validator.sh
+# ~/.mariadb-shell-agent/hooks/todo-completion-validator.sh
 # Validates todo completion conditions
 
 INPUT=$(cat)
@@ -1474,7 +1474,7 @@ exit 0
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.qwen/hooks/todo-completion-validator.sh",
+            "command": "$HOME/.mariadb-shell-agent/hooks/todo-completion-validator.sh",
             "name": "completion-validator",
             "timeout": 5
           }
@@ -1494,11 +1494,11 @@ exit 0
 
 #### InstructionsLoaded
 
-**Purpose**: Runs for each context file Qwen loads into the system prompt, such as `QWEN.md`, and for each file those files import. Use it to audit which instruction files a session uses. It is informational: it cannot stop or change loading.
+**Purpose**: Runs for each context file Qwen loads into the system prompt, such as `MARIADB-SHELL-AGENT.md`, and for each file those files import. Use it to audit which instruction files a session uses. It is informational: it cannot stop or change loading.
 
 It fires when the session starts, when context files are reloaded during the session, and for every file pulled in through an import, after the file has been read. Qwen waits for the hooks before it continues loading; a hook failure is logged and does not stop loading.
 
-**Matcher**: Matches against `file_path`. For example, `"matcher": "QWEN\\.local\\.md$"` fires only for local context files.
+**Matcher**: Matches against `file_path`. For example, `"matcher": "MARIADB-SHELL-AGENT\\.local\\.md$"` fires only for local context files.
 
 **Event-specific fields**:
 
@@ -1514,7 +1514,7 @@ It fires when the session starts, when context files are reloaded during the ses
 
 `load_reason` is `session_start` for the initial load, `refresh` when context files are reloaded, and `include` for a file reached through an import.
 
-`memory_type` is `extension` for an extension's context files and files in its directory, `user` for files in the global `.qwen` directory or directly in your home directory, `local` for `.qwen/QWEN.local.md` at the project root, and `project` for any other file. An imported file has the same `memory_type` as the context file that imported it.
+`memory_type` is `extension` for an extension's context files and files in its directory, `user` for files in the global `.mariadb-shell-agent` directory or directly in your home directory, `local` for `.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md` at the project root, and `project` for any other file. An imported file has the same `memory_type` as the context file that imported it.
 
 **Output Options**:
 
@@ -1522,7 +1522,7 @@ It fires when the session starts, when context files are reloaded during the ses
 
 ## Hook Configuration
 
-Hooks are configured in Qwen Code settings, typically in `.qwen/settings.json` or user configuration files. Hooks in the system settings files (System and SystemDefaults) load with the source System and, like user hooks, regardless of folder trust. Within one event, sequential hooks from settings and extensions run in this order: Project, User, System, Extension.
+Hooks are configured in MariaDB Shell Agent settings, typically in `.mariadb-shell-agent/settings.json` or user configuration files. Hooks in the system settings files (System and SystemDefaults) load with the source System and, like user hooks, regardless of folder trust. Within one event, sequential hooks from settings and extensions run in this order: Project, User, System, Extension.
 
 > [!NOTE]
 > A hook must include a name field to be enabled or disabled individually at runtime. Hooks without a name will always execute when their event and matcher conditions are met.
@@ -1592,7 +1592,7 @@ Async hooks are scoped to the Qwen process. On POSIX, Qwen reclaims a still-runn
         "hooks": [
           {
             "type": "command",
-            "command": "\"$QWEN_PROJECT_DIR/.qwen/hooks/run-tests-async.sh\"",
+            "command": "\"$QWEN_PROJECT_DIR/.mariadb-shell-agent/hooks/run-tests-async.sh\"",
             "async": true,
             "timeout": 300
           }
@@ -1668,7 +1668,7 @@ echo '{
 exit 0
 ```
 
-Configure in `.qwen/settings.json`:
+Configure in `.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -1782,9 +1782,9 @@ sys.exit(0)
 
 1. **Event name.** The key must be one of the events in [Hook Events](#hook-events), spelled exactly, including case. An unknown event name is skipped with the warning `Invalid hook event name`.
 2. **Matcher.** Tool events match the runtime tool id, such as `run_shell_command` or `write_file`, or an accepted alias such as Claude Code's `Bash` or `Write` (see [Matcher Patterns](#matcher-patterns)). On events without matcher support, `matcher` is ignored.
-3. **Folder trust.** Hooks in a project's `.qwen/settings.json` load only when the folder is trusted. User hooks load regardless of folder trust.
+3. **Folder trust.** Hooks in a project's `.mariadb-shell-agent/settings.json` load only when the folder is trusted. User hooks load regardless of folder trust.
 4. **Hooks disabled.** `"disableAllHooks": true`, `--safe-mode` (or `QWEN_CODE_SAFE_MODE`) and `--bare` (or `QWEN_CODE_SIMPLE`) turn off all hooks, including user hooks.
-5. **Debug log.** Start Qwen Code with `--debug`, or set `QWEN_DEBUG_LOG_FILE=1`, then read the session log at `~/.qwen/debug/latest` (under `$QWEN_RUNTIME_DIR` when that is set). Each line is tagged with a namespace:
+5. **Debug log.** Start MariaDB Shell Agent with `--debug`, or set `QWEN_DEBUG_LOG_FILE=1`, then read the session log at `~/.mariadb-shell-agent/debug/latest` (under `$QWEN_RUNTIME_DIR` when that is set). Each line is tagged with a namespace:
    - `[HOOK_REGISTRY]`: `Hook registry initialized with N hook entries`, and hook definitions discarded as invalid
    - `[TRUSTED_HOOKS]`: `Hook <name> started for event <event>` and the matching `ended` line for each run, async hook status, and hook system messages
    - `[HOOK_MATCHER]`: matchers that are not valid regular expressions
@@ -1793,7 +1793,7 @@ sys.exit(0)
 
    Prompt-hook inputs can be written to the session debug log, so apply appropriate access and retention controls.
 
-6. **Edited during the session.** Hooks are read when the session starts. After editing hook definitions, open the interactive `/hooks` menu once to reload them, or restart Qwen Code. Changes to hook controls and HTTP security settings require a restart.
+6. **Edited during the session.** Hooks are read when the session starts. After editing hook definitions, open the interactive `/hooks` menu once to reload them, or restart MariaDB Shell Agent. Changes to hook controls and HTTP security settings require a restart.
 
 ### Other checks
 

@@ -28,7 +28,7 @@ export interface WebShellBrand {
   logoDataUri?: string;
 }
 
-export const DEFAULT_BRAND_NAME = 'Qwen Code';
+export const DEFAULT_BRAND_NAME = 'MariaDB Shell Agent';
 
 /**
  * The payload of `onBrandResolved` — the subset of `WebShellBrand` a host

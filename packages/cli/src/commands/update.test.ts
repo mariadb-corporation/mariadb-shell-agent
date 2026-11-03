@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -33,7 +34,7 @@ const formatUpdateInstructions = vi.fn(
         `  ${resolveUpdateCommand(installationInfo.updateCommand, latestVersion)}`,
       ];
     }
-    return ['Manual update required. Please reinstall Qwen Code.'];
+    return ['Manual update required. Please reinstall MariaDB Shell Agent.'];
   },
 );
 const performStandaloneUpdate = vi.fn();
@@ -304,7 +305,7 @@ describe('update command', () => {
       'Running via npx, update not applicable.',
     );
     expect(writeStdoutLine).not.toHaveBeenCalledWith(
-      'Manual update required. Please reinstall Qwen Code.',
+      'Manual update required. Please reinstall MariaDB Shell Agent.',
     );
   });
 
@@ -360,7 +361,7 @@ describe('update command', () => {
     await updateCommand.handler(updateArgs);
 
     expect(writeStdoutLine).toHaveBeenCalledWith(
-      'Qwen Code 1.0.0 is up to date!',
+      'MariaDB Shell Agent 1.0.0 is up to date!',
     );
     expect(getInstallationInfo).not.toHaveBeenCalled();
   });

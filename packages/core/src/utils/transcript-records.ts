@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -144,6 +145,7 @@ const KNOWN_RECORD_SUBTYPES = new Set([
   'session_source',
   'session_model',
   'omni_recall',
+  'sent_user_content',
   'session_execution_engine',
   'session_sources_snapshot',
   'session_approval_mode',

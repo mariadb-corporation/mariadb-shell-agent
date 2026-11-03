@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -393,7 +394,7 @@ export function runRepoContext(
       // runs for local and file-path reviews, so scope the remedy.
       throw new Error(
         `repo-context: worktree ${worktreeRoot} is missing — recreate the ` +
-          `review worktree (for PR targets: re-run \`qwen review fetch-pr\`)`,
+          `review worktree (for PR targets: re-run \`mariadb-shell-agent review fetch-pr\`)`,
       );
     }
     throw err;
@@ -411,7 +412,7 @@ export function runRepoContext(
     throw new Error(
       `repo-context: refusing to read the repository context — ${untrusted}. ` +
         `The merge-base identity files would come from whichever repository ` +
-        `that pointer names. Sweep the tree (\`qwen review cleanup\`) and ` +
+        `that pointer names. Sweep the tree (\`mariadb-shell-agent review cleanup\`) and ` +
         `re-fetch before re-running.`,
     );
   }

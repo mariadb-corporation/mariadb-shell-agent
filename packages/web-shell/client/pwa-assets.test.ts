@@ -24,8 +24,8 @@ describe('committed PWA assets', () => {
     };
 
     expect(manifest).toMatchObject({
-      name: 'Qwen Code',
-      short_name: 'Qwen Code',
+      name: 'MariaDB Shell Agent',
+      short_name: 'MariaDB Shell Agent',
       start_url: '/',
       scope: '/',
       display: 'standalone',

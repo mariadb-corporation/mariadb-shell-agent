@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -128,7 +129,7 @@ export async function getEnvironmentContext(config: Config): Promise<Part[]> {
   const directoryContext = await getDirectoryContextString(config);
 
   const context = `
-This is the Qwen Code. We are setting up the context for our chat.
+This is the MariaDB Shell Agent. We are setting up the context for our chat.
 Today's date is ${today}.
 ${platform}${directoryContext}
         `.trim();
@@ -592,6 +593,9 @@ export interface InitialChatHistoryOptions {
   // prompt so a repository change between sessions does not invalidate the
   // provider-cached system prompt. Subagents leave it unset.
   gitStatus?: string | null;
+  // Main session: its interaction-mode reminder, sent here instead of in the
+  // system prompt so the system prompt is the same in every mode.
+  interactionModeReminder?: string | null;
 }
 
 /**
@@ -637,6 +641,9 @@ export async function getInitialChatHistory(
   // parts. Deferred-tools is last because progressive MCP discovery can
   // change it — only the tail recomputes.
   const reminderParts = [
+    options.interactionModeReminder
+      ? wrapSystemReminder(options.interactionModeReminder)
+      : null,
     buildMcpServerInstructionsReminder(toolRegistry),
     skillsResult?.reminder ?? null,
     startupReminder,

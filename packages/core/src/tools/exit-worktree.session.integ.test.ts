@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -230,7 +231,7 @@ describe('ExitWorktreeTool — WorktreeSession sidecar cleanup', () => {
     if (details.type === 'exec') {
       expect(details.command).toContain(`git worktree remove ${wtPath}`);
       expect(details.command).not.toContain(
-        path.join(nestedCwd, '.qwen', 'worktrees', 'cwd-stale'),
+        path.join(nestedCwd, '.mariadb-shell-agent', 'worktrees', 'cwd-stale'),
       );
     }
 
@@ -261,10 +262,10 @@ describe('ExitWorktreeTool — WorktreeSession sidecar cleanup', () => {
     const wtPath = await enterAsOldSession('reattached-relative-active');
     const packageDir = path.join(repoRoot, 'packages', 'app');
     await fs.mkdir(packageDir, { recursive: true });
-    Storage.setRuntimeBaseDir('.qwen', packageDir);
+    Storage.setRuntimeBaseDir('.mariadb-shell-agent', packageDir);
     await writeOldSessionStatus(packageDir, process.pid);
 
-    Storage.setRuntimeBaseDir('.qwen', wtPath);
+    Storage.setRuntimeBaseDir('.mariadb-shell-agent', wtPath);
     const currentSessionService = new SessionService(wtPath);
     await reattach('reattached-relative-active', wtPath, currentSessionService);
 

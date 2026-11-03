@@ -1,6 +1,6 @@
 # Recorded probe inputs
 
-These are the exact diagnostic inputs of the first, legacy-only native run. They do not patch production code. Environment-specific paths and the executed bundle digest are preserved as evidence. Copy the files into the indicated ignored `.qwen/acceptance-h3/` directory at the named production source, build its Java production classes and CLI, install native Node dependencies, and provide an isolated MySQL database. For another host, replace the owned paths and record the newly built bundle digest before checking it; do not describe an unmatched binary as the recorded binary.
+These are the exact diagnostic inputs of the first, legacy-only native run. They do not patch production code. Environment-specific paths and the executed bundle digest are preserved as evidence. Copy the files into the indicated ignored `.mariadb-shell-agent/acceptance-h3/` directory at the named production source, build its Java production classes and CLI, install native Node dependencies, and provide an isolated MySQL database. For another host, replace the owned paths and record the newly built bundle digest before checking it; do not describe an unmatched binary as the recorded binary.
 
 The source check used a 5,042-file manifest over core/CLI src/**, Java src/main/** and four existing Node helpers. The manifest SHA256 was `a4aeadf5fbfbb8583ec1eec5b5e08cc0d4ff1f3c7ed0c3d49f6eca4168cd232b`. The first native log SHA256 was `6e9e30a15a5e32f58d014bc649c78130695bca3f28d7b852e5b38b0357531338`. This manifest excludes the separate #12904 test overlays and is not a claim that the entire guest tree is a clean checkout.
 
@@ -10,7 +10,7 @@ In a checkout of the named production commit, generate the same manifest before 
 
 <!-- prettier-ignore -->
 ```sh
-mkdir -p .qwen/acceptance-h3
+mkdir -p .mariadb-shell-agent/acceptance-h3
 git ls-tree -rz --name-only 669b2f0f91b0c787f7d8a26971c7c34210b935e1 -- \
   packages/core/src packages/cli/src \
   packages/sdk-java/qwencode/src/main \
@@ -21,7 +21,7 @@ git ls-tree -rz --name-only 669b2f0f91b0c787f7d8a26971c7c34210b935e1 -- \
   integration-tests/helpers/hosted-harness-process.ts \
   integration-tests/scratch-dir.ts \
   | LC_ALL=C sort -z | xargs -0 sha256sum \
-  > .qwen/acceptance-h3/exact-base-source.sha256
+  > .mariadb-shell-agent/acceptance-h3/exact-base-source.sha256
 ```
 
 ## Prepare Java classpath and script permissions
@@ -34,9 +34,9 @@ mvn --batch-mode --no-transfer-progress \
   -f packages/sdk-java/managed-agent-server/pom.xml \
   -DskipTests compile dependency:build-classpath \
   -Dmdep.outputFile=target/acceptance-classpath.txt
-chmod +x .qwen/acceptance-h3/run-gate.sh
+chmod +x .mariadb-shell-agent/acceptance-h3/run-gate.sh
 # After copying the second-run inputs / 复制第二次输入之后：
-chmod +x .qwen/acceptance-h3-publication/run-gate.sh
+chmod +x .mariadb-shell-agent/acceptance-h3-publication/run-gate.sh
 ```
 
 ## Executed command — legacy control
@@ -45,13 +45,13 @@ The owned Lima VM supplied a non-root delegated systemd unit and a wrapper expor
 
 <!-- prettier-ignore -->
 ```sh
-/Users/zzj/.qwen/tmp/managed-agent-two-issues-20261009/linux-env/lima-env.sh shell h3 \
+/Users/zzj/.mariadb-shell-agent/tmp/managed-agent-two-issues-20261009/linux-env/lima-env.sh shell h3 \
   sudo systemd-run --quiet --wait --pipe --collect \
   --unit=qwen-h3-gate-20261009-0920 --uid=qwen \
   --property=Delegate=yes \
   --property=WorkingDirectory=/home/qwen/acceptance/12904 \
   /home/qwen/managed-env/delegate-run.sh \
-  /home/qwen/acceptance/12904/.qwen/acceptance-h3/run-gate.sh \
+  /home/qwen/acceptance/12904/.mariadb-shell-agent/acceptance-h3/run-gate.sh \
   /home/qwen/acceptance/12904/packages/sdk-java/managed-agent-server/target/acceptance-classpath.txt \
   /home/qwen/acceptance/13532-run-20261009-0920
 ```
@@ -61,7 +61,7 @@ The SQL schema and credentials in these inputs belong only to the disposable acc
 <details>
 <summary>中文说明</summary>
 
-下面保留首次 legacy 原生运行的准确诊断输入，没有修改生产代码。环境专用路径及实际执行的 bundle 摘要原样保留。复跑时将文件放入指定生产源码的忽略目录 `.qwen/acceptance-h3/`，构建 Java 生产类与 CLI、安装原生 Node 依赖，并提供独立 MySQL 数据库。换宿主时调整所拥有的路径，先记录新构建 bundle 的摘要再检查；不能把摘要不匹配的二进制称为当次已记录产物。
+下面保留首次 legacy 原生运行的准确诊断输入，没有修改生产代码。环境专用路径及实际执行的 bundle 摘要原样保留。复跑时将文件放入指定生产源码的忽略目录 `.mariadb-shell-agent/acceptance-h3/`，构建 Java 生产类与 CLI、安装原生 Node 依赖，并提供独立 MySQL 数据库。换宿主时调整所拥有的路径，先记录新构建 bundle 的摘要再检查；不能把摘要不匹配的二进制称为当次已记录产物。
 
 源码检查使用 5,042 个文件的清单，覆盖 core/CLI src/**、Java src/main/** 及四个既有 Node helpers；清单 SHA256：`a4aeadf5fbfbb8583ec1eec5b5e08cc0d4ff1f3c7ed0c3d49f6eca4168cd232b`。首次原生日志 SHA256：`6e9e30a15a5e32f58d014bc649c78130695bca3f28d7b852e5b38b0357531338`。清单排除了另一个 #12904 的测试覆盖文件，不能据此称整个 guest 目录为干净 checkout。
 
@@ -83,17 +83,17 @@ qa_source_root=/home/qwen/acceptance/12904
 qa_classpath_file=$1
 qa_run_directory=$2
 cd "$qa_source_root"
-sha256sum --status -c .qwen/acceptance-h3/exact-base-source.sha256
+sha256sum --status -c .mariadb-shell-agent/acceptance-h3/exact-base-source.sha256
 qa_bundle_sha=$(sha256sum dist/cli.js | cut -d' ' -f1)
 test "$qa_bundle_sha" = 11db529ca76a62e3b19c95269da45583ffb6b820b5e9619ae38bb973661c5c2d
-printf 'H3_SOURCE_MATCH files=%s sourceHead=%s bundleSha256=%s\n' "$(wc -l < .qwen/acceptance-h3/exact-base-source.sha256)" 669b2f0f91b0c787f7d8a26971c7c34210b935e1 "$qa_bundle_sha"
+printf 'H3_SOURCE_MATCH files=%s sourceHead=%s bundleSha256=%s\n' "$(wc -l < .mariadb-shell-agent/acceptance-h3/exact-base-source.sha256)" 669b2f0f91b0c787f7d8a26971c7c34210b935e1 "$qa_bundle_sha"
 qa_classpath="packages/sdk-java/managed-agent-server/target/classes:$(cat "$qa_classpath_file")"
-mkdir -p .qwen/acceptance-h3/classes
-javac -cp "$qa_classpath" -d .qwen/acceptance-h3/classes .qwen/acceptance-h3/H3GateProbe.java
+mkdir -p .mariadb-shell-agent/acceptance-h3/classes
+javac -cp "$qa_classpath" -d .mariadb-shell-agent/acceptance-h3/classes .mariadb-shell-agent/acceptance-h3/H3GateProbe.java
 printf 'H3_LINUX %s\n' "$(uname -a)"
 printf 'H3_DELEGATED_CGROUP %s\n' "$QWEN_MANAGED_HOOK_CGROUP_ROOT"
 findmnt -no FSTYPE,OPTIONS /sys/fs/cgroup
-java -cp ".qwen/acceptance-h3/classes:$qa_classpath" \
+java -cp ".mariadb-shell-agent/acceptance-h3/classes:$qa_classpath" \
   -Dsource.head=669b2f0f91b0c787f7d8a26971c7c34210b935e1 \
   -Dnode.executable="$(command -v node)" \
   -Dmysql.url='jdbc:mysql://127.0.0.1:23060/qwen_13532?allowPublicKeyRetrieval=true&useSSL=false' \
@@ -202,7 +202,7 @@ public class H3GateProbe {
             System.out.println("H3_ENV " + Map.of("head", head, "brokerPid", ProcessHandle.current().pid(),
                     "cgroupRoot", System.getenv("QWEN_MANAGED_HOOK_CGROUP_ROOT"),
                     "database", jdbc.queryForMap("SELECT VERSION() AS version, @@version_comment AS engine")));
-            Process driver = new ProcessBuilder(node.toString(), "--import", "tsx", ".qwen/acceptance-h3/hosted-gate-driver.ts", config.toString())
+            Process driver = new ProcessBuilder(node.toString(), "--import", "tsx", ".mariadb-shell-agent/acceptance-h3/hosted-gate-driver.ts", config.toString())
                     .directory(root.toFile()).inheritIO().start();
             try {
                 if (!driver.waitFor(300, TimeUnit.SECONDS)) throw new IllegalStateException("H3 driver timeout");
@@ -308,7 +308,7 @@ The second run reused the unchanged production classes, source manifest and pack
 
 <!-- prettier-ignore -->
 ```sh
-/Users/zzj/.qwen/tmp/managed-agent-two-issues-20261009/linux-env/lima-env.sh shell h3 sudo systemd-run --quiet --wait --pipe --collect --unit=qwen-h3-publication-gate-20261009-1007 --uid=qwen --property=Delegate=yes --property=WorkingDirectory=/home/qwen/acceptance/12904 /home/qwen/managed-env/delegate-run.sh /home/qwen/acceptance/12904/.qwen/acceptance-h3-publication/run-gate.sh /home/qwen/acceptance/12904/packages/sdk-java/managed-agent-server/target/acceptance-classpath.txt /home/qwen/acceptance/13532-publication-run-20261009-1007
+/Users/zzj/.mariadb-shell-agent/tmp/managed-agent-two-issues-20261009/linux-env/lima-env.sh shell h3 sudo systemd-run --quiet --wait --pipe --collect --unit=qwen-h3-publication-gate-20261009-1007 --uid=mariadb-shell-agent --property=Delegate=yes --property=WorkingDirectory=/home/qwen/acceptance/12904 /home/qwen/managed-env/delegate-run.sh /home/qwen/acceptance/12904/.mariadb-shell-agent/acceptance-h3-publication/run-gate.sh /home/qwen/acceptance/12904/packages/sdk-java/managed-agent-server/target/acceptance-classpath.txt /home/qwen/acceptance/13532-publication-run-20261009-1007
 ```
 
 The foreground recorder deliberately does not assert success: its `recoveryBlocked`, missing marker and SQL `not_started` result are acceptance evidence of a blocked control, not a passing H3 result.
@@ -323,7 +323,7 @@ The foreground recorder deliberately does not assert success: its `recoveryBlock
 
 ## Second-run input deltas
 
-Copy the three original files and source manifest into `.qwen/acceptance-h3-publication/`, then apply these deltas to that copy. / 将原始三个文件及源码清单复制到 `.qwen/acceptance-h3-publication/`，再对副本应用以下差异。
+Copy the three original files and source manifest into `.mariadb-shell-agent/acceptance-h3-publication/`, then apply these deltas to that copy. / 将原始三个文件及源码清单复制到 `.mariadb-shell-agent/acceptance-h3-publication/`，再对副本应用以下差异。
 
 ### run-gate.sh
 
@@ -337,22 +337,22 @@ Second-run SHA256: `f472bf668dac01ea0c68e1253cd078080741b334fcf357ae8132aaa2052e
  qa_classpath_file=$1
  qa_run_directory=$2
  cd "$qa_source_root"
--sha256sum --status -c .qwen/acceptance-h3/exact-base-source.sha256
-+sha256sum --status -c .qwen/acceptance-h3-publication/exact-base-source.sha256
+-sha256sum --status -c .mariadb-shell-agent/acceptance-h3/exact-base-source.sha256
++sha256sum --status -c .mariadb-shell-agent/acceptance-h3-publication/exact-base-source.sha256
  qa_bundle_sha=$(sha256sum dist/cli.js | cut -d' ' -f1)
  test "$qa_bundle_sha" = 11db529ca76a62e3b19c95269da45583ffb6b820b5e9619ae38bb973661c5c2d
--printf 'H3_SOURCE_MATCH files=%s sourceHead=%s bundleSha256=%s\n' "$(wc -l < .qwen/acceptance-h3/exact-base-source.sha256)" 669b2f0f91b0c787f7d8a26971c7c34210b935e1 "$qa_bundle_sha"
-+printf 'H3_SOURCE_MATCH files=%s sourceHead=%s bundleSha256=%s\n' "$(wc -l < .qwen/acceptance-h3-publication/exact-base-source.sha256)" 669b2f0f91b0c787f7d8a26971c7c34210b935e1 "$qa_bundle_sha"
+-printf 'H3_SOURCE_MATCH files=%s sourceHead=%s bundleSha256=%s\n' "$(wc -l < .mariadb-shell-agent/acceptance-h3/exact-base-source.sha256)" 669b2f0f91b0c787f7d8a26971c7c34210b935e1 "$qa_bundle_sha"
++printf 'H3_SOURCE_MATCH files=%s sourceHead=%s bundleSha256=%s\n' "$(wc -l < .mariadb-shell-agent/acceptance-h3-publication/exact-base-source.sha256)" 669b2f0f91b0c787f7d8a26971c7c34210b935e1 "$qa_bundle_sha"
  qa_classpath="packages/sdk-java/managed-agent-server/target/classes:$(cat "$qa_classpath_file")"
--mkdir -p .qwen/acceptance-h3/classes
--javac -cp "$qa_classpath" -d .qwen/acceptance-h3/classes .qwen/acceptance-h3/H3GateProbe.java
-+mkdir -p .qwen/acceptance-h3-publication/classes
-+javac -cp "$qa_classpath" -d .qwen/acceptance-h3-publication/classes .qwen/acceptance-h3-publication/H3GateProbe.java
+-mkdir -p .mariadb-shell-agent/acceptance-h3/classes
+-javac -cp "$qa_classpath" -d .mariadb-shell-agent/acceptance-h3/classes .mariadb-shell-agent/acceptance-h3/H3GateProbe.java
++mkdir -p .mariadb-shell-agent/acceptance-h3-publication/classes
++javac -cp "$qa_classpath" -d .mariadb-shell-agent/acceptance-h3-publication/classes .mariadb-shell-agent/acceptance-h3-publication/H3GateProbe.java
  printf 'H3_LINUX %s\n' "$(uname -a)"
  printf 'H3_DELEGATED_CGROUP %s\n' "$QWEN_MANAGED_HOOK_CGROUP_ROOT"
  findmnt -no FSTYPE,OPTIONS /sys/fs/cgroup
--java -cp ".qwen/acceptance-h3/classes:$qa_classpath" \
-+java -cp ".qwen/acceptance-h3-publication/classes:$qa_classpath" \
+-java -cp ".mariadb-shell-agent/acceptance-h3/classes:$qa_classpath" \
++java -cp ".mariadb-shell-agent/acceptance-h3-publication/classes:$qa_classpath" \
    -Dsource.head=669b2f0f91b0c787f7d8a26971c7c34210b935e1 \
    -Dnode.executable="$(command -v node)" \
    -Dmysql.url='jdbc:mysql://127.0.0.1:23060/qwen_13532?allowPublicKeyRetrieval=true&useSSL=false' \
@@ -370,8 +370,8 @@ Second-run SHA256: `54cc933222a8deb097c4425b6fd3bda4b09de6a2abd3d5991f3ebe69928f
              System.out.println("H3_ENV " + Map.of("head", head, "brokerPid", ProcessHandle.current().pid(),
                      "cgroupRoot", System.getenv("QWEN_MANAGED_HOOK_CGROUP_ROOT"),
                      "database", jdbc.queryForMap("SELECT VERSION() AS version, @@version_comment AS engine")));
--            Process driver = new ProcessBuilder(node.toString(), "--import", "tsx", ".qwen/acceptance-h3/hosted-gate-driver.ts", config.toString())
-+            Process driver = new ProcessBuilder(node.toString(), "--import", "tsx", ".qwen/acceptance-h3-publication/hosted-gate-driver.ts", config.toString())
+-            Process driver = new ProcessBuilder(node.toString(), "--import", "tsx", ".mariadb-shell-agent/acceptance-h3/hosted-gate-driver.ts", config.toString())
++            Process driver = new ProcessBuilder(node.toString(), "--import", "tsx", ".mariadb-shell-agent/acceptance-h3-publication/hosted-gate-driver.ts", config.toString())
                      .directory(root.toFile()).inheritIO().start();
              try {
                  if (!driver.waitFor(300, TimeUnit.SECONDS)) throw new IllegalStateException("H3 driver timeout");

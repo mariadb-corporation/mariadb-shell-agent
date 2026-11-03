@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -254,7 +255,7 @@ export class DashScopeWebSearchBackend implements WebSearchBackend {
       maxRetries: 1,
       defaultHeaders: withDashScopeSourceConfig(
         {
-          'User-Agent': `QwenCode/${this.config.getCliVersion() || 'unknown'} (${process.platform}; ${process.arch})`,
+          'User-Agent': `MariaDBShellAgent/${this.config.getCliVersion() || 'unknown'} (${process.platform}; ${process.arch})`,
           // Entry-declared headers win, matching the providers' merge order;
           // only the source attribution below takes precedence over them.
           ...(backend.customHeaders ?? {}),

@@ -4,7 +4,7 @@ This monorepo contains two main packages: `@qwen-code/qwen-code` and `@qwen-code
 
 ## `@qwen-code/qwen-code`
 
-This is the main package for Qwen Code. It is responsible for the user interface, command parsing, and all other user-facing functionality.
+This is the main package for MariaDB Shell Agent. It is responsible for the user interface, command parsing, and all other user-facing functionality.
 
 When this package is published, it is bundled into a single executable file. This bundle includes all of the package's dependencies, including `@qwen-code/qwen-code-core`. This means that whether a user installs the package with `npm install -g @qwen-code/qwen-code` or runs it directly with `npx @qwen-code/qwen-code`, they are using this single, self-contained executable.
 
@@ -20,7 +20,7 @@ This project follows a structured release process to ensure that all packages ar
 
 ## How To Release
 
-Releases are managed through the [release.yml](https://github.com/QwenLM/qwen-code/actions/workflows/release.yml) GitHub Actions workflow. To perform a manual release for a patch or hotfix:
+Releases are managed through the [release.yml](https://github.invalid/QwenLM/qwen-code/actions/workflows/release.yml) GitHub Actions workflow. To perform a manual release for a patch or hotfix:
 
 1.  Navigate to the **Actions** tab of the repository.
 2.  Select the **Release** workflow from the list.
@@ -141,7 +141,7 @@ You typically do not merge release branches for pre-releases back into `main`.
 
 If you need to test the release process without actually publishing to NPM or creating a public GitHub release, you can trigger the workflow manually from the GitHub UI.
 
-1.  Go to the [Actions tab](https://github.com/QwenLM/qwen-code/actions/workflows/release.yml) of the repository.
+1.  Go to the [Actions tab](https://github.invalid/QwenLM/qwen-code/actions/workflows/release.yml) of the repository.
 2.  Click on the "Run workflow" dropdown.
 3.  Leave the `dry_run` option checked (`true`).
 4.  Click the "Run workflow" button.

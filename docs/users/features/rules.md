@@ -1,16 +1,16 @@
 # Rules
 
-A rule is a Markdown file that reaches the model either at the start of a session or the moment the work touches a file it applies to. Rules live in `.qwen/rules/`, and the `paths:` field is what makes the second kind possible: guidance about your React components does not have to be in the prompt while you are editing a Makefile.
+A rule is a Markdown file that reaches the model either at the start of a session or the moment the work touches a file it applies to. Rules live in `.mariadb-shell-agent/rules/`, and the `paths:` field is what makes the second kind possible: guidance about your React components does not have to be in the prompt while you are editing a Makefile.
 
-They are the cheap counterpart to a context file (`QWEN.md`), which is carried on **every** request of every session — see [Resident Context Cost](context-cost.md).
+They are the cheap counterpart to a context file (`MARIADB-SHELL-AGENT.md`), which is carried on **every** request of every session — see [Resident Context Cost](context-cost.md).
 
 ## Where rules live
 
-| Location                                  | Loaded                                     |
-| ----------------------------------------- | ------------------------------------------ |
-| `~/.qwen/rules/` (or `$QWEN_HOME/rules/`) | always                                     |
-| `<project>/.qwen/rules/`                  | when the workspace is trusted              |
-| an active extension's `rules/`            | always, conditional rules only — see below |
+| Location                                                 | Loaded                                     |
+| -------------------------------------------------------- | ------------------------------------------ |
+| `~/.mariadb-shell-agent/rules/` (or `$QWEN_HOME/rules/`) | always                                     |
+| `<project>/.mariadb-shell-agent/rules/`                  | when the workspace is trusted              |
+| an active extension's `rules/`                           | always, conditional rules only — see below |
 
 Every `.md` file under those directories is discovered, including in subdirectories, in a deterministic order.
 
@@ -58,12 +58,12 @@ They are not gated on workspace trust, unlike project rules: installing an exten
 
 ## Rules, skills and context files
 
-|                             | In the prompt from the start | Loaded on demand                |
-| --------------------------- | ---------------------------- | ------------------------------- |
-| Context file (`QWEN.md`)    | always, in full              | —                               |
-| Baseline rule               | always, in full              | —                               |
-| Conditional rule (`paths:`) | nothing                      | when a matching file is touched |
-| Skill                       | name + description only      | body, when the model invokes it |
+|                                         | In the prompt from the start | Loaded on demand                |
+| --------------------------------------- | ---------------------------- | ------------------------------- |
+| Context file (`MARIADB-SHELL-AGENT.md`) | always, in full              | —                               |
+| Baseline rule                           | always, in full              | —                               |
+| Conditional rule (`paths:`)             | nothing                      | when a matching file is touched |
+| Skill                                   | name + description only      | body, when the model invokes it |
 
 A skill is the right home for a procedure the model chooses to follow; a conditional rule is the right home for a constraint that applies to a region of the codebase whether or not the model thought to look for it. Skills can also be [gated on `paths:`](skills.md#optional-gate-a-skill-on-file-paths-paths), which keeps even their listing entry out of the prompt until it is relevant.
 

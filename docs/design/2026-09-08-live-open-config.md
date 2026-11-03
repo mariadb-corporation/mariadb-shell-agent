@@ -14,7 +14,7 @@ The standalone daemon adds its absolute `configPath` to the existing private
 discovery record. The Host validates this optional field (absolute path,
 `config.json` basename, bounded length, no NUL) and includes it in the discovery
 identity. The connection exposes the path only after the matching nonce welcome
-and while the socket is ready. Older daemons and built-in `qwen serve` omit the
+and while the socket is ready. Older daemons and built-in `mariadb-shell-agent serve` omit the
 field and do not acquire standalone configuration authority.
 
 The renderer receives only `canOpenConfig`, not a filesystem path or contents.

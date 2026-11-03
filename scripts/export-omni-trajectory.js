@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,11 +15,11 @@
  * Usage:
  *   node scripts/export-omni-trajectory.js \
  *     --transcript <path/to/session.jsonl> \
- *     --omni-root <project>/.qwen/omni \
+ *     --omni-root <project>/.mariadb-shell-agent/omni \
  *     --out <path/to/trajectory.jsonl>
  *
  * The transcript is a chat-record JSONL (found under
- * `~/.qwen/tmp/<project_id>/chats/`); --omni-root holds memory.json.
+ * `~/.mariadb-shell-agent/tmp/<project_id>/chats/`); --omni-root holds memory.json.
  */
 
 import path from 'node:path';
@@ -36,7 +37,7 @@ const outPath = argValue('--out');
 if (!transcriptPath || !omniRootDir || !outPath) {
   console.error(
     'usage: export-omni-trajectory.js --transcript <session.jsonl> ' +
-      '--omni-root <.qwen/omni> --out <trajectory.jsonl>',
+      '--omni-root <.mariadb-shell-agent/omni> --out <trajectory.jsonl>',
   );
   process.exit(2);
 }

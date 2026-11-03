@@ -411,7 +411,7 @@ networking, installation, process cleanup and container death. Simulated runtime
 tests are protocol evidence, not evidence of kernel isolation. Report unavailable
 real-runtime tests explicitly.
 
-[Independent Linux verification](https://github.com/QwenLM/qwen-code/pull/11711#issuecomment-5645312113)
+[Independent Linux verification](https://github.invalid/QwenLM/qwen-code/pull/11711#issuecomment-5645312113)
 reports ten harness suites and thirteen CLI arms at `ebae028529` with rootful
 Docker 26.1.5. It used the published 0.23.0 image because 0.23.3 could not be
 pulled, and a local HTTP tarball server because the bridge lacked public egress.
@@ -419,7 +419,7 @@ Podman, a live rootless daemon and the configured 0.23.3 image remain unverified
 by that report. These are external results, distinct from local process-fixture
 checks.
 
-[Independent Linux round 2](https://github.com/QwenLM/qwen-code/pull/11711#issuecomment-5652725410)
+[Independent Linux round 2](https://github.invalid/QwenLM/qwen-code/pull/11711#issuecomment-5652725410)
 reports policy and lifecycle verification at `e544823995`, including fourteen
 boundary checks on each of Docker 26.1.5 and rootful/rootless Podman 5.4.2 with
 the configured 0.23.3 image. It used a copied independent bundle, a local HTTP

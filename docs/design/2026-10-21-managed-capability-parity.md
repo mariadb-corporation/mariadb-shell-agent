@@ -4,7 +4,7 @@
 
 ## Motivation
 
-The repository maintains two server paths: the legacy `qwen serve` daemon and
+The repository maintains two server paths: the legacy `mariadb-shell-agent serve` daemon and
 the Managed Agent control plane. They share one TypeScript agent core. They
 differ in control plane, isolation model, and operations. No single place
 states which capability lives on which path. A user cannot tell whether a

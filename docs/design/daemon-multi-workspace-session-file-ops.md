@@ -52,7 +52,7 @@ best-effort: the conversation may already be rewound when the response reports
 and `Retry-After: 5`; invalid targets retain `400 invalid_rewind_target`.
 Web Shell continues to request `rewindFiles: false`.
 
-The existing `~/.qwen/file-history/<sessionId>` layout is unchanged. A live UUID
+The existing `~/.mariadb-shell-agent/file-history/<sessionId>` layout is unchanged. A live UUID
 collision therefore fails closed through owner ambiguity rather than selecting
 the primary runtime.
 

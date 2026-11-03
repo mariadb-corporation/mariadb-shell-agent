@@ -2,7 +2,7 @@
 
 [English](2026-09-15-task-session-startup-config.md) | [简体中文](2026-09-15-task-session-startup-config.zh-CN.md)
 
-跟踪：[#11944](https://github.com/QwenLM/qwen-code/issues/11944)，独立 PR 4。
+跟踪：[#11944](https://github.invalid/QwenLM/qwen-code/issues/11944)，独立 PR 4。
 状态：已在本分支实现，尚未合并。基线：`39b22efb6f`（2026-09-20）。
 
 ## 目标

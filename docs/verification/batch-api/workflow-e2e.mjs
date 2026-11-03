@@ -227,7 +227,7 @@ fs.writeFileSync(
 const env = {
   HOME: fakeHome,
   USERPROFILE: fakeHome,
-  QWEN_HOME: path.join(fakeHome, '.qwen'),
+  QWEN_HOME: path.join(fakeHome, '.mariadb-shell-agent'),
   QWEN_CODE_SYSTEM_SETTINGS_PATH: path.join(fakeHome, 'system-settings.json'),
   QWEN_CODE_SYSTEM_DEFAULTS_PATH: path.join(fakeHome, 'system-defaults.json'),
   OPENAI_API_KEY: 'fake-key',

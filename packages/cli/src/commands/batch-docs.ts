@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -428,7 +429,7 @@ export function deliverResult(
     if (current !== expectedSourceSha256) {
       return {
         kind: 'held',
-        reason: `source "${item.source}" changed since submission; \`qwen batch retry\` resubmits it against the new source`,
+        reason: `source "${item.source}" changed since submission; \`mariadb-shell-agent batch retry\` resubmits it against the new source`,
         sourceChanged: true,
       };
     }

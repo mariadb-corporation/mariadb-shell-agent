@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -118,7 +119,7 @@ export function createMonitorWakeRunTurn(params: {
         // shares the transient account: this attempt ends without anything
         // settled, and the busy retry re-drives next wake (F6).
         params.writeStderr(
-          'qwen serve: Interrupted channel wake turn ' +
+          'mariadb-shell-agent serve: Interrupted channel wake turn ' +
             turn.turnId +
             ' could not settle this pass; the next wake attempt drives it again: ' +
             String(cause),
@@ -127,7 +128,7 @@ export function createMonitorWakeRunTurn(params: {
       }
       if (interrupted === 'settled') {
         params.writeStderr(
-          'qwen serve: Interrupted channel wake turn ' +
+          'mariadb-shell-agent serve: Interrupted channel wake turn ' +
             turn.turnId +
             ' was settled without a reply; the Session stays usable.',
         );
@@ -135,7 +136,7 @@ export function createMonitorWakeRunTurn(params: {
       }
       if (interrupted === 'held') {
         params.writeStderr(
-          'qwen serve: Interrupted channel wake turn ' +
+          'mariadb-shell-agent serve: Interrupted channel wake turn ' +
             turn.turnId +
             ' keeps its durable wait for its approval; the Session stays usable.',
         );
@@ -154,7 +155,7 @@ export function createMonitorWakeRunTurn(params: {
       // caller tracking the turn settles its stop the honest way.
       session.blocked = true;
       params.writeStderr(
-        'qwen serve: Monitor wake turn ' +
+        'mariadb-shell-agent serve: Monitor wake turn ' +
           turn.turnId +
           ' needs recovery, not a re-drive.',
       );
@@ -195,7 +196,7 @@ export function createMonitorWakeRunTurn(params: {
         return 'settled_incomplete';
       } catch (cause) {
         params.writeStderr(
-          'qwen serve: Queued wake cancellation ' +
+          'mariadb-shell-agent serve: Queued wake cancellation ' +
             turn.turnId +
             ' could not settle this pass; the next wake attempt drives it again: ' +
             String(cause),
@@ -218,7 +219,7 @@ export function createMonitorWakeRunTurn(params: {
         // the input, exactly like a parked prompt.
         session.blocked = true;
         params.writeStderr(
-          'qwen serve: Monitor wake turn ' +
+          'mariadb-shell-agent serve: Monitor wake turn ' +
             turn.turnId +
             ' is recovery blocked: ' +
             String(cause),
@@ -306,7 +307,7 @@ export function withChildAgentConsumption(
         // block — the acceptance stays at `accepting`, owed evidence the
         // relay's own deliver arm reconciles.
         writeStderr(
-          'qwen serve: Hosted acceptance consumption faltered (owed evidence kept): ' +
+          'mariadb-shell-agent serve: Hosted acceptance consumption faltered (owed evidence kept): ' +
             String(cause),
         );
       }

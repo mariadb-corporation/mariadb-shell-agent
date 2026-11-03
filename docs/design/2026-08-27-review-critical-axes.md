@@ -49,13 +49,13 @@ plausibly settles around round 19 instead of 23.
 
 ### Carriers
 
-| Surface                                      | Form                                                                                           | Reader                                                                                                   |
-| -------------------------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Findings artifact (`qwen review findings`)   | `direction` / `baseline` enums, refused when misspelled                                        | report, `report_findings`, the compose state                                                             |
-| `report_findings` tool (core)                | same optional enums in the schema                                                              | TUI / Web Shell / ACP display (pass-through)                                                             |
-| Drafted Critical comment                     | claim-line bracket tags `[fails-closed] [new-surface]` beside the id, copied from the artifact | `floorEnforcedReroute` (backstop), `buildLedger` (marker) — claim line only                              |
-| Typed deferral entry (`deferredSuggestions`) | `severity: "Critical"` + both axes                                                             | `splitDeferralChannel` — deferred only when licensed                                                     |
-| Ledger marker                                | `d: 'c' \| 'f'`, `b: 'r' \| 'n'` per finding; unknown values normalise to absent               | next round's side-file work-list table (`Critical (fails-closed, new-surface)`), autofix tooling (#9907) |
+| Surface                                                   | Form                                                                                           | Reader                                                                                                   |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Findings artifact (`mariadb-shell-agent review findings`) | `direction` / `baseline` enums, refused when misspelled                                        | report, `report_findings`, the compose state                                                             |
+| `report_findings` tool (core)                             | same optional enums in the schema                                                              | TUI / Web Shell / ACP display (pass-through)                                                             |
+| Drafted Critical comment                                  | claim-line bracket tags `[fails-closed] [new-surface]` beside the id, copied from the artifact | `floorEnforcedReroute` (backstop), `buildLedger` (marker) — claim line only                              |
+| Typed deferral entry (`deferredSuggestions`)              | `severity: "Critical"` + both axes                                                             | `splitDeferralChannel` — deferred only when licensed                                                     |
+| Ledger marker                                             | `d: 'c' \| 'f'`, `b: 'r' \| 'n'` per finding; unknown values normalise to absent               | next round's side-file work-list table (`Critical (fails-closed, new-surface)`), autofix tooling (#9907) |
 
 ### The licence
 

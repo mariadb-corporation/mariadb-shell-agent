@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +10,7 @@
 //
 // Every `/review` subcommand runs as `"${QWEN_CODE_CLI}" review <name>`, which
 // resolves to the built bundle — not to the working tree. `QWEN_CODE_CLI`
-// already stops the review talking to a DIFFERENT program (a bare `qwen` on
+// already stops the review talking to a DIFFERENT program (a bare `mariadb-shell-agent` on
 // PATH once resolved to a v0.19.10 whose `agent-prompt` predated `--role`, and
 // the review died on a missing argument). This is the other half: the right
 // program, built before the change you are trying to exercise. That failure is
@@ -535,7 +536,7 @@ export function staleBundleWarning(
   }
   return (
     `review: the bundle these commands run from was NOT built from the review sources in this tree. ` +
-    `Every \`qwen review …\` step below runs the BUILT bundle, not the working tree, ` +
+    `Every \`mariadb-shell-agent review …\` step below runs the BUILT bundle, not the working tree, ` +
     `so a review source changed since that build will not take effect and this run ` +
     `will measure the old behaviour without saying so. Rebuild with ` +
     `\`npm run bundle\` ` +

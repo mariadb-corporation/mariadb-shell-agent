@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -129,7 +130,12 @@ describe('EnterWorktreeTool.execute', () => {
   it('refuses nested invocation from inside a worktree', async () => {
     await withTmpDir('qwen-nested-', async (cwd) => {
       // A path that contains the nested-marker substring.
-      const nested = path.join(cwd, '.qwen', 'worktrees', 'inner');
+      const nested = path.join(
+        cwd,
+        '.mariadb-shell-agent',
+        'worktrees',
+        'inner',
+      );
       await fs.mkdir(nested, { recursive: true });
       const result = await enterFrom(nested, 'nope');
       expect(result.error?.message).toMatch(/already inside.*worktree/i);
@@ -193,16 +199,16 @@ describe('GitWorktreeService.generateAutoSlug', () => {
 });
 
 describe('GitWorktreeService.getUserWorktreesDir / getUserWorktreePath', () => {
-  it('uses .qwen/worktrees under the project root', () => {
+  it('uses .mariadb-shell-agent/worktrees under the project root', () => {
     // Use the cwd (which exists) so simple-git's existence check passes.
     // Expected paths use path.join so the separator matches the platform.
     const root = process.cwd();
     const service = new GitWorktreeService(root);
     expect(service.getUserWorktreesDir()).toBe(
-      path.join(root, '.qwen', 'worktrees'),
+      path.join(root, '.mariadb-shell-agent', 'worktrees'),
     );
     expect(service.getUserWorktreePath('feat-x')).toBe(
-      path.join(root, '.qwen', 'worktrees', 'feat-x'),
+      path.join(root, '.mariadb-shell-agent', 'worktrees', 'feat-x'),
     );
   });
 });

@@ -594,7 +594,7 @@ export async function createReferenceDistribution({
     version,
     status: 'experimental',
     source: {
-      repository: 'https://github.com/QwenLM/qwen-code',
+      repository: 'https://github.invalid/QwenLM/qwen-code',
       revision: sourceRevision,
     },
     components,

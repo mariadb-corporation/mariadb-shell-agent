@@ -3,18 +3,18 @@
 [English](2026-10-15-managed-workspace-resident-runtime.md) | [简体中文](2026-10-15-managed-workspace-resident-runtime.zh-CN.md)
 
 Status: Section 4.1 is implemented by PR1
-([#14254](https://github.com/QwenLM/qwen-code/pull/14254)), Section 4.2 by PR2
-([#14339](https://github.com/QwenLM/qwen-code/pull/14339)) and Section 4.3 by
-PR3 ([#14435](https://github.com/QwenLM/qwen-code/pull/14435)) and Section 4.4
+([#14254](https://github.invalid/QwenLM/qwen-code/pull/14254)), Section 4.2 by PR2
+([#14339](https://github.invalid/QwenLM/qwen-code/pull/14339)) and Section 4.3 by
+PR3 ([#14435](https://github.invalid/QwenLM/qwen-code/pull/14435)) and Section 4.4
 (Session-create warm) by PR4. Section 4.5 remains a proposal.
 Tracking issue:
-[#14211](https://github.com/QwenLM/qwen-code/issues/14211). Part of the Managed
-Agent proposal [#12380](https://github.com/QwenLM/qwen-code/issues/12380). Code
+[#14211](https://github.invalid/QwenLM/qwen-code/issues/14211). Part of the Managed
+Agent proposal [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380). Code
 references are to `main` @ `c3012a523f`, before PR2.
 
 Revision history:
 
-- Revision 1 landed as PR0 ([#14214](https://github.com/QwenLM/qwen-code/pull/14214)).
+- Revision 1 landed as PR0 ([#14214](https://github.invalid/QwenLM/qwen-code/pull/14214)).
 - Revision 2 (review on #14214) reused the existing provisioner capabilities in
   PR1, listed the Harness-ownership paths keyed by the isolation key, made the
   generation budget an admission-time bound and deferred keep-warm.
@@ -23,7 +23,7 @@ Revision history:
   - idle retirement and the generation budget are deferred (Section 4.5);
   - the slices are reordered: PR2 re-keys Harness ownership, PR3 enables
     Workspace residency, PR4 adds Session-create warm.
-- Revision 4 (PR3, [#14435](https://github.com/QwenLM/qwen-code/pull/14435)):
+- Revision 4 (PR3, [#14435](https://github.invalid/QwenLM/qwen-code/pull/14435)):
   - close/recovery side: a closing Session releases only its own Runtime
     Sessions on a shared binding (the worker and the binding stay `READY`) on
     both close protocols; v2 cleanup authority is fenced by the Runtime
@@ -394,14 +394,14 @@ Durations follow the existing unit rules and must be written with a suffix.
 
 ## 6. Delivery slices
 
-| PR    | Scope                                                                                                  | Depends on   | Behaviour change |
-| ----- | ------------------------------------------------------------------------------------------------------ | ------------ | ---------------- |
-| PR0   | Bilingual design (#14214)                                                                              | —            | none             |
-| PR1   | Kind identity and isolation policy (4.1, #14254)                                                       | —            | none             |
-| PR2   | Harness ownership on shared bindings (4.2)                                                             | PR1          | none             |
-| PR3   | Workspace isolation for bound Sessions (4.3, [#14435](https://github.com/QwenLM/qwen-code/pull/14435)) | PR2          | opt-in           |
-| PR4   | Session-create warm (4.4)                                                                              | —            | opt-in           |
-| Later | Idle retirement and generation budget (4.5), keep-warm                                                 | measurements | opt-in           |
+| PR    | Scope                                                                                                      | Depends on   | Behaviour change |
+| ----- | ---------------------------------------------------------------------------------------------------------- | ------------ | ---------------- |
+| PR0   | Bilingual design (#14214)                                                                                  | —            | none             |
+| PR1   | Kind identity and isolation policy (4.1, #14254)                                                           | —            | none             |
+| PR2   | Harness ownership on shared bindings (4.2)                                                                 | PR1          | none             |
+| PR3   | Workspace isolation for bound Sessions (4.3, [#14435](https://github.invalid/QwenLM/qwen-code/pull/14435)) | PR2          | opt-in           |
+| PR4   | Session-create warm (4.4)                                                                                  | —            | opt-in           |
+| Later | Idle retirement and generation budget (4.5), keep-warm                                                     | measurements | opt-in           |
 
 If PR3 exceeds roughly 1000 production lines, split it into
 "provisioning and placement" and "close split and evidence". Each slice updates

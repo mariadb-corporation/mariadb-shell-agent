@@ -26,7 +26,7 @@ workspace.
   `packages/cli/src/serve/routes/workspace-management.ts` registers an existing
   directory, or takes exactly `{ "kind": "scratch" }` to create and register an
   empty directory under the daemon-owned scratch root
-  (`~/.qwen/scratch-workspaces/scratch-*`).
+  (`~/.mariadb-shell-agent/scratch-workspaces/scratch-*`).
 - There is no clone path anywhere. The `workspace-git*` routes are read-only
   (status, diff, log, branches, worktrees).
 - A new workspace is `untrusted` unless it is a managed scratch or live

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +39,7 @@ describe('buildLaunchAgentPlist', () => {
       'agent',
     ],
     port: 47821,
-    logPath: '/Users/me/.qwen/desktop-relay/agent.log',
+    logPath: '/Users/me/.mariadb-shell-agent/desktop-relay/agent.log',
   });
 
   it('listens on loopback only and starts one process per connection', () => {
@@ -61,7 +62,7 @@ describe('buildLaunchAgentPlist', () => {
   it("sends the relay's stderr to its log, the only channel it has", () => {
     expect(plist).toContain('<key>StandardErrorPath</key>');
     expect(plist).toContain(
-      '<string>/Users/me/.qwen/desktop-relay/agent.log</string>',
+      '<string>/Users/me/.mariadb-shell-agent/desktop-relay/agent.log</string>',
     );
   });
 });

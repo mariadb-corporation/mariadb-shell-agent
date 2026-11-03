@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -40,7 +41,7 @@ import { createDebugLogger, sessionIdContext } from '@qwen-code/qwen-code-core';
 const debugLogger = createDebugLogger('SKILL_ARGS_FILE');
 
 /** Where a skill finds the arguments it was invoked with. */
-export const SKILL_ARGS_DIR = join('.qwen', 'tmp');
+export const SKILL_ARGS_DIR = join('.mariadb-shell-agent', 'tmp');
 
 /** A component safe to put in a filename. */
 function safe(s: string): string {

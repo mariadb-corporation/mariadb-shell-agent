@@ -185,6 +185,13 @@ describe('tokenLimit', () => {
       expect(tokenLimit('gpt-5.2-pro')).toBe(272000);
     });
 
+    it('should return 922K for GPT-6.x', () => {
+      expect(tokenLimit('gpt-6-astra')).toBe(922_000);
+      expect(tokenLimit('gpt-6.1-sol')).toBe(922_000);
+      expect(tokenLimit('gpt-6.1-terra')).toBe(922_000);
+      expect(tokenLimit('openai/gpt-6-luna')).toBe(922_000);
+    });
+
     it('should return 128K for legacy GPT (fallback)', () => {
       expect(tokenLimit('gpt-4o')).toBe(131072);
       expect(tokenLimit('gpt-4o-mini')).toBe(131072);
@@ -481,6 +488,13 @@ describe('tokenLimit with output type', () => {
     it('should return correct output limits for GPT-5.x', () => {
       expect(tokenLimit('gpt-5.2', 'output')).toBe(131072);
       expect(tokenLimit('gpt-5-mini', 'output')).toBe(131072);
+    });
+
+    it('should return correct output limits for GPT-6.x', () => {
+      expect(tokenLimit('gpt-6-astra', 'output')).toBe(131072);
+      expect(tokenLimit('gpt-6.1-sol', 'output')).toBe(131072);
+      expect(tokenLimit('gpt-6.1-terra', 'output')).toBe(131072);
+      expect(tokenLimit('gpt-6-luna', 'output')).toBe(131072);
     });
 
     it('should return correct output limits for Gemini 3.x', () => {

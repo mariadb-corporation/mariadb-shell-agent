@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,7 +15,7 @@ import { FatalConfigError } from '../utils/errors.js';
 export { QWEN_DIR } from '../utils/paths.js';
 export const GOOGLE_ACCOUNTS_FILENAME = 'google_accounts.json';
 export const OAUTH_FILE = 'oauth_creds.json';
-export const SKILL_PROVIDER_CONFIG_DIRS = ['.qwen', '.agents'];
+export const SKILL_PROVIDER_CONFIG_DIRS = ['.mariadb-shell-agent', '.agents'];
 const TMP_DIR_NAME = 'tmp';
 const BIN_DIR_NAME = 'bin';
 const PROJECT_DIR_NAME = 'projects';
@@ -122,7 +123,7 @@ export class Storage {
    * Pass null/undefined/empty string to reset to default (getGlobalQwenDir()).
    * @param dir - The directory path, or null/undefined to reset
    * @param cwd - Base directory for resolving relative paths (defaults to process.cwd()).
-   *              Pass the project root so that relative values like ".qwen" resolve
+   *              Pass the project root so that relative values like ".mariadb-shell-agent" resolve
    *              per-project, enabling a single global config to work across all projects.
    */
   static setRuntimeBaseDir(dir: string | null | undefined, cwd?: string): void {
@@ -197,7 +198,7 @@ export class Storage {
     }
     const homeDir = os.homedir();
     if (!homeDir) {
-      return path.join(os.tmpdir(), '.qwen');
+      return path.join(os.tmpdir(), '.mariadb-shell-agent');
     }
     return path.join(homeDir, QWEN_DIR);
   }
@@ -384,7 +385,7 @@ export class Storage {
     // leaf. `mkdirSync(…, { recursive: true })` follows symlinks in every
     // component above the final one, and `lstat` refuses to follow only the
     // final one — so a leaf-only check cannot see a redirected parent. With
-    // `audits` planted as a symlink (one `ln -s`, no race: `~/.qwen` exists
+    // `audits` planted as a symlink (one `ln -s`, no race: `~/.mariadb-shell-agent` exists
     // long before `audits` does), the leaf is created inside the planter's
     // directory, reports as a perfectly real directory, and every artifact
     // written "into the landing" lands wherever the link points. Binding
@@ -654,7 +655,7 @@ export class Storage {
   }
 
   /**
-   * Project-level saved-workflow scripts directory: `<targetDir>/.qwen/workflows`.
+   * Project-level saved-workflow scripts directory: `<targetDir>/.mariadb-shell-agent/workflows`.
    * Saved workflow scripts (`<name>.js`) here are surfaced as slash commands
    * and resolvable by `workflow('<name>')` from inside a running workflow.
    */
@@ -663,7 +664,7 @@ export class Storage {
   }
 
   /**
-   * User-level saved-workflow scripts directory: `~/.qwen/workflows`. User
+   * User-level saved-workflow scripts directory: `~/.mariadb-shell-agent/workflows`. User
    * scope is lower-precedence than project scope when the same `<name>.js`
    * exists in both.
    */
@@ -761,9 +762,9 @@ export class Storage {
   }
 
   /**
-   * Returns the user-level extensions directory (~/.qwen/extensions/).
+   * Returns the user-level extensions directory (~/.mariadb-shell-agent/extensions/).
    * Extensions installed at user scope are stored here, as opposed to
-   * project-level extensions which live in <project>/.qwen/extensions/.
+   * project-level extensions which live in <project>/.mariadb-shell-agent/extensions/.
    */
   static getUserExtensionsDir(): string {
     return path.join(Storage.getGlobalQwenDir(), 'extensions');

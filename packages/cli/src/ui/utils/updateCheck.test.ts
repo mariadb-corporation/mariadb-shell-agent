@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -207,7 +208,7 @@ describe('checkForUpdates', () => {
     expect(result).toEqual({
       status: 'update',
       info: {
-        message: 'Qwen Code update available! 1.0.0 → 1.1.0',
+        message: 'MariaDB Shell Agent update available! 1.0.0 → 1.1.0',
         update: {
           current: '1.0.0',
           latest: '1.1.0',

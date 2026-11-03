@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -67,7 +68,7 @@ export function getHookExitCodes(eventName: string): HookExitCode[] {
       { code: 'Other', description: t('show stderr to user only') },
     ],
     [HookEventName.UserPromptSubmit]: [
-      { code: 0, description: t('stdout shown to Qwen') },
+      { code: 0, description: t('stdout shown to MariaDB Shell Agent') },
       {
         code: 2,
         description: t(
@@ -77,7 +78,7 @@ export function getHookExitCodes(eventName: string): HookExitCode[] {
       { code: 'Other', description: t('show stderr to user only') },
     ],
     [HookEventName.UserPromptExpansion]: [
-      { code: 0, description: t('stdout shown to Qwen') },
+      { code: 0, description: t('stdout shown to MariaDB Shell Agent') },
       {
         code: 2,
         description: t(
@@ -87,7 +88,7 @@ export function getHookExitCodes(eventName: string): HookExitCode[] {
       { code: 'Other', description: t('show stderr to user only') },
     ],
     [HookEventName.SessionStart]: [
-      { code: 0, description: t('stdout shown to Qwen') },
+      { code: 0, description: t('stdout shown to MariaDB Shell Agent') },
       {
         code: 'Other',
         description: t('show stderr to user only (blocking errors ignored)'),
@@ -191,7 +192,9 @@ export function getHookShortDescription(eventName: string): string {
     [HookEventName.MessageDisplay]: t(
       'Repeatedly, as the assistant reply streams',
     ),
-    [HookEventName.Stop]: t('Right before Qwen Code concludes its response'),
+    [HookEventName.Stop]: t(
+      'Right before MariaDB Shell Agent concludes its response',
+    ),
     [HookEventName.SubagentStart]: t(
       'When a subagent (Agent tool call) is started',
     ),

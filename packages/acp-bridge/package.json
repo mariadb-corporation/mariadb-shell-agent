@@ -2,10 +2,10 @@
   "name": "@qwen-code/acp-bridge",
   "private": true,
   "version": "0.26.5",
-  "description": "Shared ACP bridge core (createHttpAcpBridge factory, BridgeClient, defaultSpawnChannelFactory, BridgeFileSystem injection seam) + primitives (EventBus, AcpChannel, in-memory channel, PermissionMediator interface) used by qwen serve, channels, IDE, TUI, and remote-control adapters.",
+  "description": "Shared ACP bridge core (createHttpAcpBridge factory, BridgeClient, defaultSpawnChannelFactory, BridgeFileSystem injection seam) + primitives (EventBus, AcpChannel, in-memory channel, PermissionMediator interface) used by mariadb-shell-agent serve, channels, IDE, TUI, and remote-control adapters.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/QwenLM/qwen-code.git",
+    "url": "git+https://github.invalid/QwenLM/qwen-code.git",
     "directory": "packages/acp-bridge"
   },
   "type": "module",

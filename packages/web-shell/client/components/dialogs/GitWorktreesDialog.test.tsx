@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -108,7 +109,7 @@ const MAIN = {
   isWorkspace: true,
 };
 const FEATURE = {
-  path: '/repo/.qwen/worktrees/swift-fox',
+  path: '/repo/.mariadb-shell-agent/worktrees/swift-fox',
   head: 'b'.repeat(40),
   branch: 'qwen/swift-fox',
   detached: false,
@@ -398,7 +399,7 @@ describe('GitWorktreesContent', () => {
   it('drops the kept-directory notice when the next removal is clean', async () => {
     const other = {
       ...FEATURE,
-      path: '/repo/.qwen/worktrees/bold-owl',
+      path: '/repo/.mariadb-shell-agent/worktrees/bold-owl',
       slug: 'bold-owl',
     };
     workspaceGitWorktrees
@@ -444,7 +445,7 @@ describe('GitWorktreesContent', () => {
   it('never overwrites a fresh status with a slow probe from before', async () => {
     const other = {
       ...FEATURE,
-      path: '/repo/.qwen/worktrees/bold-owl',
+      path: '/repo/.mariadb-shell-agent/worktrees/bold-owl',
       slug: 'bold-owl',
     };
     workspaceGitWorktrees
@@ -545,7 +546,7 @@ describe('GitWorktreesContent', () => {
   it('re-reads working-tree state on a refresh instead of reusing it', async () => {
     const other = {
       ...FEATURE,
-      path: '/repo/.qwen/worktrees/bold-owl',
+      path: '/repo/.mariadb-shell-agent/worktrees/bold-owl',
       slug: 'bold-owl',
     };
     workspaceGitWorktrees
@@ -1155,7 +1156,7 @@ describe('GitWorktreesContent', () => {
     const settle: Array<() => void> = [];
     const OWL = {
       ...FEATURE,
-      path: '/repo/.qwen/worktrees/bold-owl',
+      path: '/repo/.mariadb-shell-agent/worktrees/bold-owl',
       slug: 'bold-owl',
       branch: 'qwen/bold-owl',
     };
@@ -1994,7 +1995,7 @@ describe('GitWorktreesContent', () => {
   it('never lands one row\u2019s refusal on another row\u2019s confirmation', async () => {
     const other = {
       ...FEATURE,
-      path: '/repo/.qwen/worktrees/bold-owl',
+      path: '/repo/.mariadb-shell-agent/worktrees/bold-owl',
       slug: 'bold-owl',
     };
     workspaceGitWorktrees.mockResolvedValue(
@@ -2179,7 +2180,7 @@ describe('GitWorktreesContent', () => {
   it('never lets an unanswered confirmation hold a stale list', async () => {
     const other = {
       ...FEATURE,
-      path: '/repo/.qwen/worktrees/bold-owl',
+      path: '/repo/.mariadb-shell-agent/worktrees/bold-owl',
       slug: 'bold-owl',
     };
     let failRefresh: (() => void) | undefined;

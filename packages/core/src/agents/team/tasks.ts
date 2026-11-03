@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +9,7 @@
  * @fileoverview Distributed task system for agent teams.
  *
  * Each task is a separate JSON file at
- * `~/.qwen/tasks/{teamName}/{id}.json`.
+ * `~/.mariadb-shell-agent/tasks/{teamName}/{id}.json`.
  * Concurrency is handled in two layers (mirroring `mailbox.ts`): an
  * in-process per-file `Mutex` serializes same-process writers so they
  * don't stampede the OS lock, and `proper-lockfile` (30 retries,

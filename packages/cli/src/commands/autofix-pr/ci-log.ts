@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -145,7 +146,7 @@ export function runCiLog(
   const jobs = failed.map((job) => job.name);
   const path = join(
     root,
-    '.qwen',
+    '.mariadb-shell-agent',
     'tmp',
     `autofix-pr-${prNumber}-ci-${runId}.log`,
   );

@@ -583,8 +583,8 @@ E2E (Playwright, `packages/web-shell/client/e2e`):
   Recents lifecycle; capability loading/absent/error states; capable-daemon
   failure with retained intent.
 - Manual E2E plan recorded at
-  `.qwen/e2e-tests/2026-08-29-webshell-standalone-chats.md` and dry-run
-  against a real `qwen serve` daemon before merge, per repo workflow.
+  `.mariadb-shell-agent/e2e-tests/2026-08-29-webshell-standalone-chats.md` and dry-run
+  against a real `mariadb-shell-agent serve` daemon before merge, per repo workflow.
 
 Commands: `cd packages/web-shell && npx vitest run <file>` for focused
 tests, `npm run verify` (lint + format:check + typecheck + test:ci) and

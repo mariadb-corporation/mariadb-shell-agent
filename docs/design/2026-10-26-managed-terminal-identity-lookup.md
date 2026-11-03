@@ -4,7 +4,7 @@
 
 ## Problem and current state
 
-Issue [#13184](https://github.com/QwenLM/qwen-code/issues/13184) tracks growth of Managed state. The [bounded-retention design](2026-10-19-managed-session-bounded-retention.md) requires durable historical identity queries before any terminal state can leave memory. This is PR1 of that remaining work.
+Issue [#13184](https://github.invalid/QwenLM/qwen-code/issues/13184) tracks growth of Managed state. The [bounded-retention design](2026-10-19-managed-session-bounded-retention.md) requires durable historical identity queries before any terminal state can leave memory. This is PR1 of that remaining work.
 
 `FileManagedActivationStore` and `FileManagedSessionInbox` already preserve terminal results in their authoritative journals and snapshots. Opening them rebuilds every identity in memory. Duplicate admission consults those resident maps; there is no per-identity durable terminal lookup. Activation/inbox transition compaction does not bound the number of terminal identities.
 

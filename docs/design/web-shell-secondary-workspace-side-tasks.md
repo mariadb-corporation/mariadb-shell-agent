@@ -55,7 +55,7 @@ actual target and absence of primary-side mutation.
   runtime invalidation cleans up only in the resolved workspace.
 - Primary and internal creation still work. Standalone creation remains
   unsupported; branch, fork, and directory-change restrictions remain intact.
-- Run the E2E baseline with global `qwen`, then verify with `node dist/cli.js`;
+- Run the E2E baseline with global `mariadb-shell-agent`, then verify with `node dist/cli.js`;
   build, typecheck, and run focused daemon and Web Shell tests.
 
 ## Open questions

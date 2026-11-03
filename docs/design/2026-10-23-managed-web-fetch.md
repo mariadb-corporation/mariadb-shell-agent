@@ -4,7 +4,7 @@
 
 ## Problem and scope
 
-The `web_fetch` part of [#15076](https://github.com/QwenLM/qwen-code/issues/15076) is missing from the main Hosted Workspace profiles. Add it to the existing files, shell, search and team lead profiles. Snapshot read profiles and the separate CSI files contract retain their existing tool vocabulary. `todo_write`, authenticated fetching and binary downloads are outside this change.
+The `web_fetch` part of [#15076](https://github.invalid/QwenLM/qwen-code/issues/15076) is missing from the main Hosted Workspace profiles. Add it to the existing files, shell, search and team lead profiles. Snapshot read profiles and the separate CSI files contract retain their existing tool vocabulary. `todo_write`, authenticated fetching and binary downloads are outside this change.
 
 ## Execution and permissions
 
@@ -29,6 +29,6 @@ Advertise `web-fetch/1` in the Harness capability envelope. Add the native tool 
 
 ## Validation and acceptance
 
-Use `.qwen/e2e-tests/managed-web-fetch.md` for baseline and post-change checks. Verify public HTML/markdown/text, format negotiation, redirects, HTTP errors, response limits, cancellation, binary refusal, and bounded output without host paths. Test private and mixed DNS rejection, pinned connections across redirects/retries, TLS verification, and approval deny/resume. Verify normal inline result recovery and lifecycle settlement. Run affected Core/CLI tests, root build/typecheck/bundle, Java affected tests and `mvn verify`; report unavailable real-model or deployment checks separately.
+Use `.mariadb-shell-agent/e2e-tests/managed-web-fetch.md` for baseline and post-change checks. Verify public HTML/markdown/text, format negotiation, redirects, HTTP errors, response limits, cancellation, binary refusal, and bounded output without host paths. Test private and mixed DNS rejection, pinned connections across redirects/retries, TLS verification, and approval deny/resume. Verify normal inline result recovery and lifecycle settlement. Run affected Core/CLI tests, root build/typecheck/bundle, Java affected tests and `mvn verify`; report unavailable real-model or deployment checks separately.
 
 Acceptance requires the main profiles to declare and execute `web_fetch`, approval to show the actual URL, denied calls to make no request, safe public text to reach the model and durable history, and settled calls to permit lifecycle cleanup. Deployment acceptance remains separate from local verification. There are no unresolved design questions.

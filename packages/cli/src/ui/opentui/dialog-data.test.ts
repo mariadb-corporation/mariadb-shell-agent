@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -620,7 +621,7 @@ describe('applyModelSelection', () => {
         persistScope: 'workspace',
       });
 
-      // The shareable .qwen/settings.json only gets the bare selector.
+      // The shareable .mariadb-shell-agent/settings.json only gets the bare selector.
       expect(written).toContainEqual({
         scope: SettingScope.Workspace,
         key: 'fastModel',

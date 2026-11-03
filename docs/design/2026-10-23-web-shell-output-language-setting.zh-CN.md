@@ -16,7 +16,7 @@ Web Shell 设置面板通过 `general.language` 暴露界面语言，用 `en` / 
 `TUI_ONLY_SETTINGS`（`packages/cli/src/serve/routes/workspace-settings.ts`）里，
 因此 `GET /workspace/settings` 不下发它的 descriptor。原因是走
 `POST /workspace/settings` 持久化该 key 只会改写 `settings.json`，不会重写
-`~/.qwen/output-language.md`，也不会刷新运行中的会话。这正是
+`~/.mariadb-shell-agent/output-language.md`，也不会刷新运行中的会话。这正是
 [User-Level Language Sync for the Daemon](2026-08-29-user-level-language-sync.md)
 中记录的“持久化不等于同步”规则。
 
@@ -62,7 +62,7 @@ daemon 下发的建议以提升可发现性。输入为空或选择第一项表�
 提交后，通过与 `/language ui` 相同的会话命令通道发送
 `/language output <value>`（空值发送 `auto`）。daemon 侧命令会写入当前会话实际
 读取的 `output-language.md`（存在项目文件时为项目文件，否则为
-`~/.qwen/output-language.md`），在用户作用域持久化 `general.outputLanguage`，
+`~/.mariadb-shell-agent/output-language.md`），在用户作用域持久化 `general.outputLanguage`，
 刷新分层记忆并重建当前系统提示。随后面板重新加载 `/workspace/settings`，让该
 行反映已持久化的值。
 
@@ -73,7 +73,7 @@ daemon 下发的建议以提升可发现性。输入为空或选择第一项表�
 
 输出语言是用户级设置。该行只在“用户”作用域标签页渲染：命令没有工作区目标，
 放在“工作区”标签页会暗示一个写入路径无法兑现的覆盖值。项目内的
-`.qwen/output-language.md` 仍按项目覆盖全局文件，与这一行相互独立。
+`.mariadb-shell-agent/output-language.md` 仍按项目覆盖全局文件，与这一行相互独立。
 
 ## 失败矩阵
 

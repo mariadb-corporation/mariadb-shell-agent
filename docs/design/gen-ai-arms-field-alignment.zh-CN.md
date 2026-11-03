@@ -4,7 +4,7 @@
 
 ## 范围与标准基线
 
-本设计对齐 Qwen Code 首批在 OpenTelemetry GenAI 语义约定与阿里云 ARMS LLM Trace 之间名称、类型和含义一致的 Span 属性，保留框架现有的 Span 名称和类型。主 Agent 扩展让现有交互 Span 成为完整工具续接拓扑的父节点。
+本设计对齐 MariaDB Shell Agent 首批在 OpenTelemetry GenAI 语义约定与阿里云 ARMS LLM Trace 之间名称、类型和含义一致的 Span 属性，保留框架现有的 Span 名称和类型。主 Agent 扩展让现有交互 Span 成为完整工具续接拓扑的父节点。
 本文也记录需显式启用的 ARMS 专用终端用户身份扩展。
 
 OpenTelemetry GenAI 约定仍处于 Development 状态。本变更锁定到提交
@@ -24,7 +24,7 @@ OpenTelemetry GenAI 约定仍处于 Development 状态。本变更锁定到提�
 
 `gen_ai.request.reasoning.level` 是一项范围有限、仅依据 OTel 的补充，来自上述锁定的 GenAI 注册表。它将 OpenAI 兼容请求中已有的推理强度暴露到遥测中，不引入私有别名或 ARMS 专属仪表盘映射。
 
-ARMS 基线为 [LLM Trace 字段定义](https://help.aliyun.com/zh/arms/application-monitoring/developer-reference/llm-trace-field-definition-description)。
+ARMS 基线为 [LLM Trace 字段定义](https://help.aliyun.invalid/zh/arms/application-monitoring/developer-reference/llm-trace-field-definition-description)。
 升级任一基线都需要重新生成并审查此矩阵。
 
 ## 字段契约
@@ -85,7 +85,7 @@ Gemini 和 Vertex AI 请求使用 `generate_content`。
 
 ## 请求参数
 
-在提供方适配器应用默认值、覆盖值、移除不支持字段并限制输出窗口之后，紧接着调用提供方 SDK 之前，收集请求属性。这是 Qwen Code 能观察到的最终 SDK 请求对象，不是原始逻辑配置或序列化后的 HTTP 请求体。一个逻辑 LLM Span 只记录其首个此类请求快照。
+在提供方适配器应用默认值、覆盖值、移除不支持字段并限制输出窗口之后，紧接着调用提供方 SDK 之前，收集请求属性。这是 MariaDB Shell Agent 能观察到的最终 SDK 请求对象，不是原始逻辑配置或序列化后的 HTTP 请求体。一个逻辑 LLM Span 只记录其首个此类请求快照。
 
 | 标准属性                           | OpenAI 兼容与 Qwen OAuth                                  | Anthropic        | Gemini 与 Vertex AI       |
 | ---------------------------------- | --------------------------------------------------------- | ---------------- | ------------------------- |
@@ -106,7 +106,7 @@ Gemini 和 Vertex AI 请求使用 `generate_content`。
 
 ## 内容与工具载荷
 
-仅在启用 `telemetry.includeSensitiveSpanAttributes` 时采集敏感 GenAI 内容。Qwen Code 不读取 `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT`，因此只有一个内容采集开关。OpenAI 兼容、Anthropic、Gemini 和 Vertex 适配器将经过提供方适配后的最终 SDK 请求及原始响应结构转换为本设计锁定的 JSON 模式。
+仅在启用 `telemetry.includeSensitiveSpanAttributes` 时采集敏感 GenAI 内容。MariaDB Shell Agent 不读取 `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT`，因此只有一个内容采集开关。OpenAI 兼容、Anthropic、Gemini 和 Vertex 适配器将经过提供方适配后的最终 SDK 请求及原始响应结构转换为本设计锁定的 JSON 模式。
 
 第一次物理请求尝试提供输入消息、系统指令和工具定义。响应绑定到对应生成尝试：提供方回退或要求启用思考的重试会启动新的响应累加器，旧尝试中迟到的块被忽略。流式累加器保留规范化的部分而非原始块。部分失败时，未完成的候选标记为 `error`；成功响应中某个候选缺少显式结束原因时，省略整个输出消息属性。
 
@@ -138,17 +138,17 @@ ARMS 自动识别 GenAI 应用需要以下 Resource 属性：
 }
 ```
 
-Qwen Code 不注入此厂商专用 Resource 属性或 `gen_ai.span.kind`。ARMS 可以通过 `gen_ai.operation.name` 推断 LLM、工具和 Agent 角色。
+MariaDB Shell Agent 不注入此厂商专用 Resource 属性或 `gen_ai.span.kind`。ARMS 可以通过 `gen_ai.operation.name` 推断 LLM、工具和 Agent 角色。
 
 ### ARMS 终端用户身份扩展
 
-`gen_ai.user.id` 是 ARMS Span 通用属性，不属于上述锁定的 OpenTelemetry GenAI 基线。仅当操作者显式配置 `telemetry.userId` 或 `QWEN_TELEMETRY_USER_ID` 时，Qwen Code 才发出此属性。在创建交互 Span 时设置该值，并通过现有进程内上下文传播至 LLM、工具和 Agent Span，包括通过链接关联的根级 fork/后台 Agent。工具结果续接通过精确的 prompt ID 查找同一个活动交互，并保持为其子节点。活动注册表和保留的身份条目沿用现有 30 分钟 Span 兜底 TTL 到期。
+`gen_ai.user.id` 是 ARMS Span 通用属性，不属于上述锁定的 OpenTelemetry GenAI 基线。仅当操作者显式配置 `telemetry.userId` 或 `QWEN_TELEMETRY_USER_ID` 时，MariaDB Shell Agent 才发出此属性。在创建交互 Span 时设置该值，并通过现有进程内上下文传播至 LLM、工具和 Agent Span，包括通过链接关联的根级 fork/后台 Agent。工具结果续接通过精确的 prompt ID 查找同一个活动交互，并保持为其子节点。活动注册表和保留的身份条目沿用现有 30 分钟 Span 兜底 TTL 到期。
 
-该值绝不被推断或自动生成，不写入 Resource/日志/指标，也不放入出站 Baggage。Qwen Code 不双写 `enduser.id` 或 `user.id`。之前配置的 `telemetry.resourceAttributes.user.id` 仍为通用 Resource 维度，迁移时必须显式移除。因为此设置作用于整个进程，仅支持一个进程代表一个终端用户的场景；共享守护进程和通道部署中的请求级身份，推迟到可信调用者身份能够端到端接通之后再实现。
+该值绝不被推断或自动生成，不写入 Resource/日志/指标，也不放入出站 Baggage。MariaDB Shell Agent 不双写 `enduser.id` 或 `user.id`。之前配置的 `telemetry.resourceAttributes.user.id` 仍为通用 Resource 维度，迁移时必须显式移除。因为此设置作用于整个进程，仅支持一个进程代表一个终端用户的场景；共享守护进程和通道部署中的请求级身份，推迟到可信调用者身份能够端到端接通之后再实现。
 
 ## 延后工作
 
 - `seed` 和 `top_k` 在基线中的 ARMS 与 GenAI 类型不兼容。
 - Embedding 在追踪前需要正确的请求模型生命周期。
-- ARMS 首 token 时间与 OpenTelemetry 首块时间的名称、单位和含义不同。Qwen Code 同时发出标准 `gen_ai.response.time_to_first_chunk` 和私有 `ttft_ms`，不保证自动填充 ARMS 首 token 仪表盘。
+- ARMS 首 token 时间与 OpenTelemetry 首块时间的名称、单位和含义不同。MariaDB Shell Agent 同时发出标准 `gen_ai.response.time_to_first_chunk` 和私有 `ttft_ms`，不保证自动填充 ARMS 首 token 仪表盘。
 - 完整 GenAI Span 命名、CLIENT Span 类型和逻辑重试拓扑属于独立的合规工作。

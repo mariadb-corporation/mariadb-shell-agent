@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -840,7 +841,7 @@ export class ManagedToolExecutor {
         // read too. Same three arguments as those call sites.
         if (await this.ownsAnotherSessionDir?.(tools.sessionId, real, boundary))
           continue;
-        // One physical file under both names (`AGENTS.md -> QWEN.md`) is
+        // One physical file under both names (`AGENTS.md -> MARIADB-SHELL-AGENT.md`) is
         // injected once, as core's memory loader does (#9597).
         if (seen.has(real)) continue;
         seen.add(real);

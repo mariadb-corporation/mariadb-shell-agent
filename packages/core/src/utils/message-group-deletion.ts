@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -112,6 +113,7 @@ const GROUP_SYSTEM_SUBTYPES = new Set([
   'ui_telemetry',
   'at_command',
   'omni_recall',
+  'sent_user_content',
   'user_text_elements',
   'turn_result',
   'turn_attempt',

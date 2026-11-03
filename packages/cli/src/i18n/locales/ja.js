@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Japanese translations for Qwen Code CLI
+// Japanese translations for MariaDB Shell Agent CLI
 
 export default {
   'Generated UI': 'Generated UI（生成 UI）',
@@ -62,7 +63,7 @@ export default {
   'For a full list of shortcuts, see {{docPath}}':
     'ショートカットの完全なリストは {{docPath}} を参照',
   'docs/keyboard-shortcuts.md': 'docs/keyboard-shortcuts.md',
-  'for help on Qwen Code': 'Qwen Code のヘルプ',
+  'for help on MariaDB Shell Agent': 'MariaDB Shell Agent のヘルプ',
   'show version info': 'バージョン情報を表示',
   'submit a bug report': 'バグレポートを送信',
   Model: 'モデル',
@@ -76,25 +77,25 @@ export default {
   // ============================================================================
   // Commands - General
   // ============================================================================
-  'Analyzes the project and creates a tailored QWEN.md file.':
-    'プロジェクトを分析し、カスタマイズされた QWEN.md ファイルを作成',
-  'List available Qwen Code tools. Usage: /tools [desc]':
-    '利用可能な Qwen Code ツールを一覧表示。使い方: /tools [desc]',
+  'Analyzes the project and creates a tailored MARIADB-SHELL-AGENT.md file.':
+    'プロジェクトを分析し、カスタマイズされた MARIADB-SHELL-AGENT.md ファイルを作成',
+  'List available MariaDB Shell Agent tools. Usage: /tools [desc]':
+    '利用可能な MariaDB Shell Agent ツールを一覧表示。使い方: /tools [desc]',
   'Open the skills panel (browse, search, toggle, pick).':
     'スキルパネルを開く（一覧・検索・有効化/無効化・選択）。',
   'Manage Skills': 'スキルを管理',
   'Skills configuration saved.': 'スキル設定を保存しました。',
   'Skills configuration saved, but refresh failed: {{error}}. Restart to ensure the new state is applied.':
     'スキル設定を保存しましたが、更新に失敗しました：{{error}}。再起動して新しい状態が反映されることを確認してください。',
-  'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.qwen/settings.json directly to manage skills at user scope.':
-    'ワークスペースが信頼されていないため、ワークスペース設定はマージ設定で無視されます。先に /trust を実行するか、~/.qwen/settings.json を直接編集してユーザースコープでスキルを管理してください。',
+  'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.mariadb-shell-agent/settings.json directly to manage skills at user scope.':
+    'ワークスペースが信頼されていないため、ワークスペース設定はマージ設定で無視されます。先に /trust を実行するか、~/.mariadb-shell-agent/settings.json を直接編集してユーザースコープでスキルを管理してください。',
   'SkillManager not available.': 'SkillManager は利用できません。',
   'Loading skills…': 'スキルを読み込み中…',
   'Failed to load skills: {{error}}': 'スキルの読み込みに失敗：{{error}}',
   'Failed to save skills configuration: {{error}}':
     'スキル設定の保存に失敗しました：{{error}}',
-  'All available skills are disabled. Edit ~/.qwen/settings.json or .qwen/settings.json (skills.disabled) to re-enable.':
-    'すべての利用可能なスキルが無効化されています。~/.qwen/settings.json または .qwen/settings.json (skills.disabled) を編集して再有効化してください。',
+  'All available skills are disabled. Edit ~/.mariadb-shell-agent/settings.json or .mariadb-shell-agent/settings.json (skills.disabled) to re-enable.':
+    'すべての利用可能なスキルが無効化されています。~/.mariadb-shell-agent/settings.json または .mariadb-shell-agent/settings.json (skills.disabled) を編集して再有効化してください。',
   'Press esc to close.': 'Esc で閉じる。',
   '{{count}} skills · ': '{{count}} スキル · ',
   '{{matched}} / {{total}} skills · ': '{{matched}} / {{total}} スキル · ',
@@ -112,7 +113,8 @@ export default {
     '  {{name}} {{description}}  [ロック中：{{scope}}]',
   '↑/↓ navigate · backspace edits search': '↑/↓ 移動 · Backspace 検索編集',
   Bundled: '組み込み',
-  'Available Qwen Code CLI tools:': '利用可能な Qwen Code CLI ツール:',
+  'Available MariaDB Shell Agent CLI tools:':
+    '利用可能な MariaDB Shell Agent CLI ツール:',
   'No tools available': '利用可能なツールはありません',
   'View or change the approval mode for tool usage':
     'ツール使用の承認モードを表示または変更',
@@ -184,8 +186,8 @@ export default {
     '会話履歴をクリアしてコンテキストを解放',
   'Compresses the context by replacing it with a summary.':
     'コンテキストを要約に置き換えて圧縮',
-  'open full Qwen Code documentation in your browser':
-    'ブラウザで Qwen Code のドキュメントを開く',
+  'open full MariaDB Shell Agent documentation in your browser':
+    'ブラウザで MariaDB Shell Agent のドキュメントを開く',
   'Configuration not available.': '設定が利用できません',
   'Connect an LLM provider': 'LLM プロバイダーに接続',
   'Copy the last AI response to clipboard (/copy N for Nth-latest)':
@@ -280,8 +282,10 @@ export default {
   '✗ Error:': '✗ エラー:',
   'Are you sure you want to delete agent "{{name}}"?':
     'エージェント "{{name}}" を削除してもよろしいですか?',
-  'Project Level (.qwen/agents/)': 'プロジェクトレベル (.qwen/agents/)',
-  'User Level (~/.qwen/agents/)': 'ユーザーレベル (~/.qwen/agents/)',
+  'Project Level (.mariadb-shell-agent/agents/)':
+    'プロジェクトレベル (.mariadb-shell-agent/agents/)',
+  'User Level (~/.mariadb-shell-agent/agents/)':
+    'ユーザーレベル (~/.mariadb-shell-agent/agents/)',
   '✓ Subagent Created Successfully!': '✓ サブエージェントの作成に成功しました!',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     'サブエージェント "{{name}}" を {{level}} に保存しました',
@@ -291,7 +295,8 @@ export default {
   'Warnings:': '警告:',
   'Step {{n}}: Choose Location': 'ステップ {{n}}: 場所を選択',
   'Step {{n}}: Choose Generation Method': 'ステップ {{n}}: 作成方法を選択',
-  'Generate with Qwen Code (Recommended)': 'Qwen Code で生成(推奨)',
+  'Generate with MariaDB Shell Agent (Recommended)':
+    'MariaDB Shell Agent で生成(推奨)',
   'Manual Creation': '手動作成',
   'Generating subagent configuration...': 'サブエージェント設定を生成中...',
   'Failed to generate subagent: {{error}}':
@@ -355,9 +360,10 @@ export default {
   'e.g., Reviews code for best practices and potential bugs.':
     '例: ベストプラクティスと潜在的なバグについてコードをレビューします。',
   // Commands - General (continued)
-  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
-    '変更を確認するには Qwen Code を再起動する必要があります。 r を押して終了し、変更を適用してください',
-  'View and edit Qwen Code settings': 'Qwen Code の設定を表示・編集',
+  'To see changes, MariaDB Shell Agent must be restarted. Press r to exit and apply changes now.':
+    '変更を確認するには MariaDB Shell Agent を再起動する必要があります。 r を押して終了し、変更を適用してください',
+  'View and edit MariaDB Shell Agent settings':
+    'MariaDB Shell Agent の設定を表示・編集',
   Settings: '設定',
   'Vim Mode': 'Vim モード',
   'Output Format': '出力形式',
@@ -390,7 +396,7 @@ export default {
   'Load Memory From Include Directories':
     'インクルードディレクトリからメモリを読み込み',
   'Respect .gitignore': '.gitignore を優先',
-  'Respect .qwenignore': '.qwenignore を優先',
+  'Respect .mariadb-shell-agentignore': '.mariadb-shell-agentignore を優先',
   'Enable Recursive File Search': '再帰的ファイル検索を有効化',
   'Show Color': '色を表示',
   'Use Ripgrep': 'Ripgrep を使用',
@@ -458,16 +464,16 @@ export default {
   'set external editor preference': '外部エディタの設定',
   'Manage extensions': '拡張機能を管理',
   'Manage installed extensions': 'インストール済みの拡張機能を管理する',
-  'You are installing an extension from {{originSource}}. Some features may not work perfectly with Qwen Code.':
-    '{{originSource}} から拡張機能をインストールしています。一部の機能は Qwen Code で完全に動作しない可能性があります。',
+  'You are installing an extension from {{originSource}}. Some features may not work perfectly with MariaDB Shell Agent.':
+    '{{originSource}} から拡張機能をインストールしています。一部の機能は MariaDB Shell Agent で完全に動作しない可能性があります。',
   'manage IDE integration': 'IDE連携を管理',
   'check status of IDE integration': 'IDE連携の状態を確認',
   'install required IDE companion for {{ideName}}':
     '{{ideName}} 用の必要なIDEコンパニオンをインストール',
   'enable IDE integration': 'IDE連携を有効化',
   'disable IDE integration': 'IDE連携を無効化',
-  'IDE integration is not supported in your current environment. To use this feature, run Qwen Code in one of these supported IDEs: VS Code or VS Code forks.':
-    '現在の環境ではIDE連携はサポートされていません。この機能を使用するには、VS Code または VS Code 派生エディタで Qwen Code を実行してください',
+  'IDE integration is not supported in your current environment. To use this feature, run MariaDB Shell Agent in one of these supported IDEs: VS Code or VS Code forks.':
+    '現在の環境ではIDE連携はサポートされていません。この機能を使用するには、VS Code または VS Code 派生エディタで MariaDB Shell Agent を実行してください',
   'Set up GitHub Actions': 'GitHub Actions を設定',
   'Configure terminal keybindings for multiline input (VS Code, Cursor, Windsurf, Trae)':
     '複数行入力用のターミナルキーバインドを設定(VS Code、Cursor、Windsurf、Trae)',
@@ -501,7 +507,7 @@ export default {
   // ============================================================================
   // Commands - Hooks
   // ============================================================================
-  'Manage Qwen Code hooks': 'Qwen Code のフックを管理する',
+  'Manage MariaDB Shell Agent hooks': 'MariaDB Shell Agent のフックを管理する',
   'List all configured hooks': '設定済みのフックをすべて表示する',
   // Hooks - Dialog
   Hooks: 'フック',
@@ -516,8 +522,8 @@ export default {
   'No hook events found.': 'フックイベントが見つかりません。',
   '{{count}} hook configured': '{{count}} 件のフックが設定されています',
   '{{count}} hooks configured': '{{count}} 件のフックが設定されています',
-  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask Qwen Code.':
-    'このメニューは読み取り専用です。フックを追加または変更するには、settings.json を直接編集するか、Qwen Code に尋ねてください。',
+  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask MariaDB Shell Agent.':
+    'このメニューは読み取り専用です。フックを追加または変更するには、settings.json を直接編集するか、MariaDB Shell Agent に尋ねてください。',
   'Reopen this menu to reload hook definitions.':
     'このメニューを再度開くと、フック定義を再読み込みできます。',
   'Hook controls and HTTP security settings require a restart.':
@@ -530,7 +536,7 @@ export default {
   'Configured hooks:': '設定済みのフック：',
   'No hooks configured for this event.':
     'このイベントにはフックが設定されていません。',
-  'To add hooks, edit settings.json directly or ask Qwen.':
+  'To add hooks, edit settings.json directly or ask MariaDB Shell Agent.':
     'フックを追加するには、settings.json を直接編集するか、Qwen に尋ねてください。',
   'Enter to select · Esc to go back': 'Enter で選択 · Esc で戻る',
   // Hooks - Config Detail Step
@@ -539,7 +545,7 @@ export default {
   'Extension:': '拡張機能：',
   'Desc:': '説明：',
   'No hook config selected': 'フック設定が選択されていません',
-  'To modify or remove this hook, edit settings.json directly or ask Qwen to help.':
+  'To modify or remove this hook, edit settings.json directly or ask MariaDB Shell Agent to help.':
     'このフックを変更または削除するには、settings.json を直接編集するか、Qwen に尋ねてください。',
   // Hooks - Disabled Step
   'Hook Configuration - Disabled': 'フック設定 - 無効',
@@ -552,8 +558,8 @@ export default {
   'StatusLine will not be displayed': 'StatusLine は表示されません',
   'Tool operations will proceed without hook validation':
     'ツール操作はフック検証なしで続行されます',
-  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask Qwen Code.':
-    'フックを再有効化するには、settings.json から "disableAllHooks" を削除するか、Qwen Code に尋ねてください。',
+  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask MariaDB Shell Agent.':
+    'フックを再有効化するには、settings.json から "disableAllHooks" を削除するか、MariaDB Shell Agent に尋ねてください。',
   // Hooks - Source
   Project: 'プロジェクト',
   User: 'ユーザー',
@@ -574,8 +580,8 @@ export default {
   'When a slash command expands into a prompt':
     'スラッシュコマンドがプロンプトに展開された時',
   'When a new session is started': '新しいセッションが開始された時',
-  'Right before Qwen Code concludes its response':
-    'Qwen Code が応答を終了する直前',
+  'Right before MariaDB Shell Agent concludes its response':
+    'MariaDB Shell Agent が応答を終了する直前',
   'When a subagent (Agent tool call) is started':
     'サブエージェント（Agent ツール呼び出し）が開始された時',
   'Right before a subagent concludes its response':
@@ -628,7 +634,7 @@ export default {
     '処理をブロックし、元のプロンプトを消去し、stderr をユーザーのみに表示',
   'block expanded prompt submission and show stderr to user only':
     '展開後のプロンプト送信をブロックし、stderr をユーザーのみに表示',
-  'stdout shown to Qwen': 'stdout を Qwen に表示',
+  'stdout shown to MariaDB Shell Agent': 'stdout を Qwen に表示',
   'show stderr to user only (blocking errors ignored)':
     'stderr をユーザーのみに表示（ブロッキングエラーは無視）',
   'command completes successfully': 'コマンドが正常に完了',
@@ -769,8 +775,8 @@ export default {
   Disconnected: '切断',
   '{{count}} tool': '{{count}} ツール',
   '{{count}} tools': '{{count}} ツール',
-  'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md':
-    'プロジェクトサマリーを生成し、.qwen/PROJECT_SUMMARY.md に保存',
+  'Generate a project summary and save it to .mariadb-shell-agent/PROJECT_SUMMARY.md':
+    'プロジェクトサマリーを生成し、.mariadb-shell-agent/PROJECT_SUMMARY.md に保存',
   'No chat client available to generate summary.':
     'サマリーを生成するためのチャットクライアントがありません',
   'Already generating summary, wait for previous request to complete':
@@ -842,8 +848,8 @@ export default {
     '制限的なサンドボックスプロファイルでは /directory add コマンドはサポートされていません。代わりにセッション開始時に --include-directories を使用してください',
   "Error adding '{{path}}': {{error}}":
     "'{{path}}' の追加中にエラー: {{error}}",
-  'Successfully added QWEN.md files from the following directories if there are:\n- {{directories}}':
-    '以下のディレクトリから QWEN.md ファイルを追加しました(存在する場合):\n- {{directories}}',
+  'Successfully added MARIADB-SHELL-AGENT.md files from the following directories if there are:\n- {{directories}}':
+    '以下のディレクトリから MARIADB-SHELL-AGENT.md ファイルを追加しました(存在する場合):\n- {{directories}}',
   'Error refreshing memory: {{error}}': 'メモリの更新中にエラー: {{error}}',
   'Successfully added directories:\n- {{directories}}':
     'ディレクトリを正常に追加しました:\n- {{directories}}',
@@ -918,8 +924,8 @@ export default {
   servers: 'サーバー',
   'Add MCP servers to your settings to get started.':
     '設定に MCP servers を追加して開始してください。',
-  'Run qwen --debug to see error logs':
-    'qwen --debug を実行してエラーログを確認してください',
+  'Run mariadb-shell-agent --debug to see error logs':
+    'mariadb-shell-agent --debug を実行してエラーログを確認してください',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth 認証',
@@ -1096,12 +1102,12 @@ export default {
   Ask: '確認',
   Deny: '拒否',
   Workspace: 'ワークスペース',
-  "Qwen Code won't ask before using allowed tools.":
-    'Qwen Code は許可されたツールを使用する前に確認しません。',
-  'Qwen Code will ask before using these tools.':
-    'Qwen Code はこれらのツールを使用する前に確認します。',
-  'Qwen Code is not allowed to use denied tools.':
-    'Qwen Code は拒否されたツールを使用できません。',
+  "MariaDB Shell Agent won't ask before using allowed tools.":
+    'MariaDB Shell Agent は許可されたツールを使用する前に確認しません。',
+  'MariaDB Shell Agent will ask before using these tools.':
+    'MariaDB Shell Agent はこれらのツールを使用する前に確認します。',
+  'MariaDB Shell Agent is not allowed to use denied tools.':
+    'MariaDB Shell Agent は拒否されたツールを使用できません。',
   'Manage trusted directories for this workspace.':
     'このワークスペースの信頼済みディレクトリを管理します。',
   'Any use of the {{tool}} tool': '{{tool}} ツールのすべての使用',
@@ -1111,9 +1117,11 @@ export default {
   'From project settings': 'プロジェクト設定から',
   'From session': 'セッションから',
   'Project settings': 'プロジェクト設定',
-  'Checked in at .qwen/settings.json': '.qwen/settings.json にチェックイン',
+  'Checked in at .mariadb-shell-agent/settings.json':
+    '.mariadb-shell-agent/settings.json にチェックイン',
   'User settings': 'ユーザー設定',
-  'Saved in at ~/.qwen/settings.json': '~/.qwen/settings.json に保存',
+  'Saved in at ~/.mariadb-shell-agent/settings.json':
+    '~/.mariadb-shell-agent/settings.json に保存',
   'Add a new rule…': '新しいルールを追加…',
   'Add {{type}} permission rule': '{{type}} permission rule を追加',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1135,10 +1143,10 @@ export default {
   // Workspace directory management
   'Add directory…': 'ディレクトリを追加…',
   'Add directory to workspace': 'ワークスペースにディレクトリを追加',
-  'Qwen Code can read files in the workspace, and make edits when auto-accept edits is on.':
-    'Qwen Code はワークスペース内のファイルを読み取り、自動編集承認が有効な場合は編集を行えます。',
-  'Qwen Code will be able to read files in this directory and make edits when auto-accept edits is on.':
-    'Qwen Code はこのディレクトリ内のファイルを読み取り、自動編集承認が有効な場合は編集を行えます。',
+  'MariaDB Shell Agent can read files in the workspace, and make edits when auto-accept edits is on.':
+    'MariaDB Shell Agent はワークスペース内のファイルを読み取り、自動編集承認が有効な場合は編集を行えます。',
+  'MariaDB Shell Agent will be able to read files in this directory and make edits when auto-accept edits is on.':
+    'MariaDB Shell Agent はこのディレクトリ内のファイルを読み取り、自動編集承認が有効な場合は編集を行えます。',
   'Enter the path to the directory:': 'ディレクトリのパスを入力してください:',
   'Enter directory path…': 'ディレクトリパスを入力…',
   'Tab to complete · Enter to add · Esc to cancel':
@@ -1211,20 +1219,20 @@ export default {
     '問題が発生したら /bug でメンテナーに報告できます。',
   'Switch auth type quickly with /auth.':
     '/auth で認証タイプをすばやく切り替えられます。',
-  'You can run any shell commands from Qwen Code using ! (e.g. !ls).':
-    'Qwen Code から ! を使って任意のシェルコマンドを実行できます（例: !ls）。',
+  'You can run any shell commands from MariaDB Shell Agent using ! (e.g. !ls).':
+    'MariaDB Shell Agent から ! を使って任意のシェルコマンドを実行できます（例: !ls）。',
   'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.':
     '/ を入力してコマンドポップアップを開きます。Tab でスラッシュコマンドと保存済みプロンプトを補完できます。',
-  'You can resume a previous conversation by running qwen --continue or qwen --resume.':
-    'qwen --continue または qwen --resume で前の会話を再開できます。',
+  'You can resume a previous conversation by running mariadb-shell-agent --continue or mariadb-shell-agent --resume.':
+    'mariadb-shell-agent --continue または mariadb-shell-agent --resume で前の会話を再開できます。',
   'You can switch permission mode quickly with Shift+Tab or /approval-mode.':
     'Shift+Tab または /approval-mode で権限モードをすばやく切り替えられます。',
   'You can switch permission mode quickly with Tab or /approval-mode.':
     'Tab または /approval-mode で権限モードをすばやく切り替えられます。',
   'Try /insight to generate personalized insights from your chat history.':
     '/insight でチャット履歴からパーソナライズされたインサイトを生成できます。',
-  'Add a QWEN.md file to give Qwen Code persistent project context.':
-    'QWEN.md ファイルを追加すると、Qwen Code に永続的なプロジェクトコンテキストを与えられます。',
+  'Add a MARIADB-SHELL-AGENT.md file to give MariaDB Shell Agent persistent project context.':
+    'MARIADB-SHELL-AGENT.md ファイルを追加すると、MariaDB Shell Agent に永続的なプロジェクトコンテキストを与えられます。',
   'Use /btw to ask a quick side question without disrupting the conversation.':
     '会話を中断せずに /btw でちょっとした横道の質問ができます。',
   'Context is almost full! Run /compress now or start /new to continue.':
@@ -1456,9 +1464,10 @@ export default {
     'Alibaba Cloud Coding Plan での認証に成功しました。',
   'Failed to authenticate with Coding Plan: {{error}}':
     'Coding Plan での認証に失敗しました: {{error}}',
-  '阿里云百炼 (aliyun.com)': '阿里云百炼 (aliyun.com)',
+  '阿里云百炼 (aliyun.invalid)': '阿里云百炼 (aliyun.invalid)',
   Global: 'グローバル',
-  'Alibaba Cloud (alibabacloud.com)': 'Alibaba Cloud (alibabacloud.com)',
+  'Alibaba Cloud (alibabacloud.invalid)':
+    'Alibaba Cloud (alibabacloud.invalid)',
   'Select region for Coding Plan:': 'Coding Plan のリージョンを選択:',
   'Enter your Coding Plan API key: ':
     'Coding Plan の API Key を入力してください: ',
@@ -1468,11 +1477,11 @@ export default {
     '⚠  認証方法が設定されていません。\n',
   'Run one of the following commands to get started:\n':
     '以下のコマンドのいずれかを実行して開始してください:\n',
-  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  qwen auth qwen-oauth     - Qwen OAuth で認証（終了）',
+  '  mariadb-shell-agent auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
+    '  mariadb-shell-agent auth qwen-oauth     - Qwen OAuth で認証（終了）',
   'Or simply run:': 'または以下を実行:',
-  '  qwen auth                - Interactive authentication setup\n':
-    '  qwen auth                - インタラクティブ認証セットアップ\n',
+  '  mariadb-shell-agent auth                - Interactive authentication setup\n':
+    '  mariadb-shell-agent auth                - インタラクティブ認証セットアップ\n',
   '✓ Authentication Method: Qwen OAuth': '✓ 認証方法: Qwen OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  タイプ: 無料枠（2026-04-15 終了）',
@@ -1490,8 +1499,8 @@ export default {
     '⚠  認証方法: Alibaba Cloud Coding Plan（不完全）',
   '  Issue: API key not found in environment or settings\n':
     '  問題: 環境変数または設定に API Key が見つかりません\n',
-  '  Run `qwen auth coding-plan` to re-configure.\n':
-    '  `qwen auth coding-plan` を実行して再設定してください。\n',
+  '  Run `mariadb-shell-agent auth coding-plan` to re-configure.\n':
+    '  `mariadb-shell-agent auth coding-plan` を実行して再設定してください。\n',
   '✓ Authentication Method: {{type}}': '✓ 認証方法: {{type}}',
   '  Status: Configured\n': '  ステータス: 設定済み\n',
   'Failed to check authentication status: {{error}}':
@@ -1514,7 +1523,8 @@ export default {
     'すでにプランモードです。"/plan exit" でプランモードを終了します。',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     'プランモードではありません。"/plan" で先にプランモードに入ってください。',
-  "Set up Qwen Code's status line UI": 'Qwen Code のステータスライン UI を設定',
+  "Set up MariaDB Shell Agent's status line UI":
+    'MariaDB Shell Agent のステータスライン UI を設定',
 
   // === Core: added from PR #3328 ===
   'Open the memory manager.': 'メモリマネージャーを開く。',
@@ -1561,7 +1571,7 @@ export default {
   'Show Line Numbers in Code': 'コードの行番号を表示',
   'Show Welcome Back Dialog': 'おかえりダイアログを表示',
   'Enable User Feedback': 'ユーザーフィードバックを有効化',
-  'How is Qwen doing this session? (optional)':
+  'How is MariaDB Shell Agent doing this session? (optional)':
     'このセッションでの Qwen の調子はどうですか？（任意）',
   'Interactive Shell (PTY)': '対話型シェル (PTY)',
   'Select Editor': 'エディタを選択',
@@ -1688,7 +1698,7 @@ export default {
 
   // === Missing key backfill ===
   Status: 'ステータス',
-  'Qwen Code': 'Qwen Code',
+  'MariaDB Shell Agent': 'MariaDB Shell Agent',
   Runtime: 'ランタイム',
   OS: 'OS',
   Auth: '認証',
@@ -1726,8 +1736,8 @@ export default {
   remote: 'リモート',
   'This extension will add the following commands: {{commands}}.':
     'この拡張機能は次のコマンドを追加します: {{commands}}。',
-  'This extension will append info to your QWEN.md context using {{fileName}}':
-    'この拡張機能は {{fileName}} を使って QWEN.md コンテキストに情報を追記します',
+  'This extension will append info to your MARIADB-SHELL-AGENT.md context using {{fileName}}':
+    'この拡張機能は {{fileName}} を使って MARIADB-SHELL-AGENT.md コンテキストに情報を追記します',
   'This extension will install the following skills:':
     'この拡張機能は次のスキルをインストールします:',
   'This extension will install the following subagents:':
@@ -1987,13 +1997,14 @@ export default {
   // Update command
   'Exact-version updates require a standalone installation. Install version {{version}} manually using your installation method.':
     '指定バージョンへの更新にはスタンドアロン版が必要です。現在のインストール方法でバージョン {{version}} を手動インストールしてください。',
-  'Check for Qwen Code updates and install if available':
-    'Qwen Codeのアップデートを確認し、利用可能な場合はインストールします',
-  'Qwen Code update available! {{current}} → {{latest}}':
-    'Qwen Code のアップデートがあります！{{current}} → {{latest}}',
-  'A new version of Qwen Code is available! {{current}} → {{latest}}':
-    'Qwen Code の新しいバージョンがあります！{{current}} → {{latest}}',
-  'Qwen Code {{version}} is up to date!': 'Qwen Code {{version}} は最新です！',
+  'Check for MariaDB Shell Agent updates and install if available':
+    'MariaDB Shell Agentのアップデートを確認し、利用可能な場合はインストールします',
+  'MariaDB Shell Agent update available! {{current}} → {{latest}}':
+    'MariaDB Shell Agent のアップデートがあります！{{current}} → {{latest}}',
+  'A new version of MariaDB Shell Agent is available! {{current}} → {{latest}}':
+    'MariaDB Shell Agent の新しいバージョンがあります！{{current}} → {{latest}}',
+  'MariaDB Shell Agent {{version}} is up to date!':
+    'MariaDB Shell Agent {{version}} は最新です！',
   'Failed to check for updates ({{reason}}). Please check your network or registry configuration.':
     'アップデートの確認に失敗しました（{{reason}}）。ネットワークまたはレジストリ設定を確認してください。',
   'Update check skipped ({{reason}}) — run /update to retry.':
@@ -2010,8 +2021,8 @@ export default {
     'アップデートをダウンロードしました。現在のセッション終了後に適用されます。',
   'Update failed: {{error}}': 'アップデート失敗：{{error}}',
   'Downloading update...': 'アップデートをダウンロードしています...',
-  'Update successful! Please restart Qwen Code to use the new version. Switching model providers before restarting may not work correctly.':
-    'アップデートに成功しました！新しいバージョンを使用するには Qwen Code を再起動してください。再起動前にモデルプロバイダーを切り替えると正しく動作しない場合があります。',
+  'Update successful! Please restart MariaDB Shell Agent to use the new version. Switching model providers before restarting may not work correctly.':
+    'アップデートに成功しました！新しいバージョンを使用するには MariaDB Shell Agent を再起動してください。再起動前にモデルプロバイダーを切り替えると正しく動作しない場合があります。',
   'Automatic update failed. Please try updating manually.':
     '自動アップデートに失敗しました。手動で更新してください。',
   'Automatic update failed: {{error}}. Re-run the installer to update manually.':
@@ -2038,12 +2049,12 @@ export default {
     '以下のコマンドを実行してアップデートしてください：',
   'Unable to auto-update this standalone installation. Please reinstall from:':
     'このスタンドアロンインストールを自動更新できません。以下から再インストールしてください：',
-  'Manual update required. Please reinstall Qwen Code.':
-    '手動更新が必要です。Qwen Codeを再インストールしてください。',
-  'This session uses the custom sandbox image {{image}}. Update that image and restart Qwen Code.':
-    'このセッションではカスタムサンドボックスイメージ {{image}} を使用しています。イメージを更新して Qwen Code を再起動してください。',
-  'Update Qwen Code on the host, then restart the sandbox.':
-    'ホスト上の Qwen Code を更新してから、サンドボックスを再起動してください。',
+  'Manual update required. Please reinstall MariaDB Shell Agent.':
+    '手動更新が必要です。MariaDB Shell Agentを再インストールしてください。',
+  'This session uses the custom sandbox image {{image}}. Update that image and restart MariaDB Shell Agent.':
+    'このセッションではカスタムサンドボックスイメージ {{image}} を使用しています。イメージを更新して MariaDB Shell Agent を再起動してください。',
+  'Update MariaDB Shell Agent on the host, then restart the sandbox.':
+    'ホスト上の MariaDB Shell Agent を更新してから、サンドボックスを再起動してください。',
   'The update will be installed after you exit this session.':
     'このセッションを終了すると、更新が自動的にインストールされます。',
   'Run /update to install the update on the host.':

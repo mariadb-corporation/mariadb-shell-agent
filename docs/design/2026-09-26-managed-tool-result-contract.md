@@ -2,7 +2,7 @@
 
 [English](2026-09-26-managed-tool-result-contract.md) | [简体中文](2026-09-26-managed-tool-result-contract.zh-CN.md)
 
-Status: contract defined; no worker, store or Broker uses it yet. Updated: 2026-09-26. This is slice O1a of [#12723](https://github.com/QwenLM/qwen-code/issues/12723), stage O1 of the Managed Agent proposal [#12380](https://github.com/QwenLM/qwen-code/issues/12380). Below, "the reference design" is section 11 and the sections it builds on of the proposal's [tool results and durable artifacts design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-tool-result-artifacts.md), at the commit that #12723 pins.
+Status: contract defined; no worker, store or Broker uses it yet. Updated: 2026-09-26. This is slice O1a of [#12723](https://github.invalid/QwenLM/qwen-code/issues/12723), stage O1 of the Managed Agent proposal [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380). Below, "the reference design" is section 11 and the sections it builds on of the proposal's [tool results and durable artifacts design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-tool-result-artifacts.md), at the commit that #12723 pins.
 
 ## Problem
 
@@ -238,7 +238,7 @@ The schema fixes each record's shape and the rules it can state readably, includ
 - `packages/core/src/managed-runtime/contracts/managed-tool-result-v1.schema.json` and `.fixtures.json` (new).
 - `packages/core/src/managed-runtime/managed-tool-result.ts` and its test (new).
 - `packages/cli/src/serve/managed-tool-result-admission.test.ts` (new).
-- `ManagedToolResultConformanceTest` in `packages/managed-agent-server` (new), and the module's `README.md` and `QWEN.md`.
+- `ManagedToolResultConformanceTest` in `packages/managed-agent-server` (new), and the module's `README.md` and `MARIADB-SHELL-AGENT.md`.
 - This design document in both languages (new), and the Tool v2 contract document, whose note on the artifact delivery track now points here.
 
 No worker, route manifest, store, provisioner, transport or CI workflow changes.

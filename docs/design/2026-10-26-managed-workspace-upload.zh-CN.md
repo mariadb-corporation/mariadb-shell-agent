@@ -48,6 +48,6 @@ Runtime 在配置的私有状态目录下按 `uploadId` 保存仅 owner 可访�
 
 同步主干 `338f13366c` 后，根目录 build/typecheck/bundle、452 个定向 WebShell 测试、267 个定向 CLI 测试、92 个定向 Java 测试、可执行 Server 打包和 Checkstyle 均通过。一次新的 MySQL 8.4.11 案例初始化当前完整 V1 基线，并验证原进程 hold 拒绝第二次上传及物理 fencing。用户明确为本次部署工作追加了 30 分钟共享 Java 验证预算。
 
-真实 `qwen serve --managed` 使用隔离数据目录、Gateway 到 Java 的签名请求、新 H2、Hosted Harness 和正式构建的 LOCAL Runtime，全程没有 HTTP 拦截。十组 API 检查通过二进制/空文件/8 MiB 上传、超限拒绝、不覆盖与幂等结果、路径安全和独立 actor/租户隔离。Chromium 通过完整应用的实际菜单完成上传，并以带作用域的纯路径输入提交新 Session。配置的 Kimi Turn 在 150 秒内没有 assistant 或工具结果，已取消，不能宣称真实模型读取通过。受控重启后，四个已完成上传的回执、磁盘摘要和作用域修订均保持一致。原 Session 随后需要 operator recovery，上传菜单按该失败边界禁用，因此本次部署没有验证该已有 Session 的二进制提交。
+真实 `mariadb-shell-agent serve --managed` 使用隔离数据目录、Gateway 到 Java 的签名请求、新 H2、Hosted Harness 和正式构建的 LOCAL Runtime，全程没有 HTTP 拦截。十组 API 检查通过二进制/空文件/8 MiB 上传、超限拒绝、不覆盖与幂等结果、路径安全和独立 actor/租户隔离。Chromium 通过完整应用的实际菜单完成上传，并以带作用域的纯路径输入提交新 Session。配置的 Kimi Turn 在 150 秒内没有 assistant 或工具结果，已取消，不能宣称真实模型读取通过。受控重启后，四个已完成上传的回执、磁盘摘要和作用域修订均保持一致。原 Session 随后需要 operator recovery，上传菜单按该失败边界禁用，因此本次部署没有验证该已有 Session 的二进制提交。
 
 远端 SSH、Linux、真实模型读取、上述 Session 的恢复及完整 Java/Hosted/故障 CI 门禁仍待验收。CSI 仍不支持。部署时需要同步更新 Server、CLI 和 WebShell；按正式发布前的 schema 策略，本次 V1 基线变更后需重建开发数据库。

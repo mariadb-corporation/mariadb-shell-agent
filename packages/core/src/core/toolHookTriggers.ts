@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -512,7 +513,7 @@ export interface NotificationHookResult {
 
 /**
  * Fire Notification hook via MessageBus
- * Called when Qwen Code sends a notification
+ * Called when MariaDB Shell Agent sends a notification
  */
 export async function fireNotificationHook(
   messageBus: MessageBus | undefined,

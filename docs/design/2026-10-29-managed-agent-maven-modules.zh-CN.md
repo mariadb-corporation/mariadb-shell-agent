@@ -2,7 +2,7 @@
 
 [English](2026-10-29-managed-agent-maven-modules.md) | [简体中文](2026-10-29-managed-agent-maven-modules.zh-CN.md)
 
-状态：已通过 [PR #15871](https://github.com/QwenLM/qwen-code/pull/15871)
+状态：已通过 [PR #15871](https://github.invalid/QwenLM/qwen-code/pull/15871)
 合入 `f3af3dd857`。下方合并后证据区分已完成检查与剩余验收。调研基线为
 `523be857db`。本设计取代
 [源码布局](2026-10-15-managed-agent-server-layout.zh-CN.md)及
@@ -223,8 +223,8 @@ SDK 子树和合并提交 `f3af3dd857` 完全一致，其他 monorepo 文件存�
 | macOS Java 21     | 1,259 项测试，1 项失败，13 项跳过                            | caller-cancellation 探针取消前未确认响应已开始，CI 未记录实际时序 |
 | 真实集成          | Real daemon 及 RocketMQ Broker/多节点门禁通过                | 此快照中 MySQL、Hosted failover 及 Hosted 故障任务仍在运行或排队  |
 
-对应运行是 [fast gate](https://github.com/QwenLM/qwen-code/actions/runs/41048531547)
-及 [full gate](https://github.com/QwenLM/qwen-code/actions/runs/41071842780)。
+对应运行是 [fast gate](https://github.invalid/QwenLM/qwen-code/actions/runs/41048531547)
+及 [full gate](https://github.invalid/QwenLM/qwen-code/actions/runs/41071842780)。
 取消探针修正会等待首个响应字节 flush，确认 future 取消成功，在完整 handler 范围观测
 I/O 失败并关闭自建 executor。原有 300 毫秒 deadline、10 秒 caller timeout 及 2 秒
 对端闭连断言保持不变。生产取消实现未改；必须有新一次 macOS 运行才能认定修后探针

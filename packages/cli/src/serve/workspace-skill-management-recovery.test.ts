@@ -100,20 +100,29 @@ describe('workspace Skill install recovery', () => {
     });
     expect(
       await fs.readFile(
-        path.join(workspace, '.qwen/skills/foo/SKILL.md'),
+        path.join(workspace, '.mariadb-shell-agent/skills/foo/SKILL.md'),
         'utf8',
       ),
     ).toBe(markdown('foo'));
     expect(
       await fs.readFile(
-        path.join(workspace, '.qwen/skills/foo/references/guide.md'),
+        path.join(
+          workspace,
+          '.mariadb-shell-agent/skills/foo/references/guide.md',
+        ),
         'utf8',
       ),
     ).toBe('guide');
     expect(
-      (await fs.readdir(path.join(workspace, '.qwen/skills/foo'))).sort(),
+      (
+        await fs.readdir(
+          path.join(workspace, '.mariadb-shell-agent/skills/foo'),
+        )
+      ).sort(),
     ).toEqual(['SKILL.md', 'references']);
-    expect(await fs.readdir(path.join(workspace, '.qwen'))).toEqual(['skills']);
+    expect(
+      await fs.readdir(path.join(workspace, '.mariadb-shell-agent')),
+    ).toEqual(['skills']);
   });
 
   it.each(['foo.reference-1', 'foo.notes-abc123', 'bar.reference-1'])(
@@ -180,13 +189,13 @@ describe('workspace Skill install recovery', () => {
       await victim;
       expect(
         await fs.readFile(
-          path.join(workspace, '.qwen/skills', name, 'a.txt'),
+          path.join(workspace, '.mariadb-shell-agent/skills', name, 'a.txt'),
           'utf8',
         ),
       ).toBe('must survive');
       expect(
         await fs.readFile(
-          path.join(workspace, '.qwen/skills', name, 'SKILL.md'),
+          path.join(workspace, '.mariadb-shell-agent/skills', name, 'SKILL.md'),
           'utf8',
         ),
       ).toBe(markdown(name));
@@ -260,10 +269,17 @@ describe('workspace Skill install recovery', () => {
     });
     expect(execFileMock).toHaveBeenCalled();
     expect(
-      (await fs.readdir(path.join(workspace, '.qwen/skills/foo'))).sort(),
+      (
+        await fs.readdir(
+          path.join(workspace, '.mariadb-shell-agent/skills/foo'),
+        )
+      ).sort(),
     ).toEqual(['SKILL.md', 'a.txt']);
     expect(
-      await fs.readFile(path.join(workspace, '.qwen/skills/foo/a.txt'), 'utf8'),
+      await fs.readFile(
+        path.join(workspace, '.mariadb-shell-agent/skills/foo/a.txt'),
+        'utf8',
+      ),
     ).toBe('must survive');
     expect(
       (await fs.readdir(os.tmpdir())).filter(
@@ -346,7 +362,11 @@ describe('workspace Skill install recovery', () => {
       source: { type: 'folder', path: source },
     });
     expect(
-      (await fs.readdir(path.join(workspace, '.qwen/skills/foo'))).sort(),
+      (
+        await fs.readdir(
+          path.join(workspace, '.mariadb-shell-agent/skills/foo'),
+        )
+      ).sort(),
     ).toEqual(['SKILL.md', 'a.txt']);
   });
 
@@ -355,7 +375,7 @@ describe('workspace Skill install recovery', () => {
     const source = await temporary();
     await fs.writeFile(path.join(source, 'SKILL.md'), markdown('other'));
     const previousQwenHome = process.env['QWEN_HOME'];
-    process.env['QWEN_HOME'] = path.join(workspace, '.qwen');
+    process.env['QWEN_HOME'] = path.join(workspace, '.mariadb-shell-agent');
     let release!: () => void;
     let parked!: () => void;
     const pause = new Promise<void>((resolve) => {
@@ -417,7 +437,7 @@ describe('workspace Skill install recovery', () => {
       await victim;
       expect(
         await fs.readFile(
-          path.join(workspace, '.qwen/skills/foo/a.txt'),
+          path.join(workspace, '.mariadb-shell-agent/skills/foo/a.txt'),
           'utf8',
         ),
       ).toBe('must survive');
@@ -593,7 +613,7 @@ describe('workspace Skill install recovery', () => {
     );
     expect(
       await fs.readFile(
-        path.join(workspace, '.qwen/skills/foo/SKILL.md'),
+        path.join(workspace, '.mariadb-shell-agent/skills/foo/SKILL.md'),
         'utf8',
       ),
     ).toBe(markdown('foo'));
@@ -618,9 +638,14 @@ describe('workspace Skill install recovery', () => {
     await fs.writeFile(path.join(source, 'SKILL.md'), markdown('foo'));
     await fs.writeFile(path.join(invalid, 'SKILL.md'), markdown('other'));
     const previousQwenHome = process.env['QWEN_HOME'];
-    process.env['QWEN_HOME'] = path.join(workspace, '.qwen');
+    process.env['QWEN_HOME'] = path.join(workspace, '.mariadb-shell-agent');
     vi.spyOn(Date, 'now').mockReturnValue(1_785_000_000_000);
-    const destination = path.join(workspace, '.qwen', 'skills', 'foo');
+    const destination = path.join(
+      workspace,
+      '.mariadb-shell-agent',
+      'skills',
+      'foo',
+    );
     let release!: () => void;
     let parked!: () => void;
     const pause = new Promise<void>((resolve) => {
@@ -683,7 +708,7 @@ describe('workspace Skill install recovery', () => {
     const workspace = await temporary();
     const source = await temporary();
     await fs.writeFile(path.join(source, 'SKILL.md'), markdown('foo'));
-    const workDir = path.join(workspace, '.qwen');
+    const workDir = path.join(workspace, '.mariadb-shell-agent');
     await fs.mkdir(workDir, { recursive: true });
     const live = path.join(workDir, '.skills-foo.installing-55555-live');
     const dead = path.join(workDir, '.skills-foo.installing-424242-dead');
@@ -717,7 +742,7 @@ describe('workspace Skill install recovery', () => {
     await fs.writeFile(path.join(source, 'a.txt'), 'must survive');
     await fs.writeFile(path.join(invalid, 'SKILL.md'), markdown('other'));
     const previousQwenHome = process.env['QWEN_HOME'];
-    process.env['QWEN_HOME'] = path.join(workspace, '.qwen');
+    process.env['QWEN_HOME'] = path.join(workspace, '.mariadb-shell-agent');
     const nativeMkdir = fs.mkdir.bind(fs);
     let staging = '';
     let parked!: () => void;
@@ -760,7 +785,11 @@ describe('workspace Skill install recovery', () => {
       release();
       await victim;
       expect(
-        (await fs.readdir(path.join(workspace, '.qwen/skills/foo'))).sort(),
+        (
+          await fs.readdir(
+            path.join(workspace, '.mariadb-shell-agent/skills/foo'),
+          )
+        ).sort(),
       ).toEqual(['SKILL.md', 'a.txt']);
     } finally {
       release();
@@ -798,7 +827,7 @@ describe('workspace Skill install recovery', () => {
         statusCode: 500,
       });
       await expect(
-        fs.access(path.join(workspace, '.qwen/skills/foo')),
+        fs.access(path.join(workspace, '.mariadb-shell-agent/skills/foo')),
       ).rejects.toThrow();
     } finally {
       copyFile.mockRestore();

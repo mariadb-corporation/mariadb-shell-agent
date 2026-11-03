@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -153,7 +154,7 @@ describe('ui.render through the real QuickJS worker', () => {
       tree: {
         type: 'Text',
         children: [
-          'caught: returned the wrong shape (a tree AbovePrompt refuses: Button is not drawn by Qwen Code yet)',
+          'caught: returned the wrong shape (a tree AbovePrompt refuses: Button is not drawn by MariaDB Shell Agent yet)',
         ],
       },
       notes: [],

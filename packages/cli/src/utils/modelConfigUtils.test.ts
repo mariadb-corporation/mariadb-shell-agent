@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -314,7 +315,7 @@ describe('modelConfigUtils', () => {
       process.env['OPENAI_API_KEY'] = 'test-key';
       process.env['QWEN_MODEL'] = 'qwen3-coder-plus';
       process.env['OPENAI_BASE_URL'] =
-        'https://dashscope.aliyuncs.com/compatible-mode/v1';
+        'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
 
       expect(getAuthTypeFromEnv()).toBe(AuthType.USE_OPENAI);
     });
@@ -494,7 +495,7 @@ describe('modelConfigUtils', () => {
 
     it.each([
       'https://api.deepseek.com/v1',
-      'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
     ])(
       'distinguishes global none from a DeepSeek off preset on %s',
       async (baseUrl) => {

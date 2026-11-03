@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -88,7 +89,7 @@ describe('setupGithubCommand', async () => {
 
     const expectedSubstrings = [
       `set -eEuo pipefail`,
-      `fakeOpenCommand "https://github.com/QwenLM/qwen-code-action`,
+      `fakeOpenCommand "https://github.invalid/QwenLM/qwen-code-action`,
     ];
 
     for (const substring of expectedSubstrings) {
@@ -116,7 +117,7 @@ describe('setupGithubCommand', async () => {
 
     if (gitignoreExists) {
       const gitignoreContent = await fs.readFile(gitignorePath, 'utf8');
-      expect(gitignoreContent).toContain('.qwen/');
+      expect(gitignoreContent).toContain('.mariadb-shell-agent/');
       expect(gitignoreContent).toContain('gha-creds-*.json');
     }
   });
@@ -139,7 +140,7 @@ describe('updateGitignore', () => {
     const gitignorePath = path.join(scratchDir, '.gitignore');
     const content = await fs.readFile(gitignorePath, 'utf8');
 
-    expect(content).toBe('.qwen/\ngha-creds-*.json\n');
+    expect(content).toBe('.mariadb-shell-agent/\ngha-creds-*.json\n');
   });
 
   it('appends entries to existing .gitignore file', async () => {
@@ -152,13 +153,14 @@ describe('updateGitignore', () => {
     const content = await fs.readFile(gitignorePath, 'utf8');
 
     expect(content).toBe(
-      '# Existing content\nnode_modules/\n\n.qwen/\ngha-creds-*.json\n',
+      '# Existing content\nnode_modules/\n\n.mariadb-shell-agent/\ngha-creds-*.json\n',
     );
   });
 
   it('does not add duplicate entries', async () => {
     const gitignorePath = path.join(scratchDir, '.gitignore');
-    const existingContent = '.qwen/\nsome-other-file\ngha-creds-*.json\n';
+    const existingContent =
+      '.mariadb-shell-agent/\nsome-other-file\ngha-creds-*.json\n';
     await fs.writeFile(gitignorePath, existingContent);
 
     await updateGitignore(scratchDir);
@@ -170,7 +172,7 @@ describe('updateGitignore', () => {
 
   it('adds only missing entries when some already exist', async () => {
     const gitignorePath = path.join(scratchDir, '.gitignore');
-    const existingContent = '.qwen/\nsome-other-file\n';
+    const existingContent = '.mariadb-shell-agent/\nsome-other-file\n';
     await fs.writeFile(gitignorePath, existingContent);
 
     await updateGitignore(scratchDir);
@@ -178,16 +180,18 @@ describe('updateGitignore', () => {
     const content = await fs.readFile(gitignorePath, 'utf8');
 
     // Should add only the missing gha-creds-*.json entry
-    expect(content).toBe('.qwen/\nsome-other-file\n\ngha-creds-*.json\n');
+    expect(content).toBe(
+      '.mariadb-shell-agent/\nsome-other-file\n\ngha-creds-*.json\n',
+    );
     expect(content).toContain('gha-creds-*.json');
-    // Should not duplicate .qwen/ entry
-    expect((content.match(/\.qwen\//g) || []).length).toBe(1);
+    // Should not duplicate .mariadb-shell-agent/ entry
+    expect((content.match(/\.mariadb-shell-agent\//g) || []).length).toBe(1);
   });
 
   it('does not get confused by entries in comments or as substrings', async () => {
     const gitignorePath = path.join(scratchDir, '.gitignore');
     const existingContent = [
-      '# This is a comment mentioning .qwen/ folder',
+      '# This is a comment mentioning .mariadb-shell-agent/ folder',
       'my-app.qwen/config',
       '# Another comment with gha-creds-*.json pattern',
       'some-other-gha-creds-file.json',
@@ -200,7 +204,7 @@ describe('updateGitignore', () => {
     const content = await fs.readFile(gitignorePath, 'utf8');
 
     // Should add both entries since they don't actually exist as gitignore rules
-    expect(content).toContain('.qwen/');
+    expect(content).toContain('.mariadb-shell-agent/');
     expect(content).toContain('gha-creds-*.json');
 
     // Verify the entries were added (not just mentioned in comments)
@@ -208,7 +212,7 @@ describe('updateGitignore', () => {
       .split('\n')
       .map((line) => line.split('#')[0].trim())
       .filter((line) => line);
-    expect(lines).toContain('.qwen/');
+    expect(lines).toContain('.mariadb-shell-agent/');
     expect(lines).toContain('gha-creds-*.json');
     expect(lines).toContain('my-app.qwen/config');
     expect(lines).toContain('some-other-gha-creds-file.json');

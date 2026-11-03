@@ -7,7 +7,7 @@ setting and `--output-style` flag (#10283), and the `/output-style` picker
 
 ## What a style file is
 
-A Markdown file in `~/.qwen/output-styles/` or `<project>/.qwen/output-styles/`.
+A Markdown file in `~/.mariadb-shell-agent/output-styles/` or `<project>/.mariadb-shell-agent/output-styles/`.
 The body is the prompt section; an optional YAML frontmatter carries `name`,
 `description` and `keep-coding-instructions`. Every field has a default (file
 name, first body line, the shadowed built-in's value or `false`), so a bare
@@ -72,7 +72,7 @@ works in both.
   control and format characters are stripped from both description sources and
   the description is capped, so every current and future picker surface gets
   the same treatment the name field already got. HTML comments are dropped
-  where the body is cut, as the sibling `.qwen/rules/` loader does, so a
+  where the body is cut, as the sibling `.mariadb-shell-agent/rules/` loader does, so a
   human-only note is not fed to the model.
 - **The picker resolves against the list it showed.** The hook keeps the
   catalog it loaded when opening and resolves the selection against that list

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -53,7 +54,7 @@ type Deps = Omit<Parameters<typeof applyProviderInstallPlan>[1], 'settings'>;
 
 const MEDIA = 'https://media.example/v1';
 const MINIMAX = 'https://api.minimax.io/v1';
-const DASHSCOPE = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+const DASHSCOPE = 'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
 const GATEWAY = 'https://gateway.test/v1';
 const IMAGE = { imageOnly: true, supportsImageGeneration: true };
 

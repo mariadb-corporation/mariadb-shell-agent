@@ -4,7 +4,7 @@
 
 ## 状态与范围
 
-遵循已有发布约束，一起准备 native driver、CUA SDK、Browser SDK 与 Node REPL 0.27.0。输入投递、窗口选择和生命周期回报修正与 main 已有的光标/PiP 功能一起进入本次发布。本次改动保留这些功能，浏览器行为及 Qwen Code CLI 版本不变。
+遵循已有发布约束，一起准备 native driver、CUA SDK、Browser SDK 与 Node REPL 0.27.0。输入投递、窗口选择和生命周期回报修正与 main 已有的光标/PiP 功能一起进入本次发布。本次改动保留这些功能，浏览器行为及 MariaDB Shell Agent CLI 版本不变。
 
 此前真实主机验证使用带 0.26.0 兼容元数据的私有不可变制品。证据适用于对应功能修正，不代表生产签名、未来 0.27.0 制品安装或完整 benchmark 已验收。本次发布准备不操作实验或定时监控。
 

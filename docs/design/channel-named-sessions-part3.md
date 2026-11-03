@@ -455,7 +455,7 @@ final cards, QQ repeated flushes and retries, Telegram and WeCom long-message
 splits, labeled media envelopes, and existing same-chat passive reply and
 activity cleanup. Verification then runs focused package tests, repository
 build, typecheck, lint, and the daemon-backed Channel E2E plan in
-`.qwen/e2e-tests/channel-named-sessions-part3.md`.
+`.mariadb-shell-agent/e2e-tests/channel-named-sessions-part3.md`.
 
 ## Alternatives reviewed
 

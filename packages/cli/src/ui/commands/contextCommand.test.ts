@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -165,7 +166,10 @@ describe('collectContextData (contextCommand)', () => {
     // unrelated directory, an installed extension) stay non-interactive.
     const admissionRoot = '/workspace/repo';
     const workingDir = '/workspace/repo/sub';
-    const globalMemory = path.join(Storage.getGlobalQwenDir(), 'QWEN.md');
+    const globalMemory = path.join(
+      Storage.getGlobalQwenDir(),
+      'MARIADB-SHELL-AGENT.md',
+    );
     const rootFile = path.join(admissionRoot, 'AGENTS.md');
     const subdirFile = path.join(workingDir, 'AGENTS.md');
     const outsideFile = '/tmp/outside/AGENTS.md';
@@ -212,7 +216,7 @@ describe('collectContextData (contextCommand)', () => {
     process.env['QWEN_HOME'] = '/srv/qwen/';
     try {
       const workingDir = '/workspace';
-      const globalMemory = path.join('/srv/qwen/', 'QWEN.md');
+      const globalMemory = path.join('/srv/qwen/', 'MARIADB-SHELL-AGENT.md');
       const relative = path.relative(workingDir, globalMemory);
       const config = {
         ...makeMockConfig(200_000),
@@ -503,15 +507,15 @@ describe('collectContextData (contextCommand)', () => {
         const policy = 'Automatic memory policy. '.repeat(50);
         Object.assign(config, {
           getUserMemory: () =>
-            '--- Context from: QWEN.md ---\n' +
+            '--- Context from: MARIADB-SHELL-AGENT.md ---\n' +
             instructions +
-            '\n--- End of Context from: QWEN.md ---',
+            '\n--- End of Context from: MARIADB-SHELL-AGENT.md ---',
           getAutoMemoryPrompt: () => policy,
           getAutoMemoryContext: () => '',
         });
         const data = await collectContextData(config, true);
         expect(data.instructionFiles?.map((file) => file.path)).toEqual([
-          'QWEN.md',
+          'MARIADB-SHELL-AGENT.md',
         ]);
         expect(data.memoryFiles.map((file) => file.path)).toEqual([
           t('auto memory'),
@@ -553,9 +557,9 @@ describe('collectContextData (contextCommand)', () => {
     it('scales nonzero instruction and auto-memory rows and their details together', async () => {
       const sources = {
         getUserMemory: () =>
-          '--- Context from: QWEN.md ---\n' +
+          '--- Context from: MARIADB-SHELL-AGENT.md ---\n' +
           'Project instructions. '.repeat(100) +
-          '\n--- End of Context from: QWEN.md ---',
+          '\n--- End of Context from: MARIADB-SHELL-AGENT.md ---',
         getAutoMemoryPrompt: () => 'Automatic memory policy. '.repeat(50),
         getAutoMemoryContext: () => '',
       };
@@ -1206,7 +1210,7 @@ describe('collectContextData (contextCommand)', () => {
 
     it('gives a detail row to a listing entry listSkills does not return', async () => {
       // `collectAvailableSkillEntries` merges model-invocable commands (a user's
-      // `.qwen/commands/*.toml`, extension saved workflows) into the listing, so
+      // `.mariadb-shell-agent/commands/*.toml`, extension saved workflows) into the listing, so
       // their tokens are inside the measured block `skills` bills while
       // `listSkills()` never returns them: billed with no row.
       const commandEntry =
@@ -2036,7 +2040,11 @@ describe('collectContextData (contextCommand)', () => {
     // which in ACP/daemon-served sessions differs from process.cwd(); global
     // files must render as `~/...` instead of `../../..` chains.
     const workingDir = path.join(os.tmpdir(), 'context-session-dir');
-    const globalFile = path.join(os.homedir(), '.qwen', 'QWEN.md');
+    const globalFile = path.join(
+      os.homedir(),
+      '.mariadb-shell-agent',
+      'MARIADB-SHELL-AGENT.md',
+    );
     const markerPath = path.relative(workingDir, globalFile);
     const memory =
       `--- Context from: ${markerPath} ---\n` +
@@ -2054,7 +2062,7 @@ describe('collectContextData (contextCommand)', () => {
 
     expect(data.instructionFiles!).toHaveLength(1);
     expect(data.instructionFiles![0].path).toBe(
-      path.join('~', '.qwen', 'QWEN.md'),
+      path.join('~', '.mariadb-shell-agent', 'MARIADB-SHELL-AGENT.md'),
     );
   });
 
@@ -2064,12 +2072,12 @@ describe('collectContextData (contextCommand)', () => {
     // anchor renders every project-local file as a ../.. chain.
     const workingDir = path.join(os.tmpdir(), 'context-session-dir');
     const memory =
-      `--- Context from: QWEN.md ---\n` +
+      `--- Context from: MARIADB-SHELL-AGENT.md ---\n` +
       `project rules\n` +
-      `--- End of Context from: QWEN.md ---\n` +
-      `--- Context from: docs/QWEN.md ---\n` +
+      `--- End of Context from: MARIADB-SHELL-AGENT.md ---\n` +
+      `--- Context from: docs/MARIADB-SHELL-AGENT.md ---\n` +
       `docs rules\n` +
-      `--- End of Context from: docs/QWEN.md ---`;
+      `--- End of Context from: docs/MARIADB-SHELL-AGENT.md ---`;
     const config = {
       ...makeMockConfig(),
       getUserMemory: vi.fn().mockReturnValue(memory),
@@ -2081,8 +2089,10 @@ describe('collectContextData (contextCommand)', () => {
     const data = await collectContextData(config, true);
 
     expect(data.instructionFiles!).toHaveLength(2);
-    expect(data.instructionFiles![0].path).toBe('QWEN.md');
-    expect(data.instructionFiles![1].path).toBe(path.join('docs', 'QWEN.md'));
+    expect(data.instructionFiles![0].path).toBe('MARIADB-SHELL-AGENT.md');
+    expect(data.instructionFiles![1].path).toBe(
+      path.join('docs', 'MARIADB-SHELL-AGENT.md'),
+    );
   });
 
   it('attributes all injected skill bodies after refresh, removal and disable', async () => {
@@ -2192,12 +2202,12 @@ describe('collectContextData (contextCommand)', () => {
       workingDir,
       'extensions',
       'report-tools',
-      'QWEN.md',
+      'MARIADB-SHELL-AGENT.md',
     );
     const memory =
-      `--- Context from: QWEN.md ---\n` +
+      `--- Context from: MARIADB-SHELL-AGENT.md ---\n` +
       `project rules\n` +
-      `--- End of Context from: QWEN.md ---\n` +
+      `--- End of Context from: MARIADB-SHELL-AGENT.md ---\n` +
       `--- Context from: ${extensionFile} ---\n` +
       `extension rules\n` +
       `--- End of Context from: ${extensionFile} ---`;
@@ -2220,9 +2230,9 @@ describe('collectContextData (contextCommand)', () => {
 
     expect(data.instructionFiles!).toHaveLength(2);
     // The project file keeps its path; only the extension's file is renamed.
-    expect(data.instructionFiles![0].path).toBe('QWEN.md');
+    expect(data.instructionFiles![0].path).toBe('MARIADB-SHELL-AGENT.md');
     expect(data.instructionFiles![1].path).toBe(
-      `${t('Extension')}: Report Tools · QWEN.md`,
+      `${t('Extension')}: Report Tools · MARIADB-SHELL-AGENT.md`,
     );
   });
 
@@ -2230,7 +2240,7 @@ describe('collectContextData (contextCommand)', () => {
     const workingDir = path.join(os.tmpdir(), 'context-extension-dir');
     const extensionRoot = path.join(workingDir, 'extensions', 'report-tools');
     const files = ['docs', 'prompts'].map((dir) =>
-      path.join(extensionRoot, dir, 'QWEN.md'),
+      path.join(extensionRoot, dir, 'MARIADB-SHELL-AGENT.md'),
     );
     const memory = files
       .map((file) => {
@@ -2260,7 +2270,7 @@ describe('collectContextData (contextCommand)', () => {
     expect(after.instructionFiles!.map((file) => file.path)).toEqual(
       ['docs', 'prompts'].map(
         (dir) =>
-          `${t('Extension')}: Report Tools · ${path.join(dir, 'QWEN.md')}`,
+          `${t('Extension')}: Report Tools · ${path.join(dir, 'MARIADB-SHELL-AGENT.md')}`,
       ),
     );
     expect(after.instructionFiles!.map((file) => file.tokens)).toEqual(
@@ -2271,8 +2281,8 @@ describe('collectContextData (contextCommand)', () => {
   it('leaves memory rows alone when no extension owns them (#12030)', async () => {
     const workingDir = path.join(os.tmpdir(), 'context-extension-dir');
     const memory =
-      `--- Context from: QWEN.md ---\nproject rules\n` +
-      `--- End of Context from: QWEN.md ---`;
+      `--- Context from: MARIADB-SHELL-AGENT.md ---\nproject rules\n` +
+      `--- End of Context from: MARIADB-SHELL-AGENT.md ---`;
     const config = {
       ...makeMockConfig(),
       getUserMemory: vi.fn().mockReturnValue(memory),
@@ -2286,7 +2296,7 @@ describe('collectContextData (contextCommand)', () => {
     const data = await collectContextData(config, true);
 
     expect(data.instructionFiles!).toHaveLength(1);
-    expect(data.instructionFiles![0].path).toBe('QWEN.md');
+    expect(data.instructionFiles![0].path).toBe('MARIADB-SHELL-AGENT.md');
   });
 
   it('measures the listing a session would send before a chat exists (#12235)', async () => {
@@ -2392,13 +2402,13 @@ it.each([false, true])(
       builtinTools: [],
       mcpTools: [],
       skills: [],
-      memoryFiles: [{ path: 'QWEN.md', tokens: 200 }],
+      memoryFiles: [{ path: 'MARIADB-SHELL-AGENT.md', tokens: 200 }],
       showDetails,
     });
     expect(text).toMatch(/Memory files\s+200 tokens/);
     expect(text).not.toContain('Instruction files');
     expect(text).not.toContain('Auto memory');
-    expect(text.includes('QWEN.md')).toBe(showDetails);
+    expect(text.includes('MARIADB-SHELL-AGENT.md')).toBe(showDetails);
     expect(text.includes('**Memory files**')).toBe(showDetails);
   },
 );

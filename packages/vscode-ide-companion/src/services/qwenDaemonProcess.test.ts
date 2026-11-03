@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -79,9 +80,33 @@ async function settle(
   port: number,
 ): Promise<void> {
   const start = daemon.start('/cli.js', workspace);
-  child.emitStdout(`qwen serve listening on http://127.0.0.1:${port}\n`);
+  child.emitStdout(
+    `mariadb-shell-agent serve listening on http://127.0.0.1:${port}\n`,
+  );
   await start;
 }
+
+describe('QwenDaemonProcess arguments', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('appends extra arguments to the serve command', async () => {
+    const child = createFakeChild();
+    spawnMock.mockReturnValueOnce(child.process);
+
+    const daemon = new QwenDaemonProcess();
+    const start = daemon.start('/cli.js', '/workspace', ['--experimental-lsp']);
+    child.emitStdout(
+      'mariadb-shell-agent serve listening on http://127.0.0.1:4100\n',
+    );
+    await start;
+
+    const args = spawnMock.mock.calls[0]![1] as string[];
+    expect(args[1]).toBe('serve');
+    expect(args.at(-1)).toBe('--experimental-lsp');
+  });
+});
 
 describe('QwenDaemonProcess exit notification', () => {
   beforeEach(() => {
@@ -105,7 +130,9 @@ describe('QwenDaemonProcess exit notification', () => {
     // daemon and kills the first child; that child's later exit is not a
     // crash of the live daemon.
     const startB = daemon.start('/cli.js', '/workspace-b');
-    childB.emitStdout('qwen serve listening on http://127.0.0.1:4102\n');
+    childB.emitStdout(
+      'mariadb-shell-agent serve listening on http://127.0.0.1:4102\n',
+    );
     await startB;
 
     expect(childA.kill).toHaveBeenCalled();
@@ -185,7 +212,9 @@ describe('QwenDaemonProcess exit notification', () => {
     const startB = daemon.start('/cli.js', '/workspace-b');
     expect(onSuperseded).toHaveBeenCalledTimes(1);
 
-    childB.emitStdout('qwen serve listening on http://127.0.0.1:4102\n');
+    childB.emitStdout(
+      'mariadb-shell-agent serve listening on http://127.0.0.1:4102\n',
+    );
     await startB;
 
     childA.emitExit(0, 'SIGTERM');

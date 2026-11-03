@@ -2,6 +2,7 @@
  * @license
  * Copyright 2025 Google LLC
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -84,7 +85,7 @@ export async function searchGlobDirectory(
 
   // Prune ignored directories DURING traversal (glob's `childrenIgnored`)
   // rather than only post-filtering the results. Delegating to
-  // FileDiscoveryService reuses the real .gitignore/.qwenignore semantics
+  // FileDiscoveryService reuses the real .gitignore/.mariadb-shell-agentignore semantics
   // (anchoring, negation/re-inclusion, nested ignore files) — a hand-rolled
   // gitignore→glob pattern conversion cannot reproduce these correctly.
   const isTraversalIgnored = (entry: {

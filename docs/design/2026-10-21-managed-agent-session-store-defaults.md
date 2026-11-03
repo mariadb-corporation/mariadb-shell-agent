@@ -92,7 +92,7 @@ The startup refusal for a blank URL or ID also names the variables to set.
 - Preflight tests: the `session-store` row reports `SKIP`, `FAIL` and `PASS`, and preflight derives the URL through its environment.
 - Template tests: the bootstrap output and `server.env.example` no longer carry the removed variables and set the Workspace directory.
 - Module verification: `mvn verify` in `packages/managed-agent-server`.
-- End-to-end: build the reference archive, then follow the deployment guide literally against MySQL and a real `qwen serve --profile hosted-harness`. Run `--check`, start, and complete one text-only Turn. Repeat with the local-process tool path enabled as the guide lists it. Run the same steps on `main` as the baseline.
+- End-to-end: build the reference archive, then follow the deployment guide literally against MySQL and a real `mariadb-shell-agent serve --profile hosted-harness`. Run `--check`, start, and complete one text-only Turn. Repeat with the local-process tool path enabled as the guide lists it. Run the same steps on `main` as the baseline.
 
 ## Acceptance criteria
 

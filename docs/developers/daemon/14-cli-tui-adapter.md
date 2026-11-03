@@ -11,7 +11,7 @@
 - **Renderers** (`render.ts`, `terminal.ts`, `toolPreview.ts`): transcript blocks to HTML, terminal text, and tool preview strings. Hosts can use or replace them.
 - **Conformance** (`conformance.ts`): cross-host consistency tests used when channel, TUI, and IDE surfaces migrate to these primitives.
 
-The first production consumer was introduced in [#4328](https://github.com/QwenLM/qwen-code/pull/4328) and now lives in **`packages/web-shell/client/daemon/`**. Its React `DaemonSessionProvider` and transcript adapter let Web Shell connect directly to daemon HTTP+SSE. CLI TUI, channel base, and VS Code IDE can reuse the same layer; [`../daemon-ui/MIGRATION.md`](../daemon-ui/MIGRATION.md) documents the v2 incremental migration guide.
+The first production consumer was introduced in [#4328](https://github.invalid/QwenLM/qwen-code/pull/4328) and now lives in **`packages/web-shell/client/daemon/`**. Its React `DaemonSessionProvider` and transcript adapter let Web Shell connect directly to daemon HTTP+SSE. CLI TUI, channel base, and VS Code IDE can reuse the same layer; [`../daemon-ui/MIGRATION.md`](../daemon-ui/MIGRATION.md) documents the v2 incremental migration guide.
 
 ## Responsibilities
 
@@ -134,7 +134,7 @@ Hosts can stop at `(E)` and implement their own reducer, or consume `(G)` and th
 
 ### `packages/web-shell/client/daemon/`
 
-This landed in [#4328](https://github.com/QwenLM/qwen-code/pull/4328).
+This landed in [#4328](https://github.invalid/QwenLM/qwen-code/pull/4328).
 
 | File                                | Exports                                                                                                                                                                                                                                                                                                                        |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -192,4 +192,4 @@ The web UI can now connect directly to daemon HTTP+SSE and render a transcript. 
 - `packages/sdk-typescript/src/daemon/index.ts` (`ui/*` re-export block)
 - `packages/web-shell/client/daemon/session/DaemonSessionProvider.tsx`, `packages/web-shell/client/adapters/transcriptAdapter.ts`
 - Upstream docs: [`../daemon-ui/README.md`](../daemon-ui/README.md), [`../daemon-ui/MIGRATION.md`](../daemon-ui/MIGRATION.md), [`../daemon-client-adapters/web-shell.md`](../daemon-client-adapters/web-shell.md)
-- Context PRs: [#4328](https://github.com/QwenLM/qwen-code/pull/4328) (v1 transcript layer and web UI provider), [#4353](https://github.com/QwenLM/qwen-code/pull/4353) (v2 unified completeness follow-up)
+- Context PRs: [#4328](https://github.invalid/QwenLM/qwen-code/pull/4328) (v1 transcript layer and web UI provider), [#4353](https://github.invalid/QwenLM/qwen-code/pull/4353) (v2 unified completeness follow-up)

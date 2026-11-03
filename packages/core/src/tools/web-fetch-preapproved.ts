@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,12 +21,12 @@
 
 export const PREAPPROVED_HOSTS: ReadonlySet<string> = new Set([
   // Qwen ecosystem
-  'qwenlm.github.io',
+  'qwenlm.github.invalid',
   'qwen.readthedocs.io',
-  'github.com/QwenLM',
+  'github.invalid/QwenLM',
   // Matches QwenLM raw files whether requested directly or via a github.com
   // blob URL (the tool rewrites those to this host before fetching).
-  'raw.githubusercontent.com/QwenLM',
+  'raw.githubusercontent.invalid/QwenLM',
   'modelcontextprotocol.io',
 
   // Top programming languages
@@ -150,7 +151,7 @@ const stripWww = (hostname: string): string => hostname.replace(/^www\./, '');
 
 // Split once at module load: O(1) Set lookup for hostname-only entries, plus a
 // small per-host path-prefix list for path-scoped entries like
-// "github.com/QwenLM". Hosts are stored www-stripped; lookups strip too.
+// "github.invalid/QwenLM". Hosts are stored www-stripped; lookups strip too.
 const { HOSTNAME_ONLY, PATH_PREFIXES } = (() => {
   const hosts = new Set<string>();
   const paths = new Map<string, string[]>();

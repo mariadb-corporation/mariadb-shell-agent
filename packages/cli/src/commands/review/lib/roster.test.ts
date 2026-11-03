@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,7 +31,7 @@ const PR = {
   diffPathAbsolute: '/d.txt',
   prNumber: '6766',
   ownerRepo: 'QwenLM/qwen-code',
-  worktreePath: '.qwen/tmp/review-pr-6766',
+  worktreePath: '.mariadb-shell-agent/tmp/review-pr-6766',
   files: [{ path: 'a.ts', kind: 'source', removedLines: 0, heavy: false }],
   chunks: [{ id: 1, startLine: 1, endLine: 100 }],
   srcDiffLines: 200,
@@ -180,11 +181,16 @@ describe('requiredAgents — Step 3A', () => {
     expect(
       keys({
         ...PR,
-        files: [{ path: '.qwen/commands/release-notes.test.md' }],
+        files: [
+          { path: '.mariadb-shell-agent/commands/release-notes.test.md' },
+        ],
       }),
     ).toContain('prose-exec');
     expect(
-      keys({ ...PR, files: [{ path: '.qwen/review-rules.md' }] }),
+      keys({
+        ...PR,
+        files: [{ path: '.mariadb-shell-agent/review-rules.md' }],
+      }),
     ).toContain('prose-exec');
     // A references-only diff in a skill bundle owes it too: the directory
     // marker, not the SKILL.md filename, is what rosters the audit — a PR
@@ -478,7 +484,7 @@ describe('requiredAgents — the angles promoted out of Agent 1a (#9788)', () =>
 });
 
 describe('hasExecutableScript — the script-lint gate predicate', () => {
-  // No longer an agent requirement: the orchestrator runs `qwen review
+  // No longer an agent requirement: the orchestrator runs `mariadb-shell-agent review
   // script-lint` and compose-review reads its report. This predicate is what
   // both share to decide whether the lint was OWED — detected by path, the same
   // `pathTool` the command dispatches on, so the two cannot disagree.
@@ -513,7 +519,7 @@ describe('hasExecutableScript — the script-lint gate predicate', () => {
   });
 
   it('trusts fileLines only in pr-worktree — a true deletion is exempt there, but never in local/diff-only', () => {
-    const wt = { worktreePath: '.qwen/tmp/review-pr-1' }; // pr-worktree mode
+    const wt = { worktreePath: '.mariadb-shell-agent/tmp/review-pr-1' }; // pr-worktree mode
     // pr-worktree: fileLines is a real post-image count, so 0 is a TRUE deletion
     // (no file to lint) and is exempt...
     expect(
@@ -786,7 +792,7 @@ describe('isPromptPath — the instruction-file detector', () => {
     // Skills, agent definitions, prompt directories, and prompt/brief-named files.
     ['packages/core/src/skills/bundled/review/SKILL.md', true],
     ['.claude/agents/reviewer.md', true],
-    ['.qwen/agents/helper.md', true],
+    ['.mariadb-shell-agent/agents/helper.md', true],
     ['src/prompts/system.txt', true],
     ['packages/cli/src/commands/review/lib/agent-briefs.ts', true],
     ['packages/cli/src/commands/review/agent-prompt.ts', true],
@@ -795,7 +801,7 @@ describe('isPromptPath — the instruction-file detector', () => {
     // instructions with operational recipes, the motivating incident's shape.
     ['AGENTS.md', true],
     ['CLAUDE.md', true],
-    ['QWEN.md', true],
+    ['MARIADB-SHELL-AGENT.md', true],
     ['packages/cli/GEMINI.md', true],
     ['.github/copilot-instructions.md', true],
     // Slash-command definitions are prompts too — and the dot-directories
@@ -803,19 +809,19 @@ describe('isPromptPath — the instruction-file detector', () => {
     // only the nested form, the false-negative direction the doc calls the
     // expensive one).
     ['.claude/commands/deploy.md', true],
-    ['.qwen/commands/review.md', true],
+    ['.mariadb-shell-agent/commands/review.md', true],
     ['packages/x/.claude/agents/foo.md', true],
     // A file in a reserved directory is followed under ANY name:
     // FileCommandLoader globs **/*.md with no test filter, so a command
     // named `release-notes.test` loads live and a `.test.` basename must
     // not hide the file from the execution audit.
-    ['.qwen/commands/release-notes.test.md', true],
+    ['.mariadb-shell-agent/commands/release-notes.test.md', true],
     ['.claude/agents/reviewer.test.md', true],
     ['prompts/system.test.md', true],
     // The pipeline's own review rules: load-rules reads them first and
     // bakes them into every brief, so a rules-only diff owes the audit —
     // the pre-merge review is the only gate that can execute the change.
-    ['.qwen/review-rules.md', true],
+    ['.mariadb-shell-agent/review-rules.md', true],
     // Skill bundles, by the loader's own marker: everything prose in the
     // directory holding a SKILL.md is read AND followed (SKILL.md says so
     // of `references/posting.md` and `references/persistence.md`), so the
@@ -824,7 +830,7 @@ describe('isPromptPath — the instruction-file detector', () => {
     // pin the prose, they are not followed as it.
     ['packages/core/src/skills/bundled/review/references/posting.md', true],
     ['packages/core/src/skills/bundled/review/references/persistence.md', true],
-    ['.qwen/skills/triage/references/pr-workflow.md', true],
+    ['.mariadb-shell-agent/skills/triage/references/pr-workflow.md', true],
     ['packages/core/src/skills/skill-manager.ts', false],
     ['packages/core/src/skills/skill-manager.test.ts', false],
     ['packages/core/src/skills/bundled/review/SKILL.test.ts', false],

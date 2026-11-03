@@ -182,7 +182,7 @@ records still lack real start timestamps. Verification of the originally
 reported 57-call and 139-call turns remains outstanding. Mock daemon browser checks cover
 layout, keyboard expansion and live timers; they do not prove real history
 correctness. Results are recorded in
-`.qwen/e2e-tests/web-shell-turn-calls-redesign.md`.
+`.mariadb-shell-agent/e2e-tests/web-shell-turn-calls-redesign.md`.
 
 The sender path is also verified in macOS Chromium against a real local daemon
 and bundled Web Shell, using a scripted local model and real shell/glob tools.
@@ -190,7 +190,7 @@ Running selection persists its prompt ID without history reads; settlement reads
 history once; reopening the original sender message adopts its record ID; reload
 restores both calls. An empty session can show a pre-admission index 404 notice,
 which clears on a successful index refresh. This is not claimed fixed here.
-Evidence: `.qwen/e2e-tests/turn-calls-redesign/pr12466-round2-reproduction.md`.
+Evidence: `.mariadb-shell-agent/e2e-tests/turn-calls-redesign/pr12466-round2-reproduction.md`.
 
 ## Risks and limits
 

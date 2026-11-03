@@ -2,7 +2,7 @@
 
 [English](2026-09-20-agent-delegation-reference.md) | [简体中文](2026-09-20-agent-delegation-reference.zh-CN.md)
 
-**状态：** 实现 [#12054](https://github.com/QwenLM/qwen-code/issues/12054) 四项验收条件中的一项——给 Agent 描述加上体积预算，且只覆盖 `agent`；其余三项仍让该 issue 开着，PR 正文写的是 `Part of` 而不是 `Closes`。属于 [#12028](https://github.com/QwenLM/qwen-code/issues/12028)。建立在 [#12142](https://github.com/QwenLM/qwen-code/pull/12142) 的 Agent/Shell 体积预算之上（已合入，`36887c49`），并把其中几条预算下调。
+**状态：** 实现 [#12054](https://github.invalid/QwenLM/qwen-code/issues/12054) 四项验收条件中的一项——给 Agent 描述加上体积预算，且只覆盖 `agent`；其余三项仍让该 issue 开着，PR 正文写的是 `Part of` 而不是 `Closes`。属于 [#12028](https://github.invalid/QwenLM/qwen-code/issues/12028)。建立在 [#12142](https://github.invalid/QwenLM/qwen-code/pull/12142) 的 Agent/Shell 体积预算之上（已合入，`36887c49`），并把其中几条预算下调。
 
 下文所有数字都是实测得到的，不是纸面渲染：构造真实的 `AgentTool` 并读取它装配完成的 `description`，代入预算测试所用的两个 subagent 条目、team 关、todo 开。"改动前"那一列用的是同一套量法，只把两个被改的源文件回退到 merge base，因此只有一个变量在动。本地在 Linux 上跑过——构建 `packages/core`，然后三个受影响文件共 98 个测试、内置 skill 集成文件 20 个测试全部通过，§3 的每一行都由构造出来的工具复现。macOS 与 Windows 的单测任务在本 PR 上被 CI `skipped`、并非绿色，所以没有自动化覆盖它们；这次改动是与平台无关的字符串与模块工作，而 `Desktop Shell (windows-2022)` 确实会跑。token 数按字符数 ÷ 4 折算，与 issue 中的口径一致。
 
@@ -10,7 +10,7 @@
 
 Agent 工具的描述是请求里最长的内置工具描述，而它在**每个**会话的**每一次**请求中都会发送，无论这一轮是否真的要委派任务。其中约四分之一是"怎么写委派提示词"的手艺建议：给多少上下文、什么不该委派、fork 提示词长什么样，以及一个 `test-runner` 的完整示例。一个只读文件然后回答问题的轮次，也要为这些内容付费。
 
-Workflow 工具此前是同样的形状，并在 [#11013](https://github.com/QwenLM/qwen-code/issues/11013) 中解决：编写参考变成内置 skill `workflow-authoring`，描述里只留一个指针。本次复用这套机制，而不是另造一套。
+Workflow 工具此前是同样的形状，并在 [#11013](https://github.invalid/QwenLM/qwen-code/issues/11013) 中解决：编写参考变成内置 skill `workflow-authoring`，描述里只留一个指针。本次复用这套机制，而不是另造一套。
 
 ## 2. 搬走了什么，以及刻意留下了什么
 

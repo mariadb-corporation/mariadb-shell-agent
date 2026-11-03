@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -251,7 +252,7 @@ describe('mcpApprovals (hash-bound approval store)', () => {
         }),
       );
       resetMcpApprovalsForTesting();
-      // A synced `~/.qwen` can carry Linux decisions; their case is
+      // A synced `~/.mariadb-shell-agent` can carry Linux decisions; their case is
       // significant there, so they must round-trip verbatim.
       expect(Object.keys(loadMcpApprovals().file.config)).toEqual([
         '/home/u/Projects/Foo',

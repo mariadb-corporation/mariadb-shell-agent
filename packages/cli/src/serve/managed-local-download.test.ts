@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -54,8 +55,8 @@ describe('Managed server first-use download', () => {
   it('downloads the exact CLI version once, checks it, and installs a system-Java payload', async () => {
     await install();
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
-      `https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code/v${version}/${name}.sha256`,
-      `https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code/v${version}/${name}`,
+      `https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/releases/qwen-code/v${version}/${name}.sha256`,
+      `https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/releases/qwen-code/v${version}/${name}`,
     ]);
     expect(await readFile(path.join(directory, 'server.jar'))).toEqual(jar);
     expect(
@@ -85,22 +86,23 @@ describe('Managed server first-use download', () => {
 
   it('falls back to the same version on GitHub when the OSS release is unavailable', async () => {
     fetchMock.mockImplementation(async (url) =>
-      String(url).includes('aliyuncs.com')
+      String(url).includes('aliyuncs.invalid')
         ? new Response('', { status: 404 })
         : response(String(url)),
     );
     await install();
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
-      `https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code/v${version}/${name}.sha256`,
-      `https://github.com/QwenLM/qwen-code/releases/download/v${version}/${name}.sha256`,
-      `https://github.com/QwenLM/qwen-code/releases/download/v${version}/${name}`,
+      `https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/releases/qwen-code/v${version}/${name}.sha256`,
+      `https://github.invalid/QwenLM/qwen-code/releases/download/v${version}/${name}.sha256`,
+      `https://github.invalid/QwenLM/qwen-code/releases/download/v${version}/${name}`,
     ]);
     expect(await readFile(path.join(directory, 'server.jar'))).toEqual(jar);
   });
 
   it('discards a corrupt mirror download before installing a verified fallback', async () => {
     fetchMock.mockImplementation(async (url) =>
-      String(url).includes('aliyuncs.com') && !String(url).endsWith('.sha256')
+      String(url).includes('aliyuncs.invalid') &&
+      !String(url).endsWith('.sha256')
         ? new Response('corrupt')
         : response(String(url)),
     );
@@ -190,7 +192,7 @@ describe('Managed server first-use download', () => {
     fetchMock.mockImplementation(async (_url, options) => {
       expect(options?.signal).toBeInstanceOf(AbortSignal);
       expect(options?.headers).toEqual({
-        'User-Agent': `qwen-code/${version}`,
+        'User-Agent': `mariadb-shell-agent/${version}`,
       });
       throw new DOMException('fixture timeout', 'TimeoutError');
     });

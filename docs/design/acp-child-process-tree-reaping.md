@@ -6,7 +6,7 @@ Proposed PR title: `fix(acp-bridge): Reap ACP child process trees`
 
 ## Problem
 
-`createSpawnChannelFactory()` starts each `qwen --acp` process without an
+`createSpawnChannelFactory()` starts each `mariadb-shell-agent --acp` process without an
 isolated process group. `ProcessRegistry` then sends `SIGTERM` and `SIGKILL`
 only to that direct child. When the ACP process has started hooks, shell
 commands, MCP servers, or other grandchildren, terminating the channel can
@@ -95,7 +95,7 @@ lifecycle ownership do not change.
 
 Isolation does change terminal-signal inheritance: a POSIX signal sent to the
 host's foreground process group no longer reaches the ACP child automatically.
-`qwen serve` therefore routes `SIGHUP`, as well as `SIGINT` and `SIGTERM`,
+`mariadb-shell-agent serve` therefore routes `SIGHUP`, as well as `SIGINT` and `SIGTERM`,
 through the existing graceful and second-signal shutdown state machine.
 Embedders remain responsible for calling `AcpChannel.kill()` or `killSync()`
 from their own host lifecycle. An untrappable host crash such as `SIGKILL`
@@ -303,7 +303,7 @@ production change is required.
 - Windows uses the absolute System32 path, exact `/F /T /PID` flags, and a
   direct-child fallback on launch or exit failure.
 - Multiple children are all attempted and failures remain aggregated.
-- `qwen serve` routes `SIGHUP` through graceful cleanup, keeps the listener for
+- `mariadb-shell-agent serve` routes `SIGHUP` through graceful cleanup, keeps the listener for
   second-signal escalation during drain, and removes it after shutdown.
 
 ### Real-process tests

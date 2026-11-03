@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -246,7 +247,7 @@ export function registerWorkspaceAuthRoutes(
       // due to caller-clientId mismatch.
       if (!callerIsDeviceFlowInitiator(view, clientId) && isServeDebugMode()) {
         writeStderrLine(
-          `qwen serve debug: GET /workspace/auth/device-flow/${id} redacted verification fields — caller-clientId mismatch (initiator=${view.initiatorClientId ?? 'anonymous'}, caller=${clientId ?? 'anonymous'})`,
+          `mariadb-shell-agent serve debug: GET /workspace/auth/device-flow/${id} redacted verification fields — caller-clientId mismatch (initiator=${view.initiatorClientId ?? 'anonymous'}, caller=${clientId ?? 'anonymous'})`,
         );
       }
       res.status(200).json(toDeviceFlowStateBody(view, clientId));
@@ -398,7 +399,7 @@ export function registerWorkspaceAuthRoutes(
           } catch (syncError) {
             if (sendGenerationClosedError(res, syncError)) return;
             writeStderrLine(
-              'qwen serve: POST /workspace/auth/provider runtime sync failed after persistence',
+              'mariadb-shell-agent serve: POST /workspace/auth/provider runtime sync failed after persistence',
             );
             runtimeSync = { status: 'failed' };
           }

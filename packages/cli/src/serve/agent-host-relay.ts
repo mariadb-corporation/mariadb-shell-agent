@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +9,7 @@
  * @fileoverview `session_send` relay on a Host daemon (session-multi-agent design §9.3).
  *
  * A Claude / Codex turn running on a Host gets a stdio MCP server
- * (`qwen agents session-send-mcp --url <relay>`) that posts the agent's
+ * (`mariadb-shell-agent agents session-send-mcp --url <relay>`) that posts the agent's
  * outbound message here, over loopback. The handler pushes it into that run's
  * event stream as a `session_send` event, which the Host forwards to the
  * coordinator with the rest of the run's events.

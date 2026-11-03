@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -652,7 +653,7 @@ export function withSessionMessageConsumption(
         await session.messages.markConsumed(turn.turnId);
       } catch (cause) {
         writeStderr(
-          'qwen serve: Hosted session message consumption faltered (receipt stays accepted): ' +
+          'mariadb-shell-agent serve: Hosted session message consumption faltered (receipt stays accepted): ' +
             String(cause),
         );
       }

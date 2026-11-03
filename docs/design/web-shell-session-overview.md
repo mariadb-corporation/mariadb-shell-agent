@@ -58,7 +58,7 @@ status priority, full details, keyboard entry and Escape dismissal, ID copy,
 portal event propagation, and existing cross-workspace mutation restrictions.
 Run focused unit tests, the build/typecheck/bundle workflow, and independent
 browser or test-script verification. Record baseline and post-change evidence
-under `.qwen/e2e-tests/`.
+under `.mariadb-shell-agent/e2e-tests/`.
 
 ## Open questions
 

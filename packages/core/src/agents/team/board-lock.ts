@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,7 +29,7 @@ import { createDebugLogger } from '../../utils/debugLogger.js';
 
 const debug = createDebugLogger('BOARD_LOCK');
 
-/** Root for all boards: `~/.qwen/boards/`. */
+/** Root for all boards: `~/.mariadb-shell-agent/boards/`. */
 export const BOARDS_DIR = 'boards';
 
 export function getBoardsRootDir(): string {
@@ -46,12 +47,12 @@ function boardDirName(board: string): string {
   return board.toLowerCase();
 }
 
-/** `~/.qwen/boards/{board}/` */
+/** `~/.mariadb-shell-agent/boards/{board}/` */
 export function getBoardDir(board: string): string {
   return path.join(getBoardsRootDir(), boardDirName(board));
 }
 
-/** `~/.qwen/boards/{board}/{collection}/` */
+/** `~/.mariadb-shell-agent/boards/{board}/{collection}/` */
 export function getCollectionDir(board: string, collection: string): string {
   return path.join(getBoardDir(board), collection);
 }

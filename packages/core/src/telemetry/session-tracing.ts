@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1741,7 +1742,7 @@ export interface SubagentSpanMetadata {
  * Emits OTel GenAI agent name, description, and conversation attributes
  * alongside vendor `qwen-code.subagent.*` keys.
  * The GenAI spec is in Development status; vendor lifecycle and invocation
- * identity attributes remain available for existing Qwen Code queries.
+ * identity attributes remain available for existing MariaDB Shell Agent queries.
  */
 export function startSubagentSpan(opts: StartSubagentSpanOptions): Span {
   if (!isTelemetrySdkInitialized()) return NOOP_SPAN;

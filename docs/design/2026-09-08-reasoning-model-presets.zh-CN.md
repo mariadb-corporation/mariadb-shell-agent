@@ -78,7 +78,7 @@ payload；ACP 测试验证精确选项和默认值。测试包含关闭、副请
 - [Kimi K2.7 Code](https://platform.kimi.ai/docs/guide/kimi-k2-7-code-quickstart)：thinking 默认开启且不允许关闭。
 - [Kimi K2.6](https://platform.kimi.ai/docs/guide/kimi-k2-6-quickstart)：thinking.type 开关。
 - [DeepSeek Thinking Mode](https://api-docs.deepseek.com/guides/thinking_mode/) 与 [模型入口](https://api-docs.deepseek.com/)：原生稳定 ID 的版本、三档和关闭形状。
-- [Alibaba Chat 参数](https://help.aliyun.com/zh/model-studio/qwen-api-via-openai-chat-completions)：各系列档位、默认值、enable_thinking 与 Qwen 3.8 互斥字段。
-- [Alibaba DeepSeek](https://help.aliyun.com/zh/model-studio/deepseek-api)：稳定版与快照的档位差异。
-- [Alibaba Kimi](https://help.aliyun.com/zh/model-studio/kimi-api)：模型及路由；不加入仅支持 max 的 kimi/kimi-k3。
-- [Token Plan 模型列表](https://help.aliyun.com/zh/model-studio/token-plan-personal-overview)：新增 Flash、Pro 快照和 Preview 别名。
+- [Alibaba Chat 参数](https://help.aliyun.invalid/zh/model-studio/qwen-api-via-openai-chat-completions)：各系列档位、默认值、enable_thinking 与 Qwen 3.8 互斥字段。
+- [Alibaba DeepSeek](https://help.aliyun.invalid/zh/model-studio/deepseek-api)：稳定版与快照的档位差异。
+- [Alibaba Kimi](https://help.aliyun.invalid/zh/model-studio/kimi-api)：模型及路由；不加入仅支持 max 的 kimi/kimi-k3。
+- [Token Plan 模型列表](https://help.aliyun.invalid/zh/model-studio/token-plan-personal-overview)：新增 Flash、Pro 快照和 Preview 别名。

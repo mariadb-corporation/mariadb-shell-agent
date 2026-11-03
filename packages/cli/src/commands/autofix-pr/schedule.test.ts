@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -70,7 +71,7 @@ describe('runSchedule', () => {
     savedCwd = process.cwd();
     savedSession = process.env['QWEN_CODE_SESSION_ID'];
     process.env['QWEN_CODE_SESSION_ID'] = 'session-a';
-    // The suite runs under `qwen serve` too: a terminal session is the case
+    // The suite runs under `mariadb-shell-agent serve` too: a terminal session is the case
     // without the marker, so no ambient value may speak for it.
     savedServe = process.env['QWEN_CODE_SERVE'];
     delete process.env['QWEN_CODE_SERVE'];
@@ -208,7 +209,9 @@ describe('runSchedule', () => {
     }
     write({ sessionId: '' });
     process.env['QWEN_CODE_SESSION_ID'] = '';
-    expect(() => runSchedule({ pr: 7 })).toThrow(/outside a Qwen Code session/);
+    expect(() => runSchedule({ pr: 7 })).toThrow(
+      /outside a MariaDB Shell Agent session/,
+    );
     expect(state().watch).toBeUndefined();
   });
 

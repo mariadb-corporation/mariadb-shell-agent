@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,7 +28,7 @@ import {
  *
  * Pattern mirrors `packages/core/src/utils/jsonl-utils.ts:36-46`. The
  * Map grows by one entry per unique resolved path; production has at
- * most two (workspace QWEN.md + global QWEN.md), so no cleanup is
+ * most two (workspace MARIADB-SHELL-AGENT.md + global MARIADB-SHELL-AGENT.md), so no cleanup is
  * required. Tests use tmpdirs and clean up with `afterEach` — the Map
  * keeps inert entries between tests but each entry is a single Mutex
  * that acquires no resources when idle.
@@ -114,7 +115,7 @@ export interface WriteContextFileResult {
    * `true` when the call actually mutated the file on disk; `false`
    * when the helper short-circuited because the requested write would
    * have been a no-op (e.g. `mode: 'append'` with whitespace-only
-   * content). Callers like the `qwen serve` POST route use this to
+   * content). Callers like the `mariadb-shell-agent serve` POST route use this to
    * suppress spurious `memory_changed` events that would otherwise
    * fan out for a write that didn't change anything.
    */
@@ -122,8 +123,8 @@ export interface WriteContextFileResult {
 }
 
 /**
- * Append/replace `QWEN.md` for the workspace or the user's global
- * `~/.qwen/` directory. Used by the `qwen serve` daemon's
+ * Append/replace `MARIADB-SHELL-AGENT.md` for the workspace or the user's global
+ * `~/.mariadb-shell-agent/` directory. Used by the `mariadb-shell-agent serve` daemon's
  * `POST /workspace/memory` route (issue #4175 PR 16) and any other
  * caller that needs to mutate hierarchical memory through code.
  *
@@ -236,7 +237,7 @@ function resolveContextFilePath(
   // file GET surfaces. With the prior `DEFAULT_CONTEXT_FILENAME` hard-
   // code, a deployment that switched the context filename to
   // `AGENTS.md` would have GET listing the new file while POST kept
-  // appending to a stale `QWEN.md` — clients then observed "I just
+  // appending to a stale `MARIADB-SHELL-AGENT.md` — clients then observed "I just
   // wrote content but it's missing from /workspace/memory". Mirrors the
   // discovery path's `getAllMemoryFilenames()` usage in
   // `workspace-memory.ts:collectWorkspaceMemoryStatus`.
@@ -251,11 +252,11 @@ function resolveContextFilePath(
  * Cap on the existing-file size we'll read into memory before
  * appending. The POST route caps NEW content at 1 MB but a malicious
  * or accidental client could grow the file to arbitrary size over
- * time (workspace QWEN.md is operator-controlled but the global
- * `~/.qwen/QWEN.md` may have been edited externally). 16 MB sits
+ * time (workspace MARIADB-SHELL-AGENT.md is operator-controlled but the global
+ * `~/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md` may have been edited externally). 16 MB sits
  * three orders of magnitude above any realistic user-authored
  * memory file while still bounding the daemon's transient memory
- * cost per append. Hitting this cap means QWEN.md has grown past
+ * cost per append. Hitting this cap means MARIADB-SHELL-AGENT.md has grown past
  * any reasonable size and the operator should clean it up — we
  * 500 the route with a structured error rather than try to
  * stream-process a corrupted file.
@@ -286,7 +287,7 @@ async function composeAppendedContent(
   let existing = '';
   try {
     // `stat` first so we can refuse pathological files BEFORE pulling
-    // them into memory. Without this check a 200 MB QWEN.md would
+    // them into memory. Without this check a 200 MB MARIADB-SHELL-AGENT.md would
     // load fully into the daemon's heap on every append, even though
     // the route's 1 MB new-content cap caught the request body.
     const stat = await fs.stat(filePath);
@@ -324,7 +325,7 @@ async function composeAppendedContent(
   //
   // The naive `indexOf('\n## ')` scan, however, can match `## ` lines
   // INSIDE fenced code blocks (` ``` `) — common in user-authored
-  // QWEN.md memory entries that quote API documentation containing
+  // MARIADB-SHELL-AGENT.md memory entries that quote API documentation containing
   // markdown headings. Track fence state while scanning and only
   // accept matches outside fences. If no real heading is found
   // (memory section is the last block), keep the previous behavior

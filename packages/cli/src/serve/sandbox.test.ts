@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -248,7 +249,7 @@ describe('start_sandbox', () => {
     execSyncMock.mockReturnValue(Buffer.from(''));
 
     const digestImage =
-      'ghcr.io/qwenlm/qwen-code@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+      'ghcr.invalid/qwenlm/qwen-code@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
 
     const imageCheck = Object.assign(new EventEmitter(), {
       stdout: new EventEmitter(),
@@ -462,7 +463,7 @@ describe('isContainerPathWithinWorkdir', () => {
 
 describe('parseSandboxImageName', () => {
   it('uses the image basename and tag for container names', () => {
-    expect(parseSandboxImageName('ghcr.io/qwenlm/qwen-code:0.18.3')).toBe(
+    expect(parseSandboxImageName('ghcr.invalid/qwenlm/qwen-code:0.18.3')).toBe(
       'qwen-code-0.18.3',
     );
   });

@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 /** @jsxImportSource @opentui/react */
@@ -1232,7 +1233,7 @@ export function OpenTuiInputPrompt(props: InputPromptProps) {
           t(
             process.platform === 'linux'
               ? 'Clipboard image paste is unavailable: no supported clipboard tool was reached. On Linux, install `wl-clipboard` (Wayland) or `xclip` (X11), or set DISPLAY/WAYLAND_DISPLAY if running headless.'
-              : 'Clipboard image paste is unavailable because the native clipboard module could not be loaded. Reinstall Qwen Code or use the npm installation method.',
+              : 'Clipboard image paste is unavailable because the native clipboard module could not be loaded. Reinstall MariaDB Shell Agent or use the npm installation method.',
           ),
         );
       };

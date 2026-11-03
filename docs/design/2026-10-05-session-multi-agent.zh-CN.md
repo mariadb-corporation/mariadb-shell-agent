@@ -13,7 +13,7 @@
 **本 PR 包括：**
 
 - 在普通会话里 @ Agent。
-- 本机和远端的 Agent，程序可以是 Qwen Code、Claude Code 或 Codex。
+- 本机和远端的 Agent，程序可以是 MariaDB Shell Agent、Claude Code 或 Codex。
 - Agent 之间互相 @。
 - 会话内审批。
 - 不重启加入协调端。
@@ -28,13 +28,13 @@
 ## 0. 目标
 
 - 在普通会话里 @ Agent，它就在这个会话里流式回答；不建 thread，也不跳页面。
-- 每个 Agent 是独立进程，跑在本机或远端；程序可以是 Qwen Code、Claude Code 或 Codex。
+- 每个 Agent 是独立进程，跑在本机或远端；程序可以是 MariaDB Shell Agent、Claude Code 或 Codex。
 - Agent 之间能在会话里互相 @，文字和工具（`session_send`）两种方式都支持。
 - 远端 Agent 的能力和本机一致：
   - 流式输出；
   - 工具审批；
   - 同样的状态：排队、进行中、等审批、超时、离线、失败。
-- 已经在跑的 `qwen serve` 不用重启、不用多起进程，就能作为 runtime 加入另一个实例。
+- 已经在跑的 `mariadb-shell-agent serve` 不用重启、不用多起进程，就能作为 runtime 加入另一个实例。
 - 同一会话里多次 @ 同一个 Agent，会续接它的原生会话；不同会话之间互相独立。
 
 ## 1. 背景
@@ -56,7 +56,7 @@
 ### 3.1 分层
 
 ```
-WebShell ──HTTP/SSE──▶ 协调端 qwen serve ◀──主动外连 HTTP── 远端 qwen serve（runtime / Host）
+WebShell ──HTTP/SSE──▶ 协调端 mariadb-shell-agent serve ◀──主动外连 HTTP── 远端 mariadb-shell-agent serve（runtime / Host）
                          │ 编排器（按 会话×Agent）               │
                          │ 会话事件流、审批                      │
                      本机适配器                               本机适配器
@@ -113,10 +113,10 @@ Agent 发起的权限请求，会在会话里那条 Agent 消息上显示为审�
 
 ### 3.5 加入
 
-| 场景         | 方式                                                                                                        |
-| ------------ | ----------------------------------------------------------------------------------------------------------- |
-| 远端已经在跑 | 在远端的 WebShell 点"加入协调端"，或运行 `qwen agents join <链接>`。两者都调用远端自己的 `/hosts/connect`。 |
-| 远端还没跑   | 运行 `qwen serve --join <链接>`。                                                                           |
+| 场景         | 方式                                                                                                                       |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| 远端已经在跑 | 在远端的 WebShell 点"加入协调端"，或运行 `mariadb-shell-agent agents join <链接>`。两者都调用远端自己的 `/hosts/connect`。 |
+| 远端还没跑   | 运行 `mariadb-shell-agent serve --join <链接>`。                                                                           |
 
 - runtime 相关的路由不依赖启动时的协作开关，只要求鉴权（§8-5）。
 - 建立的连接会持久化，重启后自动重连。

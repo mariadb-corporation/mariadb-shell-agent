@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 import { createServer, type Server, type Socket } from 'node:net';
@@ -445,7 +446,7 @@ it('names Windows as unsupported instead of advising an extension install', () =
     // The reason and the next step are the whole point of this branch, and
     // both platforms share this tail verbatim.
     expect(message).toContain(
-      'because its Native Messaging host is only registered on macOS and Linux. Run Qwen Code on macOS or Linux to use Browser Use.',
+      'because its Native Messaging host is only registered on macOS and Linux. Run MariaDB Shell Agent on macOS or Linux to use Browser Use.',
     );
     // The real diagnostic stays visible on this branch too.
     expect(message).toContain('Chrome extension disconnected');

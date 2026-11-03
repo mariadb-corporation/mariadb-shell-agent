@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 // @vitest-environment jsdom
@@ -123,7 +124,7 @@ describe('useWelcomeBack', () => {
 
     await waitFor(() => {
       expect(buffer.setText).toHaveBeenCalledWith(
-        "@.qwen/PROJECT_SUMMARY.md, Based on our previous conversation,Let's continue?",
+        "@.mariadb-shell-agent/PROJECT_SUMMARY.md, Based on our previous conversation,Let's continue?",
       );
     });
 

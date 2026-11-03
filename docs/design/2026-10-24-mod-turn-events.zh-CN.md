@@ -12,7 +12,7 @@
 - Mod 从 `turn.complete` 返回 `{ text }`，在答案下方显示一行文字，例如摘要。
 - 守卫类 Mod 的某个 hook 判断回合必须停止时，用 `$.turn.abort` 结束正在进行的回合。
 
-Qwen Code 在加载时跳过这些 hook，并提示 `Hooks for unsupported events will not run: turn.complete, turn.start`。`$.turn.abort` 会抛出 `Mod API not supported`。
+MariaDB Shell Agent 在加载时跳过这些 hook，并提示 `Hooks for unsupported events will not run: turn.complete, turn.start`。`$.turn.abort` 会抛出 `Mod API not supported`。
 
 ## 目标与非目标
 

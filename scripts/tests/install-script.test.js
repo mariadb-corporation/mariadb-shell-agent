@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -85,7 +86,7 @@ describe('installation scripts', () => {
     expect(script).toContain('Node.js 22 or newer is required');
     expect(script).toContain('npm_package_spec()');
     expect(script).toContain('@qwen-code/qwen-code@latest');
-    expect(script).toContain('Installing Qwen Code version:');
+    expect(script).toContain('Installing MariaDB Shell Agent version:');
     expect(script).toContain('print_logo');
     expect(script).toContain('supports_truecolor()');
     expect(script).toContain('COLORTERM');
@@ -143,7 +144,7 @@ describe('installation scripts', () => {
     expect(script).toContain(
       'Archive contains symlinks or hardlinks; refusing to install',
     );
-    expect(script).toContain('not a Qwen Code standalone install');
+    expect(script).toContain('not a MariaDB Shell Agent standalone install');
     expect(script).toContain(
       'Return 2 only when a standalone archive is unavailable',
     );
@@ -193,8 +194,8 @@ describe('installation scripts', () => {
     expect(script).toContain('set -gx PATH ${quoted_install_bin_dir} \\$PATH');
     expect(script).toContain('export PATH=${quoted_install_bin_dir}:\\$PATH');
     expect(script).toContain('Unsupported shell for automatic PATH update');
-    expect(script).toContain('# Qwen Code PATH block begin');
-    expect(script).toContain('# Qwen Code PATH block end');
+    expect(script).toContain('# MariaDB Shell Agent PATH block begin');
+    expect(script).toContain('# MariaDB Shell Agent PATH block end');
     expect(script).toContain('probe_url_available()');
     expect(script).toContain('/latest/VERSION');
     expect(script).toContain('resolve_aliyun_version_path()');
@@ -246,10 +247,10 @@ describe('installation scripts', () => {
     expect(script).toContain('Please install Node.js');
     expect(script).toContain(':NpmPackageSpec');
     expect(script).toContain('@qwen-code/qwen-code@latest');
-    expect(script).toContain('Installing Qwen Code version:');
+    expect(script).toContain('Installing MariaDB Shell Agent version:');
     expect(script).toContain('QWEN CODE');
     expect(script).toContain(
-      'Qwen Code !INSTALLED_VERSION! installed successfully, to start:',
+      'MariaDB Shell Agent !INSTALLED_VERSION! installed successfully, to start:',
     );
     expect(script).toContain('cd ^<project^>');
     expect(script).toContain('uninstall-qwen-standalone.ps1');
@@ -1402,7 +1403,9 @@ describe('standalone release packaging', () => {
     expect(installPowerShellSource).toContain('Save-CurrentCmdPathShim');
     expect(installPowerShellSource).toContain('current-cmd-shim.txt');
     expect(installPowerShellSource).toContain('Test-WritableDirectory');
-    expect(installPowerShellSource).toContain('Qwen Code current-session shim');
+    expect(installPowerShellSource).toContain(
+      'MariaDB Shell Agent current-session shim',
+    );
     expect(installPowerShellSource).toContain(
       'TEMP environment variable is not set',
     );
@@ -3434,8 +3437,8 @@ describe('standalone release packaging', () => {
   it('does not whitelist internal planning documents in gitignore', () => {
     const gitignore = readScript('.gitignore');
 
-    expect(gitignore).not.toContain('!.qwen/design/');
-    expect(gitignore).not.toContain('!.qwen/e2e-tests/');
+    expect(gitignore).not.toContain('!.mariadb-shell-agent/design/');
+    expect(gitignore).not.toContain('!.mariadb-shell-agent/e2e-tests/');
   });
 
   it('documents optional native module parity for standalone installs', () => {
@@ -3498,7 +3501,7 @@ describe('standalone release packaging', () => {
     );
     expect(uninstallPowerShellSource).toContain('current-cmd-shim.txt');
     expect(uninstallPowerShellSource).toContain(
-      'Qwen Code current-session shim',
+      'MariaDB Shell Agent current-session shim',
     );
     expect(uninstallPowerShellSource).toContain('QWEN_UNINSTALL_PURGE');
     expect(uninstallPowerShellSource).toContain('Preserving');
@@ -3692,9 +3695,9 @@ describe('Linux/macOS installer end-to-end', () => {
             path.join(installRoot, 'lib', 'qwen-code', 'node', 'bin', 'node'),
           ),
         ).toBe(true);
-        expect(readScript(path.join(home, '.qwen', 'source.json'))).toContain(
-          '"source": "smoke"',
-        );
+        expect(
+          readScript(path.join(home, '.mariadb-shell-agent', 'source.json')),
+        ).toContain('"source": "smoke"');
 
         const version = execFileSync(path.join(installRoot, 'bin', 'qwen'), [
           '--version',
@@ -3702,11 +3705,13 @@ describe('Linux/macOS installer end-to-end', () => {
           .toString()
           .trim();
         expect(version).toBe('0.0.0-smoke');
-        expect(output).toContain('Installing Qwen Code version: latest');
+        expect(output).toContain(
+          'Installing MariaDB Shell Agent version: latest',
+        );
         expect(output).toContain('installed successfully, to start:');
         expect(output).toContain('0.0.0-smoke');
         expect(output).toContain('cd <project>');
-        expect(output).toContain('github.com/QwenLM/qwen-code');
+        expect(output).toContain('github.invalid/QwenLM/qwen-code');
         expect(output).not.toContain('rm -rf');
       } finally {
         rmSync(tmpDir, { recursive: true, force: true });
@@ -3961,13 +3966,13 @@ describe('Linux/macOS installer end-to-end', () => {
         rcFile,
         [
           'before',
-          '# Qwen Code PATH block begin',
+          '# MariaDB Shell Agent PATH block begin',
           `export PATH='${installRoot}/bin':$PATH`,
-          '# Qwen Code PATH block end',
+          '# MariaDB Shell Agent PATH block end',
           'after',
         ].join('\n') + '\n',
       );
-      const qwenDir = path.join(home, '.qwen');
+      const qwenDir = path.join(home, '.mariadb-shell-agent');
       const sourceJson = path.join(qwenDir, 'source.json');
       const settingsJson = path.join(qwenDir, 'settings.json');
       writeFileSync(settingsJson, '{"theme":"dark"}\n');
@@ -4067,7 +4072,7 @@ describe('Linux/macOS installer end-to-end', () => {
         );
         expect(output).toContain(existingQwen);
         expect(output).toContain('source ~/.bashrc');
-        expect(bashrc).toContain('# Qwen Code PATH block begin');
+        expect(bashrc).toContain('# MariaDB Shell Agent PATH block begin');
         expect(bashrc).toContain(
           `export PATH='${path.join(installRoot, 'bin')}':$PATH`,
         );
@@ -4153,7 +4158,7 @@ describe('Linux/macOS installer end-to-end', () => {
         ).toString();
 
         expect(readFileSync(bashProfile, 'utf8')).toContain(
-          '# Qwen Code PATH block begin',
+          '# MariaDB Shell Agent PATH block begin',
         );
         // An ANSI reset sits between "in" and the rc name, so match the
         // success message and the reload hint on the rc name alone.
@@ -4200,13 +4205,15 @@ describe('Linux/macOS installer end-to-end', () => {
         });
 
         const bashrcContents = readScript(bashrc);
-        expect(bashrcContents).toContain('# Qwen Code PATH block begin');
+        expect(bashrcContents).toContain(
+          '# MariaDB Shell Agent PATH block begin',
+        );
         expect(
           bashrcContents.endsWith(
             [
-              '# Qwen Code PATH block begin',
+              '# MariaDB Shell Agent PATH block begin',
               `export PATH='${installBinDir}':$PATH`,
-              '# Qwen Code PATH block end',
+              '# MariaDB Shell Agent PATH block end',
               '',
             ].join('\n'),
           ),
@@ -4251,10 +4258,10 @@ describe('Linux/macOS installer end-to-end', () => {
           rcFile,
           [
             'before',
-            '# Qwen Code PATH block begin',
+            '# MariaDB Shell Agent PATH block begin',
             '# inserted by another tool',
             `export PATH='${installRoot}/bin':$PATH`,
-            '# Qwen Code PATH block end',
+            '# MariaDB Shell Agent PATH block end',
             'after',
           ].join('\n') + '\n',
         );
@@ -4286,7 +4293,7 @@ describe('Linux/macOS installer end-to-end', () => {
           rcFile,
           [
             'before',
-            '# Qwen Code PATH block begin',
+            '# MariaDB Shell Agent PATH block begin',
             `export PATH='${installRoot}/bin':$PATH`,
             'user content that must stay',
             'after',
@@ -4298,7 +4305,7 @@ describe('Linux/macOS installer end-to-end', () => {
         expect(readScript(rcFile)).toBe(
           [
             'before',
-            '# Qwen Code PATH block begin',
+            '# MariaDB Shell Agent PATH block begin',
             `export PATH='${installRoot}/bin':$PATH`,
             'user content that must stay',
             'after',
@@ -4698,7 +4705,7 @@ describe('Linux/macOS installer end-to-end', () => {
         path.join(tmpDir, 'home'),
       ).toString();
 
-      expect(output).toContain('not a Qwen Code standalone install');
+      expect(output).toContain('not a MariaDB Shell Agent standalone install');
       expect(output).toContain('Backing up to');
 
       // Original directory should be backed up, not destroyed
@@ -4986,9 +4993,9 @@ describe('Windows installer end-to-end', () => {
         expect(
           existsSync(path.join(installRoot, 'qwen-code', 'node', 'node.exe')),
         ).toBe(true);
-        expect(readScript(path.join(home, '.qwen', 'source.json'))).toContain(
-          '"source": "smoke"',
-        );
+        expect(
+          readScript(path.join(home, '.mariadb-shell-agent', 'source.json')),
+        ).toContain('"source": "smoke"');
 
         const version = runWindowsCommand(
           `call "${path.join(installRoot, 'bin', 'qwen.cmd')}" --version`,
@@ -5367,7 +5374,7 @@ describe('Windows PowerShell uninstaller end-to-end', () => {
       const installDir = path.join(installRoot, 'qwen-code');
       const installBinDir = path.join(installRoot, 'bin');
       const home = path.join(tmpDir, 'home');
-      const qwenConfigDir = path.join(home, '.qwen');
+      const qwenConfigDir = path.join(home, '.mariadb-shell-agent');
       const sourceMarker = path.join(qwenConfigDir, 'source.json');
       const settingsFile = path.join(qwenConfigDir, 'settings.json');
 
@@ -6136,7 +6143,7 @@ function expectNoStandaloneInstallSideEffects(installRoot, home) {
     `${wrapper}.new`,
     path.join(installDir, 'bin', 'qwen.cmd'),
     path.join(installDir, 'node', 'node.exe'),
-    path.join(home, '.qwen', 'source.json'),
+    path.join(home, '.mariadb-shell-agent', 'source.json'),
   ];
   for (const unexpectedPath of unexpectedPaths) {
     expect(existsSync(unexpectedPath), unexpectedPath).toBe(false);

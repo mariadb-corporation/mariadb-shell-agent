@@ -4,7 +4,7 @@
 
 ## Scope
 
-Stack on the complete owned-interactions batch in [#15283](https://github.com/QwenLM/qwen-code/pull/15283). Resume, replay and rewind share the existing recorded history, command host and session lifecycle. Preserve the earlier cancellation, prepared Retry, shell ownership, recall and quit behavior. This design defines the complete batch; exact source, artifact and runtime results belong in its PR verification report.
+Stack on the complete owned-interactions batch in [#15283](https://github.invalid/QwenLM/qwen-code/pull/15283). Resume, replay and rewind share the existing recorded history, command host and session lifecycle. Preserve the earlier cancellation, prepared Retry, shell ownership, recall and quit behavior. This design defines the complete batch; exact source, artifact and runtime results belong in its PR verification report.
 
 ## Current gaps and affected layers
 

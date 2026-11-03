@@ -106,7 +106,7 @@ import {
 
 const sample: WorktreeSession = {
   slug: 'my-feature',
-  worktreePath: '/repo/.qwen/worktrees/my-feature',
+  worktreePath: '/repo/.mariadb-shell-agent/worktrees/my-feature',
   worktreeBranch: 'worktree-my-feature',
   originalCwd: '/repo',
   originalBranch: 'main',
@@ -481,7 +481,7 @@ async function seedSession(cfg: Config, slug: string) {
     cfg.getSessionService().getWorktreeSessionPath(cfg.getSessionId()),
     {
       slug,
-      worktreePath: `/repo/.qwen/worktrees/${slug}`,
+      worktreePath: `/repo/.mariadb-shell-agent/worktrees/${slug}`,
       worktreeBranch: `worktree-${slug}`,
       originalCwd: '/repo',
       originalBranch: 'main',
@@ -933,7 +933,7 @@ describe('WorktreeExitDialog', () => {
       <WorktreeExitDialog
         slug="my-feature"
         branch="worktree-my-feature"
-        worktreePath="/tmp/repo/.qwen/worktrees/my-feature"
+        worktreePath="/tmp/repo/.mariadb-shell-agent/worktrees/my-feature"
         originalHeadCommit="abc1234"
         onKeep={vi.fn()}
         onRemove={vi.fn()}

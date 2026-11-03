@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -80,7 +81,7 @@ import { FixedDeque } from 'mnemonist';
 import { AuthType } from '../../core/contentGenerator.js';
 
 // Usage statistics collection endpoint
-const USAGE_STATS_HOSTNAME = 'gb4w8c3ygj-default-sea.rum.aliyuncs.com';
+const USAGE_STATS_HOSTNAME = 'usage-statistics.invalid';
 const USAGE_STATS_PATH = '/';
 
 /**
@@ -89,7 +90,7 @@ const USAGE_STATS_PATH = '/';
  */
 const USAGE_STATS_PORT = 443;
 
-const RUN_APP_ID = 'gb4w8c3ygj@851d5d500f08f92';
+const RUN_APP_ID = '';
 
 /**
  * Whether `NO_PROXY` / `no_proxy` excludes a host from proxying, mirroring
@@ -374,9 +375,13 @@ export class QwenLogger {
       const globalDir = Storage.getGlobalQwenDir();
       const sourceJsonPath = path.join(globalDir, 'source.json');
 
-      // Also check legacy ~/.qwen/source.json when QWEN_HOME is set,
-      // since the installer writes to ~/.qwen/ regardless of the env var.
-      const legacyPath = path.join(os.homedir(), '.qwen', 'source.json');
+      // Also check legacy ~/.mariadb-shell-agent/source.json when QWEN_HOME is set,
+      // since the installer writes to ~/.mariadb-shell-agent/ regardless of the env var.
+      const legacyPath = path.join(
+        os.homedir(),
+        '.mariadb-shell-agent',
+        'source.json',
+      );
       const candidates =
         path.normalize(sourceJsonPath) !== path.normalize(legacyPath)
           ? [sourceJsonPath, legacyPath]

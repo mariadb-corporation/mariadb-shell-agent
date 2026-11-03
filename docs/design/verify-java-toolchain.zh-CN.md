@@ -129,7 +129,7 @@ Chromium 代码块之后向 `QWEN_ENV` 追加。后面的 `PATH` 生效，因为
 - `MAVEN_ARGS=-Dmaven.repo.local=$RUNNER_TEMP/verify-maven-repo`
 - `QWEN_VERIFY_JAVA=1`
 
-`.qwen/skills/verify-pr/SKILL.md` 告诉代理不要自己下载 JDK 或 Maven，如何读
+`.mariadb-shell-agent/skills/verify-pr/SKILL.md` 告诉代理不要自己下载 JDK 或 Maven，如何读
 `java-prepare.log`，A/B 的 base 一侧如何重装同级模块（仓库里只有一份非
 SNAPSHOT），以及把依赖数据库的集成测试写进 _Not covered_。Java diff 存在但没有
 `QWEN_VERIFY_JAVA`，表示工具链安装失败。

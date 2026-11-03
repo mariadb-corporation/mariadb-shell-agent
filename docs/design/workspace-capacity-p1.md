@@ -2,12 +2,12 @@
 
 [English](workspace-capacity-p1.md) | [简体中文](workspace-capacity-p1.zh-CN.md)
 
-Status: implemented locally, 2026-09-09; validation results are tracked in `.qwen/e2e-tests/workspace-capacity-p1.md`. Implementation baseline: `d8c505bf423d6adf68c77a603202cd7b0578be56`.
+Status: implemented locally, 2026-09-09; validation results are tracked in `.mariadb-shell-agent/e2e-tests/workspace-capacity-p1.md`. Implementation baseline: `d8c505bf423d6adf68c77a603202cd7b0578be56`.
 Source baseline: `dd4cd4a08bf416f88d9e357045f6ff45aa557d2e`, the main commit
-merging [#11428](https://github.com/QwenLM/qwen-code/pull/11428).
-Tracks [#11386](https://github.com/QwenLM/qwen-code/issues/11386) and the
-configuration requests [#9304](https://github.com/QwenLM/qwen-code/issues/9304)
-and [#9316](https://github.com/QwenLM/qwen-code/issues/9316).
+merging [#11428](https://github.invalid/QwenLM/qwen-code/pull/11428).
+Tracks [#11386](https://github.invalid/QwenLM/qwen-code/issues/11386) and the
+configuration requests [#9304](https://github.invalid/QwenLM/qwen-code/issues/9304)
+and [#9316](https://github.invalid/QwenLM/qwen-code/issues/9316).
 
 ## 1. Recommendation and scope
 
@@ -315,7 +315,7 @@ session admission mechanics should need no new algorithm.
 ## 9. Validation and unresolved deployment evidence
 
 The executable plan and global dry-run results are recorded separately in
-`.qwen/e2e-tests/workspace-capacity-p1.md`. This task's dry-run demonstrates
+`.mariadb-shell-agent/e2e-tests/workspace-capacity-p1.md`. This task's dry-run demonstrates
 pre-implementation gaps. It does not validate proposed behavior or make the
 historical measurements current production benchmarks. On 2026-09-09, five
 isolated runs against global effective CLI 0.23.0 confirmed that the proposed
@@ -351,5 +351,5 @@ thresholds and whether measured runtime costs justify LRU. The P1 contract
 selects one environment variable, default and maximum 256, a total-session
 default of 800 at registration capacities above 25, explicit startup overflow
 failure, bounded channel ownership and a documented downgrade. The default
-change is verified separately in `.qwen/e2e-tests/workspace-capacity-default256.md`;
+change is verified separately in `.mariadb-shell-agent/e2e-tests/workspace-capacity-default256.md`;
 earlier default-25 results remain historical evidence.

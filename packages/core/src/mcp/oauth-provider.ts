@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -317,7 +318,7 @@ export class MCPOAuthProvider {
             <html>
               <body>
                 <h1>Authentication Successful!</h1>
-                <p>You can close this window and return to Qwen Code.</p>
+                <p>You can close this window and return to MariaDB Shell Agent.</p>
                 <script>window.close();</script>
               </body>
             </html>

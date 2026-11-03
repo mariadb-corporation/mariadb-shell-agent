@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -54,7 +55,8 @@ vi.mock('./lib/worktree.js', async (importOriginal) => ({
 // one value the fixtures choose.
 vi.mock('./lib/paths.js', async (importOriginal) => ({
   ...(await importOriginal<typeof import('./lib/paths.js')>()),
-  worktreePath: (n: string | number) => `/repo/.qwen/tmp/review-pr-${n}`,
+  worktreePath: (n: string | number) =>
+    `/repo/.mariadb-shell-agent/tmp/review-pr-${n}`,
 }));
 
 vi.mock('node:fs', async (importOriginal) => {
@@ -85,7 +87,7 @@ async function run(ownerRepo = 'o/r') {
     $0: 'qwen',
     pr_number: '7632',
     owner_repo: ownerRepo,
-    out: '/repo/.qwen/tmp/qwen-review-pr-7632-comment-status.json',
+    out: '/repo/.mariadb-shell-agent/tmp/qwen-review-pr-7632-comment-status.json',
   } as unknown as Parameters<typeof handler>[0]);
 }
 
@@ -166,7 +168,7 @@ describe('comment-status handler', () => {
       $0: 'qwen',
       pr_number: '7632',
       owner_repo: 'o/r',
-      out: '/repo/.qwen/tmp/qwen-review-pr-7632-comment-status.json',
+      out: '/repo/.mariadb-shell-agent/tmp/qwen-review-pr-7632-comment-status.json',
       host: 'github.example.com',
     } as unknown as Parameters<typeof handler>[0]);
     expect(mocks.setGhHost).toHaveBeenCalledWith('github.example.com');

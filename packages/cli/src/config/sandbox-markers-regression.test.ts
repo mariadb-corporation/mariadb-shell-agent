@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +39,7 @@ beforeEach(() => {
   fs.mkdirSync(home);
   vi.stubEnv('HOME', home);
   vi.stubEnv('USERPROFILE', home);
-  vi.stubEnv('QWEN_HOME', path.join(home, '.qwen'));
+  vi.stubEnv('QWEN_HOME', path.join(home, '.mariadb-shell-agent'));
   vi.stubEnv('CLOUD_SHELL', undefined);
   vi.stubEnv('BOUNDARY_REGRESSION_VALUE', undefined);
   for (const key of markerKeys) vi.stubEnv(key, undefined);
@@ -76,9 +77,9 @@ function installFixture(source: string): Settings {
 describe('sandbox runtime markers', () => {
   for (const source of [
     'project:.env',
-    'project:.qwen/.env',
+    'project:.mariadb-shell-agent/.env',
     'home:.env',
-    'home:.qwen/.env',
+    'home:.mariadb-shell-agent/.env',
     'settings.env',
   ]) {
     it(`rejects file-sourced markers from ${source} on every application path`, () => {

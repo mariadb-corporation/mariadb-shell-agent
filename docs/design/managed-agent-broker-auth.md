@@ -3,8 +3,8 @@
 [English](managed-agent-broker-auth.md) | [简体中文](managed-agent-broker-auth.zh-CN.md)
 
 Status: implemented locally, 2026-10-02; verification results are tracked
-in `.qwen/issues/issue-13180.md`. Source baseline: `de2612434a`.
-Tracks [#13180](https://github.com/QwenLM/qwen-code/issues/13180).
+in `.mariadb-shell-agent/issues/issue-13180.md`. Source baseline: `de2612434a`.
+Tracks [#13180](https://github.invalid/QwenLM/qwen-code/issues/13180).
 
 ## 1. Problem statement
 
@@ -409,7 +409,7 @@ for loopback deployments without a binding key.
   codes in prose (scheme + shared `Unauthorized` descriptions); the
   web-shell generated client is regenerated against it, and its sync test
   (`managed-agent-api.test.ts`) fails on drift.
-- E2E: existing dev topology (`qwen` CLI + Web Shell on loopback) works
+- E2E: existing dev topology (`mariadb-shell-agent` CLI + Web Shell on loopback) works
   with zero new configuration; a signed-mode smoke run against a
   non-loopback address.
 

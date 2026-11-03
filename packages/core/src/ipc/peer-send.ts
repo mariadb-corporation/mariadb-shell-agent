@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -615,7 +616,7 @@ export async function sendToPeer(
   if (!self) return { kind: 'disabled' };
 
   const directory = await listMessageablePeers();
-  // Exclude every incarnation of this session — `qwen --resume <id>` from
+  // Exclude every incarnation of this session — `mariadb-shell-agent --resume <id>` from
   // a second pane runs the same session id under another process,
   // differently named when resumed from another directory. The receiver's
   // gate accepts a frame pinned to its own id, so such a twin would

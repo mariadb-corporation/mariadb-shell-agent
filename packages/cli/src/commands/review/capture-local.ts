@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review capture-local`: capture the working tree's diff — staged,
+// `mariadb-shell-agent review capture-local`: capture the working tree's diff — staged,
 // unstaged, and untracked — and partition it into review chunks, in one pass.
 // The local counterpart of `fetch-pr`.
 //
@@ -510,7 +511,7 @@ function resolveCachePath(
   } catch {
     // Missing. A `.json` name is the caller's cache FILE before its first
     // round. Anything else is the directory the skill passes
-    // (`.qwen/review-cache`) before any round created it — a fresh clone, a
+    // (`.mariadb-shell-agent/review-cache`) before any round created it — a fresh clone, a
     // CI checkout. Returning it unchanged published the DIRECTORY as
     // `cachePath`, `cache-commit` refused it as a cross-target promotion,
     // and nothing on the primary path ever created the directory: every
@@ -553,12 +554,12 @@ function cachePathFor(target: string, source: string | undefined): string {
 function runCaptureLocal(args: CaptureLocalArgs): void {
   const { out, file } = args;
   // DERIVED here when a file review does not name one, rather than recomputed
-  // by whoever calls this. `qwen review run` pins the artifact name it polls
+  // by whoever calls this. `mariadb-shell-agent review run` pins the artifact name it polls
   // for from the same repo-relative path put through the same `safeTarget`,
   // and the skill used to tell the orchestrator to apply that recipe BY HAND
   // — character-class replacement, no canonicalisation. The two agreed only
   // where the prose derivation happened to: `ln -s src srclink` then
-  // `qwen review run srclink/foo.ts` had the parent poll for
+  // `mariadb-shell-agent review run srclink/foo.ts` had the parent poll for
   // `qwen-review-src_foo.ts-composed.json` while every child artifact was
   // named `srclink_foo.ts`, so the poll never matched and a review that had
   // already run — and with --comment, already posted — reported no verdict.
@@ -611,7 +612,7 @@ function runCaptureLocal(args: CaptureLocalArgs): void {
   // bytes (`hash-object` without `-w` — computes, writes nothing) plus the
   // HEAD this diff was based against. Written on every run, incremental or
   // not, full-capture fallback or not: the candidate records what THIS round
-  // reviewed, and Step 8 promotes it to `.qwen/review-cache/` only on a clean
+  // reviewed, and Step 8 promotes it to `.mariadb-shell-agent/review-cache/` only on a clean
   // high-effort end — the same division of labour as the PR cache.
   const headSha = capture.unbornHead
     ? null
@@ -641,7 +642,7 @@ function runCaptureLocal(args: CaptureLocalArgs): void {
       // the subject keeps the next round's comparison honest instead of
       // certifying "unchanged since last round" over bytes nobody read.
       //
-      // …but a DIRECTORY subject is not hashable, and `qwen review <dir>`
+      // …but a DIRECTORY subject is not hashable, and `mariadb-shell-agent review <dir>`
       // is a supported entrance. Recorded, it lands in every candidate as
       // UNHASHABLE — which never equals itself — so `changedSince` reports
       // the directory every round, `stateChanged` is never empty, and the
@@ -913,7 +914,7 @@ function runCaptureLocal(args: CaptureLocalArgs): void {
   try {
     // noFollow: a planted symlink at this deterministic path would redirect
     // the candidate write onto its target (see cache-commit's note). The
-    // directory above it is the entry guard's: a redirected `.qwen/tmp`
+    // directory above it is the entry guard's: a redirected `.mariadb-shell-agent/tmp`
     // refused the round before anything was written. That check is at the
     // capture's entry rather than here, so it answers for the committed
     // link this threat model names, not for a directory swapped mid-round
@@ -977,7 +978,7 @@ function runCaptureLocal(args: CaptureLocalArgs): void {
    * DECIDED outcome rather than a failure.
    *
    * Both stops used to exist only as a stderr sentence the orchestrator
-   * matched on, so the parent (`qwen review run`) could not tell them from a
+   * matched on, so the parent (`mariadb-shell-agent review run`) could not tell them from a
    * round that fell over: it polls for a composed verdict, finds none, and
    * exits 1 with "Review did not complete". A user who committed without
    * fixing a blocker gets that on every later round, over a round whose own
@@ -1321,7 +1322,7 @@ function runCaptureLocal(args: CaptureLocalArgs): void {
   }
 
   // Published at a name the PARENT can predict, beside the plan rather than
-  // inside it. `qwen review run` has to find this without knowing `--out`:
+  // inside it. `mariadb-shell-agent review run` has to find this without knowing `--out`:
   // that path is the orchestrator's to choose (SKILL.md says so, and it must,
   // because the CLI-derived `<target>` token does not exist yet at Step 1),
   // so a parent polling `qwen-review-<target>-plan.json` found nothing for
@@ -1331,7 +1332,7 @@ function runCaptureLocal(args: CaptureLocalArgs): void {
   // `--cache`-resolved ledger (`cachePathEarly` — a file-form `--cache` is
   // returned unchanged, directory form resolves the canonical basename), so
   // the stamp below and the plan's published `cachePath` must name that
-  // same file. Stamping the canonical `.qwen/review-cache/…` path while the
+  // same file. Stamping the canonical `.mariadb-shell-agent/review-cache/…` path while the
   // decision consulted a caller-named file had the fence faithfully verify
   // a baseline the stop never saw — an ENOENT hash over a nonexistent
   // canonical file, an empty grant baseline, and an exit 0 over the open
@@ -1373,7 +1374,7 @@ function runCaptureLocal(args: CaptureLocalArgs): void {
           // while its NAME is the flattened target token — not injective, so
           // a concurrent review whose path flattens alike writes the same
           // path and would decide the other run's completion. Absent when the
-          // capture was not launched by `qwen review run`, which is exactly
+          // capture was not launched by `mariadb-shell-agent review run`, which is exactly
           // when no parent is reading.
           ...(process.env['QWEN_REVIEW_RUN_ID']
             ? { runId: process.env['QWEN_REVIEW_RUN_ID'] }
@@ -1451,7 +1452,7 @@ function runCaptureLocal(args: CaptureLocalArgs): void {
   const wall = captureDeadline(process.env, args.deadline, plan);
   const result: CaptureLocalResult = {
     // The token the CLI derived, so nothing downstream has to re-derive it.
-    // `qwen review run` pins the artifact name it waits for from the same
+    // `mariadb-shell-agent review run` pins the artifact name it waits for from the same
     // canonicalisation; an orchestrator that recomputes the stem by hand gets
     // a different answer wherever a symlink sits below the repo root, and
     // every artifact it names then misses the poll.
@@ -1640,7 +1641,7 @@ export const captureLocalCommand: CommandModule = {
         type: 'string',
         describe:
           "The previous local round's review cache — the file, or the " +
-          'DIRECTORY holding it (`.qwen/review-cache`), in which case this ' +
+          'DIRECTORY holding it (`.mariadb-shell-agent/review-cache`), in which case this ' +
           "command resolves this target's cache file — the same spelling " +
           'the plan publishes as `cachePath` — from the target IT derives. ' +
           'A path that does not exist yet is read as that directory unless ' +

@@ -3,7 +3,7 @@
 [English](2026-10-25-external-storage-registration.md) | [简体中文](2026-10-25-external-storage-registration.zh-CN.md)
 
 状态：已实现兼容性增量，验收等待 CI。对应
-[issue #15512](https://github.com/QwenLM/qwen-code/issues/15512) 的 PR-A。
+[issue #15512](https://github.invalid/QwenLM/qwen-code/issues/15512) 的 PR-A。
 
 ## 问题与范围
 

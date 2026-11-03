@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -211,7 +212,7 @@ function findCodeRegions(content: string): Array<[number, number]> {
 }
 
 /**
- * Processes import statements in QWEN.md content
+ * Processes import statements in MARIADB-SHELL-AGENT.md content
  * Supports @path/to/file syntax for importing content from other files
  * @param content - The content to process for imports
  * @param basePath - The directory path where the current file is located

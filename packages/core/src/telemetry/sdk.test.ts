@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1087,7 +1088,7 @@ describe('Telemetry SDK', () => {
       // Non-OTLP URLs (e.g. an LLM provider) must be traced.
       expect(
         ignores(
-          'https://dashscope.aliyuncs.com',
+          'https://dashscope.aliyuncs.invalid',
           '/compatible-mode/v1/chat/completions',
         ),
       ).toBe(false);
@@ -1206,8 +1207,8 @@ describe('Telemetry SDK', () => {
       expect(
         ignores({
           protocol: 'https:',
-          host: 'dashscope.aliyuncs.com',
-          hostname: 'dashscope.aliyuncs.com',
+          host: 'dashscope.aliyuncs.invalid',
+          hostname: 'dashscope.aliyuncs.invalid',
           path: '/compatible-mode/v1/chat/completions',
         }),
       ).toBe(false);

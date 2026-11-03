@@ -1,6 +1,6 @@
 # Model Providers
 
-Qwen Code allows you to configure multiple model providers through the `modelProviders` setting in your `settings.json`. This enables you to switch between different AI models and providers using the `/model` command.
+MariaDB Shell Agent allows you to configure multiple model providers through the `modelProviders` setting in your `settings.json`. This enables you to switch between different AI models and providers using the `/model` command.
 
 ## Overview
 
@@ -83,7 +83,7 @@ the same id exists under more than one provider).
     "openai": [
       {
         "id": "qwen3.5-omni-plus-realtime",
-        "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "baseUrl": "https://dashscope.aliyuncs.invalid/compatible-mode/v1",
         "envKey": "DASHSCOPE_API_KEY",
         "realtimeOnly": true
       }
@@ -109,7 +109,7 @@ DashScope endpoint.
 Two rules are deliberate:
 
 - Workspace settings are never consulted, only user- and system-level ones. A
-  project's `.qwen/settings.json` cannot add or redirect a Live Voice route.
+  project's `.mariadb-shell-agent/settings.json` cannot add or redirect a Live Voice route.
 - A **bare** `modelId` that matches no `realtimeOnly` route uses the
   free-standing `experimental.liveVoice.endpoint` and
   `experimental.liveVoice.apiKey` fields as before, so existing setups keep
@@ -123,11 +123,11 @@ Two rules are deliberate:
 On the free-standing path the Web Shell's Qwen Live settings set the endpoint
 and model directly. Enter the OpenAI-compatible base URL of the region or
 dedicated domain your key belongs to, such as
-`https://dashscope-intl.aliyuncs.com/compatible-mode/v1`; left empty, Live uses
-Beijing (`https://dashscope.aliyuncs.com/compatible-mode/v1`), and a key from
+`https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1`; left empty, Live uses
+Beijing (`https://dashscope.aliyuncs.invalid/compatible-mode/v1`), and a key from
 elsewhere is rejected with `401`. The base URL is stored as entered and
 converted to `wss://<host>/api-ws/v1/realtime` when a call starts; the host must
-be a DashScope or `*.maas.aliyuncs.com` endpoint. While Live Voice is on, a new
+be a DashScope or `*.maas.aliyuncs.invalid` endpoint. While Live Voice is on, a new
 endpoint is checked with a Realtime handshake before it is saved.
 
 ## Override reasoning capabilities
@@ -465,7 +465,7 @@ Use `openai` with `wireApi: "responses"` to target OpenAI's `/v1/responses` endp
 }
 ```
 
-For a vision model that can also follow the normal Qwen Code agent policy and use tools, opt in to full-turn image routing with both capabilities:
+For a vision model that can also follow the normal MariaDB Shell Agent agent policy and use tools, opt in to full-turn image routing with both capabilities:
 
 ```json
 "capabilities": {
@@ -565,7 +565,7 @@ export VLLM_API_KEY="not-needed"
 >
 > - **Option 1: Using a `.env` file** (recommended for security):
 >   ```bash
->   # ~/.qwen/.env (or project root)
+>   # ~/.mariadb-shell-agent/.env (or project root)
 >   OPENAI_API_KEY=sk-your-actual-key-here
 >   ```
 >   Be sure to add `.env` to your `.gitignore` to prevent accidentally committing secrets.
@@ -586,7 +586,7 @@ Alibaba Cloud Coding Plan provides a pre-configured set of Qwen models optimized
 
 ### Overview
 
-When you authenticate with an Alibaba Cloud Coding Plan API key using the `/auth` command, Qwen Code automatically configures the following models:
+When you authenticate with an Alibaba Cloud Coding Plan API key using the `/auth` command, MariaDB Shell Agent automatically configures the following models:
 
 | Model ID               | Name                 | Description                                               |
 | ---------------------- | -------------------- | --------------------------------------------------------- |
@@ -604,9 +604,9 @@ When you authenticate with an Alibaba Cloud Coding Plan API key using the `/auth
 ### Setup
 
 1. Obtain an Alibaba Cloud Coding Plan API key:
-   - **China**: <https://bailian.console.aliyun.com/?tab=model#/efm/coding_plan>
-   - **International**: <https://modelstudio.console.alibabacloud.com/?tab=dashboard#/efm/coding_plan>
-2. Run the `/auth` command in Qwen Code
+   - **China**: <https://bailian.console.aliyun.invalid/?tab=model#/efm/coding_plan>
+   - **International**: <https://modelstudio.console.alibabacloud.invalid/?tab=dashboard#/efm/coding_plan>
+2. Run the `/auth` command in MariaDB Shell Agent
 3. Select **Alibaba ModelStudio**, then choose **Coding Plan** from the sub-menu
 4. Select your region
 5. Enter your API key when prompted
@@ -617,10 +617,10 @@ The models will be automatically configured and added to your `/model` picker.
 
 Alibaba Cloud Coding Plan supports two regions:
 
-| Region               | Endpoint                                        | Description             |
-| -------------------- | ----------------------------------------------- | ----------------------- |
-| China                | `https://coding.dashscope.aliyuncs.com/v1`      | Mainland China endpoint |
-| Global/International | `https://coding-intl.dashscope.aliyuncs.com/v1` | International endpoint  |
+| Region               | Endpoint                                            | Description             |
+| -------------------- | --------------------------------------------------- | ----------------------- |
+| China                | `https://coding.dashscope.aliyuncs.invalid/v1`      | Mainland China endpoint |
+| Global/International | `https://coding-intl.dashscope.aliyuncs.invalid/v1` | International endpoint  |
 
 The region is selected during authentication and stored in `settings.json` under the `modelProviders` configuration. To switch regions, re-run the `/auth` command and select a different region.
 
@@ -633,7 +633,7 @@ When you configure Coding Plan through the `/auth` command, the API key is store
 > **Security Recommendation**: For better security, it is recommended to move the API key from `settings.json` to a separate `.env` file and load it as an environment variable. For example:
 >
 > ```bash
-> # ~/.qwen/.env
+> # ~/.mariadb-shell-agent/.env
 > BAILIAN_CODING_PLAN_API_KEY=your-api-key-here
 > ```
 >
@@ -641,7 +641,7 @@ When you configure Coding Plan through the `/auth` command, the API key is store
 
 ### Automatic Updates
 
-Coding Plan model configurations are versioned. When Qwen Code detects a newer version of the model template, you will be prompted to update. Accepting the update will:
+Coding Plan model configurations are versioned. When MariaDB Shell Agent detects a newer version of the model template, you will be prompted to update. Accepting the update will:
 
 - Replace the existing Coding Plan model configurations with the latest versions
 - Preserve any custom model configurations you've added manually
@@ -664,7 +664,7 @@ If you prefer to manually configure Coding Plan models, you can add them to your
         "name": "qwen3-coder-plus",
         "description": "Qwen3-Coder via Alibaba Cloud Coding Plan",
         "envKey": "YOUR_CUSTOM_ENV_KEY",
-        "baseUrl": "https://coding.dashscope.aliyuncs.com/v1"
+        "baseUrl": "https://coding.dashscope.aliyuncs.invalid/v1"
       }
     ]
   }
@@ -743,7 +743,7 @@ The configuration resolution follows a strict layering model with one crucial ru
 ### Dynamic values in `customHeaders`
 
 A `customHeaders` value may contain the placeholder `${session_id}`, which is
-expanded per request with the current Qwen Code session ID. Use it for gateways
+expanded per request with the current MariaDB Shell Agent session ID. Use it for gateways
 that require a stable per-conversation identifier — OpenCode Go, for example,
 rejects requests without `x-opencode-session`:
 
@@ -773,11 +773,11 @@ placeholder is inert until you also switch on
 ```
 
 Until you do, a value containing a placeholder is **dropped** rather than sent,
-and Qwen Code prints a warning at startup naming the header and this setting.
+and MariaDB Shell Agent prints a warning at startup naming the header and this setting.
 The header is never sent with a literal `${session_id}` in it.
 
 **One header is reserved.** On the QwenCloud MaaS endpoints — the `/auth`
-entries `China — 千问AI平台` and `International — QwenCloud` — Qwen Code owns
+entries `China — 千问AI平台` and `International — QwenCloud` — MariaDB Shell Agent owns
 `X-DashScope-Source-Config` and writes the first-party attribution value into
 it. An entry under that name — any casing — is removed before the
 request is built, so a `${session_id}` placeholder in it never survives and
@@ -807,7 +807,7 @@ The following fields are treated as atomic objects - provider values completely 
 ### Example
 
 ```jsonc
-// User settings (~/.qwen/settings.json)
+// User settings (~/.mariadb-shell-agent/settings.json)
 {
   "model": {
     "generationConfig": {
@@ -923,7 +923,7 @@ For Anthropic this becomes `thinking.budget_tokens`. For OpenAI/DeepSeek the fie
 
 ## Provider Models vs Runtime Models
 
-Qwen Code distinguishes between two types of model configurations:
+MariaDB Shell Agent distinguishes between two types of model configurations:
 
 ### Provider Model
 
@@ -943,11 +943,11 @@ Qwen Code distinguishes between two types of model configurations:
 
 ### RuntimeModelSnapshot lifecycle
 
-When you configure a model without using `modelProviders`, Qwen Code automatically creates a RuntimeModelSnapshot to preserve your configuration:
+When you configure a model without using `modelProviders`, MariaDB Shell Agent automatically creates a RuntimeModelSnapshot to preserve your configuration:
 
 ```bash
 # This creates a RuntimeModelSnapshot with ID: $runtime|openai|my-custom-model
-qwen --auth-type openai --model my-custom-model --openai-api-key $KEY --openai-base-url https://api.example.com/v1
+mariadb-shell-agent --auth-type openai --model my-custom-model --openai-api-key $KEY --openai-base-url https://api.example.com/v1
 ```
 
 The snapshot:
@@ -976,7 +976,7 @@ The snapshot:
 
 > [!important]
 >
-> Define `modelProviders` in the user-scope `~/.qwen/settings.json` whenever possible and avoid persisting credential overrides in any scope. Keeping the provider catalog in user settings prevents merge/override conflicts between project and user scopes and ensures `/auth` and `/model` updates always write back to a consistent scope.
+> Define `modelProviders` in the user-scope `~/.mariadb-shell-agent/settings.json` whenever possible and avoid persisting credential overrides in any scope. Keeping the provider catalog in user settings prevents merge/override conflicts between project and user scopes and ensures `/auth` and `/model` updates always write back to a consistent scope.
 
 - `/model` and `/auth` persist `model.name` (where applicable) and `security.auth.selectedType` to the closest writable scope that already defines `modelProviders`; otherwise they fall back to the user scope. This keeps workspace/user files in sync with the active provider catalog.
 - Without `modelProviders`, the resolver mixes CLI/env/settings layers, creating Runtime Models. This is fine for single-provider setups but cumbersome when frequently switching. Define provider catalogs whenever multi-model workflows are common so that switches stay atomic, source-attributed, and debuggable.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -614,7 +615,7 @@ export function copyBundleAssets({ root = defaultRoot } = {}) {
   }
 
   // Copy the built Web Shell SPA (index.html + assets/) so the bundled
-  // `qwen serve` can serve the browser UI at its root path. The library
+  // `mariadb-shell-agent serve` can serve the browser UI at its root path. The library
   // build outputs (dist/index.js, dist/types) are for npm consumers and are
   // intentionally NOT copied. Source only exists after the web-shell
   // workspace is built (npm run build); when absent (e.g. a --cli-only
@@ -640,7 +641,7 @@ export function copyBundleAssets({ root = defaultRoot } = {}) {
   } else {
     console.warn(
       `Warning: Web Shell assets not found at ${webShellDistDir}; ` +
-        'dist/web-shell/ will be absent and `qwen serve` runs API-only. ' +
+        'dist/web-shell/ will be absent and `mariadb-shell-agent serve` runs API-only. ' +
         'Run a full `npm run build` before bundling to include the UI.',
     );
   }
@@ -695,7 +696,7 @@ export function copyBundleAssets({ root = defaultRoot } = {}) {
   // Make dist/cli.js directly executable: shellContextEnv blanks a
   // QWEN_CODE_CLI whose entry a POSIX shell cannot exec (no shebang, or no
   // execute bit), and the `"${QWEN_CODE_CLI:-qwen}"` fallback then silently
-  // runs whatever `qwen` the PATH resolves — a different install for every
+  // runs whatever `mariadb-shell-agent` the PATH resolves — a different install for every
   // `review` subcommand of a session launched from this bundle. Measured on
   // three live `review run`s: every agent-issued subcommand ran the machine's
   // global install instead of the freshly bundled tree.

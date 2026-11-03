@@ -1,9 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import './mariadb-env-aliases.js';
 import {
   accessSync,
   chmodSync,
@@ -64,8 +66,11 @@ export const TOP_LEVEL_COMMANDS = [
   ],
   ['board <command>', 'Share work with other agents through a board'],
   ['channel <command>', 'Manage messaging channels (Telegram, Discord, etc.)'],
-  ['extensions <command>', 'Manage Qwen Code extensions.'],
-  ['hooks', 'Manage Qwen Code hooks (use /hooks in interactive mode).'],
+  ['extensions <command>', 'Manage MariaDB Shell Agent extensions.'],
+  [
+    'hooks',
+    'Manage MariaDB Shell Agent hooks (use /hooks in interactive mode).',
+  ],
   ['mcp', 'Manage MCP servers'],
   ['memory', 'Preview and import external memories'],
   [
@@ -78,11 +83,14 @@ export const TOP_LEVEL_COMMANDS = [
   ],
   [
     'serve',
-    'Run Qwen Code as a local HTTP daemon (Stage 1 experimental: --http-bridge)',
+    'Run MariaDB Shell Agent as a local HTTP daemon (Stage 1 experimental: --http-bridge)',
   ],
-  ['daemon <command>', 'Inspect and control local qwen serve daemons'],
-  ['sessions <command>', 'Manage Qwen Code sessions'],
-  ['update', 'Check for Qwen Code updates and install if available'],
+  [
+    'daemon <command>',
+    'Inspect and control local mariadb-shell-agent serve daemons',
+  ],
+  ['sessions <command>', 'Manage MariaDB Shell Agent sessions'],
+  ['update', 'Check for MariaDB Shell Agent updates and install if available'],
 ] as const;
 
 export const MCP_COMMANDS = [
@@ -164,7 +172,7 @@ for (const flag of ['--help', '-h', '--version', '-v']) {
 KNOWN_FAST_PATH_FLAGS.add('--sandbox-session-id');
 // Hidden boolean options registered inline in config.ts; like the sandbox
 // option above they are valid top-level flags the scanner should admit
-// instead of demoting (e.g. `qwen --experimental-acp --help`).
+// instead of demoting (e.g. `mariadb-shell-agent --experimental-acp --help`).
 KNOWN_FAST_PATH_FLAGS.add('--experimental-acp');
 KNOWN_FAST_PATH_FLAGS.add('--experimental-skills');
 
@@ -239,7 +247,7 @@ function hasFlag(
     }
     // Base parity (mirrors hasVersionToken): the pre-PR scan skipped the
     // token after the base's hardcoded value flags unconditionally, even
-    // the `--` sentinel, so `qwen --model -- --help` still routed to help.
+    // the `--` sentinel, so `mariadb-shell-agent --model -- --help` still routed to help.
     if (BASE_VALUE_FLAGS.has(arg)) {
       i++;
       continue;
@@ -257,10 +265,10 @@ function hasFlag(
 // following one of the base's hardcoded value-taking flags
 // (BASE_VALUE_FLAGS) is skipped unconditionally (even when it starts with
 // `-`), so a version token sitting in one of THOSE value slots is NOT
-// counted — `qwen -p -v -h` and `qwen --resume -v --help` printed
+// counted — `mariadb-shell-agent -p -v -h` and `mariadb-shell-agent --resume -v --help` printed
 // top-level help on base, not the version. The derived VALUE_FLAGS set is
 // deliberately NOT used here: flags it adds were absent from the base
-// scan, which counted a version token in their value slot (`qwen --proxy
+// scan, which counted a version token in their value slot (`mariadb-shell-agent --proxy
 // -v ...` printed the version), so this scan must count it too. Tokens
 // after `--` are positional data and never count.
 function hasVersionToken(argv: readonly string[]): boolean {
@@ -284,7 +292,7 @@ async function buildTopLevelHelpParser() {
   const { default: yargs } = await import('yargs');
   const parser = yargs([])
     .locale('en')
-    .scriptName('qwen')
+    .scriptName('mariadb-shell-agent')
     .usage(TOP_LEVEL_USAGE)
     .version(process.env['CLI_VERSION'] || 'unknown')
     .alias('v', 'version')
@@ -366,9 +374,9 @@ export function resolveBootstrapRoute(
   // the fail-closed direction is to intercept. The scan mirrors base's
   // hasFlag exactly: it skips the value slot of the base's hardcoded
   // value-taking flags only (BASE_VALUE_FLAGS), so a version token
-  // sitting in one of those slots is NOT counted (`qwen -p -v -h` and
-  // `qwen --resume -v --help` printed top-level help on base, and
-  // `qwen --model -v` demoted to the full parser). Flags the base scan
+  // sitting in one of those slots is NOT counted (`mariadb-shell-agent -p -v -h` and
+  // `mariadb-shell-agent --resume -v --help` printed top-level help on base, and
+  // `mariadb-shell-agent --model -v` demoted to the full parser). Flags the base scan
   // did not know (--worktree, --proxy, -e, --auth-type, ...) never
   // consumed a value slot there, so a version token in their value slot
   // WAS counted and IS intercepted here. The scan models no help state
@@ -424,13 +432,14 @@ async function printTopLevelHelp(): Promise<void> {
 
 function printMcpHelp(): void {
   const lines = [
-    'Usage: qwen mcp <command>',
+    'Usage: mariadb-shell-agent mcp <command>',
     '',
     'Manage MCP servers',
     '',
     'Commands:',
     ...MCP_COMMANDS.map(
-      ([command, description]) => `  qwen mcp ${command}  ${description}`,
+      ([command, description]) =>
+        `  mariadb-shell-agent mcp ${command}  ${description}`,
     ),
   ];
   writeStdoutLine(lines.join('\n'));
@@ -438,7 +447,7 @@ function printMcpHelp(): void {
 
 function printMemoryHelp(): void {
   const lines = [
-    'Usage: qwen memory <command>',
+    'Usage: mariadb-shell-agent memory <command>',
     '',
     'Preview and import external memories',
     '',
@@ -474,7 +483,7 @@ async function runMcpFastPath(rawArgv: readonly string[]): Promise<void> {
   ]);
 
   const parser = yargsInstance([])
-    .scriptName('qwen')
+    .scriptName('mariadb-shell-agent')
     .command(mcpCommand)
     .version(false)
     .help()
@@ -511,7 +520,7 @@ async function runMemoryFastPath(rawArgv: readonly string[]): Promise<void> {
   ]);
 
   const parser = yargsInstance([])
-    .scriptName('qwen')
+    .scriptName('mariadb-shell-agent')
     .command(memoryCommand)
     .version(false)
     .help()
@@ -647,7 +656,7 @@ export async function runCliEntry(
   const argv = normalizeServeFastPathArgv(rawArgv);
   const route = resolveBootstrapRoute(argv);
   if (route !== 'serve') {
-    // This credential belongs only to `qwen serve`. Scrub it before any other
+    // This credential belongs only to `mariadb-shell-agent serve`. Scrub it before any other
     // subcommand handler can start a child process during yargs parsing. The
     // serve route keeps it until either the fast path or full serve handler
     // has captured it into daemon-local options.
@@ -691,7 +700,9 @@ export async function runCliEntry(
     );
     const url = readSessionSendMcpUrl(argv.slice(2));
     if (!url) {
-      writeStderrLine('Usage: qwen agents session-send-mcp --url <endpoint>');
+      writeStderrLine(
+        'Usage: mariadb-shell-agent agents session-send-mcp --url <endpoint>',
+      );
       process.exitCode = 1;
       return;
     }
@@ -757,13 +768,13 @@ function writeStderrLine(line: string): void {
  * The npm bin wrapper (scripts/cli-entry.js) stamps installed launches, but a
  * workspace launch — a direct `node dist/index.js` — never passes through
  * it (the npm `start` and `dev` scripts stamp QWEN_CODE_CLI in their own
- * launchers), so every skill shell-out resolved `qwen` off PATH: a different
+ * launchers), so every skill shell-out resolved `mariadb-shell-agent` off PATH: a different
  * install, silently.
  *
  * Stamps the bin entry (dist/index.js), not this module: cli.ts compiles to
  * dist/src/cli.js, which carries no shebang, and the spawn-time filter blanks
  * an entry a shell cannot exec. Skipped when the derived path does not exist
- * (dev runs execute .ts sources with no built entry; the bare-`qwen` fallback
+ * (dev runs execute .ts sources with no built entry; the bare-`mariadb-shell-agent` fallback
  * is the pre-existing behavior there) and when the module was not loaded from
  * the filesystem at all — under test runners, Vite statically rewrites the
  * new URL(…, import.meta.url) expression to a non-file URL, and the stamp
@@ -774,13 +785,13 @@ function writeStderrLine(line: string): void {
  * bin-link ever chmods it — on a plain `npm run build` checkout the spawn
  * filter would blank the stamp and the version skew this exists to fix would
  * survive. A failed chmod keeps the old fallback: the filter writes '' and
- * subprocesses run `qwen`.
+ * subprocesses run `mariadb-shell-agent`.
  *
  * First writer wins, unlike the wrapper's unconditional assignment: an
  * already-set value may come from an outer launcher in THIS process —
  * cli-entry.js selecting a standalone shim, or the desktop app's vendored
  * bundle — which knows launch details this module cannot see and must not be
- * overwritten. The cost is that a value inherited from a PARENT qwen session
+ * overwritten. The cost is that a value inherited from a PARENT mariadb-shell-agent session
  * also survives, since the two cases are indistinguishable here; the primary
  * skew scenario — a workspace launch from a plain terminal — has the slot
  * unset either way. Empty counts as unset: a parent session's spawn filter
@@ -821,7 +832,7 @@ export function stampCliEntryEnv(entryPath?: string): void {
         chmodSync(entry, statSync(entry).mode | 0o111);
       } catch {
         // Not chmoddable (read-only checkout): the spawn filter blanks the
-        // stamp and subprocesses fall back to `qwen`, as before this stamp.
+        // stamp and subprocesses fall back to `mariadb-shell-agent`, as before this stamp.
       }
     }
     process.env['QWEN_CODE_CLI'] = entry;

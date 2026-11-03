@@ -1,13 +1,14 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * @fileoverview Coordinator side of the Agent Host protocol (v2).
  *
- * A Host (a remote `qwen serve` that joined this workspace) talks to these
+ * A Host (a remote `mariadb-shell-agent serve` that joined this workspace) talks to these
  * routes over outbound HTTP: enroll once, then heartbeat (presence, program
  * probe, lease renewal and cancellation, permission decisions), long-poll
  * pickup for a session turn, long-poll decisions while a turn waits on a

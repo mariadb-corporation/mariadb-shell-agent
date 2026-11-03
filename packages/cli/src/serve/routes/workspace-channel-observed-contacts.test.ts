@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -328,7 +329,7 @@ describe('workspace observed channel contact routes', () => {
     });
     expect(JSON.stringify(response.body)).not.toContain(filePath);
     expect(stderr).toHaveBeenCalledWith(
-      'qwen serve: observed channel contacts unavailable.\n',
+      'mariadb-shell-agent serve: observed channel contacts unavailable.\n',
     );
   });
 });

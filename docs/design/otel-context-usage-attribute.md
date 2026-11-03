@@ -19,9 +19,9 @@ compaction.
 This change does not add a metric, log event, session attribute, or standard
 `gen_ai.*` field. `gen_ai.usage.input_tokens` remains the authoritative total
 input-token count reported by the provider. This design extends the private
-Qwen Code namespace because the version-pinned GenAI semantic-convention
+MariaDB Shell Agent namespace because the version-pinned GenAI semantic-convention
 baseline in `gen-ai-arms-field-alignment.md` has no standard attribute for a
-Qwen Code context-category breakdown.
+MariaDB Shell Agent context-category breakdown.
 
 ## Attribute contract
 
@@ -124,17 +124,17 @@ reserve, while the other thresholds were not part of the requested payload.
 
 The snapshot is built synchronously from the logical request received by
 `LoggingContentGenerator`. This is the last provider-neutral request shape
-shared by all supported providers and already contains Qwen Code's effective
+shared by all supported providers and already contains MariaDB Shell Agent's effective
 system instruction, messages, and tool declarations for that attempt.
 Provider adapters may still normalize that request before the SDK call, so the
-breakdown describes Qwen Code's logical context rather than a provider's wire
+breakdown describes MariaDB Shell Agent's logical context rather than a provider's wire
 serialization or billing tokenizer.
 
-If a direct or custom caller supplies an unresolved `CallableTool`, Qwen Code
+If a direct or custom caller supplies an unresolved `CallableTool`, MariaDB Shell Agent
 omits the complete private attribute for that attempt. Resolving the callable
 would add asynchronous provider-adapter work to the synchronous snapshot path,
 while treating it as an empty declaration would silently misclassify its token
-cost. Normal Qwen Code request construction supplies materialized function
+cost. Normal MariaDB Shell Agent request construction supplies materialized function
 declarations and is unaffected.
 
 | JSON field             | Source and attribution rule                                                                                                                                                                                                                                                                                                                                                                                                                                        |
@@ -346,7 +346,7 @@ remains the control plane for whether spans are recorded or exported.
 - Snapshot construction performs a bounded number of linear passes over the
   logical request. It must not add a nested scan per tool, skill, or message.
 - The schema has a fixed key set and a bounded serialized size. JSON is compact
-  and is never truncated into invalid JSON. At SDK initialization, Qwen Code
+  and is never truncated into invalid JSON. At SDK initialization, MariaDB Shell Agent
   resolves the standard OTel span-specific/general attribute-value limit with
   the same precedence used by `NodeSDK` and passes it explicitly to the SDK.
   Serialization omits the complete attribute if it exceeds the smaller of that

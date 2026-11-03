@@ -4,7 +4,7 @@
 [简体中文](2026-10-21-opentui-input-ownership.zh-CN.md)
 
 Current delivery (2026-10-21): this work is consolidated with input ownership,
-editing and status lines in [#14964](https://github.com/QwenLM/qwen-code/pull/14964).
+editing and status lines in [#14964](https://github.invalid/QwenLM/qwen-code/pull/14964).
 The original batch boundaries, source bases, validation results and stack-promotion
 steps below are historical. Follow the [delivery plan](2026-10-20-opentui-migration-delivery.md)
 for the active sequence. Combined acceptance requires fresh results for the
@@ -186,7 +186,7 @@ length and expected hash, not merely an image field or screenshot.
 Before completion run build/typecheck, focused unit suites, native regression,
 and Node+Ink/Bun+Ink/Bun+strict OpenTUI product legs on the final artifact. Record
 source/bundle/fixture/runtime identity, raw inputs, viewports, requests and cleanup
-outcomes under `.qwen/e2e-tests/`. Inspect the whole diff and challenge each oracle
+outcomes under `.mariadb-shell-agent/e2e-tests/`. Inspect the whole diff and challenge each oracle
 in two consecutive clean self-audits after fixes. The parent coordinates one heavy
 operation lease. macOS results do not establish Linux/Windows clipboard or IME
 coverage; retain those cells in the broader migration inventory.
@@ -205,5 +205,5 @@ cleanup. Original fixture failures remain evidence: held-stream idle quiescence,
 a clipped Ink title colon and Enter being consumed by active path completion.
 Only fixture assumptions changed; product source and bundle stayed frozen. Two
 clean full-diff self-audits and the independent review are recorded with the
-candidate manifest and raw reports under `.qwen/`. These local results do not
+candidate manifest and raw reports under `.mariadb-shell-agent/`. These local results do not
 replace the remaining platform gates or establish complete Ink parity.

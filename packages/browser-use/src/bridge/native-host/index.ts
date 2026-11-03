@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -71,7 +72,7 @@ const startupTimer = setTimeout(() => void shutdown(1), 10_000);
 // Protocol 2 CLIs listen on `bridge.sock` in the socket base (the parent of
 // the discovery directory) and wait for their own Native Host, which this
 // extension no longer launches. Greet each new such listener once with this
-// protocol's hello so it reports that Qwen Code must be updated instead of a
+// protocol's hello so it reports that MariaDB Shell Agent must be updated instead of a
 // generic connection timeout.
 const legacySocketPath = overridden
   ? undefined
@@ -201,7 +202,7 @@ function accept(socket: Socket): void {
                 type: 'error',
                 code: 'EXTENSION_VERSION_MISMATCH',
                 message:
-                  'Browser Use CLI, Native Host and Chrome extension versions must match. Update Qwen Code, run native-host-setup.js install, and reload the extension at chrome://extensions.',
+                  'Browser Use CLI, Native Host and Chrome extension versions must match. Update MariaDB Shell Agent, run native-host-setup.js install, and reload the extension at chrome://extensions.',
               }),
             );
             return;

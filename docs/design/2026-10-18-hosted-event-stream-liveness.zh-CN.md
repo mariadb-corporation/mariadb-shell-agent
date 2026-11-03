@@ -2,7 +2,7 @@
 
 [English](2026-10-18-hosted-event-stream-liveness.md) | [简体中文](2026-10-18-hosted-event-stream-liveness.zh-CN.md)
 
-状态：本次变更已实现。交付 [#14135](https://github.com/QwenLM/qwen-code/issues/14135)，即 [#13302 第 2 项](https://github.com/QwenLM/qwen-code/issues/13302#issuecomment-6117110640)（#12380 决策 3）的心跳那一半，也是 [H4f](2026-10-10-managed-task-cancel.zh-CN.md) 真实栈验收的发现 1。模型、工具与 Turn 的操作预算仍归 #13302 第 2 项。
+状态：本次变更已实现。交付 [#14135](https://github.invalid/QwenLM/qwen-code/issues/14135)，即 [#13302 第 2 项](https://github.invalid/QwenLM/qwen-code/issues/13302#issuecomment-6117110640)（#12380 决策 3）的心跳那一半，也是 [H4f](2026-10-10-managed-task-cancel.zh-CN.md) 真实栈验收的发现 1。模型、工具与 Turn 的操作预算仍归 #13302 第 2 项。
 
 ## 问题
 

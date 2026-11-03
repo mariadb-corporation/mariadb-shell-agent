@@ -11,7 +11,7 @@
 派发——还是在运维手工批量取消约 300 个排队 run 之后），`Quality Checks`
 汇总门等了 53 分钟，`Audio Capture Prebuilds / collect prebuilds` 等了 49
 分钟。托管池 20 个并发额度被约 146 个排队的自动化 job（`Qwen Pull Request
-Review`、`Qwen Code CI`、`Qwen Triage` 等）占满，而 GitHub Actions 对托管
+Review`、`MariaDB Shell Agent CI`、`Qwen Triage` 等）占满，而 GitHub Actions 对托管
 runner 是 FIFO 派发、没有按工作流加急的机制，release 只能排队或让运维手工
 批量取消。
 

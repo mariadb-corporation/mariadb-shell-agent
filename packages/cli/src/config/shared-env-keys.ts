@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 import {
@@ -50,7 +51,7 @@ export const PROJECT_ENV_HARDCODED_EXCLUSIONS = [
   'QWEN_UPDATE_BASE_URL',
   // The model catalog is written to the global cache that every project
   // reads, so all three of its keys are operator decisions. A project must
-  // not choose where it is downloaded from; and because `qwen serve`
+  // not choose where it is downloaded from; and because `mariadb-shell-agent serve`
   // snapshots and freezes this environment before any workspace file loads
   // — every workspace child inherits that snapshot, and a workspace can only
   // add absent keys (`setRuntimeEnvIfUnset`) — a repository's own config
@@ -259,7 +260,7 @@ export const PROJECT_ENV_HARDCODED_EXCLUSIONS = [
   'BROWSER',
   // QWEN_CLI_ENTRY is the script path daemon-spawned session processes run.
   // A project `.env` or settings.env fixing it turns
-  // `cd <untrusted repo> && qwen serve` into code execution as the daemon
+  // `cd <untrusted repo> && mariadb-shell-agent serve` into code execution as the daemon
   // via an attacker-chosen ACP entrypoint, for every workspace's sessions.
   'QWEN_CLI_ENTRY',
   // QWEN_CDP_MCP_COMMAND is the command the daemon spawns as the
@@ -272,9 +273,9 @@ export const PROJECT_ENV_HARDCODED_EXCLUSIONS = [
   // The serve daemon bearer token, resolved from --token, the operator's
   // exported environment, or — only on a non-loopback bind with neither
   // source present — a generated ephemeral bearer. A project `.env`,
-  // `.qwen/.env`, or workspace settings.env supplying it would let a cloned
+  // `.mariadb-shell-agent/.env`, or workspace settings.env supplying it would let a cloned
   // repository preset the daemon credential for the operator who launches
-  // `qwen serve` there; the full loader already rejects the key on the reload
+  // `mariadb-shell-agent serve` there; the full loader already rejects the key on the reload
   // tier, and the fast path must not be a second, weaker entry point. The
   // operator channels (export/--token) and home-scoped `.env` files are
   // unaffected; settings.env is rejected at every scope.

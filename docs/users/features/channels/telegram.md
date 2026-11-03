@@ -1,6 +1,6 @@
 # Telegram
 
-This guide covers setting up a Qwen Code channel on Telegram.
+This guide covers setting up a MariaDB Shell Agent channel on Telegram.
 
 ## Prerequisites
 
@@ -24,7 +24,7 @@ The easiest way to find it:
 
 ## Configuration
 
-Add the channel to `~/.qwen/settings.json`:
+Add the channel to `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -58,10 +58,10 @@ Or add it to a `.env` file that gets sourced before running.
 
 ```bash
 # Start only the Telegram channel
-qwen channel start my-telegram
+mariadb-shell-agent channel start my-telegram
 
 # Or start all configured channels together
-qwen channel start
+mariadb-shell-agent channel start
 ```
 
 Then open your bot in Telegram and send a message. You should see "Working..." appear immediately, followed by the agent's response.

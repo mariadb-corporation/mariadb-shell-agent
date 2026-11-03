@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -31,7 +32,7 @@ export function containerEnv(cacheDir: string): string[] {
  * The environment the container RUNTIME CLIENT is spawned with.
  *
  * `DOCKER_HOST` and its TLS companions decide which daemon answers — so a
- * repository that ships one in `.qwen/.env` points both the availability probe
+ * repository that ships one in `.mariadb-shell-agent/.env` points both the availability probe
  * and every `docker run` at a daemon it controls: `required` reads as
  * satisfied, the mount is handed over, and whatever that daemon returns is
  * treated as trusted execution evidence. An operator's own `DOCKER_HOST`

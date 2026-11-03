@@ -4,7 +4,7 @@
 
 状态：已在本次变更中实现
 日期：2026-09-27
-Issue：[#12793](https://github.com/QwenLM/qwen-code/issues/12793)，属于 [#12380](https://github.com/QwenLM/qwen-code/issues/12380)
+Issue：[#12793](https://github.invalid/QwenLM/qwen-code/issues/12793)，属于 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380)
 前置：[Managed Agent API 契约（D1 阶段）](2026-09-27-managed-agent-api-contract.zh-CN.md)
 
 ## 1. 问题
@@ -23,7 +23,7 @@ D1 把评审过的 OpenAPI 放进本仓库，并把它与服务端之间的每�
 - 已归档的 Session 读回时 `status` 为 `"archived"`，而契约的状态枚举没有该值。
 - 若干 operation 没有声明服务端实际返回的错误状态码，契约测试因此从未校验过这些
   错误信封。
-- W0d（[#12797](https://github.com/QwenLM/qwen-code/pull/12797)）把空 Session
+- W0d（[#12797](https://github.invalid/QwenLM/qwen-code/pull/12797)）把空 Session
   绑定到 Workspace。已绑定 Session 的 `workspace` 缺少必填的 `context_revision`
   与 `state`，W0d 把它们记为创建与查询路由上的差异。
 

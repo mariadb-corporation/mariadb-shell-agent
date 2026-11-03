@@ -219,7 +219,7 @@ being a single undo, for the card's size label (a card without a size shows
 none), for the fold and the move on the touch textarea backend, and for a folded
 card reaching the submit payload as an attachment. Browser verification covers the paste-to-card path, the inline
 default, and the move into the editor; the send path is verified at the actions
-layer, because the browser mock daemon has no attachment store. See `.qwen/e2e-tests/web-shell-paste-as-attachment.md` for
+layer, because the browser mock daemon has no attachment store. See `.mariadb-shell-agent/e2e-tests/web-shell-paste-as-attachment.md` for
 the commands and the results.
 
 No open design questions. The follow-up recorded above (attachment-carrying

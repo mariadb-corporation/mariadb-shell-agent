@@ -4,7 +4,7 @@
 
 A deployment can rename the Web Shell product and replace its logo without
 editing source or rebuilding. Two channels: `settings.json` for the standalone
-shell served by `qwen serve`, and a React prop for hosts that embed
+shell served by `mariadb-shell-agent serve`, and a React prop for hosts that embed
 `@qwen-code/web-shell`. An untouched installation renders exactly what it
 renders today.
 
@@ -36,14 +36,14 @@ Brand lives under the existing `ui` section as two string leaves:
   "ui": {
     "brand": {
       "name": "QiuQiu Code",
-      "logoPath": "~/.qwen/brand/logo.svg"
+      "logoPath": "~/.mariadb-shell-agent/brand/logo.svg"
     }
   }
 }
 ```
 
 Both default to the empty string, which means "use the built-in brand". An
-absent or empty `name` keeps `Qwen Code`; an absent or empty `logoPath` keeps
+absent or empty `name` keeps `MariaDB Shell Agent`; an absent or empty `logoPath` keeps
 the current Qwen mark in both the sidebar and the favicon. The two leaves are
 independent — a deployment may rename without replacing the artwork, or the
 reverse.
@@ -64,7 +64,7 @@ consulted, and the daemon route passes `skipWorkspaceSettings` so that layer is
 never even read off disk — the exclusion is structural rather than a filter
 applied after merging.
 
-A workspace `.qwen/settings.json` commonly arrives from a cloned repository
+A workspace `.mariadb-shell-agent/settings.json` commonly arrives from a cloned repository
 that the person opening the shell did not write. Letting that file rename the
 product would let a repo control what every connected browser displays, and
 letting it name a file for the daemon to read and inline into every client
@@ -75,7 +75,7 @@ the same reason, and brand follows that precedent.
 The same boundary closes the placeholder side door. `loadSettings` substitutes
 `$VAR`/`${VAR}` placeholders from the process-wide environment, which
 `loadEnvironment` populates workspace-first at boot — so an operator-layer
-`${BRAND_NAME}` would resolve to whatever a repository's `.qwen/.env` or `env`
+`${BRAND_NAME}` would resolve to whatever a repository's `.mariadb-shell-agent/.env` or `env`
 block supplied. Brand keys therefore compare each layer's substituted value
 against its pre-substitution snapshot (`originalSettings`) and refuse with a
 warning whenever substitution actually fired. A placeholder that resolves to
@@ -309,7 +309,7 @@ prose — settings page descriptions, channel setup, live host installation,
 workflows, skill descriptions — are out of scope by decision. Covering them
 requires a message-override mechanism on the localization provider, which does
 not exist and is a materially larger change. The consequence is stated plainly
-so it is not discovered later: a renamed shell still says `Qwen Code` in body
+so it is not discovered later: a renamed shell still says `MariaDB Shell Agent` in body
 copy.
 
 One localized string is removed rather than left behind: the About panel's

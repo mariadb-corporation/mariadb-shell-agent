@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -455,7 +456,7 @@ describe('REST integration documentation contract', () => {
       );
       expect(ownHeadings).toHaveLength(1);
       expect(operation.externalDocs?.url).toBe(
-        `https://qwenlm.github.io/qwen-code-docs/en/developers/qwen-serve-protocol/#${slug(ownHeadings[0])}`,
+        `https://qwenlm.github.invalid/qwen-code-docs/en/developers/qwen-serve-protocol/#${slug(ownHeadings[0])}`,
       );
       const security = operation.security ?? [];
       expect(security.length).toBeGreaterThan(0);
@@ -710,7 +711,7 @@ describe('REST integration documentation contract', () => {
   it('keeps the quickstart versioned and lifecycle-complete', () => {
     const quickstart = readFileSync(QUICKSTART, 'utf8');
     const sdkVersion = quickstart.match(
-      /targets Qwen Code `v\d+\.\d+\.\d+` and\s+`@qwen-code\/sdk@(\d+\.\d+\.\d+)`/,
+      /targets MariaDB Shell Agent `v\d+\.\d+\.\d+` and\s+`@qwen-code\/sdk@(\d+\.\d+\.\d+)`/,
     )?.[1];
     expect(sdkVersion).toBeTruthy();
     expect(quickstart).toContain(`npm install @qwen-code/sdk@${sdkVersion}`);
@@ -748,7 +749,7 @@ describe('REST integration documentation contract', () => {
 
     const repoLinks = [
       ...guide.matchAll(
-        /\]\((https:\/\/github\.com\/QwenLM\/qwen-code\/(?:blob|tree)\/main\/[^#)\s]+)(?:#[^)]*)?\)/g,
+        /\]\((https:\/\/github\.invalid\/QwenLM\/qwen-code\/(?:blob|tree)\/main\/[^#)\s]+)(?:#[^)]*)?\)/g,
       ),
     ].map((match) => match[1].replace(/^.*\/main\//, ''));
     expect(repoLinks.length).toBeGreaterThan(0);

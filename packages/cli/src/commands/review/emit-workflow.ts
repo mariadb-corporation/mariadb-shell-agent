@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review emit-workflow`: a complete review roster or a selected wave,
+// `mariadb-shell-agent review emit-workflow`: a complete review roster or a selected wave,
 // dispatched by one fixed workflow while preserving the recorded prompts.
 
 import type { CommandModule } from 'yargs';

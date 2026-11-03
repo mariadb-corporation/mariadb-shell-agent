@@ -17,7 +17,7 @@ The OpenTUI foundation, many dialogs, transcript windowing, and steady caret are
 on main. The Hooks and sandbox Diff work in #14044 merged into an old feature
 branch, not main. PTY #14046 and the standalone update stack
 #14134/#14139/#14142/#14187/#14210 remain open. Current npm installation does not
-provide a complete Bun/OpenTUI runtime. Global `qwen` 0.23.0 is only a historical
+provide a complete Bun/OpenTUI runtime. Global `mariadb-shell-agent` 0.23.0 is only a historical
 baseline: strict OpenTUI cannot start because its native package is absent.
 
 ## Goals and boundaries

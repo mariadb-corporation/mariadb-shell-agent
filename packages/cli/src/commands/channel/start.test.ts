@@ -765,7 +765,7 @@ describe('startCommand.handler', () => {
     }
   });
 
-  it('refuses to start when channels are managed by qwen serve', async () => {
+  it('refuses to start when channels are managed by mariadb-shell-agent serve', async () => {
     mockReadServiceInfo.mockReturnValue({
       owner: 'serve',
       pid: 1234,
@@ -787,7 +787,7 @@ describe('startCommand.handler', () => {
     }
 
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      expect.stringContaining('managed by qwen serve'),
+      expect.stringContaining('managed by mariadb-shell-agent serve'),
     );
     expect(mockBridgeStart).not.toHaveBeenCalled();
   });
@@ -1132,7 +1132,7 @@ describe('startCommand.handler', () => {
     const channels = { telegram: { type: 'telegram' } };
     const err = Object.assign(
       new Error(
-        'Channel service pidfile /home/u/.qwen/channels/service.pid holds a record this machine cannot verify.',
+        'Channel service pidfile /home/u/.mariadb-shell-agent/channels/service.pid holds a record this machine cannot verify.',
       ),
       { code: 'channel_service_conflict' },
     );

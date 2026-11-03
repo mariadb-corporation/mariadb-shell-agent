@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -34,7 +35,7 @@ async function download(
 ): Promise<string> {
   const response = await fetch(url, {
     signal,
-    headers: { 'User-Agent': `qwen-code/${version}` },
+    headers: { 'User-Agent': `mariadb-shell-agent/${version}` },
   });
   if (!response.ok || !response.body) {
     await response.body?.cancel();
@@ -101,8 +102,8 @@ export async function installManagedLocalRuntime(
     const tag = encodeURIComponent(`v${version}`);
     const name = `qwen-managed-agent-server-${version}.jar`;
     const sources = [
-      `https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code/${tag}`,
-      `https://github.com/QwenLM/qwen-code/releases/download/${tag}`,
+      `https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/releases/qwen-code/${tag}`,
+      `https://github.invalid/QwenLM/qwen-code/releases/download/${tag}`,
     ];
     const errors: string[] = [];
     for (const source of sources) {

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,7 +13,7 @@ export const modelscopeProvider: ProviderConfig = {
   label: 'ModelScope API Key',
   description: 'Quick setup for ModelScope API Inference',
   protocol: AuthType.USE_OPENAI,
-  baseUrl: 'https://api-inference.modelscope.cn/v1',
+  baseUrl: 'https://api-inference.modelscope.invalid/v1',
   envKey: 'MODELSCOPE_API_KEY',
   models: [
     {
@@ -34,6 +35,6 @@ export const modelscopeProvider: ProviderConfig = {
   modelsEditable: true,
   modelNamePrefix: 'ModelScope',
   documentationUrl:
-    'https://modelscope.cn/docs/model-service/API-Inference/intro',
+    'https://modelscope.invalid/docs/model-service/API-Inference/intro',
   uiGroup: 'third-party',
 };

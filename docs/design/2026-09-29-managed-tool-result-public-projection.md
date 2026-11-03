@@ -2,11 +2,11 @@
 
 [English](2026-09-29-managed-tool-result-public-projection.md) | [简体中文](2026-09-29-managed-tool-result-public-projection.zh-CN.md)
 
-Status: implementation in this change, disabled by default pending deployment validation. Research date: 2026-09-29; implementation date: 2026-09-30. Part of [#12380](https://github.com/QwenLM/qwen-code/issues/12380).
+Status: implementation in this change, disabled by default pending deployment validation. Research date: 2026-09-29; implementation date: 2026-09-30. Part of [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380).
 
 ## 1. Baselines and objective
 
-Research used main at `be1ebc74d7f5b0bdce2b88a6565d4940d5a6b3c0`, O2 [#12894](https://github.com/QwenLM/qwen-code/pull/12894) at `0172d5ecae7a3a11824665800211241d24472cd6`, and the [original result design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-tool-result-artifacts.md). O2 is an unmerged dependency at this baseline. The implementation is rebased onto main `3b18cfe5e4ab7ea72f1a92736186dacf753bf727` after O2 merged, including its latest retry and cancellation fixes; local tests do not establish real OSS or different-host readiness.
+Research used main at `be1ebc74d7f5b0bdce2b88a6565d4940d5a6b3c0`, O2 [#12894](https://github.invalid/QwenLM/qwen-code/pull/12894) at `0172d5ecae7a3a11824665800211241d24472cd6`, and the [original result design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-tool-result-artifacts.md). O2 is an unmerged dependency at this baseline. The implementation is rebased onto main `3b18cfe5e4ab7ea72f1a92736186dacf753bf727` after O2 merged, including its latest retry and cancellation fixes; local tests do not establish real OSS or different-host readiness.
 
 O3 makes a durably recorded tool result discoverable and readable through the Java public API and Managed WebShell. A user can inspect a bounded preview and download an authorized immutable output after the Runtime and Harness have gone. Live events and restored history identify the same result. A successful command, complete capture, committed delivery, and currently readable content remain separate facts.
 
@@ -132,7 +132,7 @@ The preview source window is up to 8 KiB, with independent UTF-8 byte and 200-li
 
 ## 5. Public contract and event recovery
 
-The canonical OpenAPI remains the source for Java contract tests and generated WebShell types. This change implements the seven routes below with handlers and conformance tests in OpenAPI v1.27.0, plus Flyway V26 after rebasing onto main and reconciling the merged O2 migrations and concurrent contract work such as [#12998](https://github.com/QwenLM/qwen-code/pull/12998).
+The canonical OpenAPI remains the source for Java contract tests and generated WebShell types. This change implements the seven routes below with handlers and conformance tests in OpenAPI v1.27.0, plus Flyway V26 after rebasing onto main and reconciling the merged O2 migrations and concurrent contract work such as [#12998](https://github.invalid/QwenLM/qwen-code/pull/12998).
 
 | Surface        | Operation                                                                                                         |
 | -------------- | ----------------------------------------------------------------------------------------------------------------- |
@@ -229,7 +229,7 @@ O3 adds public reference mappings and read admission; O4 owns physical garbage c
 | Session deletion races projection                                                             | Session-row gate prevents public writes after deletion starts; source is retained/suppressed for recovery policy.                                                                    |
 | Access revoked during a range/download                                                        | Stop future delivery at the stated chunk boundary; no Runtime action. (Since 2026-10-02, issue #13181: at the first chunk boundary after the revalidation window's end, default 5s.) |
 | Accepted bytes become corrupt or missing                                                      | Availability becomes unavailable with bounded diagnostics; original execution/capture facts are preserved.                                                                           |
-| An uncertain publication candidate's operation deadline expires before durable finish/receipt | No public accepted Artifact; [#13019](https://github.com/QwenLM/qwen-code/issues/13019) owns that liveness policy. This is not expiry of retained publication data.                  |
+| An uncertain publication candidate's operation deadline expires before durable finish/receipt | No public accepted Artifact; [#13019](https://github.invalid/QwenLM/qwen-code/issues/13019) owns that liveness policy. This is not expiry of retained publication data.              |
 
 O3 cannot certify O2 durability, solve orphan Runtime cleanup, or make partial output safe for model continuation. Its reads remain independent of those execution recovery actions.
 
@@ -262,7 +262,7 @@ No change to Tool v3 execution/ACK schemas or Broker dispatch is required by thi
 
 ## 11. Validation plan and acceptance
 
-The companion working plan is `.qwen/e2e-tests/2026-09-29-o3-public-projection.md`. Each behavioral test must exercise the actual producer or transaction boundary; mocked UI data alone cannot prove the pipeline.
+The companion working plan is `.mariadb-shell-agent/e2e-tests/2026-09-29-o3-public-projection.md`. Each behavioral test must exercise the actual producer or transaction boundary; mocked UI data alone cannot prove the pipeline.
 
 | Group                  | Required evidence                                                                                                                                                                                                  |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

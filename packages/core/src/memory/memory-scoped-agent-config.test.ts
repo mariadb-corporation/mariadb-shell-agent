@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -393,7 +394,7 @@ describe('isAllowedMemoryPath with a symlinked project root', () => {
   let projectRoot: string;
 
   beforeEach(async () => {
-    // Local mode anchors the memory root at `<projectRoot>/.qwen/memory`, so an
+    // Local mode anchors the memory root at `<projectRoot>/.mariadb-shell-agent/memory`, so an
     // explicit project-root symlink puts a symlink in the root path on every
     // platform, not only where os.tmpdir() is one (macOS `/var`). The root is
     // deliberately NOT created: the allow-check must resolve the nearest
@@ -424,7 +425,7 @@ describe('isAllowedMemoryPath with a symlinked project root', () => {
 
   it('still denies a path outside the symlinked managed-memory root', () => {
     // The symmetric resolution must not become overly permissive: a project
-    // file outside `<projectRoot>/.qwen/memory`, reached through the same
+    // file outside `<projectRoot>/.mariadb-shell-agent/memory`, reached through the same
     // symlinked root, is still rejected.
     const outsideFile = path.join(projectRoot, 'notes.md');
     expect(isAllowedMemoryPath(outsideFile, projectRoot)).toBe(false);
@@ -433,9 +434,9 @@ describe('isAllowedMemoryPath with a symlinked project root', () => {
 
 describe('isAllowedMemoryPath with a symlinked managed-memory suffix', () => {
   // Unlike the block above (symlink ABOVE the trusted anchor, like macOS
-  // `/var`), here a repo-tracked `.qwen` INSIDE the managed suffix points out
+  // `/var`), here a repo-tracked `.mariadb-shell-agent` INSIDE the managed suffix points out
   // of the project. Canonicalizing it would relocate the allowed root, so the
-  // anchor is canonicalized but `.qwen/memory` is appended literally and the
+  // anchor is canonicalized but `.mariadb-shell-agent/memory` is appended literally and the
   // write is denied.
   const originalMemoryLocal = process.env['QWEN_CODE_MEMORY_LOCAL'];
   let baseDir: string;
@@ -449,9 +450,12 @@ describe('isAllowedMemoryPath with a symlinked managed-memory suffix', () => {
     outsideDir = path.join(baseDir, 'outside');
     await fs.mkdir(projectRoot, { recursive: true });
     await fs.mkdir(outsideDir, { recursive: true });
-    // A malicious repo can ship the whole `.qwen` dir as a git-tracked
+    // A malicious repo can ship the whole `.mariadb-shell-agent` dir as a git-tracked
     // symlink escaping the project.
-    await fs.symlink(outsideDir, path.join(projectRoot, '.qwen'));
+    await fs.symlink(
+      outsideDir,
+      path.join(projectRoot, '.mariadb-shell-agent'),
+    );
     clearAutoMemoryRootCache();
   });
 
@@ -461,15 +465,15 @@ describe('isAllowedMemoryPath with a symlinked managed-memory suffix', () => {
     await fs.rm(baseDir, { recursive: true, force: true });
   });
 
-  it('denies a write via a `.qwen` symlink escaping the project when the target is absent', () => {
-    // `.qwen -> /outside` with `/outside/memory` absent: the candidate resolves
+  it('denies a write via a `.mariadb-shell-agent` symlink escaping the project when the target is absent', () => {
+    // `.mariadb-shell-agent -> /outside` with `/outside/memory` absent: the candidate resolves
     // to `/outside/memory/project.md`, but the allowed root keeps the literal
-    // `.qwen/memory` suffix, so the escape is rejected before it creates it.
+    // `.mariadb-shell-agent/memory` suffix, so the escape is rejected before it creates it.
     const memoryFile = path.join(getAutoMemoryRoot(projectRoot), 'project.md');
     expect(isAllowedMemoryPath(memoryFile, projectRoot)).toBe(false);
   });
 
-  it('denies a write via a `.qwen` symlink escaping the project when the target already exists', async () => {
+  it('denies a write via a `.mariadb-shell-agent` symlink escaping the project when the target already exists', async () => {
     // Must stay denied once `/outside/memory` exists; realpath'ing the whole
     // root would resolve the symlink on both sides and let the write through.
     await fs.mkdir(path.join(outsideDir, 'memory'), { recursive: true });
@@ -520,7 +524,7 @@ describe('isAllowedMemoryPath in default (shared) memory mode', () => {
     await fs.symlink(realBase, linkBase);
     const root = useBaseDir(linkBase);
     // Sanity: shared mode puts the root under the (symlinked) base dir, not
-    // `<projectRoot>/.qwen`; guards against silently falling back to local.
+    // `<projectRoot>/.mariadb-shell-agent`; guards against silently falling back to local.
     expect(root.startsWith(linkBase + path.sep)).toBe(true);
     expect(
       isAllowedMemoryPath(path.join(root, 'project.md'), projectRoot),

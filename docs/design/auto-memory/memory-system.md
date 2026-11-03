@@ -1,6 +1,6 @@
 # Memory 记忆管理系统
 
-> 本文介绍 Qwen Code 中 **Managed Auto-Memory**（托管自动记忆）的记忆管理机制、触发时机和实现细节。
+> 本文介绍 MariaDB Shell Agent 中 **Managed Auto-Memory**（托管自动记忆）的记忆管理机制、触发时机和实现细节。
 
 ---
 
@@ -38,7 +38,7 @@ Managed Auto-Memory 是一套在 AI 会话过程中**自动**积累、整合和�
 ### 目录布局
 
 ```
-~/.qwen/                                      ← 全局基础目录（默认）
+~/.mariadb-shell-agent/                                      ← 全局基础目录（默认）
 └── projects/
     └── <sanitized-git-root>/                 ← 项目标识（基于 Git 根路径）
         ├── meta.json                         ← 元数据（提取/整合时间戳、状态）
@@ -57,8 +57,8 @@ Managed Auto-Memory 是一套在 AI 会话过程中**自动**积累、整合和�
 > **环境变量覆盖**：
 >
 > - `QWEN_CODE_MEMORY_BASE_DIR`：替换全局基础目录
-> - `QWEN_CODE_MEMORY_LOCAL=1`：改用项目内路径 `.qwen/memory/`
-> - `QWEN_CODE_MEMORY_PROJECT_SCOPE=workspace`：按精确 workspace 目录分区项目记忆。`qwen serve` 未显式设置或值为空白时会注入 `workspace`；standalone CLI 仍默认按 Git 根目录共享。非空取值会做 trim / 小写归一，无法识别的值会告警一次并回退到 `git-root`。
+> - `QWEN_CODE_MEMORY_LOCAL=1`：改用项目内路径 `.mariadb-shell-agent/memory/`
+> - `QWEN_CODE_MEMORY_PROJECT_SCOPE=workspace`：按精确 workspace 目录分区项目记忆。`mariadb-shell-agent serve` 未显式设置或值为空白时会注入 `workspace`；standalone CLI 仍默认按 Git 根目录共享。非空取值会做 trim / 小写归一，无法识别的值会告警一次并回退到 `git-root`。
 >   - 团队记忆（`getTeamAutoMemoryRoot`）仍按 Git 根目录分区：同一 checkout 内的嵌套 workspace 仍共享团队记忆——团队记忆本就应跨 workspace 共享，不随本开关改变。
 >   - 切换 scope 不做迁移：切到 `workspace` 后，此前写在 git-root key 下的项目记忆会“失联”（切回去则看不到 workspace key 下新写的内容）。
 >   - 目录 key 由 `sanitizeCwd` 生成（非字母数字字符替换为 `-`），仅在标点上不同的兄弟目录（如 `feature_1` 与 `feature-1`）会映射到同一记忆目录；`workspace` 分区下这类命名会共享记忆，命名时需避开。
@@ -86,7 +86,7 @@ Managed Auto-Memory 是一套在 AI 会话过程中**自动**积累、整合和�
 | `project`   | 项目进展、目标、决策、截止日期、Bug 追踪              | 了解到谁在做什么、为什么、截止何时时     | 帮助 AI 理解工作背景和动机时 |
 | `reference` | 外部系统资源指针（Dashboard、工单系统、Slack 频道等） | 得知某种外部资源及其用途时               | 用户提及外部系统或相关信息时 |
 
-**不应该存入记忆的内容**：代码模式/约定、Git 历史、调试方案、临时任务状态、已在 QWEN.md/AGENTS.md 中记录的内容。
+**不应该存入记忆的内容**：代码模式/约定、Git 历史、调试方案、临时任务状态、已在 MARIADB-SHELL-AGENT.md/AGENTS.md 中记录的内容。
 
 ---
 

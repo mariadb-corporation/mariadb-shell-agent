@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -112,7 +113,7 @@ describe('SleepInhibitor', () => {
       [
         '--no-ask-password',
         '--what=sleep',
-        '--who=Qwen Code',
+        '--who=MariaDB Shell Agent',
         '--why=working',
         '--mode=block',
         'sleep',

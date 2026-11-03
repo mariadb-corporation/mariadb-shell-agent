@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -97,7 +98,9 @@ describe('tailJob', () => {
 describe('runCiLog', () => {
   beforeEach(() => {
     mocks.root = mkdtempSync(join(tmpdir(), 'autofix-ci-log-'));
-    mkdirSync(join(mocks.root, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(mocks.root, '.mariadb-shell-agent', 'tmp'), {
+      recursive: true,
+    });
     mocks.gh.mockReset();
     mocks.stdout.mockReset();
   });
@@ -154,7 +157,12 @@ describe('runCiLog', () => {
     );
     const outside = join(mocks.root, 'outside.txt');
     writeFileSync(outside, 'keep me');
-    const log = join(mocks.root, '.qwen', 'tmp', 'autofix-pr-7-ci-456.log');
+    const log = join(
+      mocks.root,
+      '.mariadb-shell-agent',
+      'tmp',
+      'autofix-pr-7-ci-456.log',
+    );
     symlinkSync(outside, log);
     runCiLog(7, 456, 200);
     expect(readFileSync(outside, 'utf8')).toBe('keep me');
@@ -267,7 +275,14 @@ describe('runCiLog', () => {
     );
     expect(mocks.stdout).not.toHaveBeenCalled();
     expect(
-      existsSync(join(mocks.root, '.qwen', 'tmp', 'autofix-pr-7-ci-456.log')),
+      existsSync(
+        join(
+          mocks.root,
+          '.mariadb-shell-agent',
+          'tmp',
+          'autofix-pr-7-ci-456.log',
+        ),
+      ),
     ).toBe(false);
   });
 });

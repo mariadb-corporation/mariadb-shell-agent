@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,13 +18,13 @@ import type {
 /**
  * Option B: writes the artifact to the local Qwen home and returns a file://
  * URL. No network, no sharing — the page opens directly in the browser. Keyed
- * by id under `~/.qwen/artifacts/{id}/index.html`, so redeploys overwrite in
+ * by id under `~/.mariadb-shell-agent/artifacts/{id}/index.html`, so redeploys overwrite in
  * place and keep the same URL.
  */
 export class LocalPublisher implements ArtifactPublisher {
   readonly kind = 'local';
 
-  /** @param baseDir Override the output root (defaults to ~/.qwen/artifacts). */
+  /** @param baseDir Override the output root (defaults to ~/.mariadb-shell-agent/artifacts). */
   constructor(private readonly baseDir?: string) {}
 
   private getBaseDir(): string {

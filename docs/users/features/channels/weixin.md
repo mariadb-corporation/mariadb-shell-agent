@@ -1,6 +1,6 @@
 # WeChat (Weixin)
 
-This guide covers setting up a Qwen Code channel on WeChat via the official iLink Bot API.
+This guide covers setting up a MariaDB Shell Agent channel on WeChat via the official iLink Bot API.
 
 ## Prerequisites
 
@@ -14,14 +14,14 @@ This guide covers setting up a Qwen Code channel on WeChat via the official iLin
 WeChat uses QR code authentication instead of a static bot token. Run the login command:
 
 ```bash
-qwen channel configure-weixin
+mariadb-shell-agent channel configure-weixin
 ```
 
-This will display a QR code URL. Scan it with your WeChat mobile app to authenticate. Your credentials are saved to `~/.qwen/channels/weixin/account.json`.
+This will display a QR code URL. Scan it with your WeChat mobile app to authenticate. Your credentials are saved to `~/.mariadb-shell-agent/channels/weixin/account.json`.
 
 ### 2. Configure the channel
 
-Add the channel to `~/.qwen/settings.json`:
+Add the channel to `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -45,10 +45,10 @@ Note: WeChat channels do not use a `token` field — credentials come from the Q
 
 ```bash
 # Start only the WeChat channel
-qwen channel start my-weixin
+mariadb-shell-agent channel start my-weixin
 
 # Or start all configured channels together
-qwen channel start
+mariadb-shell-agent channel start
 ```
 
 Open WeChat and send a message to the bot. You should see a typing indicator ("...") while the agent processes, followed by the response.
@@ -81,23 +81,23 @@ WeChat channels support all the standard channel options (see [Channel Overview]
 
 - **Use plain text instructions** — Since WeChat strips all markdown, add instructions like "Use plain text only" to avoid the agent producing formatted responses that look messy.
 - **Keep responses short** — WeChat message bubbles work best with concise text. Adding a character limit to your instructions helps (e.g., "Keep responses under 500 characters").
-- **Session expiry** — If you see "Session expired (errcode -14)" in the logs, your WeChat login has expired. Stop the channel and re-run `qwen channel configure-weixin` to log in again.
+- **Session expiry** — If you see "Session expired (errcode -14)" in the logs, your WeChat login has expired. Stop the channel and re-run `mariadb-shell-agent channel configure-weixin` to log in again.
 - **Restrict access** — Use `privatePolicy: "pairing"` or `"allowlist"` to control who can talk to the bot. See [DM Pairing](./overview#dm-pairing) for details.
 
 ## Troubleshooting
 
 ### "WeChat account not configured"
 
-Run `qwen channel configure-weixin` to log in via QR code first.
+Run `mariadb-shell-agent channel configure-weixin` to log in via QR code first.
 
 ### "Session expired (errcode -14)"
 
-Your WeChat login session has expired. Stop the channel and run `qwen channel configure-weixin` again.
+Your WeChat login session has expired. Stop the channel and run `mariadb-shell-agent channel configure-weixin` again.
 
 ### Bot doesn't respond
 
 - Check the terminal output for errors
-- Verify the channel is running (`qwen channel start my-weixin`)
+- Verify the channel is running (`mariadb-shell-agent channel start my-weixin`)
 - If using `privatePolicy: "allowlist"`, make sure your WeChat user ID is in `allowedUsers`
 
 ### Images not working

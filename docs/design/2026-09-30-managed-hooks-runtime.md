@@ -3,7 +3,7 @@
 [English](2026-09-30-managed-hooks-runtime.md) | [简体中文](2026-09-30-managed-hooks-runtime.zh-CN.md)
 
 Status: implemented and locally validated; Linux cgroup execution validation
-remains pending. This implements H2 of [#12827](https://github.com/QwenLM/qwen-code/issues/12827), following H1.
+remains pending. This implements H2 of [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827), following H1.
 The references are section 5 of the
 [extension runtime design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-extension-runtime.md)
 and section 6 of the
@@ -313,7 +313,7 @@ top-level code finishes. All saved receipts, including settled ones,
 count toward the 4096 lifetime limit. Neither timeout, user cancellation, DELETE
 nor process replacement proves completion or permits replay. H2 provides no
 administrative abandonment route; receipt reconciliation or durable fenced
-reclamation is tracked in [#13133](https://github.com/QwenLM/qwen-code/issues/13133).
+reclamation is tracked in [#13133](https://github.invalid/QwenLM/qwen-code/issues/13133).
 This is an accepted recovery limitation, not a bounded recovery or availability
 guarantee, and does not declare the original review findings resolved.
 
@@ -419,14 +419,14 @@ enforces them in memory.
 
 ## Validation and acceptance
 
-The ignored working plan is `.qwen/e2e-tests/12827-h2.md`. Baseline uses global
-`qwen`; verification uses the local bundle, deterministic model responses, real
+The ignored working plan is `.mariadb-shell-agent/e2e-tests/12827-h2.md`. Baseline uses global
+`mariadb-shell-agent`; verification uses the local bundle, deterministic model responses, real
 processes and side-effect counters. Production transport coverage connects Hosted,
 Java Session Store, Embedded Broker and a spawned Tool Runtime. Local SQL coverage
 uses H2; it is not a claim of a MySQL deployment test. The current validation host
 is macOS without a Linux container runtime. Linux cgroup descendant, cancellation
 and async drain tests are conditional and have not been executed here; their setup
-is recorded in `.qwen/e2e-tests/12827-h2-cgroup-validation.md`. Local transport E2E
+is recorded in `.mariadb-shell-agent/e2e-tests/12827-h2-cgroup-validation.md`. Local transport E2E
 uses trusted function handlers for side effects and separately verifies command
 refusal before execution. It does not claim to verify Linux command drain.
 

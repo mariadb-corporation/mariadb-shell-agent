@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,7 +19,7 @@
  *  1. the daemon's workspace MCP status (injected via getMcpServers) — this
  *     covers servers registered at runtime via POST /workspace/mcp/servers;
  *     any server whose name contains "a2ui" is a candidate, connected first;
- *  2. fallback: `mcpServers` in the workspace `.qwen/settings.json` (when the
+ *  2. fallback: `mcpServers` in the workspace `.mariadb-shell-agent/settings.json` (when the
  *     daemon status is unavailable).
  * Transports: stdio (command/args) and streamable HTTP (httpUrl). Legacy SSE
  * (`url`) is intentionally unsupported.
@@ -123,7 +124,7 @@ export async function findFromSettingsFile(
 ): Promise<McpServerConfigLike | null> {
   try {
     const raw = await fsp.readFile(
-      path.join(workspaceCwd, '.qwen', 'settings.json'),
+      path.join(workspaceCwd, '.mariadb-shell-agent', 'settings.json'),
       'utf8',
     );
     const settings = JSON.parse(raw) as {

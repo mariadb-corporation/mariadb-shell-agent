@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -130,7 +131,9 @@ describe('loadServerHierarchicalMemory', () => {
       );
 
       expect(fileCount).toEqual(1);
-      expect(memoryContent).toContain(path.relative(cwd, filepath).toString());
+      expect(memoryContent).toContain(
+        formatContextFileDisplayPath(filepath, cwd, homedir).toString(),
+      );
     });
   });
 
@@ -247,7 +250,7 @@ describe('loadServerHierarchicalMemory', () => {
     );
 
     expect(result).toEqual({
-      memoryContent: `--- Context from: ${path.relative(cwd, defaultContextFile)} ---\ndefault context content\n--- End of Context from: ${path.relative(cwd, defaultContextFile)} ---`,
+      memoryContent: `--- Context from: ${formatContextFileDisplayPath(defaultContextFile, cwd, homedir)} ---\ndefault context content\n--- End of Context from: ${formatContextFileDisplayPath(defaultContextFile, cwd, homedir)} ---`,
       fileCount: 1,
       contextFilePaths: [
         path.join('~', path.relative(homedir, defaultContextFile)),
@@ -276,7 +279,7 @@ describe('loadServerHierarchicalMemory', () => {
     );
 
     expect(result).toEqual({
-      memoryContent: `--- Context from: ${path.relative(cwd, customContextFile)} ---\ncustom context content\n--- End of Context from: ${path.relative(cwd, customContextFile)} ---`,
+      memoryContent: `--- Context from: ${formatContextFileDisplayPath(customContextFile, cwd, homedir)} ---\ncustom context content\n--- End of Context from: ${formatContextFileDisplayPath(customContextFile, cwd, homedir)} ---`,
       fileCount: 1,
       contextFilePaths: [
         path.join('~', path.relative(homedir, customContextFile)),
@@ -442,7 +445,7 @@ describe('loadServerHierarchicalMemory', () => {
 
     // Subdirectory files are not loaded, only global and upward from CWD
     expect(result).toEqual({
-      memoryContent: `--- Context from: ${path.relative(cwd, defaultContextFile)} ---\ndefault context content\n--- End of Context from: ${path.relative(cwd, defaultContextFile)} ---\n\n--- Context from: ${path.relative(cwd, rootMemoryFile)} ---\nProject parent memory\n--- End of Context from: ${path.relative(cwd, rootMemoryFile)} ---\n\n--- Context from: ${path.relative(cwd, projectRootMemoryFile)} ---\nProject root memory\n--- End of Context from: ${path.relative(cwd, projectRootMemoryFile)} ---\n\n--- Context from: ${path.relative(cwd, cwdMemoryFile)} ---\nCWD memory\n--- End of Context from: ${path.relative(cwd, cwdMemoryFile)} ---`,
+      memoryContent: `--- Context from: ${formatContextFileDisplayPath(defaultContextFile, cwd, homedir)} ---\ndefault context content\n--- End of Context from: ${formatContextFileDisplayPath(defaultContextFile, cwd, homedir)} ---\n\n--- Context from: ${path.relative(cwd, rootMemoryFile)} ---\nProject parent memory\n--- End of Context from: ${path.relative(cwd, rootMemoryFile)} ---\n\n--- Context from: ${path.relative(cwd, projectRootMemoryFile)} ---\nProject root memory\n--- End of Context from: ${path.relative(cwd, projectRootMemoryFile)} ---\n\n--- Context from: ${path.relative(cwd, cwdMemoryFile)} ---\nCWD memory\n--- End of Context from: ${path.relative(cwd, cwdMemoryFile)} ---`,
       fileCount: 4,
       contextFilePaths: [
         path.join('~', path.relative(homedir, defaultContextFile)),
@@ -517,7 +520,7 @@ describe('loadServerHierarchicalMemory', () => {
 
   it('should load extension context file paths', async () => {
     const extensionFilePath = await createTestFile(
-      path.join(testRootDir, 'extensions/ext1/QWEN.md'),
+      path.join(testRootDir, 'extensions/ext1/MARIADB-SHELL-AGENT.md'),
       'Extension memory content',
     );
 
@@ -590,7 +593,7 @@ describe('loadServerHierarchicalMemory', () => {
       'project context',
     );
     const extensionFile = await createTestFile(
-      path.join(testRootDir, 'extensions/ext1/QWEN.md'),
+      path.join(testRootDir, 'extensions/ext1/MARIADB-SHELL-AGENT.md'),
       'extension context',
     );
     const notifications: InstructionsLoadedNotification[] = [];
@@ -873,7 +876,7 @@ describe('loadServerHierarchicalMemory', () => {
     );
 
     // The grandchild is imported by child.md, but the chain was started by the
-    // top-level discovered QWEN.md, so trigger != parent at depth > 1.
+    // top-level discovered MARIADB-SHELL-AGENT.md, so trigger != parent at depth > 1.
     expect(notifications).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -1056,8 +1059,8 @@ describe('loadServerHierarchicalMemory', () => {
     expect(childOccurrences).toBe(1);
   });
 
-  describe('QWEN.local.md (project-local context file)', () => {
-    // The local-context-file slot is anchored at `<projectRoot>/.qwen/`, where
+  describe('MARIADB-SHELL-AGENT.local.md (project-local context file)', () => {
+    // The local-context-file slot is anchored at `<projectRoot>/.mariadb-shell-agent/`, where
     // projectRoot is the nearest ancestor containing a `.git` directory OR a
     // `.git` file (the latter is how git worktrees and submodules are marked).
     // Most tests in this block use the directory form; a few below cover the
@@ -1066,9 +1069,9 @@ describe('loadServerHierarchicalMemory', () => {
       await createEmptyDir(path.join(projectRoot, '.git'));
     });
 
-    it('loads .qwen/QWEN.local.md from project root when present', async () => {
+    it('loads .mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md from project root when present', async () => {
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'MARIADB-SHELL-AGENT.local.md'),
         'local context content',
       );
 
@@ -1086,7 +1089,7 @@ describe('loadServerHierarchicalMemory', () => {
       );
     });
 
-    it('notifies when QWEN.local.md is loaded', async () => {
+    it('notifies when MARIADB-SHELL-AGENT.local.md is loaded', async () => {
       const localFile = await createTestFile(
         path.join(projectRoot, QWEN_DIR, LOCAL_CONTEXT_FILENAME),
         'local context content',
@@ -1119,13 +1122,13 @@ describe('loadServerHierarchicalMemory', () => {
       );
     });
 
-    it('orders QWEN.local.md after the project-root QWEN.md', async () => {
+    it('orders MARIADB-SHELL-AGENT.local.md after the project-root MARIADB-SHELL-AGENT.md', async () => {
       const projectFile = await createTestFile(
         path.join(projectRoot, DEFAULT_CONTEXT_FILENAME),
         'shared project context',
       );
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'MARIADB-SHELL-AGENT.local.md'),
         'local override',
       );
 
@@ -1148,7 +1151,7 @@ describe('loadServerHierarchicalMemory', () => {
       expect(localIdx).toBeGreaterThan(projectIdx);
     });
 
-    it('orders QWEN.local.md after upward-traversed CWD QWEN.md', async () => {
+    it('orders MARIADB-SHELL-AGENT.local.md after upward-traversed CWD MARIADB-SHELL-AGENT.md', async () => {
       const projectFile = await createTestFile(
         path.join(projectRoot, DEFAULT_CONTEXT_FILENAME),
         'project root memory',
@@ -1158,7 +1161,7 @@ describe('loadServerHierarchicalMemory', () => {
         'cwd memory',
       );
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'MARIADB-SHELL-AGENT.local.md'),
         'local memory',
       );
 
@@ -1183,7 +1186,7 @@ describe('loadServerHierarchicalMemory', () => {
       expect(localIdx).toBeGreaterThan(cwdIdx);
     });
 
-    it('silently ignores absent .qwen/QWEN.local.md', async () => {
+    it('silently ignores absent .mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md', async () => {
       await createTestFile(
         path.join(projectRoot, DEFAULT_CONTEXT_FILENAME),
         'project content',
@@ -1199,12 +1202,14 @@ describe('loadServerHierarchicalMemory', () => {
 
       expect(result.fileCount).toBe(1);
       expect(result.memoryContent).toContain('project content');
-      expect(result.memoryContent).not.toContain('QWEN.local.md');
+      expect(result.memoryContent).not.toContain(
+        'MARIADB-SHELL-AGENT.local.md',
+      );
     });
 
-    it('does not load QWEN.local.md from untrusted workspaces', async () => {
+    it('does not load MARIADB-SHELL-AGENT.local.md from untrusted workspaces', async () => {
       await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'MARIADB-SHELL-AGENT.local.md'),
         'local content',
       );
 
@@ -1220,9 +1225,9 @@ describe('loadServerHierarchicalMemory', () => {
       expect(memoryContent).not.toContain('local content');
     });
 
-    it('does not load QWEN.local.md in explicit-only mode', async () => {
+    it('does not load MARIADB-SHELL-AGENT.local.md in explicit-only mode', async () => {
       await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'MARIADB-SHELL-AGENT.local.md'),
         'local content',
       );
 
@@ -1241,12 +1246,12 @@ describe('loadServerHierarchicalMemory', () => {
       expect(result.memoryContent).not.toContain('local content');
     });
 
-    it('does not search .qwen/QWEN.local.md in CWD subdirectories', async () => {
-      // A `.qwen/QWEN.local.md` placed inside a nested directory (not the
+    it('does not search .mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md in CWD subdirectories', async () => {
+      // A `.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md` placed inside a nested directory (not the
       // project root) must NOT be picked up — the slot is single, fixed,
-      // and lives at <projectRoot>/.qwen/QWEN.local.md.
+      // and lives at <projectRoot>/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md.
       await createTestFile(
-        path.join(cwd, QWEN_DIR, 'QWEN.local.md'),
+        path.join(cwd, QWEN_DIR, 'MARIADB-SHELL-AGENT.local.md'),
         'misplaced local content',
       );
 
@@ -1262,9 +1267,9 @@ describe('loadServerHierarchicalMemory', () => {
       expect(result.memoryContent).not.toContain('misplaced local content');
     });
 
-    it('loads QWEN.local.md even when no project QWEN.md exists', async () => {
+    it('loads MARIADB-SHELL-AGENT.local.md even when no project MARIADB-SHELL-AGENT.md exists', async () => {
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'MARIADB-SHELL-AGENT.local.md'),
         'standalone local',
       );
 
@@ -1282,7 +1287,7 @@ describe('loadServerHierarchicalMemory', () => {
       );
     });
 
-    it('loads QWEN.local.md when project root is marked by a .git FILE (worktree / submodule layout)', async () => {
+    it('loads MARIADB-SHELL-AGENT.local.md when project root is marked by a .git FILE (worktree / submodule layout)', async () => {
       // Git worktrees and submodules mark the repo root with a `.git` file
       // (containing `gitdir: <path>`), not a `.git` directory. The loader
       // must treat that as a valid project root, otherwise `<cwd>` is used
@@ -1298,7 +1303,7 @@ describe('loadServerHierarchicalMemory', () => {
       );
 
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'MARIADB-SHELL-AGENT.local.md'),
         'worktree local',
       );
 
@@ -1316,7 +1321,7 @@ describe('loadServerHierarchicalMemory', () => {
       );
     });
 
-    it('skips QWEN.local.md when no project root can be found (no .git ancestor)', async () => {
+    it('skips MARIADB-SHELL-AGENT.local.md when no project root can be found (no .git ancestor)', async () => {
       // Without a project root, falling back to cwd would silently turn the
       // single fixed slot into a per-cwd file — opposite of the design.
       // Pin the "skip" behavior so a future regression doesn't reintroduce
@@ -1327,11 +1332,11 @@ describe('loadServerHierarchicalMemory', () => {
       });
 
       await createTestFile(
-        path.join(cwd, QWEN_DIR, 'QWEN.local.md'),
+        path.join(cwd, QWEN_DIR, 'MARIADB-SHELL-AGENT.local.md'),
         'cwd-anchored local that must not load',
       );
       await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'MARIADB-SHELL-AGENT.local.md'),
         'projectRoot-anchored local that must not load either',
       );
 
@@ -1352,9 +1357,9 @@ describe('loadServerHierarchicalMemory', () => {
       );
     });
 
-    it('skips QWEN.local.md when cwd === homedir without .git (avoids global-dir collision)', async () => {
+    it('skips MARIADB-SHELL-AGENT.local.md when cwd === homedir without .git (avoids global-dir collision)', async () => {
       // When cwd is the home directory and there is no `.git` there, the
-      // would-be slot path resolves to `<homedir>/.qwen/QWEN.local.md` —
+      // would-be slot path resolves to `<homedir>/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md` —
       // i.e. inside the GLOBAL Qwen dir. Loading that as a project-local
       // override is wrong: there is no project. Pin the "skip" behavior.
       await fsPromises.rm(path.join(projectRoot, '.git'), {
@@ -1362,7 +1367,7 @@ describe('loadServerHierarchicalMemory', () => {
         force: true,
       });
       await createTestFile(
-        path.join(homedir, QWEN_DIR, 'QWEN.local.md'),
+        path.join(homedir, QWEN_DIR, 'MARIADB-SHELL-AGENT.local.md'),
         'do not promote this to project-local',
       );
 
@@ -1374,7 +1379,7 @@ describe('loadServerHierarchicalMemory', () => {
         DEFAULT_FOLDER_TRUST,
       );
 
-      // Allowed: global QWEN.md / AGENTS.md in ~/.qwen/ may still load via
+      // Allowed: global MARIADB-SHELL-AGENT.md / AGENTS.md in ~/.mariadb-shell-agent/ may still load via
       // the existing global-discovery path. The assertion here is narrow —
       // the LOCAL slot specifically must not have been loaded.
       expect(result.memoryContent).not.toContain(
@@ -1384,7 +1389,7 @@ describe('loadServerHierarchicalMemory', () => {
 
     it('dedupes when an extension registers the local slot path explicitly', async () => {
       // The hierarchical scan iterates `getAllMemoryFilenames()`
-      // (QWEN.md / AGENTS.md) and never produces a `QWEN.local.md` path,
+      // (MARIADB-SHELL-AGENT.md / AGENTS.md) and never produces a `MARIADB-SHELL-AGENT.local.md` path,
       // so the dedup guard in the slot loader looks unreachable in
       // production paths. It IS reachable, though, via
       // `extensionContextFilePaths`: an extension may register the slot
@@ -1393,7 +1398,7 @@ describe('loadServerHierarchicalMemory', () => {
       // slot loader from then appending the same file a second time
       // (double content + inflated fileCount). Pin that behavior.
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'MARIADB-SHELL-AGENT.local.md'),
         'slot content only once',
       );
 
@@ -1608,7 +1613,7 @@ describe('loadServerHierarchicalMemory', () => {
       },
     );
 
-    it('does not duplicate AGENTS.md imported by QWEN.md with default filenames', async () => {
+    it('does not duplicate AGENTS.md imported by MARIADB-SHELL-AGENT.md with default filenames', async () => {
       setMemoryFilename([DEFAULT_CONTEXT_FILENAME, AGENT_CONTEXT_FILENAME]);
       await createTestFile(
         path.join(cwd, AGENT_CONTEXT_FILENAME),
@@ -1651,28 +1656,37 @@ describe('formatContextFileDisplayPath', () => {
   });
 
   it('returns CWD-relative paths for files inside the CWD tree', () => {
-    expect(formatContextFileDisplayPath(path.join(proj, 'QWEN.md'), proj)).toBe(
-      'QWEN.md',
-    );
     expect(
-      formatContextFileDisplayPath(path.join(proj, 'sub', 'QWEN.md'), proj),
-    ).toBe(path.join('sub', 'QWEN.md'));
+      formatContextFileDisplayPath(
+        path.join(proj, 'MARIADB-SHELL-AGENT.md'),
+        proj,
+      ),
+    ).toBe('MARIADB-SHELL-AGENT.md');
+    expect(
+      formatContextFileDisplayPath(
+        path.join(proj, 'sub', 'MARIADB-SHELL-AGENT.md'),
+        proj,
+      ),
+    ).toBe(path.join('sub', 'MARIADB-SHELL-AGENT.md'));
   });
 
   it('shortens home-dir files outside the CWD tree to ~ paths', () => {
     expect(
-      formatContextFileDisplayPath(path.join(home, '.qwen', 'QWEN.md'), proj),
-    ).toBe(path.join('~', '.qwen', 'QWEN.md'));
+      formatContextFileDisplayPath(
+        path.join(home, '.mariadb-shell-agent', 'MARIADB-SHELL-AGENT.md'),
+        proj,
+      ),
+    ).toBe(path.join('~', '.mariadb-shell-agent', 'MARIADB-SHELL-AGENT.md'));
   });
 
   it('prefers CWD-relative paths for projects under the home dir', () => {
     const projUnderHome = path.join(home, 'proj');
     expect(
       formatContextFileDisplayPath(
-        path.join(projUnderHome, 'QWEN.md'),
+        path.join(projUnderHome, 'MARIADB-SHELL-AGENT.md'),
         projUnderHome,
       ),
-    ).toBe('QWEN.md');
+    ).toBe('MARIADB-SHELL-AGENT.md');
   });
 
   it('keeps CWD-relative paths for directories with leading-dot names', () => {
@@ -1681,28 +1695,30 @@ describe('formatContextFileDisplayPath', () => {
     const projUnderHome = path.join(home, 'proj2');
     expect(
       formatContextFileDisplayPath(
-        path.join(projUnderHome, '..cfg', 'QWEN.md'),
+        path.join(projUnderHome, '..cfg', 'MARIADB-SHELL-AGENT.md'),
         projUnderHome,
       ),
-    ).toBe(path.join('..cfg', 'QWEN.md'));
+    ).toBe(path.join('..cfg', 'MARIADB-SHELL-AGENT.md'));
   });
 
   it('does not tildeify sibling directories sharing the home prefix', () => {
-    const file = path.join(siblingHome, 'proj', 'QWEN.md');
+    const file = path.join(siblingHome, 'proj', 'MARIADB-SHELL-AGENT.md');
     expect(formatContextFileDisplayPath(file, proj)).toBe(
       path.relative(proj, file),
     );
   });
 
   it('keeps relative paths for files outside both CWD and home', () => {
-    const file = path.join(other, 'QWEN.md');
+    const file = path.join(other, 'MARIADB-SHELL-AGENT.md');
     expect(formatContextFileDisplayPath(file, proj)).toBe(
       path.relative(proj, file),
     );
   });
 
   it('passes through non-absolute paths unchanged', () => {
-    expect(formatContextFileDisplayPath('QWEN.md', proj)).toBe('QWEN.md');
+    expect(formatContextFileDisplayPath('MARIADB-SHELL-AGENT.md', proj)).toBe(
+      'MARIADB-SHELL-AGENT.md',
+    );
   });
 
   it('strips ANSI escapes and control characters from display paths', () => {

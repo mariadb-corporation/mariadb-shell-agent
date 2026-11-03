@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review mock-provider`: an OpenAI-compatible endpoint the review can
+// `mariadb-shell-agent review mock-provider`: an OpenAI-compatible endpoint the review can
 // drive the real product against, and a JSONL record of every request it saw.
 //
 // Measured across 94 hand-written mock servers in this repo's own verification

@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -65,17 +66,19 @@ export function getPermissionsTabs(): PermissionsTabDef[] {
     {
       id: 'allow',
       label: t('Allow'),
-      description: t("Qwen Code won't ask before using allowed tools."),
+      description: t(
+        "MariaDB Shell Agent won't ask before using allowed tools.",
+      ),
     },
     {
       id: 'ask',
       label: t('Ask'),
-      description: t('Qwen Code will ask before using these tools.'),
+      description: t('MariaDB Shell Agent will ask before using these tools.'),
     },
     {
       id: 'deny',
       label: t('Deny'),
-      description: t('Qwen Code is not allowed to use denied tools.'),
+      description: t('MariaDB Shell Agent is not allowed to use denied tools.'),
     },
     {
       id: 'workspace',
@@ -124,13 +127,13 @@ export function getPermissionScopeItems(): Array<{
   return [
     {
       label: t('Project settings'),
-      description: t('Checked in at .qwen/settings.json'),
+      description: t('Checked in at .mariadb-shell-agent/settings.json'),
       value: SettingScope.Workspace,
       key: 'project',
     },
     {
       label: t('User settings'),
-      description: t('Saved in at ~/.qwen/settings.json'),
+      description: t('Saved in at ~/.mariadb-shell-agent/settings.json'),
       value: SettingScope.User,
       key: 'user',
     },
@@ -297,7 +300,7 @@ export function OpenTuiPermissionsDialog(props: OpenTuiPermissionsDialogProps) {
   // uncharged paints over a row the window thinks it owns.
   const regionHeight = clampDialogHeight(props.availableTerminalHeight);
   const workspaceDescription = t(
-    'Qwen Code can read files in the workspace, and make edits when auto-accept edits is on.',
+    'MariaDB Shell Agent can read files in the workspace, and make edits when auto-accept edits is on.',
   );
   const ruleDescriptionRows = wrappedRows(activeTab.description, areaWidth);
   const workspaceDescriptionRows = wrappedRows(workspaceDescription, areaWidth);
@@ -596,7 +599,7 @@ export function OpenTuiPermissionsDialog(props: OpenTuiPermissionsDialogProps) {
         <box height={1} />
         <text fg={C.dim}>
           {t(
-            'Qwen Code will be able to read files in this directory and make edits when auto-accept edits is on.',
+            'MariaDB Shell Agent will be able to read files in this directory and make edits when auto-accept edits is on.',
           )}
         </text>
         <box height={1} />

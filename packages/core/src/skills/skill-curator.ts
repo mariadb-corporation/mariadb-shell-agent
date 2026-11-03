@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -293,7 +294,7 @@ async function readState(statePath: string): Promise<AutoSkillCuratorState> {
   }
   // Mirror the noFollow/lstat guards every write already uses: a state file
   // that is a symlink (committable via git mode 120000, e.g. pointing at
-  // /dev/zero or a path outside .qwen/) or a FIFO would otherwise be followed,
+  // /dev/zero or a path outside .mariadb-shell-agent/) or a FIFO would otherwise be followed,
   // driving an unbounded read (OOM) or blocking the CLI boot indefinitely.
   if (!stat.isFile() || stat.isSymbolicLink()) {
     throw new Error(`Auto-skill curator refuses unsafe path ${statePath}.`);

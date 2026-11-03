@@ -3,7 +3,7 @@
 [English](2026-10-24-automation-scanner-row-pool.md) | [简体中文](2026-10-24-automation-scanner-row-pool.zh-CN.md)
 
 - Status: implemented (2026-10-24)
-- Issue: [#15418](https://github.com/QwenLM/qwen-code/issues/15418)
+- Issue: [#15418](https://github.invalid/QwenLM/qwen-code/issues/15418)
 - Supersedes the open question "Scanner capacity" in
   [§10 of the Managed automation gate design](2026-10-22-managed-automation-gate.md).
 

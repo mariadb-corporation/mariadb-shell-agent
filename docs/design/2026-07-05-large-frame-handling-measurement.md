@@ -2,7 +2,7 @@
 
 ## Summary
 
-This PR is a measurement and design step for large `qwen serve` ACP pipe frames. It does not change pipe payloads, frame limits, EventBus behavior, SDK behavior, public protocol fields, CLI flags, HTTP query parameters, or advertised capabilities.
+This PR is a measurement and design step for large `mariadb-shell-agent serve` ACP pipe frames. It does not change pipe payloads, frame limits, EventBus behavior, SDK behavior, public protocol fields, CLI flags, HTTP query parameters, or advertised capabilities.
 
 The immediate goal is to collect low-cardinality attribution for oversized NDJSON pipe messages so the next sidecar design can use real `pipe.message_bytes` distributions instead of guessed thresholds.
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -79,8 +80,8 @@ export interface DualOutputBridgeOptions {
  * programmatic consumption by IDE extensions, web frontends, CI pipelines, etc.
  *
  * Usage:
- *   qwen --json-fd 3        # JSON events written to fd 3
- *   qwen --json-file /path  # JSON events written to file/FIFO
+ *   mariadb-shell-agent --json-fd 3        # JSON events written to fd 3
+ *   mariadb-shell-agent --json-file /path  # JSON events written to file/FIFO
  */
 export class DualOutputBridge {
   private readonly adapter: StreamJsonOutputAdapter;
@@ -145,7 +146,7 @@ export class DualOutputBridge {
               throw new Error(
                 `--json-file "${target.filePath}": permission denied opening FIFO for read-write. ` +
                   'Check read/write permissions on the file and its parent directories, ' +
-                  'or start a reader before launching Qwen Code.',
+                  'or start a reader before launching MariaDB Shell Agent.',
               );
             }
             throw retryErr;

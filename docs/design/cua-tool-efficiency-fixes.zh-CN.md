@@ -61,4 +61,4 @@ GUI 控制实验通过实际后置状态验证了应用实时变化、选区/替
 - AX 错误发生在真实 UI 变化之后时，保留并明确状态证据。sheet `setValue` 拒绝、颜色文本读回但实际颜色未联动仍是独立未解决问题。
 - 使用原任务描述、原始输入、setup/getter/scoring 契约及修改后的 Skill 继续对齐回归。在独立且不可改写的运行中记录源码/runtime/Skill 哈希；历史主机/provider/CLI/scorer 差异及实际工作量差异仍限制归因。baseline 的相似症状在未证实同根因前仍标为疑似环境问题。
 
-详细实验保留在本地调查记录和 Git 历史中。PR 包含[英文验证报告](https://github.com/QwenLM/qwen-code/pull/11683#issuecomment-5642894479)、[中文验证报告](https://github.com/QwenLM/qwen-code/pull/11683#issuecomment-5642915885)及任务对比评论。仅凭机制控制实验和更短的已记录运行，不能证明纯 SDK 提速或全部工具路径已覆盖。
+详细实验保留在本地调查记录和 Git 历史中。PR 包含[英文验证报告](https://github.invalid/QwenLM/qwen-code/pull/11683#issuecomment-5642894479)、[中文验证报告](https://github.invalid/QwenLM/qwen-code/pull/11683#issuecomment-5642915885)及任务对比评论。仅凭机制控制实验和更短的已记录运行，不能证明纯 SDK 提速或全部工具路径已覆盖。

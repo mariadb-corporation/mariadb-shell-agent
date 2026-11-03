@@ -190,4 +190,4 @@ typecheck && npm run bundle`。
 - 冻结控制面变体是否后续继承身份断言（延后；Q2 的范围是过期 claim 围栏）。
 - 投影重建游标/resync 语义作为独立切片（此处范围外）。
 
-[issue]: https://github.com/QwenLM/qwen-code/issues/14481
+[issue]: https://github.invalid/QwenLM/qwen-code/issues/14481

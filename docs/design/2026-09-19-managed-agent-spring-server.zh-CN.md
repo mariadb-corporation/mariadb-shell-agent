@@ -9,7 +9,7 @@
 
 ## 1. 问题
 
-Qwen Code 已经具备 Hosted Harness Profile，以及访问其私有 HTTP/SSE 协议和 Runtime Broker 的 Java 库，但仓库内还没有一个可运行、与具体产品无关的 Java 控制面。现有产品接入依赖 DataWorks 的身份、存储和部署代码，无法直接作为独立 Qwen Code 服务使用。
+MariaDB Shell Agent 已经具备 Hosted Harness Profile，以及访问其私有 HTTP/SSE 协议和 Runtime Broker 的 Java 库，但仓库内还没有一个可运行、与具体产品无关的 Java 控制面。现有产品接入依赖 DataWorks 的身份、存储和部署代码，无法直接作为独立 MariaDB Shell Agent 服务使用。
 
 新服务需要在 TypeScript Hosted Harness 继续拥有模型循环的前提下，提供低延迟、多租户 Session API。它必须不依赖 DataWorks，接收上游传入的租户身份，在 MySQL 中持久化权威公共状态，并保证 Harness 和 Tool Runtime 凭证只存在于服务端。
 
@@ -46,7 +46,7 @@ Spring Managed Agent Server（一个逻辑多租户服务）
   |-- 异步 Harness Coordinator
   |-- 私有 Runtime Broker listener（可选）
   |
-  +---- HTTP/SSE ----> qwen serve --profile hosted-harness
+  +---- HTTP/SSE ----> mariadb-shell-agent serve --profile hosted-harness
   |                         |-- 模型循环与上下文
   |                         `-- BrokerManagedRuntimeProvider
   |                                      |
@@ -178,7 +178,7 @@ Flyway 在应用启动时执行版本化 migration。生产使用 MySQL；H2 MyS
 - 验证持久 Event 顺序与 `Last-Event-ID` replay。
 - 对接确定性 Hosted Harness fixture，证明 create、Prompt admission、SSE 投影、终态结算和 retry 都使用稳定身份。
 - 在 Java 21 上执行模块测试与 Checkstyle。
-- 在生产门禁完成前，用 MySQL 和真实 `qwen serve --profile hosted-harness` 构建并启动 executable jar。
+- 在生产门禁完成前，用 MySQL 和真实 `mariadb-shell-agent serve --profile hosted-harness` 构建并启动 executable jar。
 
 仓库内的确定性 fixture 现已覆盖 13 个测试：tenant 强制校验、跨 tenant
 404、串行与并发命令重放（包括原 Turn 仍活跃时的重放）、事件续传、异步
@@ -208,6 +208,6 @@ Phase 1 完成条件：
 4. 客户端可以从公共 Event sequence 重连，且不会收到重复事件。
 5. 确定性 Harness fixture 可以完成一个真实异步 Turn。
 6. 任何公共响应或日志都不包含 Harness、Broker 或 Runtime secret。
-7. 现有 TypeScript Hosted Harness 和 Legacy `qwen serve` 路由行为不变。
+7. 现有 TypeScript Hosted Harness 和 Legacy `mariadb-shell-agent serve` 路由行为不变。
 
 生产多副本门禁还要求：真实 MySQL 并发、使用持久 Repository 的嵌入 Broker、生产 Hosted Harness 与 ACS/Pod Runtime 部署、进程丢失恢复，以及负载均衡下的租户隔离测试。同时还需要 attachment 空闲淘汰/容量策略，避免长期运行的 Java 进程持续为所有历史 Session 保留 heartbeat。

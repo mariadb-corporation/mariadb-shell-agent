@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -207,7 +208,8 @@ for (const theme of [
       savedWorkflowDetails: {
         'review-changes': {
           source: 'project',
-          scriptPath: '/workspace/.qwen/workflows/review-changes.js',
+          scriptPath:
+            '/workspace/.mariadb-shell-agent/workflows/review-changes.js',
           script: [
             'export const meta = {',
             "  name: 'review-changes',",

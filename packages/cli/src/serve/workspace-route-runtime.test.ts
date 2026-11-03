@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -195,7 +196,12 @@ describe('resolveSessionManagedGitCwd', () => {
   });
 
   it('authorizes only the live session that owns the managed worktree', async () => {
-    const worktree = path.join(repo, '.qwen', 'worktrees', 'branch-a');
+    const worktree = path.join(
+      repo,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'branch-a',
+    );
     fs.mkdirSync(path.dirname(worktree), { recursive: true });
     execFileSync(
       'git',
@@ -367,7 +373,12 @@ describe('resolveSessionManagedGitCwd', () => {
 
     fs.rmSync(path.join(worktree, '.qwen-session'));
     fs.writeFileSync(path.join(worktree, '.qwen-session'), sessionId);
-    const otherWorktree = path.join(repo, '.qwen', 'worktrees', 'branch-other');
+    const otherWorktree = path.join(
+      repo,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'branch-other',
+    );
     execFileSync(
       'git',
       [
@@ -392,7 +403,12 @@ describe('resolveSessionManagedGitCwd', () => {
   it('accepts an existing sidecar whose original cwd is a repo subdirectory', async () => {
     const workspace = path.join(repo, 'packages', 'app');
     fs.mkdirSync(workspace, { recursive: true });
-    const worktree = path.join(repo, '.qwen', 'worktrees', 'branch-b');
+    const worktree = path.join(
+      repo,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'branch-b',
+    );
     fs.mkdirSync(path.dirname(worktree), { recursive: true });
     execFileSync(
       'git',
@@ -448,7 +464,12 @@ describe('resolveSessionManagedGitCwd', () => {
   });
 
   it('accepts a publish-window sidecar and reads it to EOF under short reads', async () => {
-    const worktree = path.join(repo, '.qwen', 'worktrees', 'branch-residue');
+    const worktree = path.join(
+      repo,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'branch-residue',
+    );
     fs.mkdirSync(path.dirname(worktree), { recursive: true });
     execFileSync(
       'git',
@@ -546,7 +567,12 @@ describe('resolveSessionManagedGitCwd', () => {
   });
 
   it('rejects a standalone repository under the managed worktree root', async () => {
-    const worktree = path.join(repo, '.qwen', 'worktrees', 'standalone');
+    const worktree = path.join(
+      repo,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'standalone',
+    );
     fs.mkdirSync(worktree, { recursive: true });
     execFileSync('git', ['init', '-q'], { cwd: worktree });
     fs.writeFileSync(path.join(worktree, '.qwen-session'), sessionId);
@@ -719,7 +745,12 @@ describe('resolveSessionManagedGitCwd', () => {
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'non-git-'));
     const subdirectory = path.join(workspace, 'packages', 'app');
     const nestedRepo = path.join(workspace, 'inner');
-    const worktree = path.join(nestedRepo, '.qwen', 'worktrees', 'task');
+    const worktree = path.join(
+      nestedRepo,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'task',
+    );
     fs.mkdirSync(subdirectory, { recursive: true });
     fs.mkdirSync(nestedRepo);
     execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: nestedRepo });
@@ -763,7 +794,12 @@ describe('resolveSessionManagedGitCwd', () => {
   it('rejects a nested repository worktree inside a git workspace', async () => {
     const workspace = path.join(repo, 'packages', 'app');
     const nestedRepo = path.join(workspace, 'inner');
-    const worktree = path.join(nestedRepo, '.qwen', 'worktrees', 'task');
+    const worktree = path.join(
+      nestedRepo,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'task',
+    );
     fs.mkdirSync(nestedRepo, { recursive: true });
     execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: nestedRepo });
     execFileSync('git', ['config', 'commit.gpgsign', 'false'], {
@@ -804,7 +840,12 @@ describe('resolveSessionManagedGitCwd', () => {
           : fs.mkdtempSync(path.join(os.tmpdir(), 'non-git-workspace-'));
       const nestedRepo = path.join(workspace, 'inner');
       const metadata = path.join(runtimeBase, `metadata-${kind}`);
-      const worktree = path.join(nestedRepo, '.qwen', 'worktrees', 'task');
+      const worktree = path.join(
+        nestedRepo,
+        '.mariadb-shell-agent',
+        'worktrees',
+        'task',
+      );
       fs.mkdirSync(nestedRepo, { recursive: true });
       try {
         execFileSync(
@@ -857,7 +898,12 @@ describe('resolveSessionManagedGitCwd', () => {
   );
 
   it('accepts a linked worktree that is itself the registered workspace', async () => {
-    const worktree = path.join(repo, '.qwen', 'worktrees', 'registered');
+    const worktree = path.join(
+      repo,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'registered',
+    );
     fs.mkdirSync(path.dirname(worktree), { recursive: true });
     execFileSync(
       'git',

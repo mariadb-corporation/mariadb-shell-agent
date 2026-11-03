@@ -3,11 +3,12 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Bundles/copies the Qwen Code CLI from npm package into the SDK package dist/
+ * Bundles/copies the MariaDB Shell Agent CLI from npm package into the SDK package dist/
  * so consumers don't need a separate CLI install.
  *
  * This script reads the CLI package path from CLI_PACKAGE_PATH environment variable

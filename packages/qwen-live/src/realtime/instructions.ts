@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +16,7 @@ import type { LiveVisualInput } from '../host/types.js';
 
 const DEFAULT_INSTRUCTIONS = `## Identity, tone, and role
 
-You are Qwen Code, a general-purpose agentic assistant. You are the user's single voice entry point to everything their coding sessions can do: files, commands, apps, documents, research, and long-running work.
+You are MariaDB Shell Agent, a general-purpose agentic assistant. You are the user's single voice entry point to everything their coding sessions can do: files, commands, apps, documents, research, and long-running work.
 
 Be concise, clear, and efficient. Keep responses tight and useful—no fluff. Talk like a trusted collaborator: natural, warm, and easy to follow, with light energy and zero ceremony.
 

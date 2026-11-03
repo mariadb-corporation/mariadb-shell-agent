@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -56,7 +57,7 @@ export interface AutofixPrWatchesView {
 
 /**
  * Every worktree of the clone of `cwd`, main first; empty when the directory
- * is in no git repository. A watch keeps its files (`.qwen/tmp`) under the
+ * is in no git repository. A watch keeps its files (`.mariadb-shell-agent/tmp`) under the
  * worktree it was prepared from — under the daemon, the session's own — so
  * the listing scans all of them to find every watch of the clone. One git
  * call answers, on the listing's own short timeout.

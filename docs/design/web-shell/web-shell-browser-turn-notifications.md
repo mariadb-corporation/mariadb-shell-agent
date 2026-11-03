@@ -50,7 +50,7 @@ Reuse the existing Switch and SettingsRow. Add a local setting explicitly labele
 | Tab synchronization  | Listen for storage events; the writing page updates its local state directly.                                                                     |
 | Storage failure      | Remains usable within this page and displays “This setting applies only to the current page.”                                                     |
 
-Do not write to `.qwen/settings.json`: browser permission is a device/site state, and daemon configuration cannot replace user authorization. The same workspace can be open in browsers with different permissions at the same time.
+Do not write to `.mariadb-shell-agent/settings.json`: browser permission is a device/site state, and daemon configuration cannot replace user authorization. The same workspace can be open in browsers with different permissions at the same time.
 
 ### Permission and settings state
 
@@ -85,7 +85,7 @@ The first version targets desktop browsers. The presence of a Notification objec
 
 The display condition is `document.visibilityState !== 'visible' || !document.hasFocus()`. Consume terminal events without displaying notifications while the page is in the foreground and focused; losing focus later does not replay them. The first version adds no duration threshold, sound selection, or custom body.
 
-The title is fixed to Qwen Code. The body uses only the generic copy above, with no prompt, response, error, session title, path, or workspace name. Clicking attempts window.focus() and closes the notification, without automatically switching sessions. The operating system may refuse to focus the window, so success cannot be guaranteed. A display failure does not change the turn result.
+The title is fixed to MariaDB Shell Agent. The body uses only the generic copy above, with no prompt, response, error, session title, path, or workspace name. Clicking attempts window.focus() and closes the notification, without automatically switching sessions. The operating system may refuse to focus the window, so success cannot be guaranteed. A display failure does not change the turn result.
 
 ## Internal architecture
 
@@ -159,7 +159,7 @@ Before implementation, perform a baseline dry-run with the global qwen CLI as re
 | Deduplication         | No replay after consumption in the foreground or while disabled; cache boundaries; cross-tab lock contention; fallback without locks/storage; failures do not change chat.             |
 | Manual                | Completion and failure in the background on desktop Chrome/Safari; OS permission; click to focus. Explicitly identify other browsers not tested and do not claim mobile support.       |
 
-The E2E checklist is at `.qwen/e2e-tests/web-shell-browser-turn-notifications-independent.md`. After implementation, review the full diff and complete two clean self-audit passes and an independent code review as required by the repository. Submit the PR separately according to user instructions.
+The E2E checklist is at `.mariadb-shell-agent/e2e-tests/web-shell-browser-turn-notifications-independent.md`. After implementation, review the full diff and complete two clean self-audit passes and an independent code review as required by the repository. Submit the PR separately according to user instructions.
 
 ## Follow-up capabilities
 
@@ -173,6 +173,6 @@ Browser push after the page closes requires a separate Push delivery path. Regis
 
 The implementation changed only Web Shell. The root component provides page-level notification state and local settings. DaemonSessionProvider observes authoritative terminal events after live/recovery transcript projection is complete, and existing submission callbacks support recovery tracking. No daemon route, SSE connection, or public SDK callback was added. Page validation also identified and fixed the shared Switch state selector: it matches Radix's data-state attribute to display the toggle color and thumb position correctly.
 
-Unit tests cover terminal-event classification, permissions and preferences, duplicate consumption, silent history, restricted storage, notification-failure isolation, and the actual Provider's terminal projection ordering and epoch reset recovery. Page-level validation used the real Web Shell, mockDaemon SSE, Chromium, and a Notification stub, covering the settings entry point, absence of daemon settings writes, foreground/background differences, cross-tab toggle synchronization, and real Web Locks contention. Final operating-system display, mobile devices, and push after page closure were outside this validation. Detailed commands and results are in the local `.qwen/e2e-tests/web-shell-browser-turn-notifications-independent.md`.
+Unit tests cover terminal-event classification, permissions and preferences, duplicate consumption, silent history, restricted storage, notification-failure isolation, and the actual Provider's terminal projection ordering and epoch reset recovery. Page-level validation used the real Web Shell, mockDaemon SSE, Chromium, and a Notification stub, covering the settings entry point, absence of daemon settings writes, foreground/background differences, cross-tab toggle synchronization, and real Web Locks contention. Final operating-system display, mobile devices, and push after page closure were outside this validation. Detailed commands and results are in the local `.mariadb-shell-agent/e2e-tests/web-shell-browser-turn-notifications-independent.md`.
 
 The final source passed repository-wide `npm run build`, `npm run typecheck`, and `npm run bundle`, with 365 passing tests across 6 relevant test files. Changed-file ESLint, Prettier, and diff checks passed. Independent review found and fixed the race where a late permission grant could override a disable action from another tab; the review after the fix found no new issues.

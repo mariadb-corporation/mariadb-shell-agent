@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -171,7 +172,7 @@ function resolvePersistScope(
 }
 
 /**
- * Workspace settings are shareable (`<project>/.qwen/settings.json` gets
+ * Workspace settings are shareable (`<project>/.mariadb-shell-agent/settings.json` gets
  * committed), so only a provably public endpoint may be persisted there;
  * otherwise drop just the `\0baseUrl` disambiguator, matching the policy in
  * serve/routes/workspace-models.ts. `publicProviderBaseUrl` is the fail-closed

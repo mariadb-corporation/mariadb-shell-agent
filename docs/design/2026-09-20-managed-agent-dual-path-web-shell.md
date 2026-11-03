@@ -14,7 +14,7 @@ through the existing public WebShell provider prop.
 
 The Java Managed Agent path previously had a daemon-free, Managed-only entry.
 That entry proves the browser-to-Java contract, but it does not demonstrate how
-Managed Sessions coexist with the complete WebShell used by `qwen serve`.
+Managed Sessions coexist with the complete WebShell used by `mariadb-shell-agent serve`.
 
 Java must not implement the daemon protocol merely to reuse the full UI. The
 ordinary and Managed paths have different owners and must remain independently

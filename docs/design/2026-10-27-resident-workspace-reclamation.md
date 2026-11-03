@@ -4,11 +4,11 @@
 
 ## Status
 
-Combined S2 design and S3 implementation for [#13395](https://github.com/QwenLM/qwen-code/issues/13395). Implementation baseline: main `0539160f35f983ba4a6d4d369c0ae18941b2fdb2`. This document describes the implemented contract; complete platform acceptance remains pending.
+Combined S2 design and S3 implementation for [#13395](https://github.invalid/QwenLM/qwen-code/issues/13395). Implementation baseline: main `0539160f35f983ba4a6d4d369c0ae18941b2fdb2`. This document describes the implemented contract; complete platform acceptance remains pending.
 
 On 2026-10-27 focused Java/Checkstyle, real MySQL/process checks and an isolated ACK healthy handoff passed in their recorded scopes. The native run used the implementation baseline plus the 31-file source manifest with SHA-256 `9edfca3f939c5e19b4cebdacbc13460b9c4b4590c2de2c9113b30d59fa299ee2`, ACK `1.36.2-aliyun.1` and Disk CSI `1.37.3`. One disk passed A→B→C→D with reserved revisions `1/3/5/7`, released revisions `2/4/6`, and 22 successful file-tool executions preserving prior bytes. The model endpoint was a controlled fixture. This evidence covers that source/artifact snapshot and healthy sequence; a rebase does not qualify a new integrated artifact. Full CI, the required native fault matrix and production least-privilege qualification remain pending.
 
-On 2026-10-27 the operator selected preserving files and explicitly handing the disk to another Workspace in the same tenant. Reuse must preserve this decision through every ownership cycle. The [existing delivery boundary](2026-10-23-csi-evidence-source.md) and separate CSI LOST recovery issue [#12670](https://github.com/QwenLM/qwen-code/issues/12670) still apply.
+On 2026-10-27 the operator selected preserving files and explicitly handing the disk to another Workspace in the same tenant. Reuse must preserve this decision through every ownership cycle. The [existing delivery boundary](2026-10-23-csi-evidence-source.md) and separate CSI LOST recovery issue [#12670](https://github.invalid/QwenLM/qwen-code/issues/12670) still apply.
 
 ## Problem and baseline state
 
@@ -101,7 +101,7 @@ The canonical V1 work-kind domain changes. Follow the server's pre-release schem
 
 ## Validation and acceptance
 
-Use the detailed ignored E2E plan under `.qwen/e2e-tests/13395-s2-s3-20261027/`. Dry-run the global CLI first and explicitly record if the private maintenance path needs a Java/API fallback. Share one 600-second local Java verification budget across setup, builds, selected unit tests and selected real MySQL/process cases; leave full profiles to CI and keep uncovered checks explicit.
+Use the detailed ignored E2E plan under `.mariadb-shell-agent/e2e-tests/13395-s2-s3-20261027/`. Dry-run the global CLI first and explicitly record if the private maintenance path needs a Java/API fallback. Share one 600-second local Java verification budget across setup, builds, selected unit tests and selected real MySQL/process cases; leave full profiles to CI and keep uncovered checks explicit.
 
 Required acceptance includes at least three reserve/release cycles with preserved file contents across distinct same-tenant Workspaces; execution and close at revisions greater than 1; foreign-tenant and old-Workspace refusal; two concurrent claimants; platform identity substitutions; API and node/network partition retention; duplicate and lost replies; crashes before/after receipt persistence and SQL commit; rollback at each release write; and terminal inspection after mapping replacement and later reuse. Verify task-owned resource cleanup independently.
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -643,7 +644,7 @@ export class AcpConnection {
       clearTimeout(binding.graceTimer);
       binding.graceTimer = undefined;
       writeStderrLine(
-        `qwen serve: /acp session reclaimed within grace (${logSafe(sessionId)})`,
+        `mariadb-shell-agent serve: /acp session reclaimed within grace (${logSafe(sessionId)})`,
       );
     }
     const prevStream = binding.stream;
@@ -709,7 +710,7 @@ export class AcpConnection {
       // trace. Logging the arm gives operators a starting point when responses
       // look stuck behind the replay window.
       writeStderrLine(
-        `qwen serve: /acp replay deferral armed (${logSafe(sessionId)}, from id ${resumeFromEventId ?? 'initial'})`,
+        `mariadb-shell-agent serve: /acp replay deferral armed (${logSafe(sessionId)}, from id ${resumeFromEventId ?? 'initial'})`,
       );
     }
     // Drain the gap buffer into a separate array first: on the resume path the
@@ -835,7 +836,7 @@ export class AcpConnection {
     // disconnect→reconnect gap against the grace window (the reclaim/expiry
     // logs alone can't tell "reclaimed with 0.5s to spare" from "9.5s").
     writeStderrLine(
-      `qwen serve: /acp session stream detached (${logSafe(sessionId)}), ` +
+      `mariadb-shell-agent serve: /acp session stream detached (${logSafe(sessionId)}), ` +
         `grace=${graceMs}ms`,
     );
     // Stop the closing stream's event pump; the prompt + ownership live on.
@@ -850,7 +851,7 @@ export class AcpConnection {
       // debugging a vanished session can tell grace-expiry teardown apart from
       // an explicit `session/close` or connection drop.
       writeStderrLine(
-        `qwen serve: /acp session grace expired (${logSafe(sessionId)}), ` +
+        `mariadb-shell-agent serve: /acp session grace expired (${logSafe(sessionId)}), ` +
           `no reconnect within ${graceMs}ms — tearing down`,
       );
       // `closeSessionStream` → `teardownBinding` runs external callbacks
@@ -862,7 +863,7 @@ export class AcpConnection {
         this.closeSessionStream(sessionId);
       } catch (err) {
         writeStderrLine(
-          `qwen serve: /acp teardown failed during grace expiry ` +
+          `mariadb-shell-agent serve: /acp teardown failed during grace expiry ` +
             `(${logSafe(sessionId)}): ` +
             (err instanceof Error ? err.message : String(err)),
         );
@@ -877,7 +878,7 @@ export class AcpConnection {
         this.onSessionGraceExpired?.();
       } catch (err) {
         writeStderrLine(
-          `qwen serve: /acp onSessionGraceExpired failed during grace expiry ` +
+          `mariadb-shell-agent serve: /acp onSessionGraceExpired failed during grace expiry ` +
             `(${logSafe(sessionId)}): ` +
             (err instanceof Error ? err.message : String(err)),
         );
@@ -924,7 +925,7 @@ export class AcpConnection {
         this.teardownBinding(binding);
       } catch (err) {
         writeStderrLine(
-          `qwen serve: /acp teardownBinding(${logSafe(binding.sessionId)}) failed during destroy: ${err instanceof Error ? err.message : String(err)}`,
+          `mariadb-shell-agent serve: /acp teardownBinding(${logSafe(binding.sessionId)}) failed during destroy: ${err instanceof Error ? err.message : String(err)}`,
         );
       }
     }
@@ -1396,7 +1397,9 @@ export class AcpConnection {
         receipt[outcome]();
       }
     } catch {
-      writeStderrLine(`qwen serve: /acp ${outcome} receipt callback failed`);
+      writeStderrLine(
+        `mariadb-shell-agent serve: /acp ${outcome} receipt callback failed`,
+      );
     }
   }
 
@@ -1406,7 +1409,9 @@ export class AcpConnection {
   ): void {
     this.preAttachBudget.recordGuardFailure();
     this.onPreAttachGuardFailure?.();
-    writeStderrLine(`qwen serve: /acp resource guard: ${message}`);
+    writeStderrLine(
+      `mariadb-shell-agent serve: /acp resource guard: ${message}`,
+    );
     if (
       !binding ||
       binding.usesConnectionStream === true ||
@@ -1421,7 +1426,7 @@ export class AcpConnection {
       this.closeSessionStream(binding.sessionId);
     } catch (error) {
       writeStderrLine(
-        `qwen serve: /acp resource guard session teardown failed: ${
+        `mariadb-shell-agent serve: /acp resource guard session teardown failed: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );
@@ -1429,14 +1434,18 @@ export class AcpConnection {
   }
 
   private failSerializationOwner(binding: SessionBinding | undefined): void {
-    writeStderrLine('qwen serve: /acp response serialization failed');
+    writeStderrLine(
+      'mariadb-shell-agent serve: /acp response serialization failed',
+    );
     if (binding) this.failOwner(binding, 'ACP response serialization failed');
   }
 
   private failConnection(message: string, recordFailure = true): void {
     if (recordFailure) this.preAttachBudget.recordGuardFailure();
     this.onPreAttachGuardFailure?.();
-    writeStderrLine(`qwen serve: /acp resource guard: ${message}`);
+    writeStderrLine(
+      `mariadb-shell-agent serve: /acp resource guard: ${message}`,
+    );
     this.retireConnection(message);
   }
 
@@ -1466,7 +1475,7 @@ export class AcpConnection {
       const cancelled = this.onAbandonPending?.(req, clientId) ?? true;
       if (!cancelled) {
         writeStderrLine(
-          `qwen serve: /acp MEDIATOR STUCK: abandonPendingForSession(${logSafe(sessionId)}) cancel failed for ${logSafe(req.bridgeRequestId)}`,
+          `mariadb-shell-agent serve: /acp MEDIATOR STUCK: abandonPendingForSession(${logSafe(sessionId)}) cancel failed for ${logSafe(req.bridgeRequestId)}`,
         );
       }
     }
@@ -1674,7 +1683,7 @@ export class ConnectionRegistry {
       // froze". Note that `touch()` fires on inbound HTTP AND on event
       // delivery (pumpSessionEvents), so a long quiet prompt isn't reaped.
       writeStderrLine(
-        `qwen serve: /acp reaping idle connection ${id} ` +
+        `mariadb-shell-agent serve: /acp reaping idle connection ${id} ` +
           `(idle > ${Math.round(this.idleTtlMs / 60_000)}m, ` +
           `${conn.sessions.size} session(s))`,
       );

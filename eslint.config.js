@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -73,7 +74,7 @@ export default tseslint.config(
       'demo/**/dist/**',
       'docs-site/.next/**',
       'docs-site/out/**',
-      '.qwen/**',
+      '.mariadb-shell-agent/**',
       'scripts/codemod/fixtures/**', // codemod test data; intentionally non-idiomatic ink input/output
       'packages/desktop/runtime/**',
       'packages/core/src/skills/bundled/browser-use/runtime/**',

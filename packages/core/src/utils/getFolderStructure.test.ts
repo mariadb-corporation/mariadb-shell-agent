@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -283,7 +284,7 @@ describe('getFolderStructure', () => {
       'ignored.txt\nnode_modules/\n.gemini/\n!/.gemini/config.yaml';
 
     it('should ignore qwenignore files by default', async () => {
-      await createIgnoreFixture('.qwenignore', qwenignoreRules);
+      await createIgnoreFixture('.mariadb-shell-agentignore', qwenignoreRules);
 
       const structure = await structureWithFileService();
       expect(structure).not.toContain('ignored.txt');
@@ -292,7 +293,7 @@ describe('getFolderStructure', () => {
     });
 
     it('should not ignore files if respectQwenIgnore is false', async () => {
-      await createIgnoreFixture('.qwenignore', qwenignoreRules);
+      await createIgnoreFixture('.mariadb-shell-agentignore', qwenignoreRules);
 
       const structure = await structureWithFileService({
         fileFilteringOptions: {

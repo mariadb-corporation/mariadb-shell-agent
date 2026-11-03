@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -63,24 +64,24 @@ describe('subscription plan definitions', () => {
 
     expect(china.region).toBe(CodingPlanRegion.CHINA);
     expect(china.baseUrl).toBe(
-      'https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+      'https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
     );
     const firstChinaModel = china.template[0]!;
     expect(firstChinaModel).toMatchObject({
       name: `[ModelStudio Token Plan] ${firstChinaModel.id}`,
       baseUrl:
-        'https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+        'https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
     });
 
     expect(global.region).toBe(CodingPlanRegion.GLOBAL);
     expect(global.baseUrl).toBe(
-      'https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1',
+      'https://token-plan.ap-southeast-1.maas.aliyuncs.invalid/compatible-mode/v1',
     );
     const firstGlobalModel = global.template[0]!;
     expect(firstGlobalModel).toMatchObject({
       name: `[ModelStudio Token Plan for Global/Intl] ${firstGlobalModel.id}`,
       baseUrl:
-        'https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1',
+        'https://token-plan.ap-southeast-1.maas.aliyuncs.invalid/compatible-mode/v1',
     });
   });
 });

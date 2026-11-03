@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -713,7 +714,7 @@ export function validatePolicyConfig(
       !validSet.has(permissionStrategy))
   ) {
     throw new InvalidPolicyConfigError(
-      `qwen serve: invalid policy.permissionStrategy ` +
+      `mariadb-shell-agent serve: invalid policy.permissionStrategy ` +
         `"${String(permissionStrategy)}"; must be one of ` +
         `${Array.from(validSet).join(', ')}`,
     );
@@ -725,7 +726,7 @@ export function validatePolicyConfig(
       consensusQuorum < 1)
   ) {
     throw new InvalidPolicyConfigError(
-      `qwen serve: invalid policy.consensusQuorum ` +
+      `mariadb-shell-agent serve: invalid policy.consensusQuorum ` +
         `${String(consensusQuorum)}; must be a positive integer`,
     );
   }
@@ -737,7 +738,7 @@ export function validatePolicyConfig(
     consensusQuorum !== undefined && permissionStrategy === 'consensus';
   if (consensusQuorum !== undefined && permissionStrategy !== 'consensus') {
     onWarning(
-      'qwen serve: policy.consensusQuorum is set but ' +
+      'mariadb-shell-agent serve: policy.consensusQuorum is set but ' +
         'policy.permissionStrategy is not "consensus"; the override will ' +
         'be ignored.',
     );
@@ -1813,7 +1814,7 @@ function certCoversHost(x509: X509Certificate, host: string): boolean {
  *
  * Returning `undefined` leaves the workspace on the daemon's init-default
  * chain — the primary workspace's configured `context.fileName` snapshot
- * (`contextFilenameForInit`), then the hard-coded `QWEN.md` — so a malformed
+ * (`contextFilenameForInit`), then the hard-coded `MARIADB-SHELL-AGENT.md` — so a malformed
  * value keeps the daemon alive rather than producing a garbage filename.
  */
 export function extractContextFilename(value: unknown): string | undefined {
@@ -1865,7 +1866,7 @@ export function subSessionConcurrencyCapsFromSettings(
       return value;
     }
     onWarning(
-      `qwen serve: ignoring invalid ${key} (${JSON.stringify(value)}); ` +
+      `mariadb-shell-agent serve: ignoring invalid ${key} (${JSON.stringify(value)}); ` +
         `expected a positive integer, falling back to the built-in default.`,
     );
     return undefined;
@@ -1904,7 +1905,7 @@ export function maxSessionsFromSettings(
     return value;
   }
   onWarning(
-    `qwen serve: ignoring invalid serve.maxSessions (${JSON.stringify(value)}); ` +
+    `mariadb-shell-agent serve: ignoring invalid serve.maxSessions (${JSON.stringify(value)}); ` +
       `expected a non-negative integer (0 = unlimited), falling back to the built-in default.`,
   );
   return undefined;
@@ -2108,7 +2109,10 @@ function writeServeChannelReservation(
 }
 
 function channelServicePidfileConflictError(info: ServiceInfo): Error {
-  const owner = info.owner === 'serve' ? 'qwen serve' : 'qwen channel start';
+  const owner =
+    info.owner === 'serve'
+      ? 'mariadb-shell-agent serve'
+      : 'mariadb-shell-agent channel start';
   return Object.assign(
     new Error(
       `Channel service is already running under ${owner} (PID ${info.pid}). Stop it before enabling daemon-managed channels.`,
@@ -2255,7 +2259,7 @@ export interface RunQwenServeDeps {
   workspaceRegistrationStore?: WorkspaceRegistrationStore;
   /** Test/embed override; production uses the private user Conversations root. */
   liveConversationWorkspace?: ConversationWorkspace;
-  /** Test/embed override; production uses ~/.qwen for the Live Host locator. */
+  /** Test/embed override; production uses ~/.mariadb-shell-agent for the Live Host locator. */
   liveDiscoveryStableBaseDir?: string;
   /** Test/embed override for stable Live locator ownership handoff. */
   liveDiscoveryRetryDelayMs?: number;
@@ -3434,7 +3438,7 @@ async function createBranchRecoverySessionService(
 let brokenPipeGuardInstalled = false;
 
 /**
- * stdout/stderr may be pipes whose reader leaves (`qwen serve | head -n 1`,
+ * stdout/stderr may be pipes whose reader leaves (`mariadb-shell-agent serve | head -n 1`,
  * a log shipper closing its end). Node reports EPIPE as an asynchronous
  * 'error' event that no try/catch around write() can see; without a listener
  * it becomes an uncaught exception and kills the already-listening daemon
@@ -3565,7 +3569,7 @@ async function runQwenServeImpl(
   // environment back.
   const loaderEnvScrub = acquireInheritedLoaderEnvScrub(
     process.env,
-    'qwen serve',
+    'mariadb-shell-agent serve',
     'daemon',
   );
   const scrubbedLoaderEnvKeys = loaderEnvScrub.removedKeys;
@@ -3616,7 +3620,7 @@ async function runQwenServeImpl(
     !trustedLoopbackMode
   ) {
     writeStderrLine(
-      `qwen serve: --enable-session-shell ignored because no bearer token ` +
+      `mariadb-shell-agent serve: --enable-session-shell ignored because no bearer token ` +
         `is configured. Set ${QWEN_SERVER_TOKEN_ENV} or pass --token to ` +
         `enable direct session shell.`,
     );
@@ -3927,7 +3931,7 @@ async function runQwenServeImpl(
       );
     }
     writeStderrLine(
-      `qwen serve: --allow-origin: ${opts.allowOrigins.join(', ')}` +
+      `mariadb-shell-agent serve: --allow-origin: ${opts.allowOrigins.join(', ')}` +
         (parsed.allowAny
           ? ' (WARNING: `*` admits any cross-origin browser — bearer ' +
             'token gates API routes; the Web Shell static assets stay ' +
@@ -3947,7 +3951,7 @@ async function runQwenServeImpl(
   }
   if (opts.allowPrivateAuthBaseUrl) {
     writeStderrLine(
-      'qwen serve: --allow-private-auth-base-url enabled; ' +
+      'mariadb-shell-agent serve: --allow-private-auth-base-url enabled; ' +
         '/workspace/auth/provider may install localhost/private-network ' +
         'model endpoints. Use only for local development with trusted clients.',
     );
@@ -4141,7 +4145,7 @@ async function runQwenServeImpl(
         const displayName = stored.displayNames?.[registrationId];
         if (isReservedConversationWorkspace(storedWorkspace)) {
           writeStderrLine(
-            `qwen serve: skipping persisted workspace registration ${JSON.stringify(
+            `mariadb-shell-agent serve: skipping persisted workspace registration ${JSON.stringify(
               storedWorkspace,
             )}: path is reserved for Conversations`,
           );
@@ -4153,7 +4157,7 @@ async function runQwenServeImpl(
           readSshWorkspace(cwd);
         } catch (err) {
           writeStderrLine(
-            `qwen serve: skipping persisted workspace registration ${JSON.stringify(
+            `mariadb-shell-agent serve: skipping persisted workspace registration ${JSON.stringify(
               storedWorkspace,
             )}: ${err instanceof Error ? err.message : String(err)}`,
           );
@@ -4161,7 +4165,7 @@ async function runQwenServeImpl(
         }
         if (isReservedConversationWorkspace(cwd)) {
           writeStderrLine(
-            `qwen serve: skipping persisted workspace registration ${JSON.stringify(
+            `mariadb-shell-agent serve: skipping persisted workspace registration ${JSON.stringify(
               storedWorkspace,
             )}: path is reserved for Conversations`,
           );
@@ -4182,7 +4186,7 @@ async function runQwenServeImpl(
         );
         if (nested) {
           writeStderrLine(
-            `qwen serve: skipping persisted workspace registration ${JSON.stringify(
+            `mariadb-shell-agent serve: skipping persisted workspace registration ${JSON.stringify(
               storedWorkspace,
             )}: path nests with an explicit or earlier restored workspace`,
           );
@@ -4198,7 +4202,7 @@ async function runQwenServeImpl(
       }
     } catch (err) {
       writeStderrLine(
-        `qwen serve: failed to read persisted workspace registrations: ${
+        `mariadb-shell-agent serve: failed to read persisted workspace registrations: ${
           err instanceof Error ? err.message : String(err)
         }; continuing with explicit workspaces only`,
       );
@@ -4239,7 +4243,7 @@ async function runQwenServeImpl(
       loadServeFastPathSettings(boundWorkspace, {
         onWorkspaceSettingsError: (error) => {
           writeStderrLine(
-            `qwen serve: ignoring unreadable workspace settings for ${boundWorkspace} ` +
+            `mariadb-shell-agent serve: ignoring unreadable workspace settings for ${boundWorkspace} ` +
               `(${error.message}); operator settings are still applied.`,
           );
         },
@@ -4265,7 +4269,7 @@ async function runQwenServeImpl(
     // All other settings-read failures (corrupted JSON, transient
     // disk IO) fall back to defaults so the daemon stays bootable.
     writeStderrLine(
-      `qwen serve: could not read settings for context.fileName / ` +
+      `mariadb-shell-agent serve: could not read settings for context.fileName / ` +
         `policy.* / serve.channels / serve.tokenQr / serve.maxSessions ` +
         `(${err instanceof Error ? err.message : String(err)}); ` +
         `falling back to defaults. Restart with a valid settings.json ` +
@@ -4367,7 +4371,7 @@ async function runQwenServeImpl(
     );
     const detail = /[.!?]$/.test(message) ? message : `${message}.`;
     writeStderrLine(
-      `qwen serve: workspace serve.channels was not restored: ${detail} ` +
+      `mariadb-shell-agent serve: workspace serve.channels was not restored: ${detail} ` +
         `Continuing without channels.`,
     );
     daemonLog.warn(
@@ -4401,7 +4405,7 @@ async function runQwenServeImpl(
       return;
     }
     writeStderrLine(
-      `qwen serve: workspace ${JSON.stringify(
+      `mariadb-shell-agent serve: workspace ${JSON.stringify(
         diagnostic.workspaceCwd,
       )} serve.channels: ${detail}`,
     );
@@ -4536,7 +4540,7 @@ async function runQwenServeImpl(
   let loggerPublished = false;
   let loggerSignalOwned = false;
   writeStderrLine(
-    `qwen serve: daemon log → ${daemonLog.getLogPath() || '(disabled)'}`,
+    `mariadb-shell-agent serve: daemon log → ${daemonLog.getLogPath() || '(disabled)'}`,
   );
 
   // The MCP client guardrails enforce in the ACP child process (where
@@ -4736,7 +4740,7 @@ async function runQwenServeImpl(
     await provider.initialize();
     externalToolGuardHandler = provider.prepare;
     writeStderrLine(
-      'qwen serve: required external tool guard handshake succeeded.',
+      'mariadb-shell-agent serve: required external tool guard handshake succeeded.',
     );
   }
   // Keep the guard's core helper imports out of the serve fast-path bundle.
@@ -4778,7 +4782,7 @@ async function runQwenServeImpl(
       removeDaemonDiscovery(actualPort, { expectedPid: process.pid });
       removeDaemonToken(actualPort, process.pid);
     } catch {
-      // Best-effort: a stale record is pruned by `qwen daemon status`.
+      // Best-effort: a stale record is pruned by `mariadb-shell-agent daemon status`.
     }
   };
 
@@ -4794,16 +4798,18 @@ async function runQwenServeImpl(
   if (opts.serveWebShell !== false) {
     if (!webShellDir) {
       writeStderrLine(
-        'qwen serve: Web Shell assets not found; serving API only. ' +
+        'mariadb-shell-agent serve: Web Shell assets not found; serving API only. ' +
           'Build the web-shell workspace (npm run build) or pass --no-web to silence this.',
       );
     } else {
       // Positive happy-path breadcrumb so operators can confirm the UI is live
       // (the only other lines are negative-path warnings).
-      writeStderrLine(`qwen serve: Web Shell UI served from ${webShellDir}`);
+      writeStderrLine(
+        `mariadb-shell-agent serve: Web Shell UI served from ${webShellDir}`,
+      );
       if (!isLoopbackBind(opts.hostname)) {
         writeStderrLine(
-          'qwen serve: Web Shell UI is served WITHOUT auth on a non-loopback ' +
+          'mariadb-shell-agent serve: Web Shell UI is served WITHOUT auth on a non-loopback ' +
             'bind (the static shell has no secrets; the API stays token-gated). ' +
             'Pass --no-web to disable the UI.',
         );
@@ -4817,7 +4823,7 @@ async function runQwenServeImpl(
         // verbatim and needs nothing.
         if (!opts.allowOrigins || opts.allowOrigins.length === 0) {
           writeStderrLine(
-            'qwen serve: same-origin Web Shell HTTP and WebSocket requests work ' +
+            'mariadb-shell-agent serve: same-origin Web Shell HTTP and WebSocket requests work ' +
               'without --allow-origin. Browsers reaching the daemon through a ' +
               'TLS-terminating proxy still need --allow-origin <origin>. A plain-HTTP ' +
               'intermediary that rewrites the Host header (nginx default ' +
@@ -4846,7 +4852,8 @@ async function runQwenServeImpl(
       })
     : undefined;
   const liveDiscoveryStableBaseDir = path.resolve(
-    deps.liveDiscoveryStableBaseDir ?? path.join(os.homedir(), '.qwen'),
+    deps.liveDiscoveryStableBaseDir ??
+      path.join(os.homedir(), '.mariadb-shell-agent'),
   );
   let resolveServeAppStartup!: () => void;
   let rejectServeAppStartup!: (error: Error) => void;
@@ -5397,7 +5404,7 @@ async function runQwenServeImpl(
       );
     } catch (err) {
       writeStderrLine(
-        `qwen serve: managed scratch workspaces are unavailable: ${
+        `mariadb-shell-agent serve: managed scratch workspaces are unavailable: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );
@@ -5417,7 +5424,7 @@ async function runQwenServeImpl(
     } catch (err) {
       if (err instanceof InvalidExecutionSandboxConfigError) throw err;
       writeStderrLine(
-        `qwen serve: could not read full settings for runtime startup ` +
+        `mariadb-shell-agent serve: could not read full settings for runtime startup ` +
           `(${err instanceof Error ? err.message : String(err)}); falling back to defaults.`,
       );
     }
@@ -5487,8 +5494,8 @@ async function runQwenServeImpl(
       }
       const homeDir = os.homedir();
       return homeDir
-        ? path.join(homeDir, '.qwen')
-        : path.join(os.tmpdir(), '.qwen');
+        ? path.join(homeDir, '.mariadb-shell-agent')
+        : path.join(os.tmpdir(), '.mariadb-shell-agent');
     };
     const logRuntimeEnvFileReadFailures = (
       workspace: string,
@@ -6253,7 +6260,7 @@ async function runQwenServeImpl(
           const message = `persistSettings partial failure (workspace=${workspace}, committed=${committed}/${writes.length}, failedKey=${failedWrite?.key ?? '<unknown>'}, failedScope=${failedWrite?.scope ?? '<unknown>'}): ${
             err instanceof Error ? err.message : String(err)
           }`;
-          writeStderrLine(`qwen serve: ${message}`);
+          writeStderrLine(`mariadb-shell-agent serve: ${message}`);
           throw new runtime.WorkspaceSettingsPartialPersistError(
             message,
             writes.filter((write) => committedScopes.has(write.scope)),
@@ -6584,7 +6591,7 @@ async function runQwenServeImpl(
       boundWorkspace,
       isWorkspaceTrusted: () => trustedWorkspace,
       assertGenerationOpen: () => primaryGenerationGuard.assertOpen(),
-      contextFilename: contextFilenameForInit ?? 'QWEN.md',
+      contextFilename: contextFilenameForInit ?? 'MARIADB-SHELL-AGENT.md',
       statusProvider,
       workspaceProvidersStatusProvider,
       workspaceSkillsStatusProvider,
@@ -6842,7 +6849,7 @@ async function runQwenServeImpl(
         });
       } catch (err) {
         writeStderrLine(
-          `qwen serve: could not read full settings for Conversations ` +
+          `mariadb-shell-agent serve: could not read full settings for Conversations ` +
             `(${err instanceof Error ? err.message : String(err)}); falling back to defaults.`,
         );
       }
@@ -6895,7 +6902,7 @@ async function runQwenServeImpl(
       } catch (err) {
         if (err instanceof InvalidExecutionSandboxConfigError) throw err;
         writeStderrLine(
-          `qwen serve: could not read full settings for secondary workspace ` +
+          `mariadb-shell-agent serve: could not read full settings for secondary workspace ` +
             `${workspaceInput.cwd} (${err instanceof Error ? err.message : String(err)}); ` +
             `falling back to defaults.`,
         );
@@ -6920,7 +6927,7 @@ async function runQwenServeImpl(
       const secondaryContextFilename =
         extractContextFilename(secondarySettings?.merged.context?.fileName) ??
         contextFilenameForInit ??
-        'QWEN.md';
+        'MARIADB-SHELL-AGENT.md';
       const secondaryWorkspaceHash = core.hashDaemonWorkspace(
         workspaceInput.cwd,
       );
@@ -7614,7 +7621,7 @@ async function runQwenServeImpl(
         // Match the startup secondary-workspace path: surface why full settings
         // couldn't be read instead of silently falling back to defaults.
         writeStderrLine(
-          `qwen serve: could not read full settings for dynamic workspace ` +
+          `mariadb-shell-agent serve: could not read full settings for dynamic workspace ` +
             `${cwd} (${err instanceof Error ? err.message : String(err)}); ` +
             `falling back to defaults.`,
         );
@@ -7629,7 +7636,7 @@ async function runQwenServeImpl(
       const wsContextFilename =
         extractContextFilename(wsSettings?.merged.context?.fileName) ??
         contextFilenameForInit ??
-        'QWEN.md';
+        'MARIADB-SHELL-AGENT.md';
       const wsHash = core.hashDaemonWorkspace(cwd);
       const generationGuard =
         buildOptions?.generationGuard ??
@@ -9157,7 +9164,7 @@ async function runQwenServeImpl(
   // operators conventionally type `[::1]` (or copy/paste from URLs that
   // need the brackets to disambiguate the port). Strip brackets at
   // bind-time, keep them for the printed URL — without this fixup
-  // `qwen serve --hostname [::1]` would pass the loopback/token check
+  // `mariadb-shell-agent serve --hostname [::1]` would pass the loopback/token check
   // and then fail to start with ENOTFOUND.
   //
   // Only accept *pure* bracketed forms: `[…]` with no trailing `:port`
@@ -9816,7 +9823,9 @@ async function runQwenServeImpl(
           startup.preheat.status = 'failed';
           startup.preheat.error = message;
         }
-        writeStderrLine(`qwen serve: runtime startup failed: ${message}`);
+        writeStderrLine(
+          `mariadb-shell-agent serve: runtime startup failed: ${message}`,
+        );
         daemonLog.error('runtime startup failed', error);
         markRuntimeFailed(error);
         if (closeServerAfterChannelWorkerStartupFailure && server.listening) {
@@ -10292,7 +10301,7 @@ async function runQwenServeImpl(
             );
             startup.preheat.error = message;
             writeStderrLine(
-              `qwen serve: ACP preheat failed, will retry on first session: ${message}`,
+              `mariadb-shell-agent serve: ACP preheat failed, will retry on first session: ${message}`,
             );
           });
       };
@@ -10367,11 +10376,11 @@ async function runQwenServeImpl(
           // Match standard daemon behavior (nginx, redis, etc.):
           // first signal = graceful drain; second = hard exit.
           //
-          // Synchronously SIGKILL every live `qwen --acp`
+          // Synchronously SIGKILL every live `mariadb-shell-agent --acp`
           // child BEFORE `process.exit(1)`. Otherwise the daemon
           // vanishes but its child processes keep running with
           // dangling stdin/stdout pipes — visible as orphan
-          // `qwen` processes in the operator's `ps` output.
+          // `mariadb-shell-agent` processes in the operator's `ps` output.
           daemonLog.warn(`received ${signal} during drain — forcing exit`);
           removeDiscoveryRecord();
           try {
@@ -10559,7 +10568,7 @@ async function runQwenServeImpl(
               )
                 .catch((telemetryErr) => {
                   writeStderrLine(
-                    `qwen serve: telemetry shutdown error: ${
+                    `mariadb-shell-agent serve: telemetry shutdown error: ${
                       telemetryErr instanceof Error
                         ? telemetryErr.message
                         : String(telemetryErr)
@@ -10797,7 +10806,7 @@ async function runQwenServeImpl(
               512,
             );
             writeStderrLine(
-              `qwen serve: channel "${skip.channel}" was not restored: ${detail}`,
+              `mariadb-shell-agent serve: channel "${skip.channel}" was not restored: ${detail}`,
             );
             daemonLog.warn(`channel was not restored: ${detail}`, {
               code: skip.code,
@@ -10871,13 +10880,13 @@ async function runQwenServeImpl(
         if (opts.channelSelection?.mode === 'all') {
           writeStderrLine(
             channelSelectionFromSettings
-              ? 'qwen serve: workspace serve.channels selection "all" is primary-workspace only; non-primary workspace channels are not hosted.'
-              : 'qwen serve: --channel all is primary-workspace only; non-primary workspace channels are not hosted.',
+              ? 'mariadb-shell-agent serve: workspace serve.channels selection "all" is primary-workspace only; non-primary workspace channels are not hosted.'
+              : 'mariadb-shell-agent serve: --channel all is primary-workspace only; non-primary workspace channels are not hosted.',
           );
         }
       }
       writeStdoutLine(
-        `qwen serve listening on ${url} (mode=${opts.mode}, ` +
+        `mariadb-shell-agent serve listening on ${url} (mode=${opts.mode}, ` +
           `workspace=${boundWorkspace})`,
       );
       try {
@@ -10904,7 +10913,7 @@ async function runQwenServeImpl(
         process.once('exit', removeDiscoveryRecord);
       } catch (err) {
         writeStderrLine(
-          `qwen serve: could not write the daemon discovery record: ${
+          `mariadb-shell-agent serve: could not write the daemon discovery record: ${
             err instanceof Error ? err.message : String(err)
           }`,
         );
@@ -10937,7 +10946,7 @@ async function runQwenServeImpl(
         // here — echoing either would re-publish a live bearer into
         // captured stderr on every boot.
         writeStderrLine(
-          `qwen serve: serve.tokenQr must be a boolean; ignoring a ${typeof settingTokenQr} value.`,
+          `mariadb-shell-agent serve: serve.tokenQr must be a boolean; ignoring a ${typeof settingTokenQr} value.`,
         );
       }
       // A workspace settings file may carry serve.tokenQr, but only
@@ -10946,8 +10955,8 @@ async function runQwenServeImpl(
       // LoadedSettings, so the one path that reads the key names it itself.
       for (const ignoredKey of bootSettings?.ignoredWorkspaceKeys ?? []) {
         writeStderrLine(
-          `qwen serve: ${ignoredKey} in workspace settings ` +
-            `(${path.join(boundWorkspace, '.qwen', 'settings.json')}) is ` +
+          `mariadb-shell-agent serve: ${ignoredKey} in workspace settings ` +
+            `(${path.join(boundWorkspace, '.mariadb-shell-agent', 'settings.json')}) is ` +
             'ignored; it is honored from user, system, and system-defaults ' +
             'scopes only.',
         );
@@ -10999,22 +11008,22 @@ async function runQwenServeImpl(
       // somehow contained one — operator-controlled today, but
       // cheap defense-in-depth).
       writeStderrLine(
-        `qwen serve: bound to workspace ${JSON.stringify(boundWorkspace)}`,
+        `mariadb-shell-agent serve: bound to workspace ${JSON.stringify(boundWorkspace)}`,
       );
       writeStderrLine(
-        `qwen serve: startup timing: processToListenMs=${startup.processToListenMs} ` +
+        `mariadb-shell-agent serve: startup timing: processToListenMs=${startup.processToListenMs} ` +
           `runQwenServeToListenMs=${startup.runQwenServeToListenMs}`,
       );
       if (!token) {
         writeStderrLine(
-          `qwen serve: trusted loopback mode; local callers have full API ` +
+          `mariadb-shell-agent serve: trusted loopback mode; local callers have full API ` +
             `access without bearer authentication, including code execution ` +
             `as the daemon user. Use --require-auth with ` +
             `${QWEN_SERVER_TOKEN_ENV} on shared or untrusted hosts.`,
         );
         if (opts.clientMcpOverWs === true) {
           writeStderrLine(
-            `qwen serve: client-hosted MCP tools are accepted over the WebSocket without auth. ` +
+            `mariadb-shell-agent serve: client-hosted MCP tools are accepted over the WebSocket without auth. ` +
               `Set ${QWEN_SERVE_CLIENT_MCP_OVER_WS_ENV}=0 to disable.`,
           );
         }
@@ -11026,14 +11035,14 @@ async function runQwenServeImpl(
         // `/capabilities` (and is a useful breadcrumb when triaging
         // "why is loopback returning 401" tickets).
         writeStderrLine(
-          'qwen serve: --require-auth enabled (bearer token mandatory ' +
+          'mariadb-shell-agent serve: --require-auth enabled (bearer token mandatory ' +
             'on every route, including loopback /health).',
         );
       }
       writeStderrLine(
-        `qwen serve: manage this daemon with \`qwen daemon status\`, ` +
-          `\`qwen daemon logs --port ${actualPort} --follow\`, or ` +
-          `\`qwen daemon stop --port ${actualPort}\`.`,
+        `mariadb-shell-agent serve: manage this daemon with \`mariadb-shell-agent daemon status\`, ` +
+          `\`mariadb-shell-agent daemon logs --port ${actualPort} --follow\`, or ` +
+          `\`mariadb-shell-agent daemon stop --port ${actualPort}\`.`,
       );
 
       if (deps.installSignalHandlers !== false) {
@@ -11108,7 +11117,7 @@ async function runQwenServeImpl(
                 if (hasRetryableChannelWorkerShutdownError(closeErr)) {
                   writeDaemonLifecycleBestEffort(() =>
                     daemonLog.error(
-                      'runtime startup failed, but qwen serve remains alive to retain the channel service lease until worker exit is confirmed',
+                      'runtime startup failed, but mariadb-shell-agent serve remains alive to retain the channel service lease until worker exit is confirmed',
                     ),
                   );
                   return;
@@ -11408,7 +11417,7 @@ async function runQwenServeImpl(
         // moved Harness would start while no Session could reach it.
         if (err.code === 'EADDRINUSE' && opts.profile === 'hosted-harness') {
           writeStderrLine(
-            `qwen serve: port ${attemptPort} is in use; --profile hosted-harness does not move to another port`,
+            `mariadb-shell-agent serve: port ${attemptPort} is in use; --profile hosted-harness does not move to another port`,
           );
         } else if (
           err.code === 'EADDRINUSE' &&
@@ -11417,14 +11426,14 @@ async function runQwenServeImpl(
           attempt < MAX_PORT_ATTEMPTS - 1
         ) {
           writeStderrLine(
-            `qwen serve: port ${attemptPort} is in use, trying ${nextPort}...`,
+            `mariadb-shell-agent serve: port ${attemptPort} is in use, trying ${nextPort}...`,
           );
           tryListen(nextPort, attempt + 1);
           return;
         }
         if (err.code === 'EADDRINUSE' && attempt > 0) {
           writeStderrLine(
-            `qwen serve: all ports ${opts.port}–${attemptPort} are in use`,
+            `mariadb-shell-agent serve: all ports ${opts.port}–${attemptPort} are in use`,
           );
         }
         removeCurrentServePidfile();

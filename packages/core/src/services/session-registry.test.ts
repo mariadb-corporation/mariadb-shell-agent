@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -35,7 +36,7 @@ import * as processLiveness from '../utils/process-liveness.js';
  * work. The `<pid>.json` filename filter is invisible from the outside —
  * the filename/contents agreement check downstream rejects everything a
  * looser regex would let through — so the only way to hold the filter to
- * its stated job, not reading whatever else lives in `~/.qwen/sessions`,
+ * its stated job, not reading whatever else lives in `~/.mariadb-shell-agent/sessions`,
  * is to watch what it opens.
  */
 const statCalls: string[] = [];

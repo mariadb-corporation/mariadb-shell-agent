@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -158,11 +159,11 @@ class SkippedConnectionError extends Error {
 /**
  * The reconnect command runs in its own short-lived process: it can verify
  * (and refresh) its own connection, but it has no channel into a running
- * Qwen Code session. Say so plainly in the success output so it is not read
+ * MariaDB Shell Agent session. Say so plainly in the success output so it is not read
  * as "your running session's MCP tools are back" (issue #9944).
  */
 const SESSION_SCOPE_NOTE =
-  'Note: this command reconnects in a separate process; it cannot refresh the MCP tools of an already-running Qwen Code session. Restart that session if its tools remain unavailable.';
+  'Note: this command reconnects in a separate process; it cannot refresh the MCP tools of an already-running MariaDB Shell Agent session. Restart that session if its tools remain unavailable.';
 
 function createReconnectError(
   message: string,
@@ -318,7 +319,7 @@ async function reconnectAllMcpServers(): Promise<void> {
           // An intentional skip is not a failure — the client never tried to
           // connect. Report it informationally and keep it out of failedCount:
           // counting it would force exit code 1 on every run (alerting
-          // `qwen mcp reconnect --all || alert` wrappers forever) even though
+          // `mariadb-shell-agent mcp reconnect --all || alert` wrappers forever) even though
           // nothing actually failed.
           writeStdoutLine(`- ${serverName}: Skipped - ${error.skipReason}`);
           continue;
@@ -340,7 +341,7 @@ async function reconnectAllMcpServers(): Promise<void> {
   // handler's `process.exit(exitCode)` never runs and `--all` exits 0 even
   // when some (or all) servers failed verification — the single-server path
   // exits 1 for the identical failure. Wrapper scripts running
-  // `qwen mcp reconnect --all || alert` would never alert.
+  // `mariadb-shell-agent mcp reconnect --all || alert` would never alert.
   if (failedCount > 0) {
     throw createReconnectError(
       `Failed to reconnect ${failedCount} of ${serverNames.length} configured server(s).`,
@@ -353,7 +354,7 @@ export const reconnectCommand: CommandModule = {
   describe: 'Reconnect MCP server(s)',
   builder: (yargs) =>
     yargs
-      .usage('Usage: qwen mcp reconnect [options] [server-name]')
+      .usage('Usage: mariadb-shell-agent mcp reconnect [options] [server-name]')
       .positional('server-name', {
         describe: 'Name of the server to reconnect',
         type: 'string',

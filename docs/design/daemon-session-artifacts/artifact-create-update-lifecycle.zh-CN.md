@@ -4,7 +4,7 @@
 
 - 状态：实现中（PR 1）
 - 日期：2026-10-15
-- 关联 issue：[#14282](https://github.com/QwenLM/qwen-code/issues/14282)
+- 关联 issue：[#14282](https://github.invalid/QwenLM/qwen-code/issues/14282)
 - 相关设计：[session-artifacts-persistence-v2-design.md](session-artifacts-persistence-v2-design.md)、[session-artifacts-directory-expansion.md](../session-artifacts-directory-expansion.md)、[web-shell-tool-file-preview.md](../web-shell-tool-file-preview.md)
 
 ## 1. 背景与问题
@@ -231,7 +231,7 @@ interface ToolArtifact {
 
 ## 8. 验证
 
-实现前在 `.qwen/e2e-tests/` 写 E2E 计划，并先对全局 `qwen` CLI dry-run 记录基线。
+实现前在 `.mariadb-shell-agent/e2e-tests/` 写 E2E 计划，并先对全局 `mariadb-shell-agent` CLI dry-run 记录基线。
 
 1. 上传 `orders.csv`，让 AI 用 `edit` 加一列 → 产物新建、出现在本 turn、可预览可下载。
 2. 下一轮再改 → 同一 id 发 `updated`，状态 `available`，产物出现在最新 turn。

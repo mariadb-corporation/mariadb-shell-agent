@@ -54,7 +54,7 @@ The lock itself lives in one place, the Config. The Config hands it to the workf
 
 ## Differences from Claude Code
 
-Claude Code's `CLAUDE_WORKFLOW_NAME_ONLY` refuses `script`, `scriptPath` and `resumeFromRunId`, limits resolution to built-in workflows, and refuses a nested `workflow({ scriptPath })` for every run. Qwen Code has no built-in workflows, and the lock serves deployments that start named runs and resume them, so it keeps every name tier (project, user, extension), allows a named resume, and leaves host-started runs unrestricted.
+Claude Code's `CLAUDE_WORKFLOW_NAME_ONLY` refuses `script`, `scriptPath` and `resumeFromRunId`, limits resolution to built-in workflows, and refuses a nested `workflow({ scriptPath })` for every run. MariaDB Shell Agent has no built-in workflows, and the lock serves deployments that start named runs and resume them, so it keeps every name tier (project, user, extension), allows a named resume, and leaves host-started runs unrestricted.
 
 ## Related fix
 

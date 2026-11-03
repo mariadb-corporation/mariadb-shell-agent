@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review check-coverage`: read what the review agents actually returned,
+// `mariadb-shell-agent review check-coverage`: read what the review agents actually returned,
 // and say which parts of the diff nobody looked at.
 //
 // This exists because the review approved a pull request that no agent read.

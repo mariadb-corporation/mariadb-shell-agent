@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -356,7 +357,7 @@ describe('runFixedPolicies', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'omni-orchestrator-'));
-    store = new OmniObjectStore(path.join(tmpDir, '.qwen'));
+    store = new OmniObjectStore(path.join(tmpDir, '.mariadb-shell-agent'));
     sourcePath = path.join(tmpDir, 'photo.png');
     await fs.writeFile(sourcePath, SOURCE_BYTES);
     source = {

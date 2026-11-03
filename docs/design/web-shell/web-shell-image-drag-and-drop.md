@@ -2,7 +2,7 @@
 
 ## 状态
 
-针对 [#8321](https://github.com/QwenLM/qwen-code/issues/8321) 的实现方案。初始实现由
+针对 [#8321](https://github.invalid/QwenLM/qwen-code/issues/8321) 的实现方案。初始实现由
 `48d1e1d69` 落地，review 修正由 `afb55ebae` 补齐 admission、恢复和资源边界。
 其中队列展示和 admission 失败语义已由
 [Web Shell backend-authoritative queue display](../web-shell-backend-authoritative-queue-display.md)
@@ -478,7 +478,7 @@ helper 只返回结构化 accepted/rejected；toast 只能由当前 lane 的 `us
 
 - Web Shell 在每次 paste/drop ingestion 中以 `8 MiB` base64 data 预算减去当前已有附件，
   限制本批可读候选，属于固定的浏览器资源保护，不是 daemon admission 阈值；
-- `qwen serve` 的 `express.json({ limit: '10mb' })` 限制整个已经 base64 编码并包含 JSON
+- `mariadb-shell-agent serve` 的 `express.json({ limit: '10mb' })` 限制整个已经 base64 编码并包含 JSON
   envelope 的 HTTP 请求体；超过后在路由前返回结构化 `413`。
 - Core 的 `DEFAULT_MAX_INLINE_MEDIA_BYTES = 10 * 1024 * 1024` 限制单个
   `inlineData` 的估算 decoded bytes，只有请求先通过 daemon parser 后才生效，且可由

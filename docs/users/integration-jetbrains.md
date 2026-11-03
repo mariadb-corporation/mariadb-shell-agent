@@ -1,6 +1,6 @@
 # JetBrains IDEs
 
-> JetBrains IDEs provide native support for AI coding assistants through the Agent Client Protocol (ACP). This integration allows you to use Qwen Code directly within your JetBrains IDE with real-time code suggestions.
+> JetBrains IDEs provide native support for AI coding assistants through the Agent Client Protocol (ACP). This integration allows you to use MariaDB Shell Agent directly within your JetBrains IDE with real-time code suggestions.
 
 ### Features
 
@@ -9,18 +9,18 @@
 - **Symbol management**: #-mention files to add them to the conversation context
 - **Conversation history**: Access to past conversations within the IDE
 - **Reasoning effort**: Choose Default, Low, Medium, High, Extra high, or Max from the agent's session options; each provider maps or clamps the requested tier for the active model
-- **Context usage**: See the current context-window occupancy while Qwen Code works
+- **Context usage**: See the current context-window occupancy while MariaDB Shell Agent works
 
 ### Requirements
 
 - JetBrains IDE with ACP support (IntelliJ IDEA, WebStorm, PyCharm, etc.)
-- Qwen Code CLI installed
+- MariaDB Shell Agent CLI installed
 
 ### Installation
 
 #### Install from ACP Registry (Recommend)
 
-1. Install Qwen Code CLI:
+1. Install MariaDB Shell Agent CLI:
 
    ```bash
    npm install -g @qwen-code/qwen-code
@@ -30,19 +30,19 @@
 
 3. Click **Add ACP Agent**, then click **Install**.
 
-   ![Install](https://img.alicdn.com/imgextra/i4/O1CN01qNdPCW1y8AcqxRgCy_!!6000000006533-2-tps-2490-1788.png)
+   ![Install](https://img.alicdn.invalid/imgextra/i4/O1CN01qNdPCW1y8AcqxRgCy_!!6000000006533-2-tps-2490-1788.png)
 
-   For users using JetBrains AI Assistant and/or other ACP agents, click **Install From ACP Registry** in Agents List, then install Qwen Code ACP.
+   For users using JetBrains AI Assistant and/or other ACP agents, click **Install From ACP Registry** in Agents List, then install MariaDB Shell Agent ACP.
 
-   ![Add from Agents List](https://img.alicdn.com/imgextra/i2/O1CN01ZyOugP26BOKzNgZXx_!!6000000007623-2-tps-479-523.png)
+   ![Add from Agents List](https://img.alicdn.invalid/imgextra/i2/O1CN01ZyOugP26BOKzNgZXx_!!6000000007623-2-tps-479-523.png)
 
-4. The Qwen Code agent should now be available in the AI Assistant panel.
+4. The MariaDB Shell Agent agent should now be available in the AI Assistant panel.
 
-   ![Qwen Code in JetBrains AI Chat](https://img.alicdn.com/imgextra/i4/O1CN013kAVE41XVzbIZOxyv_!!6000000002930-2-tps-3188-2170.png)
+   ![MariaDB Shell Agent in JetBrains AI Chat](https://img.alicdn.invalid/imgextra/i4/O1CN013kAVE41XVzbIZOxyv_!!6000000002930-2-tps-3188-2170.png)
 
 #### Manual Install (for older version of JetBrains IDEs)
 
-1. Install Qwen Code CLI:
+1. Install MariaDB Shell Agent CLI:
 
    ```bash
    npm install -g @qwen-code/qwen-code
@@ -50,7 +50,7 @@
 
 2. Open your JetBrains IDE and navigate to AI Chat tool window.
 
-3. Click the 3-dot menu in the upper-right corner and select **Configure ACP Agent** and configure Qwen Code with the following settings:
+3. Click the 3-dot menu in the upper-right corner and select **Configure ACP Agent** and configure MariaDB Shell Agent with the following settings:
 
 ```json
 {
@@ -64,20 +64,20 @@
 }
 ```
 
-4. The Qwen Code agent should now be available in the AI Assistant panel
+4. The MariaDB Shell Agent agent should now be available in the AI Assistant panel
 
-![Qwen Code in JetBrains AI Chat](https://img.alicdn.com/imgextra/i3/O1CN01ZxYel21y433Ci6eg0_!!6000000006524-2-tps-2774-1494.png)
+![MariaDB Shell Agent in JetBrains AI Chat](https://img.alicdn.invalid/imgextra/i3/O1CN01ZxYel21y433Ci6eg0_!!6000000006524-2-tps-2774-1494.png)
 
 ## Troubleshooting
 
 ### Agent not appearing
 
-- Run `qwen --version` in terminal to verify installation
+- Run `mariadb-shell-agent --version` in terminal to verify installation
 - Ensure your JetBrains IDE version supports ACP
 - Restart your JetBrains IDE
 
-### Qwen Code not responding
+### MariaDB Shell Agent not responding
 
 - Check your internet connection
-- Verify CLI works by running `qwen` in terminal
-- [File an issue on GitHub](https://github.com/qwenlm/qwen-code/issues) if the problem persists
+- Verify CLI works by running `mariadb-shell-agent` in terminal
+- [File an issue on GitHub](https://github.invalid/qwenlm/qwen-code/issues) if the problem persists

@@ -2,7 +2,7 @@
 
 **Status:** implemented & verified (2026-08-07) — workstream A closed by
 measurement (no client change); workstream B shipped as `match-remote`,
-E2E-verified through the skill (see `.qwen/e2e-tests/review-cpu-for-tokens.md`
+E2E-verified through the skill (see `.mariadb-shell-agent/e2e-tests/review-cpu-for-tokens.md`
 — an untracked, machine-local run archive, not committed)
 **Date:** 2026-08-07
 **Scope:** `/review` token economy — two workstreams, one measurement-gated,
@@ -41,7 +41,7 @@ review covers or what evidence a verdict requires.
 - **Response parsing.** The OpenAI-compatible converter reads both
   `usage.prompt_tokens_details.cached_tokens` and the top-level
   `cached_tokens` shape into `cachedContentTokenCount`.
-- **Measurement.** `qwen review cost-ledger` already aggregates per-agent
+- **Measurement.** `mariadb-shell-agent review cost-ledger` already aggregates per-agent
   `input / cached / output / thinking` token counts from the harness's own
   transcript records — the same records `check-coverage` trusts. Step 8
   archives the ledger beside every saved report. No new instrumentation is
@@ -139,7 +139,7 @@ subagent prefixes) is already in place; the DESIGN.md "~880K-1.2M input
 tokens" figure is raw re-delivered tokens, not billed cost — the cache
 serves the bulk of it.
 
-### Workstream B — `qwen review match-remote`
+### Workstream B — `mariadb-shell-agent review match-remote`
 
 One new read-only subcommand owning the remote-resolution rule SKILL.md
 currently carries as prose in two places (pr-url matching in Step 1, and
@@ -148,7 +148,7 @@ remote selection for bare pr-numbers).
 **Interface:**
 
 ```bash
-qwen review match-remote --owner <owner> --repo <repo> [--host <host>]
+mariadb-shell-agent review match-remote --owner <owner> --repo <repo> [--host <host>]
 # prints the matched remote name on stdout; exits 6 when no remote matches
 ```
 

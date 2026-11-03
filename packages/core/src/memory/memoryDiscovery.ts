@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -144,7 +145,7 @@ async function getMemoryFilePathsInternalForEachDir(
     }
 
     if (isHomeDirectory) {
-      // For home directory, only check for QWEN.md directly in the home directory
+      // For home directory, only check for MARIADB-SHELL-AGENT.md directly in the home directory
       const homeContextPath = path.join(resolvedHome, memoryFilename);
       try {
         await fs.access(homeContextPath, fsSync.constants.R_OK);
@@ -218,7 +219,7 @@ async function getMemoryFilePathsInternalForEachDir(
 /**
  * Deduplicates discovered context files by canonical file identity so one
  * physical file reached through multiple lexical paths (e.g. a workspace
- * QWEN.md that symlinks to an ancestor QWEN.md) is read, attached, and
+ * MARIADB-SHELL-AGENT.md that symlinks to an ancestor MARIADB-SHELL-AGENT.md) is read, attached, and
  * announced only once (#9597). The first-discovered lexical path is kept
  * so ordering, display, and relative @import resolution are unchanged.
  * Paths whose canonical identity cannot be resolved (broken symlink,
@@ -393,19 +394,22 @@ function concatenateInstructions(
   instructionContents: MemoryFileContent[],
   // CWD is needed to resolve relative paths for display markers
   currentWorkingDirectoryForDisplay: string,
+  userHomePath?: string,
 ): string {
   return instructionContents
     .filter(hasAttachedContent)
     .map((item) => {
       const trimmedContent = (item.content as string).trim();
-      // Sanitize the marker path: paths under attacker-influenceable
-      // directory names could otherwise forge or hide entries in the
-      // `/context` parser (newline/control chars break its line-oriented
-      // markers), contradicting the sanitized announcement surface.
-      const displayPath = stripAnsiAndControl(
-        path.isAbsolute(item.filePath)
-          ? path.relative(currentWorkingDirectoryForDisplay, item.filePath)
-          : item.filePath,
+      // The same display form as the announced list: relative inside the
+      // CWD, `~/...` for files under the home directory. A cwd-relative
+      // `../../..` chain would make the system prompt differ per working
+      // directory and defeat provider prompt caching. The helper also
+      // sanitizes the path: names under attacker-influenceable directories
+      // could otherwise forge or hide entries in the `/context` parser.
+      const displayPath = formatContextFileDisplayPath(
+        item.filePath,
+        currentWorkingDirectoryForDisplay,
+        userHomePath,
       );
       return `--- Context from: ${displayPath} ---\n${trimmedContent}\n--- End of Context from: ${displayPath} ---`;
     })
@@ -422,7 +426,7 @@ export interface LoadServerHierarchicalMemoryResponse {
    * Lets callers tell users which files were actually attached (see #5267).
    * Top-level files only: content pulled in via `@import` is inlined into
    * the importing file and is not listed separately.
-   * Baseline rules (`.qwen/rules/`) are injected separately and deliberately
+   * Baseline rules (`.mariadb-shell-agent/rules/`) are injected separately and deliberately
    * not listed here (see `ruleCount`).
    */
   contextFilePaths: string[];
@@ -507,8 +511,8 @@ function createMemoryTypeClassifier(
 }
 
 /**
- * Loads hierarchical QWEN.md files and concatenates their content.
- * Also loads path-based context rules from `.qwen/rules/` directories.
+ * Loads hierarchical MARIADB-SHELL-AGENT.md files and concatenates their content.
+ * Also loads path-based context rules from `.mariadb-shell-agent/rules/` directories.
  * This function is intended for use by the server.
  *
  * @param contextRuleExcludes - Glob patterns to skip when loading rules.
@@ -541,15 +545,15 @@ export async function loadServerHierarchicalMemory(
     implicitDiscoveryEnabled,
   );
 
-  // Resolve project root once — needed both for the QWEN.local.md slot
+  // Resolve project root once — needed both for the MARIADB-SHELL-AGENT.local.md slot
   // (below) and for rules discovery (further down).
   const resolvedCwd = path.resolve(currentWorkingDirectory);
   const foundRoot = await findProjectRoot(resolvedCwd);
   const effectiveRoot = foundRoot ?? resolvedCwd;
 
   // Append the per-developer local context file slot:
-  // `<projectRoot>/.qwen/QWEN.local.md`. Loaded after all hierarchical
-  // QWEN.md / AGENTS.md files so local instructions can supplement or
+  // `<projectRoot>/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md`. Loaded after all hierarchical
+  // MARIADB-SHELL-AGENT.md / AGENTS.md files so local instructions can supplement or
   // override shared ones. Same trust + explicit-only gating as the rest
   // of the project-level discovery.
   //
@@ -557,7 +561,7 @@ export async function loadServerHierarchicalMemory(
   // fallback). Without that gate, two failure modes appear:
   //   * Deep cwd in a non-git workspace turns the slot into a per-cwd
   //     file, breaking the "single fixed slot" invariant.
-  //   * `cwd === homedir` resolves the slot path to `~/.qwen/QWEN.local.md`,
+  //   * `cwd === homedir` resolves the slot path to `~/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md`,
   //     colliding with the global Qwen directory.
   if (implicitDiscoveryEnabled && folderTrust && foundRoot) {
     const localContextPath = path.join(
@@ -579,7 +583,7 @@ export async function loadServerHierarchicalMemory(
   }
 
   // One physical file may be discovered through several lexical paths
-  // (a workspace symlink aliasing an ancestor QWEN.md, an extension path
+  // (a workspace symlink aliasing an ancestor MARIADB-SHELL-AGENT.md, an extension path
   // that duplicates a scanned path). Dedupe by canonical identity so the
   // file's content reaches the system prompt exactly once (#9597).
   const { filePaths: dedupedFilePaths, topLevelFiles } =
@@ -607,9 +611,10 @@ export async function loadServerHierarchicalMemory(
     combinedInstructions = concatenateInstructions(
       contentsWithPaths,
       currentWorkingDirectory,
+      userHomePath,
     );
 
-    // Only count files that match configured memory filenames (e.g., QWEN.md),
+    // Only count files that match configured memory filenames (e.g., MARIADB-SHELL-AGENT.md),
     // excluding system context files like output-language.md. Note: this is
     // intentionally different from contextFilePaths below, which is
     // content-based and includes non-memory-named files. The two surfaces
@@ -639,7 +644,7 @@ export async function loadServerHierarchicalMemory(
       );
   }
 
-  // Load path-based context rules from .qwen/rules/ directories.
+  // Load path-based context rules from .mariadb-shell-agent/rules/ directories.
   const {
     content: rulesContent,
     ruleCount,
@@ -668,7 +673,7 @@ export async function loadServerHierarchicalMemory(
   }
 
   if (!memoryContent && dedupedFilePaths.length === 0 && ruleCount === 0) {
-    logger.debug('No QWEN.md files or rules found.');
+    logger.debug('No MARIADB-SHELL-AGENT.md files or rules found.');
   }
 
   return {

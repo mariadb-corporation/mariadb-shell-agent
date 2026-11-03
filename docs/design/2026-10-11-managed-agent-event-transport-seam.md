@@ -5,12 +5,12 @@
 > **Status:** Proposed slice. This is phase **MQ1** of the cross-node
 > EventTransport design
 > ([2026-10-04-managed-agent-event-transport](2026-10-04-managed-agent-event-transport.md),
-> §7), tracked under [#12380](https://github.com/QwenLM/qwen-code/issues/12380).
+> §7), tracked under [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380).
 > MQ1 introduces the named seam only: no broker dependency, no configuration,
 > no behavior change. The envelope contract landed in
-> [#13498](https://github.com/QwenLM/qwen-code/pull/13498); the P2 candidate
+> [#13498](https://github.invalid/QwenLM/qwen-code/pull/13498); the P2 candidate
 > selection (RocketMQ LiteTopic 5.5.0+) is pinned by
-> [#13200](https://github.com/QwenLM/qwen-code/issues/13200).
+> [#13200](https://github.invalid/QwenLM/qwen-code/issues/13200).
 
 ## Problem
 
@@ -22,8 +22,8 @@ lands that composition point by itself, with the default composition equal to
 today's in-process fan-out, so MQ2's diff is purely additive behind a
 default-off flag.
 
-MQ1's stated prerequisites are met: [#13300](https://github.com/QwenLM/qwen-code/issues/13300)
-(H0c review follow-ups) closed and [#13265](https://github.com/QwenLM/qwen-code/issues/13265)
+MQ1's stated prerequisites are met: [#13300](https://github.invalid/QwenLM/qwen-code/issues/13300)
+(H0c review follow-ups) closed and [#13265](https://github.invalid/QwenLM/qwen-code/issues/13265)
 (H3) merged. One qualification on "the envelope keys are final": the frozen
 v1 envelope names `authoritative_journal` as its only stream, while this seam
 carries the public `managed_agent_event` stream — admitting a `public_event`
@@ -96,7 +96,7 @@ than a claim.
 - No Java mirror of the envelope contract. The parent design's phase table
   originally assigned the Java fixture consumer to the contract slice landing
   in MQ1 (§7); the merged contract slice
-  [#13498](https://github.com/QwenLM/qwen-code/pull/13498) deferred it to the
+  [#13498](https://github.invalid/QwenLM/qwen-code/pull/13498) deferred it to the
   transport slice (delivery ledger, #13498 row), and this slice keeps that
   exclusion.
 - No change to `ManagedAgentStore`, the commit path, SSE endpoints, or the

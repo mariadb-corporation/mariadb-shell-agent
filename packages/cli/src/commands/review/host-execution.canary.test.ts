@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -125,7 +126,7 @@ describe('a planted repository reaches no host-side execution', () => {
   const g = (cwd: string, ...args: string[]) =>
     execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
 
-  /** A repository with one commit, and `.qwen/tmp` ready for its trees. */
+  /** A repository with one commit, and `.mariadb-shell-agent/tmp` ready for its trees. */
   const repository = () => {
     const repo = tmp('qwen-canary-repo-');
     g(repo, 'init', '-q', '-b', 'main');
@@ -134,12 +135,12 @@ describe('a planted repository reaches no host-side execution', () => {
     writeFileSync(join(repo, 'a.ts'), 'export const x = 1;\n');
     g(repo, 'add', 'a.ts');
     g(repo, 'commit', '-qm', 'init');
-    mkdirSync(join(repo, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(repo, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     return repo;
   };
 
   /**
-   * The single-layer geometry: a review worktree under `<repo>/.qwen/tmp`, with
+   * The single-layer geometry: a review worktree under `<repo>/.mariadb-shell-agent/tmp`, with
    * `plant()` to rewrite its gitfile the way the reviewed code would.
    *
    * Split in two because one arm needs the pointer poisoned AFTER a first call
@@ -151,18 +152,18 @@ describe('a planted repository reaches no host-side execution', () => {
     const repo = repository();
     const canaryDir = tmp('qwen-canary-out-');
     const canary = join(canaryDir, 'PWNED');
-    const tree = join(repo, '.qwen', 'tmp', 'review-pr-1');
+    const tree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     g(repo, 'worktree', 'add', '-q', '--detach', tree, 'HEAD');
     const headSha = g(tree, 'rev-parse', 'HEAD');
     const realEntry = join(repo, '.git', 'worktrees', 'review-pr-1');
     const plant = () => {
       const common = plantRepository(
-        join(repo, '.qwen', 'tmp', '.evil-common'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-common'),
         join(repo, '.git'),
         canary,
       );
       const entry = plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-git'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
         realEntry,
         tree,
         common,
@@ -323,7 +324,7 @@ describe('a planted repository reaches no host-side execution', () => {
       const repo = repository();
       const canaryDir = tmp('qwen-canary-out-');
       const canary = join(canaryDir, 'PWNED');
-      const worktree = join(repo, '.qwen', 'tmp', 'review-pr-1');
+      const worktree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
       g(repo, 'worktree', 'add', '-q', '--detach', worktree, 'HEAD');
       const baseSha = g(worktree, 'rev-parse', 'HEAD');
       acquireLease(repo, worktree, baseSha);
@@ -343,12 +344,12 @@ describe('a planted repository reaches no host-side execution', () => {
         untracked: {},
       });
       const common = plantRepository(
-        join(repo, '.qwen', 'tmp', '.evil-common'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-common'),
         join(repo, '.git'),
         canary,
       );
       plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-git'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
         join(repo, '.git', 'worktrees', basename(tree)),
         tree,
         common,
@@ -388,7 +389,7 @@ describe('a planted repository reaches no host-side execution', () => {
       const repo = repository();
       const canaryDir = tmp('qwen-canary-out-');
       const canary = join(canaryDir, 'PWNED');
-      const worktree = join(repo, '.qwen', 'tmp', 'review-pr-1');
+      const worktree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
       g(repo, 'worktree', 'add', '-q', '--detach', worktree, 'HEAD');
       const baseSha = g(worktree, 'rev-parse', 'HEAD');
       acquireLease(repo, worktree, baseSha);
@@ -404,12 +405,12 @@ describe('a planted repository reaches no host-side execution', () => {
           // The reviewed code's move, mid-build: rewrite the new tree's
           // pointer at a planted repository carrying a clean filter.
           const common = plantRepository(
-            join(repo, '.qwen', 'tmp', '.evil-common'),
+            join(repo, '.mariadb-shell-agent', 'tmp', '.evil-common'),
             join(repo, '.git'),
             canary,
           );
           plantAdminEntry(
-            join(repo, '.qwen', 'tmp', '.evil-git'),
+            join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
             join(repo, '.git', 'worktrees', basename(w)),
             w,
             common,
@@ -466,7 +467,7 @@ describe('a planted repository reaches no host-side execution', () => {
     'an ancestor layer of the nested geometry is inside the writable surface too',
     () => {
       // Entrance 4: a review running inside another review's worktree nests one
-      // `.qwen/tmp` inside another. The MOUNT is the innermost one — widening
+      // `.mariadb-shell-agent/tmp` inside another. The MOUNT is the innermost one — widening
       // it would pull `<repo>/.git` and every sibling checkout into the
       // container — but the OUTER review's containerized phase held the outer
       // temp dir read-write, so a plant one layer up is reachable and, judged
@@ -474,9 +475,9 @@ describe('a planted repository reaches no host-side execution', () => {
       const repo = repository();
       const canaryDir = tmp('qwen-canary-out-');
       const canary = join(canaryDir, 'PWNED');
-      const outer = join(repo, '.qwen', 'tmp', 'review-pr-1');
+      const outer = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
       g(repo, 'worktree', 'add', '-q', '--detach', outer, 'HEAD');
-      const inner = join(outer, '.qwen', 'tmp', 'review-pr-2');
+      const inner = join(outer, '.mariadb-shell-agent', 'tmp', 'review-pr-2');
       mkdirSync(dirname(inner), { recursive: true });
       g(outer, 'worktree', 'add', '-q', '--detach', inner, 'HEAD');
       // git puts a linked worktree's admin entry under the MAIN repository's
@@ -487,23 +488,25 @@ describe('a planted repository reaches no host-side execution', () => {
       expect(existsSync(realEntry)).toBe(true);
 
       const innerRoot = mountRootFor(inner);
-      expect(innerRoot).toBe(realpathSync(join(outer, '.qwen', 'tmp')));
+      expect(innerRoot).toBe(
+        realpathSync(join(outer, '.mariadb-shell-agent', 'tmp')),
+      );
 
       const common = plantRepository(
-        join(repo, '.qwen', 'tmp', '.evil-common'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-common'),
         join(repo, '.git'),
         canary,
       );
       // Planted in the OUTER temp dir: outside the inner root, inside the
       // outer review's read-write mount.
       const entry = plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-git'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
         realEntry,
         inner,
         common,
       );
       expect(mountRootFor(entry)).toBe(
-        realpathSync(join(repo, '.qwen', 'tmp')),
+        realpathSync(join(repo, '.mariadb-shell-agent', 'tmp')),
       );
 
       // The judgement, asked against the innermost root the mount was cut at:
@@ -528,9 +531,9 @@ describe('a planted repository reaches no host-side execution', () => {
       // gate that refuses everything — and the layout it admits is the
       // pipeline's own dogfood geometry, two layers deep.
       const repo = repository();
-      const outer = join(repo, '.qwen', 'tmp', 'review-pr-1');
+      const outer = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
       g(repo, 'worktree', 'add', '-q', '--detach', outer, 'HEAD');
-      const inner = join(outer, '.qwen', 'tmp', 'review-pr-2');
+      const inner = join(outer, '.mariadb-shell-agent', 'tmp', 'review-pr-2');
       mkdirSync(dirname(inner), { recursive: true });
       g(outer, 'worktree', 'add', '-q', '--detach', inner, 'HEAD');
       const headSha = g(inner, 'rev-parse', 'HEAD');
@@ -549,7 +552,7 @@ describe('a planted repository reaches no host-side execution', () => {
     'a pointer planted AFTER the first clean answer is refused too (lib/git)',
     () => {
       // The window is one CLI command rather than the whole review — each
-      // `qwen review <cmd>` is its own process — but it is the whole command,
+      // `mariadb-shell-agent review <cmd>` is its own process — but it is the whole command,
       // and in the nested geometry the OUTER review's containerized build/test
       // phase holds this directory read-write for that long. A verdict memoized
       // for the process lifetime served the first clean answer to every later
@@ -584,7 +587,7 @@ describe('a planted repository reaches no host-side execution', () => {
     'an ancestor rename does not memoize TRUSTED over the re-stood-up spelling (lib/git)',
     () => {
       // The rename attack on the launch-dir memo. Judged once while clean,
-      // the directory is inside a review temp dir — but `mv .qwen
+      // the directory is inside a review temp dir — but `mv .mariadb-shell-agent
       // .qwen-real` makes `mountRootFor` answer null for the live cwd's
       // stale spelling, and a memo keyed on "no mount root" recorded TRUSTED
       // for it. The spelling re-stood-up over a filter-carrying plant then
@@ -602,7 +605,10 @@ describe('a planted repository reaches no host-side execution', () => {
         // The ancestor is renamed out from under the live cwd. The stale
         // spelling still matches the marker lexically, so this call is a
         // refusal — not the "nothing to police" the old gate memoized.
-        renameSync(join(repo, '.qwen'), join(repo, '.qwen-real'));
+        renameSync(
+          join(repo, '.mariadb-shell-agent'),
+          join(repo, '.qwen-real'),
+        );
         // The premise, pinned rather than assumed (the deleted-cwd tests pin
         // `uv_cwd` the same way): Node serves the PRE-rename spelling from
         // its cwd cache — if a future runtime or an in-process `chdir`
@@ -616,7 +622,9 @@ describe('a planted repository reaches no host-side execution', () => {
         });
 
         // The same spelling is stood back up, with the plant under it.
-        mkdirSync(join(repo, '.qwen', 'tmp'), { recursive: true });
+        mkdirSync(join(repo, '.mariadb-shell-agent', 'tmp'), {
+          recursive: true,
+        });
         renameSync(join(repo, '.qwen-real', 'tmp', 'review-pr-1'), tree);
         plant();
         // `status`, not `rev-parse`: the command that refreshes the index,
@@ -648,7 +656,7 @@ describe('a planted repository reaches no host-side execution', () => {
         // the kernel stands in the renamed tree. (Pointing the link at the
         // repo ROOT would still refuse — the common-dir question — whatever
         // the gate judges.)
-        const sibling = join(repo, '.qwen', 'tmp', 'sibling-wt');
+        const sibling = join(repo, '.mariadb-shell-agent', 'tmp', 'sibling-wt');
         execFileSync(
           'git',
           ['worktree', 'add', '-q', '--detach', sibling, 'HEAD'],
@@ -659,16 +667,16 @@ describe('a planted repository reaches no host-side execution', () => {
 
         // The rename, the honest re-stand of the spelling, and the plant
         // at the kernel's location.
-        const evil = join(repo, '.qwen', 'tmp', 'evil');
+        const evil = join(repo, '.mariadb-shell-agent', 'tmp', 'evil');
         renameSync(tree, evil);
         symlinkSync(sibling, tree);
         const common = plantRepository(
-          join(repo, '.qwen', 'tmp', '.evil-common'),
+          join(repo, '.mariadb-shell-agent', 'tmp', '.evil-common'),
           join(repo, '.git'),
           canary,
         );
         plantAdminEntry(
-          join(repo, '.qwen', 'tmp', '.evil-git'),
+          join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
           join(repo, '.git', 'worktrees', 'review-pr-1'),
           evil,
           common,
@@ -805,7 +813,7 @@ describe('a planted repository reaches no host-side execution', () => {
       // admin entry moved, the plant above would be building a shape the
       // pipeline never produces and every refusal would be about nothing.
       const repo = repository();
-      const tree = join(repo, '.qwen', 'tmp', 'review-pr-1');
+      const tree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
       g(repo, 'worktree', 'add', '-q', '--detach', tree, 'HEAD');
       const real = join(repo, '.git', 'worktrees', 'review-pr-1');
       expect(readFileSync(join(tree, '.git'), 'utf8').trim()).toBe(

@@ -4,9 +4,9 @@
 
 ## 1. 状态与交付边界
 
-已在本地实现并完成下述验证，日期为 2026-09-15。源码基线：`88347ccca394902262915dde880499976e596cd7`，即已合并的 [PR1 #11911](https://github.com/QwenLM/qwen-code/pull/11911)。交付跟踪：[#11907](https://github.com/QwenLM/qwen-code/issues/11907)。本次变更包含 PR2 实现与相邻回归测试，运行证据记录在本地 E2E 报告中。
+已在本地实现并完成下述验证，日期为 2026-09-15。源码基线：`88347ccca394902262915dde880499976e596cd7`，即已合并的 [PR1 #11911](https://github.invalid/QwenLM/qwen-code/pull/11911)。交付跟踪：[#11907](https://github.invalid/QwenLM/qwen-code/issues/11907)。本次变更包含 PR2 实现与相邻回归测试，运行证据记录在本地 E2E 报告中。
 
-PR1 已交付可选启用的 daemon 全局 ACP 进程数量准入，以及可识别的容量错误。PR2 增加按需回收符合条件的空闲 ACP 子进程。PR3 仍负责自动回收无能为力时，让用户选择关闭 workspace runtime 或取消。上述阶段都不施加建模的单 child 堆上限，也不完成 [#8182](https://github.com/QwenLM/qwen-code/issues/8182)。
+PR1 已交付可选启用的 daemon 全局 ACP 进程数量准入，以及可识别的容量错误。PR2 增加按需回收符合条件的空闲 ACP 子进程。PR3 仍负责自动回收无能为力时，让用户选择关闭 workspace runtime 或取消。上述阶段都不施加建模的单 child 堆上限，也不完成 [#8182](https://github.invalid/QwenLM/qwen-code/issues/8182)。
 
 **首版只自动回收 live session 数量为零且没有待处理工作的 ACP channel。** 过期且无人使用的 session 继续交给现有 session reaper；不提前其超时，也不因为很久没有生成内容就关闭仍连接着的聊天。现有 reaper 关闭所有 session 后，仍保温的 channel 才能成为候选。
 
@@ -105,7 +105,7 @@ PR1 已交付可选启用的 daemon 全局 ACP 进程数量准入，以及可识
 
 ## 9. 验证与验收
 
-按 `e2e-testing` 工作流，使用隔离 daemon、确定性本地 provider 和测试自有子进程。实现前记录全局 CLI 基线；若已包含后续变更，应记录准确版本，而不是编造预期失败。详细本地计划位于 `.qwen/e2e-tests/daemon-acp-idle-reclamation-pr2.md`，基线和实现验证结果记录在其旁。
+按 `e2e-testing` 工作流，使用隔离 daemon、确定性本地 provider 和测试自有子进程。实现前记录全局 CLI 基线；若已包含后续变更，应记录准确版本，而不是编造预期失败。详细本地计划位于 `.mariadb-shell-agent/e2e-tests/daemon-acp-idle-reclamation-pr2.md`，基线和实现验证结果记录在其旁。
 
 1. 单名额下，保温空 A 在 PR1 基线中阻止冷 B。PR2 中同一操作应在 A 被跟踪 child 真正释放后成功，注册和已保存历史不变。
 2. 多个保温空候选时回收最久未用者。MCP/control 与 preheat 活动更新顺序，反复查询状态不更新；同时间顺序稳定，只尝试一个候选。
@@ -120,7 +120,7 @@ PR1 已交付可选启用的 daemon 全局 ACP 进程数量准入，以及可识
 
 完整 build、typecheck、bundle、定向 lint 通过。ACP 定向测试 80 项、serve 生命周期/路由测试 696 项、独立 server 接线测试 4 项通过。测试覆盖单候选策略、释放前不 spawn、取消/失败/竞争结果、候选身份与活动保护、软保温、MCP 完成更新时间和状态轮询不更新时间。
 
-macOS、Node 22 上 5 组真实 daemon 测试的 52 项断言通过：空保温回收、旧 PID 退出、原 workspace 冷恢复和 epoch 递增、历史保留与原 session ID 加载、已加载空闲会话及 ACP connection 保护、LRU 顺序、动态注册请求方、注册身份及堆参数不变。测试自有进程全部退出，详细报告位于 `.qwen/e2e-tests/pr2-idle-reclamation/verification-report.md`。
+macOS、Node 22 上 5 组真实 daemon 测试的 52 项断言通过：空保温回收、旧 PID 退出、原 workspace 冷恢复和 epoch 递增、历史保留与原 session ID 加载、已加载空闲会话及 ACP connection 保护、LRU 顺序、动态注册请求方、注册身份及堆参数不变。测试自有进程全部退出，详细报告位于 `.mariadb-shell-agent/e2e-tests/pr2-idle-reclamation/verification-report.md`。
 
 未执行 Linux/Windows 验证、真实后代延迟退出与故障注入、真实模型对话及所有业务服务组合。进程取消/竞争等依赖定向单测证据；这些单测不能替代部署目标上的进程树验证。测试不证明实际 RAM 安全或性能收益。
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -570,8 +571,8 @@ describe('RipGrepTool', () => {
       expect(result.returnDisplay).toBe('Found 1 match');
     });
 
-    it('should pass .qwenignore to ripgrep when respected', async () => {
-      await write('.qwenignore', 'ignored.txt\n');
+    it('should pass .mariadb-shell-agentignore to ripgrep when respected', async () => {
+      await write('.mariadb-shell-agentignore', 'ignored.txt\n');
 
       const result = await searchWith('', { pattern: 'secret' });
       expect(result.llmContent).toContain(
@@ -580,8 +581,8 @@ describe('RipGrepTool', () => {
       expect(result.returnDisplay).toBe('No matches found');
     });
 
-    it('should include .qwenignore matches when disabled in config', async () => {
-      await write('.qwenignore', 'kept.txt\n');
+    it('should include .mariadb-shell-agentignore matches when disabled in config', async () => {
+      await write('.mariadb-shell-agentignore', 'kept.txt\n');
       await write('kept.txt', 'keep me');
       setFiltering({ respectGitIgnore: true, respectQwenIgnore: false });
 
@@ -766,17 +767,24 @@ describe('RipGrepTool', () => {
       await fs.rm(secondDir, { recursive: true, force: true });
     });
 
-    it('should load .qwenignore from each workspace directory', async () => {
+    it('should load .mariadb-shell-agentignore from each workspace directory', async () => {
       const secondDir = await makeSecondDir();
-      await fs.writeFile(path.join(secondDir, '.qwenignore'), 'ignored.txt\n');
-      await write('.qwenignore', 'other-ignored.txt\n');
+      await fs.writeFile(
+        path.join(secondDir, '.mariadb-shell-agentignore'),
+        'ignored.txt\n',
+      );
+      await write('.mariadb-shell-agentignore', 'other-ignored.txt\n');
 
       await searchWith('', { pattern: 'test' }, multiDirTool(secondDir));
 
-      // Verify both .qwenignore files were passed
+      // Verify both .mariadb-shell-agentignore files were passed
       const ignoreFiles = ignoreFileArgs();
-      expect(ignoreFiles).toContain(path.join(tempRootDir, '.qwenignore'));
-      expect(ignoreFiles).toContain(path.join(secondDir, '.qwenignore'));
+      expect(ignoreFiles).toContain(
+        path.join(tempRootDir, '.mariadb-shell-agentignore'),
+      );
+      expect(ignoreFiles).toContain(
+        path.join(secondDir, '.mariadb-shell-agentignore'),
+      );
 
       await fs.rm(secondDir, { recursive: true, force: true });
     });
@@ -793,7 +801,10 @@ describe('RipGrepTool', () => {
     });
 
     it('should pass non-qwen ignore files unchanged so ripgrep preserves negations', async () => {
-      const qwenIgnorePath = path.join(tempRootDir, '.qwenignore');
+      const qwenIgnorePath = path.join(
+        tempRootDir,
+        '.mariadb-shell-agentignore',
+      );
       const agentIgnorePath = path.join(tempRootDir, '.agentignore');
 
       await fs.writeFile(qwenIgnorePath, '*.env\n');
@@ -824,8 +835,11 @@ describe('RipGrepTool', () => {
       await expectOnlyKept('allowed.env', 'blocked.env');
     });
 
-    it('should not let a custom ignore negation expose .qwenignore matches in grep output', async () => {
-      const qwenIgnorePath = path.join(tempRootDir, '.qwenignore');
+    it('should not let a custom ignore negation expose .mariadb-shell-agentignore matches in grep output', async () => {
+      const qwenIgnorePath = path.join(
+        tempRootDir,
+        '.mariadb-shell-agentignore',
+      );
       const agentIgnorePath = path.join(tempRootDir, '.agentignore');
       await fs.writeFile(qwenIgnorePath, '*.env\n');
       await fs.writeFile(agentIgnorePath, '!*.env\n');
@@ -840,10 +854,13 @@ describe('RipGrepTool', () => {
       expect(ignoreFileArgs()).toEqual([agentIgnorePath, qwenIgnorePath]);
     });
 
-    it('should post-filter matches ignored by another workspace .qwenignore', async () => {
+    it('should post-filter matches ignored by another workspace .mariadb-shell-agentignore', async () => {
       const secondDir = await makeSecondDir();
-      await write('.qwenignore', '*.env\n');
-      await fs.writeFile(path.join(secondDir, '.qwenignore'), '!*.env\n');
+      await write('.mariadb-shell-agentignore', '*.env\n');
+      await fs.writeFile(
+        path.join(secondDir, '.mariadb-shell-agentignore'),
+        '!*.env\n',
+      );
       await write('secret.env', 'API_KEY=1');
       await write('visible.txt', 'API_KEY=2');
 
@@ -856,27 +873,27 @@ describe('RipGrepTool', () => {
       await fs.rm(secondDir, { recursive: true, force: true });
     });
 
-    it('should preserve negation semantics within the same .qwenignore', async () => {
-      await write('.qwenignore', '*.env\n!allowed.env\n');
+    it('should preserve negation semantics within the same .mariadb-shell-agentignore', async () => {
+      await write('.mariadb-shell-agentignore', '*.env\n!allowed.env\n');
       await write('blocked.env', 'API_KEY=1');
       await write('allowed.env', 'API_KEY=2');
 
       await expectOnlyKept('allowed.env', 'blocked.env');
     });
 
-    it('should post-filter matches unignored by a custom nested .qwenignore', async () => {
+    it('should post-filter matches unignored by a custom nested .mariadb-shell-agentignore', async () => {
       await fs.mkdir(path.join(tempRootDir, 'nested'));
-      await write('.qwenignore', '*.env\n');
-      await write('nested/.qwenignore', '!*.env\n');
+      await write('.mariadb-shell-agentignore', '*.env\n');
+      await write('nested/.mariadb-shell-agentignore', '!*.env\n');
       await write('secret.env', 'API_KEY=1');
       await write('visible.txt', 'API_KEY=2');
-      withCustomIgnores('nested/.qwenignore');
+      withCustomIgnores('nested/.mariadb-shell-agentignore');
 
       await expectOnlyKept('visible.txt', 'secret.env');
 
       expect(ignoreFileArgs()).toEqual([
-        path.join(tempRootDir, 'nested', '.qwenignore'),
-        path.join(tempRootDir, '.qwenignore'),
+        path.join(tempRootDir, 'nested', '.mariadb-shell-agentignore'),
+        path.join(tempRootDir, '.mariadb-shell-agentignore'),
       ]);
     });
 

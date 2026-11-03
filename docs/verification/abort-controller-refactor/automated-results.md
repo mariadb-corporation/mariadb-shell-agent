@@ -106,7 +106,7 @@ $ NODE_OPTIONS=--trace-warnings node packages/cli/dist/index.js --version
 EXIT=0
 
 $ node packages/cli/dist/index.js --help
-Usage: qwen [options] [command]
+Usage: mariadb-shell-agent [options] [command]
 ...
 ```
 

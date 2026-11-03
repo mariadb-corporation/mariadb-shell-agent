@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -57,7 +58,7 @@ if (!Array.isArray(AGENTS) || AGENTS.length === 0) {
   // zero missing roles, which reads as "nothing to report".
   throw new Error(
     'review fan-out: the generated roster is empty — no agent would run. ' +
-      'Re-run \\'qwen review emit-workflow\\'.',
+      'Re-run \\'mariadb-shell-agent review emit-workflow\\'.',
   );
 }
 
@@ -183,7 +184,7 @@ export function buildReviewWorkflowScript(
     `  description: 'Launch every agent selected for this review batch in one fan-out',\n` +
     `  phases: [{ title: 'Review', detail: 'one agent per required role' }],\n` +
     `};\n\n` +
-    `// Written by \`qwen review emit-workflow\`. The roster below is the one\n` +
+    `// Written by \`mariadb-shell-agent review emit-workflow\`. The roster below is the one\n` +
     `// \`check-coverage\` holds this run to; editing it makes the two disagree.\n` +
     `const AGENTS = ${JSON.stringify(roster, null, 2)};\n` +
     `// The worktree every agent is pinned to, or null when the review has none.\n` +

@@ -3,7 +3,7 @@
 [English](2026-09-18-fleet-shepherd-noop-close.md) | [简体中文](2026-09-18-fleet-shepherd-noop-close.zh-CN.md)
 
 Date: 2026-09-18 (revised 2026-09-19 after review rounds 1–2)
-Status: proposed — implemented in [#12150](https://github.com/QwenLM/qwen-code/pull/12150); awaiting review
+Status: proposed — implemented in [#12150](https://github.invalid/QwenLM/qwen-code/pull/12150); awaiting review
 
 ## Problem
 

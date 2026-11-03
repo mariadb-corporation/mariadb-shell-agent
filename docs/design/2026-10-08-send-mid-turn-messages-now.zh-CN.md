@@ -12,7 +12,7 @@
 回复结束，再等这次回复的工具批次结束。如果这次回复是纯文本回答，消息要等整段
 回答结束后才作为新 prompt 执行。
 
-使用 `qwen serve`、Web Shell 和脚本化 provider 实测（时间从插入算到携带该消息
+使用 `mariadb-shell-agent serve`、Web Shell 和脚本化 provider 实测（时间从插入算到携带该消息
 的请求发出）：
 
 | 插入时的状态                       | 延迟   | 在等什么                 |

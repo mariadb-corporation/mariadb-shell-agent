@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -258,7 +259,7 @@ export function registerSseEventsRoutes(
             daemonLog.warn('SSE slow client warning', context);
           } else {
             writeStderrLine(
-              `qwen serve: SSE slow client warning ${JSON.stringify(context)}`,
+              `mariadb-shell-agent serve: SSE slow client warning ${JSON.stringify(context)}`,
             );
           }
           handled = true;
@@ -301,7 +302,7 @@ export function registerSseEventsRoutes(
             daemonLog.warn('SSE client evicted', context);
           } else {
             writeStderrLine(
-              `qwen serve: SSE client evicted ${JSON.stringify(context)}`,
+              `mariadb-shell-agent serve: SSE client evicted ${JSON.stringify(context)}`,
             );
           }
           handled = true;
@@ -458,7 +459,7 @@ export function registerSseEventsRoutes(
       // a raw-fetch client gets the same structured error.
       if (err instanceof SubscriberLimitExceededError) {
         writeStderrLine(
-          `qwen serve: subscriber limit reached for session ${diagnosticSessionId} (limit=${err.limit}); rejecting new SSE client with 429`,
+          `mariadb-shell-agent serve: subscriber limit reached for session ${diagnosticSessionId} (limit=${err.limit}); rejecting new SSE client with 429`,
         );
         res.setHeader('Retry-After', '5');
         res.status(429).json({
@@ -842,7 +843,7 @@ export function registerSseEventsRoutes(
             daemonLog.warn('SSE writer idle timeout', idleContext);
           } else {
             writeStderrLine(
-              `qwen serve: evicting SSE client (session ${diagnosticSessionId}) — ` +
+              `mariadb-shell-agent serve: evicting SSE client (session ${diagnosticSessionId}) — ` +
                 `writer idle for ${idleForMs}ms > ${writerIdleTimeoutMsValue}ms timeout ` +
                 `(streamId=${streamId}${clientId ? `, clientId=${clientId}` : ''})`,
             );
@@ -894,7 +895,7 @@ export function registerSseEventsRoutes(
           });
         } else {
           writeStderrLine(
-            `qwen serve: SSE socket error (session ${diagnosticSessionId}): ${err.message} ` +
+            `mariadb-shell-agent serve: SSE socket error (session ${diagnosticSessionId}): ${err.message} ` +
               `(streamId=${streamId}${clientId ? `, clientId=${clientId}` : ''})`,
           );
         }
@@ -971,7 +972,7 @@ export function registerSseEventsRoutes(
                 );
               } else {
                 writeStderrLine(
-                  `qwen serve: SSE ring eviction detected (session ${diagnosticSessionId}): ` +
+                  `mariadb-shell-agent serve: SSE ring eviction detected (session ${diagnosticSessionId}): ` +
                     `lastEventId=${data.lastDeliveredId ?? '?'}, ` +
                     `earliestInRing=${data.earliestAvailableId ?? '?'}, ` +
                     `gap=${gap ?? '?'} events, ` +
@@ -1057,7 +1058,7 @@ export function registerSseEventsRoutes(
           // Log bridge iterator errors to daemon stderr for
           // operator observability.
           writeStderrLine(
-            `qwen serve: bridge iterator error (session ${diagnosticSessionId}): ` +
+            `mariadb-shell-agent serve: bridge iterator error (session ${diagnosticSessionId}): ` +
               `${errorMessage(err)}` +
               (errorKind ? ` [${errorKind}]` : ''),
           );

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -368,7 +369,7 @@ describe('buildHooksListing', () => {
         HookEventName.PreToolUse,
         'Bash',
         { type: HookType.Command, command: './skill-check.sh' },
-        { skillRoot: '/project/.qwen/skills/check', trustGated },
+        { skillRoot: '/project/.mariadb-shell-agent/skills/check', trustGated },
       );
       return rows({ session, trusted })[0];
     }

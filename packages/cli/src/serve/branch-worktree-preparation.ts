@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -431,8 +432,12 @@ export function recoverBranchWorktreePreparations(args: {
         journal.sidecarPath !==
           args.sessionService.getWorktreeSessionPath(journal.targetSessionId) ||
         journalRepoTop !== runtimeRepoTop ||
-        path.resolve(journal.repoTop, '.qwen', 'worktrees', journal.slug) !==
-          path.resolve(journal.worktreePath) ||
+        path.resolve(
+          journal.repoTop,
+          '.mariadb-shell-agent',
+          'worktrees',
+          journal.slug,
+        ) !== path.resolve(journal.worktreePath) ||
         journal.worktreeBranch !== worktreeBranchForSlug(journal.slug)
       ) {
         args.warn?.('branch worktree recovery journal identity mismatch', {
@@ -693,7 +698,11 @@ export async function resolveBranchWorktreeBaseCheckout(args: {
     const snapshotPath = args.snapshot.worktree
       ? await fs.realpath(args.snapshot.worktree.path).catch(() => null)
       : null;
-    const managedRoot = path.join(canonicalRepoTop, '.qwen', 'worktrees');
+    const managedRoot = path.join(
+      canonicalRepoTop,
+      '.mariadb-shell-agent',
+      'worktrees',
+    );
     const markerOwner = await readWorktreeSessionMarker(canonicalCheckoutTop);
     if (
       workspaceCommonDir === null ||
@@ -734,7 +743,7 @@ export async function resolveBranchWorktreeBaseCheckout(args: {
 export async function isBranchWorktreeCreationSupported(
   base: BranchWorktreeBaseCheckout,
 ): Promise<boolean> {
-  const qwenDir = path.join(base.repoTop, '.qwen');
+  const qwenDir = path.join(base.repoTop, '.mariadb-shell-agent');
   try {
     let writableTarget = base.repoTop;
     for (const candidate of [qwenDir, path.join(qwenDir, 'worktrees')]) {

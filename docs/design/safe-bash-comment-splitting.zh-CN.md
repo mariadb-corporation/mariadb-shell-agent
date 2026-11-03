@@ -10,7 +10,7 @@
 
 `PermissionManager` 在应用 `Bash(...)` 规则前会切分 shell 命令。对于 `echo 'a' # comment ; rm -rf /tmp/x`，与 shell 无关的切分器会把 Bash 注释内的分号当成真实边界，导致已经允许的 `echo` 仍对 Bash 根本不会执行的命令弹出确认。
 
-全局应用 Bash 注释规则并不安全，因为 Qwen Code 也可能通过 `cmd.exe` 或 PowerShell 执行命令；把切分器继续扩展到 heredoc 或嵌套 substitution，则会在权限边界重新制造一个不完整的 shell parser。
+全局应用 Bash 注释规则并不安全，因为 MariaDB Shell Agent 也可能通过 `cmd.exe` 或 PowerShell 执行命令；把切分器继续扩展到 heredoc 或嵌套 substitution，则会在权限边界重新制造一个不完整的 shell parser。
 
 ## 目标
 

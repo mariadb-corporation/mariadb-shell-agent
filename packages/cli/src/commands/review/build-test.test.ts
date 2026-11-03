@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -4018,7 +4019,7 @@ describe('runBuildTest', () => {
     // Every other test injects a fake exec, so the production default path
     // (args.exec undefined -> the real `run`) had zero coverage. Dropping the
     // `?? run` fallback would hand the adapter exec: undefined and crash the first
-    // real `qwen review build-test`. Mock the adapter to capture the args it
+    // real `mariadb-shell-agent review build-test`. Mock the adapter to capture the args it
     // receives (so no real npm spawns) and pin that exec is a function.
     writeFileSync(
       join(root, 'package.json'),

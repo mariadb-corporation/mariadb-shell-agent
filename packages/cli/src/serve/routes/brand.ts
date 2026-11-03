@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,7 +14,7 @@ export interface BrandRouteDeps {
   /**
    * Primary workspace cwd, used only to locate settings files. The response
    * never reflects workspace-scoped settings: `skipWorkspaceSettings` keeps
-   * that layer off disk entirely, so a repository's `.qwen/settings.json`
+   * that layer off disk entirely, so a repository's `.mariadb-shell-agent/settings.json`
    * cannot rebrand the shell for whoever opens it.
    */
   boundWorkspace: string;
@@ -51,12 +52,12 @@ export function registerBrandRoutes(
       // One line per cause, so a log rule keyed on one key's prefix keeps
       // firing when a second misconfiguration exists alongside it.
       for (const warning of warnings ?? []) {
-        writeStderrLine(`qwen serve: GET /brand: ${warning}`);
+        writeStderrLine(`mariadb-shell-agent serve: GET /brand: ${warning}`);
       }
       res.status(200).json(brand);
     } catch (err) {
       writeStderrLine(
-        `qwen serve: GET /brand failed: ${
+        `mariadb-shell-agent serve: GET /brand failed: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );

@@ -6,13 +6,13 @@ Status: proposed. This stage follows the turn events in #15443 and the 2.1.310 b
 
 ## Problem and current behavior
 
-Token Weather, the sample that marks the first milestone in #13749, draws a one-line forecast of the context window directly above the prompt: an icon, a word, the fill percentage, the token count and a chart of the last turns. It needs three things Qwen Code does not have:
+Token Weather, the sample that marks the first milestone in #13749, draws a one-line forecast of the context window directly above the prompt: an icon, a word, the fill percentage, the token count and a chart of the last turns. It needs three things MariaDB Shell Agent does not have:
 
 - a `ui.render` hook on the `AbovePrompt` component, which returns a tree of `Box` and `Text` elements;
 - `$.ui.resolve(e)`, which hands the hook those element constructors;
 - `$.ui.invalidate("ui.render")`, which its `turn.complete` hook calls after each reading so the band redraws.
 
-Everything else it uses, `session.start`, `turn.complete` and `$.session.usage()`, already runs. Today Qwen Code skips the `ui.render` hook at load with `Hooks for unsupported events will not run: ui.render`, and `$.ui.resolve` and `$.ui.invalidate` throw `Mod API not supported`. There is no host code that draws a tree a Mod returns.
+Everything else it uses, `session.start`, `turn.complete` and `$.session.usage()`, already runs. Today MariaDB Shell Agent skips the `ui.render` hook at load with `Hooks for unsupported events will not run: ui.render`, and `$.ui.resolve` and `$.ui.invalidate` throw `Mod API not supported`. There is no host code that draws a tree a Mod returns.
 
 ## Goals and non-goals
 
@@ -39,7 +39,7 @@ Non-goals, each left to a later stage:
 
 The hook receives Claude Code's input for the band:
 
-| Field               | Value in Qwen Code                                                                                                                                      |
+| Field               | Value in MariaDB Shell Agent                                                                                                                            |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `surface`           | `"terminal"`                                                                                                                                            |
 | `component`         | `"AbovePrompt"`                                                                                                                                         |
@@ -60,7 +60,7 @@ A render runs when the site's input changes, when the Mods load, and when a plug
 
 - **The input key** is the viewport's `columns` and `isFullscreen` and the props, compared as stable JSON. A change of height alone runs nothing, unless it changes `maxRows`. A change of width or of `maxRows` runs once it has settled for 150 milliseconds, so a drag-resize runs one render.
 - **The first render** runs after `session.start`, and again after a session switch (`/clear`, `/resume`, `/branch`), since the band's facts may differ.
-- **`$.ui.invalidate("ui.render")`** asks for a redraw of every site the calling plugin's `ui.render` registrations may select. It returns at once. Qwen Code Mods have no timers yet, so the call comes from some other dispatch, such as `turn.complete`, and the render runs after that dispatch. Calls fold: a burst runs one render. Renders run at most every 34 milliseconds, Claude Code's rate for an expanded band. As in Claude Code, a plugin whose render takes longer than that drops to the steady rate, one render every 100 milliseconds, for the next second, so a hook that asks for its own redraw on every render cannot keep the dispatch queue busy. `$.ui.invalidate` for the cached events Claude Code also names, such as `prompt.section`, has nothing to drop in Qwen Code and does nothing.
+- **`$.ui.invalidate("ui.render")`** asks for a redraw of every site the calling plugin's `ui.render` registrations may select. It returns at once. MariaDB Shell Agent Mods have no timers yet, so the call comes from some other dispatch, such as `turn.complete`, and the render runs after that dispatch. Calls fold: a burst runs one render. Renders run at most every 34 milliseconds, Claude Code's rate for an expanded band. As in Claude Code, a plugin whose render takes longer than that drops to the steady rate, one render every 100 milliseconds, for the next second, so a hook that asks for its own redraw on every render cannot keep the dispatch queue busy. `$.ui.invalidate` for the cached events Claude Code also names, such as `prompt.section`, has nothing to drop in MariaDB Shell Agent and does nothing.
 
 Renders share the session's dispatch queue with commands, tool middleware and turn events, because the Mod worker runs one root at a time:
 
@@ -71,7 +71,7 @@ Renders share the session's dispatch queue with commands, tool middleware and tu
 
 ### 3. Elements, `h` and `Fragment`
 
-`$.ui.resolve(e)` reads, without a dispatch, the element table of `e.surface`. It is a frozen object with no prototype. For the terminal it holds all eleven constructors Claude Code declares, so a Mod that destructures `Button` still loads. In this stage only `Box` and `Text` draw. A tree with any other element fails, with the reason `<Element> is not drawn by Qwen Code yet`. Any argument other than a `ui.render` input with a known surface throws.
+`$.ui.resolve(e)` reads, without a dispatch, the element table of `e.surface`. It is a frozen object with no prototype. For the terminal it holds all eleven constructors Claude Code declares, so a Mod that destructures `Button` still loads. In this stage only `Box` and `Text` draw. A tree with any other element fails, with the reason `<Element> is not drawn by MariaDB Shell Agent yet`. Any argument other than a `ui.render` input with a known surface throws.
 
 A constructor takes the props, with `children` among them, and returns a deep-frozen plain-data element, as Claude Code's does:
 
@@ -98,7 +98,7 @@ A hook whose answer fails is skipped alone: its `.catch` runs, what it had from 
 - a `borderStyle` the terminal lacks draws no border;
 - texts past 100,000 characters in all are cut, ending `… <n> more characters, not drawn`; the cut never splits a surrogate pair.
 
-The debug log records each refusal and adjustment in Claude Code's words, such as `<plugin>: ui.render hook skipped: returned the wrong shape (a tree AbovePrompt refuses: <reason>)` and `<plugin>: ui.render (AbovePrompt) refused: <reason>; nothing was drawn`. A refusal is recorded once per load and reason, and an adjustment once per load, site and kind, so a text cut whose length changes on each render is told once. Claude Code also shows these lines in the transcript, but only while it hot-reloads a plugin folder. Qwen Code has no hot reload yet, so they stay in the debug log.
+The debug log records each refusal and adjustment in Claude Code's words, such as `<plugin>: ui.render hook skipped: returned the wrong shape (a tree AbovePrompt refuses: <reason>)` and `<plugin>: ui.render (AbovePrompt) refused: <reason>; nothing was drawn`. A refusal is recorded once per load and reason, and an adjustment once per load, site and kind, so a text cut whose length changes on each render is told once. Claude Code also shows these lines in the transcript, but only while it hot-reloads a plugin folder. MariaDB Shell Agent has no hot reload yet, so they stay in the debug log.
 
 ### 5. Drawing in Ink
 
@@ -109,7 +109,7 @@ The debug log records each refusal and adjustment in Claude Code's words, such a
   - text wrap values `end` and `middle` become `truncate-end` and `truncate-middle`;
   - spacing steps become cells: `xs` and `sm` are 1 across and 0 down, `md` 2 and 1, `lg` 3 and 1, `xl` 4 and 2;
   - `weight: "semibold"` or `"bold"` draws bold; `size`, `mono`, `tabular` and `dir` are dropped, as Claude Code's terminal drops them;
-  - a color that is one of Claude Code's theme keys maps to the active Qwen Code theme: `text` to the primary text color, `subtle` and `inactive` to the secondary one, `success`, `error` and `warning` to the status colors, and `claude` and `suggestion` to the accent;
+  - a color that is one of Claude Code's theme keys maps to the active MariaDB Shell Agent theme: `text` to the primary text color, `subtle` and `inactive` to the secondary one, `success`, `error` and `warning` to the status colors, and `claude` and `suggestion` to the accent;
   - Claude Code's other theme keys, such as `permission` or `diffAdded`, draw in the default color in this stage;
   - any other color draws when Ink accepts it (a name or hex value) and otherwise draws in the default color;
   - all text is sanitized for the terminal, as Mod transcript lines are; tabs become spaces to the next 8-column stop, as Claude Code's Ink expands them.
@@ -131,8 +131,8 @@ The load result tells the host whether any plugin hooks `ui.render`. Ink queues 
 
 - **One site first.** `AbovePrompt` is the site Token Weather draws, and the engine draws nothing there, so `next(e)` is trivial. The whole path gets built and tested on it: dispatch, element model, validation, scheduling and drawing. Other sites then add props and an engine node.
 - **A data tree, drawn by the host.** A Mod never touches Ink. Its answer crosses the worker boundary as JSON, under the existing size and depth limits, and the same tree can be drawn by OpenTUI later.
-- **No cancel to supersede.** Claude Code aborts a stale render. In Qwen Code a cancel can terminate the worker and end every Mod in the session, so renders fold and wait.
-- **Claude Code's whole validator, including what this stage does not draw.** For `Box` and `Text`, a tree Qwen Code accepts is one Claude Code accepts, and the reverse. A Mod tested here does not break there, and `hover` keeps validating when it starts to draw.
+- **No cancel to supersede.** Claude Code aborts a stale render. In MariaDB Shell Agent a cancel can terminate the worker and end every Mod in the session, so renders fold and wait.
+- **Claude Code's whole validator, including what this stage does not draw.** For `Box` and `Text`, a tree MariaDB Shell Agent accepts is one Claude Code accepts, and the reverse. A Mod tested here does not break there, and `hover` keeps validating when it starts to draw.
 - **The host offers the site.** Ink and OpenTUI both report the `terminal` surface, so the support decision cannot come from the surface name. A capability in the `load` request lets each host offer the sites it draws.
 
 ## Differences from Claude Code
@@ -141,13 +141,13 @@ These go into the user guide:
 
 - Only the `AbovePrompt` site is raised, and only in Ink. Elements other than `Box` and `Text` fail the tree.
 - The band has no collapse mark, focus, scrolling or `n more` row. A tree taller than `maxRows` is clipped. `maxRows` is a third of the terminal's rows, where Claude Code gives the bottom slot's remaining rows in fullscreen and the terminal's height otherwise. `bodyColumns` keeps Claude Code's five-column reservation.
-- `$.ui.invalidate` takes effect after the dispatch that called it, since Qwen Code Mods have no timers.
+- `$.ui.invalidate` takes effect after the dispatch that called it, since MariaDB Shell Agent Mods have no timers.
 - A render can wait behind a tool call and its approval, and the band keeps its last tree meanwhile. A tool call, command or turn event queued behind a running render waits for it, up to 10 seconds for each `ui.render` hook in the chain.
 - `ui.resolve` hooks are skipped as unsupported. `hover` is checked but not drawn.
-- Refusal lines go only to the debug log, since Qwen Code has no hot reload.
+- Refusal lines go only to the debug log, since MariaDB Shell Agent has no hot reload.
 - JSX is not compiled yet, although `h` and `Fragment` exist.
 
-The Token Weather sample reads `e.hasSurvey` and `e.bodyColumns`, but Claude Code declares both under `e.props`. In Claude Code, as in Qwen Code, the sample therefore never yields to a survey and always lays out 80 columns. Qwen Code keeps Claude Code's input shape and adds no aliases.
+The Token Weather sample reads `e.hasSurvey` and `e.bodyColumns`, but Claude Code declares both under `e.props`. In Claude Code, as in MariaDB Shell Agent, the sample therefore never yields to a survey and always lays out 80 columns. MariaDB Shell Agent keeps Claude Code's input shape and adds no aliases.
 
 ## PR plan
 

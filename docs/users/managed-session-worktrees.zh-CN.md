@@ -16,7 +16,7 @@ Skills、MCP 和 Extensions 继续使用 Managed 会话固定的配置版本。
 忽略的内容。清理只删除干净的目录，保留所有分支，不自动将修改合回源目录。
 
 部署通过 `qwen.managed-agent.runtime-broker.session-worktrees-enabled` 启用，默认关闭；
-`qwen serve --managed` 为符合条件的本机主机启用。首版支持 macOS/Linux 的 LOCAL 存储、
+`mariadb-shell-agent serve --managed` 为符合条件的本机主机启用。首版支持 macOS/Linux 的 LOCAL 存储、
 按 Session 隔离的持久化 local-process worker，以及 Git 2.40 或更新版本。
 仓库及其 Git common directory 必须在已登记存储根内。已有 linked checkout 的 Git
 元数据位于外部时，请选择原始 checkout，或由管理员登记同时包含两者的根目录。

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -186,7 +187,7 @@ export async function applyHostedModelPin(
       });
     } catch (cleanupCause) {
       writeStderrLineSafe(
-        `qwen serve: Hosted Harness model cleanup failed: ${String(cleanupCause)}`,
+        `mariadb-shell-agent serve: Hosted Harness model cleanup failed: ${String(cleanupCause)}`,
       );
     }
     throw new HostedModelUnavailableError(cause);
@@ -233,7 +234,7 @@ export async function applyHostedPublicChildModelPin(
       });
     } catch (cleanupCause) {
       writeStderrLineSafe(
-        `qwen serve: Hosted child model cleanup failed: ${String(cleanupCause)}`,
+        `mariadb-shell-agent serve: Hosted child model cleanup failed: ${String(cleanupCause)}`,
       );
     }
     throw new HostedModelUnavailableError(cause);
@@ -1334,7 +1335,7 @@ async function runPreparedHostedHarnessTextTurn(
       });
     } catch (cause) {
       writeStderrLineSafe(
-        `qwen serve: Hosted Harness model cleanup failed: ${String(cause)}`,
+        `mariadb-shell-agent serve: Hosted Harness model cleanup failed: ${String(cause)}`,
       );
     }
   }

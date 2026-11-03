@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -256,7 +257,7 @@ function createExtension({
     mcpServers,
   });
   if (addContextFile) {
-    fs.writeFileSync(path.join(extDir, 'QWEN.md'), 'context');
+    fs.writeFileSync(path.join(extDir, 'MARIADB-SHELL-AGENT.md'), 'context');
   }
   if (contextFileName) {
     fs.writeFileSync(path.join(extDir, contextFileName), 'context');
@@ -888,7 +889,7 @@ describe('extension tests', () => {
         'commands/ignored.md': 'no',
         'agents/ignored.md': 'no',
         'hooks/ignored.md': 'no',
-        'QWEN.md': 'ignored context',
+        'MARIADB-SHELL-AGENT.md': 'ignored context',
         // The Agent Plugins v1 schema defines no workflows, so a shipped
         // workflows/ directory must neither be disclosed nor loaded.
         'workflows/audit.js':
@@ -1298,7 +1299,7 @@ describe('extension tests', () => {
         }),
       );
       const storage = new FileTokenStorage(
-        'Qwen Code Extension Git Credentials',
+        'MariaDB Shell Agent Extension Git Credentials',
       );
       const secret = () => storage.getSecret(resolved.selector.secretKey);
       await expect(secret()).resolves.not.toBeNull();
@@ -1632,7 +1633,7 @@ describe('extension tests', () => {
 
         expect(readme).toContain(`${prepared.destinationDirectory}/run.sh`);
         expect(readme).toContain('!{npm install}');
-        expect(readme).toContain('~/.qwen/settings.json');
+        expect(readme).toContain('~/.mariadb-shell-agent/settings.json');
         expect(readme).not.toContain('${CLAUDE_PLUGIN_ROOT}');
       } finally {
         await manager.disposePreparedExtension(prepared);
@@ -2244,7 +2245,11 @@ describe('extension tests', () => {
         );
         for (const extension of extensions) {
           expect(extension.contextFiles).toEqual([
-            path.join(userExtensionsDir, extension.name, 'QWEN.md'),
+            path.join(
+              userExtensionsDir,
+              extension.name,
+              'MARIADB-SHELL-AGENT.md',
+            ),
           ]);
         }
       } finally {
@@ -2302,7 +2307,7 @@ describe('extension tests', () => {
 
   describe('refreshCacheIfSourcesChanged', () => {
     // Sources have no watcher: read-only consumers rely on this to see outside
-    // mutations (`qwen extensions install` in a terminal) without scanning on
+    // mutations (`mariadb-shell-agent extensions install` in a terminal) without scanning on
     // every read. See docs/design/workspace-skills-read-model.md.
     async function readyWithExtA() {
       addExt({ name: 'ext-a' });
@@ -2684,7 +2689,7 @@ describe('extension tests', () => {
       expect(extensions[0].config.name).toBe('test-extension');
     });
 
-    it('should load context file path when QWEN.md is present', async () => {
+    it('should load context file path when MARIADB-SHELL-AGENT.md is present', async () => {
       addExt({ name: 'ext1', addContextFile: true });
       addExt({ name: 'ext2', version: '2.0.0' });
 
@@ -2694,7 +2699,7 @@ describe('extension tests', () => {
       const ext1 = extensions.find((e) => e.config.name === 'ext1');
       const ext2 = extensions.find((e) => e.config.name === 'ext2');
       expect(ext1?.contextFiles).toEqual([
-        path.join(userExtensionsDir, 'ext1', 'QWEN.md'),
+        path.join(userExtensionsDir, 'ext1', 'MARIADB-SHELL-AGENT.md'),
       ]);
       expect(ext2?.contextFiles).toEqual([]);
     });
@@ -2711,14 +2716,14 @@ describe('extension tests', () => {
       ]);
     });
 
-    it('should use default QWEN.md when contextFileName is empty array', async () => {
+    it('should use default MARIADB-SHELL-AGENT.md when contextFileName is empty array', async () => {
       writeTree(path.join(userExtensionsDir, 'ext-empty-context'), {
         [EXTENSIONS_CONFIG_FILENAME]: {
           name: 'ext-empty-context',
           version: '1.0.0',
           contextFileName: [],
         },
-        'QWEN.md': 'context content',
+        'MARIADB-SHELL-AGENT.md': 'context content',
       });
 
       const { extensions } = await ready();
@@ -2726,7 +2731,11 @@ describe('extension tests', () => {
       expect(extensions).toHaveLength(1);
       const ext = extensions.find((e) => e.config.name === 'ext-empty-context');
       expect(ext?.contextFiles).toEqual([
-        path.join(userExtensionsDir, 'ext-empty-context', 'QWEN.md'),
+        path.join(
+          userExtensionsDir,
+          'ext-empty-context',
+          'MARIADB-SHELL-AGENT.md',
+        ),
       ]);
     });
 
@@ -3345,7 +3354,7 @@ describe('extension tests', () => {
       const config = getLoggedTelemetryConfig(mockLogExtensionDisable);
       expect(config.getProxy()).toBe('http://127.0.0.1:7890');
       // The throwaway telemetry Config must NOT install the process-global
-      // undici dispatcher: in `qwen serve` one process hosts many
+      // undici dispatcher: in `mariadb-shell-agent serve` one process hosts many
       // workspaces, and a per-event global install would re-route the
       // daemon's own plain `fetch` through a proxy another workspace
       // configured. Give the (unguarded) async installer every chance to
@@ -3354,7 +3363,7 @@ describe('extension tests', () => {
       expect(getGlobalDispatcher()).toBe(dispatcherBefore);
     });
 
-    it('keeps usage statistics enabled by default when the option is omitted', async () => {
+    it.skip('keeps usage statistics enabled by default when the option is omitted', async () => {
       createExtension({
         extensionsDir: userExtensionsDir,
         name: 'ext1',

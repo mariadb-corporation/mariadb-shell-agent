@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -109,7 +110,7 @@ function getMergeStrategyForPath(path: string[]): MergeStrategy | undefined {
 export type { Settings, MemoryImportFormat };
 
 // Lazy getters: must NOT be top-level consts. `QWEN_HOME` may be resolved
-// from `~/.env` or `~/.qwen/.env` by `preResolveHomeEnvOverrides()` in
+// from `~/.env` or `~/.mariadb-shell-agent/.env` by `preResolveHomeEnvOverrides()` in
 // `loadSettings()`, which runs after this module is imported. A const
 // captured here would freeze the pre-bootstrap value and split state across
 // callers.
@@ -1098,7 +1099,7 @@ export const CORRUPTED_SUFFIX = '.corrupted';
 
 /**
  * Load and merge settings from all scopes:
- * System Defaults → User (~/.qwen/settings.json) → Workspace → System.
+ * System Defaults → User (~/.mariadb-shell-agent/settings.json) → Workspace → System.
  */
 export interface LoadSettingsOptions {
   consumeCorruptionEnvVars?: boolean;

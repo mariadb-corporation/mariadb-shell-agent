@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -95,7 +96,7 @@ const DIST_ALLOWED_ENTRIES = new Set([
   'cli.js',
   'execution-worker.js',
   // bin wrapper emitted by prepare-package.js. Standalone shims use it for
-  // `qwen serve` so daemon startup gets the same fast path as npm installs.
+  // `mariadb-shell-agent serve` so daemon startup gets the same fast path as npm installs.
   'cli-entry.js',
   // fzf fuzzy-search worker; esbuild emits it as a standalone entry that must
   // sit next to cli.js so `new URL('./fzfWorker.js', ...)` resolves at runtime.
@@ -128,7 +129,7 @@ const DIST_ALLOWED_ENTRIES = new Set([
   // directory for code-block syntax highlighting. copyOpenTuiAddon syncs the
   // target's native library into it.
   'opentui-assets',
-  // Web Shell SPA served at the daemon root by `qwen serve` (index.html +
+  // Web Shell SPA served at the daemon root by `mariadb-shell-agent serve` (index.html +
   // assets/). Copied into dist/web-shell/ by copy_bundle_assets.js when the
   // web-shell workspace has been built; optional, so it's allowed but not
   // required.
@@ -374,7 +375,7 @@ function readOptionValue(argv, index, optionName) {
 }
 
 function printUsage() {
-  console.log(`Qwen Code standalone package builder
+  console.log(`MariaDB Shell Agent standalone package builder
 
 Usage:
   npm run package:standalone -- --target TARGET --node-archive PATH [OPTIONS]
@@ -404,7 +405,7 @@ Options:
                           packages are fatal when this is supplied.
   --out-dir DIR           Output directory. Defaults to dist/standalone,
                           or dist/managed-local for a Managed package.
-  --version VERSION       Qwen Code version. Defaults to package.json version.
+  --version VERSION       MariaDB Shell Agent version. Defaults to package.json version.
   --skip-checksums        Do not update SHA256SUMS. Used by release packaging.
   -h, --help              Show this help message.`);
 }

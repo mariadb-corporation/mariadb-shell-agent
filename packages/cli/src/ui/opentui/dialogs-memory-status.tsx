@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,7 +37,7 @@ export function resolvePreferredMemoryFile(dir: string): string {
       // Unreadable — try the next candidate.
     }
   }
-  return path.join(dir, filenames[0] ?? 'QWEN.md');
+  return path.join(dir, filenames[0] ?? 'MARIADB-SHELL-AGENT.md');
 }
 
 function useEsc(onClose: () => void) {
@@ -126,13 +127,13 @@ export function OpenTuiMemoryDialog(props: {
   const toggle = (k: string) => readMemoryToggle(mem?.[k], modes);
   // Real memory file names (audit 01 G-8): ink's MemoryDialog resolves the
   // user file from Storage.getGlobalQwenDir() and the project file from the
-  // working dir, both through getAllGeminiMdFilenames() (default QWEN.md) —
+  // working dir, both through getAllGeminiMdFilenames() (default MARIADB-SHELL-AGENT.md) —
   // never a hardcoded memory.md.
   const cwd = config?.getWorkingDir?.() ?? process.cwd();
   const filenames = getAllGeminiMdFilenames();
   const userMem = path.join(
     Storage.getGlobalQwenDir(),
-    filenames[0] ?? 'QWEN.md',
+    filenames[0] ?? 'MARIADB-SHELL-AGENT.md',
   );
   const projectMem = resolvePreferredMemoryFile(cwd);
   return (

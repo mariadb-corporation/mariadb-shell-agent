@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2910,7 +2911,8 @@ describe('modelCommand', () => {
                 label: 'ASR',
                 voiceOnly: true,
                 authType: AuthType.USE_OPENAI,
-                baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+                baseUrl:
+                  'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
               },
             ]),
           },

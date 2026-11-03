@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -78,6 +79,30 @@ function getInteractionModePrompt(mode: SystemPromptInteractionMode): {
   }
 }
 
+function formatInteractionModeReminder(interaction: {
+  role: string;
+  questions: string;
+}): string {
+  return `Interaction mode reminder: You are running as ${interaction.role}. ${interaction.questions}`;
+}
+
+/**
+ * The interaction-mode reminder of a main session, for its startup prelude, or
+ * null when the session's system prompt is a full override (a configured
+ * system prompt or QWEN_SYSTEM_MD), which never carried mode guidance.
+ */
+export function getMainSessionInteractionModeReminder(config: {
+  getSystemPrompt(): string | undefined;
+  getExperimentalZedIntegration(): boolean;
+  getInputFormat?(): string;
+  isInteractive(): boolean;
+}): string | null {
+  if (config.getSystemPrompt() || isSystemMdActive()) return null;
+  return formatInteractionModeReminder(
+    getInteractionModePrompt(resolveInteractionMode(config)),
+  );
+}
+
 function getInteractiveInteractionModePrompt(): {
   role: string;
   questions: string;
@@ -103,7 +128,7 @@ function getDefaultCoreIdentitySentence(
   const focus = hasOutputStyle
     ? 'responding according to your "Output Style" below, which describes how you should respond to user queries'
     : 'specializing in software engineering tasks';
-  return `You are Qwen Code, ${role} developed by Alibaba Group, ${focus}. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.`;
+  return `You are MariaDB Shell Agent, ${role} developed by MariaDB, ${focus}. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.`;
 }
 
 /**
@@ -274,6 +299,13 @@ export interface PromptToolSurface {
   executionSandboxFilesystem?: 'read-only' | 'workspace-write';
   executionSandboxBackend?: 'bwrap' | 'landlock';
   executionSandboxNetwork?: 'open' | 'closed';
+  /**
+   * The main session sends the interaction-mode reminder in its startup
+   * prelude (getMainSessionInteractionModeReminder) instead of at the end of
+   * the system prompt, so the system prompt is identical in every mode and a
+   * provider's prompt cache can share it.
+   */
+  interactionModeReminderInPrelude?: boolean;
 }
 
 /**
@@ -541,9 +573,12 @@ When you create a todo list:
   // A QWEN_SYSTEM_IDENTITY_MD override is inserted verbatim, so the styled
   // variant applies only to the default identity sentence — the override is
   // distributor-owned wording we must not rewrite.
+  // The opening sentence is the same in every interaction mode, so headless,
+  // interactive and ACP sessions share their cached prompt prefix; the mode
+  // itself is named in the "Interaction mode reminder" at the end.
   const coreIdentity =
     resolveCoreIdentityOverride() ??
-    getDefaultCoreIdentitySentence(interaction.role, Boolean(outputStyle));
+    getDefaultCoreIdentitySentence('a CLI agent', Boolean(outputStyle));
 
   const toolGuidance = getToolGuidanceSection(
     codeModeOnly,
@@ -634,7 +669,7 @@ You are running under macos seatbelt with limited access to files outside the pr
     const backend = process.env['SANDBOX'];
     return `
 # Kernel Sandbox (${backend})
-You are running under a kernel-level sandbox (${backend}). The host filesystem is mounted READ-ONLY outside the writable roots configured at startup; /dev is the exception — a minimal synthetic device tree replaces it, so host device nodes (/dev/shm, /dev/kvm, /dev/dri, /dev/snd) are absent rather than read-only, and no writable root restores them. You cannot inspect the writable set from in here: 'QWEN_SANDBOX=bwrap qwen sandbox' explicitly selects this backend and only reports from outside, so tell the user to run it from this project directory on the host — the report reflects that directory's settings, and a session started elsewhere or with '--include-directories' may bind a different set. A write refused by a read-only mount fails with 'Read-only file system' (EROFS). 'Permission denied' (EACCES) can instead come from ordinary file permissions, even inside a writable root. Host services reached through Unix sockets remain outside this filesystem boundary, including in closed network mode. Proxied mode supplies proxy settings without preventing direct connections. Granted repository Git metadata, including config and hooks, remains writable and can affect later unconfined Git commands.
+You are running under a kernel-level sandbox (${backend}). The host filesystem is mounted READ-ONLY outside the writable roots configured at startup; /dev is the exception — a minimal synthetic device tree replaces it, so host device nodes (/dev/shm, /dev/kvm, /dev/dri, /dev/snd) are absent rather than read-only, and no writable root restores them. You cannot inspect the writable set from in here: 'QWEN_SANDBOX=bwrap mariadb-shell-agent sandbox' explicitly selects this backend and only reports from outside, so tell the user to run it from this project directory on the host — the report reflects that directory's settings, and a session started elsewhere or with '--include-directories' may bind a different set. A write refused by a read-only mount fails with 'Read-only file system' (EROFS). 'Permission denied' (EACCES) can instead come from ordinary file permissions, even inside a writable root. Host services reached through Unix sockets remain outside this filesystem boundary, including in closed network mode. Proxied mode supplies proxy settings without preventing direct connections. Granted repository Git metadata, including config and hooks, remains writable and can affect later unconfined Git commands.
 When a write fails with EROFS, report it to the user, name the refused path, and explain that changing the writable roots requires restarting with the appropriate sandbox configuration. Do NOT work around a refusal by writing somewhere else, by escalating privileges, or by retrying the same write.
 `;
   } else if (isGenericSandbox) {
@@ -682,7 +717,7 @@ ${codeModeOnly ? codeModeToolCallExamples : filterToolCallExamples(getToolCallEx
 # Final Reminder
 Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
 
-Interaction mode reminder: ${interaction.questions}
+${surface?.interactionModeReminderInPrelude ? '' : formatInteractionModeReminder(interaction)}
 `.trim();
 }
 
@@ -754,7 +789,7 @@ export function getCoreSystemPrompt(
     interactionMode,
   );
   // if QWEN_SYSTEM_MD is set (and not 0|false), override system prompt from file
-  // default path is .qwen/system.md (project-level), can be overridden via QWEN_SYSTEM_MD
+  // default path is .mariadb-shell-agent/system.md (project-level), can be overridden via QWEN_SYSTEM_MD
   const systemMdEnabled = isSystemMdActive();
   let systemMdPath = path.resolve(path.join(QWEN_DIR, 'system.md'));
 
@@ -861,7 +896,7 @@ export interface SystemPromptLayers {
    */
   mediaGuidance?: string | null;
   /**
-   * Context layer: concatenated context files (QWEN.md hierarchy, baseline
+   * Context layer: concatenated context files (MARIADB-SHELL-AGENT.md hierarchy, baseline
    * rules, extension files). Reloaded only on explicit refresh.
    */
   contextFiles?: string;
@@ -895,7 +930,7 @@ function getActionsSection(): string {
   return `
 # Executing actions with care
 
-Carefully consider the reversibility and blast radius of actions. Generally you can freely take local, reversible actions like editing files or running tests. But for actions that are hard to reverse, affect shared systems beyond your local environment, or could otherwise be risky or destructive, obtain confirmation when the current interaction mode can receive it; otherwise stop and report the blocker. The cost of pausing to confirm is low, while the cost of an unwanted action (lost work, unintended messages sent, deleted branches) can be very high. For actions like these, consider the context, the action, and user instructions, and by default transparently communicate the action and follow the active interaction mode's question guidance before proceeding. This default can be changed by user instructions - if explicitly asked to operate more autonomously, then you may proceed without confirmation, but still attend to the risks and consequences when taking actions. A user approving an action (like a git push) once does NOT mean that they approve it in all contexts, so unless actions are authorized in advance in durable instructions like QWEN.md files, obtain confirmation only when the current interaction mode can receive it; otherwise report the blocker. Authorization stands for the scope specified, not beyond. Match the scope of your actions to what was actually requested.
+Carefully consider the reversibility and blast radius of actions. Generally you can freely take local, reversible actions like editing files or running tests. But for actions that are hard to reverse, affect shared systems beyond your local environment, or could otherwise be risky or destructive, obtain confirmation when the current interaction mode can receive it; otherwise stop and report the blocker. The cost of pausing to confirm is low, while the cost of an unwanted action (lost work, unintended messages sent, deleted branches) can be very high. For actions like these, consider the context, the action, and user instructions, and by default transparently communicate the action and follow the active interaction mode's question guidance before proceeding. This default can be changed by user instructions - if explicitly asked to operate more autonomously, then you may proceed without confirmation, but still attend to the risks and consequences when taking actions. A user approving an action (like a git push) once does NOT mean that they approve it in all contexts, so unless actions are authorized in advance in durable instructions like MARIADB-SHELL-AGENT.md files, obtain confirmation only when the current interaction mode can receive it; otherwise report the blocker. Authorization stands for the scope specified, not beyond. Match the scope of your actions to what was actually requested.
 
 Examples of the kind of risky actions that warrant user confirmation:
 - Destructive operations: deleting files/branches, dropping database tables, killing processes, rm -rf, overwriting uncommitted changes
@@ -1518,7 +1553,7 @@ type InsightPromptType =
   | 'at_a_glance';
 
 const INSIGHT_PROMPTS: Record<InsightPromptType, string> = {
-  analysis: `Analyze this Qwen Code session and extract structured facets.
+  analysis: `Analyze this MariaDB Shell Agent session and extract structured facets.
 
 CRITICAL GUIDELINES:
 
@@ -1551,7 +1586,7 @@ CRITICAL GUIDELINES:
 
 4. If very short or just warmup, use warmup_minimal for goal_category`,
 
-  impressive_workflows: `Analyze this Qwen Code usage data and identify what's working well for this user. Use second person ("you").
+  impressive_workflows: `Analyze this MariaDB Shell Agent usage data and identify what's working well for this user. Use second person ("you").
 
 Call respond_in_schema function with A VALID JSON OBJECT as argument:
 {
@@ -1563,18 +1598,18 @@ Call respond_in_schema function with A VALID JSON OBJECT as argument:
 
 Include 3 impressive workflows.`,
 
-  project_areas: `Analyze this Qwen Code usage data and identify project areas.
+  project_areas: `Analyze this MariaDB Shell Agent usage data and identify project areas.
 
 Call respond_in_schema function with A VALID JSON OBJECT as argument:
 {
   "areas": [
-    {"name": "Area name", "session_count": N, "description": "2-3 sentences about what was worked on and how Qwen Code was used."}
+    {"name": "Area name", "session_count": N, "description": "2-3 sentences about what was worked on and how MariaDB Shell Agent was used."}
   ]
 }
 
 Include 4-5 areas. Skip internal QC operations.`,
 
-  future_opportunities: `Analyze this Qwen Code usage data and identify future opportunities.
+  future_opportunities: `Analyze this MariaDB Shell Agent usage data and identify future opportunities.
 
 Call respond_in_schema function with A VALID JSON OBJECT as argument:
 {
@@ -1586,7 +1621,7 @@ Call respond_in_schema function with A VALID JSON OBJECT as argument:
 
 Include 3 opportunities. Think BIG - autonomous workflows, parallel agents, iterating against tests.`,
 
-  friction_points: `Analyze this Qwen Code usage data and identify friction points for this user. Use second person ("you").
+  friction_points: `Analyze this MariaDB Shell Agent usage data and identify friction points for this user. Use second person ("you").
 
 Call respond_in_schema function with A VALID JSON OBJECT as argument:
 {
@@ -1598,7 +1633,7 @@ Call respond_in_schema function with A VALID JSON OBJECT as argument:
 
 Include 3 friction categories with 2 examples each.`,
 
-  memorable_moment: `Analyze this Qwen Code usage data and find a memorable moment.
+  memorable_moment: `Analyze this MariaDB Shell Agent usage data and find a memorable moment.
 
 Call respond_in_schema function with A VALID JSON OBJECT as argument:
 {
@@ -1608,16 +1643,16 @@ Call respond_in_schema function with A VALID JSON OBJECT as argument:
 
 Find something genuinely interesting or amusing from the session summaries.`,
 
-  improvements: `Analyze this Qwen Code usage data and suggest improvements.
+  improvements: `Analyze this MariaDB Shell Agent usage data and suggest improvements.
 
 ## QC FEATURES REFERENCE (pick from these for features_to_try):
 1. **MCP Servers**: Connect Qwen to external tools, databases, and APIs via Model Context Protocol.
-   - How to use: Run \`qwen mcp add --transport http <server-name> <http-url>\`
+   - How to use: Run \`mariadb-shell-agent mcp add --transport http <server-name> <http-url>\`
    - Good for: database queries, Slack integration, GitHub issue lookup, connecting to internal APIs
-   - Example: "To connect to GitHub, run \`qwen mcp add --header "Authorization: Bearer your_github_mcp_pat" --transport http github https://api.githubcopilot.com/mcp/\` and set the AUTHORIZATION header with your PAT. Then you can ask Qwen to query issues, PRs, or repos."
+   - Example: "To connect to GitHub, run \`mariadb-shell-agent mcp add --header "Authorization: Bearer your_github_mcp_pat" --transport http github https://api.githubcopilot.com/mcp/\` and set the AUTHORIZATION header with your PAT. Then you can ask MariaDB Shell Agent to query issues, PRs, or repos."
 
 2. **Custom Skills**: Reusable prompts you define as markdown files that run with a single /command.
-   - How to use: Create \`.qwen/skills/wrapup/SKILL.md\` with instructions. Then type \`/wrapup\` to run it.
+   - How to use: Create \`.mariadb-shell-agent/skills/wrapup/SKILL.md\` with instructions. Then type \`/wrapup\` to run it.
    - Good for: repetitive workflows - /wrapup, /review, /test, /deploy, /pr, or complex multi-step workflows
    - SKILL.md format:
     \`\`\`
@@ -1641,7 +1676,7 @@ Find something genuinely interesting or amusing from the session summaries.`,
     \`\`\`
 
 3. **Headless Mode**: Run Qwen non-interactively from scripts and CI/CD.
-   - How to use: \`qwen -p "fix lint errors"\`
+   - How to use: \`mariadb-shell-agent -p "fix lint errors"\`
    - Good for: CI/CD integration, batch code fixes, automated reviews
 
 4. **Task Agents**: Qwen spawns focused sub-agents for complex exploration or parallel work.
@@ -1651,7 +1686,7 @@ Find something genuinely interesting or amusing from the session summaries.`,
 Call respond_in_schema function with A VALID JSON OBJECT as argument:
 {
   "Qwen_md_additions": [
-    {"addition": "A specific line or block to add to QWEN.md based on workflow patterns. E.g., 'Always run tests after modifying auth-related files'", "why": "1 sentence explaining why this would help based on actual sessions", "prompt_scaffold": "Instructions for where to add this in QWEN.md. E.g., 'Add under ## Testing section'"}
+    {"addition": "A specific line or block to add to MARIADB-SHELL-AGENT.md based on workflow patterns. E.g., 'Always run tests after modifying auth-related files'", "why": "1 sentence explaining why this would help based on actual sessions", "prompt_scaffold": "Instructions for where to add this in MARIADB-SHELL-AGENT.md. E.g., 'Add under ## Testing section'"}
   ],
   "features_to_try": [
     {"feature": "Feature name from QC FEATURES REFERENCE above", "one_liner": "What it does", "why_for_you": "Why this would help YOU based on your sessions", "example_code": "Actual command or config to copy"}
@@ -1665,16 +1700,16 @@ IMPORTANT for Qwen_md_additions: PRIORITIZE instructions that appear MULTIPLE TI
 
 IMPORTANT for features_to_try: Pick 2-3 from the QC FEATURES REFERENCE above. Include 2-3 items for each category.`,
 
-  interaction_style: `Analyze this Qwen Code usage data and describe the user's interaction style.
+  interaction_style: `Analyze this MariaDB Shell Agent usage data and describe the user's interaction style.
 
 Call respond_in_schema function with A VALID JSON OBJECT as argument:
 {
-  "narrative": "2-3 paragraphs analyzing HOW the user interacts with Qwen Code. Use second person 'you'. Describe patterns: iterate quickly vs detailed upfront specs? Interrupt often or let Qwen run? Include specific examples. Use **bold** for key insights.",
+  "narrative": "2-3 paragraphs analyzing HOW the user interacts with MariaDB Shell Agent. Use second person 'you'. Describe patterns: iterate quickly vs detailed upfront specs? Interrupt often or let Qwen run? Include specific examples. Use **bold** for key insights.",
   "key_pattern": "One sentence summary of most distinctive interaction style"
 }
 `,
 
-  at_a_glance: `You're writing an "At a Glance" summary for a Qwen Code usage insights report for Qwen Code users. The goal is to help them understand their usage and improve how they can use Qwen better, especially as models improve.
+  at_a_glance: `You're writing an "At a Glance" summary for a MariaDB Shell Agent usage insights report for MariaDB Shell Agent users. The goal is to help them understand their usage and improve how they can use Qwen better, especially as models improve.
 
 Use this 4-part structure:
 
@@ -1682,7 +1717,7 @@ Use this 4-part structure:
 
 2. **What's hindering you** - Split into (a) Qwen's fault (misunderstandings, wrong approaches, bugs) and (b) user-side friction (not providing enough context, environment issues -- ideally more general than just one project). Be honest but constructive.
 
-3. **Quick wins to try** - Specific Qwen Code features they could try from the examples below, or a workflow technique if you think it's really compelling. (Avoid stuff like "Ask Qwen to confirm before taking actions" or "Type out more context up front" which are less compelling.)
+3. **Quick wins to try** - Specific MariaDB Shell Agent features they could try from the examples below, or a workflow technique if you think it's really compelling. (Avoid stuff like "Ask Qwen to confirm before taking actions" or "Type out more context up front" which are less compelling.)
 
 4. **Ambitious workflows for better models** - As we move to much more capable models over the next 3-6 months, what should they prepare for? What workflows that seem impossible now will become possible? Draw from the appropriate section below.
 

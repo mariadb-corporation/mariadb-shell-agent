@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -73,7 +74,7 @@ async function handleNew(args: NewArgs) {
       writeStdoutLine(`Successfully created new extension at ${args.path}.`);
     }
     writeStdoutLine(
-      `You can install this using "qwen extensions link ${args.path}" to test it out.`,
+      `You can install this using "mariadb-shell-agent extensions link ${args.path}" to test it out.`,
     );
   } catch (error) {
     writeStderrLine(getErrorMessage(error));

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -221,7 +222,7 @@ describe('downloadSkill', () => {
       expect.objectContaining({
         headers: expect.objectContaining({
           Accept: 'application/vnd.github+json',
-          'User-Agent': 'qwen-code',
+          'User-Agent': 'mariadb-shell-agent',
         }),
       }),
     );

@@ -10,9 +10,9 @@ PR1 provides an opt-in process-count limit and an actionable capacity error. It 
 
 Suggested implementation PR title: `feat(serve): add budget-based ACP child admission`.
 
-The three-stage proposal is tracked in [#11907](https://github.com/QwenLM/qwen-code/issues/11907). This document specifies its first stage; idle reclamation and user-directed closure remain separate follow-ups.
+The three-stage proposal is tracked in [#11907](https://github.invalid/QwenLM/qwen-code/issues/11907). This document specifies its first stage; idle reclamation and user-directed closure remain separate follow-ups.
 
-[#8182](https://github.com/QwenLM/qwen-code/issues/8182) is open and still requires fixed-heap enforcement plus representative evidence. [#11386](https://github.com/QwenLM/qwen-code/issues/11386) is closed, as read on 2026-09-15. PR1 is related follow-up work; use `Related to #8182` and reference #11386 as background, without closing keywords. Count admission alone does not complete #8182.
+[#8182](https://github.invalid/QwenLM/qwen-code/issues/8182) is open and still requires fixed-heap enforcement plus representative evidence. [#11386](https://github.invalid/QwenLM/qwen-code/issues/11386) is closed, as read on 2026-09-15. PR1 is related follow-up work; use `Related to #8182` and reference #11386 as background, without closing keywords. Count admission alone does not complete #8182.
 
 ## 2. Current behavior and gap
 
@@ -54,11 +54,11 @@ Extend the existing `--child-heap-mode` option and `ChildHeapMode` with `admit`;
 | `observe` (unchanged default) | Yes                          | No                        | No                           |
 | `admit` (new, opt-in)         | Yes                          | Yes                       | No                           |
 
-Example after implementation: `qwen serve --child-heap-mode admit`. An existing `--memory-budget-mb` override affects the modeled limit through the current calculation and also retains its existing journal-budget effects. It is not a dedicated concurrency knob. Budget and mode remain fixed for the daemon lifetime; switching requires restart. Do not introduce `enforce` in PR1 or imply that `admit` enforces a heap/RSS budget.
+Example after implementation: `mariadb-shell-agent serve --child-heap-mode admit`. An existing `--memory-budget-mb` override affects the modeled limit through the current calculation and also retains its existing journal-budget effects. It is not a dedicated concurrency knob. Budget and mode remain fixed for the daemon lifetime; switching requires restart. Do not introduce `enforce` in PR1 or imply that `admit` enforces a heap/RSS budget.
 
 Update the fast parser, full CLI choices/help, programmatic options, policy type and SDK status mirror together. Retain `off`/`observe` behavior, legacy child arguments, workspace registration limits and per-workspace/global session limits. Upgrading without opting in must not introduce capacity rejection.
 
-Support the managed `runQwenServe` spawn path. Reject `admit` with an injected bridge or an unwired direct-embed factory rather than silently accepting an ineffective option. A public admitting spawn factory must receive an explicit shared registry. Direct `createServeApp` callers without managed admission wiring must reject `admit`; pass the actual shared registry/policy references through the managed server construction, rather than treating a status-only snapshot callback as proof of enforcement. Keep ordinary direct-embed, IDE and standalone `qwen --acp` behavior unchanged.
+Support the managed `runQwenServe` spawn path. Reject `admit` with an injected bridge or an unwired direct-embed factory rather than silently accepting an ineffective option. A public admitting spawn factory must receive an explicit shared registry. Direct `createServeApp` callers without managed admission wiring must reject `admit`; pass the actual shared registry/policy references through the managed server construction, rather than treating a status-only snapshot callback as proof of enforcement. Keep ordinary direct-embed, IDE and standalone `mariadb-shell-agent --acp` behavior unchanged.
 
 A zero-slot `admit` configuration is unusable. Validate it before starting the listener or preheat and report the budget/model failure as a configuration error. `off` and `observe` retain their existing tiny-host behavior. After valid startup, bootstrap status remains explicitly unwired until the registry/policy are installed.
 
@@ -148,9 +148,9 @@ Do not rename unrelated modules, add a new scheduling abstraction or revise the 
 5. Wrapper/outcome tests cover successful rollback, uncertain side effects, generation changes and preheat failures. Capacity is not hidden by `runtime_initialization_failed` or a generic reconnect error, and does not override a more important rollback outcome.
 6. Web Shell shows the capacity reason once, ends the spinner/retry loop and preserves new-session text/attachments or restoration state. Cancel has no delete side effect. A deliberate retry after a slot is released works without duplicated prompts or worktrees.
 7. Status accurately separates count admission from modeled heap values, handles bootstrap/direct-embed/older-server fields, and reads the same shared registry used at spawn.
-8. Run build, typecheck and focused package tests for implementation. Run the E2E baseline first with global `qwen`, then the bundled implementation in isolated directories with a deterministic local provider. Model load/heap calibration is not needed to demonstrate slot accounting and error UX.
+8. Run build, typecheck and focused package tests for implementation. Run the E2E baseline first with global `mariadb-shell-agent`, then the bundled implementation in isolated directories with a deterministic local provider. Model load/heap calibration is not needed to demonstrate slot accounting and error UX.
 
-The detailed E2E plan is stored at `.qwen/e2e-tests/daemon-acp-capacity-admission-pr1.md`. Validation combines the global CLI baseline, focused package tests and isolated bundled-daemon process checks. Results and remaining verification limits are recorded in that plan. Earlier heap calibration runs do not validate this admission implementation.
+The detailed E2E plan is stored at `.mariadb-shell-agent/e2e-tests/daemon-acp-capacity-admission-pr1.md`. Validation combines the global CLI baseline, focused package tests and isolated bundled-daemon process checks. Results and remaining verification limits are recorded in that plan. Earlier heap calibration runs do not validate this admission implementation.
 
 ## 9. Delivery sequence and limits
 

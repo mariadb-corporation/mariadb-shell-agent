@@ -2,7 +2,7 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-This records a bounded local CLI comparison for [#12333](https://github.com/QwenLM/qwen-code/issues/12333). The measured tasks used fewer total tokens with default tool visibility, but did not establish unchanged quality. This is an experiment record and a manual verification procedure, not an automated acceptance gate.
+This records a bounded local CLI comparison for [#12333](https://github.invalid/QwenLM/qwen-code/issues/12333). The measured tasks used fewer total tokens with default tool visibility, but did not establish unchanged quality. This is an experiment record and a manual verification procedure, not an automated acceptance gate.
 
 ## Recorded experiment
 
@@ -29,7 +29,7 @@ All eight safety sessions, four Goal results and four saved Workflow executions 
 
 The first suite is retained separately: original outcomes A 14/18 and B 12/18, total tokens 969,739 → 783,840. It contained path/schema-check false negatives and two real fixture changes through still-enabled `monitor`. The second suite corrected that fixture in both arms. Do not average these different configurations or discard failed attempts.
 
-The [published report](https://github.com/QwenLM/qwen-code/pull/13767#issuecomment-6079794031) records per-task results and provenance. The historical experiment used a temporary forwarding proxy to reconcile all 128 attempts against native records. A later offline classifier correction counted the previously missed invalid-parameter call without changing tokens or task outcomes; no new provider run followed that correction. Original logs and failed runs remain local; they are not bundled with these docs. The experimental runner is retained in PR history at `82f1f057cfe17e573ae465958b95c14d0d95d196`, not maintained as a repository command.
+The [published report](https://github.invalid/QwenLM/qwen-code/pull/13767#issuecomment-6079794031) records per-task results and provenance. The historical experiment used a temporary forwarding proxy to reconcile all 128 attempts against native records. A later offline classifier correction counted the previously missed invalid-parameter call without changing tokens or task outcomes; no new provider run followed that correction. Original logs and failed runs remain local; they are not bundled with these docs. The experimental runner is retained in PR history at `82f1f057cfe17e573ae465958b95c14d0d95d196`, not maintained as a repository command.
 
 ## Repeat a small comparison with existing tools
 
@@ -38,7 +38,7 @@ The [published report](https://github.com/QwenLM/qwen-code/pull/13767#issuecomme
 3. Run each task in a fresh session in both arms, alternating A/B order on repetition. Use the existing headless CLI and API logging options for an OpenAI-compatible provider, for example:
 
    ```bash
-   qwen --model <model> --output-format json --chat-recording=true \
+   mariadb-shell-agent --model <model> --output-format json --chat-recording=true \
      --openai-logging --openai-logging-dir <private-log-directory> \
      -p '<same task prompt>'
    ```
@@ -52,7 +52,7 @@ The command illustrates existing capture options; it does not set up A/B isolati
 
 Two source-CLI sessions at `c2f5ce45b156` used the historical B configuration and the same model/prompts. Native requests confirmed 11 initial declarations, including `tool_search`/`tool_call` while Agent and Goal tools remained hidden. Agent returned exactly `TOTAL=63`; that format failure did not recur in this one sample. Goal repeated the premature `tool_call(get_goal)`, was refused, then searched the schemas, ran the verifier and completed. Both the startup reminder and Goal continuation already instructed schema review before invocation. The ordering error is reproducible model behavior; these observations do not identify a missing instruction or a production-code fix. The refusal remains a call-quality failure, even though the task recovered.
 
-Four preliminary sessions through isolated global `qwen` used its base 0.24.0 installation rather than the normal profile's auto-updated 0.25.0. They completed but exposed Agent/Goal directly, so they do not verify the deferred bridge. They are excluded from that conclusion. No new A/B cost comparison was performed, and no production change was made from these observations.
+Four preliminary sessions through isolated global `mariadb-shell-agent` used its base 0.24.0 installation rather than the normal profile's auto-updated 0.25.0. They completed but exposed Agent/Goal directly, so they do not verify the deferred bridge. They are excluded from that conclusion. No new A/B cost comparison was performed, and no production change was made from these observations.
 
 ## Remaining acceptance
 

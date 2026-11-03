@@ -78,7 +78,7 @@ for the benchmark duration.
 - Dispatch / pool submit: one-shot run and task creator.
 - PostgreSQL: shared persistent state store, not the scheduler.
 - Coordinator: expired-lease recovery, run reconciliation, and completion gate.
-- Executors: task claim, Harbor/Qwen Code/grader execution, heartbeat, and
+- Executors: task claim, Harbor/MariaDB Shell Agent/grader execution, heartbeat, and
   outcome submission.
 - Publisher: terminal-run validation, public result and trajectory bundle
   generation, and active GitHub Release writeback.
@@ -97,7 +97,7 @@ The isolated prerelease validation completed on 2026-07-25:
 - Pool run: `pool-31a24bc8acca49d2`
 - Dataset: `swe-bench/swe-bench-verified@2`, 500 frozen instances
 - Execution: 10 persistent Executors, at most two attempts per instance
-- Qwen Code: `v0.20.0-nightly.20260722.b98306b7e`
+- MariaDB Shell Agent: `v0.20.0-nightly.20260722.b98306b7e`
 - Model: `qwen3.7-max`
 - Wall time: approximately 12 hours 27 minutes
 - Results: 332 `RESOLVED`, 107 `UNRESOLVED`, 56 `EXECUTION_ERROR`,
@@ -109,9 +109,9 @@ The isolated prerelease validation completed on 2026-07-25:
 
 Evidence:
 
-- https://github.com/QwenLM/qwen-code/releases/tag/dsw-swe-full-async-poc-20260724-2c5ad4a5d0-r3
-- https://github.com/QwenLM/qwen-code/actions/runs/30079405895
-- https://github.com/QwenLM/qwen-code/releases/download/dsw-swe-full-async-poc-20260724-2c5ad4a5d0-r3/swe-bench-verified-dsw-swe-full-async-poc-20260724-2c5ad4a5d0-r3.json
+- https://github.invalid/QwenLM/qwen-code/releases/tag/dsw-swe-full-async-poc-20260724-2c5ad4a5d0-r3
+- https://github.invalid/QwenLM/qwen-code/actions/runs/30079405895
+- https://github.invalid/QwenLM/qwen-code/releases/download/dsw-swe-full-async-poc-20260724-2c5ad4a5d0-r3/swe-bench-verified-dsw-swe-full-async-poc-20260724-2c5ad4a5d0-r3.json
 
 The full chain was validated, including asynchronous dispatch, task-pool
 execution, strict quarantine, and Publisher writeback. The run is not an

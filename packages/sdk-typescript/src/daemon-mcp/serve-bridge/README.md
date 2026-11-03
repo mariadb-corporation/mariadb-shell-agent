@@ -1,18 +1,18 @@
 # qwen-serve-bridge MCP Server
 
-将 `qwen serve` 的 HTTP API 封装为 MCP (Model Context Protocol) Server，方便任何支持 MCP 的客户端直接调用。
+将 `mariadb-shell-agent serve` 的 HTTP API 封装为 MCP (Model Context Protocol) Server，方便任何支持 MCP 的客户端直接调用。
 
 ## 快速开始
 
-### 1. 启动 qwen serve daemon
+### 1. 启动 mariadb-shell-agent serve daemon
 
 ```bash
 # 基本启动
-qwen serve
+mariadb-shell-agent serve
 # 默认监听 http://127.0.0.1:4170
 
 # 带 token 和 workspace 启动
-QWEN_SERVER_TOKEN=<your-token> qwen serve \
+QWEN_SERVER_TOKEN=<your-token> mariadb-shell-agent serve \
   --port 4170 \
   --workspace /path/to/your/project
 ```
@@ -170,7 +170,7 @@ await server.instance.connect(transport);
 | `file_edit`                 | 编辑文件（精确匹配替换）           |
 | `session_set_approval_mode` | 变更审批模式                       |
 | `workspace_tool_toggle`     | 启用/禁用工具                      |
-| `workspace_init`            | 初始化 QWEN.md                     |
+| `workspace_init`            | 初始化 MARIADB-SHELL-AGENT.md      |
 | `workspace_mcp_restart`     | 重启 MCP 服务器                    |
 | `workspace_memory_read`     | 读工作区记忆                       |
 | `workspace_memory_write`    | 写工作区记忆                       |

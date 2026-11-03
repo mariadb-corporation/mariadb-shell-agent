@@ -4,9 +4,9 @@
 
 ## 状态与现状
 
-这是 [#15081](https://github.com/QwenLM/qwen-code/issues/15081) 的设计提案，不是实现，也不是 Runtime 资格验证结果。当前 Managed `local-process` 路径使用 worker 的宿主权限运行 Workspace 文件和 Shell 工具。Workspace 根目录属于可信部署数据，`isolationClass` 只命名作用域，并没有强制文件系统边界。
+这是 [#15081](https://github.invalid/QwenLM/qwen-code/issues/15081) 的设计提案，不是实现，也不是 Runtime 资格验证结果。当前 Managed `local-process` 路径使用 worker 的宿主权限运行 Workspace 文件和 Shell 工具。Workspace 根目录属于可信部署数据，`isolationClass` 只命名作用域，并没有强制文件系统边界。
 
-仓库已经有 Linux bubblewrap（`bwrap`）执行底座以及 Runtime Shell/File 阶段。现有策略使用只读宿主根视图，并明确不承诺读取保密性。因此，直接为 Managed Agent 开启它仍会允许跨 Workspace 读取。Issue [#14667](https://github.com/QwenLM/qwen-code/issues/14667) 负责独立的 cgroup 单元、`setsid`/双重 fork 进程约束和 Broker 可见的空证明；本提案消费这一契约。
+仓库已经有 Linux bubblewrap（`bwrap`）执行底座以及 Runtime Shell/File 阶段。现有策略使用只读宿主根视图，并明确不承诺读取保密性。因此，直接为 Managed Agent 开启它仍会允许跨 Workspace 读取。Issue [#14667](https://github.invalid/QwenLM/qwen-code/issues/14667) 负责独立的 cgroup 单元、`setsid`/双重 fork 进程约束和 Broker 可见的空证明；本提案消费这一契约。
 
 ## 目标
 

@@ -2,7 +2,7 @@
 
 [English](2026-10-09-managed-workflow-child-kind.md) | [简体中文](2026-10-09-managed-workflow-child-kind.zh-CN.md)
 
-状态:已在本变更中实现。已落地:`managed-child_run` 的 `workflow` 记录体 kind 与累计 child launch 预算(超出时以 `budget_exhausted` 拒绝),提交由 [workflow 运行时设计](2026-10-10-managed-workflow-child-runtime.zh-CN.md) 启用(同一棵树交付:门禁列出两种 kind)。仍为设计的只剩 Workspace 隔离策略(见"后续工作")。这是 [#12827](https://github.com/QwenLM/qwen-code/issues/12827) 的 **H4c** 切片,即 Managed Agent 提案 [#12380](https://github.com/QwenLM/qwen-code/issues/12380) 的 H 阶段,由 [#13743](https://github.com/QwenLM/qwen-code/issues/13743) 跟踪。它承接 H4a([记录契约](2026-10-06-managed-child-agent-runtime.md),#13505)与 H4b([child Session 运行时](2026-10-07-managed-child-session-runtime.md),#13550)。更早的 [H4 问题框架](2026-10-04-managed-child-agents.md) 仍是背景;凡它与 H4a、H4b 或本文档冲突之处,以后者为准。
+状态:已在本变更中实现。已落地:`managed-child_run` 的 `workflow` 记录体 kind 与累计 child launch 预算(超出时以 `budget_exhausted` 拒绝),提交由 [workflow 运行时设计](2026-10-10-managed-workflow-child-runtime.zh-CN.md) 启用(同一棵树交付:门禁列出两种 kind)。仍为设计的只剩 Workspace 隔离策略(见"后续工作")。这是 [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827) 的 **H4c** 切片,即 Managed Agent 提案 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380) 的 H 阶段,由 [#13743](https://github.invalid/QwenLM/qwen-code/issues/13743) 跟踪。它承接 H4a([记录契约](2026-10-06-managed-child-agent-runtime.md),#13505)与 H4b([child Session 运行时](2026-10-07-managed-child-session-runtime.md),#13550)。更早的 [H4 问题框架](2026-10-04-managed-child-agents.md) 仍是背景;凡它与 H4a、H4b 或本文档冲突之处,以后者为准。
 
 ## 问题与范围
 
@@ -62,7 +62,7 @@ Issue #13743 在 H4c 名下提出三件事:`workflow` child kind(C1)、Workspace
    - 重放安全:两个计数都只读已提交的记录,所以重放会推导出同样的回答。记录已存在的重驱 launch 会跳过准入(H4b 的规则),所以 child 永远不会被计入它自己的重放。
    - 取值:64 相当于并发上限的 16 个整轮。在 64 KiB 的结果副本上限下,它还把每个 Session 的结果副本限制在约 4 MiB。
 10. **配额按 child Session 计数,而不是按 kind。** 并发与预算都把 `child_agent` 与 `workflow` run 合在一起计数,所以以后启用 workflow 不会让一个 scope 的额度翻倍。
-11. **隔离是它自己的切片,其词汇现在即确定。** 以 H4a 交付的词汇为准:`shared`、`snapshot`、`worktree`。问题框架中的 `read_only_snapshot` 与 `independent_worktree` 即 `snapshot` 与 `worktree`。`shared_serialized` 在这里不单独命名:`shared` child 已经经由 Workspace lease 纪律串行化(H4b 决策 3)。按 child 的 generation 与 barrier 是否需要独立取值,由隔离切片决定。那个切片从 Workspace 能力开始,因为没有 provider 能为 child 创建 worktree 或把它合并回去。记录层的改动要等这项能力存在之后。该切片由 [#13753](https://github.com/QwenLM/qwen-code/issues/13753) 跟踪。
+11. **隔离是它自己的切片,其词汇现在即确定。** 以 H4a 交付的词汇为准:`shared`、`snapshot`、`worktree`。问题框架中的 `read_only_snapshot` 与 `independent_worktree` 即 `snapshot` 与 `worktree`。`shared_serialized` 在这里不单独命名:`shared` child 已经经由 Workspace lease 纪律串行化(H4b 决策 3)。按 child 的 generation 与 barrier 是否需要独立取值,由隔离切片决定。那个切片从 Workspace 能力开始,因为没有 provider 能为 child 创建 worktree 或把它合并回去。记录层的改动要等这项能力存在之后。该切片由 [#13753](https://github.invalid/QwenLM/qwen-code/issues/13753) 跟踪。
 
 ## 记录
 
@@ -123,5 +123,5 @@ Schema version 1。链以 `childRunId` 为键,与 `child_agent` 相同。[`child
 | 切片            | 范围                                                                                                                                                                                                                                                                                                        |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Workflow 运行时 | 已由 [workflow 运行时设计](2026-10-10-managed-workflow-child-runtime.zh-CN.md) 交付:Workflow 工具的 Managed 准入(内联源码,见该设计决策 1 —— 了结了本文未决问题 1)、launch envelope、child Session 执行 workflow(其 agent 在进程内运行,了结了未决问题 2)、relay 与级联放宽到 `workflow`,以及 kind 门禁条目。 |
-| 隔离            | [#13753](https://github.com/QwenLM/qwen-code/issues/13753):为 child worktree 及其合并回去提供 Workspace 能力;然后是 `worktree`(生命周期、合并策略)与 `snapshot`,并决定串行共享是否需要独立取值。                                                                                                            |
+| 隔离            | [#13753](https://github.invalid/QwenLM/qwen-code/issues/13753):为 child worktree 及其合并回去提供 Workspace 能力;然后是 `worktree`(生命周期、合并策略)与 `snapshot`,并决定串行共享是否需要独立取值。                                                                                                        |
 | H4d–H4f、Detach | 与 H4a/H4b 交付地图相同。                                                                                                                                                                                                                                                                                   |

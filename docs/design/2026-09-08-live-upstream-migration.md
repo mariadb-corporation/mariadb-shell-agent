@@ -28,7 +28,7 @@ it; it must not regress to the old M5 unbound-completion latch. Proactive
 delivery acknowledgement is settled before the next FIFO item is released.
 
 Automatically merged CLI changes must preserve the newer upstream runtime
-ownership, discovery and pre-start checks. The shared qwen serve integration
+ownership, discovery and pre-start checks. The shared mariadb-shell-agent serve integration
 remains screen-only and does not gain standalone Memory or shutdown authority.
 Upstream release workflows and unrelated main changes remain untouched.
 

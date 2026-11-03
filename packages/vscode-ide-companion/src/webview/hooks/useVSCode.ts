@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,7 +29,7 @@ let vscodeApiInstance: VSCodeAPI | null = null;
  * Get VS Code API instance
  * Uses module-level cache to ensure acquireVsCodeApi() is only called once
  */
-function getVSCodeAPI(): VSCodeAPI {
+export function getVSCodeAPI(): VSCodeAPI {
   if (vscodeApiInstance) {
     return vscodeApiInstance;
   }

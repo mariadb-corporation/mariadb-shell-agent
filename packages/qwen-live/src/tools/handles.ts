@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,7 +18,7 @@ export interface JobRecord {
   jobHandle: string;
   sessionHandle: string;
   backend: BackendHandle;
-  /** Adaptor-side correlation id (qwen serve: promptId). */
+  /** Adaptor-side correlation id (mariadb-shell-agent serve: promptId). */
   jobRef?: string;
   state:
     | 'accepted'
@@ -47,7 +48,7 @@ export class HandleRegistry {
   private readonly jobs = new Map<string, JobRecord>();
   /**
    * Keyed by `${backend.adaptor}:${jobRef}` — jobRefs are adaptor-local
-   * (qwen serve mints prompt UUIDs, an ACP adaptor counts turn-1, turn-2),
+   * (mariadb-shell-agent serve mints prompt UUIDs, an ACP adaptor counts turn-1, turn-2),
    * so the owning adaptor scopes the key or two backends collide.
    */
   private readonly jobsByRef = new Map<string, string>();

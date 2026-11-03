@@ -6,7 +6,7 @@ Tracking issue: #11013, item 12 (distribution half); #8105 PR 15.
 
 ## Problem
 
-Saved workflows could only live in a project (`.qwen/workflows`) or in the user's home (`~/.qwen/workflows`), so there was no way to hand a reusable workflow to someone else. Claude Code plugins already ship workflows through a `workflows` manifest field and a default `workflows/` directory. Extensions are Qwen Code's distribution unit, but extension files are third-party code, so the feature has to widen distribution without widening what a workflow run can read.
+Saved workflows could only live in a project (`.mariadb-shell-agent/workflows`) or in the user's home (`~/.mariadb-shell-agent/workflows`), so there was no way to hand a reusable workflow to someone else. Claude Code plugins already ship workflows through a `workflows` manifest field and a default `workflows/` directory. Extensions are MariaDB Shell Agent's distribution unit, but extension files are third-party code, so the feature has to widen distribution without widening what a workflow run can read.
 
 ## Decisions
 
@@ -30,7 +30,7 @@ The install and update consent prompt lists each workflow's name and description
 
 ### Surfaces and gates
 
-Extension workflows reuse the existing gates: the Workflows feature flag, bare mode and folder trust for slash commands, and the ACP workflow-control check. The slash command carries the extension's owner label as its source badge and is not model-invocable. The Workflow tool's description, parameter description, approval dialog and resume advice name an extension workflow as such. `/reload-plugins`, `qwen extensions list` and the extension detail views report what the extension ships, like their command, skill and agent siblings.
+Extension workflows reuse the existing gates: the Workflows feature flag, bare mode and folder trust for slash commands, and the ACP workflow-control check. The slash command carries the extension's owner label as its source badge and is not model-invocable. The Workflow tool's description, parameter description, approval dialog and resume advice name an extension workflow as such. `/reload-plugins`, `mariadb-shell-agent extensions list` and the extension detail views report what the extension ships, like their command, skill and agent siblings.
 
 ### Claude Code plugin conversion
 

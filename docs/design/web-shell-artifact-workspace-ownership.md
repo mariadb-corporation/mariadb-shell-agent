@@ -2,7 +2,7 @@
 
 Status: implemented and verified
 
-Issue: https://github.com/QwenLM/qwen-code/issues/8494
+Issue: https://github.invalid/QwenLM/qwen-code/issues/8494
 
 ## Problem
 

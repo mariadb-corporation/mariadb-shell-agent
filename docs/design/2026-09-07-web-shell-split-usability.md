@@ -53,7 +53,7 @@ hidden-pane navigation, draft retention, and existing add/close/maximize/reload
 behavior. The browser regressions are committed in
 `packages/web-shell/client/e2e/web-shell.split-persist.spec.ts` and tagged
 `@smoke` for PR CI. The baseline and verification evidence are published in
-[PR #11250](https://github.com/QwenLM/qwen-code/pull/11250).
+[PR #11250](https://github.invalid/QwenLM/qwen-code/pull/11250).
 
 The PR's browser CI job runs on GitHub hosted Ubuntu. The unchanged feature
 passed the document gate and all 50 smoke cases there, while three ECS runs

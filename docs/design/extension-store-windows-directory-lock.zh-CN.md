@@ -10,8 +10,8 @@
 
 ```text
 EPERM: operation not permitted, rename
-'C:\Users\<user>\.qwen\extensions\i-have-adhd' ->
-'C:\Users\<user>\.qwen\extension-store\rollback\b101694b-c6a6-4a54-9cf1-4f3e8dd7f7c0'
+'C:\Users\<user>\.mariadb-shell-agent\extensions\i-have-adhd' ->
+'C:\Users\<user>\.mariadb-shell-agent\extension-store\rollback\b101694b-c6a6-4a54-9cf1-4f3e8dd7f7c0'
 ```
 
 这段文字会原样出现在终端里，因为更新命令用 `writeStderrLine(getErrorMessage(error))` 报告
@@ -27,8 +27,8 @@ await renameWithRetry(destinationDirectory, backupDirectory, 3, 50);
 ```
 
 在 Windows 上，如果被改名目录的**任意后代目录**上存在一个打开的句柄，`MoveFileEx` 就会失败。
-而这个句柄正是 Qwen Code 自己打开的：`ExtensionFileWatcher` 用 chokidar 以无限深度监视
-`~/.qwen/extensions`，而 chokidar 会为它发现的**每一个子目录**各挂一个原生
+而这个句柄正是 MariaDB Shell Agent 自己打开的：`ExtensionFileWatcher` 用 chokidar 以无限深度监视
+`~/.mariadb-shell-agent/extensions`，而 chokidar 会为它发现的**每一个子目录**各挂一个原生
 `ReadDirectoryChangesW` 句柄。于是每个交互会话都会锁住每个已安装扩展的每个目录。
 
 重试救不了。`renameWithRetry` 针对 EPERM/EACCES 在约 350 ms 内做 4 次尝试，而这个锁不是瞬时
@@ -45,7 +45,7 @@ await renameWithRetry(destinationDirectory, backupDirectory, 3, 50);
 修了同类问题，采用的正是这套备份改名模式，它消除了数据丢失，但没有处理 Windows 占用。
 
 谁持有句柄取决于入口：CLI 子命令在解析参数阶段就退出、根本不启动 watcher，所以那条路径上的锁
-属于**其他**会话。这正是修法必须与持有者无关的原因，也是"关掉其他 Qwen Code 会话"不可靠的原因
+属于**其他**会话。这正是修法必须与持有者无关的原因，也是"关掉其他 MariaDB Shell Agent 会话"不可靠的原因
 ——UI 路径是被发起会话自己锁住的。
 
 ### 实测证据
@@ -67,12 +67,12 @@ await renameWithRetry(destinationDirectory, backupDirectory, 3, 50);
 | 后代句柄存在时执行 `rm -rf`                       | OK                        |
 | 后代句柄存在时执行 `cp -r` 覆盖                   | OK                        |
 
-并已在真实机器上确认：在真实的 `~/.qwen/extensions` 下创建一次性目录，在其他 Qwen Code 会话
+并已在真实机器上确认：在真实的 `~/.mariadb-shell-agent/extensions` 下创建一次性目录，在其他 MariaDB Shell Agent 会话
 运行期间同样无法改名；探针目录随后已清除。最后两行正是这个修法可行的原因：这些句柄只阻塞目录
 改名，不阻塞目录删除、删除内容与复制，所以交换可以绕开占用，而不需要任何跨进程协议。
 
 关于句柄的行按**共享模式**拆开（原先一行把两种情况混在一起）：授予删除共享的持有者（`libuv` 就是
-这样打开的，所以每个 Qwen Code 子进程都算）既不阻塞改名也不阻塞复制；而不授予删除共享的持有者
+这样打开的，所以每个 MariaDB Shell Agent 子进程都算）既不阻塞改名也不阻塞复制；而不授予删除共享的持有者
 （扫描器、独占打开某个文件的编辑器）会以 `EPERM` 拒绝改名，并让对该文件的复制以 `EBUSY` 失败。
 后者正是占用分类器在复制路径上会看到的码，也是复制要重试的原因。
 
@@ -80,7 +80,7 @@ await renameWithRetry(destinationDirectory, backupDirectory, 3, 50);
 
 在范围内：
 
-- 在其他 Qwen Code 会话正在运行时，Windows 上的 `qwen extensions update <name>` 与
+- 在其他 MariaDB Shell Agent 会话正在运行时，Windows 上的 `mariadb-shell-agent extensions update <name>` 与
   `uninstall <name>` 能够成功；并且即使发起更新的那个活动会话本身就是持有者之一，来自
   `/extensions` UI 的更新也能完成。
 - 当交换确实无法完成时，用用户能据此采取行动的语言说明，并保留原已安装版本。
@@ -312,7 +312,7 @@ E2E harness 为一个扩展根目录树的每个目录挂一个原生监视句�
 
 验收：
 
-- 在 Windows 上、至少还有一个其他交互会话运行时，`qwen extensions update <name>` 能完成，且新版本
+- 在 Windows 上、至少还有一个其他交互会话运行时，`mariadb-shell-agent extensions update <name>` 能完成，且新版本
   可加载。
 - 无法完成的交换会报告 `extension_directory_locked` 并点出目录名，同时原版本仍已安装且可加载。
   有三种状态可能不同：被同一持有者击败的 copy 模式回滚，可能留下陈旧内容，或留下一个已删除却没能

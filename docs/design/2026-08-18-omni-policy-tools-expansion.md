@@ -3,7 +3,7 @@
 ## 状态
 
 - 状态：Implemented(omni-experiment 分支)
-- 范围:Qwen Code 实验分支 omni harness 的策略工具集与条件编排能力
+- 范围:MariaDB Shell Agent 实验分支 omni harness 的策略工具集与条件编排能力
 - 前置设计:
   [Omni 多模态数据处理 Policy 编排架构设计](./2026-07-29-omni-multimodal-policy-orchestration.md)、
   [Omni 多模态 Memory 架构设计](./2026-07-29-omni-multimodal-memory.md)

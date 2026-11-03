@@ -2,7 +2,7 @@
 
 [English](2026-09-26-managed-workspace-output-next-slices.md) | [简体中文](2026-09-26-managed-workspace-output-next-slices.zh-CN.md)
 
-状态：在 draft PR #12730 中实现。基线：2026-09-26 的 `main`，提交 `342ba1bcd`。本改动完成 [W0c #12724](https://github.com/QwenLM/qwen-code/issues/12724) 的 Broker 切片，属于 [proposal #12380](https://github.com/QwenLM/qwen-code/issues/12380)。
+状态：在 draft PR #12730 中实现。基线：2026-09-26 的 `main`，提交 `342ba1bcd`。本改动完成 [W0c #12724](https://github.invalid/QwenLM/qwen-code/issues/12724) 的 Broker 切片，属于 [proposal #12380](https://github.invalid/QwenLM/qwen-code/issues/12380)。
 
 ## 1. 当前状态与范围
 
@@ -54,7 +54,7 @@ ready 和 attestation 不兼容时关闭准入，provisioner 终止失败子进�
 - 在发送前拒绝以下安装：Session 记录不处于 ACQUIRING 或 READY、目标不是 Session 记录所指的 binding、目标是另一个 placement 的 Runtime、binding 非 READY 或已请求 drain；并拒绝格式不良的 Session 或引用 ID；容忍并发的 schema 升级。
 - 推送前运行定向测试、Java Checkstyle，并完成两轮干净的自审。
 
-E2E 计划与观测记录放在 `.qwen/e2e-tests/managed-context-broker.md`。基线先使用全局 CLI，最终使用本地 bundle；不需要模型凭证或外部模型调用。
+E2E 计划与观测记录放在 `.mariadb-shell-agent/e2e-tests/managed-context-broker.md`。基线先使用全局 CLI，最终使用本地 bundle；不需要模型凭证或外部模型调用。
 
 ## 7. 后续依赖与开放问题
 
@@ -62,6 +62,6 @@ W0c-3 连接 W0b 与 W0c-1/2：读取原始 Session binding 与冻结 config/pol
 
 Worker installation/receipt 容量限制留待后续。W0c-1 当前按 incarnation 保留证据，但没有早期草案提出的有限容量；W0c-2 不宣称已实现容量退休。任意 Shell 隔离仍需要受限 mount 或同等边界，不能只靠 realpath 检查。
 
-O1a 正在 [#12729](https://github.com/QwenLM/qwen-code/pull/12729) 独立定义：tool v3 execute/status/cancel/acknowledge、独立的 streaming store，以及前台 Shell 的 complete-required 捕获。该方向取代本草案早先建议的独立 capability-probe 路由。O1b 依赖其评审后契约；O1c 依赖 O1a/O1b 与 W0c-1 Worker 集成。Hosted 放行还需要 W0c-3 与 O2。本 PR 不含 O1 实现。
+O1a 正在 [#12729](https://github.invalid/QwenLM/qwen-code/pull/12729) 独立定义：tool v3 execute/status/cancel/acknowledge、独立的 streaming store，以及前台 Shell 的 complete-required 捕获。该方向取代本草案早先建议的独立 capability-probe 路由。O1b 依赖其评审后契约；O1c 依赖 O1a/O1b 与 W0c-1 Worker 集成。Hosted 放行还需要 W0c-3 与 O2。本 PR 不含 O1 实现。
 
-[#12713](https://github.com/QwenLM/qwen-code/pull/12713) 是无工具的 Hosted Harness 阶段。[#12358 预览](https://github.com/QwenLM/qwen-code/pull/12358) 仅用于集成调研，不证明产品门禁已经通过。当前限定的 Broker 实现没有阻塞设计问题；发布启用与容量仍是明确的后续工作。
+[#12713](https://github.invalid/QwenLM/qwen-code/pull/12713) 是无工具的 Hosted Harness 阶段。[#12358 预览](https://github.invalid/QwenLM/qwen-code/pull/12358) 仅用于集成调研，不证明产品门禁已经通过。当前限定的 Broker 实现没有阻塞设计问题；发布启用与容量仍是明确的后续工作。

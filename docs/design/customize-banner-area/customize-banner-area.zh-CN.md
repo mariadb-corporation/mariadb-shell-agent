@@ -6,11 +6,11 @@
 
 ## 概述
 
-Qwen Code CLI 启动时会在终端顶部打印一个 Banner，包含 QWEN ASCII
+MariaDB Shell Agent CLI 启动时会在终端顶部打印一个 Banner，包含 QWEN ASCII
 Logo 和一个带边框的信息面板。多种真实场景需要对这一区域进行控制：
 
-- **白标 / 第三方品牌集成**：将 Qwen Code 嵌入企业或团队自有产品时，
-  需要展示自家品牌而非默认的 "Qwen Code"。
+- **白标 / 第三方品牌集成**：将 MariaDB Shell Agent 嵌入企业或团队自有产品时，
+  需要展示自家品牌而非默认的 "MariaDB Shell Agent"。
 - **个性化**：个人用户希望让终端 Banner 与团队规范或个人审美一致。
 - **多租户 / 多实例区分**：在共享环境下，不同团队希望快速辨认自己
   正在使用哪个实例。
@@ -19,7 +19,7 @@ Logo 和一个带边框的信息面板。多种真实场景需要对这一区域
 自定义只允许用户把自己的品牌叠在上面，**不允许**屏蔽用于排障的关键
 信息。本文档后续每一处「可改 / 不可改」的判定都来自这一立场。
 
-对应 issue：[#3005](https://github.com/QwenLM/qwen-code/issues/3005)。
+对应 issue：[#3005](https://github.invalid/QwenLM/qwen-code/issues/3005)。
 
 ## Banner 区域划分
 
@@ -33,7 +33,7 @@ Logo 和一个带边框的信息面板。多种真实场景需要对这一区域
 │                                                                             │
 │   ┌──── Logo 列 ─────────┐  gap=2  ┌──── 信息面板 (带边框) ──────────────┐  │
 │   │                      │         │                                     │  │
-│   │  ███ QWEN ASCII ███  │         │  ① 标题：    >_ Qwen Code (vX.Y.Z)  │  │
+│   │  ███ QWEN ASCII ███  │         │  ① 标题：    >_ MariaDB Shell Agent (vX.Y.Z)  │  │
 │   │  ███   ART ART  ███  │         │  ② 副标题：  «空白行 / 自定义覆盖» │  │
 │   │  ███ QWEN ASCII ███  │         │  ③ 状态：    Qwen OAuth | qwen-…    │  │
 │   │                      │         │  ④ 路径：    ~/projects/example     │  │
@@ -51,7 +51,7 @@ Logo 和一个带边框的信息面板。多种真实场景需要对这一区域
   `shortAsciiLogo`。
 - **B. 信息面板** —— 带边框的信息盒，共四行。第二行默认是空白视觉
   spacer，可选地切换为调用方提供的副标题：
-  - **B①** 标题：`>_ Qwen Code (vX.Y.Z)` —— 品牌文字 + 版本号后缀。
+  - **B①** 标题：`>_ MariaDB Shell Agent (vX.Y.Z)` —— 品牌文字 + 版本号后缀。
   - **B②** 副标题 / spacer：默认是单空格行，设置 `ui.customBannerSubtitle`
     后渲染清洗后的单行副标题字符串（例如某个 fork 用
     `Built-in DataWorks Official Skills`）。
@@ -63,15 +63,15 @@ Logo 和一个带边框的信息面板。多种真实场景需要对这一区域
 
 ## 自定义规则 —— 哪些可改，哪些被锁定
 
-| 区域                               | 当前来源                             | 自定义类别              | 锁定/开放原因                                                                                                                                            |
-| ---------------------------------- | ------------------------------------ | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **A. Logo 列**                     | `shortAsciiLogo` (`AsciiArt.ts`)     | **可替换 + 可自动隐藏** | 纯品牌区域。白标场景需要完全控制视觉。窄终端下「自动隐藏 Logo」的现有行为保持不变。                                                                      |
-| **B①. 标题文字**（`>_ Qwen Code`） | `Header.tsx` 硬编码                  | **可替换**              | 品牌区域。开头的 `>_` 字符是现有品牌的一部分；如不需要，用户在 `customBannerTitle` 中省略即可。                                                          |
-| **B①. 版本号后缀**（`(vX.Y.Z)`）   | `version` prop                       | **锁定**                | 排障与支持必备。隐藏后只能通过 `--version` 才能回答「你用的什么版本？」，对支持流程是真实成本。我们以小幅白标体验损失换取支持可达性。                    |
-| **B②. 副标题 / spacer 行**         | 默认空白                             | **可替换**              | 纯品牌 / 上下文区域。白标 fork 用它给构建版本打 tag（如 "Built-in DataWorks Official Skills"）。清洗规则与标题一致；只允许单行，不接受会破坏布局的换行。 |
-| **B③. 状态行**（鉴权 + 模型）      | `formattedAuthType`、`model` prop    | **锁定**                | 运营与安全信号。用户必须看到当前使用的凭据以及实际消耗 token 的模型。任何隐藏/替换都是 footgun，即便在白标场景下也不应允许。                             |
-| **B④. 路径行**（工作目录）         | `workingDirectory` prop              | **锁定**                | 运营信息。「我现在在哪个目录？」是高频问题；Banner 是其唯一权威答案。                                                                                    |
-| **整个 Banner** (A + B)            | `AppHeader.tsx` 中 `<Header>` 挂载点 | **可隐藏**              | 一个 `ui.hideBanner: true` 同时跳过 A、B 两个区块 —— 形态与现有屏读模式开关一致。`<Tips>` 仍由独立的 `ui.hideTips` 控制。                                |
+| 区域                                         | 当前来源                             | 自定义类别              | 锁定/开放原因                                                                                                                                            |
+| -------------------------------------------- | ------------------------------------ | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **A. Logo 列**                               | `shortAsciiLogo` (`AsciiArt.ts`)     | **可替换 + 可自动隐藏** | 纯品牌区域。白标场景需要完全控制视觉。窄终端下「自动隐藏 Logo」的现有行为保持不变。                                                                      |
+| **B①. 标题文字**（`>_ MariaDB Shell Agent`） | `Header.tsx` 硬编码                  | **可替换**              | 品牌区域。开头的 `>_` 字符是现有品牌的一部分；如不需要，用户在 `customBannerTitle` 中省略即可。                                                          |
+| **B①. 版本号后缀**（`(vX.Y.Z)`）             | `version` prop                       | **锁定**                | 排障与支持必备。隐藏后只能通过 `--version` 才能回答「你用的什么版本？」，对支持流程是真实成本。我们以小幅白标体验损失换取支持可达性。                    |
+| **B②. 副标题 / spacer 行**                   | 默认空白                             | **可替换**              | 纯品牌 / 上下文区域。白标 fork 用它给构建版本打 tag（如 "Built-in DataWorks Official Skills"）。清洗规则与标题一致；只允许单行，不接受会破坏布局的换行。 |
+| **B③. 状态行**（鉴权 + 模型）                | `formattedAuthType`、`model` prop    | **锁定**                | 运营与安全信号。用户必须看到当前使用的凭据以及实际消耗 token 的模型。任何隐藏/替换都是 footgun，即便在白标场景下也不应允许。                             |
+| **B④. 路径行**（工作目录）                   | `workingDirectory` prop              | **锁定**                | 运营信息。「我现在在哪个目录？」是高频问题；Banner 是其唯一权威答案。                                                                                    |
+| **整个 Banner** (A + B)                      | `AppHeader.tsx` 中 `<Header>` 挂载点 | **可隐藏**              | 一个 `ui.hideBanner: true` 同时跳过 A、B 两个区块 —— 形态与现有屏读模式开关一致。`<Tips>` 仍由独立的 `ui.hideTips` 控制。                                |
 
 上述矩阵对应四个设置项，仅此而已：
 
@@ -115,8 +115,8 @@ ASCII art **没有固定的字符数上限** —— 只有上面这两组列/行
 ### 配置存放位置
 
 四个设置都位于 `settings.json` 的 `ui` 节点下。同时支持用户级
-（`~/.qwen/settings.json`）和工作区级（项目根目录的
-`.qwen/settings.json`），按标准合并优先级生效（workspace 覆盖
+（`~/.mariadb-shell-agent/settings.json`）和工作区级（项目根目录的
+`.mariadb-shell-agent/settings.json`），按标准合并优先级生效（workspace 覆盖
 user，system 覆盖 workspace）。
 
 `customAsciiArt` 是特例：解析器不把整个对象当成一个值由更高优先级的
@@ -124,8 +124,8 @@ scope 直接替换，而是按 tier 逐个穿越所有 scope。如果 user 设�
 了 `{ small }`、workspace 设置定义了 `{ large }`，两边都会生效 ——
 `small` 取自 user，`large` 取自 workspace。这样能同时满足两件事：
 
-1. 每个 `{ path }` 项相对于声明它的那个文件解析（workspace `.qwen/`
-   vs. user `~/.qwen/`）；只看 merged 视图就丢失了 scope 信息。
+1. 每个 `{ path }` 项相对于声明它的那个文件解析（workspace `.mariadb-shell-agent/`
+   vs. user `~/.mariadb-shell-agent/`）；只看 merged 视图就丢失了 scope 信息。
 2. 用户可以把默认的 `large` tier 留在个人设置里，按工作区只覆盖
    `small`，而不必每次重写整个对象。
 
@@ -224,8 +224,8 @@ JSON 字符串中用 `\n` 表示换行。该 ASCII art 会与默认 Logo 一样�
 
 避免在 JSON 中转义大段多行字符串。路径解析规则：
 
-- **工作区级设置**：相对路径相对于 workspace 的 `.qwen/` 目录。
-- **用户级设置**：相对路径相对于 `~/.qwen/`。
+- **工作区级设置**：相对路径相对于 workspace 的 `.mariadb-shell-agent/` 目录。
+- **用户级设置**：相对路径相对于 `~/.mariadb-shell-agent/`。
 - 绝对路径直接使用。
 - 文件**仅在启动时读取一次**，经过清洗后写入缓存。会话进行中修改
   文件不会重新渲染 —— 请重启 CLI。
@@ -320,12 +320,12 @@ JSON 字符串中用 `\n` 表示换行。该 ASCII art 会与默认 Logo 一样�
 
 ### 如何验证
 
-1. 保存 `settings.json`，重新启动 `qwen` —— Banner 解析仅在启动时
+1. 保存 `settings.json`，重新启动 `mariadb-shell-agent` —— Banner 解析仅在启动时
    运行一次。
 2. 调整终端宽度，确认 `small` / `large` 切换符合预期，并且在极窄
    宽度下 Logo 列正确隐藏。
 3. 若结果与预期不符，查看
-   `~/.qwen/debug/<sessionId>.txt`（`latest.txt` 软链指向当前
+   `~/.mariadb-shell-agent/debug/<sessionId>.txt`（`latest.txt` 软链指向当前
    会话），grep `[BANNER]` —— 每一次软失败都会打印一行 warn
    说明原因。
 
@@ -359,7 +359,7 @@ JSON 字符串中用 `\n` 表示换行。该 ASCII art 会与默认 Logo 一样�
    │      ≤ 64 KB            │         渲染 Logo 列
    │ 3. 清洗 art：            │         渲染信息面板：
    │    stripControlSeqs     │           Title    = customBannerTitle
-   │    ≤ 200 行 × 200 列    │                   ?? '>_ Qwen Code'
+   │    ≤ 200 行 × 200 列    │                   ?? '>_ MariaDB Shell Agent'
    │ 4. 清洗 title +          │           Subtitle = customBannerSubtitle
    │    subtitle（单行，      │                   ?? 空白 spacer 行
    │    ≤ 80 / 160 字符）     │           Status   = 锁定
@@ -377,7 +377,7 @@ JSON 字符串中用 `\n` 表示换行。该 ASCII art 会与默认 Logo 一样�
    - `{ path }`：同步读取，使用 `O_NOFOLLOW` 防御软链劫持
      （Windows 退化为普通只读读取 —— 该常量不暴露），
      上限 64 KB。相对路径相对于*所属设置文件的目录*：workspace
-     设置相对 workspace `.qwen/`，user 设置相对 `~/.qwen/`。
+     设置相对 workspace `.mariadb-shell-agent/`，user 设置相对 `~/.mariadb-shell-agent/`。
      读取失败 → `[BANNER]` warn，该档回退默认。
 3. **清洗**。Banner 专用 stripper：去掉 OSC / CSI / SS2 / SS3 引导
    字符，把其余 C0 / C1 控制字节（含 DEL）替换为空格，同时保留
@@ -440,7 +440,7 @@ customBannerTitle: {
   requiresRestart: false,
   default: '' as string,
   description:
-    'Replace the default ">_ Qwen Code" title shown in the banner info panel. The version suffix is always appended.',
+    'Replace the default ">_ MariaDB Shell Agent" title shown in the banner info panel. The version suffix is always appended.',
   showInDialog: false,
 },
 customBannerSubtitle: {
@@ -534,7 +534,7 @@ const displayLogo = tier ?? shortAsciiLogo;
 
 ```tsx
 <Text bold color={theme.text.accent}>
-  {customBannerTitle ? customBannerTitle : '>_ Qwen Code'}
+  {customBannerTitle ? customBannerTitle : '>_ MariaDB Shell Agent'}
 </Text>
 …
 {customBannerSubtitle ? (
@@ -680,32 +680,32 @@ export function resolveCustomBanner(settings: LoadedSettings): ResolvedBanner;
 
 下列项被有意排除。每一项都可以视用户反馈做后续单独提案。
 
-| 项目                                              | 不做的理由                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 文案转 ASCII art（`{ text: "xxxCode" }` 形态）    | v1 评估后**拒绝**。要么引入 `figlet` 运行时依赖（含一套可用字体后约 2–3 MB unpacked），要么自己 vendor 一份单字体渲染器（~200 行代码 + 一份 `.flf` 字体我们自己维护）。两条路都带来长期的维护面：字体选型、字体 license 审计、「我的字体在 X 终端渲染不对」类 issue、CJK / 全角字符处理。本特性的驱动用例（白标 / 多租户）几乎一定有设计师交付成品 ASCII art，不会依赖 figlet 默认字体。希望一行命令生成的用户今天就能 `npx figlet "xxxCode" > brand.txt` + `customAsciiArt: { "path": "./brand.txt" }` —— 等价效果、零新增依赖、零 Qwen Code 内部支持负担。如果未来诉求增多，这一形态是纯叠加：把 `AsciiArtSource` 扩展为 `string \| {path} \| {text, font?}`，不会破坏任何已有配置。 |
-| `/banner` slash 命令在线编辑                      | 设置 UI 是规范化的编辑入口；多行 ASCII 在线编辑器是另一个项目。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| 自定义渐变色 / 单行颜色                           | 颜色由 theme 拥有。如需扩展应另立提案，Banner 自定义不重复造该面。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| URL 加载 ASCII art                                | 启动期网络请求自带一堆问题：失败模式、缓存、安全评审。`{path}` 文件加载是低风险等价物。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| 动画（旋转 Logo、跑马灯标题）                     | 增加渲染负担与无障碍问题；本特性的用例不需要。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| VSCode / Web UI banner 对齐                       | 这两个端目前不渲染 Ink Banner。若未来引入，本设计为参考。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| 文件变更的动态 reload                             | 解析器仅在启动与设置 reload 时运行。会话中途换 art 的需求很少，「重启生效」是可以接受的折中。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| 单独隐藏锁定区域（version / auth / model / path） | 这些是运行时信号；屏蔽它们对支持与安全姿态的损害，远大于白标场景的收益。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 项目                                              | 不做的理由                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 文案转 ASCII art（`{ text: "xxxCode" }` 形态）    | v1 评估后**拒绝**。要么引入 `figlet` 运行时依赖（含一套可用字体后约 2–3 MB unpacked），要么自己 vendor 一份单字体渲染器（~200 行代码 + 一份 `.flf` 字体我们自己维护）。两条路都带来长期的维护面：字体选型、字体 license 审计、「我的字体在 X 终端渲染不对」类 issue、CJK / 全角字符处理。本特性的驱动用例（白标 / 多租户）几乎一定有设计师交付成品 ASCII art，不会依赖 figlet 默认字体。希望一行命令生成的用户今天就能 `npx figlet "xxxCode" > brand.txt` + `customAsciiArt: { "path": "./brand.txt" }` —— 等价效果、零新增依赖、零 MariaDB Shell Agent 内部支持负担。如果未来诉求增多，这一形态是纯叠加：把 `AsciiArtSource` 扩展为 `string \| {path} \| {text, font?}`，不会破坏任何已有配置。 |
+| `/banner` slash 命令在线编辑                      | 设置 UI 是规范化的编辑入口；多行 ASCII 在线编辑器是另一个项目。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 自定义渐变色 / 单行颜色                           | 颜色由 theme 拥有。如需扩展应另立提案，Banner 自定义不重复造该面。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| URL 加载 ASCII art                                | 启动期网络请求自带一堆问题：失败模式、缓存、安全评审。`{path}` 文件加载是低风险等价物。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| 动画（旋转 Logo、跑马灯标题）                     | 增加渲染负担与无障碍问题；本特性的用例不需要。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| VSCode / Web UI banner 对齐                       | 这两个端目前不渲染 Ink Banner。若未来引入，本设计为参考。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| 文件变更的动态 reload                             | 解析器仅在启动与设置 reload 时运行。会话中途换 art 的需求很少，「重启生效」是可以接受的折中。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 单独隐藏锁定区域（version / auth / model / path） | 这些是运行时信号；屏蔽它们对支持与安全姿态的损害，远大于白标场景的收益。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 ## 验证计划
 
 后续实施 PR 应通过以下端到端检查：
 
-1. `~/.qwen/settings.json` 设置 `customBannerTitle: "Acme CLI"`
-   与一段内联 `customAsciiArt` → `qwen` 启动后展示新标题与新
+1. `~/.mariadb-shell-agent/settings.json` 设置 `customBannerTitle: "Acme CLI"`
+   与一段内联 `customAsciiArt` → `mariadb-shell-agent` 启动后展示新标题与新
    ASCII art；版本号后缀仍在。
 2. 设置 `customBannerSubtitle: "Built-in Acme Skills"` → 副标题
    行以次要文字色出现在标题与鉴权 / 模型行之间；鉴权、模型、
    路径仍可见。取消设置后回到空白 spacer 行（向后兼容）。
-3. 设置 `hideBanner: true` → `qwen` 启动无 Banner；Tips 与正文
+3. 设置 `hideBanner: true` → `mariadb-shell-agent` 启动无 Banner；Tips 与正文
    照常渲染。
 4. workspace `settings.json` 设置
    `customAsciiArt: { "path": "./brand.txt" }`，`brand.txt` 与
-   之同处 `.qwen/` 目录 → 打开工作区时从磁盘加载。
+   之同处 `.mariadb-shell-agent/` 目录 → 打开工作区时从磁盘加载。
 5. `customAsciiArt: { "small": "...", "large": "..." }` →
    在宽 / 中 / 窄三档下调整终端尺寸；宽时取 large、中时取
    small、窄时隐藏 Logo 列；信息面板始终可见。
@@ -713,7 +713,7 @@ export function resolveCustomBanner(settings: LoadedSettings): ResolvedBanner;
    注入 `\x1b[31mhostile` → 两处都渲染为字面文本，不会被
    解释为红色。
 7. `path` 指向不存在的文件 → CLI 正常启动；
-   `~/.qwen/debug/<sessionId>.txt` 出现 `[BANNER]` warn；
+   `~/.mariadb-shell-agent/debug/<sessionId>.txt` 出现 `[BANNER]` warn；
    渲染默认 art。
 8. 在工作区信任关闭的状态下打开 worktree → workspace 提供的
    `customAsciiArt`（含 `{ path }` 项）被静默忽略；user scope

@@ -4,7 +4,7 @@
 
 ## Problem
 
-`qwen serve --max-sessions` is only reachable from the command line. A daemon
+`mariadb-shell-agent serve --max-sessions` is only reachable from the command line. A daemon
 restart therefore has to repeat the flag, and a deployment that does not keep a
 launch script (a one-off `nohup` line, a container entrypoint assembled by
 hand) silently returns to the built-in cap of 32. The `serve` settings section
@@ -100,10 +100,10 @@ src/config/settingsSchema.test.ts`
 
 ## Acceptance criteria
 
-- With `serve.maxSessions: 64` in user settings and no flag, `qwen serve`
+- With `serve.maxSessions: 64` in user settings and no flag, `mariadb-shell-agent serve`
   advertises and enforces 64.
 - With both the flag and the setting, the flag wins.
-- With the setting only in a workspace `.qwen/settings.json`, the daemon uses
+- With the setting only in a workspace `.mariadb-shell-agent/settings.json`, the daemon uses
   the default 32 and logs the ignored key.
 - With `serve.maxSessions: -1`, the daemon starts on the default and warns.
 - The Web Shell settings panel lists the row under Advanced, shows the restart

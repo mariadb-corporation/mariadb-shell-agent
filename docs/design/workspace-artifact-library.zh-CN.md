@@ -127,11 +127,11 @@ HTTP 错误；发送后用终止 `error` 报告失败，不追加 JSON 错误响
 外部替换与 runtime 元数据失效、空缓存命中、归档及加载/卸载切换、分组删除
 持久性/幂等性/警告和工作区文件不变。执行 build、typecheck、bundle 和针对性
 测试，在隔离临时 runtime 中验证全局 CLI 基线与本地 bundle。
-E2E 计划位于 `.qwen/e2e-tests/workspace-artifact-library.md`。
+E2E 计划位于 `.mariadb-shell-agent/e2e-tests/workspace-artifact-library.md`。
 
 验收还包括：恢复会话的原始创建时间、live/cold 改名即时可见、归档移动、来源保留和
 过滤、跨接口元数据缓存复用、首个会话阻塞时后续快会话先返回、断连清理、背压、
-部分失败与唯一完成事件。补充 E2E 计划见 `.qwen/e2e-tests/artifact-library-dac.md`。
+部分失败与唯一完成事件。补充 E2E 计划见 `.mariadb-shell-agent/e2e-tests/artifact-library-dac.md`。
 
 ## 决策与限制
 

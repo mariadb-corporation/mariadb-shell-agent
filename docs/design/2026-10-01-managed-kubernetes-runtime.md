@@ -207,7 +207,7 @@ it does not open those tools through public Hosted admission.
 
 ## Validation and acceptance
 
-The baseline dry-run uses the global `qwen` worker command. Its rejection of the
+The baseline dry-run uses the global `mariadb-shell-agent` worker command. Its rejection of the
 container argument is the expected gap. Local verification uses the built bundle
 and Maven tests. The fake Kubernetes client launches the real worker for a private
 read/write/edit, duplicate-call and original-status round trip; this is protocol
@@ -271,7 +271,7 @@ are pending. Real-cluster access is through authenticated Workbench; local
 Docker, kubectl and kind remain absent. Test results and unexecuted gates must
 be recorded separately.
 
-Sources: [proposal #12380](https://github.com/QwenLM/qwen-code/issues/12380),
+Sources: [proposal #12380](https://github.invalid/QwenLM/qwen-code/issues/12380),
 [reference Hosted physical-volume design](https://github.com/doudouOUC/qwen-code/blob/c7abb13f79f35b7bd2dfbca277624cbf36054616/docs/design/2026-09-21-managed-runtime-endpoint-recovery.md#hosted-runtime-profile),
 [Kubernetes Pod lifecycle](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/),
 [volume access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes).

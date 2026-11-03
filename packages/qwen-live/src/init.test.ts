@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,7 +31,7 @@ vi.mock('node:fs', async () => {
 vi.mock('./agent-detector.js', () => ({
   detectAgents: () => [
     {
-      label: 'Qwen Code',
+      label: 'MariaDB Shell Agent',
       name: 'qwen',
       command: '/usr/local/bin/qwen',
       args: ['--acp'],

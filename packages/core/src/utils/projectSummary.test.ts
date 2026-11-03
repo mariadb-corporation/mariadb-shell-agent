@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -37,9 +38,11 @@ describe('projectSummary', () => {
   });
 
   it('includes a summary fingerprint when a project summary exists', async () => {
-    await fs.mkdir(path.join(testDir, '.qwen'), { recursive: true });
+    await fs.mkdir(path.join(testDir, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fs.writeFile(
-      path.join(testDir, '.qwen', 'PROJECT_SUMMARY.md'),
+      path.join(testDir, '.mariadb-shell-agent', 'PROJECT_SUMMARY.md'),
       [
         '## Overall Goal',
         'Ship the fix.',

@@ -295,9 +295,9 @@ export class TelegramChannel extends ChannelBase {
 
   private startMessage(): string {
     return [
-      'Qwen Code Telegram bot',
+      'MariaDB Shell Agent Telegram bot',
       '',
-      'Send any message to chat with Qwen Code.',
+      'Send any message to chat with MariaDB Shell Agent.',
       'Use /new to start a fresh conversation.',
       'Use /cancel to stop a running request.',
       'Use /help to see available commands.',

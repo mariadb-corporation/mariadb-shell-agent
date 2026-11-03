@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -56,7 +57,7 @@ export async function askConsent(
       [
         'on run argv',
         'activate',
-        `display dialog (item 1 of argv) with title "Qwen Code" buttons {"Deny", "Allow"} default button "Deny" cancel button "Deny" with icon caution giving up after ${DIALOG_SECONDS}`,
+        `display dialog (item 1 of argv) with title "MariaDB Shell Agent" buttons {"Deny", "Allow"} default button "Deny" cancel button "Deny" with icon caution giving up after ${DIALOG_SECONDS}`,
         'return (button returned of result) & "|" & (gave up of result)',
         'end run',
       ],
@@ -87,7 +88,7 @@ export async function notify(
     script(
       [
         'on run argv',
-        'display notification (item 1 of argv) with title "Qwen Code"',
+        'display notification (item 1 of argv) with title "MariaDB Shell Agent"',
         'end run',
       ],
       message,

@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -571,11 +572,15 @@ describe('OpenTuiMcpDialog list windows', () => {
       />,
     );
 
-    expect(screen.getByText(/Run qwen --debug to see error logs/)).toBeTruthy();
+    expect(
+      screen.getByText(/Run mariadb-shell-agent --debug to see error logs/),
+    ).toBeTruthy();
     for (let i = 0; i < 11; i++) await press('down');
     // The window followed the cursor to the last server; the hint stayed.
     expect(screen.getByText('srv_11')).toBeTruthy();
-    expect(screen.getByText(/Run qwen --debug to see error logs/)).toBeTruthy();
+    expect(
+      screen.getByText(/Run mariadb-shell-agent --debug to see error logs/),
+    ).toBeTruthy();
   });
 
   it('charges the step footer the rows it wraps into at a narrow width', () => {
@@ -603,7 +608,7 @@ describe('OpenTuiMcpDialog list windows', () => {
 
     expect(screen.getByText(/User MCPs/)).toBeTruthy();
     expect(screen.getByText('srv_0')).toBeTruthy();
-    expect(screen.queryByText(/Run qwen --debug/)).toBeNull();
+    expect(screen.queryByText(/Run mariadb-shell-agent --debug/)).toBeNull();
   });
 
   it('lets the --debug hint yield when the region leaves the list two rows', async () => {
@@ -628,7 +633,9 @@ describe('OpenTuiMcpDialog list windows', () => {
     );
 
     expect(screen.getByText('srv_0')).toBeTruthy();
-    expect(screen.queryByText(/Run qwen --debug to see error logs/)).toBeNull();
+    expect(
+      screen.queryByText(/Run mariadb-shell-agent --debug to see error logs/),
+    ).toBeNull();
 
     await press('return');
     expect(screen.getByText(/Esc to back/)).toBeTruthy();

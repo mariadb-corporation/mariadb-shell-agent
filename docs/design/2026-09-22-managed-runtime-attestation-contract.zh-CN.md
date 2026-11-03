@@ -24,7 +24,7 @@ TypeScript worker 和未来 Java transport 还需要一份可共同评审的线�
 - 保存语言无关的闭合 schema 和正反 fixtures。
 - 通过真实 raw Node HTTP server 执行这些 fixtures，并让 Java Runtime Broker 构建读取同一批文件。
 - 通过标准输入中的一份有界 boot 文档启动最小独立进程，只绑定 loopback，并通过标准输出发布不含 token 的 ready record。
-- 在引入 Hosted profile 之前，不改变普通 `qwen serve`、公共 API 和现有 daemon 路由。
+- 在引入 Hosted profile 之前，不改变普通 `mariadb-shell-agent serve`、公共 API 和现有 daemon 路由。
 
 ## 非目标
 

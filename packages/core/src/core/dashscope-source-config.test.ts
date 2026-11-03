@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -49,16 +50,16 @@ describe('buildDashScopeSourceConfig', () => {
 
   it.each([
     ['https://maas.qianwenaiapi.com/compatible-mode/v1', CN_PAYG],
-    ['https://maas.qwencloudapi.com/compatible-mode/v1', INTL_PAYG],
+    ['https://maas.qwencloudapi.invalid/compatible-mode/v1', INTL_PAYG],
     [
       'https://token-plan.maas.qianwenaiapi.com/compatible-mode/v1',
       CN_TOKEN_PLAN,
     ],
     [
-      'https://token-plan.maas.qwencloudapi.com/compatible-mode/v1',
+      'https://token-plan.maas.qwencloudapi.invalid/compatible-mode/v1',
       INTL_TOKEN_PLAN,
     ],
-    ['https://MAAS.QwenCloudAPI.com:443/compatible-mode/v1/', INTL_PAYG],
+    ['https://MAAS.QwenCloudAPI.invalid:443/compatible-mode/v1/', INTL_PAYG],
   ])('attributes %s', (baseUrl, expected) => {
     expect(buildDashScopeSourceConfig(baseUrl)).toBe(expected);
   });
@@ -76,14 +77,14 @@ describe('buildDashScopeSourceConfig', () => {
     undefined,
     '',
     'not a url',
-    'https://dashscope.aliyuncs.com/compatible-mode/v1',
-    'https://coding.dashscope.aliyuncs.com/v1',
-    'https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+    'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
+    'https://coding.dashscope.aliyuncs.invalid/v1',
+    'https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
     'https://api.openai.com/v1',
-    'https://maas.qwencloudapi.com.evil.example/v1',
-    'https://evil-maas.qwencloudapi.com/v1',
-    'https://other.maas.qwencloudapi.com/v1',
-    'https://proxy.example/maas.qwencloudapi.com/v1',
+    'https://maas.qwencloudapi.invalid.evil.example/v1',
+    'https://evil-maas.qwencloudapi.invalid/v1',
+    'https://other.maas.qwencloudapi.invalid/v1',
+    'https://proxy.example/maas.qwencloudapi.invalid/v1',
   ])('leaves %s unattributed', (baseUrl) => {
     expect(buildDashScopeSourceConfig(baseUrl)).toBeUndefined();
   });

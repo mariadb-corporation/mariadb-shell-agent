@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -37,14 +38,14 @@ describe('<Header />', () => {
 
   it('renders the ASCII logo on wide terminal', () => {
     const { lastFrame } = render(<Header {...defaultProps} />);
-    expect(lastFrame()).toContain('██╔═══██╗');
+    expect(lastFrame()).toContain('██╔████╔██║');
   });
 
   it('hides the ASCII logo on narrow terminal', () => {
     useTerminalSizeMock.mockReturnValue({ columns: 60, rows: 24 });
     const { lastFrame } = render(<Header {...defaultProps} />);
-    expect(lastFrame()).not.toContain('██╔═══██╗');
-    expect(lastFrame()).toContain('>_ Qwen Code');
+    expect(lastFrame()).not.toContain('██╔████╔██║');
+    expect(lastFrame()).toContain('>_ MariaDB Shell Agent');
   });
 
   it('displays the version number', () => {
@@ -115,7 +116,7 @@ describe('<Header />', () => {
 
     const { lastFrame } = render(<Header {...defaultProps} />);
 
-    expect(lastFrame()).toContain('██╔═══██╗');
+    expect(lastFrame()).toContain('██╔████╔██║');
   });
 
   it('renders the custom subtitle in place of the blank spacer row', () => {
@@ -128,7 +129,7 @@ describe('<Header />', () => {
     const frame = lastFrame() ?? '';
     expect(frame).toContain('Built-in DataWorks Official Skills');
     // Subtitle sits between the title and the auth line.
-    const titleIdx = frame.indexOf('>_ Qwen Code');
+    const titleIdx = frame.indexOf('>_ MariaDB Shell Agent');
     const subtitleIdx = frame.indexOf('Built-in DataWorks Official Skills');
     const authIdx = frame.indexOf('Qwen OAuth');
     expect(titleIdx).toBeLessThan(subtitleIdx);
@@ -141,7 +142,7 @@ describe('<Header />', () => {
     // Title and auth still both render at their usual positions; the
     // spacer between them is just whitespace-padding, so we assert the
     // visible chrome the user sees.
-    expect(frame).toContain('>_ Qwen Code');
+    expect(frame).toContain('>_ MariaDB Shell Agent');
     expect(frame).toContain('Qwen OAuth');
   });
 
@@ -150,7 +151,7 @@ describe('<Header />', () => {
       <Header {...defaultProps} customBannerTitle="Acme CLI" />,
     );
     expect(lastFrame()).toContain('Acme CLI');
-    expect(lastFrame()).not.toContain('>_ Qwen Code');
+    expect(lastFrame()).not.toContain('>_ MariaDB Shell Agent');
     // version suffix is still appended
     expect(lastFrame()).toContain('v1.0.0');
   });
@@ -163,7 +164,7 @@ describe('<Header />', () => {
       />,
     );
     expect(lastFrame()).toContain('LARGE_LOGO');
-    expect(lastFrame()).not.toContain('██╔═══██╗');
+    expect(lastFrame()).not.toContain('██╔████╔██║');
   });
 
   it('falls back to the small tier when the large one does not fit', () => {
@@ -188,7 +189,7 @@ describe('<Header />', () => {
         customAsciiArt={{ small: 'X'.repeat(150), large: 'Y'.repeat(150) }}
       />,
     );
-    expect(lastFrame()).not.toContain('██╔═══██╗');
+    expect(lastFrame()).not.toContain('██╔████╔██║');
     expect(lastFrame()).not.toContain('X'.repeat(150));
     expect(lastFrame()).not.toContain('Y'.repeat(150));
     // Info panel still renders.
@@ -202,6 +203,6 @@ describe('<Header />', () => {
     // wide enough terminal would show it — the previous test already covers
     // the wide case. This one just confirms the no-custom-art path doesn't
     // incidentally hide the logo.
-    expect(lastFrame()).toContain('>_ Qwen Code');
+    expect(lastFrame()).toContain('>_ MariaDB Shell Agent');
   });
 });

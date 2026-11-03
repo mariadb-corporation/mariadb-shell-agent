@@ -173,7 +173,7 @@ PR #123 — 自上一轮以来 2 个失败检查、1 条可信评审线程。
 
 - `schedule` 对 in-place watch 放行（目前拒绝）；`unattended` 保持拒绝
   in-place。confirmed-watch 记录与 reply plan 位置保持 v1（plan 在
-  `<检出>/.qwen/tmp`）。
+  `<检出>/.mariadb-shell-agent/tmp`）。
 
 ### 6.5 `status`、`stop`、`resume`
 
@@ -206,7 +206,7 @@ fast-forward、默认分支拒绝、push 预算——从 v1 与命令设计原�
   scheduled-in-place 轮次、status/stop/resume。
 - `packages/core/src/tools/autofix-pr.ts` —— `schedule` 对 in-place 放行；
   `unattended` 仍拒绝。
-- 以上各文件的同置测试；本设计双版；`.qwen/e2e-tests/` 下的 E2E 测试计划。
+- 以上各文件的同置测试；本设计双版；`.mariadb-shell-agent/e2e-tests/` 下的 E2E 测试计划。
 
 ## 9. 约束与风险
 
@@ -235,7 +235,7 @@ fast-forward、默认分支拒绝、push 预算——从 v1 与命令设计原�
 - 工具：`schedule` 对 in-place 放行；`unattended` 仍拒绝。
 - 回归：worktree 模式的全部测试原样通过。
 
-E2E（计划在 `.qwen/e2e-tests/` 下）：scratch PR 上的定时 in-place watch；
+E2E（计划在 `.mariadb-shell-agent/e2e-tests/` 下）：scratch PR 上的定时 in-place watch；
 带失败检查的触发提案并等待；"Not now"什么都不编辑、下次触发再提案；"Fix
 it"跑前台轮次、push、reply、推进 cursor；触发时脏检出拒绝并询问；"Stop
 watching"保留检出与分支并删除任务；随后对同一 PR 跑 worktree 模式行为与从前

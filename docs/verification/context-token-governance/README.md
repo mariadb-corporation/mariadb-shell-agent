@@ -1,13 +1,13 @@
 # 交接：非对话上下文 Token 治理的验证与落地
 
 配套方案：[`docs/plans/2026-09-16-non-conversation-context-token-governance.md`](../../plans/2026-09-16-non-conversation-context-token-governance.md)
-上游跟进：[#12028](https://github.com/QwenLM/qwen-code/issues/12028)（伞）· [#12029](https://github.com/QwenLM/qwen-code/issues/12029) · [#12030](https://github.com/QwenLM/qwen-code/issues/12030) · [#12032](https://github.com/QwenLM/qwen-code/issues/12032) · [#12033](https://github.com/QwenLM/qwen-code/issues/12033) · [#12037](https://github.com/QwenLM/qwen-code/issues/12037)
+上游跟进：[#12028](https://github.invalid/QwenLM/qwen-code/issues/12028)（伞）· [#12029](https://github.invalid/QwenLM/qwen-code/issues/12029) · [#12030](https://github.invalid/QwenLM/qwen-code/issues/12030) · [#12032](https://github.invalid/QwenLM/qwen-code/issues/12032) · [#12033](https://github.invalid/QwenLM/qwen-code/issues/12033) · [#12037](https://github.invalid/QwenLM/qwen-code/issues/12037)
 
 > **这份文档里的所有代码位置都是读 `origin/main`（2026-09-16，`c46933ce56`）得出的，没有跑过任何构建或测试。**
 > **所有运行时数字来自一个真实部署的 `/context detail` 与会话记录，不是基准测试。**
 > 每一节都标注了「已核实 / 待验证 / 待决策」。
 >
-> **⚠️ 2026-09-20 起点已变，先读 §0.1 再读别的。** `v0.24.2` 含 [#10410](https://github.com/QwenLM/qwen-code/pull/10410)，它改了默认行为，使 §1 的基线与 §2.6 的成本模型**双双作废**。**任何验证都必须先在 ≥ 0.24.2 上重新取基线**，否则会把 #10410 免费带来的收益记到白名单头上。
+> **⚠️ 2026-09-20 起点已变，先读 §0.1 再读别的。** `v0.24.2` 含 [#10410](https://github.invalid/QwenLM/qwen-code/pull/10410)，它改了默认行为，使 §1 的基线与 §2.6 的成本模型**双双作废**。**任何验证都必须先在 ≥ 0.24.2 上重新取基线**，否则会把 #10410 免费带来的收益记到白名单头上。
 
 ---
 
@@ -21,7 +21,7 @@
 
 ### 变了什么
 
-`v0.24.2`（2026-09-20 14:12 发布，含 [#10410](https://github.com/QwenLM/qwen-code/pull/10410)，squash 提交 `70edbf47`）把"揭示一个延迟工具"从**改写声明列表**换成了 `tool_search` → `tool_call` **桥接**：声明列表保持字节稳定，因此**会话中途取用一个延迟工具不再作废 prompt 前缀缓存**。基于这一点，`tools.toolSearch.threshold` 的**默认值从 `10` 改为 `0`**。
+`v0.24.2`（2026-09-20 14:12 发布，含 [#10410](https://github.invalid/QwenLM/qwen-code/pull/10410)，squash 提交 `70edbf47`）把"揭示一个延迟工具"从**改写声明列表**换成了 `tool_search` → `tool_call` **桥接**：声明列表保持字节稳定，因此**会话中途取用一个延迟工具不再作废 prompt 前缀缓存**。基于这一点，`tools.toolSearch.threshold` 的**默认值从 `10` 改为 `0`**。
 
 两个直接后果：
 
@@ -45,7 +45,7 @@
 ### 重新取基线：第 0–1 步
 
 ```bash
-qwen --version        # 必须 ≥ 0.24.2；0.24.1 及之前不含 #10410，会量到旧行为
+mariadb-shell-agent --version        # 必须 ≥ 0.24.2；0.24.1 及之前不含 #10410，会量到旧行为
 ```
 
 新会话**第一轮**（对话为空时，看到的全部是前缀）执行：
@@ -101,16 +101,16 @@ qwen --version        # 必须 ≥ 0.24.2；0.24.1 及之前不含 #10410，会�
 
 ### 实测基线（改动前）
 
-| 类别                             |              token |                                                      占非对话 |
-| -------------------------------- | -----------------: | ------------------------------------------------------------: |
-| 内置工具                         |             21,461 |                                                         45.9% |
-| 上下文（`QWEN.md`）文件          |             15,400 |                                                         33.0% |
-| 系统提示词                       |              5,253 |                                                         11.2% |
-| skills                           |                472 |                                                          1.0% |
-| MCP                              |                  0 |                                                             — |
-| 分类合计                         |             42,586 |                                                               |
-| **真实首轮 `input_token_count`** |         **47,931** |                                                               |
-| **未被任何分类计入**             | **5,345（11.2%）** | 见 [#12033](https://github.com/QwenLM/qwen-code/issues/12033) |
+| 类别                                   |              token |                                                          占非对话 |
+| -------------------------------------- | -----------------: | ----------------------------------------------------------------: |
+| 内置工具                               |             21,461 |                                                             45.9% |
+| 上下文（`MARIADB-SHELL-AGENT.md`）文件 |             15,400 |                                                             33.0% |
+| 系统提示词                             |              5,253 |                                                             11.2% |
+| skills                                 |                472 |                                                              1.0% |
+| MCP                                    |                  0 |                                                                 — |
+| 分类合计                               |             42,586 |                                                                   |
+| **真实首轮 `input_token_count`**       |         **47,931** |                                                                   |
+| **未被任何分类计入**                   | **5,345（11.2%）** | 见 [#12033](https://github.invalid/QwenLM/qwen-code/issues/12033) |
 
 另一会话独立验证：总数 48,375 − 分类和 42,835 = 5,540。两次都落在 5.3–5.5k，稳定。这部分是 skill 清单（裁剪后）+ 延迟工具提醒 + 启动环境上下文 + 估算误差。
 
@@ -157,7 +157,7 @@ qwen --version        # 必须 ≥ 0.24.2；0.24.1 及之前不含 #10410，会�
 
 ### 2.2 要写的配置
 
-写在 `<projectRoot>/.qwen/settings.json` 的 `tools` 对象里（与既有的 `approvalMode` / `disabled` 并列）：
+写在 `<projectRoot>/.mariadb-shell-agent/settings.json` 的 `tools` 对象里（与既有的 `approvalMode` / `disabled` 并列）：
 
 ```jsonc
 "eager": [
@@ -188,7 +188,7 @@ qwen --version        # 必须 ≥ 0.24.2；0.24.1 及之前不含 #10410，会�
 **待执行**：
 
 ```bash
-ls ~/.qwen/agents/ ~/.qwen/extensions/*/agents/ 2>/dev/null
+ls ~/.mariadb-shell-agent/agents/ ~/.mariadb-shell-agent/extensions/*/agents/ 2>/dev/null
 # 逐个看 agent 定义里的 tools 字段，凡是出现在白名单之外的工具名都要补进白名单
 ```
 
@@ -196,7 +196,7 @@ ls ~/.qwen/agents/ ~/.qwen/extensions/*/agents/ 2>/dev/null
 
 ```bash
 # 1. 确认 JSON 合法
-python3 -m json.tool <projectRoot>/.qwen/settings.json
+python3 -m json.tool <projectRoot>/.mariadb-shell-agent/settings.json
 
 # 2. 开一个新会话，不发消息，直接 /context detail
 #    读 isEstimated 快照的 "Built-in tools" 总数
@@ -214,7 +214,7 @@ python3 -m json.tool <projectRoot>/.qwen/settings.json
 
 ### 2.6 降级的代价与运营指标（**`v0.24.1` 口径，整节作废**）
 
-> **⚠️ 本节整节作废，不要引用其中任何数字或结论。** [#10410](https://github.com/QwenLM/qwen-code/pull/10410) 已于 2026-09-20 合入（`70edbf47`）并随 `v0.24.2` 发布：`tool_search` → `tool_call` 桥接取代了"揭示即改写声明列表"，声明列表保持字节稳定，**中途取用延迟工具不再作废前缀缓存**。所以下面这三样**都不再成立**——① 这张 ¥ 表（降级省 ¥0.625 / 一次重建 ¥0.282 / 0-3 次的净收益），② 那条"每会话 `tool_search` ≤ 2 次、超过 3 次就是净亏"的运营指标，③ 后面"单独降级小工具不划算"的推论与那一串盈亏平衡使用率。桥接之后中途取用的代价是**首次使用前多一次往返**，不是一次前缀重算，所以"≤2 次"这条线要按往返延迟重新定，不能沿用。本节保留只为记录 `v0.24.1` 上的推理过程。详见 §0.1。
+> **⚠️ 本节整节作废，不要引用其中任何数字或结论。** [#10410](https://github.invalid/QwenLM/qwen-code/pull/10410) 已于 2026-09-20 合入（`70edbf47`）并随 `v0.24.2` 发布：`tool_search` → `tool_call` 桥接取代了"揭示即改写声明列表"，声明列表保持字节稳定，**中途取用延迟工具不再作废前缀缓存**。所以下面这三样**都不再成立**——① 这张 ¥ 表（降级省 ¥0.625 / 一次重建 ¥0.282 / 0-3 次的净收益），② 那条"每会话 `tool_search` ≤ 2 次、超过 3 次就是净亏"的运营指标，③ 后面"单独降级小工具不划算"的推论与那一串盈亏平衡使用率。桥接之后中途取用的代价是**首次使用前多一次往返**，不是一次前缀重算，所以"≤2 次"这条线要按往返延迟重新定，不能沿用。本节保留只为记录 `v0.24.1` 上的推理过程。详见 §0.1。
 
 `docs/design/toolsearch-preload-threshold.md` 说明了权衡：**一次会话中途的 `tool_search` 揭示会重写函数声明列表，而它在前缀最前面，整段 prompt KV 缓存作废。**
 
@@ -232,7 +232,7 @@ python3 -m json.tool <projectRoot>/.qwen/settings.json
 
 推论：**单独降级小工具不划算**，因为重建成本是固定的。各工具单独降级的盈亏平衡使用率：`workflow` <49% · `agent` <46% · `cron_create` <14% · `report_findings` <13% · `record_artifact` <11% · `update_goal` <10% · `notebook_edit` <4%。所以降级要**批量做**，小工具搭便车。
 
-**相关上游 PR：[#10410](https://github.com/QwenLM/qwen-code/pull/10410) `preserve prompt cache for deferred tools`** —— ~~（open）它一旦合入，上述重建成本大幅下降，这条 ≤2 的规则可以放宽。值得把本节的实测数据贴到该 PR 下推动它。~~ **已收口**：#10410 已于 2026-09-20 合入（`70edbf47`）并随 `v0.24.2` 发布，所以本节的重建成本与 ≤2 规则**已经**作废（不是"可以放宽"，是前提没了），也不需要再去该 PR 下推动——与 §7 第 3 条一致。
+**相关上游 PR：[#10410](https://github.invalid/QwenLM/qwen-code/pull/10410) `preserve prompt cache for deferred tools`** —— ~~（open）它一旦合入，上述重建成本大幅下降，这条 ≤2 的规则可以放宽。值得把本节的实测数据贴到该 PR 下推动它。~~ **已收口**：#10410 已于 2026-09-20 合入（`70edbf47`）并随 `v0.24.2` 发布，所以本节的重建成本与 ≤2 规则**已经**作废（不是"可以放宽"，是前提没了），也不需要再去该 PR 下推动——与 §7 第 3 条一致。
 
 ---
 
@@ -244,29 +244,29 @@ python3 -m json.tool <projectRoot>/.qwen/settings.json
 
 `packages/core/src/extension/extensionManager.ts:1710-1714` → `packages/core/src/config/config.ts:8958-8966`（唯一过滤条件是"extension 处于启用状态"）→ `packages/core/src/memory/memoryDiscovery.ts:201-204` → `:385-406`（原样拼接，**无大小上限、不截断、不按 extension 归因**）→ `packages/core/src/core/prompts.ts:698-706`。
 
-该部署 9 个 extension 合计 **9,989 token**（由大到小 2,164 / 1,602 / 1,548 / 1,487 / 1,124 / 1,078 / 650 / 172 / 164），另有父目录 `QWEN.md` 4,021、auto-memory 1,180、输出语言文件 210。**extension 占整个常驻上下文层的 65%。**
+该部署 9 个 extension 合计 **9,989 token**（由大到小 2,164 / 1,602 / 1,548 / 1,487 / 1,124 / 1,078 / 650 / 172 / 164），另有父目录 `MARIADB-SHELL-AGENT.md` 4,021、auto-memory 1,180、输出语言文件 210。**extension 占整个常驻上下文层的 65%。**
 
-唯一的告警是 `packages/core/src/config/config.ts:4702-4727`，阈值 `MEMORY_CONTEXT_WARNING_RATIO = 0.15`——**1M 窗口下要到 150,000 token 才触发**，所以 15,400 一声没响（同属 [#12029](https://github.com/QwenLM/qwen-code/issues/12029) 的参数化问题）。
+唯一的告警是 `packages/core/src/config/config.ts:4702-4727`，阈值 `MEMORY_CONTEXT_WARNING_RATIO = 0.15`——**1M 窗口下要到 150,000 token 才触发**，所以 15,400 一声没响（同属 [#12029](https://github.invalid/QwenLM/qwen-code/issues/12029) 的参数化问题）。
 
 ### 3.2 应该改成什么
 
 extension 的内容按性质分三层：
 
-| 内容性质                                       | 放哪                                                                            | 常驻成本                     |
-| ---------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------- |
-| 永远成立的少量事实（身份、术语、硬约束）       | `contextFileName`                                                               | 常驻，应当很小               |
-| 场景性指引（怎么写查询、怎么配调度、怎么排障） | **`paths:` 门控的 skill**                                                       | 清单 100–200 token，正文按需 |
-| 固定流程                                       | saved workflow（见 [#11631](https://github.com/QwenLM/qwen-code/issues/11631)） | 只写名字                     |
+| 内容性质                                       | 放哪                                                                                | 常驻成本                     |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------- | ---------------------------- |
+| 永远成立的少量事实（身份、术语、硬约束）       | `contextFileName`                                                                   | 常驻，应当很小               |
+| 场景性指引（怎么写查询、怎么配调度、怎么排障） | **`paths:` 门控的 skill**                                                           | 清单 100–200 token，正文按需 |
+| 固定流程                                       | saved workflow（见 [#11631](https://github.invalid/QwenLM/qwen-code/issues/11631)） | 只写名字                     |
 
-依据：extension **可以**携带 skill（`extensionManager.ts:1715-1717`），skill 支持 `paths:` 条件激活（`packages/core/src/skills/types.ts:155-157` + `packages/core/src/skills/skill-activation.ts:42-56`）；而 `.qwen/rules/` 的条件机制**不对 extension 开放**（`packages/core/src/config/rulesDiscovery.ts:305-324`）。更新的 `agent-plugins-v1` 格式已经完全跳过 `contextFileName`、只带 skill（`extensionManager.ts:1702-1705`）——方向上游已经选了。
+依据：extension **可以**携带 skill（`extensionManager.ts:1715-1717`），skill 支持 `paths:` 条件激活（`packages/core/src/skills/types.ts:155-157` + `packages/core/src/skills/skill-activation.ts:42-56`）；而 `.mariadb-shell-agent/rules/` 的条件机制**不对 extension 开放**（`packages/core/src/config/rulesDiscovery.ts:305-324`）。更新的 `agent-plugins-v1` 格式已经完全跳过 `contextFileName`、只带 skill（`extensionManager.ts:1702-1705`）——方向上游已经选了。
 
 参照：默认系统提示词里 `## New Applications` 整段只有 214 字符，内容是"去调 `skill="new-app"`"。把大段用法外置成 skill 是上游自己在用的写法。
 
 ### 3.3 待执行
 
 ```bash
-wc -c ~/.qwen/extensions/*/QWEN.md
-ls ~/.qwen/extensions/*/skills/
+wc -c ~/.mariadb-shell-agent/extensions/*/MARIADB-SHELL-AGENT.md
+ls ~/.mariadb-shell-agent/extensions/*/skills/
 ```
 
 然后**从最大的两个 extension 开始**（2,164 + 1,602 = 3,766，占 38%），逐段判断归属并迁移，验证效果后再铺开其余 7 个。
@@ -313,7 +313,7 @@ ls ~/.qwen/extensions/*/skills/
 | 5   | skill 的 `allowedTools`     | ✅ 只给自动放行，不声明也不加载工具（`packages/core/src/skills/types.ts:38-56`）。降级不影响，deny 会在运行时失败                                                                                                                                                                                                                                                                                                                                 |
 | 6   | 作用域外溢                  | ⚠️ `permissions.deny` 写在 settings 里会作用于所有读这份 settings 的客户端；配置应放工作区级                                                                                                                                                                                                                                                                                                                                                      |
 | 7   | DeepSeek 系模型             | ⚠️ 不适用于本部署。**2026-09-20 更正**：#10410 已删除按模型名自动退出 ToolSearch 的分支，`packages/cli/src/config/config.ts` 里已无任何 `deepseek` 引用；现在唯一的桥接开关是显式 `tools.toolSearch.enabled: false`（`packages/cli/src/config/config.ts` 里的 `shouldDisableToolSearch`，它会同时 deny `tool_search` 与 `tool_call`；引符号名而不引行号，行号会随文件漂移）。换用前缀缓存模型的部署若想要旧的「全部急揭示」行为，需手工设置该开关 |
-| 8   | `tools.disabled` 的已知缺口 | ⚠️ [#11814](https://github.com/QwenLM/qwen-code/issues/11814)：`zoom_image` 已移出 registry 但 schema 仍会发给模型。**以"被禁用工具不得出现在请求 schema 中"为验收项的部署需要关注**                                                                                                                                                                                                                                                              |
+| 8   | `tools.disabled` 的已知缺口 | ⚠️ [#11814](https://github.invalid/QwenLM/qwen-code/issues/11814)：`zoom_image` 已移出 registry 但 schema 仍会发给模型。**以"被禁用工具不得出现在请求 schema 中"为验收项的部署需要关注**                                                                                                                                                                                                                                                          |
 
 ---
 
@@ -321,7 +321,7 @@ ls ~/.qwen/extensions/*/skills/
 
 1. **`agent` 留常驻还是降级**（3,613 token）。盈亏平衡是「用到 subagent 的会话占比 < 46%」。先测：`grep -l '"name":"agent"' <chats目录>/*.jsonl | wc -l` 除以总会话数。
 2. **验收指标是否改写**。原指标「内置工具相比 20.6k 降低 50%」可以靠把 token 从工具挪进消息来假性达成；建议改成 **「空载成本 ≤ 15k」**，这个挪不动。
-3. ~~**是否推动上游 [#10410](https://github.com/QwenLM/qwen-code/pull/10410)**~~ **已收口**：#10410 已于 2026-09-20 合入（`70edbf47`）并随 `v0.24.2` 发布；§2.6 的成本模型随之作废，见 §0.1。
+3. ~~**是否推动上游 [#10410](https://github.invalid/QwenLM/qwen-code/pull/10410)**~~ **已收口**：#10410 已于 2026-09-20 合入（`70edbf47`）并随 `v0.24.2` 发布；§2.6 的成本模型随之作废，见 §0.1。
 4. **是否切显式缓存**。该部署实测缓存命中 92.8%，显式缓存按 10% 计价、隐式按 20%——若当前是隐式，切显式可将输入成本再砍一半，且不改变任何行为。这可能是整个清单里性价比最高的一项。
 
 ---
@@ -348,4 +348,4 @@ ls ~/.qwen/extensions/*/skills/
 4. 3–5 个"真干过活"的长会话记录（`<QWEN_HOME>/projects/*/chats/*.jsonl`），用于算 §4 的工具输出占比与上下文增长曲线。每条 `assistant` 记录里的 `usageMetadata.promptTokenCount` 就是完整的增长曲线。
 5. 改动后同一任务的每任务总 input token（§6 第 3 条）——防止 token 只是换了类别。
 6. **本文档中任何与实测不符的结论**。所有代码位置读自 `origin/main` 而非部署所用版本，运行时结论来自单一部署的少量样本。
-7. **升级到 `v0.24.2` 后是否出现路由未命中**：某个此前常用的工具调用频次归零、或同类任务成功率下降。这是默认延迟唯一的静默失败模式，目前**没有自动化闸门**（缺口见 [#12333](https://github.com/QwenLM/qwen-code/issues/12333)：本仓那半已由 #12346 合入，A/B 那半需要 benchmark 池给 `submit` 加 settings 覆盖能力）。所以这一条只能靠你这边的观察，**它比前面任何一个 token 数字都重要**。
+7. **升级到 `v0.24.2` 后是否出现路由未命中**：某个此前常用的工具调用频次归零、或同类任务成功率下降。这是默认延迟唯一的静默失败模式，目前**没有自动化闸门**（缺口见 [#12333](https://github.invalid/QwenLM/qwen-code/issues/12333)：本仓那半已由 #12346 合入，A/B 那半需要 benchmark 池给 `submit` 加 settings 覆盖能力）。所以这一条只能靠你这边的观察，**它比前面任何一个 token 数字都重要**。

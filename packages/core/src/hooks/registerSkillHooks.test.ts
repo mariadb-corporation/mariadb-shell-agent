@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -222,8 +223,8 @@ describe('registerSkillHooks — the trust gate travels with the entry', () => {
       name: 'repo-skill',
       description: 'repo',
       level: 'project',
-      filePath: '/repo/.qwen/skills/repo-skill/SKILL.md',
-      skillRoot: '/repo/.qwen/skills/repo-skill',
+      filePath: '/repo/.mariadb-shell-agent/skills/repo-skill/SKILL.md',
+      skillRoot: '/repo/.mariadb-shell-agent/skills/repo-skill',
       body: '',
       hooks,
     });
@@ -237,8 +238,8 @@ describe('registerSkillHooks — the trust gate travels with the entry', () => {
       name: 'home-skill',
       description: 'home',
       level: 'user',
-      filePath: '/home/u/.qwen/skills/home-skill/SKILL.md',
-      skillRoot: '/home/u/.qwen/skills/home-skill',
+      filePath: '/home/u/.mariadb-shell-agent/skills/home-skill/SKILL.md',
+      skillRoot: '/home/u/.mariadb-shell-agent/skills/home-skill',
       body: '',
       hooks,
     });

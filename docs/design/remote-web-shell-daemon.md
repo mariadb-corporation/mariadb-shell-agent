@@ -2,7 +2,7 @@
 
 [English](remote-web-shell-daemon.md) | [简体中文](remote-web-shell-daemon.zh-CN.md)
 
-Status: Web Shell milestone for [#11475](https://github.com/QwenLM/qwen-code/issues/11475). Revised 2026-10-09: simultaneous live fan-out of every saved host, in-app focused switching, and the `?fanout=` CSP contract land with [#13727](https://github.com/QwenLM/qwen-code/issues/13727); supersedes the "one live host, navigation on selection" wording kept until then. Revised 2026-10-08: restores the aggregated workspace sidebar and supersedes the 2026-09-12 narrowing (`e879557a`), which had removed the multi-host project catalog and declared aggregation a non-goal.
+Status: Web Shell milestone for [#11475](https://github.invalid/QwenLM/qwen-code/issues/11475). Revised 2026-10-09: simultaneous live fan-out of every saved host, in-app focused switching, and the `?fanout=` CSP contract land with [#13727](https://github.invalid/QwenLM/qwen-code/issues/13727); supersedes the "one live host, navigation on selection" wording kept until then. Revised 2026-10-08: restores the aggregated workspace sidebar and supersedes the 2026-09-12 narrowing (`e879557a`), which had removed the multi-host project catalog and declared aggregation a non-goal.
 
 ## Problem
 
@@ -47,7 +47,7 @@ The add operation remains a one-shot flow. The source URL is kept only in the cu
 
 Bearer tokens remain in per-tab `sessionStorage`, but are keyed by daemon origin. The legacy unqualified key is used only for same-origin connections. Selecting a remote daemon never reuses a token stored for the page's own daemon or another remote daemon.
 
-When the HTML shell is served by `qwen serve`, its CSP adds the validated selected daemon origin — plus every validated `?fanout=<origin>` parameter — and the corresponding `ws:` or `wss:` origins to `connect-src`. Fanout origins go through the same strict validator as `?daemon=` (credentials, paths, query strings, and fragments rejected), may be repeated, and are dropped when they equal the page origin. The shell keeps the `fanout` parameters in sync with the saved-host set through `history.replaceState`, which cannot widen the current document's policy; a host newly saved outside the covered set still needs its one navigation before it can be focused in place. The remote daemon must independently allow the Web Shell page origin with `--allow-origin`; existing Origin, Host, and bearer checks remain authoritative. Probing the page's own daemon for the saved-project refresh stays same-origin and needs no CSP change.
+When the HTML shell is served by `mariadb-shell-agent serve`, its CSP adds the validated selected daemon origin — plus every validated `?fanout=<origin>` parameter — and the corresponding `ws:` or `wss:` origins to `connect-src`. Fanout origins go through the same strict validator as `?daemon=` (credentials, paths, query strings, and fragments rejected), may be repeated, and are dropped when they equal the page origin. The shell keeps the `fanout` parameters in sync with the saved-host set through `history.replaceState`, which cannot widen the current document's policy; a host newly saved outside the covered set still needs its one navigation before it can be focused in place. The remote daemon must independently allow the Web Shell page origin with `--allow-origin`; existing Origin, Host, and bearer checks remain authoritative. Probing the page's own daemon for the saved-project refresh stays same-origin and needs no CSP change.
 
 Disconnecting or closing the browser only disposes the client connection. It does not stop the externally managed daemon; existing daemon-side client-detach and session-retention policies remain unchanged.
 
@@ -61,7 +61,7 @@ Disconnecting or closing the browser only disposes the client connection. It doe
 - Authentication, Origin, Host, and network failures stay explicit in the existing connection gate; there is no fallback from a valid selected remote daemon to a local runtime.
 - A URL selecting an attacker-controlled daemon cannot cause a token for another daemon to be sent to it.
 - A loopback URL selected through `?daemon=` may be an SSH tunnel and is not treated as proof that the daemon host is the browser host.
-- HTTP and HTTPS targets are accepted. HTTPS is recommended outside trusted networks. SSH transport, if desired, is supplied by the user as a loopback tunnel outside Qwen Code.
+- HTTP and HTTPS targets are accepted. HTTPS is recommended outside trusted networks. SSH transport, if desired, is supplied by the user as a loopback tunnel outside MariaDB Shell Agent.
 
 ## Validation
 

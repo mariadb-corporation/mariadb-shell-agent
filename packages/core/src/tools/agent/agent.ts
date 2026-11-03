@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -299,7 +300,7 @@ export interface AgentParams {
   read_only?: boolean;
   /**
    * When set to `'worktree'`, spins up a temporary git worktree under
-   * `<projectRoot>/.qwen/worktrees/agent-<7hex>` and instructs the agent to
+   * `<projectRoot>/.mariadb-shell-agent/worktrees/agent-<7hex>` and instructs the agent to
    * confine all file operations to that path. After the agent completes:
    * - if no changes were made, the worktree is auto-removed;
    * - if changes were made, the worktree is preserved and its path/branch
@@ -940,7 +941,7 @@ export class AgentTool extends BaseDeclarativeTool<AgentParams, ToolResult> {
           minLength: 2,
           maxLength: 50,
           description:
-            'Only valid with subagent_type "fork". Loads a project profile from .qwen/fork-profiles/<name>.md and applies its tools and optional promptHint. Cannot be combined with fork_tools.',
+            'Only valid with subagent_type "fork". Loads a project profile from .mariadb-shell-agent/fork-profiles/<name>.md and applies its tools and optional promptHint. Cannot be combined with fork_tools.',
         },
         run_in_background: {
           type: 'boolean',
@@ -958,7 +959,7 @@ export class AgentTool extends BaseDeclarativeTool<AgentParams, ToolResult> {
           type: 'string',
           enum: ['worktree'],
           description:
-            "Isolation mode. 'worktree' creates a temporary git worktree under <projectRoot>/.qwen/worktrees/agent-<7hex> so the agent works on an isolated copy of the repo. The worktree is auto-removed if the agent makes no changes; otherwise the worktree path and branch are returned in the result.",
+            "Isolation mode. 'worktree' creates a temporary git worktree under <projectRoot>/.mariadb-shell-agent/worktrees/agent-<7hex> so the agent works on an isolated copy of the repo. The worktree is auto-removed if the agent makes no changes; otherwise the worktree path and branch are returned in the result.",
         },
         working_dir: {
           type: 'string',
@@ -3463,12 +3464,12 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
       } else if (this.params.isolation === 'worktree') {
         const cwd = this.config.getTargetDir();
         // Refuse nested isolation. If the parent itself is already
-        // running inside a worktree (cwd contains `.qwen/worktrees/`),
+        // running inside a worktree (cwd contains `.mariadb-shell-agent/worktrees/`),
         // creating a sibling isolation worktree at the repo root
         // would leave the model's mental map pointing at the outer
         // worktree while the override aimed it at the inner one.
         // Same guard `enter_worktree` uses.
-        if (/\.qwen[\\/]worktrees[\\/]/.test(cwd)) {
+        if (/\.mariadb-shell-agent[\\/]worktrees[\\/]/.test(cwd)) {
           return failWorktreeProvisioning(
             `Failed to set up worktree isolation: parent is already inside ` +
               `a worktree (${cwd}). Nested isolation worktrees are not ` +
@@ -3489,7 +3490,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
           );
         }
         // Anchor the worktree at the repo top-level so monorepo subdir
-        // launches still gather worktrees under `<repoRoot>/.qwen/...`,
+        // launches still gather worktrees under `<repoRoot>/.mariadb-shell-agent/...`,
         // which is also the path the startup sweep scans.
         const projectRoot = (await probe.getRepoTopLevel()) ?? cwd;
         const wtService =

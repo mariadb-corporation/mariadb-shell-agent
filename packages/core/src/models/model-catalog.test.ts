@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -69,7 +70,7 @@ describe('model catalog', () => {
     previousHome = process.env['QWEN_HOME'];
     previousSwitch = process.env['QWEN_CODE_MODELS_DEV'];
     previousUrl = process.env[MODEL_CATALOG_URL_ENV];
-    process.env['QWEN_HOME'] = path.join(tempDir, '.qwen');
+    process.env['QWEN_HOME'] = path.join(tempDir, '.mariadb-shell-agent');
     delete process.env['QWEN_CODE_MODELS_DEV'];
     delete process.env[MODEL_CATALOG_URL_ENV];
     invalidateModelCatalog();

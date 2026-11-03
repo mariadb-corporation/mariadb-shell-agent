@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -63,9 +64,11 @@ describe('vscode-ide-companion paths – getGlobalQwenDir', () => {
     }
   });
 
-  it('defaults to ~/.qwen when QWEN_HOME is not set', () => {
+  it('defaults to ~/.mariadb-shell-agent when QWEN_HOME is not set', () => {
     delete process.env['QWEN_HOME'];
-    expect(getGlobalQwenDir()).toBe(path.join(home.tempHome, '.qwen'));
+    expect(getGlobalQwenDir()).toBe(
+      path.join(home.tempHome, '.mariadb-shell-agent'),
+    );
   });
 
   it('uses QWEN_HOME when set to absolute path', () => {
@@ -188,18 +191,20 @@ describe('vscode-ide-companion paths – .env bootstrap', () => {
     }
   });
 
-  it('reads QWEN_HOME from <homedir>/.qwen/.env', () => {
+  it('reads QWEN_HOME from <homedir>/.mariadb-shell-agent/.env', () => {
     const configDir = path.resolve('/tmp/from-qwen-dotenv');
-    fs.mkdirSync(path.join(home.tempHome, '.qwen'), { recursive: true });
+    fs.mkdirSync(path.join(home.tempHome, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     fs.writeFileSync(
-      path.join(home.tempHome, '.qwen', '.env'),
+      path.join(home.tempHome, '.mariadb-shell-agent', '.env'),
       `QWEN_HOME=${configDir}\n`,
     );
     expect(getGlobalQwenDir()).toBe(configDir);
     expect(process.env['QWEN_HOME']).toBe(configDir);
   });
 
-  it('reads QWEN_HOME from <homedir>/.env when ~/.qwen/.env is absent', () => {
+  it('reads QWEN_HOME from <homedir>/.env when ~/.mariadb-shell-agent/.env is absent', () => {
     const configDir = path.resolve('/tmp/from-home-dotenv');
     fs.writeFileSync(
       path.join(home.tempHome, '.env'),
@@ -213,9 +218,11 @@ describe('vscode-ide-companion paths – .env bootstrap', () => {
     const envDir = path.resolve('/tmp/from-process-env');
     const dotenvDir = path.resolve('/tmp/from-dotenv');
     process.env['QWEN_HOME'] = envDir;
-    fs.mkdirSync(path.join(home.tempHome, '.qwen'), { recursive: true });
+    fs.mkdirSync(path.join(home.tempHome, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     fs.writeFileSync(
-      path.join(home.tempHome, '.qwen', '.env'),
+      path.join(home.tempHome, '.mariadb-shell-agent', '.env'),
       `QWEN_HOME=${dotenvDir}\n`,
     );
     expect(getGlobalQwenDir()).toBe(envDir);
@@ -244,14 +251,16 @@ describe('vscode-ide-companion paths – .env bootstrap', () => {
     expect(process.env['QWEN_RUNTIME_DIR']).toBeUndefined();
   });
 
-  it('reads QWEN_RUNTIME_DIR from <new QWEN_HOME>/.env after discovery via ~/.qwen/.env', () => {
+  it('reads QWEN_RUNTIME_DIR from <new QWEN_HOME>/.env after discovery via ~/.mariadb-shell-agent/.env', () => {
     const configDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-bootstrap-cfg-')),
     );
     const runtimeDir = path.resolve('/tmp/from-discovered-runtime');
-    fs.mkdirSync(path.join(home.tempHome, '.qwen'), { recursive: true });
+    fs.mkdirSync(path.join(home.tempHome, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     fs.writeFileSync(
-      path.join(home.tempHome, '.qwen', '.env'),
+      path.join(home.tempHome, '.mariadb-shell-agent', '.env'),
       `QWEN_HOME=${configDir}\n`,
     );
     fs.writeFileSync(

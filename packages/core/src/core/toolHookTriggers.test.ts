@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -874,13 +875,13 @@ describe('toolHookTriggers', () => {
       [
         'permission_prompt',
         NotificationType.PermissionPrompt,
-        'Qwen Code needs your permission to use Bash',
+        'MariaDB Shell Agent needs your permission to use Bash',
         'Permission needed',
       ],
       [
         'idle_prompt',
         NotificationType.IdlePrompt,
-        'Qwen Code is waiting for your input',
+        'MariaDB Shell Agent is waiting for your input',
         'Waiting for input',
       ],
       [

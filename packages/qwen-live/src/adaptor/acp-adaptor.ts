@@ -1,13 +1,14 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Drives any ACP agent (JSON-RPC over stdio) as a backend. One child
  * process multiplexes every session this adaptor created; qwen-code's own
- * `qwen --acp` mode is the primary target, but nothing here is qwen
+ * `mariadb-shell-agent --acp` mode is the primary target, but nothing here is qwen
  * specific except the explicitly named ext methods.
  *
  * Protocol facts this adaptor is built on:

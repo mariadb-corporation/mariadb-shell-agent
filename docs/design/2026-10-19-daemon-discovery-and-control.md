@@ -4,13 +4,13 @@
 
 ## Status
 
-Implemented in this change. The new unit tests and typecheck pass. `qwen serve` keeps
+Implemented in this change. The new unit tests and typecheck pass. `mariadb-shell-agent serve` keeps
 its existing protocol, authentication, and workspace-isolation behavior; the
 new surface is local operator tooling only.
 
 ## Problem
 
-`qwen serve` can start a local HTTP daemon and serve the Web Shell with no
+`mariadb-shell-agent serve` can start a local HTTP daemon and serve the Web Shell with no
 configuration, but it leaves no machine-readable trace once it is running. An
 operator must parse stdout for the bound port, use `ps` to find the process,
 and know the internal log path under the runtime directory. A second terminal
@@ -21,10 +21,10 @@ reaches it.
 ## Goals
 
 - Publish one small discovery record per live listener.
-- Provide `qwen daemon status`, `qwen daemon logs`, and `qwen daemon stop` for
+- Provide `mariadb-shell-agent daemon status`, `mariadb-shell-agent daemon logs`, and `mariadb-shell-agent daemon stop` for
   the local operator.
 - Keep the discovery record free of bearer tokens.
-- Leave `qwen serve` behavior unchanged when the record cannot be written.
+- Leave `mariadb-shell-agent serve` behavior unchanged when the record cannot be written.
 
 ## Non-goals
 
@@ -32,14 +32,14 @@ reaches it.
 - No restart command in this slice.
 - No token persistence. `--token` and `QWEN_SERVER_TOKEN` remain the only
   bearer sources.
-- No change to the `qwen serve` HTTP protocol or Web Shell.
+- No change to the `mariadb-shell-agent serve` HTTP protocol or Web Shell.
 
 ## Discovery record
 
 The daemon writes one JSON record after its listener is bound:
 
 ```text
-${QWEN_RUNTIME_DIR:-${QWEN_HOME:-~/.qwen}}/daemon/daemon-<port>.json
+${QWEN_RUNTIME_DIR:-${QWEN_HOME:-~/.mariadb-shell-agent}}/daemon/daemon-<port>.json
 ```
 
 ```json
@@ -53,7 +53,7 @@ ${QWEN_RUNTIME_DIR:-${QWEN_HOME:-~/.qwen}}/daemon/daemon-<port>.json
   "primaryWorkspace": "/repo/project",
   "startedAt": "2026-10-19T06:00:00.000Z",
   "auth": "none",
-  "logPath": "/home/user/.qwen/debug/daemon/daemon.log",
+  "logPath": "/home/user/.mariadb-shell-agent/debug/daemon/daemon.log",
   "pidNamespace": "pid:[4026531836]"
 }
 ```
@@ -80,9 +80,9 @@ never become a token store.
 ## Command surface
 
 ```bash
-qwen daemon status [--json] [--prune]
-qwen daemon logs [--port <port>] [--lines <n>] [--follow]
-qwen daemon stop [--port <port>] [--all] [--force]
+mariadb-shell-agent daemon status [--json] [--prune]
+mariadb-shell-agent daemon logs [--port <port>] [--lines <n>] [--follow]
+mariadb-shell-agent daemon stop [--port <port>] [--all] [--force]
 ```
 
 - `status` lists every record with `running`, `unreachable`, or `stale`
@@ -126,20 +126,20 @@ qwen daemon stop [--port <port>] [--all] [--force]
   expected-PID removal, runtime-directory resolution, wildcard URL rewriting,
   process-start identity, entry selection, age formatting, and log tailing.
 - Typecheck passes for the whole workspace.
-- Manual validation: start `qwen serve`, run `qwen daemon status`, follow the
-  log, then `qwen daemon stop`, and confirm the record is removed.
+- Manual validation: start `mariadb-shell-agent serve`, run `mariadb-shell-agent daemon status`, follow the
+  log, then `mariadb-shell-agent daemon stop`, and confirm the record is removed.
 
 ## Acceptance criteria
 
 - A second terminal can discover a live local daemon without parsing stdout
   or knowing its port in advance.
-- `qwen daemon stop` exits a default loopback daemon cleanly and removes its
+- `mariadb-shell-agent daemon stop` exits a default loopback daemon cleanly and removes its
   record.
 - No discovery file contains a bearer token.
-- `qwen serve` still starts when the discovery directory is unwritable.
+- `mariadb-shell-agent serve` still starts when the discovery directory is unwritable.
 
 ## Follow-ups
 
-- `qwen daemon restart` and a startup Ready block.
-- `qwen daemon token` and opt-in token persistence for `--open-with-auth`.
+- `mariadb-shell-agent daemon restart` and a startup Ready block.
+- `mariadb-shell-agent daemon token` and opt-in token persistence for `--open-with-auth`.
 - A first-class terminal client (`qwen attach`).

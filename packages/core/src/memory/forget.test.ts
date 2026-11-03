@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -378,7 +379,7 @@ describe('selectManagedAutoMemoryForgetCandidates', () => {
 
   it('enumerates repo-local project memory so injectable documents stay forgettable', async () => {
     // The corpus readiness scan and structured recall both treat
-    // `<projectRoot>/.qwen/memory` as project scope (getProjectAutoMemoryRoots),
+    // `<projectRoot>/.mariadb-shell-agent/memory` as project scope (getProjectAutoMemoryRoots),
     // so a repo-shipped document is injectable. Forget must enumerate the same
     // universe or that document can never be forgotten.
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'forget-local-'));
@@ -393,7 +394,7 @@ describe('selectManagedAutoMemoryForgetCandidates', () => {
       const projectRoot = path.join(tempDir, 'project');
       const localFile = path.join(
         projectRoot,
-        '.qwen',
+        '.mariadb-shell-agent',
         'memory',
         'feedback',
         'no-contact.md',

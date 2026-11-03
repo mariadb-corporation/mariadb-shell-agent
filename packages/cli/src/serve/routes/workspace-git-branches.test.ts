@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -269,7 +270,12 @@ describe('workspace Git branch routes against a real repo (R10 #2)', () => {
   it('redacts the main checkout path from a linked-worktree Git error', async () => {
     const dir = makeRepo();
     const mainBranch = git(dir, 'branch', '--show-current').trim();
-    const worktree = path.join(dir, '.qwen', 'worktrees', 'linked');
+    const worktree = path.join(
+      dir,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'linked',
+    );
     fs.mkdirSync(path.dirname(worktree), { recursive: true });
     git(dir, 'worktree', 'add', '-q', '-b', 'linked', worktree);
 
@@ -707,7 +713,7 @@ describe('workspace Git branch routes against a real repo (R10 #2)', () => {
         const managed = path.join(
           root,
           'main',
-          '.qwen',
+          '.mariadb-shell-agent',
           'worktrees',
           'dirty-fix',
         );

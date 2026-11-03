@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -39,7 +40,7 @@ import type { HarnessCheckpointV1 } from '@qwen-code/qwen-code-core/managed-runt
 import type { ManagedSessionDurableRef } from '@qwen-code/qwen-code-core/managed-runtime/managed-session-records.js';
 import { testInternals } from './managed-runtime-ledger.js';
 
-// Real `qwen --acp` children and their Runtime workers, run from source
+// Real `mariadb-shell-agent --acp` children and their Runtime workers, run from source
 // through tsx; workspace packages resolve to their sources too.
 const CLI_ENTRY = fileURLToPath(new URL('../cli.ts', import.meta.url));
 const CLI_TSCONFIG = fileURLToPath(

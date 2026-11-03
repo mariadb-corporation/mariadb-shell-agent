@@ -60,7 +60,7 @@ describe('isBackgroundSubAgentToolCall', () => {
   it('keeps caller-owned working_dir launches in the foreground by default', () => {
     expect(
       isBackgroundSubAgentToolCall(
-        agentTool({ working_dir: '.qwen/worktrees/review' }),
+        agentTool({ working_dir: '.mariadb-shell-agent/worktrees/review' }),
       ),
     ).toBe(false);
   });

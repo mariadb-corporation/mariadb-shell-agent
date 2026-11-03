@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -256,7 +257,7 @@ describe('useSlashCompletion', () => {
         createTestCommand({
           name: 'help',
           altNames: ['?'],
-          description: 'for help on Qwen Code',
+          description: 'for help on MariaDB Shell Agent',
         }),
       ];
       const { result } = renderHook(() =>
@@ -443,7 +444,7 @@ describe('useSlashCompletion', () => {
         createTestCommand({
           name: 'help',
           altNames: ['?'],
-          description: 'for help on Qwen Code',
+          description: 'for help on MariaDB Shell Agent',
         }),
       ];
       const recentCommands = new Map([

@@ -6,14 +6,14 @@ Status: implemented.
 
 ## Scope
 
-Adds an opt-in, owner-only bearer-token sidecar for a daemon started by `qwen daemon start --save-token`, plus `qwen daemon token` to read or remove it. The discovery record and daemon log never contain the token.
+Adds an opt-in, owner-only bearer-token sidecar for a daemon started by `mariadb-shell-agent daemon start --save-token`, plus `mariadb-shell-agent daemon token` to read or remove it. The discovery record and daemon log never contain the token.
 
 ## Command
 
 ```bash
-qwen daemon start --token <token> --save-token
-qwen daemon token [--port <port>] [--json]
-qwen daemon token --remove [--port <port>]
+mariadb-shell-agent daemon start --token <token> --save-token
+mariadb-shell-agent daemon token [--port <port>] [--json]
+mariadb-shell-agent daemon token --remove [--port <port>]
 ```
 
 ## Storage

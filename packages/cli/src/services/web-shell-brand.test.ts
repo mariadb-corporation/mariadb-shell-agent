@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -87,7 +88,10 @@ function makeSettings(scopes: {
     settingsFile(scopes.system ?? {}, '/system/settings.json'),
     settingsFile(scopes.systemDefaults ?? {}, '/system-defaults.json'),
     settingsFile(scopes.user ?? {}, scopes.userPath ?? '/settings.json'),
-    settingsFile(scopes.workspace ?? {}, '/workspace/.qwen/settings.json'),
+    settingsFile(
+      scopes.workspace ?? {},
+      '/workspace/.mariadb-shell-agent/settings.json',
+    ),
     true,
     new Set(),
   );
@@ -755,7 +759,7 @@ describe('resolveWebShellBrand', () => {
         settingsFile({}, '/system/settings.json'),
         settingsFile({}, '/system-defaults.json'),
         user,
-        settingsFile({}, '/workspace/.qwen/settings.json'),
+        settingsFile({}, '/workspace/.mariadb-shell-agent/settings.json'),
         true,
         new Set(),
       );
@@ -776,7 +780,7 @@ describe('resolveWebShellBrand', () => {
         settingsFile({}, '/system/settings.json'),
         settingsFile({}, '/system-defaults.json'),
         user,
-        settingsFile({}, '/workspace/.qwen/settings.json'),
+        settingsFile({}, '/workspace/.mariadb-shell-agent/settings.json'),
         true,
         new Set(),
       );
@@ -814,7 +818,7 @@ describe('resolveWebShellBrand', () => {
           brandSettings({ name: 'Repo Supplied Name' }),
           '/settings.json',
         ),
-        settingsFile({}, '/workspace/.qwen/settings.json'),
+        settingsFile({}, '/workspace/.mariadb-shell-agent/settings.json'),
         true,
         new Set(),
       );
@@ -834,7 +838,7 @@ describe('resolveWebShellBrand', () => {
           '/system-defaults.json',
         ),
         settingsFile(brandSettings({ name: '' }), '/settings.json'),
-        settingsFile({}, '/workspace/.qwen/settings.json'),
+        settingsFile({}, '/workspace/.mariadb-shell-agent/settings.json'),
         true,
         new Set(),
       );
@@ -861,7 +865,7 @@ describe('resolveWebShellBrand', () => {
           }),
           '/settings.json',
         ),
-        settingsFile({}, '/workspace/.qwen/settings.json'),
+        settingsFile({}, '/workspace/.mariadb-shell-agent/settings.json'),
         true,
         new Set(),
       );
@@ -883,7 +887,7 @@ describe('resolveWebShellBrand', () => {
           '/system-defaults.json',
         ),
         settingsFile(brandSettings({ name: 'User Brand' }), '/settings.json'),
-        settingsFile({}, '/workspace/.qwen/settings.json'),
+        settingsFile({}, '/workspace/.mariadb-shell-agent/settings.json'),
         true,
         new Set(),
       );

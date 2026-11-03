@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -86,9 +87,9 @@ export const FolderTrustDialog: React.FC<FolderTrustDialogProps> = ({
             Do you trust this folder?
           </Text>
           <Text color={theme.text.primary}>
-            Trusting a folder allows Qwen Code to execute commands it suggests.
-            This is a security feature to prevent accidental execution in
-            untrusted directories.
+            Trusting a folder allows MariaDB Shell Agent to execute commands it
+            suggests. This is a security feature to prevent accidental execution
+            in untrusted directories.
           </Text>
         </Box>
 
@@ -101,7 +102,7 @@ export const FolderTrustDialog: React.FC<FolderTrustDialogProps> = ({
       {isRestarting && (
         <Box marginLeft={1} marginTop={1}>
           <Text color={theme.status.warning}>
-            Qwen Code is restarting to apply the trust changes...
+            MariaDB Shell Agent is restarting to apply the trust changes...
           </Text>
         </Box>
       )}

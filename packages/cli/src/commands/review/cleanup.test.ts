@@ -1,4 +1,5 @@
 // Copyright 2026 Qwen Team
+// Copyright (c) 2026, MariaDB plc.
 // SPDX-License-Identifier: Apache-2.0
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -127,7 +128,7 @@ const mocks = vi.hoisted(() => ({
   aoneWhoamiAccount: vi.fn(() => 'reviewer'),
 }));
 
-// The fixtures below key on POSIX path literals (`/repo/.qwen/tmp/…`), but
+// The fixtures below key on POSIX path literals (`/repo/.mariadb-shell-agent/tmp/…`), but
 // cleanup.ts and the helpers it calls (redirectedAncestor, promptRecordDir,
 // the deadline readers) run those strings through node:path. On Windows that
 // would spell them with a drive letter and backslashes, so no literal-keyed
@@ -232,15 +233,16 @@ vi.mock('./lib/paths.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./lib/paths.js')>();
   return {
     ...actual,
-    worktreePath: (prNumber: string) => `/repo/.qwen/tmp/review-pr-${prNumber}`,
+    worktreePath: (prNumber: string) =>
+      `/repo/.mariadb-shell-agent/tmp/review-pr-${prNumber}`,
     probeWorktreePath: (path: string) => `${path}-probe`,
     baseWorktreePath: (path: string) => `${path}-base`,
     scratchWorktreePrefix: (path: string) => `${path}-scratch-`,
     reviewBranch: (prNumber: string) => `qwen-review/pr-${prNumber}`,
     LEASE_PREFIX: 'qwen-review-lease-',
-    REVIEW_TMP_DIR: '/repo/.qwen/tmp',
+    REVIEW_TMP_DIR: '/repo/.mariadb-shell-agent/tmp',
     tmpFile: (target: string, suffix: string) =>
-      `/repo/.qwen/tmp/qwen-review-${target}-${suffix}`,
+      `/repo/.mariadb-shell-agent/tmp/qwen-review-${target}-${suffix}`,
     tmpPrefix: (target: string) => `qwen-review-${target}-`,
   };
 });
@@ -703,7 +705,7 @@ describe('runCleanup', () => {
       promptId: 'prompt-a',
       target: 'pr-123',
       repositoryRoot: '/repo',
-      worktreePath: '/repo/.qwen/tmp/review-pr-123',
+      worktreePath: '/repo/.mariadb-shell-agent/tmp/review-pr-123',
       branch: 'qwen-review/pr-123',
     };
     mocks.readReviewWorktreeLease.mockReturnValueOnce(lease);
@@ -749,7 +751,7 @@ describe('runCleanup', () => {
       promptId: 'prompt-b',
       target: 'pr-123',
       repositoryRoot: '/repo',
-      worktreePath: '/repo/.qwen/tmp/review-pr-123',
+      worktreePath: '/repo/.mariadb-shell-agent/tmp/review-pr-123',
       branch: 'qwen-review/pr-123',
     };
     mocks.readReviewWorktreeLease.mockReturnValueOnce(lease);
@@ -776,7 +778,7 @@ describe('runCleanup', () => {
       promptId: 'prompt-b',
       target: 'pr-123',
       repositoryRoot: '/repo',
-      worktreePath: '/repo/.qwen/tmp/review-pr-123',
+      worktreePath: '/repo/.mariadb-shell-agent/tmp/review-pr-123',
       branch: 'qwen-review/pr-123',
     };
     // First read (the gate): no lease yet — the gate short-circuits on the
@@ -838,9 +840,9 @@ describe('runCleanup', () => {
     runCleanup('pr-123');
 
     expect(mocks.releaseWorktree.mock.calls.map((c) => c[0])).toEqual([
-      '/repo/.qwen/tmp/review-pr-123',
-      '/repo/.qwen/tmp/review-pr-123-probe',
-      '/repo/.qwen/tmp/review-pr-123-base',
+      '/repo/.mariadb-shell-agent/tmp/review-pr-123',
+      '/repo/.mariadb-shell-agent/tmp/review-pr-123-probe',
+      '/repo/.mariadb-shell-agent/tmp/review-pr-123-base',
     ]);
   });
 
@@ -988,7 +990,7 @@ describe('runCleanup', () => {
           promptId: 'prompt-a',
           target: 'pr-123',
           repositoryRoot: '/repo',
-          worktreePath: '/repo/.qwen/tmp/review-pr-123',
+          worktreePath: '/repo/.mariadb-shell-agent/tmp/review-pr-123',
           branch: 'qwen-review/pr-123',
         };
         mocks.readReviewWorktreeLease.mockReturnValueOnce(lease);
@@ -1926,11 +1928,11 @@ describe('runCleanup', () => {
     runCleanup('pr-123');
 
     expect(mocks.releaseWorktree.mock.calls.map((c) => c[0])).toEqual([
-      '/repo/.qwen/tmp/review-pr-123',
-      '/repo/.qwen/tmp/review-pr-123-probe',
-      '/repo/.qwen/tmp/review-pr-123-base',
-      '/repo/.qwen/tmp/review-pr-123-scratch-verify--round-1--aaa',
-      '/repo/.qwen/tmp/review-pr-123-scratch-verify--round-2--bbb',
+      '/repo/.mariadb-shell-agent/tmp/review-pr-123',
+      '/repo/.mariadb-shell-agent/tmp/review-pr-123-probe',
+      '/repo/.mariadb-shell-agent/tmp/review-pr-123-base',
+      '/repo/.mariadb-shell-agent/tmp/review-pr-123-scratch-verify--round-1--aaa',
+      '/repo/.mariadb-shell-agent/tmp/review-pr-123-scratch-verify--round-2--bbb',
     ]);
   });
 
@@ -1952,7 +1954,7 @@ describe('runCleanup', () => {
     runCleanup('pr-123');
 
     expect(mocks.rmSync).toHaveBeenCalledWith(
-      '/repo/.qwen/tmp/review-pr-123-scratch-verify--round-1--aaa',
+      '/repo/.mariadb-shell-agent/tmp/review-pr-123-scratch-verify--round-1--aaa',
       { force: true },
     );
     expect(mocks.writeStdoutLine).toHaveBeenCalledWith(
@@ -1980,15 +1982,18 @@ describe('runCleanup', () => {
     runCleanup('pr-123');
 
     expect(mocks.releaseWorktree).not.toHaveBeenCalled();
-    expect(mocks.rmSync).toHaveBeenCalledWith('/repo/.qwen/tmp/review-pr-123', {
-      force: true,
-    });
     expect(mocks.rmSync).toHaveBeenCalledWith(
-      '/repo/.qwen/tmp/review-pr-123-probe',
+      '/repo/.mariadb-shell-agent/tmp/review-pr-123',
+      {
+        force: true,
+      },
+    );
+    expect(mocks.rmSync).toHaveBeenCalledWith(
+      '/repo/.mariadb-shell-agent/tmp/review-pr-123-probe',
       { force: true },
     );
     expect(mocks.rmSync).toHaveBeenCalledWith(
-      '/repo/.qwen/tmp/review-pr-123-base',
+      '/repo/.mariadb-shell-agent/tmp/review-pr-123-base',
       { force: true },
     );
     expect(mocks.writeStdoutLine).toHaveBeenCalledWith(
@@ -2033,8 +2038,8 @@ describe('runCleanup', () => {
     // side file, all resolved through the same redirected ancestor.
     mocks.execFileSync.mockReturnValue(Buffer.from(''));
     mocks.lstatSync.mockImplementation((p: string) => ({
-      isSymbolicLink: () => String(p) === '/repo/.qwen',
-      isDirectory: () => String(p) !== '/repo/.qwen',
+      isSymbolicLink: () => String(p) === '/repo/.mariadb-shell-agent',
+      isDirectory: () => String(p) !== '/repo/.mariadb-shell-agent',
     }));
 
     runCleanup('pr-123');
@@ -2057,7 +2062,7 @@ describe('runCleanup', () => {
     runCleanup('pr-123');
 
     expect(mocks.rmSync).toHaveBeenCalledWith(
-      '/repo/.qwen/tmp/review-pr-123-base.lock',
+      '/repo/.mariadb-shell-agent/tmp/review-pr-123-base.lock',
       { recursive: true, force: true },
     );
     // ...AND the host-side one, once the tree it guards is gone (the default
@@ -2083,7 +2088,8 @@ describe('runCleanup', () => {
     // staleness window.
     mocks.execFileSync.mockReturnValue(Buffer.from(''));
     mocks.existsSync.mockImplementation(
-      (path: string) => path === '/repo/.qwen/tmp/review-pr-123-base',
+      (path: string) =>
+        path === '/repo/.mariadb-shell-agent/tmp/review-pr-123-base',
     );
 
     runCleanup('pr-123');
@@ -2107,7 +2113,7 @@ describe('runCleanup', () => {
     runCleanup('lease');
 
     expect(mocks.rmSync).not.toHaveBeenCalledWith(
-      join('/repo/.qwen/tmp', 'qwen-review-lease-pr-123.json'),
+      join('/repo/.mariadb-shell-agent/tmp', 'qwen-review-lease-pr-123.json'),
       expect.anything(),
     );
     expect(
@@ -2130,14 +2136,17 @@ describe('runCleanup', () => {
 
     runCleanup('lease');
 
-    const sideFile = join('/repo/.qwen/tmp', 'qwen-review-lease-diff.txt');
+    const sideFile = join(
+      '/repo/.mariadb-shell-agent/tmp',
+      'qwen-review-lease-diff.txt',
+    );
     expect(mocks.rmSync).toHaveBeenCalledWith(sideFile, {
       recursive: true,
       force: true,
     });
     // A live foreign lease survives the very same sweep.
     expect(mocks.rmSync).not.toHaveBeenCalledWith(
-      join('/repo/.qwen/tmp', 'qwen-review-lease-pr-999.json'),
+      join('/repo/.mariadb-shell-agent/tmp', 'qwen-review-lease-pr-999.json'),
       expect.anything(),
     );
   });
@@ -2151,7 +2160,10 @@ describe('runCleanup', () => {
 
     runCleanup('local');
 
-    const sideFile = join('/repo/.qwen/tmp', 'qwen-review-local-diff.txt');
+    const sideFile = join(
+      '/repo/.mariadb-shell-agent/tmp',
+      'qwen-review-local-diff.txt',
+    );
     expect(mocks.rmSync).toHaveBeenCalledWith(sideFile, {
       recursive: true,
       force: true,
@@ -2193,14 +2205,18 @@ describe('runCleanup', () => {
     runCleanup('pr-123');
 
     const removed = mocks.rmSync.mock.calls.map((c) => c[0]);
-    expect(removed).toContain('/repo/.qwen/tmp/qwen-review-pr-123-fetch.json');
-    expect(removed).toContain('/repo/.qwen/tmp/qwen-review-pr-123-diff.txt');
+    expect(removed).toContain(
+      '/repo/.mariadb-shell-agent/tmp/qwen-review-pr-123-fetch.json',
+    );
+    expect(removed).toContain(
+      '/repo/.mariadb-shell-agent/tmp/qwen-review-pr-123-diff.txt',
+    );
     expect(removed).not.toContain(
-      '/repo/.qwen/tmp/qwen-review-pr-123-fetch-prompts',
+      '/repo/.mariadb-shell-agent/tmp/qwen-review-pr-123-fetch-prompts',
     );
     expect(mocks.writeStdoutLine).toHaveBeenCalledWith(
       expect.stringContaining(
-        'Kept /repo/.qwen/tmp/qwen-review-pr-123-fetch-prompts',
+        'Kept /repo/.mariadb-shell-agent/tmp/qwen-review-pr-123-fetch-prompts',
       ),
     );
   });
@@ -2213,7 +2229,7 @@ describe('runCleanup', () => {
     mocks.execFileSync.mockReturnValue(Buffer.from(''));
     mocks.existsSync.mockReturnValue(true);
     mocks.readdirSync.mockImplementation((p: string): string[] =>
-      p === '/repo/.qwen/tmp'
+      p === '/repo/.mariadb-shell-agent/tmp'
         ? ['qwen-review-pr-123-fetch.json', 'qwen-review-pr-123-fetch-prompts']
         : ['reverse-audit--chunk-13--round-1--abc.txt'],
     );
@@ -2226,12 +2242,12 @@ describe('runCleanup', () => {
     runCleanup('pr-123');
 
     expect(mocks.rmSync).not.toHaveBeenCalledWith(
-      '/repo/.qwen/tmp/qwen-review-pr-123-fetch-prompts',
+      '/repo/.mariadb-shell-agent/tmp/qwen-review-pr-123-fetch-prompts',
       expect.anything(),
     );
     expect(mocks.writeStdoutLine).toHaveBeenCalledWith(
       expect.stringContaining(
-        'Kept /repo/.qwen/tmp/qwen-review-pr-123-fetch-prompts',
+        'Kept /repo/.mariadb-shell-agent/tmp/qwen-review-pr-123-fetch-prompts',
       ),
     );
   });
@@ -2242,18 +2258,20 @@ describe('runCleanup', () => {
     // The directory that survived on that evidence must survive again —
     // and "Nothing to clean" must NOT print while something was kept.
     mocks.execFileSync.mockReturnValue(Buffer.from(''));
-    mocks.existsSync.mockImplementation((p: string) => p === '/repo/.qwen/tmp');
+    mocks.existsSync.mockImplementation(
+      (p: string) => p === '/repo/.mariadb-shell-agent/tmp',
+    );
     mocks.readdirSync.mockReturnValue(['qwen-review-pr-123-fetch-prompts']);
 
     runCleanup('pr-123');
 
     expect(mocks.rmSync).not.toHaveBeenCalledWith(
-      '/repo/.qwen/tmp/qwen-review-pr-123-fetch-prompts',
+      '/repo/.mariadb-shell-agent/tmp/qwen-review-pr-123-fetch-prompts',
       expect.anything(),
     );
     expect(mocks.writeStdoutLine).toHaveBeenCalledWith(
       expect.stringContaining(
-        'Kept /repo/.qwen/tmp/qwen-review-pr-123-fetch-prompts',
+        'Kept /repo/.mariadb-shell-agent/tmp/qwen-review-pr-123-fetch-prompts',
       ),
     );
     expect(mocks.writeStdoutLine).not.toHaveBeenCalledWith(
@@ -2269,7 +2287,7 @@ describe('runCleanup', () => {
     mocks.execFileSync.mockReturnValue(Buffer.from(''));
     mocks.existsSync.mockReturnValue(true);
     mocks.readdirSync.mockImplementation((p: string): string[] =>
-      p === '/repo/.qwen/tmp'
+      p === '/repo/.mariadb-shell-agent/tmp'
         ? ['qwen-review-pr-123-fetch.json', 'qwen-review-pr-123-fetch-prompts']
         : [],
     );
@@ -2299,12 +2317,12 @@ describe('runCleanup', () => {
     runCleanup('pr-123');
 
     expect(mocks.rmSync).not.toHaveBeenCalledWith(
-      '/repo/.qwen/tmp/qwen-review-pr-123-fetch-prompts',
+      '/repo/.mariadb-shell-agent/tmp/qwen-review-pr-123-fetch-prompts',
       expect.anything(),
     );
     expect(mocks.writeStdoutLine).toHaveBeenCalledWith(
       expect.stringContaining(
-        'Kept /repo/.qwen/tmp/qwen-review-pr-123-fetch-prompts',
+        'Kept /repo/.mariadb-shell-agent/tmp/qwen-review-pr-123-fetch-prompts',
       ),
     );
   });
@@ -2324,7 +2342,7 @@ describe('runCleanup', () => {
     runCleanup('pr-123');
 
     expect(mocks.rmSync).toHaveBeenCalledWith(
-      '/repo/.qwen/tmp/qwen-review-pr-123-fetch-prompts',
+      '/repo/.mariadb-shell-agent/tmp/qwen-review-pr-123-fetch-prompts',
       { recursive: true, force: true },
     );
   });
@@ -2507,7 +2525,7 @@ describe('runCleanup — bypass-write audit', () => {
     runCleanup('pr-123');
 
     expect(mocks.readFileSync).toHaveBeenCalledWith(
-      '/repo/.qwen/tmp/qwen-review-pr-123-fetch.json',
+      '/repo/.mariadb-shell-agent/tmp/qwen-review-pr-123-fetch.json',
       'utf8',
     );
     expect(mocks.setGhHost).toHaveBeenCalledWith('ghe.example.com');
@@ -2519,7 +2537,7 @@ describe('runCleanup — bypass-write audit', () => {
       .filter((l) => l.startsWith('warning:'));
     expect(warnings.join('\n')).toContain('posted comment 42');
     expect(warnings.join('\n')).not.toContain('comment 43');
-    expect(warnings.join('\n')).toContain('qwen review submit');
+    expect(warnings.join('\n')).toContain('mariadb-shell-agent review submit');
   });
 
   it('stays silent when the window is clean', () => {
@@ -3028,7 +3046,7 @@ describe('runCleanup — Aone bypass-write audit', () => {
     prNumber: '123',
     ownerRepo: 'maxcompute/odps_src',
     fetchedAt: '2026-07-24T08:00:00Z',
-    host: 'gitlab.alibaba-inc.com',
+    host: 'gitlab.alibaba-inc.invalid',
   });
 
   beforeEach(() => {
@@ -3078,7 +3096,7 @@ describe('runCleanup — Aone bypass-write audit', () => {
     // with the report's coordinates (the default list plus the --resolved
     // union half) — and nothing touched the gh seam.
     expect(mocks.detectPlatformKind).toHaveBeenCalledWith({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
     });
     expect(mocks.a1Json).toHaveBeenCalledWith(
       'repo',
@@ -3107,7 +3125,9 @@ describe('runCleanup — Aone bypass-write audit', () => {
       'posted comment 777 at 2026-07-24T17:02:32+08:00 on src/foo.ts:12',
     );
     expect(warnings().join('\n')).not.toContain('778');
-    expect(warnings().join('\n')).toContain('qwen review submit');
+    expect(warnings().join('\n')).toContain(
+      'mariadb-shell-agent review submit',
+    );
     // The union dedupes by id: BOTH queries returned comment 777, and the
     // relayed lines flag it once, under a header counting it once.
     expect(
@@ -3319,7 +3339,7 @@ describe('runCleanup — Aone bypass-write audit', () => {
         ownerRepo: 'maxcompute/odps_src',
         fetchedAt: '2026-07-24T10:00:00Z',
         auditSince: '2026-07-24T08:00:00Z',
-        host: 'gitlab.alibaba-inc.com',
+        host: 'gitlab.alibaba-inc.invalid',
       }),
     );
     mocks.a1Json.mockReturnValue([

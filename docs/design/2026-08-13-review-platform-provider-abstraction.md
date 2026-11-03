@@ -13,8 +13,8 @@ check-run vocabulary) are hardcoded across ~12 command files, the SKILL.md
 prose, and two agent briefs.
 
 The motivating target is the internal `odps_src` repository (MaxCompute engine,
-hosted on Aone Code at `gitlab.alibaba-inc.com`, reviewed on
-`code.alibaba-inc.com`). Its review model differs from GitHub in ways that
+hosted on Aone Code at `gitlab.alibaba-inc.invalid`, reviewed on
+`code.alibaba-inc.invalid`). Its review model differs from GitHub in ways that
 matter to the skill:
 
 - CRs are created by AGit-Flow pushes (`git push origin HEAD:refs/for/master/<feature>`);
@@ -32,8 +32,8 @@ Everything below was confirmed by running the commands, not from docs.
 | Capability                     | GitHub (`gh`)                                                          | Aone Code (`a1` CLI, v0.1.90, already authed)                                                                                                                                                                         |
 | ------------------------------ | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Review ref                     | `refs/pull/<n>/head`                                                   | `refs/merge-requests/<global-id>/head` — **global id, NOT iid** (8402 refs present)                                                                                                                                   |
-| Canonical web URL              | `https://<host>/<o>/<r>/pull/<n>`                                      | `https://code.alibaba-inc.com/<group>/<repo>/codereview/<id>` (from `mr view`'s `detailUrl`)                                                                                                                          |
-| Git host vs web host           | same host                                                              | **differ**: git `gitlab.alibaba-inc.com`, web `code.alibaba-inc.com` — needs host-alias handling                                                                                                                      |
+| Canonical web URL              | `https://<host>/<o>/<r>/pull/<n>`                                      | `https://code.alibaba-inc.invalid/<group>/<repo>/codereview/<id>` (from `mr view`'s `detailUrl`)                                                                                                                      |
+| Git host vs web host           | same host                                                              | **differ**: git `gitlab.alibaba-inc.invalid`, web `code.alibaba-inc.invalid` — needs host-alias handling                                                                                                              |
 | Metadata                       | `gh pr view --json …`                                                  | `a1 repo mr view <id> -f json` → `id, iid, title, description, state, sourceBranch (= head SHA under AGit-Flow), targetBranch, author, assignees, detailUrl`. No additions/deletions stats — compute locally from git |
 | Diff                           | `gh pr diff`                                                           | Prefer local `git diff` after fetching the ref; `a1 repo mr diff <id> [file]` as fallback (file list without file arg)                                                                                                |
 | Inline comments (read)         | `pulls/<n>/comments`                                                   | `a1 repo mr comment list --mr <id> -f json` → `id, note, author, closed, outdated, path, line, side ("right"/"left"), parentNoteId, isAiComment, isDraft`                                                             |
@@ -140,11 +140,11 @@ by nature — remain, to be re-authored or gated in Phase 3):
 
 | Prose today                                                                               | New home                                                                                                                                                                                                                                                                                    |
 | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `gh repo view` owner/repo/host derivation (bare PR numbers; Step 1 & 7)                   | `qwen review meta <n>` — one call returning `{platform, ownerRepo, host, headSha, webUrl}`                                                                                                                                                                                                  |
+| `gh repo view` owner/repo/host derivation (bare PR numbers; Step 1 & 7)                   | `mariadb-shell-agent review meta <n>` — one call returning `{platform, ownerRepo, host, headSha, webUrl}`                                                                                                                                                                                   |
 | `gh pr view --json headRefOid` head-SHA fallbacks (Step 7, 422 recovery)                  | same `meta` subcommand                                                                                                                                                                                                                                                                      |
-| Agent 0's `closingIssuesReferences` + `gh issue view` pair                                | `qwen review issue-context <n> --out <file>` — emits the evidence markdown; GitHub: closing issues + bodies + comments; Aone: workitems + fields + comments                                                                                                                                 |
-| `gh pr diff` (lightweight cross-repo mode)                                                | `qwen review fetch-diff <target>`                                                                                                                                                                                                                                                           |
-| `gh api repos/…/pulls/comments/<id>` refetch refs that `pr-context` emits into context.md | emit `qwen review comment-body <id>` commands instead (provider-routed)                                                                                                                                                                                                                     |
+| Agent 0's `closingIssuesReferences` + `gh issue view` pair                                | `mariadb-shell-agent review issue-context <n> --out <file>` — emits the evidence markdown; GitHub: closing issues + bodies + comments; Aone: workitems + fields + comments                                                                                                                  |
+| `gh pr diff` (lightweight cross-repo mode)                                                | `mariadb-shell-agent review fetch-diff <target>`                                                                                                                                                                                                                                            |
+| `gh api repos/…/pulls/comments/<id>` refetch refs that `pr-context` emits into context.md | emit `mariadb-shell-agent review comment-body <id>` commands instead (provider-routed)                                                                                                                                                                                                      |
 | `GH_HOST=<host>` prefixing rule for all model-run gh calls                                | gone for every call; the Step 4 carve-out (the one remaining model-run `gh api`) carries no host routing of its own — it routes at the Enterprise host only when `GH_HOST` is exported in the environment (subagent shells inherit it), and is unavailable otherwise. Phase 3 re-authors it |
 
 This phase is GitHub-only behavior-preserving and independently shippable: it
@@ -171,8 +171,8 @@ at `ensureAuthenticated()` and fails with an actionable message otherwise.
   carries `platform`.
 - Bare numbers: probe git remotes. Known host patterns (`github.com`, GHE via
   `GH_HOST`/`--host`) → GitHub; hosts matching the Aone mapping (initially the
-  `*.alibaba-inc.com` pair, configurable) → Aone, repo path from the remote URL.
-- Host aliasing (web `code.alibaba-inc.com` ↔ git `gitlab.alibaba-inc.com`)
+  `*.alibaba-inc.invalid` pair, configurable) → Aone, repo path from the remote URL.
+- Host aliasing (web `code.alibaba-inc.invalid` ↔ git `gitlab.alibaba-inc.invalid`)
   lives in a small mapping table in the Aone provider, overridable via settings
   (`review.platforms[]`) so other Aone-hosted pairs need no code change.
 - `match-remote` becomes platform-aware: on Aone, match by **repo path**
@@ -310,7 +310,7 @@ Enterprise paragraph.
     (2) The write gate binds hosts through `hostsEquivalent`, not raw
     equality — Aone's web/git host pair is one platform. (3) Write
     routing keys on the CANONICAL Aone pair (`isAoneCanonicalHost`),
-    never the family wildcard (a `*.alibaba-inc.com` GHE host is not
+    never the family wildcard (a `*.alibaba-inc.invalid` GHE host is not
     Aone), never the ambient GH_HOST (reads never detect from it), and
     an explicit `--host` outranks the recorded binding in both
     directions. (4) A size gate refuses any message over the
@@ -347,7 +347,7 @@ Enterprise paragraph.
     next review pass found the layer under that one. (11) The cwd arm of
     the write gate now probes the origin through the canonical predicate
     itself instead of delegating to the registry's family-wildcard
-    detection — a `ghe.alibaba-inc.com` origin no longer takes the a1
+    detection — a `ghe.alibaba-inc.invalid` origin no longer takes the a1
     path. (12) `submit` FORCES context-unavailable into the compose input
     on the Aone path — the cap no longer rides the model-written state,
     so an omitted field cannot buy a real platform approval; the docs now

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -102,10 +103,10 @@ const BYSTANDER = 'src/bystander.ts';
 
 /** Commit a baseline, then dirty all three files — round 1's working state. */
 function seedDirtyTree(): void {
-  // Real repos gitignore `.qwen/` (Step 8 checks exactly that); the fixture
+  // Real repos gitignore `.mariadb-shell-agent/` (Step 8 checks exactly that); the fixture
   // must too, or the cache file and the plan output masquerade as untracked
   // review scope.
-  write('.gitignore', '.qwen/\nplan.json\n');
+  write('.gitignore', '.mariadb-shell-agent/\nplan.json\n');
   write(CHANGED, 'export const v = 0;\n');
   write(CALLER, "import { v } from './changed.js';\nexport const c = v;\n");
   write(BYSTANDER, 'export const b = 0;\n');
@@ -153,8 +154,10 @@ function promoteCandidate(plan: Plan, model: string): string {
   const candidate = JSON.parse(
     readFileSync(plan.cacheCandidatePath, 'utf8'),
   ) as Record<string, unknown>;
-  const cachePath = join(repo, '.qwen/review-cache/local.json');
-  mkdirSync(join(repo, '.qwen/review-cache'), { recursive: true });
+  const cachePath = join(repo, '.mariadb-shell-agent/review-cache/local.json');
+  mkdirSync(join(repo, '.mariadb-shell-agent/review-cache'), {
+    recursive: true,
+  });
   writeFileSync(
     cachePath,
     JSON.stringify({ ...candidate, lastModelId: model }),
@@ -415,8 +418,13 @@ describe('capture-local — incremental local rounds', () => {
 
   it('a malformed cache and a missing --model both degrade to the full capture', () => {
     seedDirtyTree();
-    const cachePath = join(repo, '.qwen/review-cache/local.json');
-    mkdirSync(join(repo, '.qwen/review-cache'), { recursive: true });
+    const cachePath = join(
+      repo,
+      '.mariadb-shell-agent/review-cache/local.json',
+    );
+    mkdirSync(join(repo, '.mariadb-shell-agent/review-cache'), {
+      recursive: true,
+    });
     writeFileSync(cachePath, 'not json');
     expect(
       capture({ cache: cachePath, model: 'm' }).incremental,
@@ -517,7 +525,10 @@ describe('capture-local — round-2 regressions from the stop work', () => {
       else process.env['QWEN_REVIEW_RUN_ID'] = prev;
     }
     const sidecar = JSON.parse(
-      readFileSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json'), 'utf8'),
+      readFileSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+        'utf8',
+      ),
     ) as Record<string, unknown>;
     expect(sidecar['runId']).toBe('run-abc');
   });
@@ -531,7 +542,10 @@ describe('capture-local — round-2 regressions from the stop work', () => {
     const plan = capture();
     expect(plan['nothingToReview']).toEqual({ reason: 'clean-tree' });
     const sidecar = JSON.parse(
-      readFileSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json'), 'utf8'),
+      readFileSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+        'utf8',
+      ),
     ) as Record<string, unknown>;
     expect(sidecar['cachePath']).toBe(plan['cachePath']);
     expect(sidecar['findingsHash']).toBeNull();
@@ -552,7 +566,10 @@ describe('capture-local — round-2 regressions from the stop work', () => {
       reason: 'unchanged-since-last-round',
     });
     const sidecar = JSON.parse(
-      readFileSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json'), 'utf8'),
+      readFileSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+        'utf8',
+      ),
     ) as Record<string, unknown>;
     expect(sidecar['cachePath']).toBe(second['cachePath']);
     expect(sidecar['findingsHash']).toBe(
@@ -563,7 +580,7 @@ describe('capture-local — round-2 regressions from the stop work', () => {
   it('binds the ledger the stop DECIDED from — a file-form --cache outside the canonical dir', () => {
     // The stop decision reads the `--cache`-resolved ledger; the stamp and
     // the plan's published `cachePath` must name that same file. Stamping
-    // the canonical `.qwen/review-cache/…` path while the decision
+    // the canonical `.mariadb-shell-agent/review-cache/…` path while the decision
     // consulted a caller-named file had the fence verify a baseline the
     // stop never saw — an ENOENT null hash over a nonexistent canonical
     // file, an empty grant baseline, and an exit 0 over the open Critical
@@ -586,7 +603,10 @@ describe('capture-local — round-2 regressions from the stop work', () => {
     // ONE resolved value for every consumer: plan, sidecar, and hash.
     expect(second['cachePath']).toBe(outside);
     const sidecar = JSON.parse(
-      readFileSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json'), 'utf8'),
+      readFileSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+        'utf8',
+      ),
     ) as Record<string, unknown>;
     expect(sidecar['cachePath']).toBe(outside);
     expect(sidecar['findingsHash']).toBe(
@@ -642,7 +662,10 @@ describe('capture-local — round-2 regressions from the stop work', () => {
       vi.mocked(readFileSync).mockRestore();
     }
     const sidecar = JSON.parse(
-      readFileSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json'), 'utf8'),
+      readFileSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+        'utf8',
+      ),
     ) as Record<string, unknown>;
     expect(sidecar['findingsHash']).toBe(expected);
   });
@@ -665,7 +688,10 @@ describe('capture-local — round-2 regressions from the stop work', () => {
       plan['incremental'] as { scope: { supersededPaths?: string[] } }
     ).scope;
     const sidecar = JSON.parse(
-      readFileSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json'), 'utf8'),
+      readFileSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+        'utf8',
+      ),
     ) as Record<string, unknown>;
     expect(sidecar['supersededPaths']).toEqual(scope.supersededPaths);
     expect((sidecar['supersededPaths'] as string[]).length).toBeGreaterThan(0);
@@ -682,14 +708,18 @@ describe('capture-local — round-2 regressions from the stop work', () => {
     const stopped = capture();
     expect(stopped['nothingToReview']).toEqual({ reason: 'clean-tree' });
     expect(
-      existsSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json')),
+      existsSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+      ),
     ).toBe(true);
     // The tree moves; the next capture decides a real round.
     writeFileSync(join(repo, CHANGED), 'export const moved = 1;\n');
     const moved = capture();
     expect(moved['nothingToReview']).toBeUndefined();
     expect(
-      existsSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json')),
+      existsSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+      ),
     ).toBe(false);
   });
 });
@@ -704,12 +734,14 @@ describe('capture-local — promotion through the REAL cache-commit', () => {
     write('src/foo.ts', 'export const real = 1;\n');
 
     const first = capture({ file: 'src/foo.ts', model: 'model-a' });
-    const ledgerPath = join(repo, '.qwen/tmp/ledger.json');
+    const ledgerPath = join(repo, '.mariadb-shell-agent/tmp/ledger.json');
     writeFileSync(
       ledgerPath,
       JSON.stringify({ round: 1, verdict: 'Comment', findings: [] }),
     );
-    mkdirSync(join(repo, '.qwen/review-cache'), { recursive: true });
+    mkdirSync(join(repo, '.mariadb-shell-agent/review-cache'), {
+      recursive: true,
+    });
     // `--state-id` exactly as Step 8 passes it: off the plan, not off the
     // candidate file — the point of the flag is that the command re-reads
     // that file and a concurrent round may have replaced it since.
@@ -723,13 +755,13 @@ describe('capture-local — promotion through the REAL cache-commit', () => {
     write('src/foo.ts', 'export const real = 2;\n');
     const second = capture({
       file: 'src/foo.ts',
-      cache: join(repo, '.qwen/review-cache'),
+      cache: join(repo, '.mariadb-shell-agent/review-cache'),
       model: 'model-a',
     });
     expect(second.incremental?.scope?.deltaFiles).toEqual(['src/foo.ts']);
   });
 
-  it('bootstraps on a checkout with no .qwen/review-cache yet (R26-2)', () => {
+  it('bootstraps on a checkout with no .mariadb-shell-agent/review-cache yet (R26-2)', () => {
     // Step 1 passes the DIRECTORY on every high round, including the first
     // one on a fresh clone, where it does not exist. The plan published it
     // unchanged as `cachePath`, `cache-commit --out <that directory>` was
@@ -737,12 +769,12 @@ describe('capture-local — promotion through the REAL cache-commit', () => {
     // no round on that checkout ever persisted an anchor or a ledger.
     seedDirtyTree();
     write('src/foo.ts', 'export const real = 1;\n');
-    const cacheDir = join(repo, '.qwen/review-cache');
+    const cacheDir = join(repo, '.mariadb-shell-agent/review-cache');
     for (const file of [undefined, 'src/foo.ts']) {
       rmSync(cacheDir, { recursive: true, force: true });
       const first = capture({ file, cache: cacheDir, model: 'model-a' });
       expect(first['cachePath']).toMatch(/\.json$/);
-      const ledgerPath = join(repo, '.qwen/tmp/ledger.json');
+      const ledgerPath = join(repo, '.mariadb-shell-agent/tmp/ledger.json');
       writeFileSync(
         ledgerPath,
         JSON.stringify({ round: 1, verdict: 'Comment', findings: [] }),
@@ -817,7 +849,9 @@ describe('capture-local — round-5 sibling gaps', () => {
     seedDirtyTree();
     write('src/foo.ts', 'export const real = 1;\n');
     const first = capture({ file: 'src/foo.ts', model: 'model-a' });
-    mkdirSync(join(repo, '.qwen/review-cache'), { recursive: true });
+    mkdirSync(join(repo, '.mariadb-shell-agent/review-cache'), {
+      recursive: true,
+    });
     writeFileSync(
       first['cachePath'] as string,
       readFileSync(first.cacheCandidatePath, 'utf8'),
@@ -829,7 +863,7 @@ describe('capture-local — round-5 sibling gaps', () => {
 
     const second = capture({
       file: 'src/foo.ts',
-      cache: join(repo, '.qwen/review-cache'),
+      cache: join(repo, '.mariadb-shell-agent/review-cache'),
       model: 'model-a',
     });
     expect(second['nothingToReview']).toBeUndefined();
@@ -870,7 +904,7 @@ describe('capture-local — the cache namespace discriminates the subject', () =
 describe('capture-local — the decided stops are machine-readable', () => {
   it('marks the unchanged-since-last-round stop in the plan', () => {
     // `compose-review` runs only in Step 6, and this stop fires in Step 1, so
-    // no composed verdict exists — and `qwen review run` polls for exactly
+    // no composed verdict exists — and `mariadb-shell-agent review run` polls for exactly
     // that, reporting "Review did not complete" over a round whose own output
     // was decided. The signal is a field the CLI wrote, not a sentence the
     // model chose off stderr.
@@ -1166,7 +1200,7 @@ describe('capture-local — the decided stops are machine-readable', () => {
     // reviewed whole, with a verdict — while the visibility oracle is
     // repo-wide, so a bit on ANY other path makes the round ledger-only.
     // The 0-chunk rule for plain local rounds must not reach it.
-    write('.gitignore', '.qwen/\nplan.json\n');
+    write('.gitignore', '.mariadb-shell-agent/\nplan.json\n');
     write('src/a.ts', 'export const a = 0;\n');
     write('src/b.ts', 'export const b = 0;\n');
     git('add', '-A');
@@ -1187,7 +1221,7 @@ describe('capture-local — the decided stops are machine-readable', () => {
     seedDirtyTree();
     write('deploy.sh', 'echo v1\n');
     const promote = (plan: Plan): void => {
-      const ledger = join(repo, '.qwen/tmp/ledger.json');
+      const ledger = join(repo, '.mariadb-shell-agent/tmp/ledger.json');
       writeFileSync(ledger, JSON.stringify({ round: 1, findings: [] }));
       (cacheCommitCommand.handler as (argv: unknown) => void)({
         candidate: plan.cacheCandidatePath,
@@ -1196,7 +1230,7 @@ describe('capture-local — the decided stops are machine-readable', () => {
         stateId: plan.cacheCandidateStateId,
       });
     };
-    const cacheDir = join(repo, '.qwen/review-cache');
+    const cacheDir = join(repo, '.mariadb-shell-agent/review-cache');
     promote(capture({ cache: cacheDir, model: 'model-a' }));
     write('.git/info/exclude', 'deploy.sh\n');
     write('deploy.sh', 'echo v2\n');
@@ -1216,7 +1250,7 @@ describe('capture-local — the decided stops are machine-readable', () => {
   });
 
   it('keeps a DIRECTORY subject out of the anchor — it has no bytes', () => {
-    // R20-2: `qwen review <dir>` is a supported entrance, and the subject
+    // R20-2: `mariadb-shell-agent review <dir>` is a supported entrance, and the subject
     // was injected into the hashed population unconditionally — recorded as
     // UNHASHABLE, which never equals itself, so `changedSince` reported the
     // directory every round and the unchanged-since stop was unreachable
@@ -1277,7 +1311,10 @@ describe('capture-local — the decided stops are machine-readable', () => {
     });
 
     const sidecar = JSON.parse(
-      readFileSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json'), 'utf8'),
+      readFileSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+        'utf8',
+      ),
     ) as Record<string, unknown>;
     expect(sidecar['reason']).toBe('clean-tree');
   });
@@ -1299,7 +1336,7 @@ describe('capture-local — the decided stops are machine-readable', () => {
     // untracked", and with `--no-untracked` the third clause is checked by
     // nobody — the untracked enumeration never runs and records no
     // `skipped` entries, so a tracked-clean tree with pending untracked
-    // work passed every conjunct and `qwen review run` exited 0 decided
+    // work passed every conjunct and `mariadb-shell-agent review run` exited 0 decided
     // over files no round enumerated. SKILL.md's own recovery from an
     // oversized-untracked skip re-runs with exactly this flag. The anchor
     // gate has carried the exclusion since the candidate recorded
@@ -1313,7 +1350,9 @@ describe('capture-local — the decided stops are machine-readable', () => {
     expect(plan.chunks.length).toBe(0);
     expect(plan['nothingToReview']).toBeUndefined();
     expect(
-      existsSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json')),
+      existsSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+      ),
     ).toBe(false);
     const err = stderrLines.join('\n');
     expect(err).toContain(
@@ -1357,7 +1396,9 @@ describe('capture-local — the decided stops are machine-readable', () => {
     expect(unchanged.chunks.length).toBe(0);
     expect(unchanged['nothingToReview']).toBeUndefined();
     expect(
-      existsSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json')),
+      existsSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+      ),
     ).toBe(false);
     const err = stderrLines.join('\n');
     expect(err).toContain(
@@ -1398,7 +1439,7 @@ describe('capture-local — --cache takes the DIRECTORY', () => {
     // Round 1 through the SYMLINKED spelling.
     const first = capture({ file: 'srclink/foo.ts', model: 'model-a' });
     expect(first['target']).toBe('src_foo.ts');
-    const cacheDir = join(repo, '.qwen/review-cache');
+    const cacheDir = join(repo, '.mariadb-shell-agent/review-cache');
     mkdirSync(cacheDir, { recursive: true });
     // Written where the CAPTURE says this target's cache lives — the same
     // field the orchestrator reads. A file review's cache is namespaced by
@@ -1420,7 +1461,7 @@ describe('capture-local — --cache takes the DIRECTORY', () => {
 
   it('reads a directory holding no cache for this target as no anchor', () => {
     seedDirtyTree();
-    const cacheDir = join(repo, '.qwen/review-cache');
+    const cacheDir = join(repo, '.mariadb-shell-agent/review-cache');
     mkdirSync(cacheDir, { recursive: true });
     expect(capture({ cache: cacheDir, model: 'model-a' }).incremental).toBe(
       undefined,
@@ -1445,8 +1486,13 @@ describe('capture-local — the cache key is the SOURCE path, not the token', ()
       readFileSync(first.cacheCandidatePath, 'utf8'),
     ) as Record<string, unknown>;
     expect(candidate['source']).toBe('src/foo.ts');
-    mkdirSync(join(repo, '.qwen/review-cache'), { recursive: true });
-    const cachePath = join(repo, '.qwen/review-cache/src_foo.ts.json');
+    mkdirSync(join(repo, '.mariadb-shell-agent/review-cache'), {
+      recursive: true,
+    });
+    const cachePath = join(
+      repo,
+      '.mariadb-shell-agent/review-cache/src_foo.ts.json',
+    );
     writeFileSync(cachePath, JSON.stringify(candidate));
 
     // The OTHER file, whose token is the same one.
@@ -1480,7 +1526,7 @@ describe('capture-local — the cache key is the SOURCE path, not the token', ()
     // so the TOKEN-colliding pair below (which the target gate cannot tell
     // apart) shared one cache, and the second file erased the first's anchor
     // on promotion. The derivation wins now for EVERY `--file` capture: the
-    // parent (`qwen review run`) pins its artifact names to it anyway.
+    // parent (`mariadb-shell-agent review run`) pins its artifact names to it anyway.
     seedDirtyTree();
     write('src/a.ts', 'export const a = 1;\n');
     write('src_a.ts', 'export const collide = 1;\n');
@@ -1493,7 +1539,9 @@ describe('capture-local — the cache key is the SOURCE path, not the token', ()
     expect(candidate['source']).toBe('src/a.ts');
     const cachePath = join(repo, first['cachePath'] as string);
     expect(cachePath).toContain('file-src_a.ts-');
-    mkdirSync(join(repo, '.qwen/review-cache'), { recursive: true });
+    mkdirSync(join(repo, '.mariadb-shell-agent/review-cache'), {
+      recursive: true,
+    });
     writeFileSync(cachePath, JSON.stringify(candidate));
 
     // The token-colliding OTHER file under the same explicit token must not
@@ -1562,8 +1610,13 @@ describe('capture-local — the local same-model gate', () => {
     const candidate = JSON.parse(
       readFileSync(round1.cacheCandidatePath, 'utf8'),
     ) as Record<string, unknown>;
-    mkdirSync(join(repo, '.qwen/review-cache'), { recursive: true });
-    const cachePath = join(repo, '.qwen/review-cache/local.json');
+    mkdirSync(join(repo, '.mariadb-shell-agent/review-cache'), {
+      recursive: true,
+    });
+    const cachePath = join(
+      repo,
+      '.mariadb-shell-agent/review-cache/local.json',
+    );
     // Promoted verbatim — the candidate already carries who certified it.
     writeFileSync(cachePath, JSON.stringify(candidate));
 
@@ -1808,7 +1861,7 @@ describe('capture-local — round-2 findings', () => {
 
   it('an unborn-HEAD cache validates and scopes — null headSha is a supported state', () => {
     // A brand-new repo: no commits, everything untracked.
-    write('.gitignore', '.qwen/\nplan.json\n');
+    write('.gitignore', '.mariadb-shell-agent/\nplan.json\n');
     write(CHANGED, 'export const v = 1;\n');
     const cachePath = promoteCandidate(capture(), 'model-a');
     expect(
@@ -1843,16 +1896,16 @@ describe('capture-local — round-3 findings', () => {
     // relative to the invocation cwd. A root-anchored filter matched nothing
     // from a subdirectory, and the cache — rewritten every clean round —
     // then changed the state every round by construction.
-    write('.gitignore', 'nothing-ignored\n'); // .qwen deliberately NOT ignored
+    write('.gitignore', 'nothing-ignored\n'); // .mariadb-shell-agent deliberately NOT ignored
     write(CHANGED, 'export const v = 1;\n');
     write('sub/keep.ts', 'export const k = 1;\n');
     mkdirSync(join(repo, 'sub'), { recursive: true });
     // PLANT the plumbing at the SUBDIRECTORY path the review writes it to:
     // without these the assertion below passes over an empty set and proves
     // nothing (measured — it survived removing the cwd-aware prefixes).
-    write('sub/.qwen/tmp/qwen-review-parse-args.json', '{}\n');
-    write('sub/.qwen/review-cache/local.json', '{}\n');
-    write('sub/.qwen/reviews/2026-01-01-local.md', '# report\n');
+    write('sub/.mariadb-shell-agent/tmp/qwen-review-parse-args.json', '{}\n');
+    write('sub/.mariadb-shell-agent/review-cache/local.json', '{}\n');
+    write('sub/.mariadb-shell-agent/reviews/2026-01-01-local.md', '# report\n');
     const prev = process.cwd();
     process.chdir(join(repo, 'sub'));
     try {
@@ -1864,18 +1917,20 @@ describe('capture-local — round-3 findings', () => {
       });
       const plan = JSON.parse(readFileSync(out, 'utf8')) as Plan;
       const paths = plan.files.map((f) => f.path);
-      expect(paths.some((p) => p.includes('.qwen/'))).toBe(false);
+      expect(paths.some((p) => p.includes('.mariadb-shell-agent/'))).toBe(
+        false,
+      );
       expect(paths).toContain('sub/keep.ts');
     } finally {
       process.chdir(prev);
     }
   });
 
-  it('excludes .qwen/review-cache and .qwen/reviews, not just .qwen/tmp', () => {
+  it('excludes .mariadb-shell-agent/review-cache and .mariadb-shell-agent/reviews, not just .mariadb-shell-agent/tmp', () => {
     write('.gitignore', 'nothing-ignored\n');
     write(CHANGED, 'export const v = 1;\n');
-    write('.qwen/review-cache/local.json', '{}\n');
-    write('.qwen/reviews/2026-01-01-local.md', '# report\n');
+    write('.mariadb-shell-agent/review-cache/local.json', '{}\n');
+    write('.mariadb-shell-agent/reviews/2026-01-01-local.md', '# report\n');
     const out = join(repo, 'plan.json');
     (captureLocalCommand.handler as (argv: unknown) => void)({
       out,
@@ -1884,7 +1939,9 @@ describe('capture-local — round-3 findings', () => {
     });
     const plan = JSON.parse(readFileSync(out, 'utf8')) as Plan;
     expect(
-      plan.files.map((f) => f.path).some((p) => p.startsWith('.qwen/')),
+      plan.files
+        .map((f) => f.path)
+        .some((p) => p.startsWith('.mariadb-shell-agent/')),
     ).toBe(false);
   });
 
@@ -1910,7 +1967,7 @@ describe('capture-local — round-3 findings', () => {
   it('a null→string HEAD transition refuses like any other moved HEAD', () => {
     // Unborn HEAD at round 1 (cache records null), first commit before
     // round 2: the same worktree bytes now describe a different change.
-    write('.gitignore', '.qwen/\nplan.json\n');
+    write('.gitignore', '.mariadb-shell-agent/\nplan.json\n');
     write(CHANGED, 'export const v = 1;\n');
     const cachePath = promoteCandidate(capture(), 'model-a');
     git('add', '-A');
@@ -2007,7 +2064,9 @@ describe('capture-local — round-12 stop shapes', () => {
     const second = capture({ cache: cachePath, model: 'model-a' });
     expect(second['nothingToReview']).toBeUndefined();
     expect(
-      existsSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json')),
+      existsSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+      ),
     ).toBe(false);
     const err = stderrLines.join('\n');
     expect(err).toContain('still on disk');
@@ -2024,7 +2083,7 @@ describe('capture-local — round-13 findings: visibility bits and empty anchors
     // "unchanged-since-last-round" stop over bytes no round ever read.
     // `hash-object` reads through the bit, so the subject enters the anchor
     // even without a diff section.
-    write('.gitignore', '.qwen/\nplan.json\n');
+    write('.gitignore', '.mariadb-shell-agent/\nplan.json\n');
     write('src/foo.ts', 'export const v = 0;\n');
     git('add', '-A');
     git('commit', '-q', '--no-verify', '-m', 'base');
@@ -2035,7 +2094,9 @@ describe('capture-local — round-13 findings: visibility bits and empty anchors
     ) as { files: Record<string, string> };
     expect(Object.keys(candidate.files)).toEqual(['src/foo.ts']);
 
-    mkdirSync(join(repo, '.qwen/review-cache'), { recursive: true });
+    mkdirSync(join(repo, '.mariadb-shell-agent/review-cache'), {
+      recursive: true,
+    });
     writeFileSync(
       first['cachePath'] as string,
       readFileSync(first.cacheCandidatePath, 'utf8'),
@@ -2047,7 +2108,7 @@ describe('capture-local — round-13 findings: visibility bits and empty anchors
     stderrLines.length = 0;
     const second = capture({
       file: 'src/foo.ts',
-      cache: join(repo, '.qwen/review-cache'),
+      cache: join(repo, '.mariadb-shell-agent/review-cache'),
       model: 'model-a',
     });
     // The hidden edit moved the subject's identity: re-reviewed, never
@@ -2094,7 +2155,7 @@ describe('capture-local — round-13 findings: visibility bits and empty anchors
     // path the cached round did NOT review (clean at cache time) was
     // enumerated by no gate: every comparison stood still and the round
     // stopped decided over bytes no round ever read.
-    write('.gitignore', '.qwen/\nplan.json\n');
+    write('.gitignore', '.mariadb-shell-agent/\nplan.json\n');
     write('src/a.ts', 'export const a = 1;\n');
     write('src/b.ts', 'export const b = 1;\n');
     git('add', '-A');
@@ -2114,7 +2175,9 @@ describe('capture-local — round-13 findings: visibility bits and empty anchors
     const second = capture({ cache: cachePath, model: 'model-a' });
     expect(second['nothingToReview']).toBeUndefined();
     expect(
-      existsSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json')),
+      existsSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+      ),
     ).toBe(false);
     const err = stderrLines.join('\n');
     expect(err).toContain('carry an --assume-unchanged or');
@@ -2133,7 +2196,7 @@ describe('capture-local — round-13 findings: visibility bits and empty anchors
     // The clean-tree claim needs no cache, so neither did this entrance:
     // "nothing staged, nothing unstaged, nothing untracked" proves nothing
     // while a marked path may carry an edit `git diff` cannot see.
-    write('.gitignore', '.qwen/\nplan.json\n');
+    write('.gitignore', '.mariadb-shell-agent/\nplan.json\n');
     write('src/a.ts', 'export const a = 1;\n');
     git('add', '-A');
     git('commit', '-q', '--no-verify', '-m', 'base');
@@ -2144,7 +2207,9 @@ describe('capture-local — round-13 findings: visibility bits and empty anchors
     const plan = capture();
     expect(plan['nothingToReview']).toBeUndefined();
     expect(
-      existsSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json')),
+      existsSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+      ),
     ).toBe(false);
     const err = stderrLines.join('\n');
     expect(err).not.toContain('the working tree is clean');
@@ -2162,7 +2227,7 @@ describe('capture-local — round-13 findings: visibility bits and empty anchors
     // The designed all-discarded shape, plus one path the cached round never
     // reviewed hiding an edit: the empty slice proves only what `git diff`
     // can see, so the stop is withheld and the refusal is said out loud.
-    write('.gitignore', '.qwen/\nplan.json\n');
+    write('.gitignore', '.mariadb-shell-agent/\nplan.json\n');
     write('src/a.ts', 'export const a = 1;\n');
     write('src/extra.ts', 'export const e = 1;\n');
     git('add', '-A');
@@ -2203,7 +2268,7 @@ describe('capture-local — round-15 findings: the candidate under visibility bi
     // round ever read. The same uncertainty that withholds a stop withholds
     // the anchor — while the findings ledger, which has nowhere else to
     // live, is still written and promoted.
-    write('.gitignore', '.qwen/\nplan.json\n');
+    write('.gitignore', '.mariadb-shell-agent/\nplan.json\n');
     write('src/foo.ts', 'export const v = 0;\n');
     git('add', '-A');
     git('commit', '-q', '--no-verify', '-m', 'base');
@@ -2231,7 +2296,7 @@ describe('capture-local — round-15 findings: the candidate under visibility bi
     expect(hidden.chunks.length).toBeGreaterThan(0);
 
     // Promote it exactly as Step 8 does: the round's open Critical survives.
-    const ledgerPath = join(repo, '.qwen/tmp/ledger.json');
+    const ledgerPath = join(repo, '.mariadb-shell-agent/tmp/ledger.json');
     const blocker = { id: 'R2-1', severity: 'Critical', status: 'open' };
     writeFileSync(
       ledgerPath,
@@ -2255,7 +2320,7 @@ describe('capture-local — round-15 findings: the candidate under visibility bi
     git('update-index', '--no-assume-unchanged', 'src/foo.ts');
     stderrLines.length = 0;
     const next = capture({
-      cache: join(repo, '.qwen/review-cache'),
+      cache: join(repo, '.mariadb-shell-agent/review-cache'),
       model: 'model-a',
     });
     expect(next['nothingToReview']).toBeUndefined();
@@ -2275,7 +2340,7 @@ describe('capture-local — a vanished subtree probes its missing chain once', (
     // statSync per missing ancestor per path, depth times siblings (R2-1).
     const siblingCount = 5;
     const chain = ['vendor', 'a', 'b', 'c'];
-    write('.gitignore', '.qwen/\nplan.json\n');
+    write('.gitignore', '.mariadb-shell-agent/\nplan.json\n');
     write('src/keep.ts', 'export const k = 0;\n');
     for (let i = 0; i < siblingCount; i++) {
       write(

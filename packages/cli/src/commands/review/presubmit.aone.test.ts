@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -77,7 +78,7 @@ vi.mock('../../utils/stdioHelpers.js', () => ({
 const { presubmitCommand, classifyAoneChecks, aoneCommentToPresubmitComment } =
   await import('./presubmit.js');
 
-const FOOTER = '_— qwen-max via Qwen Code /review (v0.1.0)_';
+const FOOTER = '_— qwen-max via MariaDB Shell Agent /review (v0.1.0)_';
 
 async function run(args?: Record<string, unknown>) {
   const handler = presubmitCommand.handler;
@@ -88,8 +89,9 @@ async function run(args?: Record<string, unknown>) {
     pr_number: '29295886',
     commit_sha: 'sha-reviewed',
     owner_repo: 'maxcompute/odps_src',
-    out_path: '/repo/.qwen/tmp/qwen-review-pr-29295886-presubmit.json',
-    host: 'gitlab.alibaba-inc.com',
+    out_path:
+      '/repo/.mariadb-shell-agent/tmp/qwen-review-pr-29295886-presubmit.json',
+    host: 'gitlab.alibaba-inc.invalid',
     ...args,
   } as unknown as Parameters<typeof handler>[0]);
 }
@@ -244,7 +246,7 @@ describe('aoneCommentToPresubmitComment (a1 → GitHub-shaped input)', () => {
       'sha-reviewed',
     );
     expect(mapped.body).toContain('**[Critical]** null deref');
-    expect(mapped.body).toContain('via Qwen Code /review');
+    expect(mapped.body).toContain('via MariaDB Shell Agent /review');
   });
 
   it('an OUTDATED thread rides an empty commit_id (the stale bucket)', () => {
@@ -356,7 +358,9 @@ describe('presubmit handler (Aone backing)', () => {
     mocks.readFileSync.mockReturnValue(
       JSON.stringify([{ path: 'a.ts', line: 42 }]),
     );
-    await run({ 'new-findings': '/repo/.qwen/tmp/new-findings.json' });
+    await run({
+      'new-findings': '/repo/.mariadb-shell-agent/tmp/new-findings.json',
+    });
     const report = reportWritten();
     expect(report.blockOnExistingComments).toBe(true);
     expect(report.existingComments.byBucket.overlap).toBe(1);
@@ -403,7 +407,7 @@ describe('presubmit handler (Aone backing)', () => {
     mocks.listMrComments.mockReturnValue([
       {
         id: 205,
-        note: '**[Critical]** prior\n\n_— qwen-max via Qwen Code /review_',
+        note: '**[Critical]** prior\n\n_— qwen-max via MariaDB Shell Agent /review_',
         path: 'a.ts',
         line: 42,
         author: { username: 'another-bot' },
@@ -412,7 +416,9 @@ describe('presubmit handler (Aone backing)', () => {
     mocks.readFileSync.mockReturnValue(
       JSON.stringify([{ path: 'a.ts', line: 42 }]),
     );
-    await run({ 'new-findings': '/repo/.qwen/tmp/new-findings.json' });
+    await run({
+      'new-findings': '/repo/.mariadb-shell-agent/tmp/new-findings.json',
+    });
     const report = reportWritten();
     expect(report.existingComments.byBucket.overlap).toBe(1);
     expect(report.blockOnExistingComments).toBe(true);
@@ -434,7 +440,9 @@ describe('presubmit handler (Aone backing)', () => {
     mocks.readFileSync.mockReturnValue(
       JSON.stringify([{ path: 'a.ts', line: 42 }]),
     );
-    await run({ 'new-findings': '/repo/.qwen/tmp/new-findings.json' });
+    await run({
+      'new-findings': '/repo/.mariadb-shell-agent/tmp/new-findings.json',
+    });
     const report = reportWritten();
     expect(report.existingComments.byBucket.overlap).toBe(1);
     expect(report.blockOnExistingComments).toBe(true);
@@ -457,7 +465,9 @@ describe('presubmit handler (Aone backing)', () => {
     mocks.readFileSync.mockReturnValue(
       JSON.stringify([{ path: 'a.ts', line: 42 }]),
     );
-    await run({ 'new-findings': '/repo/.qwen/tmp/new-findings.json' });
+    await run({
+      'new-findings': '/repo/.mariadb-shell-agent/tmp/new-findings.json',
+    });
     const report = reportWritten();
     expect(report.existingComments.byBucket.overlap).toBe(1);
     expect(report.blockOnExistingComments).toBe(true);
@@ -482,7 +492,9 @@ describe('presubmit handler (Aone backing)', () => {
     mocks.readFileSync.mockReturnValue(
       JSON.stringify([{ path: 'a.ts', line: 42 }]),
     );
-    await run({ 'new-findings': '/repo/.qwen/tmp/new-findings.json' });
+    await run({
+      'new-findings': '/repo/.mariadb-shell-agent/tmp/new-findings.json',
+    });
     const report = reportWritten();
     expect(report.existingComments.total).toBe(0);
     expect(report.existingComments.byBucket.overlap).toBe(0);
@@ -503,7 +515,9 @@ describe('presubmit handler (Aone backing)', () => {
     mocks.readFileSync.mockReturnValue(
       JSON.stringify([{ path: 'a.ts', line: 42 }]),
     );
-    await run({ 'new-findings': '/repo/.qwen/tmp/new-findings.json' });
+    await run({
+      'new-findings': '/repo/.mariadb-shell-agent/tmp/new-findings.json',
+    });
     const report = reportWritten();
     expect(report.existingComments.byBucket.stale).toBe(1);
     expect(report.existingComments.byBucket.overlap).toBe(0);
@@ -535,7 +549,9 @@ describe('presubmit handler (Aone backing)', () => {
     mocks.readFileSync.mockReturnValue(
       JSON.stringify([{ path: 'a.ts', line: 42 }]),
     );
-    await run({ 'new-findings': '/repo/.qwen/tmp/new-findings.json' });
+    await run({
+      'new-findings': '/repo/.mariadb-shell-agent/tmp/new-findings.json',
+    });
     const report = reportWritten();
     expect(report.existingComments.byBucket.resolved).toBe(2);
     expect(report.existingComments.byBucket.overlap).toBe(0);
@@ -592,7 +608,9 @@ describe('presubmit handler (Aone backing)', () => {
     mocks.readFileSync.mockReturnValue(
       JSON.stringify([{ path: 'a.ts', line: 42 }]),
     );
-    await run({ 'new-findings': '/repo/.qwen/tmp/new-findings.json' });
+    await run({
+      'new-findings': '/repo/.mariadb-shell-agent/tmp/new-findings.json',
+    });
     const report = reportWritten();
     expect(report.existingComments.total).toBe(1);
     expect(report.existingComments.byBucket.overlap).toBe(0);
@@ -622,7 +640,9 @@ describe('presubmit handler (Aone backing)', () => {
     mocks.readFileSync.mockReturnValue(
       JSON.stringify([{ path: 'a.ts', line: 42 }]),
     );
-    await run({ 'new-findings': '/repo/.qwen/tmp/new-findings.json' });
+    await run({
+      'new-findings': '/repo/.mariadb-shell-agent/tmp/new-findings.json',
+    });
     const report = reportWritten();
     expect(report.headDrift).toMatchObject({
       reviewedSha: 'sha-reviewed',
@@ -708,7 +728,9 @@ describe('presubmit handler (Aone backing)', () => {
     mocks.readFileSync.mockReturnValue(
       JSON.stringify([{ path: 'a.ts', line: 42, id: 'R2-1' }]),
     );
-    await run({ 'new-findings': '/repo/.qwen/tmp/new-findings.json' });
+    await run({
+      'new-findings': '/repo/.mariadb-shell-agent/tmp/new-findings.json',
+    });
     const report = reportWritten();
     expect(report.existingComments.byBucket.repost).toBe(1);
     expect(report.existingComments.repost[0].matchedIds).toEqual(['R2-1']);
@@ -718,7 +740,9 @@ describe('presubmit handler (Aone backing)', () => {
 
   it('flags a malformed --new-findings file', async () => {
     mocks.readFileSync.mockReturnValue('not json');
-    await run({ 'new-findings': '/repo/.qwen/tmp/new-findings.json' });
+    await run({
+      'new-findings': '/repo/.mariadb-shell-agent/tmp/new-findings.json',
+    });
     const report = reportWritten();
     expect(report.findingsFileInvalid).toBe(true);
     expect(report.downgradeApprove).toBe(true);

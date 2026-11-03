@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -261,7 +262,7 @@ describe('managed Skill mutations', () => {
     const userSkill = await writeSkill(tempHome, '.agents/skills', 'course');
     const projectSkill = await writeSkill(
       tempProject,
-      '.qwen/skills',
+      '.mariadb-shell-agent/skills',
       'project-course',
     );
     const manager = managerFor('unused');
@@ -317,7 +318,12 @@ describe('managed Skill mutations', () => {
     const tempProject = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qwen-project-cwd-skill-'),
     );
-    const skillDir = path.join(tempProject, '.qwen', 'skills', 'issue-fixer');
+    const skillDir = path.join(
+      tempProject,
+      '.mariadb-shell-agent',
+      'skills',
+      'issue-fixer',
+    );
     const skillFile = path.join(skillDir, 'SKILL.md');
     await fs.mkdir(skillDir, { recursive: true });
     await fs.writeFile(
@@ -350,7 +356,7 @@ describe('managed Skill mutations', () => {
         installedPath: skillFile,
       });
       expect(loadSkillsFromDir).toHaveBeenCalledWith(
-        path.join(tempProject, '.qwen', 'skills'),
+        path.join(tempProject, '.mariadb-shell-agent', 'skills'),
         'project',
       );
       expect(listSkills).not.toHaveBeenCalled();

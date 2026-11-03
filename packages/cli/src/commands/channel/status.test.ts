@@ -68,7 +68,7 @@ describe('statusCommand', () => {
     await expect(invokeStatus()).rejects.toThrow('process.exit: 0');
 
     expect(mockWriteStdoutLine).toHaveBeenCalledWith(
-      'Channel service: managed by qwen serve (PID 1234)',
+      'Channel service: managed by mariadb-shell-agent serve (PID 1234)',
     );
     expect(mockWriteStdoutLine).toHaveBeenCalledWith('Worker PID:      5678');
   });
@@ -88,7 +88,7 @@ describe('statusCommand', () => {
     await expect(invokeStatus()).rejects.toThrow('process.exit: 0');
 
     expect(mockWriteStdoutLine).toHaveBeenCalledWith(
-      'Channel service: managed by qwen serve (PID 1234)',
+      'Channel service: managed by mariadb-shell-agent serve (PID 1234)',
     );
     expect(mockWriteStdoutLine).not.toHaveBeenCalledWith(
       expect.stringContaining('Worker PID:'),

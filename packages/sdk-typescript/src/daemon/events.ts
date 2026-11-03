@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -535,8 +536,8 @@ export interface DaemonMcpChildRefusedBatchData {
 
 /**
  * A `POST /workspace/memory` write completed successfully. `scope`
- * records which file was touched (workspace QWEN.md vs global
- * ~/.qwen/QWEN.md), `mode` is the requested write mode, and
+ * records which file was touched (workspace MARIADB-SHELL-AGENT.md vs global
+ * ~/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md), `mode` is the requested write mode, and
  * `bytesWritten` is the size of the file post-write.
  */
 export interface DaemonFileMemoryChangedData {
@@ -1426,7 +1427,7 @@ export interface DaemonSessionViewState {
   /**
    * Workspace-scoped -- every session bus receives
    * `workspace_initialized` events. `lastWorkspaceInit` records the
-   * most recent envelope so adapters can render a "QWEN.md was just
+   * most recent envelope so adapters can render a "MARIADB-SHELL-AGENT.md was just
    * scaffolded by another client" notice without polling.
    */
   workspaceInitCount: number;
@@ -2254,7 +2255,7 @@ export function reduceDaemonSessionEvent(
       return base;
     case 'workspace_initialized':
       // Workspace-scoped fan-out. Non-terminal — just records that a
-      // QWEN.md scaffold was performed.
+      // MARIADB-SHELL-AGENT.md scaffold was performed.
       return {
         ...base,
         workspaceInitCount: base.workspaceInitCount + 1,

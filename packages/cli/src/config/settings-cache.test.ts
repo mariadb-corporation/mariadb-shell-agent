@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -47,7 +48,7 @@ describe('loadSettingsCached', () => {
 
   const userSettingsPath = () => path.join(qwenHome, 'settings.json');
   const workspaceSettingsPath = (ws = workspaceDir) =>
-    path.join(ws, '.qwen', 'settings.json');
+    path.join(ws, '.mariadb-shell-agent', 'settings.json');
 
   const writeJson = (filePath: string, value: unknown) => {
     fs.mkdirSync(path.dirname(filePath), { recursive: true });

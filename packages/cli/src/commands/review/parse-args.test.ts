@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -114,7 +115,7 @@ vi.mock('../../config/settings.js', async (importOriginal) => {
     // The production call carries `{ skipWorkspaceSettings: true }` — these
     // policy keys resolve from operator scopes only. A caller that forgets
     // the flag reads the workspace-polluted view below instead, and the
-    // wiring assertions redden: a repository's `.qwen/settings.json` must
+    // wiring assertions redden: a repository's `.mariadb-shell-agent/settings.json` must
     // not control them.
     loadSettings: vi.fn((...callArgs: unknown[]) => {
       const opts = callArgs[1] as
@@ -442,7 +443,7 @@ const CASES: Case[] = [
   },
   {
     name: 'prose before an Aone CR URL never steals the target',
-    raw: '重新评审 https://code.alibaba-inc.com/group/repo/codereview/12345',
+    raw: '重新评审 https://code.alibaba-inc.invalid/group/repo/codereview/12345',
     expect: {
       targetType: 'pr-url',
       extraTokens: ['重新评审'],
@@ -786,11 +787,11 @@ describe('parseReviewArgs', () => {
 
   it('an Aone codereview URL is a pr-url target keyed on the global MR id', () => {
     const got = parseReviewArgs(
-      'https://code.alibaba-inc.com/maxcompute/odps_src/codereview/29295886',
+      'https://code.alibaba-inc.invalid/maxcompute/odps_src/codereview/29295886',
     );
     expect(got.target).toMatchObject({
       type: 'pr-url',
-      host: 'code.alibaba-inc.com',
+      host: 'code.alibaba-inc.invalid',
       owner: 'maxcompute',
       repo: 'odps_src',
       number: 29295886,
@@ -799,14 +800,14 @@ describe('parseReviewArgs', () => {
 
   it('an Aone codereview URL with a trailing query still parses', () => {
     const got = parseReviewArgs(
-      'https://code.alibaba-inc.com/maxcompute/odps_src/codereview/123?tab=files',
+      'https://code.alibaba-inc.invalid/maxcompute/odps_src/codereview/123?tab=files',
     );
     expect(got.target).toMatchObject({ type: 'pr-url', number: 123 });
   });
 
   it('an Aone codereview URL with a nested group keeps the last two segments', () => {
     const got = parseReviewArgs(
-      'https://code.alibaba-inc.com/sub/maxcompute/odps_src/codereview/123',
+      'https://code.alibaba-inc.invalid/sub/maxcompute/odps_src/codereview/123',
     );
     expect(got.target).toMatchObject({
       type: 'pr-url',
@@ -820,7 +821,7 @@ describe('parseReviewArgs', () => {
     // The canonicalized URL keeps the full path too — a collapsed spelling
     // would name a different repo to anything that re-reads it.
     expect((got.target as { url: string }).url).toBe(
-      'https://code.alibaba-inc.com/sub/maxcompute/odps_src/codereview/123',
+      'https://code.alibaba-inc.invalid/sub/maxcompute/odps_src/codereview/123',
     );
   });
 
@@ -828,7 +829,7 @@ describe('parseReviewArgs', () => {
     // The URL pins an exact repo: the gates must not match it against a
     // nested remote sharing the tail (reverse direction of the hazard).
     const got = parseReviewArgs(
-      'https://code.alibaba-inc.com/maxcompute/odps_src/codereview/5',
+      'https://code.alibaba-inc.invalid/maxcompute/odps_src/codereview/5',
     );
     expect(got.target).toMatchObject({
       type: 'pr-url',
@@ -900,30 +901,30 @@ describe('parseReviewArgs', () => {
     // an Aone host is a fabrication and must fail closed, not become a live
     // target routed at the Aone host.
     const got = parseReviewArgs(
-      'https://code.alibaba-inc.com/maxcompute/odps_src/pull/123',
+      'https://code.alibaba-inc.invalid/maxcompute/odps_src/pull/123',
     );
     expect(got.target).toEqual({ type: 'local' });
     expect(got.warnings[0]).toContain('not a PR/CR URL');
   });
 
   it('the trailing-dot FQDN spelling of an Aone host is refused too', () => {
-    // `code.alibaba-inc.com.` is DNS-identical to the plain host and the
+    // `code.alibaba-inc.invalid.` is DNS-identical to the plain host and the
     // URL grammar admits the dot — isAoneHost normalizes it, so the /pull/
     // refusal and the CR-form refusal treat both spellings alike.
     const got = parseReviewArgs(
-      'https://code.alibaba-inc.com./maxcompute/odps_src/pull/5',
+      'https://code.alibaba-inc.invalid./maxcompute/odps_src/pull/5',
     );
     expect(got.target).toEqual({ type: 'local' });
     expect(got.warnings[0]).toContain('not a PR/CR URL');
   });
 
   it('a /codereview/ URL on a family-only (GHE) host is refused — fail closed', () => {
-    // `ghe.alibaba-inc.com` serves no /codereview/ grammar; accepting it
+    // `ghe.alibaba-inc.invalid` serves no /codereview/ grammar; accepting it
     // as a live target would let detection route the explicit GHE host to
     // GitHub and aim fetch/submit at GHE PR #123 — a target the supplied
     // URL never named as a valid GHE resource.
     const got = parseReviewArgs(
-      'https://ghe.alibaba-inc.com/group/repo/codereview/123',
+      'https://ghe.alibaba-inc.invalid/group/repo/codereview/123',
     );
     expect(got.target).toEqual({ type: 'local' });
     expect(got.warnings[0]).toContain('not a PR/CR URL');
@@ -934,11 +935,11 @@ describe('parseReviewArgs', () => {
     // the family host must parse as a pr-url (and its explicit host then
     // routes to the GitHub reader — pinned in registry.test.ts).
     const got = parseReviewArgs(
-      'https://ghe.alibaba-inc.com/group/repo/pull/123',
+      'https://ghe.alibaba-inc.invalid/group/repo/pull/123',
     );
     expect(got.target).toMatchObject({
       type: 'pr-url',
-      host: 'ghe.alibaba-inc.com',
+      host: 'ghe.alibaba-inc.invalid',
       number: 123,
     });
   });
@@ -1128,8 +1129,8 @@ describe('parseReviewArgs — --severity-floor (the convergence posture knob)', 
     // `maxcompute/odps_src`… here: shared tail `sub/app`) and silently
     // reviewed the first. The full group path keeps them distinct.
     const got = parseReviewArgs(
-      '--severity-floor https://code.alibaba-inc.com/groupA/sub/app/codereview/7 ' +
-        '--effort https://code.alibaba-inc.com/groupB/sub/app/codereview/7',
+      '--severity-floor https://code.alibaba-inc.invalid/groupA/sub/app/codereview/7 ' +
+        '--effort https://code.alibaba-inc.invalid/groupB/sub/app/codereview/7',
     );
     expect(got.target).toEqual({ type: 'local' });
     expect(got.warnings.some((w) => w.includes('Ambiguous target'))).toBe(true);
@@ -1140,12 +1141,13 @@ describe('parseReviewArgs — --severity-floor (the convergence posture knob)', 
     // spellings of one PR arrive, the URL must be the target regardless of
     // token order — a bare-number target flips detection onto the cwd
     // fallback and silently reviews the cwd clone's same-number PR.
-    const url = 'https://code.alibaba-inc.com/maxcompute/odps_src/codereview/7';
+    const url =
+      'https://code.alibaba-inc.invalid/maxcompute/odps_src/codereview/7';
     for (const args of [`7 ${url}`, `${url} 7`]) {
       const got = parseReviewArgs(args);
       expect(got.target).toMatchObject({
         type: 'pr-url',
-        host: 'code.alibaba-inc.com',
+        host: 'code.alibaba-inc.invalid',
         owner: 'maxcompute',
         repo: 'odps_src',
         number: 7,
@@ -1156,7 +1158,8 @@ describe('parseReviewArgs — --severity-floor (the convergence posture knob)', 
   it('flag-rescued spellings prefer the CR URL over the bare number too', () => {
     // The rescue pool's one-PR subsumption must pick the repo-qualified
     // spelling whichever order the invalid flag values arrived in.
-    const url = 'https://code.alibaba-inc.com/maxcompute/odps_src/codereview/7';
+    const url =
+      'https://code.alibaba-inc.invalid/maxcompute/odps_src/codereview/7';
     for (const args of [
       `--severity-floor 7 --effort ${url}`,
       `--severity-floor ${url} --effort 7`,
@@ -1164,7 +1167,7 @@ describe('parseReviewArgs — --severity-floor (the convergence posture knob)', 
       const got = parseReviewArgs(args);
       expect(got.target).toMatchObject({
         type: 'pr-url',
-        host: 'code.alibaba-inc.com',
+        host: 'code.alibaba-inc.invalid',
         number: 7,
       });
     }
@@ -1177,7 +1180,8 @@ describe('parseReviewArgs — --severity-floor (the convergence posture knob)', 
     // host/platform identity) was discarded as an effort typo and the run
     // retargeted onto the cwd clone's same-number PR. A DIFFERENT number
     // typed positionally still outranks (control at the end).
-    const url = 'https://code.alibaba-inc.com/maxcompute/odps_src/codereview/7';
+    const url =
+      'https://code.alibaba-inc.invalid/maxcompute/odps_src/codereview/7';
     for (const args of [
       `--effort ${url} 7`,
       `7 --effort ${url}`,
@@ -1186,7 +1190,7 @@ describe('parseReviewArgs — --severity-floor (the convergence posture knob)', 
       const got = parseReviewArgs(args);
       expect(got.target).toMatchObject({
         type: 'pr-url',
-        host: 'code.alibaba-inc.com',
+        host: 'code.alibaba-inc.invalid',
         number: 7,
       });
     }
@@ -1198,15 +1202,15 @@ describe('parseReviewArgs — --severity-floor (the convergence posture knob)', 
   });
 
   it('records the --host flag verbatim for the write gate', () => {
-    expect(parseReviewArgs('123 --host gitlab.alibaba-inc.com').host).toBe(
-      'gitlab.alibaba-inc.com',
+    expect(parseReviewArgs('123 --host gitlab.alibaba-inc.invalid').host).toBe(
+      'gitlab.alibaba-inc.invalid',
     );
-    expect(parseReviewArgs('123 --host=code.alibaba-inc.com').host).toBe(
-      'code.alibaba-inc.com',
+    expect(parseReviewArgs('123 --host=code.alibaba-inc.invalid').host).toBe(
+      'code.alibaba-inc.invalid',
     );
     expect(parseReviewArgs('123').host).toBeUndefined();
     // The value is consumed — it never leaks into the target tokens.
-    const got = parseReviewArgs('123 --host gitlab.alibaba-inc.com');
+    const got = parseReviewArgs('123 --host gitlab.alibaba-inc.invalid');
     expect(got.target).toMatchObject({ type: 'pr-number', number: 123 });
     expect(got.extraTokens).toEqual([]);
   });
@@ -1885,7 +1889,7 @@ describe('parseReviewArgs — case and single-dash disposal (bug: guessed where 
  * Wiring-level tests: the real yargs command, not the pure function. The
  * pure-function table cannot see transport failures — the documented
  * positional invocation broke on any raw string that begins with a flag
- * (`qwen review parse-args '--effort low'` → `Unknown argument`), and every
+ * (`mariadb-shell-agent review parse-args '--effort low'` → `Unknown argument`), and every
  * unit test kept passing while it did.
  */
 describe('parseArgsCommand wiring', () => {
@@ -2662,15 +2666,21 @@ describe('--resume', () => {
 });
 
 describe('parse-args — the scratch directory guard', () => {
-  it('guards a --out under .qwen/tmp, and only there', () => {
-    // Step 0's write is the round's first into `.qwen/tmp`: the shared
+  it('guards a --out under .mariadb-shell-agent/tmp, and only there', () => {
+    // Step 0's write is the round's first into `.mariadb-shell-agent/tmp`: the shared
     // entry guard refuses a workspace-planted link before it lands. A
     // `--out` elsewhere is the caller's directory, not the scratch one.
-    const out = join('.qwen', 'tmp', 'qwen-review-parse-args.json');
+    const out = join(
+      '.mariadb-shell-agent',
+      'tmp',
+      'qwen-review-parse-args.json',
+    );
     ensureReviewTmpDirMock.mockClear();
     fsState.written.delete(out);
     ensureReviewTmpDirMock.mockImplementationOnce(() => {
-      throw new Error('parse-args: .qwen/tmp is a symbolic link');
+      throw new Error(
+        'parse-args: .mariadb-shell-agent/tmp is a symbolic link',
+      );
     });
     expect(() =>
       (parseArgsCommand.handler as (a: unknown) => void)({
@@ -2683,14 +2693,14 @@ describe('parse-args — the scratch directory guard', () => {
     // …and the refusal came BEFORE the write, or the guard is decoration.
     expect(fsState.written.has(out)).toBe(false);
     // …and the spelling a case-insensitive filesystem resolves through:
-    // `--out .QWEN/tmp/x` reaches the very directory the guard is about to
+    // `--out .MARIADB-SHELL-AGENT/tmp/x` reaches the very directory the guard is about to
     // check, so the predicate folds case. Over-matching on a case-sensitive
     // filesystem is the safe direction — the answer only decides whether to
     // CHECK.
     ensureReviewTmpDirMock.mockClear();
     (parseArgsCommand.handler as (a: unknown) => void)({
       raw: '',
-      out: join('.QWEN', 'tmp', 'qwen-review-parse-args.json'),
+      out: join('.MARIADB-SHELL-AGENT', 'tmp', 'qwen-review-parse-args.json'),
       _: ['review', 'parse-args'],
     });
     expect(ensureReviewTmpDirMock).toHaveBeenCalledWith('parse-args');
@@ -2702,7 +2712,7 @@ describe('parse-args — the scratch directory guard', () => {
     ensureReviewTmpDirMock.mockClear();
     (parseArgsCommand.handler as (a: unknown) => void)({
       raw: '',
-      out: join('.qwen', 'tmp'),
+      out: join('.mariadb-shell-agent', 'tmp'),
       _: ['review', 'parse-args'],
     });
     expect(ensureReviewTmpDirMock).toHaveBeenCalledWith('parse-args');

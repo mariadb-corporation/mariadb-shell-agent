@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -58,12 +59,12 @@ import { PINNED_DIFF_CONFIG, PINNED_DIFF_FLAGS } from '../diff-flags.js';
 describe('parseRemoteUrl hardening', () => {
   it('discards an explicit port instead of folding it into the path', () => {
     expect(
-      parseRemoteUrl('https://gitlab.alibaba-inc.com:8443/solo'),
+      parseRemoteUrl('https://gitlab.alibaba-inc.invalid:8443/solo'),
     ).toBeNull();
     expect(
-      parseRemoteUrl('https://gitlab.alibaba-inc.com:8443/g/p.git'),
+      parseRemoteUrl('https://gitlab.alibaba-inc.invalid:8443/g/p.git'),
     ).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'g',
       repo: 'p',
       groupPath: 'g/p',
@@ -97,18 +98,18 @@ describe('parseRemoteUrl hardening', () => {
     // unredacted into the refusal message.
     expect(
       parseRemoteUrl(
-        'https://ci-user:SECRET1@SECRET2@code.alibaba-inc.com/g/p',
+        'https://ci-user:SECRET1@SECRET2@code.alibaba-inc.invalid/g/p',
       ),
     ).toEqual({
-      host: 'code.alibaba-inc.com',
+      host: 'code.alibaba-inc.invalid',
       owner: 'g',
       repo: 'p',
       groupPath: 'g/p',
     });
     expect(
-      parseRemoteUrl('https://ci-user:S1@S2@S3@code.alibaba-inc.com/g/p'),
+      parseRemoteUrl('https://ci-user:S1@S2@S3@code.alibaba-inc.invalid/g/p'),
     ).toEqual({
-      host: 'code.alibaba-inc.com',
+      host: 'code.alibaba-inc.invalid',
       owner: 'g',
       repo: 'p',
       groupPath: 'g/p',
@@ -123,17 +124,19 @@ describe('parseRemoteUrl hardening', () => {
     // earlier last-`@` consumption let fetchDiff's same-repo guard pass
     // while git fetched from a DIFFERENT server than the identity named.
     expect(
-      parseRemoteUrl('ci-user:/token-with-slash@code.alibaba-inc.com:g/p.git'),
+      parseRemoteUrl(
+        'ci-user:/token-with-slash@code.alibaba-inc.invalid:g/p.git',
+      ),
     ).toBeNull();
     // The plain token-bearing scp shape too: git reads host `oauth2`, so
     // the residue fails closed here as well.
     expect(
-      parseRemoteUrl('oauth2:SECRET@code.alibaba-inc.com:g/p.git'),
+      parseRemoteUrl('oauth2:SECRET@code.alibaba-inc.invalid:g/p.git'),
     ).toBeNull();
     // The legitimate shape is untouched: `user@` with no colon/slash in
     // the user part.
-    expect(parseRemoteUrl('ci-user@code.alibaba-inc.com:g/p.git')).toEqual({
-      host: 'code.alibaba-inc.com',
+    expect(parseRemoteUrl('ci-user@code.alibaba-inc.invalid:g/p.git')).toEqual({
+      host: 'code.alibaba-inc.invalid',
       owner: 'g',
       repo: 'p',
       groupPath: 'g/p',
@@ -145,7 +148,7 @@ describe('parseRemoteUrl hardening', () => {
     // the raw URL through redactUrl, which consumes the same greedy shape.
     expect(
       parseRemoteUrl(
-        'https://ci-user:SECRET1@SECRET2@code.alibaba-inc.com/solo',
+        'https://ci-user:SECRET1@SECRET2@code.alibaba-inc.invalid/solo',
       ),
     ).toBeNull();
   });
@@ -161,7 +164,7 @@ describe('parseRemoteUrl hardening', () => {
       parseRemoteUrl('https://user:S1/S2@host.example:8443/project'),
     ).toBeNull();
     expect(
-      parseRemoteUrl('https://gitlab.alibaba-inc.com/x//y@g/p'),
+      parseRemoteUrl('https://gitlab.alibaba-inc.invalid/x//y@g/p'),
     ).toBeNull();
   });
 
@@ -170,10 +173,10 @@ describe('parseRemoteUrl hardening', () => {
     // anything can parse `cd` as a host; the real path parses.
     expect(
       parseRemoteUrl(
-        'https://gitlab.alibaba-inc.com/group/proj?private_token=ab@cd:8443/x/y',
+        'https://gitlab.alibaba-inc.invalid/group/proj?private_token=ab@cd:8443/x/y',
       ),
     ).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'group',
       repo: 'proj',
       groupPath: 'group/proj',
@@ -183,10 +186,10 @@ describe('parseRemoteUrl hardening', () => {
     // `?` and consume the path (round-10 fabrication witness).
     expect(
       parseRemoteUrl(
-        'git@gitlab.alibaba-inc.com:group/proj?private_token=ab@cd:8443/x/y',
+        'git@gitlab.alibaba-inc.invalid:group/proj?private_token=ab@cd:8443/x/y',
       ),
     ).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'group',
       repo: 'proj',
       groupPath: 'group/proj',
@@ -195,7 +198,7 @@ describe('parseRemoteUrl hardening', () => {
     // into a host swap.
     expect(
       parseRemoteUrl(
-        'https://gitlab.alibaba-inc.com/junk@gitlab.alibaba-inc.com:g/p',
+        'https://gitlab.alibaba-inc.invalid/junk@gitlab.alibaba-inc.invalid:g/p',
       ),
     ).toBeNull();
   });
@@ -224,7 +227,7 @@ describe('aoneReader.resolveRepo', () => {
     // `?private_token=…` origins carry no `@` for the userinfo redaction.
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'remote')
-        return 'https://code.alibaba-inc.com/solo?private_token=SECRET123';
+        return 'https://code.alibaba-inc.invalid/solo?private_token=SECRET123';
       return '';
     });
     let message = '';
@@ -246,11 +249,11 @@ describe('aoneReader.resolveRepo', () => {
     // the whole query), so there is no refusal message to leak through.
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'remote')
-        return 'https://gitlab.alibaba-inc.com/g/p?private_token=SECRET\nx';
+        return 'https://gitlab.alibaba-inc.invalid/g/p?private_token=SECRET\nx';
       return '';
     });
     expect(aoneReader.resolveRepo()).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'g',
       repo: 'p',
       groupPath: 'g/p',
@@ -262,7 +265,7 @@ describe('aoneReader.resolveRepo', () => {
     // refusal message must not echo the token the strip removed.
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'remote')
-        return 'https://code.alibaba-inc.com/solo?private_token=SECRET\nx';
+        return 'https://code.alibaba-inc.invalid/solo?private_token=SECRET\nx';
       return '';
     });
     let message = '';
@@ -282,11 +285,11 @@ describe('aoneReader.resolveRepo', () => {
     // the refusal. Userinfo goes FIRST, so this origin parses.
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'remote')
-        return 'https://user:pa?ss@gitlab.alibaba-inc.com/g/p.git';
+        return 'https://user:pa?ss@gitlab.alibaba-inc.invalid/g/p.git';
       return '';
     });
     expect(aoneReader.resolveRepo()).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'g',
       repo: 'p',
       groupPath: 'g/p',
@@ -298,7 +301,7 @@ describe('aoneReader.resolveRepo', () => {
     // must not carry the username or secret prefix.
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'remote')
-        return 'https://user:pa?ss@code.alibaba-inc.com/solo.git';
+        return 'https://user:pa?ss@code.alibaba-inc.invalid/solo.git';
       return '';
     });
     let message = '';
@@ -315,7 +318,7 @@ describe('aoneReader.resolveRepo', () => {
   it('redacts a `/`-bearing scp userinfo on the refusal path too', () => {
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'remote')
-        return 'ci-user:/token-with-slash@code.alibaba-inc.com:solo';
+        return 'ci-user:/token-with-slash@code.alibaba-inc.invalid:solo';
       return '';
     });
     let message = '';
@@ -353,7 +356,7 @@ describe('aoneReader.resolveRepo', () => {
     // `host:` shape at all. None may reach the message.
     for (const [origin, secret, user] of [
       ['https://user:sec/ret@code.example.com/solo', 'sec', 'user'],
-      ['ci-user:sec\nret@code.alibaba-inc.com:solo', 'sec', 'ci-user'],
+      ['ci-user:sec\nret@code.alibaba-inc.invalid:solo', 'sec', 'ci-user'],
       ['user:token@weirdhost', 'token', 'user'],
     ]) {
       gitMock.mockImplementation((...args: string[]) => {
@@ -379,9 +382,9 @@ describe('aoneReader.resolveRepo', () => {
     // there, so the message becomes a constant. Round-10 witnesses: the
     // URL, scp, and fragment spellings all leaked the token tail before.
     for (const origin of [
-      'https://code.alibaba-inc.com/solo?private_token=prefix@SECRET-TOKEN-TAIL',
-      'ci-user:tok@code.alibaba-inc.com:solo?token=a@SECRET-SCP',
-      'https://code.alibaba-inc.com/solo#frag@SECRET-FRAG',
+      'https://code.alibaba-inc.invalid/solo?private_token=prefix@SECRET-TOKEN-TAIL',
+      'ci-user:tok@code.alibaba-inc.invalid:solo?token=a@SECRET-SCP',
+      'https://code.alibaba-inc.invalid/solo#frag@SECRET-FRAG',
     ]) {
       gitMock.mockImplementation((...args: string[]) => {
         if (args[0] === 'remote') return origin;
@@ -478,13 +481,13 @@ describe('aoneReader.getPrMeta — the live-head read behind meta.headSha', () =
     a1JsonMock.mockReturnValue({
       mergeRequest: {
         sourceBranch: 'sha123',
-        detailUrl: 'https://code.alibaba-inc.com/g/p/codereview/7',
+        detailUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/7',
       },
     });
     expect(aoneReader.getPrMeta(7, 'g/p')).toEqual({
       number: 7,
       headSha: 'sha123',
-      webUrl: 'https://code.alibaba-inc.com/g/p/codereview/7',
+      webUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/7',
     });
   });
 
@@ -512,7 +515,7 @@ describe('aoneReader.getFetchMeta / fetchHeadRefSpec', () => {
         sourceBranch: 'sha123',
         targetBranch: 'master',
         description: 'desc',
-        detailUrl: 'https://code.alibaba-inc.com/g/p/codereview/7',
+        detailUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/7',
       },
     });
     const meta = aoneReader.getFetchMeta(7, 'g/p');
@@ -571,7 +574,7 @@ describe('aoneReader.getReviewContext / getCurrentUser', () => {
           description: 'the description',
           author: { username: 'someone' },
           state: 'opened',
-          detailUrl: 'https://code.alibaba-inc.com/g/p/codereview/7',
+          detailUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/7',
           ...view,
         },
       })
@@ -828,11 +831,11 @@ describe('aoneReader.composeUrl', () => {
     a1JsonMock.mockReturnValue({
       mergeRequest: {
         detailUrl:
-          'https://code.alibaba-inc.com/odps/odps_src/codereview/29295886',
+          'https://code.alibaba-inc.invalid/odps/odps_src/codereview/29295886',
       },
     });
     expect(aoneReader.composeUrl(29295886, 'odps/odps_src')).toBe(
-      'https://code.alibaba-inc.com/odps/odps_src/codereview/29295886',
+      'https://code.alibaba-inc.invalid/odps/odps_src/codereview/29295886',
     );
   });
 
@@ -1022,7 +1025,7 @@ describe('aoneReader.fetchDiff', () => {
     });
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'merge-base') return 'base-sha';
-      if (args[0] === 'remote') return 'git@gitlab.alibaba-inc.com:g/p.git';
+      if (args[0] === 'remote') return 'git@gitlab.alibaba-inc.invalid:g/p.git';
       return '';
     });
     gitRawMock.mockReturnValue(Buffer.from('diff --git a/x b/x\n', 'latin1'));
@@ -1077,7 +1080,7 @@ describe('aoneReader.fetchDiff', () => {
       },
     });
     gitMock.mockImplementation((...args: string[]) => {
-      if (args[0] === 'remote') return 'git@gitlab.alibaba-inc.com:g/p.git';
+      if (args[0] === 'remote') return 'git@gitlab.alibaba-inc.invalid:g/p.git';
       return '';
     });
     expect(() => aoneReader.fetchDiff(7, 'g/p')).toThrow(
@@ -1098,7 +1101,7 @@ describe('aoneReader.fetchDiff', () => {
     // empty string all die at the metadata stage — each has a distinct
     // wrong outcome inside git.
     gitMock.mockImplementation((...args: string[]) => {
-      if (args[0] === 'remote') return 'git@gitlab.alibaba-inc.com:g/p.git';
+      if (args[0] === 'remote') return 'git@gitlab.alibaba-inc.invalid:g/p.git';
       return '';
     });
     for (const target of [
@@ -1127,7 +1130,7 @@ describe('aoneReader.fetchDiff', () => {
     });
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'merge-base') throw new Error('no merge-base');
-      if (args[0] === 'remote') return 'git@gitlab.alibaba-inc.com:g/p.git';
+      if (args[0] === 'remote') return 'git@gitlab.alibaba-inc.invalid:g/p.git';
       return '';
     });
     gitRawMock.mockReturnValue(Buffer.from('d', 'latin1'));
@@ -1172,7 +1175,7 @@ describe('aoneReader.fetchDiff', () => {
     });
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'remote')
-        return 'git@gitlab.alibaba-inc.com:other/repo.git';
+        return 'git@gitlab.alibaba-inc.invalid:other/repo.git';
       return '';
     });
     expect(() => aoneReader.fetchDiff(7, 'g/p')).toThrow(
@@ -1204,7 +1207,8 @@ describe('aoneReader.fetchDiff', () => {
     });
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'merge-base') return 'base-sha';
-      if (args[0] === 'remote') return 'https://code.alibaba-inc.com/g/p.git';
+      if (args[0] === 'remote')
+        return 'https://code.alibaba-inc.invalid/g/p.git';
       return '';
     });
     gitRawMock.mockReturnValue(Buffer.from('d', 'latin1'));
@@ -1219,12 +1223,13 @@ describe('aoneReader.fetchDiff', () => {
       mergeRequest: {
         sourceBranch: 'sha',
         targetBranch: 'master',
-        detailUrl: 'https://code.alibaba-inc.com/groupA/sub/app/codereview/7',
+        detailUrl:
+          'https://code.alibaba-inc.invalid/groupA/sub/app/codereview/7',
       },
     });
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'remote')
-        return 'git@gitlab.alibaba-inc.com:groupB/sub/app.git';
+        return 'git@gitlab.alibaba-inc.invalid:groupB/sub/app.git';
       return '';
     });
     expect(() => aoneReader.fetchDiff(7, 'sub/app')).toThrow(
@@ -1238,13 +1243,14 @@ describe('aoneReader.fetchDiff', () => {
       mergeRequest: {
         sourceBranch: 'sha',
         targetBranch: 'master',
-        detailUrl: 'https://code.alibaba-inc.com/groupA/sub/app/codereview/7',
+        detailUrl:
+          'https://code.alibaba-inc.invalid/groupA/sub/app/codereview/7',
       },
     });
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'merge-base') return 'base-sha';
       if (args[0] === 'remote')
-        return 'git@gitlab.alibaba-inc.com:groupA/sub/app.git';
+        return 'git@gitlab.alibaba-inc.invalid:groupA/sub/app.git';
       return '';
     });
     gitRawMock.mockReturnValue(Buffer.from('d', 'latin1'));
@@ -1260,7 +1266,8 @@ describe('aoneReader.fetchDiff', () => {
     });
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'merge-base') return 'base-sha';
-      if (args[0] === 'remote') return 'https://code.alibaba-inc.com./g/p.git';
+      if (args[0] === 'remote')
+        return 'https://code.alibaba-inc.invalid./g/p.git';
       return '';
     });
     gitRawMock.mockReturnValue(Buffer.from('d', 'latin1'));
@@ -1272,7 +1279,7 @@ describe('aoneReader.fetchDiff', () => {
     // full-range metadata); ORIG_HEAD to an arbitrary ancestor. Both are
     // shape-legal and silently wrong — the allowlist refuses the set.
     gitMock.mockImplementation((...args: string[]) => {
-      if (args[0] === 'remote') return 'git@gitlab.alibaba-inc.com:g/p.git';
+      if (args[0] === 'remote') return 'git@gitlab.alibaba-inc.invalid:g/p.git';
       return '';
     });
     for (const target of [
@@ -1313,7 +1320,7 @@ describe('aoneReader.fetchDiff', () => {
     });
     gitMock.mockImplementation((...args: string[]) => {
       if (args[0] === 'merge-base') return 'base-sha';
-      if (args[0] === 'remote') return 'git@gitlab.alibaba-inc.com:g/p.git';
+      if (args[0] === 'remote') return 'git@gitlab.alibaba-inc.invalid:g/p.git';
       return '';
     });
     gitRawMock.mockReturnValue(Buffer.from('d', 'latin1'));
@@ -1344,7 +1351,7 @@ describe('submitAoneReview (the a1 write path)', () => {
         return {
           mergeRequest: {
             ...(head === undefined ? {} : { sourceBranch: head }),
-            detailUrl: 'https://code.alibaba-inc.com/g/p/codereview/7',
+            detailUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/7',
           },
         };
       }
@@ -1439,7 +1446,9 @@ describe('submitAoneReview (the a1 write path)', () => {
     expect(result.postedInline).toBe(2);
     expect(result.summaryPosted).toBe(true);
     expect(result.approved).toBe(false);
-    expect(result.webUrl).toBe('https://code.alibaba-inc.com/g/p/codereview/7');
+    expect(result.webUrl).toBe(
+      'https://code.alibaba-inc.invalid/g/p/codereview/7',
+    );
     expect(ensureAuthMock).toHaveBeenCalledTimes(1);
     // And the auth check must PRECEDE the writes — count alone cannot
     // show that. A mutant moving the check below the batch turns an
@@ -1736,13 +1745,13 @@ describe('submitAoneReview (the a1 write path)', () => {
       .mockReturnValueOnce({
         mergeRequest: {
           sourceBranch: 'sha-head',
-          detailUrl: 'https://code.alibaba-inc.com/g/p/codereview/7',
+          detailUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/7',
         },
       })
       .mockReturnValueOnce({
         mergeRequest: {
           sourceBranch: 'sha-amended',
-          detailUrl: 'https://code.alibaba-inc.com/g/p/codereview/7',
+          detailUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/7',
         },
       });
     a1JsonOnceMock
@@ -1767,7 +1776,7 @@ describe('submitAoneReview (the a1 write path)', () => {
       .mockReturnValueOnce({
         mergeRequest: {
           sourceBranch: 'sha-head',
-          detailUrl: 'https://code.alibaba-inc.com/g/p/codereview/7',
+          detailUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/7',
         },
       })
       .mockImplementationOnce(() => {
@@ -1922,13 +1931,13 @@ describe('submitAoneReview (the a1 write path)', () => {
       .mockReturnValueOnce({
         mergeRequest: {
           sourceBranch: 'sha-head',
-          detailUrl: 'https://code.alibaba-inc.com/g/p/codereview/7',
+          detailUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/7',
         },
       })
       .mockReturnValueOnce({
         mergeRequest: {
           sourceBranch: 'sha-amended',
-          detailUrl: 'https://code.alibaba-inc.com/g/p/codereview/7',
+          detailUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/7',
         },
       });
     const result = submitAoneReview(req());
@@ -1950,7 +1959,7 @@ describe('submitAoneReview (the a1 write path)', () => {
       .mockReturnValueOnce({
         mergeRequest: {
           sourceBranch: 'sha-head',
-          detailUrl: 'https://code.alibaba-inc.com/g/p/codereview/7',
+          detailUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/7',
         },
       })
       .mockImplementationOnce(() => {

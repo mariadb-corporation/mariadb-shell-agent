@@ -36,7 +36,7 @@ Keep the SQL database durable across the execution-host reboot. An external MySQ
 
 ## Evidence status
 
-The design and code are local implementation artifacts. The verification report under `.qwen/e2e-tests/managed-schema-32.md` records exact executed suites and environments. Formal production cutover is a separate operational outcome and requires read-back evidence; a passing local test or successful start is not production acceptance.
+The design and code are local implementation artifacts. The verification report under `.mariadb-shell-agent/e2e-tests/managed-schema-32.md` records exact executed suites and environments. Formal production cutover is a separate operational outcome and requires read-back evidence; a passing local test or successful start is not production acceptance.
 
 ## Initial acceptance on 2026-10-13 (before review fixes)
 
@@ -52,7 +52,7 @@ The unchanged-mount positive uses a fresh database and a persistent native ext4 
 
 The final jar is running on an isolated Linux acceptance host, bound to loopback `127.0.0.1:18084`, against a task-specific new database on MySQL33384. Health is UP. Actual HTTP create/commit/read/idempotent-replay/seal/delete completed; SQL showed32 business tables plus Flyway history version1, original journal revision1/writer generation1 and a permanent deletion tombstone. Server process10562 was stopped and restarted as12123; the same Session and completed deletion operation persisted. This service acceptance intentionally disables Harness/Broker dispatch; actual native tool/worker behavior is covered by the separate unchanged fixtures above. No model credentials or formal traffic gateway were configured. The old application database was not migrated or modified. Production quiesce/routing/cutover remains a separate operational step. Preserve this new database and its Session records during rollback.
 
-Full commands, failures and read-back outputs are retained locally under `.qwen/e2e-tests/managed-schema-32.md` and the independent test-engineer report. Acceptance artifacts, deployment scripts and the `native-volume/fixture` are retained in the task-specific acceptance directory on that host. Only task-specific MySQL33384 and these acceptance resources were configured.
+Full commands, failures and read-back outputs are retained locally under `.mariadb-shell-agent/e2e-tests/managed-schema-32.md` and the independent test-engineer report. Acceptance artifacts, deployment scripts and the `native-volume/fixture` are retained in the task-specific acceptance directory on that host. Only task-specific MySQL33384 and these acceptance resources were configured.
 
 ## Review fixes on 2026-10-13
 
@@ -60,7 +60,7 @@ The four confirmed review defects are fixed: successful object writes can recove
 
 This follow-up is a local code and acceptance result. The Linux deployment and reboot above ran the pre-fix artifact and remain historical evidence; this round does not replace that service or change its database. The updated fresh-database baseline is not an upgrade migration for that existing acceptance database.
 
-The independent reproduction scripts and 15 additional real-MySQL protection/transaction cases passed. The Server's 114-case MySQL 8.4.11 suite and five MySQL/child-JVM PUT fault cases passed with no failures or skips. A final 24-case regression repeated all 21 MySQL snapshot cases and preserved the existing small-message query budget exactly. Broker verify passed 828 unit tests (two environment skips), its real MySQL catalog gate, and static analysis. Node build/typecheck/bundle passed. PUT fault storage is a controlled file/in-memory adapter; this round does not claim real OSS acceptance. Full logs and final artifact checks are recorded in `.qwen/e2e-tests/managed-schema-32.md` and the independent report `.qwen/pr-reviews/managed-schema32-review/fix-verification.md`.
+The independent reproduction scripts and 15 additional real-MySQL protection/transaction cases passed. The Server's 114-case MySQL 8.4.11 suite and five MySQL/child-JVM PUT fault cases passed with no failures or skips. A final 24-case regression repeated all 21 MySQL snapshot cases and preserved the existing small-message query budget exactly. Broker verify passed 828 unit tests (two environment skips), its real MySQL catalog gate, and static analysis. Node build/typecheck/bundle passed. PUT fault storage is a controlled file/in-memory adapter; this round does not claim real OSS acceptance. Full logs and final artifact checks are recorded in `.mariadb-shell-agent/e2e-tests/managed-schema-32.md` and the independent report `.mariadb-shell-agent/pr-reviews/managed-schema32-review/fix-verification.md`.
 
 Final Server unit run: 2391 tests, zero failures/errors, six environment skips. Checkstyle and SpotBugs passed after removing one trailing blank line. All 549 production class digests in the rebuilt artifact exactly match the fully tested classes. Final local Server artifact SHA256 is `f98551840d147cf2fde7ca7535e7e3df055a15abc870c622e35e66924445478e`; readback confirms the shared DDL above and no legacy application migrations. The additional final-source independent MySQL rerun passed all 15 protection/transaction cases again.
 

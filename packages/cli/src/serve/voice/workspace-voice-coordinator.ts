@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -152,7 +153,7 @@ export class WorkspaceVoiceCoordinator {
     }
     if (timedOut && state.leases.size > 0) {
       process.stderr.write(
-        `qwen serve: Voice runtime disposal timed out with ${state.leases.size} active lease(s).\n`,
+        `mariadb-shell-agent serve: Voice runtime disposal timed out with ${state.leases.size} active lease(s).\n`,
       );
     }
   }

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 // @vitest-environment jsdom
@@ -3620,7 +3621,8 @@ describe('useSlashCommandProcessor', () => {
           skillDetail: {
             name: 'review-skill',
             level: 'project',
-            filePath: '/test/project/.qwen/skills/auto-skill-review/SKILL.md',
+            filePath:
+              '/test/project/.mariadb-shell-agent/skills/auto-skill-review/SKILL.md',
           },
           action: vi.fn().mockResolvedValue({
             type: 'submit_prompt',
@@ -3645,7 +3647,8 @@ describe('useSlashCommandProcessor', () => {
       expect(recordAutoSkillUsageMock).toHaveBeenCalledWith('/test/project', {
         name: 'review-skill',
         level: 'project',
-        filePath: '/test/project/.qwen/skills/auto-skill-review/SKILL.md',
+        filePath:
+          '/test/project/.mariadb-shell-agent/skills/auto-skill-review/SKILL.md',
       });
     });
 
@@ -3728,7 +3731,8 @@ describe('useSlashCommandProcessor', () => {
           skillDetail: {
             name: 'review-skill',
             level: 'project',
-            filePath: '/test/project/.qwen/skills/auto-skill-review/SKILL.md',
+            filePath:
+              '/test/project/.mariadb-shell-agent/skills/auto-skill-review/SKILL.md',
           },
           action,
         },
@@ -4064,7 +4068,8 @@ describe('useSlashCommandProcessor', () => {
         skillDetail: {
           name: 'feat-dev',
           level: 'project',
-          filePath: '/test/project/.qwen/skills/auto-skill-feat-dev/SKILL.md',
+          filePath:
+            '/test/project/.mariadb-shell-agent/skills/auto-skill-feat-dev/SKILL.md',
         },
       };
       const skillB = {
@@ -4072,7 +4077,8 @@ describe('useSlashCommandProcessor', () => {
         skillDetail: {
           name: 'review',
           level: 'project',
-          filePath: '/test/project/.qwen/skills/auto-skill-review/SKILL.md',
+          filePath:
+            '/test/project/.mariadb-shell-agent/skills/auto-skill-review/SKILL.md',
         },
       };
       const result = setupProcessorHook([skillA, skillB]);
@@ -4087,12 +4093,14 @@ describe('useSlashCommandProcessor', () => {
       expect(recordAutoSkillUsageMock).toHaveBeenCalledWith('/test/project', {
         name: 'feat-dev',
         level: 'project',
-        filePath: '/test/project/.qwen/skills/auto-skill-feat-dev/SKILL.md',
+        filePath:
+          '/test/project/.mariadb-shell-agent/skills/auto-skill-feat-dev/SKILL.md',
       });
       expect(recordAutoSkillUsageMock).toHaveBeenCalledWith('/test/project', {
         name: 'review',
         level: 'project',
-        filePath: '/test/project/.qwen/skills/auto-skill-review/SKILL.md',
+        filePath:
+          '/test/project/.mariadb-shell-agent/skills/auto-skill-review/SKILL.md',
       });
     });
 

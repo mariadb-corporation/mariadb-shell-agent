@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -465,7 +466,7 @@ export function formatDaemonDetail(
   detail: DaemonDetailSummary | string,
 ): string {
   if (typeof detail === 'string') {
-    return `qwen daemon: port ${record.port}: detail unavailable: ${sanitize(detail)}`;
+    return `mariadb-shell-agent daemon: port ${record.port}: detail unavailable: ${sanitize(detail)}`;
   }
   const uptime =
     detail.uptimeMs === undefined
@@ -479,7 +480,7 @@ export function formatDaemonDetail(
           ? ''
           : `(+${detail.sessions.admissionInFlight} admitting)`);
   return (
-    `qwen daemon: port ${record.port}: status=${sanitize(detail.status)}` +
+    `mariadb-shell-agent daemon: port ${record.port}: status=${sanitize(detail.status)}` +
     ` version=${sanitize(detail.version ?? 'unknown')} uptime=${uptime}` +
     `${sessions} issues=${detail.issues.length}`
   );
@@ -594,10 +595,10 @@ export function formatDaemonStartSummary(
   record: DaemonDiscoveryRecord,
 ): string {
   return [
-    `qwen daemon: started pid ${record.pid} on ${record.url}`,
-    `qwen daemon: workspace ${record.primaryWorkspace}`,
-    `qwen daemon: logs ${logPathFor(record)}`,
-    `qwen daemon: stop with \`qwen daemon stop --port ${record.port}\``,
+    `mariadb-shell-agent daemon: started pid ${record.pid} on ${record.url}`,
+    `mariadb-shell-agent daemon: workspace ${record.primaryWorkspace}`,
+    `mariadb-shell-agent daemon: logs ${logPathFor(record)}`,
+    `mariadb-shell-agent daemon: stop with \`mariadb-shell-agent daemon stop --port ${record.port}\``,
   ].join('\n');
 }
 
@@ -720,7 +721,7 @@ async function handleStart(argv: StartArgs): Promise<void> {
   const entry = resolveCliEntry();
   if (!entry) {
     writeStderrLine(
-      'qwen daemon: cannot determine the CLI entry; run `qwen serve` directly.',
+      'mariadb-shell-agent daemon: cannot determine the CLI entry; run `mariadb-shell-agent serve` directly.',
     );
     process.exitCode = 1;
     return;
@@ -736,7 +737,7 @@ async function handleStart(argv: StartArgs): Promise<void> {
     workspaces = await canonicalizeStartWorkspaces(rawWorkspaces);
   } catch (error) {
     writeStderrLine(
-      `qwen daemon: ${error instanceof Error ? error.message : String(error)}`,
+      `mariadb-shell-agent daemon: ${error instanceof Error ? error.message : String(error)}`,
     );
     process.exitCode = 1;
     return;
@@ -748,29 +749,29 @@ async function handleStart(argv: StartArgs): Promise<void> {
     argv.token?.trim() || process.env['QWEN_SERVER_TOKEN']?.trim() || undefined;
   if (argv['require-auth'] && !token) {
     writeStderrLine(
-      'qwen daemon: --require-auth requires --token or QWEN_SERVER_TOKEN.',
+      'mariadb-shell-agent daemon: --require-auth requires --token or QWEN_SERVER_TOKEN.',
     );
     process.exitCode = 1;
     return;
   }
   if (argv['save-token'] && !token) {
     writeStderrLine(
-      'qwen daemon: --save-token requires --token or QWEN_SERVER_TOKEN.',
+      'mariadb-shell-agent daemon: --save-token requires --token or QWEN_SERVER_TOKEN.',
     );
     process.exitCode = 1;
     return;
   }
   if (!isLoopbackBind(hostname) && !token) {
     writeStderrLine(
-      'qwen daemon: a non-loopback bind requires QWEN_SERVER_TOKEN; ' +
-        'run `qwen serve` directly if you want an ephemeral token.',
+      'mariadb-shell-agent daemon: a non-loopback bind requires QWEN_SERVER_TOKEN; ' +
+        'run `mariadb-shell-agent serve` directly if you want an ephemeral token.',
     );
     process.exitCode = 1;
     return;
   }
   if (argv.token) {
     writeStderrLine(
-      'qwen daemon: --token is visible in this shell process list; prefer QWEN_SERVER_TOKEN.',
+      'mariadb-shell-agent daemon: --token is visible in this shell process list; prefer QWEN_SERVER_TOKEN.',
     );
   }
 
@@ -786,7 +787,7 @@ async function handleStart(argv: StartArgs): Promise<void> {
   );
   if (existing && argv.port === undefined) {
     writeStderrLine(
-      `qwen daemon: a daemon is already running for ${primary} on port ${existing.record.port}; pass --port to start another.`,
+      `mariadb-shell-agent daemon: a daemon is already running for ${primary} on port ${existing.record.port}; pass --port to start another.`,
     );
     process.exitCode = 1;
     return;
@@ -818,7 +819,7 @@ async function handleStart(argv: StartArgs): Promise<void> {
   } catch (error) {
     fs.closeSync(logFd);
     writeStderrLine(
-      `qwen daemon: could not spawn the daemon: ${
+      `mariadb-shell-agent daemon: could not spawn the daemon: ${
         error instanceof Error ? error.message : String(error)
       }`,
     );
@@ -828,7 +829,9 @@ async function handleStart(argv: StartArgs): Promise<void> {
   fs.closeSync(logFd);
 
   if (child.pid === undefined) {
-    writeStderrLine('qwen daemon: the daemon process did not start.');
+    writeStderrLine(
+      'mariadb-shell-agent daemon: the daemon process did not start.',
+    );
     process.exitCode = 1;
     return;
   }
@@ -860,7 +863,7 @@ async function handleStart(argv: StartArgs): Promise<void> {
         writeDaemonToken(record.port, record.pid, token!);
       } catch (error) {
         writeStderrLine(
-          `qwen daemon: could not persist the token: ${
+          `mariadb-shell-agent daemon: could not persist the token: ${
             error instanceof Error ? error.message : String(error)
           }`,
         );
@@ -889,14 +892,14 @@ async function handleStart(argv: StartArgs): Promise<void> {
 
     if (readyFailed) {
       writeStderrLine(
-        `qwen daemon: daemon pid ${record.pid} is running but did not report ready within ${
+        `mariadb-shell-agent daemon: daemon pid ${record.pid} is running but did not report ready within ${
           START_READY_TIMEOUT_MS / 1000
         }s.`,
       );
       if (typeof ready === 'string') {
-        writeStderrLine(`qwen daemon: ${ready}`);
+        writeStderrLine(`mariadb-shell-agent daemon: ${ready}`);
       }
-      writeStderrLine(`qwen daemon: startup log: ${startLog}`);
+      writeStderrLine(`mariadb-shell-agent daemon: startup log: ${startLog}`);
       process.exitCode = 1;
       return;
     }
@@ -910,14 +913,16 @@ async function handleStart(argv: StartArgs): Promise<void> {
   }
 
   writeStderrLine(
-    `qwen daemon: daemon pid ${child.pid} did not publish a discovery record within ${
+    `mariadb-shell-agent daemon: daemon pid ${child.pid} did not publish a discovery record within ${
       START_TIMEOUT_MS / 1000
-    }s. The detached child may still start; run \`qwen daemon status\` to check.`,
+    }s. The detached child may still start; run \`mariadb-shell-agent daemon status\` to check.`,
   );
   if (spawnError) {
-    writeStderrLine(`qwen daemon: spawn failed: ${spawnError.message}`);
+    writeStderrLine(
+      `mariadb-shell-agent daemon: spawn failed: ${spawnError.message}`,
+    );
   }
-  writeStderrLine(`qwen daemon: startup log: ${startLog}`);
+  writeStderrLine(`mariadb-shell-agent daemon: startup log: ${startLog}`);
   await printStartLogTail(startLog);
   process.exitCode = 1;
 }
@@ -954,7 +959,7 @@ async function handleStatus(argv: StatusArgs): Promise<void> {
 
   for (const bad of invalid) {
     writeStderrLine(
-      `qwen daemon: ignoring ${sanitize(bad.path)}: ${sanitize(bad.reason)}`,
+      `mariadb-shell-agent daemon: ignoring ${sanitize(bad.path)}: ${sanitize(bad.reason)}`,
     );
   }
 
@@ -997,7 +1002,7 @@ async function handleStatus(argv: StatusArgs): Promise<void> {
 
   if (rows.length === 0) {
     writeStdoutLine(
-      'No local qwen serve daemon is registered. Start one with `qwen serve`.',
+      'No local mariadb-shell-agent serve daemon is registered. Start one with `mariadb-shell-agent serve`.',
     );
     return;
   }
@@ -1022,13 +1027,15 @@ async function handleStatus(argv: StatusArgs): Promise<void> {
         writeStdoutLine(formatDaemonDetail(row.entry.record, detail));
       } else {
         writeStdoutLine(
-          `qwen daemon: port ${row.entry.record.port}: detail unavailable (${row.health})`,
+          `mariadb-shell-agent daemon: port ${row.entry.record.port}: detail unavailable (${row.health})`,
         );
       }
     }
   }
   writeStdoutLine('');
-  writeStdoutLine('Use `qwen daemon logs --port <port> --follow` to tail one.');
+  writeStdoutLine(
+    'Use `mariadb-shell-agent daemon logs --port <port> --follow` to tail one.',
+  );
 }
 
 async function printTail(file: string, count: number): Promise<number> {
@@ -1037,7 +1044,9 @@ async function printTail(file: string, count: number): Promise<number> {
     text = await fsp.readFile(file, 'utf8');
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-      writeStderrLine(`qwen daemon: log file not found: ${file}`);
+      writeStderrLine(
+        `mariadb-shell-agent daemon: log file not found: ${file}`,
+      );
       return 0;
     }
     throw error;
@@ -1082,7 +1091,9 @@ export async function followFile(
     return stat.size;
   };
   await openCurrent();
-  writeStderrLine(`qwen daemon: following ${file} (Ctrl+C to stop)`);
+  writeStderrLine(
+    `mariadb-shell-agent daemon: following ${file} (Ctrl+C to stop)`,
+  );
   let stopped = false;
   const stop = () => {
     stopped = true;
@@ -1127,7 +1138,7 @@ async function handleLogs(argv: LogsArgs): Promise<void> {
   const { entries } = readDaemonDiscoveries();
   const error = selectionError(entries, argv);
   if (error) {
-    writeStderrLine(`qwen daemon: ${error}`);
+    writeStderrLine(`mariadb-shell-agent daemon: ${error}`);
     process.exitCode = 1;
     return;
   }
@@ -1135,7 +1146,7 @@ async function handleLogs(argv: LogsArgs): Promise<void> {
   const entry = selected[0];
   if (!entry) {
     writeStderrLine(
-      'qwen daemon: no daemon is registered. Start one with `qwen serve`.',
+      'mariadb-shell-agent daemon: no daemon is registered. Start one with `mariadb-shell-agent serve`.',
     );
     process.exitCode = 1;
     return;
@@ -1143,7 +1154,9 @@ async function handleLogs(argv: LogsArgs): Promise<void> {
   const file = logPathFor(entry.record);
   const count = argv.lines ?? 50;
   if (!Number.isInteger(count) || count <= 0) {
-    writeStderrLine('qwen daemon: --lines must be a positive integer.');
+    writeStderrLine(
+      'mariadb-shell-agent daemon: --lines must be a positive integer.',
+    );
     process.exitCode = 1;
     return;
   }
@@ -1158,14 +1171,14 @@ async function handleStop(argv: StopArgs): Promise<void> {
   const { entries } = readDaemonDiscoveries();
   const error = selectionError(entries, argv);
   if (error) {
-    writeStderrLine(`qwen daemon: ${error}`);
+    writeStderrLine(`mariadb-shell-agent daemon: ${error}`);
     process.exitCode = 1;
     return;
   }
   const selected = selectDaemonEntries(entries, argv);
   if (selected.length === 0) {
     writeStderrLine(
-      'qwen daemon: no daemon is registered. Start one with `qwen serve`.',
+      'mariadb-shell-agent daemon: no daemon is registered. Start one with `mariadb-shell-agent serve`.',
     );
     process.exitCode = 1;
     return;
@@ -1180,18 +1193,20 @@ async function handleStop(argv: StopArgs): Promise<void> {
         removeDaemonToken(record.port, record.pid);
       }
       writeStdoutLine(
-        `qwen daemon: removed stale record for port ${record.port} (pid ${record.pid} is gone).`,
+        `mariadb-shell-agent daemon: removed stale record for port ${record.port} (pid ${record.pid} is gone).`,
       );
       continue;
     }
     if (record.pid === process.pid) {
-      writeStderrLine('qwen daemon: refusing to stop the current process.');
+      writeStderrLine(
+        'mariadb-shell-agent daemon: refusing to stop the current process.',
+      );
       failed = true;
       continue;
     }
     if (!pidResolvableHere(record, currentPidNamespace())) {
       writeStderrLine(
-        `qwen daemon: refusing to signal pid ${record.pid}: the record was written in PID namespace ${record.pidNamespace}, which this process cannot address.`,
+        `mariadb-shell-agent daemon: refusing to signal pid ${record.pid}: the record was written in PID namespace ${record.pidNamespace}, which this process cannot address.`,
       );
       failed = true;
       continue;
@@ -1199,14 +1214,14 @@ async function handleStop(argv: StopArgs): Promise<void> {
     const processStarted = processStartTime(record.pid);
     if (processStarted === undefined) {
       writeStderrLine(
-        `qwen daemon: refusing to signal pid ${record.pid}: its process start time could not be read.`,
+        `mariadb-shell-agent daemon: refusing to signal pid ${record.pid}: its process start time could not be read.`,
       );
       failed = true;
       continue;
     }
     if (!processStartMatchesRecord(record.startedAt, processStarted)) {
       writeStderrLine(
-        `qwen daemon: refusing to signal pid ${record.pid}: its start time does not match the daemon recorded at ${record.startedAt}.`,
+        `mariadb-shell-agent daemon: refusing to signal pid ${record.pid}: its start time does not match the daemon recorded at ${record.startedAt}.`,
       );
       failed = true;
       continue;
@@ -1218,14 +1233,14 @@ async function handleStop(argv: StopArgs): Promise<void> {
       !/(qwen|cli\.js)/.test(command)
     ) {
       writeStderrLine(
-        `qwen daemon: refusing to signal pid ${record.pid}: its command line is not the recorded daemon.`,
+        `mariadb-shell-agent daemon: refusing to signal pid ${record.pid}: its command line is not the recorded daemon.`,
       );
       failed = true;
       continue;
     }
     if (process.platform === 'win32' && argv.force !== true) {
       writeStderrLine(
-        'qwen daemon: Windows stop is a hard kill; pass --force to confirm (shutdown handlers do not run).',
+        'mariadb-shell-agent daemon: Windows stop is a hard kill; pass --force to confirm (shutdown handlers do not run).',
       );
       failed = true;
       continue;
@@ -1234,7 +1249,7 @@ async function handleStop(argv: StopArgs): Promise<void> {
       terminateTree(record.pid, false);
     } catch (killError) {
       writeStderrLine(
-        `qwen daemon: could not signal pid ${record.pid}: ${
+        `mariadb-shell-agent daemon: could not signal pid ${record.pid}: ${
           killError instanceof Error ? killError.message : String(killError)
         }`,
       );
@@ -1247,7 +1262,7 @@ async function handleStop(argv: StopArgs): Promise<void> {
         removeDaemonToken(record.port, record.pid);
       }
       writeStdoutLine(
-        `qwen daemon: ${
+        `mariadb-shell-agent daemon: ${
           process.platform === 'win32' ? 'hard-killed' : 'stopped'
         } port ${record.port} (pid ${record.pid}).`,
       );
@@ -1265,13 +1280,13 @@ async function handleStop(argv: StopArgs): Promise<void> {
           removeDaemonToken(record.port, record.pid);
         }
         writeStdoutLine(
-          `qwen daemon: force-stopped port ${record.port} (pid ${record.pid}).`,
+          `mariadb-shell-agent daemon: force-stopped port ${record.port} (pid ${record.pid}).`,
         );
         continue;
       }
     }
     writeStderrLine(
-      `qwen daemon: port ${record.port} (pid ${record.pid}) did not exit within ${STOP_TIMEOUT_MS / 1000}s; ` +
+      `mariadb-shell-agent daemon: port ${record.port} (pid ${record.pid}) did not exit within ${STOP_TIMEOUT_MS / 1000}s; ` +
         'retry with --force if it is safe to SIGKILL it.',
     );
     failed = true;
@@ -1284,14 +1299,14 @@ async function handleToken(argv: TokenArgs): Promise<void> {
   const { entries } = readDaemonDiscoveries();
   const error = selectionError(entries, { port: argv.port });
   if (error) {
-    writeStderrLine(`qwen daemon: ${error}`);
+    writeStderrLine(`mariadb-shell-agent daemon: ${error}`);
     process.exitCode = 1;
     return;
   }
   const selected = selectDaemonEntries(entries, { port: argv.port });
   if (selected.length !== 1) {
     writeStderrLine(
-      'qwen daemon: token needs exactly one registered daemon; pass --port.',
+      'mariadb-shell-agent daemon: token needs exactly one registered daemon; pass --port.',
     );
     process.exitCode = 1;
     return;
@@ -1302,7 +1317,7 @@ async function handleToken(argv: TokenArgs): Promise<void> {
     const removed = removeDaemonToken(record.port, record.pid);
     if (!removed) {
       writeStderrLine(
-        `qwen daemon: no persisted token for port ${record.port}.`,
+        `mariadb-shell-agent daemon: no persisted token for port ${record.port}.`,
       );
       process.exitCode = 1;
       return;
@@ -1310,7 +1325,7 @@ async function handleToken(argv: TokenArgs): Promise<void> {
     writeStdoutLine(
       argv.json === true
         ? JSON.stringify({ port: record.port, removed: true })
-        : `qwen daemon: removed persisted token for port ${record.port}.`,
+        : `mariadb-shell-agent daemon: removed persisted token for port ${record.port}.`,
     );
     return;
   }
@@ -1318,7 +1333,7 @@ async function handleToken(argv: TokenArgs): Promise<void> {
   const token = readDaemonToken(record.port, record.pid);
   if (!token) {
     writeStderrLine(
-      `qwen daemon: no persisted token for port ${record.port}; start with --save-token or use QWEN_SERVER_TOKEN.`,
+      `mariadb-shell-agent daemon: no persisted token for port ${record.port}; start with --save-token or use QWEN_SERVER_TOKEN.`,
     );
     process.exitCode = 1;
     return;
@@ -1326,7 +1341,7 @@ async function handleToken(argv: TokenArgs): Promise<void> {
   writeStdoutLine(
     argv.json === true
       ? JSON.stringify({ port: record.port, token })
-      : `qwen daemon: token for port ${record.port}: ${token}`,
+      : `mariadb-shell-agent daemon: token for port ${record.port}: ${token}`,
   );
 }
 
@@ -1362,7 +1377,7 @@ export function buildDaemonRestartPlan(
   if (protocol === 'https:') {
     return {
       error:
-        'restarting an HTTPS daemon is not supported; restart it with qwen serve and the original TLS settings.',
+        'restarting an HTTPS daemon is not supported; restart it with mariadb-shell-agent serve and the original TLS settings.',
     };
   }
 
@@ -1379,7 +1394,7 @@ export function buildDaemonRestartPlan(
     return {
       error:
         `the daemon on port ${record.port} was started by an older qwen that did not record its startup workspaces; ` +
-        `stop it and start it again with \`qwen daemon start --port ${record.port} --workspace <path>\`.`,
+        `stop it and start it again with \`mariadb-shell-agent daemon start --port ${record.port} --workspace <path>\`.`,
     };
   }
 
@@ -1416,7 +1431,7 @@ export function buildDaemonRestartPlan(
           ? '--require-auth requires --token or QWEN_SERVER_TOKEN.'
           : record.tokenGenerated === true
             ? `the daemon on port ${record.port} uses a token generated at startup, which is not recorded; ` +
-              'pass that token with --token or QWEN_SERVER_TOKEN, or stop the daemon and run `qwen serve` again.'
+              'pass that token with --token or QWEN_SERVER_TOKEN, or stop the daemon and run `mariadb-shell-agent serve` again.'
             : 'restarting a bearer daemon requires --token or QWEN_SERVER_TOKEN; ' +
               'a token in a workspace .env or settings file is not read here.',
     };
@@ -1474,7 +1489,10 @@ export function selectRestartTarget(
       : { error: `No daemon is registered on port ${port}.` };
   }
   if (entries.length === 0) {
-    return { error: 'no daemon is registered. Start one with `qwen serve`.' };
+    return {
+      error:
+        'no daemon is registered. Start one with `mariadb-shell-agent serve`.',
+    };
   }
   if (entries.length > 1) {
     return {
@@ -1546,11 +1564,11 @@ export async function runDaemonRestart(
   deps: DaemonRestartDeps = defaultRestartDeps,
 ): Promise<number> {
   if (plan.error) {
-    writeStderrLine(`qwen daemon: ${plan.error}`);
+    writeStderrLine(`mariadb-shell-agent daemon: ${plan.error}`);
     return 1;
   }
   for (const notice of plan.notices ?? []) {
-    writeStderrLine(`qwen daemon: ${notice}`);
+    writeStderrLine(`mariadb-shell-agent daemon: ${notice}`);
   }
   // Stopping the daemon tears down the shells it hosts (Web Shell terminals
   // and agent shell tools), and this command with them, before the start leg.
@@ -1559,7 +1577,7 @@ export async function runDaemonRestart(
     deps.hostedBy(record.pid)
   ) {
     writeStderrLine(
-      `qwen daemon: refusing to restart port ${record.port} from a process that daemon hosts, such as its Web Shell terminal; ` +
+      `mariadb-shell-agent daemon: refusing to restart port ${record.port} from a process that daemon hosts, such as its Web Shell terminal; ` +
         'stopping it would end this command before the new daemon starts. Run restart from a shell outside the daemon.',
     );
     return 1;
@@ -1568,7 +1586,7 @@ export async function runDaemonRestart(
     await deps.validateWorkspaces(plan.workspaces!);
   } catch (error) {
     writeStderrLine(
-      `qwen daemon: cannot restart: ${
+      `mariadb-shell-agent daemon: cannot restart: ${
         error instanceof Error ? error.message : String(error)
       }`,
     );
@@ -1581,7 +1599,7 @@ export async function runDaemonRestart(
     (await deps.rejectsToken(record, token))
   ) {
     writeStderrLine(
-      `qwen daemon: the daemon on port ${record.port} rejected the supplied token. ` +
+      `mariadb-shell-agent daemon: the daemon on port ${record.port} rejected the supplied token. ` +
         'Restart keeps the daemon credential; pass its current token, or stop it and start it with the new one.',
     );
     return 1;
@@ -1595,7 +1613,7 @@ export async function runDaemonRestart(
   const stopped = deps.run(plan.command!, plan.stopArgs!, plan.env!);
   if (stopped.error) {
     writeStderrLine(
-      `qwen daemon: could not run daemon stop: ${stopped.error.message}`,
+      `mariadb-shell-agent daemon: could not run daemon stop: ${stopped.error.message}`,
     );
     return 1;
   }
@@ -1606,17 +1624,17 @@ export async function runDaemonRestart(
       return 1;
     }
     writeStdoutLine(
-      `qwen daemon: the daemon on port ${record.port} already exited; starting it again.`,
+      `mariadb-shell-agent daemon: the daemon on port ${record.port} already exited; starting it again.`,
     );
   }
 
   const started = deps.run(plan.command!, plan.startArgs!, plan.env!);
   if (started.error) {
     writeStderrLine(
-      `qwen daemon: could not run daemon start: ${started.error.message}`,
+      `mariadb-shell-agent daemon: could not run daemon start: ${started.error.message}`,
     );
     writeStderrLine(
-      `qwen daemon: the daemon on port ${record.port} is stopped.`,
+      `mariadb-shell-agent daemon: the daemon on port ${record.port} is stopped.`,
     );
     return 1;
   }
@@ -1634,7 +1652,7 @@ export async function runDaemonRestart(
     );
   if (!restarted) {
     writeStderrLine(
-      `qwen daemon: the restarted daemon is not on port ${record.port}; the port may be in use. Run \`qwen daemon status\` to find it.`,
+      `mariadb-shell-agent daemon: the restarted daemon is not on port ${record.port}; the port may be in use. Run \`mariadb-shell-agent daemon status\` to find it.`,
     );
     return 1;
   }
@@ -1644,7 +1662,7 @@ export async function runDaemonRestart(
       writeDaemonToken(record.port, restarted.record.pid, tokenToPersist);
     } catch (error) {
       writeStderrLine(
-        `qwen daemon: could not persist the token for the restarted daemon: ${
+        `mariadb-shell-agent daemon: could not persist the token for the restarted daemon: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );
@@ -1661,7 +1679,7 @@ async function handleRestart(argv: RestartArgs): Promise<void> {
     argv.port,
   );
   if (!target.entry) {
-    writeStderrLine(`qwen daemon: ${target.error}`);
+    writeStderrLine(`mariadb-shell-agent daemon: ${target.error}`);
     process.exitCode = 1;
     return;
   }
@@ -1669,7 +1687,7 @@ async function handleRestart(argv: RestartArgs): Promise<void> {
   const entry = resolveCliEntry();
   if (!entry) {
     writeStderrLine(
-      'qwen daemon: cannot determine the CLI entry; restart requires the qwen CLI.',
+      'mariadb-shell-agent daemon: cannot determine the CLI entry; restart requires the qwen CLI.',
     );
     process.exitCode = 1;
     return;
@@ -1691,7 +1709,7 @@ async function handleRestart(argv: RestartArgs): Promise<void> {
 
 const startCommand: CommandModule<unknown, StartArgs> = {
   command: 'start',
-  describe: 'Start a local qwen serve daemon in the background',
+  describe: 'Start a local mariadb-shell-agent serve daemon in the background',
   builder: (yargs: Argv) =>
     yargs
       .option('port', {
@@ -1746,7 +1764,7 @@ const startCommand: CommandModule<unknown, StartArgs> = {
 
 const statusCommand: CommandModule<unknown, StatusArgs> = {
   command: 'status',
-  describe: 'List local qwen serve daemons and their health',
+  describe: 'List local mariadb-shell-agent serve daemons and their health',
   builder: (yargs: Argv) =>
     yargs
       .option('json', {
@@ -1798,7 +1816,7 @@ const logsCommand: CommandModule<unknown, LogsArgs> = {
 
 const stopCommand: CommandModule<unknown, StopArgs> = {
   command: 'stop',
-  describe: 'Stop a local qwen serve daemon',
+  describe: 'Stop a local mariadb-shell-agent serve daemon',
   builder: (yargs: Argv) =>
     yargs
       .option('port', {
@@ -1823,7 +1841,7 @@ const stopCommand: CommandModule<unknown, StopArgs> = {
 const restartCommand: CommandModule<unknown, RestartArgs> = {
   command: 'restart',
   describe:
-    'Restart a local qwen serve daemon on its recorded port and workspaces',
+    'Restart a local mariadb-shell-agent serve daemon on its recorded port and workspaces',
   builder: (yargs: Argv) =>
     yargs
       .option('port', {
@@ -1882,7 +1900,7 @@ const tokenCommand: CommandModule<unknown, TokenArgs> = {
 
 export const daemonCommand: CommandModule = {
   command: 'daemon',
-  describe: 'Inspect and control local qwen serve daemons',
+  describe: 'Inspect and control local mariadb-shell-agent serve daemons',
   builder: (yargs: Argv) =>
     yargs
       .command(startCommand)

@@ -1,6 +1,6 @@
 ---
 name: workflow-creator
-description: Create or update reusable Dynamic Workflow JavaScript files under .qwen/workflows. Use when the user asks to create, save, edit, or reuse a Dynamic Workflow, including requests started from the Web Shell Workflows page.
+description: Create or update reusable Dynamic Workflow JavaScript files under .mariadb-shell-agent/workflows. Use when the user asks to create, save, edit, or reuse a Dynamic Workflow, including requests started from the Web Shell Workflows page.
 ---
 
 # Workflow Creator
@@ -9,10 +9,10 @@ Create and maintain saved Dynamic Workflows for the current workspace.
 
 ## Boundary
 
-- This skill manages `.qwen/workflows/<name>.js` files used by the `workflow` tool and exposed as `/<name>` slash commands.
+- This skill manages `.mariadb-shell-agent/workflows/<name>.js` files used by the `workflow` tool and exposed as `/<name>` slash commands.
 - Do not create or edit `qwen-workflow-design/*.yaml`; those Task Flow definitions are a different feature.
-- Local hosts may also discover trusted ancestor `.qwen/workflows` directories up to the nearest Git root, with the nearest definition first. Discovery does not change the project save destination: use the current session target.
-- Use project scope by default. Write to `~/.qwen/workflows` only when the user explicitly asks for a workflow shared across projects.
+- Local hosts may also discover trusted ancestor `.mariadb-shell-agent/workflows` directories up to the nearest Git root, with the nearest definition first. Discovery does not change the project save destination: use the current session target.
+- Use project scope by default. Write to `~/.mariadb-shell-agent/workflows` only when the user explicitly asks for a workflow shared across projects.
 
 ## Workflow
 

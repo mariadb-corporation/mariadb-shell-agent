@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,7 +19,7 @@ vi.mock('./sessions/list.js', () => ({
 vi.mock('./sessions/ps.js', () => ({
   psCommand: {
     command: 'ps',
-    describe: 'List interactive Qwen Code sessions running right now',
+    describe: 'List interactive MariaDB Shell Agent sessions running right now',
   },
 }));
 
@@ -36,7 +37,9 @@ import yargs from 'yargs';
 describe('sessions command', () => {
   it('should have correct command definition', () => {
     expect(sessionsCommand.command).toBe('sessions');
-    expect(sessionsCommand.describe).toBe('Manage Qwen Code sessions');
+    expect(sessionsCommand.describe).toBe(
+      'Manage MariaDB Shell Agent sessions',
+    );
     expect(typeof sessionsCommand.builder).toBe('function');
     expect(typeof sessionsCommand.handler).toBe('function');
   });

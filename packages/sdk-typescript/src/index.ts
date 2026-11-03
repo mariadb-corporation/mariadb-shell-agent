@@ -4,7 +4,7 @@ export { Query } from './query/Query.js';
 export { SdkLogger } from './utils/logger.js';
 export { PERMISSION_MODES } from './types/permission-mode.js';
 
-// Daemon HTTP client (talks to `qwen serve`)
+// Daemon HTTP client (talks to `mariadb-shell-agent serve`)
 export {
   DAEMON_APPROVAL_MODES,
   DAEMON_ERROR_KINDS,

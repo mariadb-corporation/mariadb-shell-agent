@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -91,7 +92,7 @@ export async function renderPreparedGoalUpdate(
 export const UNREADABLE_GOAL_REASON =
   'Goal not restored: its saved state could not be read, so this session is not driving it.';
 export const LEGACY_GOAL_REASON =
-  'Goal not restored: it was recorded by an earlier version of Qwen Code, so this session is not driving it. Set it again with /goal set.';
+  'Goal not restored: it was recorded by an earlier version of MariaDB Shell Agent, so this session is not driving it. Set it again with /goal set.';
 
 /**
  * The trailing `cleared` card for a Goal a build before #7895 recorded as a

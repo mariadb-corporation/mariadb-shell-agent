@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -52,7 +53,7 @@ const getUserLocalesDir = (): string =>
 /**
  * Get the path to the user's custom locales directory.
  * Users can place custom language packs (e.g., es.js, fr.js) in this directory.
- * @returns The path to ~/.qwen/locales
+ * @returns The path to ~/.mariadb-shell-agent/locales
  */
 export function getUserLocalesDirectory(): string {
   return getUserLocalesDir();

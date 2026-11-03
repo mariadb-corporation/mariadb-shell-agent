@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -135,7 +136,7 @@ export class MessageRouter {
   ): void {
     this.authHandler.setAuthInteractiveHandler(handler);
     // SessionMessageHandler's authHandler is a simple () => Promise<void>.
-    // Wrap so "Configure" prompts trigger the full interactive auth QuickPick.
+    // Wrap so "Configure" prompts open the provider setup wizard.
     this.sessionHandler?.setAuthHandler?.(() =>
       this.authHandler.handle({ type: 'auth' }),
     );

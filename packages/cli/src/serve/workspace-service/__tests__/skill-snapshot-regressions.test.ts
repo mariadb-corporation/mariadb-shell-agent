@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -49,7 +50,7 @@ function inventory(
       modelInvocable: true,
       installedPath: path.join(
         workspaceCwd,
-        '.qwen',
+        '.mariadb-shell-agent',
         'skills',
         name,
         'SKILL.md',
@@ -62,7 +63,7 @@ function service(overrides: Partial<DaemonWorkspaceServiceDeps> = {}) {
   return createDaemonWorkspaceService({
     boundWorkspace: '/workspace',
     isWorkspaceTrusted: () => true,
-    contextFilename: 'QWEN.md',
+    contextFilename: 'MARIADB-SHELL-AGENT.md',
     persistDisabledTools: vi.fn().mockResolvedValue(undefined),
     persistDisabledSkills: vi
       .fn()
@@ -485,7 +486,7 @@ describe('Skill snapshot correctness regressions', () => {
           );
           const skillPath = path.join(
             workspaceCwd,
-            '.qwen',
+            '.mariadb-shell-agent',
             'skills',
             'later-installed',
             'SKILL.md',

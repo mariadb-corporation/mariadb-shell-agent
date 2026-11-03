@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -46,7 +47,8 @@ import {
 // none can start with a space.
 const CUSTOM_MODEL = ' custom';
 
-const DEFAULT_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+const DEFAULT_BASE_URL =
+  'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
 
 function RequirementBadge({
   state,

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -203,12 +204,12 @@ export function performVariableReplacement(
           '!{$1}',
         );
 
-        // Replace references to ".claude" directory with ".qwen" in markdown files
+        // Replace references to ".claude" directory with ".mariadb-shell-agent" in markdown files
         // Only match path references (e.g., ~/.claude/, $HOME/.claude, ./.claude/)
         // Avoid matching URLs, comments, or string literals containing .claude
         const updatedMdContent = syntaxUpdatedContent.replace(
           /(\$\{?HOME\}?\/|~\/)?\.claude(\/|$)/g,
-          '$1.qwen$2',
+          '$1.mariadb-shell-agent$2',
         );
 
         // Only write if content was actually changed
@@ -259,19 +260,19 @@ export function performVariableReplacement(
           '.message.parts | map(select(has("text")))',
         );
 
-        // Replace references to ".claude" directory with ".qwen" in shell scripts
+        // Replace references to ".claude" directory with ".mariadb-shell-agent" in shell scripts
         // Only match path references (e.g., ~/.claude/, $HOME/.claude, ./.claude/)
         // Avoid matching URLs, comments, or string literals containing .claude
         const finalScriptContent = adaptedScriptContent.replace(
           /(\$\{?HOME\}?\/|~\/)?\.claude(\/|$)/g,
-          '$1.qwen$2',
+          '$1.mariadb-shell-agent$2',
         );
 
         // Only write if content was actually changed
         if (finalScriptContent !== content) {
           fs.writeFileSync(filePath, finalScriptContent, 'utf8');
           debugLogger.debug(
-            `Updated transcript format and replaced .claude with .qwen in shell script: ${filePath}`,
+            `Updated transcript format and replaced .claude with .mariadb-shell-agent in shell script: ${filePath}`,
           );
         }
       } catch (error) {

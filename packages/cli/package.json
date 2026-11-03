@@ -2,16 +2,17 @@
   "name": "@qwen-code/qwen-code",
   "private": true,
   "version": "0.26.5",
-  "description": "Qwen Code",
+  "description": "MariaDB Shell Agent",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/QwenLM/qwen-code.git"
+    "url": "git+https://github.com/mariadb-corporation/mariadb-shell-agent.git"
   },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "qwen": "dist/index.js"
+    "mariadb-shell-agent": "dist/index.js",
+    "msa": "dist/index.js"
   },
   "exports": {
     ".": {
@@ -38,7 +39,7 @@
     "dist"
   ],
   "config": {
-    "sandboxImageUri": "ghcr.io/qwenlm/qwen-code:0.26.5"
+    "sandboxImageUri": "ghcr.invalid/qwenlm/qwen-code:0.26.5"
   },
   "dependencies": {
     "@alcalzone/ansi-tokenize": "0.3.0",

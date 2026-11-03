@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1910,7 +1911,7 @@ function markOrphanReplies(
   // keeps what it learned. Read again: another helper may have learned
   // others meanwhile.
   const keep = (id: string, parent: string | null) => {
-    // The gate may run before anything prepared `.qwen/tmp`.
+    // The gate may run before anything prepared `.mariadb-shell-agent/tmp`.
     mkdirSync(dirname(check.cachePath), { recursive: true });
     atomicWriteFileSync(
       check.cachePath,
@@ -2587,7 +2588,7 @@ export const snapshotCommand: CommandModule = {
         type: 'boolean',
         default: false,
         describe:
-          'Probe mode for a scheduled task gate: no worktree, a cursor in .qwen/tmp, only transitions since the last run on stdout and nothing when there are none',
+          'Probe mode for a scheduled task gate: no worktree, a cursor in .mariadb-shell-agent/tmp, only transitions since the last run on stdout and nothing when there are none',
       })
       .option('session', {
         type: 'string',

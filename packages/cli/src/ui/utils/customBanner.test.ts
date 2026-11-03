@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Code
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -51,13 +52,13 @@ function makeSettings(opts: {
     user: opts.userUi
       ? file(
           { ui: opts.userUi },
-          opts.userPath ?? '/home/u/.qwen/settings.json',
+          opts.userPath ?? '/home/u/.mariadb-shell-agent/settings.json',
         )
       : empty,
     workspace: opts.workspaceUi
       ? file(
           { ui: opts.workspaceUi },
-          opts.workspacePath ?? '/repo/.qwen/settings.json',
+          opts.workspacePath ?? '/repo/.mariadb-shell-agent/settings.json',
         )
       : empty,
     isTrusted: opts.isTrusted ?? true,
@@ -315,7 +316,7 @@ describe('resolveCustomBanner', () => {
             small: 'should-be-rejected',
           } as unknown as CustomAsciiArtSetting,
         },
-        userPath: '/home/u/.qwen/settings.json',
+        userPath: '/home/u/.mariadb-shell-agent/settings.json',
       }),
     );
     // The resolver must NOT silently let `path` win — both forms are

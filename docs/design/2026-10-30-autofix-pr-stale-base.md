@@ -173,7 +173,7 @@ Verified against `origin/main` at `38337f7257` (2026-10-30):
 - `SKILL.test.ts` pins for the new brief and round text.
 - A live read-only probe of the compare endpoint on a real behind PR
   (dry-run baseline in the E2E test plan).
-- E2E test plan: `.qwen/e2e-tests/2026-10-30-autofix-pr-stale-base.md`.
+- E2E test plan: `.mariadb-shell-agent/e2e-tests/2026-10-30-autofix-pr-stale-base.md`.
 - `npm run build`, `npm run typecheck`, and the focused unit tests of the
   changed files.
 

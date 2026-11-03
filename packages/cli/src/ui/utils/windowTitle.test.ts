@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,7 +28,7 @@ describe('computeWindowTitle', () => {
 
   it('should use default Qwen title when CLI_TITLE is not set', () => {
     const result = computeWindowTitle();
-    expect(result).toBe('Qwen - qwen');
+    expect(result).toBe('MariaDB Shell Agent - qwen');
   });
 
   it('should use CLI_TITLE environment variable when set', () => {
@@ -38,7 +39,7 @@ describe('computeWindowTitle', () => {
 
   it('should use Qwen prefix with folder name when CLI_TITLE is not set', () => {
     const result = computeWindowTitle('my-project');
-    expect(result).toBe('Qwen - my-project');
+    expect(result).toBe('MariaDB Shell Agent - my-project');
   });
 
   it('should prefer CLI_TITLE over folder name', () => {
@@ -62,7 +63,7 @@ describe('computeWindowTitle', () => {
 
   it('should fall back to default when folderName is empty string', () => {
     const result = computeWindowTitle('');
-    expect(result).toBe('Qwen - qwen');
+    expect(result).toBe('MariaDB Shell Agent - qwen');
   });
 });
 
@@ -197,7 +198,7 @@ describe('formatSessionWindowTitle', () => {
 
   it('should fall back to computeWindowTitle when sessionName is null', () => {
     expect(formatSessionWindowTitle(null, 'my-project')).toBe(
-      'Qwen - my-project',
+      'MariaDB Shell Agent - my-project',
     );
   });
 
@@ -211,7 +212,7 @@ describe('formatSessionWindowTitle', () => {
   });
 
   it('should use default title when sessionName is null and no folder', () => {
-    expect(formatSessionWindowTitle(null)).toBe('Qwen - qwen');
+    expect(formatSessionWindowTitle(null)).toBe('MariaDB Shell Agent - qwen');
   });
 
   it('should prepend a status prefix when provided', () => {
@@ -222,7 +223,7 @@ describe('formatSessionWindowTitle', () => {
 
   it('should prepend status prefix to the fallback title too', () => {
     expect(formatSessionWindowTitle(null, 'my-project', '✳\uFE0E ')).toBe(
-      '✳\uFE0E Qwen - my-project',
+      '✳\uFE0E MariaDB Shell Agent - my-project',
     );
   });
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -199,7 +200,7 @@ export class WorkspaceGitState {
       const status = await getGitWorkingTreeStatus(workspaceCwd).catch(
         (err) => {
           writeStderrLineSafe(
-            `qwen serve: git status failed for ${workspaceCwd}: ${err instanceof Error ? err.message : String(err)}`,
+            `mariadb-shell-agent serve: git status failed for ${workspaceCwd}: ${err instanceof Error ? err.message : String(err)}`,
           );
           return null;
         },

@@ -8,7 +8,7 @@ Daemon-managed channel workers receive platform user, group, and topic identifie
 
 This change observes accepted inbound messages, persists a bounded relationship graph per daemon workspace, and returns complete platform identifiers for DingTalk, Feishu, Telegram, and WeCom channels.
 
-It does not change webhook configuration or proactive delivery, query a platform directory, claim to return complete group membership, observe bot output, or backfill historical traffic. Standalone `qwen channel start` is unchanged.
+It does not change webhook configuration or proactive delivery, query a platform directory, claim to return complete group membership, observe bot output, or backfill historical traffic. Standalone `mariadb-shell-agent channel start` is unchanged.
 
 ## Ownership and persistence
 

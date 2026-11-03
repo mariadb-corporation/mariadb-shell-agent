@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -84,7 +85,7 @@ describe('parseJoinLink', () => {
     });
   });
 
-  it('refuses anything else, as `qwen serve --join` does', () => {
+  it('refuses anything else, as `mariadb-shell-agent serve --join` does', () => {
     for (const link of [
       '',
       'not a url',
@@ -110,7 +111,7 @@ describe('joinCoordinatorCommand', () => {
       false,
     );
     expect(command).toBe(
-      `QWEN_AGENT_HOST_ENROLLMENT_TOKEN='secret' qwen agents join 'https://host/join/ws'"'"'x'`,
+      `QWEN_AGENT_HOST_ENROLLMENT_TOKEN='secret' mariadb-shell-agent agents join 'https://host/join/ws'"'"'x'`,
     );
   });
 

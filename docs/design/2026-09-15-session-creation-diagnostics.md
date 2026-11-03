@@ -2,7 +2,7 @@
 
 [English](2026-09-15-session-creation-diagnostics.md) | [简体中文](2026-09-15-session-creation-diagnostics.zh-CN.md)
 
-Implementation design for PR 1 of [#11944](https://github.com/QwenLM/qwen-code/issues/11944), based on `main@bda4b0743b80a8d07413f03839b34cd5b470e39a`. Independent of PRs 2–4.
+Implementation design for PR 1 of [#11944](https://github.invalid/QwenLM/qwen-code/issues/11944), based on `main@bda4b0743b80a8d07413f03839b34cd5b470e39a`. Independent of PRs 2–4.
 
 ## Problem and evidence
 

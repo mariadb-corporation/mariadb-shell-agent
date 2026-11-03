@@ -627,7 +627,7 @@ scope is:
 - `packages/cli/src/commands/channel/daemon-worker.ts`
 
 Tests remain collocated with each changed implementation. An E2E plan belongs
-under `.qwen/e2e-tests/` during implementation and is not committed.
+under `.mariadb-shell-agent/e2e-tests/` during implementation and is not committed.
 
 The implementation also updates:
 

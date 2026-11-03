@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -287,7 +288,7 @@ describe('runPrepare (real git)', () => {
     savedHost = process.env['GH_HOST'];
     delete process.env['GH_HOST'];
     // `watchRoot` roots a daemon session's watch at its own worktree, so a
-    // runner that itself runs under `qwen serve` must not leak that into the
+    // runner that itself runs under `mariadb-shell-agent serve` must not leak that into the
     // non-daemon tests: each daemon test sets it explicitly.
     savedServe = process.env['QWEN_CODE_SERVE'];
     delete process.env['QWEN_CODE_SERVE'];
@@ -896,9 +897,14 @@ describe('runPrepare (real git)', () => {
     });
   });
 
-  it('counts uncommitted work under .qwen outside the watch directory', () => {
-    mkdirSync(join(clone, '.qwen', 'skills'), { recursive: true });
-    writeFileSync(join(clone, '.qwen', 'skills', 'mine.md'), 'work\n');
+  it('counts uncommitted work under .mariadb-shell-agent outside the watch directory', () => {
+    mkdirSync(join(clone, '.mariadb-shell-agent', 'skills'), {
+      recursive: true,
+    });
+    writeFileSync(
+      join(clone, '.mariadb-shell-agent', 'skills', 'mine.md'),
+      'work\n',
+    );
     runPrepare({ pr: 7, repo: 'o/r' });
     expect(lastReport()).toMatchObject({
       localUncommittedChanges: true,
@@ -1201,10 +1207,10 @@ describe('runPrepare (real git)', () => {
     ).toThrow(/is a watch of github\.com\/o\/r, not github\.com:8443\/o\/r/);
   });
 
-  it('refuses to create the worktree through a symlinked .qwen', () => {
+  it('refuses to create the worktree through a symlinked .mariadb-shell-agent', () => {
     const elsewhere = join(dir, 'elsewhere');
     mkdirSync(elsewhere);
-    symlinkSync(elsewhere, join(clone, '.qwen'));
+    symlinkSync(elsewhere, join(clone, '.mariadb-shell-agent'));
     expect(() => runPrepare({ pr: 7, repo: 'o/r' })).toThrow(/is a symlink/);
     expect(readdirSync(elsewhere)).toEqual([]);
     expect(run(clone, 'branch', '--list', 'qwen-autofix/pr-7')).toBe('');

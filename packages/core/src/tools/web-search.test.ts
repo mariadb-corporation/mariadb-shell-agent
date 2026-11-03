@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -47,7 +48,8 @@ vi.mock('openai', () => ({
 }));
 
 const TEST_ENV_KEY = 'WEB_SEARCH_TEST_DS_KEY';
-const DASHSCOPE_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+const DASHSCOPE_BASE_URL =
+  'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
 
 interface ConfigOverrides {
   allowDynamicHeaderValues?: boolean;
@@ -418,7 +420,7 @@ describe('evaluateWebSearchGate', () => {
     const { notice } = rejectedFor({
       models: [
         dsModel({
-          baseUrl: 'http://dashscope.aliyuncs.com/compatible-mode/v1',
+          baseUrl: 'http://dashscope.aliyuncs.invalid/compatible-mode/v1',
         }),
       ],
     });
@@ -469,7 +471,7 @@ describe('evaluateWebSearchGate', () => {
   });
 
   it('env-declared backend takes precedence over modelProviders resolution', () => {
-    const intl = 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1';
+    const intl = 'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1';
     // A conflicting modelProviders entry must be ignored in env mode.
     const backend = passedFor({ settings: envSettings({ baseUrl: intl }) });
     expect(backend.baseUrl).toBe(intl);
@@ -495,7 +497,7 @@ describe('evaluateWebSearchGate', () => {
   it('rejects a plain-http env-declared base URL, naming HTTPS as the fix', () => {
     const { notice } = rejectedFor({
       settings: envSettings({
-        baseUrl: 'http://dashscope.aliyuncs.com/compatible-mode/v1',
+        baseUrl: 'http://dashscope.aliyuncs.invalid/compatible-mode/v1',
       }),
     });
     expect(notice).toContain('https://');
@@ -516,8 +518,8 @@ describe('evaluateWebSearchGate', () => {
 
   it('accepts the US regional and Token Plan MaaS endpoints', () => {
     for (const baseUrl of [
-      'https://dashscope-us.aliyuncs.com/compatible-mode/v1',
-      'https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope-us.aliyuncs.invalid/compatible-mode/v1',
+      'https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
     ]) {
       passedFor({ models: [dsModel({ baseUrl })] });
     }
@@ -525,16 +527,18 @@ describe('evaluateWebSearchGate', () => {
 
   it('accepts internal Alibaba gateway hosts', () => {
     passedFor({
-      models: [dsModel({ baseUrl: 'https://gw.some-team.alibaba-inc.com/v1' })],
+      models: [
+        dsModel({ baseUrl: 'https://gw.some-team.alibaba-inc.invalid/v1' }),
+      ],
     });
   });
 
   it('accepts the QwenCloud pay-as-you-go and Token Plan MaaS endpoints', () => {
     for (const baseUrl of [
       'https://maas.qianwenaiapi.com/compatible-mode/v1',
-      'https://maas.qwencloudapi.com/compatible-mode/v1',
+      'https://maas.qwencloudapi.invalid/compatible-mode/v1',
       'https://token-plan.maas.qianwenaiapi.com/compatible-mode/v1',
-      'https://token-plan.maas.qwencloudapi.com/compatible-mode/v1',
+      'https://token-plan.maas.qwencloudapi.invalid/compatible-mode/v1',
     ]) {
       passedFor({ models: [dsModel({ baseUrl })] });
     }
@@ -545,7 +549,7 @@ describe('evaluateWebSearchGate', () => {
     // appended suffix, a forged prefix, or userinfo smuggling must not pass.
     for (const baseUrl of [
       'https://maas.qianwenaiapi.com.evil.com/compatible-mode/v1',
-      'https://evilmaas.qwencloudapi.com/compatible-mode/v1',
+      'https://evilmaas.qwencloudapi.invalid/compatible-mode/v1',
       'https://maas.qianwenaiapi.com@evil.com/compatible-mode/v1',
     ]) {
       const gate = rejectedFor({ models: [dsModel({ baseUrl })] });
@@ -678,7 +682,7 @@ describe('evaluateWebSearchGate auto derivation', () => {
       authType: 'openai',
       envKey: 'WS_WORKSPACE_KEY',
       baseUrl:
-        'https://llm-1yxl3y53fm8pcr4z.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+        'https://llm-1yxl3y53fm8pcr4z.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
     };
     const backend = passedBackend(autoFor(workspace, 'sk-workspace'));
     expect(backend.baseUrl).toBe(workspace.baseUrl);
@@ -690,7 +694,7 @@ describe('evaluateWebSearchGate auto derivation', () => {
       id: 'my-model',
       authType: 'openai',
       envKey: 'MY_DASHSCOPE_KEY',
-      baseUrl: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
     };
     passedBackend(autoFor(handWritten, 'sk-hand-written'));
   });
@@ -784,7 +788,7 @@ describe('evaluateWebSearchGate auto derivation', () => {
           model: 'env-model',
           authType: AuthType.USE_OPENAI,
           baseUrl:
-            'https://llm-xyz.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+            'https://llm-xyz.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
           apiKey: 'sk-workspace',
           customHeaders,
         },
@@ -812,7 +816,7 @@ describe('evaluateWebSearchGate auto derivation', () => {
     const intl = {
       ...STANDARD,
       envKey: 'DASHSCOPE_INTL_KEY',
-      baseUrl: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
     };
     vi.stubEnv(STANDARD.envKey, 'sk-standard');
     vi.stubEnv(intl.envKey, 'sk-intl');
@@ -829,7 +833,7 @@ describe('evaluateWebSearchGate auto derivation', () => {
     const sibling = {
       ...STANDARD,
       envKey: 'DASHSCOPE_INTL_KEY',
-      baseUrl: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
     };
     vi.stubEnv(sibling.envKey, 'sk-intl');
     const backend = passedBackend(
@@ -877,7 +881,7 @@ describe('evaluateWebSearchGate auto derivation', () => {
       id: 'internal-model',
       authType: AuthType.USE_OPENAI,
       envKey: 'INTERNAL_MODEL_KEY',
-      baseUrl: 'https://gw.some-team.alibaba-inc.com/v1',
+      baseUrl: 'https://gw.some-team.alibaba-inc.invalid/v1',
     };
     const backend = passedBackend(autoFor(internal, 'sk-internal'));
     expect(backend.baseUrl).toBe(internal.baseUrl);
@@ -888,7 +892,7 @@ describe('evaluateWebSearchGate auto derivation', () => {
       id: 'shared-model',
       authType: AuthType.USE_ANTHROPIC,
       envKey: 'IDEALAB_OPUS_API_KEY',
-      baseUrl: 'https://idealab.alibaba-inc.com/api/anthropic',
+      baseUrl: 'https://idealab.alibaba-inc.invalid/api/anthropic',
     };
     const gate = rejectedGate(
       autoFor(anthropic, 'sk-anthropic', {
@@ -903,7 +907,7 @@ describe('evaluateWebSearchGate auto derivation', () => {
       id: STANDARD.id,
       authType: AuthType.USE_ANTHROPIC,
       envKey: 'ANTHROPIC_GATEWAY_KEY',
-      baseUrl: 'https://gateway.aliyun-inc.com/anthropic',
+      baseUrl: 'https://gateway.aliyun-inc.invalid/anthropic',
     };
     vi.stubEnv(STANDARD.envKey, 'sk-standard');
     vi.stubEnv(anthropic.envKey, 'sk-anthropic');
@@ -971,7 +975,7 @@ describe('evaluateWebSearchGate auto derivation', () => {
       id: 'my-model',
       authType: 'openai',
       envKey: 'MY_CODING_KEY',
-      baseUrl: 'https://coding-intl.dashscope.aliyuncs.com/v1',
+      baseUrl: 'https://coding-intl.dashscope.aliyuncs.invalid/v1',
     };
     const gate = rejectedGate(autoFor(handWritten, 'sk-sp-hand-written'));
     expect(gate.silent).toBe(true);
@@ -993,7 +997,7 @@ describe('evaluateWebSearchGate auto derivation', () => {
       id: 'qwen3.6-plus',
       authType: AuthType.USE_OPENAI,
       envKey: 'IDEALAB_API_KEY',
-      baseUrl: 'https://idealab.alibaba-inc.com/api/openai/v1',
+      baseUrl: 'https://idealab.alibaba-inc.invalid/api/openai/v1',
     };
     expect(rejectedGate(autoFor(idealab, 'sk-idealab')).notice).toContain(
       'provider "idealab" declares no built-in web search backend',
@@ -1002,7 +1006,7 @@ describe('evaluateWebSearchGate auto derivation', () => {
 
   it.each([
     [CODING_PLAN.baseUrl + '/', 'ALT_CODING_KEY'],
-    ['https://idealab.alibaba-inc.com/api/openai/v1/', 'ALT_IDEALAB_KEY'],
+    ['https://idealab.alibaba-inc.invalid/api/openai/v1/', 'ALT_IDEALAB_KEY'],
   ])(
     'honors an endpoint preset veto despite credential formatting: %s',
     (baseUrl, envKey) => {
@@ -1022,7 +1026,7 @@ describe('evaluateWebSearchGate auto derivation', () => {
         {
           model: 'qwen3.6-plus',
           authType: AuthType.USE_OPENAI,
-          baseUrl: 'https://idealab.alibaba-inc.com/api/openai/v1',
+          baseUrl: 'https://idealab.alibaba-inc.invalid/api/openai/v1',
           apiKey: 'sk-literal',
         },
         settingsSource,
@@ -1081,7 +1085,7 @@ describe('evaluateWebSearchGate auto derivation', () => {
       id: 'my-model',
       authType: 'openai',
       envKey: 'MY_INSECURE_KEY',
-      baseUrl: 'http://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'http://dashscope.aliyuncs.invalid/compatible-mode/v1',
     };
     expect(rejectedGate(autoFor(insecure, 'sk-insecure')).silent).toBe(true);
   });
@@ -1264,7 +1268,7 @@ describe('WebSearchTool execute', () => {
       defaultHeaders: Record<string, string>;
     };
     expect(opts.defaultHeaders['X-Gateway-Route']).toBe('ds');
-    expect(opts.defaultHeaders['User-Agent']).toContain('QwenCode/');
+    expect(opts.defaultHeaders['User-Agent']).toContain('MariaDBShellAgent/');
     expect(opts.defaultHeaders).not.toHaveProperty('X-DashScope-Source-Config');
   });
 

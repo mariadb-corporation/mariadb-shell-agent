@@ -12,7 +12,7 @@ Mods written for Claude Code follow the turns of a session:
 - A Mod returns `{ text }` from `turn.complete` to show a line beneath the answer, such as a summary.
 - A guard ends the running turn with `$.turn.abort` when one of its hooks decides the turn must stop.
 
-Qwen Code skips these hooks at load and reports `Hooks for unsupported events will not run: turn.complete, turn.start`. `$.turn.abort` throws `Mod API not supported`.
+MariaDB Shell Agent skips these hooks at load and reports `Hooks for unsupported events will not run: turn.complete, turn.start`. `$.turn.abort` throws `Mod API not supported`.
 
 ## Goals and non-goals
 

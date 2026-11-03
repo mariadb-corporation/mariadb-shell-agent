@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -474,7 +475,7 @@ async function rebuildFromSessionJsonl(
 
   // Persist rebuilt records as a one-time migration so later reads are fast.
   // Read-only callers (e.g. the daemon dashboard, which serves a GET) pass
-  // `persist: false` so opening the dashboard never writes to `~/.qwen`.
+  // `persist: false` so opening the dashboard never writes to `~/.mariadb-shell-agent`.
   if (persist && results.length > 0) {
     const usagePath = getUsageHistoryPath();
     for (const record of results) {

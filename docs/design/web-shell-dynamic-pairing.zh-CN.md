@@ -66,14 +66,14 @@ daemon 从不信任转发头，因此在 TLS 终结代理之后，配对二维�
 
 ## 验证与验收
 
-先用全局 `qwen` 验证基线，再用构建后的 daemon 和浏览器验证完整流程。
+先用全局 `mariadb-shell-agent` 验证基线，再用构建后的 daemon 和浏览器验证完整流程。
 覆盖非 loopback 默认可用、二维码自动轮换、倒计时、一次性与过期拒绝、
 二维码不含 runtime bearer、轮换后设备仍可访问、主监听与 Local Control
 隔离、同源和跨域检查、wildcard 地址选择及 loopback 原流程不变。
 同时覆盖 allowlist 中的外部 origin，以及配置限流后的签发、无效兑换拒绝和
 被限流配对码的成功重试。
 完成构建、类型检查、针对性测试、两次全量 diff 自审及代码审查。
-结果记录在 `.qwen/e2e-tests/web-shell-dynamic-pairing.md`。
+结果记录在 `.mariadb-shell-agent/e2e-tests/web-shell-dynamic-pairing.md`。
 
 ## 待定问题
 

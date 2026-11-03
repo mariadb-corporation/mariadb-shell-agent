@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -492,7 +493,9 @@ describe('Chrome Native Host installer', () => {
         platform: 'linux',
       }),
     ).rejects.toThrow('must be absolute');
-    expect(fs.existsSync(path.join(fixture.homeDir, '.qwen'))).toBe(false);
+    expect(
+      fs.existsSync(path.join(fixture.homeDir, '.mariadb-shell-agent')),
+    ).toBe(false);
   });
 
   it('rejects a missing Native Host before writing anything', async () => {
@@ -505,7 +508,9 @@ describe('Chrome Native Host installer', () => {
         platform: 'linux',
       }),
     ).rejects.toMatchObject({ code: 'ENOENT' });
-    expect(fs.existsSync(path.join(fixture.homeDir, '.qwen'))).toBe(false);
+    expect(
+      fs.existsSync(path.join(fixture.homeDir, '.mariadb-shell-agent')),
+    ).toBe(false);
     expect(
       fs.existsSync(
         path.join(
@@ -532,7 +537,7 @@ describe('Chrome Native Host installer', () => {
     const options = { ...fixture, platform: 'darwin' as const };
     const launcherPath = path.join(
       fixture.homeDir,
-      '.qwen/browser-use/host.sh',
+      '.mariadb-shell-agent/browser-use/host.sh',
     );
     // A different program's launcher: a shell script without the owned marker.
     const foreign = '#!/bin/sh\nexec /other/tool "$@"\n';
@@ -730,7 +735,7 @@ describe('first-use Native Host setup', () => {
       expect(result).toBeInstanceOf(NativeHostNewerError);
       expect(result).toMatchObject({
         installedProtocolVersion: CHROME_BRIDGE_PROTOCOL_VERSION + 1,
-        message: expect.stringContaining('Update Qwen Code'),
+        message: expect.stringContaining('Update MariaDB Shell Agent'),
       });
     } else {
       expect(result).toMatchObject({
@@ -744,7 +749,7 @@ describe('first-use Native Host setup', () => {
     );
   });
 
-  it('is unaffected by the protocol 2 registration older Qwen Code rewrites', async () => {
+  it('is unaffected by the protocol 2 registration older MariaDB Shell Agent rewrites', async () => {
     const fixture = createFixture();
     const browserRoot = createBrowserProfile(
       fixture.homeDir,
@@ -755,7 +760,7 @@ describe('first-use Native Host setup', () => {
     // What a protocol 2 CLI writes on every first use.
     const legacyLauncher = path.join(
       fixture.homeDir,
-      '.qwen/browser-use/native-host.sh',
+      '.mariadb-shell-agent/browser-use/native-host.sh',
     );
     const legacyManifest = path.join(
       browserRoot,

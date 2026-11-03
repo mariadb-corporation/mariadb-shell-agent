@@ -31,7 +31,7 @@
 | Holo 文档提供 `/v1/memories/`，但示例省略 `infer`，描述的是服务端抽取；搜索文档还存在 GET/POST 表述差异。                                        | 端点和协议用客户文件及实际接口验收固定，不通过产品名推断兼容性。当前留存响应没有完整请求正文，不能单独证明 `infer:false` 的完整语义。 |
 | Mem0 当前 Direct Import 文档说明 `infer:false` 原样存储；其当前去重和同步响应描述已不同于旧 Direct 设计记录。                                    | 不把旧文档的“总是异步”或“不去重”泛化为所有服务的保证；Extension 自身不承诺去重或 exactly-once。                                       |
 
-相关 issue 的定位：[#9951](https://github.com/QwenLM/qwen-code/issues/9951) 仍开放，包含 OSS 协议写入需求，但采用旧私有 provider 扩展路线；[#9964](https://github.com/QwenLM/qwen-code/issues/9964) 是对应旧路线的交互测试补充。两者可作为需求与验收参考，不能视为本设计已实现。[#7449](https://github.com/QwenLM/qwen-code/issues/7449#issuecomment-5350606639) 的企业 Gateway 已按 not planned 归档，本阶段不恢复该项目。
+相关 issue 的定位：[#9951](https://github.invalid/QwenLM/qwen-code/issues/9951) 仍开放，包含 OSS 协议写入需求，但采用旧私有 provider 扩展路线；[#9964](https://github.invalid/QwenLM/qwen-code/issues/9964) 是对应旧路线的交互测试补充。两者可作为需求与验收参考，不能视为本设计已实现。[#7449](https://github.invalid/QwenLM/qwen-code/issues/7449#issuecomment-5350606639) 的企业 Gateway 已按 not planned 归档，本阶段不恢复该项目。
 
 ## 3. 用户流程与工具契约
 
@@ -227,7 +227,7 @@ REST SSE 断开只会终止订阅；Web Shell 卸载还可能 detach 客户端�
 
 真实服务部署前仍需确认：Holo 的 `infer:false` 是否原样存储一条含空白/换行/Unicode 的 user message、是否会影响旧记录、回执是否对应新建记录、写入与召回 scope 是否一致。本次在新的隔离 scope 上执行前置 list，188 ms 返回 HTTP 403，未调用 create，也没有需要清理的新记录。未更改云端访问配置。网络/访问条件恢复后，再执行隔离写入、精确读回及清理，并通过真实 daemon 完成 Alice 写入、Bob 新会话召回与另一 workspace 不串库的验收。
 
-单元和合成 E2E 可验证请求保真、结果分类及请求次数；真实 Holo 验收用于确认服务协议，不能用其中一项代替另一项。详细用例见工作区 `.qwen/e2e-tests/external-context-mem0-explicit-write.md`。
+单元和合成 E2E 可验证请求保真、结果分类及请求次数；真实 Holo 验收用于确认服务协议，不能用其中一项代替另一项。详细用例见工作区 `.mariadb-shell-agent/e2e-tests/external-context-mem0-explicit-write.md`。
 
 建议用一个聚焦的实现 PR 交付 writer、配置、通用审批展示及完整测试。删除、自动写入和 Auto Recall 的 daemon 适配保持独立后续范围。#9951 如继续跟踪该需求，应先把范围从内置 provider 改为当前 Extension 路线，避免并行实现两套方案。
 
@@ -237,7 +237,7 @@ REST SSE 断开只会终止订阅；Web Shell 卸载还可能 detach 客户端�
 
 2026-09-07 的验收覆盖：包级 182 项测试、Web Shell 67 项回归，以及真实本地 bundle 的 18 组 daemon 合成服务测试。后者包含独立 workspace 的 scope/凭证隔离、逐次审批、取消和过期投票、配置重启、runtime 移除及新 generation、HTTP 中断与超时不重试、MCP transport 退出后 Core 跳过不安全重放，以及 Alice 写入后 Bob 新 session/client 按需搜索的闭环。真实 Chrome 还检查了 3046 code point 正文逐字符可还原、格式字符可见转义、滚动末尾可见、批准一次写入及第二次拒绝零新增写入。
 
-这些结果使用合成 HTTP 服务和模型，不证明 Holo 协议兼容。尚未实测 ACP-over-HTTP 断线、单独撤销 trust、待审批时 MCP restart、跨 workspace cwd 迁移及 Conversations。后两项原本就在首版范围之外；其余生命周期路径沿用宿主现有语义，不作新增保证。实际测试脚本、逐项结果和浏览器证据位于 `.qwen/e2e-tests/mem0-daemon-write-verification-report.md`；长期回归入口为 `integration-tests/cli/external-context-mem0-daemon-write.test.ts`。
+这些结果使用合成 HTTP 服务和模型，不证明 Holo 协议兼容。尚未实测 ACP-over-HTTP 断线、单独撤销 trust、待审批时 MCP restart、跨 workspace cwd 迁移及 Conversations。后两项原本就在首版范围之外；其余生命周期路径沿用宿主现有语义，不作新增保证。实际测试脚本、逐项结果和浏览器证据位于 `.mariadb-shell-agent/e2e-tests/mem0-daemon-write-verification-report.md`；长期回归入口为 `integration-tests/cli/external-context-mem0-daemon-write.test.ts`。
 
 代码依据（均已对照上述 main 基线）：
 
@@ -258,7 +258,7 @@ REST SSE 断开只会终止订阅；Web Shell 卸载还可能 detach 客户端�
 
 服务依据（2026-09-07 查阅，服务行为可能随版本变化）：
 
-- [Holo 创建和调用长记忆服务](https://www.alibabacloud.com/help/tc/hologres/user-guide/create-and-use-long-memory-service)：认证、路径与基础请求/响应示例，不能据此补全未记载的 infer 语义。
+- [Holo 创建和调用长记忆服务](https://www.alibabacloud.invalid/help/tc/hologres/user-guide/create-and-use-long-memory-service)：认证、路径与基础请求/响应示例，不能据此补全未记载的 infer 语义。
 - [Mem0 Direct Import](https://docs.mem0.ai/platform/features/direct-import)：当前原样保存说明及示例；去重说明不能泛化成其他兼容服务的幂等保证。
 - [Mem0 Add Memories](https://docs.mem0.ai/api-reference/memory/add-memories)：同步 records 与异步 event 的不同结果形态。
 

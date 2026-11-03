@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +9,7 @@
  * The one-line join link a coordinator hands out under Agent → Runtime:
  * `<coordinator URL>/join/<workspace id>`.
  *
- * It only ever travels to `qwen serve --join`; nothing serves that path. The
+ * It only ever travels to `mariadb-shell-agent serve --join`; nothing serves that path. The
  * single-use enrollment token travels separately in
  * QWEN_AGENT_HOST_ENROLLMENT_TOKEN so it is not exposed in process argv.
  */

@@ -74,7 +74,7 @@ const reviewDocument = {
     held: 2,
   },
   outcomesRecorded: false,
-  markdownReportPath: '.qwen/reviews/pr-123.md',
+  markdownReportPath: '.mariadb-shell-agent/reviews/pr-123.md',
 };
 
 function renderWith(
@@ -98,7 +98,7 @@ function renderWith(
     root.render(
       <I18nProvider language={language}>
         <CodeReviewArtifactDetail
-          workspacePath=".qwen/reviews/pr-123.json"
+          workspacePath=".mariadb-shell-agent/reviews/pr-123.json"
           workspaceActions={actions}
         />
       </I18nProvider>,
@@ -235,11 +235,13 @@ describe('CodeReviewArtifactDetail', () => {
     });
 
     expect(actions.readWorkspaceFile).toHaveBeenCalledWith(
-      '.qwen/reviews/pr-123.md',
+      '.mariadb-shell-agent/reviews/pr-123.md',
     );
     expect(container.textContent).toContain('Durable report');
     expect(
-      container.querySelector('a[href=".qwen/reviews/pr-123.md"]'),
+      container.querySelector(
+        'a[href=".mariadb-shell-agent/reviews/pr-123.md"]',
+      ),
     ).toBeNull();
   });
 
@@ -257,13 +259,13 @@ describe('CodeReviewArtifactDetail', () => {
     };
     const actions = {
       readWorkspaceFile: vi.fn((path: string) => {
-        if (path === '.qwen/reviews/pr-123.json') {
+        if (path === '.mariadb-shell-agent/reviews/pr-123.json') {
           return Promise.resolve({
             content: JSON.stringify(reviewDocument),
             truncated: false,
           });
         }
-        if (path === '.qwen/reviews/pr-123.md') {
+        if (path === '.mariadb-shell-agent/reviews/pr-123.md') {
           return new Promise<{ content: string; truncated: false }>(
             (resolve) => {
               resolveReport = resolve;
@@ -285,7 +287,7 @@ describe('CodeReviewArtifactDetail', () => {
       root.render(
         <I18nProvider language="en">
           <CodeReviewArtifactDetail
-            workspacePath=".qwen/reviews/pr-123.json"
+            workspacePath=".mariadb-shell-agent/reviews/pr-123.json"
             artifactVersion="1"
             workspaceActions={actions}
           />
@@ -302,7 +304,7 @@ describe('CodeReviewArtifactDetail', () => {
       root.render(
         <I18nProvider language="en">
           <CodeReviewArtifactDetail
-            workspacePath=".qwen/reviews/pr-456.json"
+            workspacePath=".mariadb-shell-agent/reviews/pr-456.json"
             artifactVersion="2"
             workspaceActions={actions}
           />
@@ -353,7 +355,7 @@ describe('CodeReviewArtifactDetail', () => {
       'non-Markdown report path',
       JSON.stringify({
         ...reviewDocument,
-        markdownReportPath: '.qwen/reviews/report.json',
+        markdownReportPath: '.mariadb-shell-agent/reviews/report.json',
       }),
       'markdownReportPath must be a relative .md path',
     ],
@@ -363,7 +365,7 @@ describe('CodeReviewArtifactDetail', () => {
         ...reviewDocument,
         markdownReportPath: 'docs/report.md',
       }),
-      'markdownReportPath must be a file under .qwen/reviews/',
+      'markdownReportPath must be a file under .mariadb-shell-agent/reviews/',
     ],
   ])('shows a dedicated error for %s', async (_name, content, expected) => {
     const { container } = renderWith(content);
@@ -400,7 +402,7 @@ describe('CodeReviewArtifactDetail', () => {
       root.render(
         <I18nProvider language="en">
           <CodeReviewArtifactDetail
-            workspacePath=".qwen/reviews/pr-123.json"
+            workspacePath=".mariadb-shell-agent/reviews/pr-123.json"
             artifactVersion="1"
             workspaceActions={actions}
           />
@@ -423,7 +425,7 @@ describe('CodeReviewArtifactDetail', () => {
       root.render(
         <I18nProvider language="en">
           <CodeReviewArtifactDetail
-            workspacePath=".qwen/reviews/pr-456.json"
+            workspacePath=".mariadb-shell-agent/reviews/pr-456.json"
             artifactVersion="2"
             workspaceActions={actions}
           />
@@ -466,7 +468,10 @@ describe('CodeReviewArtifactDetail', () => {
       findings: [
         {
           ...reviewDocument.findings[2],
-          assetFiles: ['.qwen/tmp/shots/evidence.png', '.qwen/tmp/notes.txt'],
+          assetFiles: [
+            '.mariadb-shell-agent/tmp/shots/evidence.png',
+            '.mariadb-shell-agent/tmp/notes.txt',
+          ],
         },
       ],
     };
@@ -491,7 +496,7 @@ describe('CodeReviewArtifactDetail', () => {
       root.render(
         <I18nProvider language="en">
           <CodeReviewArtifactDetail
-            workspacePath=".qwen/reviews/pr-123.json"
+            workspacePath=".mariadb-shell-agent/reviews/pr-123.json"
             workspaceActions={actions}
           />
         </I18nProvider>,
@@ -500,15 +505,17 @@ describe('CodeReviewArtifactDetail', () => {
     await flush();
 
     const image = container.querySelector<HTMLImageElement>(
-      'img[alt=".qwen/tmp/shots/evidence.png"]',
+      'img[alt=".mariadb-shell-agent/tmp/shots/evidence.png"]',
     );
     expect(image?.src).toBe('blob:evidence-0');
     expect(actions.readFileBytes).toHaveBeenCalledWith(
-      '.qwen/tmp/shots/evidence.png',
+      '.mariadb-shell-agent/tmp/shots/evidence.png',
       expect.objectContaining({ offset: 0 }),
     );
     // A non-image assetFile stays a bare path and is never fetched.
-    expect(container.textContent).toContain('.qwen/tmp/notes.txt');
+    expect(container.textContent).toContain(
+      '.mariadb-shell-agent/tmp/notes.txt',
+    );
     expect(actions.readFileBytes).toHaveBeenCalledTimes(1);
   });
 
@@ -530,7 +537,7 @@ describe('CodeReviewArtifactDetail', () => {
     });
 
     expect(actions.readWorkspaceFile).toHaveBeenCalledWith(
-      '.qwen/reviews/pr-123.md',
+      '.mariadb-shell-agent/reviews/pr-123.md',
     );
     expect(container.textContent).toContain('Durable report');
   });
@@ -552,7 +559,7 @@ describe('CodeReviewArtifactDetail', () => {
       root.render(
         <I18nProvider language="en">
           <CodeReviewArtifactDetail
-            workspacePath=".qwen/reviews/pr-123.json"
+            workspacePath=".mariadb-shell-agent/reviews/pr-123.json"
             workspaceActions={actions}
           />
         </I18nProvider>,
@@ -590,7 +597,7 @@ describe('CodeReviewArtifactDetail', () => {
         root.render(
           <I18nProvider language={language}>
             <CodeReviewArtifactDetail
-              workspacePath=".qwen/reviews/pr-123.json"
+              workspacePath=".mariadb-shell-agent/reviews/pr-123.json"
               workspaceActions={actions}
             />
           </I18nProvider>,
@@ -637,7 +644,7 @@ describe('CodeReviewArtifactDetail', () => {
       root.render(
         <I18nProvider language="en">
           <CodeReviewArtifactDetail
-            workspacePath=".qwen/reviews/pr-123.json"
+            workspacePath=".mariadb-shell-agent/reviews/pr-123.json"
             workspaceActions={actions}
           />
         </I18nProvider>,

@@ -1,10 +1,10 @@
 # Email
 
-Use a dedicated mailbox to send tasks to Qwen Code through IMAP and receive plain-text SMTP replies. The first connection skips mail already in the selected folder. Later connections resume the saved UID cursor.
+Use a dedicated mailbox to send tasks to MariaDB Shell Agent through IMAP and receive plain-text SMTP replies. The first connection skips mail already in the selected folder. Later connections resume the saved UID cursor.
 
 ## Configure and start
 
-Enable IMAP and SMTP for the mailbox and export its credentials into the environment of the process running Qwen Code. Add this channel to `settings.json`:
+Enable IMAP and SMTP for the mailbox and export its credentials into the environment of the process running MariaDB Shell Agent. Add this channel to `settings.json`:
 
 ```json
 {
@@ -27,9 +27,9 @@ Enable IMAP and SMTP for the mailbox and export its credentials into the environ
 }
 ```
 
-Run `qwen channel start agent-mail`. Password fields support the existing `$ENV_VAR` references; keep plaintext passwords out of settings. The adapter disables protocol logging and reports connection failures without credentials.
+Run `mariadb-shell-agent channel start agent-mail`. Password fields support the existing `$ENV_VAR` references; keep plaintext passwords out of settings. The adapter disables protocol logging and reports connection failures without credentials.
 
-Implicit TLS defaults to IMAP port 993 and SMTP port 465. For STARTTLS, set `imapSecure` or `smtpSecure` to `false`; the default ports become 143 and 587 respectively. STARTTLS and certificate verification remain mandatory. Override `imapPort` and `smtpPort` when needed. For a private CA, configure Node's `NODE_EXTRA_CA_CERTS` before launching Qwen Code.
+Implicit TLS defaults to IMAP port 993 and SMTP port 465. For STARTTLS, set `imapSecure` or `smtpSecure` to `false`; the default ports become 143 and 587 respectively. STARTTLS and certificate verification remain mandatory. Override `imapPort` and `smtpPort` when needed. For a private CA, configure Node's `NODE_EXTRA_CA_CERTS` before launching MariaDB Shell Agent.
 
 | Option                | Default    | Meaning                                                            |
 | --------------------- | ---------- | ------------------------------------------------------------------ |
@@ -54,7 +54,7 @@ Proactive delivery is disabled unless `proactiveRecipients` contains the exact t
 
 ## Recovery
 
-State resides under `$QWEN_HOME/channels/<workspace>/email-<account-hash>/state.json` (default QWEN_HOME is `~/.qwen`). Channel name, canonical workspace and mailbox endpoint/user/folder determine the store. Only one process can own it. Switching accounts establishes a separate baseline; UIDVALIDITY changes also skip the existing folder contents.
+State resides under `$QWEN_HOME/channels/<workspace>/email-<account-hash>/state.json` (default QWEN_HOME is `~/.mariadb-shell-agent`). Channel name, canonical workspace and mailbox endpoint/user/folder determine the store. Only one process can own it. Switching accounts establishes a separate baseline; UIDVALIDITY changes also skip the existing folder contents.
 
 The adapter persists an in-flight UID before starting a task and an `outboundPending` message ID before each SMTP send, including proactive sends. It removes each record after its corresponding operation completes. If the process stops during execution or SMTP returns an uncertain result, the record remains. Restart reports the state path, pending UIDs and outgoing message IDs and refuses to replay them. Stop the channel, inspect the mailbox and task side effects, and remove only reconciled UIDs from the state's `pending` array and reconciled outgoing IDs from `outboundPending` before restarting. Keep the cursor and thread metadata intact. Do not delete the state file as a retry mechanism: its absence creates a new baseline and skips existing mail.
 

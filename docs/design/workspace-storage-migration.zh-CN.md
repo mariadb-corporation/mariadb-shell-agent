@@ -24,7 +24,7 @@ W2 cwd 准入在第一次读取前获取相同的 tenant placement 锁，随后�
 
 复用 W1b 有界 Session 水位、资源闭包、历史解析器和流式树校验。检查全部保留备份；原本不存在、未捕获和缺失备份保持不同含义。Hosted 相对历史键基于新 effective directory 解析；保存的备份名称和字节保持不变。
 
-目标树唯一例外是根 `.qwen-managed-storage.json`：只能匹配封存源 marker 或本操作固定目标 marker。通过目标文件系统内本操作专有的临时文件、原子替换和目标目录同步发布。重试校验前，先确认该路径不属于封存 capture，再只清除精确名称、普通单链接且有界字节匹配固定 marker 前缀的临时文件。冲突对象拒绝，完整目标清单不忽略任何条目。不得排除其他 `.qwen*` 文件，也不修改原 bundle/源 marker。
+目标树唯一例外是根 `.qwen-managed-storage.json`：只能匹配封存源 marker 或本操作固定目标 marker。通过目标文件系统内本操作专有的临时文件、原子替换和目标目录同步发布。重试校验前，先确认该路径不属于封存 capture，再只清除精确名称、普通单链接且有界字节匹配固定 marker 前缀的临时文件。冲突对象拒绝，完整目标清单不忽略任何条目。不得排除其他 `.mariadb-shell-agent*` 文件，也不修改原 bundle/源 marker。
 
 最终 SQL 事务检查操作所有权、旧 revision/fence、完整来源水位和旧 placement 停写证据，安装目标 root/身份/新 registration UUID，revision 增加一次，持久化完成并清除迁移准入。提交前失败保持旧 fenced 登记；SQL 前 marker 发布可由同一操作续办。abort 保留退役事实和 W1a fence，不删除目标或重开服务。若已取消或失效的操作留下 marker 或临时文件，新操作必须通过外部流程重新准备与新 capture 匹配的目标副本，不接受或删除其他操作的产物。反向迁移需要新操作/capture 和更高 revision。
 

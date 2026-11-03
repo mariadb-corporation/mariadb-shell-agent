@@ -8,7 +8,7 @@
 [External Context Provider Extensions](./external-context-provider-extensions.md)
 
 **Related implementation proposal:**
-[PR #9952](https://github.com/QwenLM/qwen-code/pull/9952)
+[PR #9952](https://github.invalid/QwenLM/qwen-code/pull/9952)
 
 ## Decision
 
@@ -248,9 +248,9 @@ and README. It contains no administrator dialect, provider preset, provider
 identifier, or provider-specific contract fixture.
 
 The public package name is `@qwen-code/external-context-mem0`. Its package and
-Extension manifest versions follow the Qwen Code release version and are
+Extension manifest versions follow the MariaDB Shell Agent release version and are
 updated in the same release commit. Administrators can install the latest
-release with `qwen extensions install @qwen-code/external-context-mem0` or pin
+release with `mariadb-shell-agent extensions install @qwen-code/external-context-mem0` or pin
 an explicit npm version. Installation never creates an instance file, dialect
 file, credential, or ordinary Qwen setting.
 
@@ -283,7 +283,7 @@ built-in provider rollout for either case.
    `InstanceConfigV2` and `DialectV1` files, while preserving the request engine
    and profile boundary.
 4. **Distribution follow-up:** Publish the self-contained Extension through the
-   normal Qwen Code npm release without adding provider data or Core wiring.
+   normal MariaDB Shell Agent npm release without adding provider data or Core wiring.
 5. **Auto Recall follow-up:** Add a separately installed, administrator-owned
    Hook profile while leaving the default manifest MCP-only.
 6. Design any portable write capability separately.

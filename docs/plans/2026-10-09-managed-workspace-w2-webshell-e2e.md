@@ -4,7 +4,7 @@
 
 ## Baseline and test layers
 
-Global `qwen --version` and `qwen serve --help` identify the installed runtime but cannot prove Java WebShell behavior. Before this change a bound Session has no cwd control. Run focused tests from `packages/web-shell`. Keep browser API simulation, real Java/Hosted execution and live-model instruction adoption as separate evidence.
+Global `mariadb-shell-agent --version` and `mariadb-shell-agent serve --help` identify the installed runtime but cannot prove Java WebShell behavior. Before this change a bound Session has no cwd control. Run focused tests from `packages/web-shell`. Keep browser API simulation, real Java/Hosted execution and live-model instruction adoption as separate evidence.
 
 ## Browser behavior
 
@@ -23,8 +23,8 @@ Run root `npm run build`, `npm run typecheck`, `npm run bundle`. Under JDK 21 ru
 
 ## Release acceptance and compatibility
 
-The frontend and BFF are delivered in one draft PR. Before the combined PR is merged/deployed, #13564 must pass same-Hosted-attachment A→B acceptance: the next Turn writes in B and uses B's QWEN.md/AGENTS.md rules, without recreating the Session. Also verify real filesystem Unicode/spaces/containment and busy/approval admission, React 18/19 keyboard/ref-sensitive dialog behavior and portal theme. Runtime compatibility with capability-less servers still requires hiding the entry. No live rule test is claimed from a deterministic model.
+The frontend and BFF are delivered in one draft PR. Before the combined PR is merged/deployed, #13564 must pass same-Hosted-attachment A→B acceptance: the next Turn writes in B and uses B's MARIADB-SHELL-AGENT.md/AGENTS.md rules, without recreating the Session. Also verify real filesystem Unicode/spaces/containment and busy/approval admission, React 18/19 keyboard/ref-sensitive dialog behavior and portal theme. Runtime compatibility with capability-less servers still requires hiding the entry. No live rule test is claimed from a deterministic model.
 
 ## Verification record
 
-Local artifacts and exact commands/results live in `.qwen/e2e-tests/`; report these results in the PR separately. At this revision the browser's ten groups, real H2 cwd process case and focused tests passed; seventeen React 18.3.1 hook/control tests also passed in jsdom with one isolated runtime. The live-model #13564 gate, MySQL family and React 18 browser execution remain unverified. Record further runs without replacing these limits with assumptions.
+Local artifacts and exact commands/results live in `.mariadb-shell-agent/e2e-tests/`; report these results in the PR separately. At this revision the browser's ten groups, real H2 cwd process case and focused tests passed; seventeen React 18.3.1 hook/control tests also passed in jsdom with one isolated runtime. The live-model #13564 gate, MySQL family and React 18 browser execution remain unverified. Record further runs without replacing these limits with assumptions.

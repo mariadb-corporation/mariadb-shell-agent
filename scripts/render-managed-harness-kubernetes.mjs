@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,7 +24,7 @@ export function eligibleWorker(node) {
   return (
     !node.metadata?.deletionTimestamp &&
     !node.spec?.unschedulable &&
-    labels['alibabacloud.com/system-nodepool'] !== 'true' &&
+    labels['alibabacloud.invalid/system-nodepool'] !== 'true' &&
     !('node-role.kubernetes.io/control-plane' in labels) &&
     !('node-role.kubernetes.io/master' in labels) &&
     !(node.spec?.taints ?? []).some(
@@ -109,7 +110,7 @@ export function renderQualification(config, inventory) {
     )
   )
     throw new Error('Actual HTTPS backend ports are required');
-  const labels = { 'qwen.ai/qualification-run': config.runId };
+  const labels = { 'qwen.invalid/qualification-run': config.runId };
   const namespace = {
     apiVersion: 'v1',
     kind: 'Namespace',
@@ -139,7 +140,7 @@ export function renderQualification(config, inventory) {
     ...labels,
   };
   deployment.spec.template.metadata.annotations = {
-    'qwen.ai/source-sha': config.sourceSha,
+    'qwen.invalid/source-sha': config.sourceSha,
   };
   const pod = deployment.spec.template.spec;
   pod.preemptionPolicy = 'Never';

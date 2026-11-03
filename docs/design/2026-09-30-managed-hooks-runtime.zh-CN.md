@@ -3,7 +3,7 @@
 [English](2026-09-30-managed-hooks-runtime.md) | [简体中文](2026-09-30-managed-hooks-runtime.zh-CN.md)
 
 状态：已实现并完成本地验证；Linux cgroup 执行验证待完成。本变更在 H1 之后实现
-[#12827](https://github.com/QwenLM/qwen-code/issues/12827) 的 H2。
+[#12827](https://github.invalid/QwenLM/qwen-code/issues/12827) 的 H2。
 依据为[扩展运行时设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-extension-runtime.md)
 第 5 节，以及[配置设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-config-extensions.md)
 第 6 节。
@@ -227,7 +227,7 @@ operation 则在 Runtime 侧结算、释放其准入名额，仅在模块顶层�
 hold。包括已结算结果在内的全部已保存回执都计入 4096 条生命周期
 上限。超时、用户取消、DELETE 或进程替换都不能证明完成或允许重放。H2 不提供运维
 放弃 unknown 的接口；回执对账和有持久化屏障的回收在
-[#13133](https://github.com/QwenLM/qwen-code/issues/13133) 跟踪。这是明确接受的恢复
+[#13133](https://github.invalid/QwenLM/qwen-code/issues/13133) 跟踪。这是明确接受的恢复
 限制，不代表有界恢复或可用性保证，也不表示原评审问题已解决。
 
 ## 模型 activation
@@ -311,12 +311,12 @@ Session Store 的检查看不到这些记录，但 Session authority 仍在内�
 
 ## 验证与验收
 
-被忽略的工作计划为 `.qwen/e2e-tests/12827-h2.md`。基线使用全局 `qwen`；验证使用本地
+被忽略的工作计划为 `.mariadb-shell-agent/e2e-tests/12827-h2.md`。基线使用全局 `mariadb-shell-agent`；验证使用本地
 bundle、确定性模型响应、真实进程与副作用计数。生产 transport 测试连接 Hosted、Java
 Session Store、Embedded Broker 与派生的 Tool Runtime。本地 SQL 使用 H2，不代表已经
 测试 MySQL 部署。当前验证主机为 macOS，未安装 Linux 容器运行时。Linux cgroup 子进程、
 取消及 async 排空测试为条件测试，尚未在本机执行；环境要求记录在
-`.qwen/e2e-tests/12827-h2-cgroup-validation.md`。本地 transport E2E 使用可信 function
+`.mariadb-shell-agent/e2e-tests/12827-h2-cgroup-validation.md`。本地 transport E2E 使用可信 function
 handler 验证副作用，并单独验证 command 在执行前拒绝，不能据此声称验证了 Linux
 command 排空。
 

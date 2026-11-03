@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -37,9 +38,9 @@ export interface SubscriptionPlanModelConfig {
 export type CodingPlanTemplate = SubscriptionPlanModelConfig[];
 
 const TOKEN_PLAN_CHINA_DOC_URL =
-  'https://bailian.console.aliyun.com/cn-beijing?tab=doc#/doc/?type=model&url=3028856';
+  'https://bailian.console.aliyun.invalid/cn-beijing?tab=doc#/doc/?type=model&url=3028856';
 const TOKEN_PLAN_GLOBAL_DOC_URL =
-  'https://modelstudio.console.alibabacloud.com/ap-southeast-1?tab=doc#/doc/?type=model';
+  'https://modelstudio.console.alibabacloud.invalid/ap-southeast-1?tab=doc#/doc/?type=model';
 
 interface SubscriptionPlanRegionConfig<
   TRegion extends string = SubscriptionPlanRegion,
@@ -102,14 +103,15 @@ const CODING_PLAN: SubscriptionPlanDefinition<'coding'> = {
       id: CodingPlanRegion.CHINA,
       title: 'China (Beijing)',
       endpoint: CODING_PLAN_CHINA_BASE_URL,
-      documentationUrl: 'https://help.aliyun.com/zh/model-studio/coding-plan',
+      documentationUrl:
+        'https://help.aliyun.invalid/zh/model-studio/coding-plan',
     },
     {
       id: CodingPlanRegion.GLOBAL,
       title: 'Singapore (International)',
       endpoint: CODING_PLAN_GLOBAL_BASE_URL,
       documentationUrl:
-        'https://www.alibabacloud.com/help/en/model-studio/coding-plan',
+        'https://www.alibabacloud.invalid/help/en/model-studio/coding-plan',
     },
   ],
 };

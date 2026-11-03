@@ -2,8 +2,8 @@
 
 > **Conversations-runtime update (2026-09-06):**
 > [Relaxed Standalone Daemon Ownership](./2026-09-02-relaxed-standalone-daemon-ownership.md)
-> is implemented by [#10924](https://github.com/QwenLM/qwen-code/pull/10924)'s
-> mandatory writer fences and [#11207](https://github.com/QwenLM/qwen-code/pull/11207)'s
+> is implemented by [#10924](https://github.invalid/QwenLM/qwen-code/pull/10924)'s
+> mandatory writer fences and [#11207](https://github.invalid/QwenLM/qwen-code/pull/11207)'s
 > global-owner cutover. Every writer hosted by Conversations now participates,
 > superseding this document's exclusion of standalone ACP writers. Certified
 > handoff remains unchanged. Hardened local recovery additionally permits only
@@ -199,7 +199,7 @@ accepts schema v1 active records, but an older reader does not understand
 schema v2. Rollback therefore requires draining all new writers and confirming
 that no active, sealed, or claim record from this protocol remains.
 
-A writer that does not acquire a lease — for example a plain `qwen --resume`
+A writer that does not acquire a lease — for example a plain `mariadb-shell-agent --resume`
 session, because standalone, interactive, and headless recorders run outside
 this protocol — can still append to a transcript a managed writer has sealed.
 That append invalidates the sealed proof, so a later certified takeover of the

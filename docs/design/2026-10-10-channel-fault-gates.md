@@ -288,7 +288,7 @@ JDBC instead of sleeping; pacing predicates name the driver's markers
 **Case states.** The Legacy-derived adapter state store keys on the
 user-global qwen directory, so the IT gives every case its own `HOME`
 (child of the per-case directory) — without it, a case re-runs against a
-previous run's cursor and test state leaks into the real `~/.qwen`.
+previous run's cursor and test state leaks into the real `~/.mariadb-shell-agent`.
 Persisted evidence (`results-*.json`, `driver-*.log`) lives under
 `target/fg7-cases/`, rebuilt per method, because `@TempDir` is cleaned
 on test completion.

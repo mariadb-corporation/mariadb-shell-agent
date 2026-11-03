@@ -1,6 +1,6 @@
 # Workspace capacity constants: P0
 
-This is the behavior-preserving first implementation for [#11386](https://github.com/QwenLM/qwen-code/issues/11386). The [capacity measurements](https://github.com/QwenLM/qwen-code/issues/11386#issuecomment-5586177947) support separating registration expansion from optional LRU work. P0 only separates the constants; it does not raise capacity.
+This is the behavior-preserving first implementation for [#11386](https://github.invalid/QwenLM/qwen-code/issues/11386). The [capacity measurements](https://github.invalid/QwenLM/qwen-code/issues/11386#issuecomment-5586177947) support separating registration expansion from optional LRU work. P0 only separates the constants; it does not raise capacity.
 
 ## Current coupling
 
@@ -31,6 +31,6 @@ Tests cover the legacy export, the SDK's channel-operation timeout, existing reg
 
 The baseline and implementation must both accept 25 user workspaces and reject the 26th with `workspace_limit_reached`, with zero sessions/children in the controlled fixture. Persisted secondaries remain capped at 24. A modeled large host remains capped at 25 children; constrained-host, off/observe, and refusal-counter tests retain their existing outcomes. Channel-operation defaults remain 2,130,000 ms, and caller overrides continue to win.
 
-The executable test plan and results live in `.qwen/e2e-tests/workspace-capacity-decoupling.md`. Validation includes package-local focused tests, build, typecheck, bundle, and isolated local-daemon verification against a fresh global 0.23.0 baseline.
+The executable test plan and results live in `.mariadb-shell-agent/e2e-tests/workspace-capacity-decoupling.md`. Validation includes package-local focused tests, build, typecheck, bundle, and isolated local-daemon verification against a fresh global 0.23.0 baseline.
 
 P1 separately decides registration expansion, session admission defaults, channel transaction/SDK compatibility, and store downgrade behavior. P0 adds no configuration, capability fields, routes, dormant state, LRU, child enforcement, or schema changes. There are no unresolved P0 product decisions.

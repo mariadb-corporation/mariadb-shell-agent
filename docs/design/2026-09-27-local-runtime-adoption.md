@@ -130,7 +130,7 @@ build/typecheck and two clean full-diff audits. A simulated boot identity
 validates decisions only; actual Linux reboot acceptance belongs to W0e-3 and
 requires a dedicated host.
 
-For [#12956](https://github.com/QwenLM/qwen-code/issues/12956), cover startup
+For [#12956](https://github.invalid/QwenLM/qwen-code/issues/12956), cover startup
 adoption with a real unreaped Linux zombie and an unpublished ready record.
 Assert prompt non-retryable failure, the original registration's retirement,
 unchanged resource identity, no replacement worker and no writer-stop evidence.
@@ -144,5 +144,5 @@ or invalid identity, even when the portable unit suite can run on that host.
 
 The local development host is macOS. Portable real-process tests use a
 test-only identity source. Independent production-Linux adoption evidence is
-recorded in [PR #12865](https://github.com/QwenLM/qwen-code/pull/12865);
+recorded in [PR #12865](https://github.invalid/QwenLM/qwen-code/pull/12865);
 the physical reboot acceptance gate belongs to W0e-3.

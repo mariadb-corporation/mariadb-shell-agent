@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -63,7 +64,7 @@ delete process.env['QWEN_SERVE_MAX_WORKSPACES'];
 
 // QWEN_HOME is the OPERATOR's settings home, and this suite must not read it:
 // the verification gate runs with the host's real HOME on a machine shared
-// with other jobs, and a malformed $HOME/.qwen/settings.json there fails
+// with other jobs, and a malformed $HOME/.mariadb-shell-agent/settings.json there fails
 // every operator-settings reader at once — readOperatorSettingsScopes fails
 // closed by design (one polluted file failed 408 tests across 15 files in a
 // measured gate run). The pin is unconditional: this repo's own agent gates
@@ -81,7 +82,7 @@ export function pinQwenHome(env: NodeJS.ProcessEnv): string {
   // The pinned value must stay non-empty: every production reader gates on
   // truthiness (Storage.getGlobalQwenDir does `if (envDir)`), so an ambient
   // empty string must be pinned over rather than falling through to
-  // $HOME/.qwen.
+  // $HOME/.mariadb-shell-agent.
   const qwenHome = fs.mkdtempSync(path.join(os.tmpdir(), QWEN_HOME_PIN_PREFIX));
   env['QWEN_HOME'] = qwenHome;
   return qwenHome;
@@ -144,7 +145,7 @@ afterAll(() => {
 });
 
 // Give every test its own autofix anchor dir so anchors never leak between
-// tests or onto the host's real ~/.qwen; a test confirms an anchor for its
+// tests or onto the host's real ~/.mariadb-shell-agent; a test confirms an anchor for its
 // clone via writeAnchor in its own beforeEach. Capture the base root at module
 // load, BEFORE any suite repoints TMPDIR/TEMP/TMP (script-lint-isolation does,
 // to exercise a fail-closed path): os.tmpdir() inside a beforeEach would then

@@ -34,7 +34,7 @@ LOCAL Session isolation, verified recovery, files, and foreground Shell with
 default approval. Leave publication and child agents disabled. Background Shell,
 Monitor, command Hooks, and delegated cgroup support are outside this increment.
 
-Add `qwen serve --managed-web-config <file>` as a dedicated gateway runner.
+Add `mariadb-shell-agent serve --managed-web-config <file>` as a dedicated gateway runner.
 Configuration contains only `apiUrl`, `tenantId`, `actorId`, and `signingKeyFile`.
 The upstream must be a loopback HTTP origin. Read the signing key as exact UTF-8
 bytes and require an independent browser bearer token. Reuse the current signing

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -83,7 +84,7 @@ function entry(port: number): DaemonDiscoveryEntry {
   };
 }
 
-describe('qwen daemon command', () => {
+describe('mariadb-shell-agent daemon command', () => {
   it('declares the daemon namespace', () => {
     expect(daemonCommand.command).toBe('daemon');
     expect(typeof daemonCommand.builder).toBe('function');
@@ -312,7 +313,7 @@ describe('qwen daemon command', () => {
         error: '2 daemons are registered; pass --port <port> to choose one.',
       });
       expect(selectRestartTarget([], undefined).error).toBe(
-        'no daemon is registered. Start one with `qwen serve`.',
+        'no daemon is registered. Start one with `mariadb-shell-agent serve`.',
       );
       expect(selectRestartTarget([entry(4170)], 4171).error).toBe(
         'No daemon is registered on port 4171.',
@@ -628,7 +629,7 @@ describe('qwen daemon command', () => {
     const summary = formatDaemonStartSummary(entry(4170).record);
     expect(summary).toContain('started pid');
     expect(summary).toContain('http://127.0.0.1:4170');
-    expect(summary).toContain('qwen daemon stop --port 4170');
+    expect(summary).toContain('mariadb-shell-agent daemon stop --port 4170');
   });
 
   it('waits for a daemon to report ready', async () => {

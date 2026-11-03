@@ -47,7 +47,7 @@ TypeScript ESM monorepo（cli / sdk-typescript / webui / web-shell），vitest�
 - [x] 5. webui：connection.gitStatus + mapper + 单测
 - [x] 6. web-shell：App.tsx（options 迁移 + fast/fresh 双发 + SSE 同步 effect）+ WorkspaceSection `wait: true`
 - [x] 7. `npm run build && npm run typecheck` + 各包目标单测全绿
-- [x] 8. E2E 测试计划写入 `.qwen/e2e-tests/`，test-engineer 实测验证（协议级 6/6 通过，记录见计划文件）
+- [x] 8. E2E 测试计划写入 `.mariadb-shell-agent/e2e-tests/`，test-engineer 实测验证（协议级 6/6 通过，记录见计划文件）
 - [x] 9. 自审 diff（两轮）+ `/review`（medium local：无遗留发现；评审中补了 2 个 App 用例）
 
 ## 备注

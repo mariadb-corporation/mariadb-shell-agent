@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 import { describe, expect, it } from 'vitest';
@@ -26,7 +27,7 @@ const file = {
 };
 
 describe('Hosted immutable attachment input', () => {
-  it('keeps the public image format contract aligned with ordinary Qwen Code', () => {
+  it('keeps the public image format contract aligned with ordinary MariaDB Shell Agent', () => {
     const spec = JSON.parse(
       readFileSync(
         new URL(

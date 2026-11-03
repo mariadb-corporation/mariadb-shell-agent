@@ -7,14 +7,14 @@
 ## 问题与范围
 
 Hosted 模型回合以 `safeMode: true` 运行，`refreshHierarchicalMemory` 在发现
-之前就返回，因此回合开始时没有 Workspace 的 `QWEN.md` / `AGENTS.md`。
+之前就返回，因此回合开始时没有 Workspace 的 `MARIADB-SHELL-AGENT.md` / `AGENTS.md`。
 safe mode 是一个不可分割的捆绑（hooks、extensions、skills、MCP、工具列
 表），必须保持开启；回合的 `cwd` 是 Harness 自己绑定的工作区，而设计禁止
 模型依赖它。因此项目说明需要一条来自 Workspace 的路径，而不是解除一道
 保护。
 
 本切片交付这条路径：Hosted Workspace 回合第一次获取 Runtime 时，Harness
-经 `workspace-context` Runtime 控制操作读取 Session 工作目录的说明文件（`QWEN.md`、
+经 `workspace-context` Runtime 控制操作读取 Session 工作目录的说明文件（`MARIADB-SHELL-AGENT.md`、
 `AGENTS.md`），并把拼装好的文本保存在已接入的 Session 上。Harness 通过 `Config.setUserMemory` 注入取回的文本，并在下一个模型请求前
 调用 `refreshSystemInstruction` 刷新缓存的系统指令——Session 已持有上下文
 时在 `initialize()` 之后注入，首个请求即可带上；回合进行中取回时，在两个
@@ -53,7 +53,7 @@ profile；MCP 回合跳过此读取。
 无上下文状态，回合不受影响；失败记录在 Harness 的 stderr。取消会立即停止等待读取，也不会锁定 slot，即使底层请求稍后才完成。
 slot 会记录一次已完成的读取——包括「Workspace 没有说明文件」——因此每个
 已接入的 Session 只读取一次，直到 Harness 能看到的操作改动了说明文件：原生
-`write_file`/`edit` 批次指向 `QWEN.md` 或 `AGENTS.md`（在执行前失效，无论
+`write_file`/`edit` 批次指向 `MARIADB-SHELL-AGENT.md` 或 `AGENTS.md`（在执行前失效，无论
 结果如何），或文件 rewind 的 `filesChanged` 包含其中之一。两者都会把 slot
 重置为 undefined，下一个原生工具回合重新读取（#13564）。
 
@@ -90,9 +90,9 @@ slot 会记录一次已完成的读取——包括「Workspace 没有说明文�
 先升级 Broker 与 worker bundle，再升级 Hosted Harness。旧版 Broker 会以
 `400 runtime_control_operation_invalid` 拒绝 `workspace-context` 控制操作，
 旧版 worker 也会按自身封闭的操作联合拒绝它。由于读取是尽力而为的，这种版本
-错配对 API 和模型都不可见：没有任何 Session 能拿到 `QWEN.md` 或
+错配对 API 和模型都不可见：没有任何 Session 能拿到 `MARIADB-SHELL-AGENT.md` 或
 `AGENTS.md`，slot 永远不会锁定，每一轮都会重新读取。可观测信号是 Harness
-stderr 上反复出现的 `qwen serve: Hosted Workspace context read failed` 日志。
+stderr 上反复出现的 `mariadb-shell-agent serve: Hosted Workspace context read failed` 日志。
 
 ## 风险与未决问题
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -459,7 +460,7 @@ describe('parseInstallSource', () => {
       expect(http.get).toHaveBeenCalledWith(
         'http://example.com/marketplace.json',
         {
-          headers: { 'User-Agent': 'qwen-code' },
+          headers: { 'User-Agent': 'mariadb-shell-agent' },
           signal: expect.any(AbortSignal),
         },
         expect.any(Function),

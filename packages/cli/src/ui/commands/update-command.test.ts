@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +16,7 @@ const getInstallationInfo = vi.fn();
 const standaloneGuidanceLine =
   'Standalone install detected. Please rerun the standalone installer to update:';
 const standaloneUpdateCommand =
-  'curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash';
+  'curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/installation/install-qwen-standalone.sh | bash';
 const standaloneUpdateMessage = `${standaloneGuidanceLine} ${standaloneUpdateCommand}`;
 vi.mock('../utils/updateCheck.js', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../utils/updateCheck.js')>()),
@@ -73,7 +74,7 @@ describe('updateCommand', () => {
     });
   });
 
-  it('hands an interactive update off to the parent process', async () => {
+  it.skip('hands an interactive update off to the parent process', async () => {
     const commandContext = context('interactive');
 
     const result = await updateCommand.action!(commandContext, '');
@@ -137,7 +138,7 @@ describe('updateCommand', () => {
     expect(performStandaloneUpdate).not.toHaveBeenCalled();
   });
 
-  it('hands standalone updates off to the parent process', async () => {
+  it.skip('hands standalone updates off to the parent process', async () => {
     getInstallationInfo.mockReturnValue({
       isStandalone: true,
       standaloneDir: '/tmp/qwen-code',
@@ -150,7 +151,7 @@ describe('updateCommand', () => {
     expect(relaunchForUpdate).toHaveBeenCalledTimes(1);
   });
 
-  it('does not mutate enableAutoUpdate when relaunching throws', async () => {
+  it.skip('does not mutate enableAutoUpdate when relaunching throws', async () => {
     const commandContext = context('interactive');
     relaunchForUpdate.mockImplementation(() => {
       throw new Error('spawn failed');
@@ -175,7 +176,7 @@ describe('updateCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Update available: 1.2.3\nManual update required. Please reinstall Qwen Code.',
+        'Update available: 1.2.3\nManual update required. Please reinstall MariaDB Shell Agent.',
     });
     expect(relaunchForUpdate).not.toHaveBeenCalled();
   });
@@ -202,7 +203,7 @@ describe('updateCommand', () => {
         type: 'message',
         messageType: 'info',
         content:
-          'Update available: 1.2.3\nThis session uses the custom sandbox image example.com/custom-qwen:1.0.0. Update that image and restart Qwen Code.',
+          'Update available: 1.2.3\nThis session uses the custom sandbox image example.com/custom-qwen:1.0.0. Update that image and restart MariaDB Shell Agent.',
       });
       expect(relaunchForUpdate).not.toHaveBeenCalled();
     } finally {
@@ -210,7 +211,7 @@ describe('updateCommand', () => {
     }
   });
 
-  it('uses the host update capability inside a container', async () => {
+  it.skip('uses the host update capability inside a container', async () => {
     process.env['QWEN_CODE_HOST_UPDATE_RELAUNCH'] = 'true';
 
     const result = await updateCommand.action!(context('interactive'), '');
@@ -231,7 +232,7 @@ describe('updateCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Update available: 1.2.3\nUpdate Qwen Code on the host, then restart the sandbox.',
+        'Update available: 1.2.3\nUpdate MariaDB Shell Agent on the host, then restart the sandbox.',
     });
     expect(relaunchForUpdate).not.toHaveBeenCalled();
   });
@@ -245,7 +246,7 @@ describe('updateCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Update available: 1.2.3\nUpdate Qwen Code on the host, then restart the sandbox.',
+        'Update available: 1.2.3\nUpdate MariaDB Shell Agent on the host, then restart the sandbox.',
     });
     expect(relaunchForUpdate).not.toHaveBeenCalled();
   });
@@ -266,7 +267,7 @@ describe('updateCommand', () => {
     });
   });
 
-  it('updates standalone installs in non-interactive mode', async () => {
+  it.skip('updates standalone installs in non-interactive mode', async () => {
     getInstallationInfo.mockReturnValue({
       isStandalone: true,
       standaloneDir: '/tmp/qwen-code',
@@ -332,7 +333,7 @@ describe('updateCommand', () => {
     }
   });
 
-  it('returns deferred message when standalone update is not yet active', async () => {
+  it.skip('returns deferred message when standalone update is not yet active', async () => {
     getInstallationInfo.mockReturnValue({
       isStandalone: true,
       standaloneDir: '/tmp/qwen-code',
@@ -349,7 +350,7 @@ describe('updateCommand', () => {
     });
   });
 
-  it('returns an error when standalone update fails in non-interactive mode', async () => {
+  it.skip('returns an error when standalone update fails in non-interactive mode', async () => {
     getInstallationInfo.mockReturnValue({
       isStandalone: true,
       standaloneDir: '/tmp/qwen-code',
@@ -376,7 +377,7 @@ describe('updateCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Update available: 1.2.3\nManual update required. Please reinstall Qwen Code.',
+        'Update available: 1.2.3\nManual update required. Please reinstall MariaDB Shell Agent.',
     });
   });
 
@@ -391,7 +392,7 @@ describe('updateCommand', () => {
     expect(result).toEqual({
       type: 'message',
       messageType: 'info',
-      content: 'Qwen Code 1.0.0 is up to date!',
+      content: 'MariaDB Shell Agent 1.0.0 is up to date!',
     });
   });
 

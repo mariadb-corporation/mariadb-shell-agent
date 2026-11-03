@@ -12,13 +12,13 @@ Mod 的 `$` 只提供 `command.register`、`session.version` 和 `ui.log`，调�
 - Claude Code 内置的 telemetry Mod 读取 `$.session.id()`、`cwd()`、`model()` 和 `surfaces()`，并用 `$.clock.sleep()` 等待。
 - Mod 用 `$.plugin.name` 标注自己的输出。
 
-这些调用目前在 Qwen Code 里都会失败，于是这类 Mod 的 hook 失败并被跳过。
+这些调用目前在 MariaDB Shell Agent 里都会失败，于是这类 Mod 的 hook 失败并被跳过。
 
 ## 目标与非目标
 
 目标：
 
-- 用 Claude Code 的结构回答只读的会话信息和时钟，数值取自 Qwen Code 已经显示的数据。
+- 用 Claude Code 的结构回答只读的会话信息和时钟，数值取自 MariaDB Shell Agent 已经显示的数据。
 - 每个方法和 `session.version` 一样都是 API 事件，其他插件可以观察、代为回答或拒绝。
 
 非目标：
@@ -38,7 +38,7 @@ Mod 的 `$` 只提供 `command.register`、`session.version` 和 `ui.log`，调�
 
 除 `session.usage` 外，每个方法都是不带参数的 API 事件：
 
-| 方法                   | 回答                                          | 在 Qwen Code 中的来源                                                      |
+| 方法                   | 回答                                          | 在 MariaDB Shell Agent 中的来源                                            |
 | ---------------------- | --------------------------------------------- | -------------------------------------------------------------------------- |
 | `session.id()`         | 会话 id                                       | 当前会话；`/clear` 和 `/resume` 会改变它                                   |
 | `session.cwd()`        | 会话运行所在的目录                            | 会话的目标目录                                                             |
@@ -53,8 +53,8 @@ Mod 的 `$` 只提供 `command.register`、`session.version` 和 `ui.log`，调�
 
 - `startedAt`：会话开始的时间，单位与 `$.clock.now()` 相同，为毫秒。恢复的会话取该会话的第一条记录；`/clear` 会重新计时。用 `/branch` 创建的分支会复制父会话的记录，因此沿用父会话的开始时间，正如它的 `turns` 也包含父会话的回合。
 - `context`：主对话的 `tokens`、模型的上下文窗口 `window`，以及 `percent`，取值为 0 到 100 的整数。这些就是状态栏显示的数据：上一次响应的输入 token 数，包括缓存命中的部分。第一次响应之前，`tokens` 和 `percent` 为 0。窗口大小未知时，`window` 为 0，且没有 `percent`。
-- `rateLimits`：始终为空。Qwen Code 不读取速率限制窗口。
-- 没有 `cost`，因为 Qwen Code 不记录费用。`args.breakdown` 和 `args.columns` 会被校验，但不计算 breakdown。
+- `rateLimits`：始终为空。MariaDB Shell Agent 不读取速率限制窗口。
+- 没有 `cost`，因为 MariaDB Shell Agent 不记录费用。`args.breakdown` 和 `args.columns` 会被校验，但不计算 breakdown。
 
 这些信息在每次派发开始时于主线程读取，随请求一起发给 worker。工具运行期间调用 `$.session.usage()` 的 hook，读到的是该次工具调用开始时的数据。工具调用期间这些数据不会变化：主对话要等工具结束后才发送下一次请求，子代理也不会更新主对话的数据。
 
@@ -66,7 +66,7 @@ Mod 的 `$` 只提供 `command.register`、`session.version` 和 `ui.log`，调�
 
 - `ms` 必须是有限的非负数。
 - 与其他所有 `$` 调用不同，等待时间计入调用方 hook 的预算，这与 Claude Code 相同。睡眠时间超过剩余预算时，hook 会超时。
-- `options.signal` 中止时，睡眠立即以拒绝结束。在 Qwen Code 中，Mod 唯一可用的 signal 是 `next.signal`，因为 QuickJS 环境不提供 `AbortController`。与 Claude Code 一样，signal 不会传到宿主一侧。
+- `options.signal` 中止时，睡眠立即以拒绝结束。在 MariaDB Shell Agent 中，Mod 唯一可用的 signal 是 `next.signal`，因为 QuickJS 环境不提供 `AbortController`。与 Claude Code 一样，signal 不会传到宿主一侧。
 - 睡眠随发起它的 hook 一起结束。目前还不支持在派发结束后继续运行的工作，因此 hook 没有 await 的睡眠不会拖住派发。
 
 ## 设计决策

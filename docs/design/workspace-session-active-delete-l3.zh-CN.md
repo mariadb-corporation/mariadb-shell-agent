@@ -5,7 +5,7 @@
 ## 1. 状态与范围
 
 已在 `codex/workspace-session-l3` 本地实现，2026-10-03，Linux 实体验收仍待完成。本文实现
-[#13164](https://github.com/QwenLM/qwen-code/issues/13164) 的 L3，基于 main 已合入的
+[#13164](https://github.invalid/QwenLM/qwen-code/issues/13164) 的 L3，基于 main 已合入的
 可靠 close #13135、L1/L2 #13194、O4 退役 #13084 和 H2 Hooks #13129。
 通过既有公开和 WebShell 路由接纳空闲的 `hosted-workspace-files/1` 会话删除。
 Shell/MCP profile、按钮、物理擦除、新角色和放弃 unknown 副作用不在范围内。
@@ -209,4 +209,4 @@ Harness/worker、host/boot/PID 身份、共享文件和邻居 holder 保留。
 
 执行 build、typecheck、bundle、定向 TS/Java 测试及 E2E 计划，再完成两轮干净
 自审和独立评审。结果和环境限制记录在
-`.qwen/e2e-tests/workspace-session-active-delete-l3.md`。
+`.mariadb-shell-agent/e2e-tests/workspace-session-active-delete-l3.md`。

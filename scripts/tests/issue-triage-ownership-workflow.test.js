@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,7 +11,7 @@ import { describe, expect, it } from 'vitest';
 
 const workflowsDir = '.github/workflows';
 const issueWorkflow = readFileSync(
-  '.qwen/skills/triage/references/issue-workflow.md',
+  '.mariadb-shell-agent/skills/triage/references/issue-workflow.md',
   'utf8',
 );
 const legacyWorkflows = [

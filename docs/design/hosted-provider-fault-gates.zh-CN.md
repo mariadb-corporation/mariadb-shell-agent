@@ -52,7 +52,7 @@ worker 无法重新 acquire，且只有关闭得到确认后才释放存储所�
 设计。既有 Hosted MySQL profile 会发现该入口，不需要新增 CI 任务或产品路由。
 各场景可独立选择以开展突变验证。
 
-在 `.qwen/e2e-tests/` 保存精确 E2E 命令和证据。先尝试全局 CLI；若缺少私有
+在 `.mariadb-shell-agent/e2e-tests/` 保存精确 E2E 命令和证据。先尝试全局 CLI；若缺少私有
 worker 能力，记录基线不可用，不声称复现缺陷。构建、typecheck 并打包本地 CLI，
 编译 Java 测试并运行 Checkstyle，执行定向 provider 测试及完整 Hosted 系列，
 数据库使用 MySQL/MariaDB。H2 不能作为验收证据。

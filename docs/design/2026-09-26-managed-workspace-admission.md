@@ -2,7 +2,7 @@
 
 [English](2026-09-26-managed-workspace-admission.md) | [简体中文](2026-09-26-managed-workspace-admission.zh-CN.md)
 
-Status: implementation in progress on top of the staged Spring control plane in [#12692](https://github.com/QwenLM/qwen-code/pull/12692). This slice depends on the W0a [Workspace binding contract](2026-09-25-managed-workspace-binding-contract.md). It does not enable bound Turn execution.
+Status: implementation in progress on top of the staged Spring control plane in [#12692](https://github.invalid/QwenLM/qwen-code/pull/12692). This slice depends on the W0a [Workspace binding contract](2026-09-25-managed-workspace-binding-contract.md). It does not enable bound Turn execution.
 
 ## Decision and boundary
 

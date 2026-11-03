@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -221,7 +222,7 @@ function planAt(root: string, plan: object): string {
 
 function writeManifest(worktree: string, paths = ['src/**']): void {
   write(
-    join(worktree, '.qwen', 'review-context.json'),
+    join(worktree, '.mariadb-shell-agent', 'review-context.json'),
     JSON.stringify({
       version: 1,
       label: 'Manifest project',
@@ -342,7 +343,7 @@ describe('repo-context providers and trust boundary', () => {
       ),
     ).toThrow(
       'is missing — recreate the review worktree ' +
-        '(for PR targets: re-run `qwen review fetch-pr`)',
+        '(for PR targets: re-run `mariadb-shell-agent review fetch-pr`)',
     );
   });
 
@@ -568,7 +569,7 @@ describe('repo-context providers and trust boundary', () => {
       const worktree = join(root, 'repository');
       initGit(worktree);
       write(
-        join(worktree, '.qwen', 'manifest.json'),
+        join(worktree, '.mariadb-shell-agent', 'manifest.json'),
         JSON.stringify({
           version: 1,
           label: 'Manifest project',
@@ -577,7 +578,7 @@ describe('repo-context providers and trust boundary', () => {
       );
       symlinkSync(
         'manifest.json',
-        join(worktree, '.qwen', 'review-context.json'),
+        join(worktree, '.mariadb-shell-agent', 'review-context.json'),
       );
       write(join(worktree, 'src', 'change.ts'), 'base\n');
       const base = commitAll(worktree);
@@ -607,10 +608,10 @@ describe('repo-context providers and trust boundary', () => {
       const worktree = join(root, 'repository');
       initGit(worktree);
       write(join(worktree, 'outside.json'), '{}');
-      mkdirSync(join(worktree, '.qwen'), { recursive: true });
+      mkdirSync(join(worktree, '.mariadb-shell-agent'), { recursive: true });
       symlinkSync(
         '../../outside.json',
-        join(worktree, '.qwen', 'review-context.json'),
+        join(worktree, '.mariadb-shell-agent', 'review-context.json'),
       );
       write(join(worktree, 'src', 'change.ts'), 'base\n');
       const base = commitAll(worktree);
@@ -631,14 +632,14 @@ describe('repo-context providers and trust boundary', () => {
       const root = temp();
       const worktree = join(root, 'repository');
       initGit(worktree);
-      mkdirSync(join(worktree, '.qwen'), { recursive: true });
+      mkdirSync(join(worktree, '.mariadb-shell-agent'), { recursive: true });
       symlinkSync(
         'loop-b.json',
-        join(worktree, '.qwen', 'review-context.json'),
+        join(worktree, '.mariadb-shell-agent', 'review-context.json'),
       );
       symlinkSync(
         'review-context.json',
-        join(worktree, '.qwen', 'loop-b.json'),
+        join(worktree, '.mariadb-shell-agent', 'loop-b.json'),
       );
       write(join(worktree, 'src', 'change.ts'), 'base\n');
       const base = commitAll(worktree);
@@ -912,7 +913,12 @@ describe('repo-context providers and trust boundary', () => {
       initGit(repository);
       write(join(repository, 'src', 'change.ts'), 'base\n');
       const base = commitAll(repository);
-      const worktree = join(repository, '.qwen', 'tmp', 'review-pr-1');
+      const worktree = join(
+        repository,
+        '.mariadb-shell-agent',
+        'tmp',
+        'review-pr-1',
+      );
       mkdirSync(dirname(worktree), { recursive: true });
       execFileSync('git', [
         '-C',
@@ -928,7 +934,7 @@ describe('repo-context providers and trust boundary', () => {
       // temp dir, with git's own BARE backpointer so the round-trip gates
       // this command inherits all agree with it.
       plantAdminEntry(
-        join(repository, '.qwen', 'tmp', '.evil-git'),
+        join(repository, '.mariadb-shell-agent', 'tmp', '.evil-git'),
         join(repository, '.git', 'worktrees', 'review-pr-1'),
         worktree,
         join(repository, '.git'),
@@ -958,7 +964,12 @@ describe('repo-context providers and trust boundary', () => {
       writeManifest(repository);
       write(join(repository, 'src', 'change.ts'), 'base\n');
       const base = commitAll(repository);
-      const worktree = join(repository, '.qwen', 'tmp', 'review-pr-1');
+      const worktree = join(
+        repository,
+        '.mariadb-shell-agent',
+        'tmp',
+        'review-pr-1',
+      );
       mkdirSync(dirname(worktree), { recursive: true });
       execFileSync('git', [
         '-C',
@@ -1001,7 +1012,15 @@ describe('repo-context providers and trust boundary', () => {
     const root = temp();
     const worktree = join(root, 'repository');
     initGit(worktree);
-    write(join(worktree, '.qwen', 'review-context.json', 'inner.txt'), '{}\n');
+    write(
+      join(
+        worktree,
+        '.mariadb-shell-agent',
+        'review-context.json',
+        'inner.txt',
+      ),
+      '{}\n',
+    );
     write(join(worktree, 'src', 'change.ts'), 'base\n');
     const base = commitAll(worktree);
     const { outPath } = run(root, worktree, {
@@ -1021,7 +1040,7 @@ describe('repo-context providers and trust boundary', () => {
       const worktree = join(root, 'repository');
       initGit(worktree);
       write(
-        join(worktree, '.qwen', 'manifest.json'),
+        join(worktree, '.mariadb-shell-agent', 'manifest.json'),
         JSON.stringify({
           version: 1,
           label: 'Manifest project',
@@ -1030,7 +1049,7 @@ describe('repo-context providers and trust boundary', () => {
       );
       symlinkSync(
         'manifest.json/',
-        join(worktree, '.qwen', 'review-context.json'),
+        join(worktree, '.mariadb-shell-agent', 'review-context.json'),
       );
       write(join(worktree, 'src', 'change.ts'), 'base\n');
       const base = commitAll(worktree);
@@ -1269,7 +1288,7 @@ describe('repo-context providers and trust boundary', () => {
     const root = temp();
     const worktree = join(root, 'worktree');
     write(
-      join(worktree, '.qwen', 'review-context.json'),
+      join(worktree, '.mariadb-shell-agent', 'review-context.json'),
       `"${'x'.repeat(MAX_IDENTITY_BYTES)}"`,
     );
     expect(() =>
@@ -1352,8 +1371,11 @@ describe('repo-context providers and trust boundary', () => {
       const root = temp();
       const worktree = join(root, 'repository');
       initGit(worktree);
-      write(join(worktree, '.qwen', 'a'), '{}');
-      symlinkSync('a/.', join(worktree, '.qwen', 'review-context.json'));
+      write(join(worktree, '.mariadb-shell-agent', 'a'), '{}');
+      symlinkSync(
+        'a/.',
+        join(worktree, '.mariadb-shell-agent', 'review-context.json'),
+      );
       write(join(worktree, 'src', 'change.ts'), 'base\n');
       const base = commitAll(worktree);
       const pr = run(join(root, 'pr'), worktree, {

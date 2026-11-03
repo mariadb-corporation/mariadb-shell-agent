@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -95,10 +96,13 @@ describe('getErrorMessage cause unwrapping', () => {
     expect(
       getErrorMessage({
         code: -32603,
-        message: 'path escapes workspace: /root/.qwen/skills/example.md',
+        message:
+          'path escapes workspace: /root/.mariadb-shell-agent/skills/example.md',
         data: { errorKind: 'path_outside_workspace' },
       }),
-    ).toBe('path escapes workspace: /root/.qwen/skills/example.md');
+    ).toBe(
+      'path escapes workspace: /root/.mariadb-shell-agent/skills/example.md',
+    );
   });
 
   it('surfaces cause details from plain error-like objects', () => {

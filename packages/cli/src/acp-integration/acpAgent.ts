@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2796,7 +2797,8 @@ async function resolveQwenMemoryPaths(params: {
   cwd: string;
   projectRoot: string;
 }): Promise<QwenMemoryPaths> {
-  const fallbackFilename = getAllMemoryFilenames()[0] ?? 'QWEN.md';
+  const fallbackFilename =
+    getAllMemoryFilenames()[0] ?? 'MARIADB-SHELL-AGENT.md';
   const userMemoryFile = await resolvePreferredMemoryFile(
     Storage.getGlobalQwenDir(),
     fallbackFilename,
@@ -3449,7 +3451,7 @@ export async function runAcpAgent(
           ];
         });
         writeStderrLineSafe(
-          'qwen --acp: managed session writer shutdown failed; a writer lock may be retained for safety. ' +
+          'mariadb-shell-agent --acp: managed session writer shutdown failed; a writer lock may be retained for safety. ' +
             'Verify that no previous writer is running before manual cleanup.' +
             (retainedLockPaths.length > 0
               ? ` Candidate lock paths: ${retainedLockPaths.join(', ')}`
@@ -3651,7 +3653,7 @@ function parsePoolDrainMs(envValue: string | undefined): number {
   const trimmed = envValue.trim();
   if (!/^\d+$/.test(trimmed)) {
     process.stderr.write(
-      `qwen serve: QWEN_SERVE_MCP_POOL_DRAIN_MS=${JSON.stringify(envValue)} ` +
+      `mariadb-shell-agent serve: QWEN_SERVE_MCP_POOL_DRAIN_MS=${JSON.stringify(envValue)} ` +
         `is not a valid integer; using default 30000ms.\n`,
     );
     return 30_000;
@@ -3685,7 +3687,7 @@ export function createWorkspaceMcpBudget(
       budget = parsed;
     } else {
       process.stderr.write(
-        `qwen serve: ignoring invalid QWEN_SERVE_MCP_CLIENT_BUDGET=` +
+        `mariadb-shell-agent serve: ignoring invalid QWEN_SERVE_MCP_CLIENT_BUDGET=` +
           `'${rawBudget}' (expected positive integer); ` +
           `MCP budget enforcement disabled for this child.\n`,
       );
@@ -5322,7 +5324,7 @@ class QwenAgent implements Agent {
         qwenVersion: config.getCliVersion() ?? null,
         // What spawned this process, as far as it can tell: the daemon
         // marks the children it starts, and anything else running
-        // `qwen --acp` is a client driving it directly.
+        // `mariadb-shell-agent --acp` is a client driving it directly.
         kind: process.env[QWEN_CODE_SERVE_ENV] === '1' ? 'serve' : 'headless',
         // One record per session rather than one per process: they have
         // separate ids, names and working directories.
@@ -5634,8 +5636,8 @@ class QwenAgent implements Agent {
     const response: InitializeResponse = {
       protocolVersion: PROTOCOL_VERSION,
       agentInfo: {
-        name: 'qwen-code',
-        title: 'Qwen Code',
+        name: 'mariadb-shell-agent',
+        title: 'MariaDB Shell Agent',
         version,
       },
       authMethods,
@@ -7518,11 +7520,11 @@ class QwenAgent implements Agent {
       }
       // Resolve the session's stable workspace root, not its live cwd:
       // `session/cd` relocates `config.targetDir` into a subdirectory that
-      // carries no `.qwen/settings.json`, while `storage` stays bound to the
+      // carries no `.mariadb-shell-agent/settings.json`, while `storage` stays bound to the
       // admission workspace (`relocateWorkingDirectory` runs with
       // `skipArtifactMigration: true`, so it never replaces `storage`). The
       // live cwd would make all twelve handlers read/write a stray
-      // `<subdir>/.qwen/settings.json` after a single cd.
+      // `<subdir>/.mariadb-shell-agent/settings.json` after a single cd.
       return this.sessionWorkspaceRoot(session.getConfig());
     }
     return this.config.getTargetDir();
@@ -7746,7 +7748,7 @@ class QwenAgent implements Agent {
    * twelve `qwen/settings/*` / `qwen/permissions/*` handlers and the
    * workspace-scoped permission fan-out on this root — rather than the live
    * cwd — is what keeps a post-`cd` request from reading/writing a stray
-   * `<subdir>/.qwen/settings.json`.
+   * `<subdir>/.mariadb-shell-agent/settings.json`.
    */
   private sessionWorkspaceRoot(config: Config): string {
     return config.storage.getProjectRoot();
@@ -7864,7 +7866,7 @@ class QwenAgent implements Agent {
           // depending on `debugLogger.debug` operator opt-in (matches
           // the budget-accounting fail-loud pattern below).
           process.stderr.write(
-            `qwen serve: pool snapshot for workspace MCP status failed: ` +
+            `mariadb-shell-agent serve: pool snapshot for workspace MCP status failed: ` +
               `${err instanceof Error ? err.message : String(err)}\n`,
           );
         }
@@ -7900,7 +7902,7 @@ class QwenAgent implements Agent {
           // Accounting failure must not crash the snapshot — the per-
           // server data is still useful even without budget overlay.
           process.stderr.write(
-            `qwen serve: getMcpClientAccounting failed: ` +
+            `mariadb-shell-agent serve: getMcpClientAccounting failed: ` +
               `${err instanceof Error ? err.message : String(err)}\n`,
           );
         }
@@ -8862,7 +8864,7 @@ class QwenAgent implements Agent {
           status: 'warning',
           errorKind: 'auth_env_error',
           error: 'No auth method configured.',
-          hint: 'Run `qwen` and complete the auth flow, or set a provider env var.',
+          hint: 'Run `mariadb-shell-agent` and complete the auth flow, or set a provider env var.',
           detail: { source: 'none', hasToken: false },
         });
       }
@@ -10143,9 +10145,35 @@ class QwenAgent implements Agent {
       }
       case 'qwen/providers/list': {
         return {
-          providers: ALL_PROVIDERS.map((provider) =>
-            serializeProviderConfig(provider, this.settings),
-          ),
+          providers: ALL_PROVIDERS.filter((p) =>
+            [
+              'openrouter',
+              'requesty',
+              'openai',
+              'grok',
+              'custom-openai-compatible',
+            ].includes(p.id),
+          )
+            .sort(
+              (a, b) =>
+                [
+                  'openrouter',
+                  'requesty',
+                  'openai',
+                  'grok',
+                  'custom-openai-compatible',
+                ].indexOf(a.id) -
+                [
+                  'openrouter',
+                  'requesty',
+                  'openai',
+                  'grok',
+                  'custom-openai-compatible',
+                ].indexOf(b.id),
+            )
+            .map((provider) =>
+              serializeProviderConfig(provider, this.settings),
+            ),
         };
       }
       case 'qwen/providers/connect': {
@@ -11515,7 +11543,7 @@ class QwenAgent implements Agent {
           // clearing so a misconfigured settings file is loud.
           if (mergedDisabled !== undefined && !Array.isArray(mergedDisabled)) {
             process.stderr.write(
-              `qwen serve: MCP restart for ${JSON.stringify(serverName)}: ` +
+              `mariadb-shell-agent serve: MCP restart for ${JSON.stringify(serverName)}: ` +
                 `tools.disabled has unexpected type ${typeof mergedDisabled}; ` +
                 `clearing disabled set — check settings.json. ` +
                 `Expected an array of strings.\n`,
@@ -11529,7 +11557,7 @@ class QwenAgent implements Agent {
           // Settings load failures are non-fatal — fall through with
           // the existing in-memory snapshot.
           process.stderr.write(
-            `qwen serve: MCP restart for ${JSON.stringify(serverName)} ` +
+            `mariadb-shell-agent serve: MCP restart for ${JSON.stringify(serverName)} ` +
               `could not refresh disabledTools from merged settings ` +
               `(${err instanceof Error ? err.message : String(err)}); ` +
               `proceeding with the bootstrap snapshot — recently toggled ` +
@@ -12944,7 +12972,7 @@ class QwenAgent implements Agent {
             // another workspace's value in a multi-workspace daemon — the bug
             // this fixes), and deliberately NOT a live re-read keyed on the
             // current cwd: a cd moves `targetDir` into a subdirectory that
-            // carries no `.qwen/settings.json`, so a cwd-keyed read resolves
+            // carries no `.mariadb-shell-agent/settings.json`, so a cwd-keyed read resolves
             // disabled after the first cd and disarms the gate for the rest of
             // the session. `security.folderTrust.enabled` is `requiresRestart`,
             // so binding it at admission matches its declared semantics.
@@ -15849,7 +15877,7 @@ class QwenAgent implements Agent {
         }
         // `workspaceSettingsActive` is false for two unrelated states: an
         // untrusted workspace, and a trusted workspace rooted at `$HOME`
-        // (whose `~/.qwen/settings.json` must not be read twice). Only the
+        // (whose `~/.mariadb-shell-agent/settings.json` must not be read twice). Only the
         // first is a trust failure; telling a home-rooted workspace it is
         // untrusted points at a grant that cannot fix it.
         if (!this.config.isTrustedFolder()) {
@@ -16873,7 +16901,7 @@ class QwenAgent implements Agent {
     if (!selectedType) {
       throw RequestError.authRequired(
         { authMethods: pickAuthMethodsForAuthRequired() },
-        'Use Qwen Code CLI to authenticate first.',
+        'Use MariaDB Shell Agent CLI to authenticate first.',
       );
     }
 

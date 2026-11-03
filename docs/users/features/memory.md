@@ -1,17 +1,17 @@
 # Memory
 
-Every Qwen Code session starts with a fresh context window. Two mechanisms carry knowledge across sessions so you don't have to re-explain yourself every time:
+Every MariaDB Shell Agent session starts with a fresh context window. Two mechanisms carry knowledge across sessions so you don't have to re-explain yourself every time:
 
-- **QWEN.md** — instructions _you_ write once and Qwen reads every session
+- **MARIADB-SHELL-AGENT.md** — instructions _you_ write once and Qwen reads every session
 - **Auto-memory** — notes Qwen writes itself based on what it learns from you
 
 ---
 
-## QWEN.md: your instructions to Qwen
+## MARIADB-SHELL-AGENT.md: your instructions to Qwen
 
-QWEN.md is a plain text file where you write things Qwen should always know about your project or your preferences. Think of it as a permanent briefing that loads at the start of every conversation.
+MARIADB-SHELL-AGENT.md is a plain text file where you write things Qwen should always know about your project or your preferences. Think of it as a permanent briefing that loads at the start of every conversation.
 
-### What to put in QWEN.md
+### What to put in MARIADB-SHELL-AGENT.md
 
 Add things you'd otherwise have to repeat every session:
 
@@ -21,21 +21,21 @@ Add things you'd otherwise have to repeat every session:
 - Personal preferences ("always use pnpm, not npm")
 - A verification policy for high-stakes work — for example "verify against the database before concluding" (see [Enforce evidence-based conclusions](../common-workflow.md#enforce-evidence-based-conclusions) for a ready-made template)
 
-Don't include things Qwen can figure out by reading your code. QWEN.md works best when it's short and specific — the longer it gets, the less reliably Qwen follows it.
+Don't include things Qwen can figure out by reading your code. MARIADB-SHELL-AGENT.md works best when it's short and specific — the longer it gets, the less reliably Qwen follows it.
 
-### Where to create QWEN.md
+### Where to create MARIADB-SHELL-AGENT.md
 
-| File                          | Who it applies to                                |
-| ----------------------------- | ------------------------------------------------ |
-| `~/.qwen/QWEN.md`             | You, across all your projects                    |
-| `QWEN.md` in the project root | Your whole team (commit it to source control)    |
-| `.qwen/QWEN.local.md`         | Only you, only in this project (keep out of git) |
+| File                                                | Who it applies to                                |
+| --------------------------------------------------- | ------------------------------------------------ |
+| `~/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md`     | You, across all your projects                    |
+| `MARIADB-SHELL-AGENT.md` in the project root        | Your whole team (commit it to source control)    |
+| `.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md` | Only you, only in this project (keep out of git) |
 
 You can have any combination of these. Qwen loads all of them when you start a session.
 
 If your repository already has an `AGENTS.md` file for other AI tools, Qwen reads that too. No need to duplicate instructions.
 
-#### When to use `.qwen/QWEN.local.md`
+#### When to use `.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md`
 
 Use it for **project-specific but personal** instructions — things that belong to this project but shouldn't be shared with the team:
 
@@ -43,21 +43,21 @@ Use it for **project-specific but personal** instructions — things that belong
 - A personal debug command that hardcodes your local environment
 - Notes you want Qwen to know about your work-in-progress, but not commit
 
-It loads **after** the shared project `QWEN.md`, so your local instructions can supplement or override the team's.
+It loads **after** the shared project `MARIADB-SHELL-AGENT.md`, so your local instructions can supplement or override the team's.
 
-**You must gitignore it yourself.** Although `.qwen/` is often treated as a local directory, qwen-code does not generate a `.gitignore` for you, and some projects commit `.qwen/settings.json`. Add this line to your `.gitignore` (or to your global git ignore):
+**You must gitignore it yourself.** Although `.mariadb-shell-agent/` is often treated as a local directory, qwen-code does not generate a `.gitignore` for you, and some projects commit `.mariadb-shell-agent/settings.json`. Add this line to your `.gitignore` (or to your global git ignore):
 
 ```
-.qwen/QWEN.local.md
+.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md
 ```
 
 ### Generate one automatically with `/init`
 
-Run `/init` and Qwen will analyze your codebase to create a starter QWEN.md with build commands, test instructions, and conventions it finds. If one already exists, it suggests additions instead of overwriting.
+Run `/init` and Qwen will analyze your codebase to create a starter MARIADB-SHELL-AGENT.md with build commands, test instructions, and conventions it finds. If one already exists, it suggests additions instead of overwriting.
 
 ### Reference other files
 
-You can point QWEN.md at other files so Qwen reads them too:
+You can point MARIADB-SHELL-AGENT.md at other files so Qwen reads them too:
 
 ```markdown
 See @README.md for project overview.
@@ -67,7 +67,7 @@ See @README.md for project overview.
 - Git workflow: @docs/git-workflow.md
 ```
 
-Use `@path/to/file` anywhere in QWEN.md. Relative paths resolve from the QWEN.md file itself.
+Use `@path/to/file` anywhere in MARIADB-SHELL-AGENT.md. Relative paths resolve from the MARIADB-SHELL-AGENT.md file itself.
 
 ---
 
@@ -75,7 +75,7 @@ Use `@path/to/file` anywhere in QWEN.md. Relative paths resolve from the QWEN.md
 
 Auto-memory runs in the background. After each of your conversations, Qwen quietly saves useful things it learned — your preferences, feedback you gave, project context — so it can use them in future sessions without you repeating yourself.
 
-This is different from QWEN.md: you don't write it, Qwen does.
+This is different from MARIADB-SHELL-AGENT.md: you don't write it, Qwen does.
 
 ### What Qwen saves
 
@@ -92,7 +92,7 @@ Qwen doesn't save everything — only things that would actually be useful next 
 
 ### Where it's stored
 
-Auto-memory files live at `~/.qwen/projects/<project>/memory/`. All branches of the same checkout share the same memory folder, so what Qwen learns in one branch is available in others. Each linked git worktree gets its own memory folder, matching the per-worktree isolation of chats and other session state — repository-wide conventions you want in every worktree belong in [team memory](#team-memory-shared-with-collaborators).
+Auto-memory files live at `~/.mariadb-shell-agent/projects/<project>/memory/`. All branches of the same checkout share the same memory folder, so what Qwen learns in one branch is available in others. Each linked git worktree gets its own memory folder, matching the per-worktree isolation of chats and other session state — repository-wide conventions you want in every worktree belong in [team memory](#team-memory-shared-with-collaborators).
 
 Everything saved is plain markdown — you can open, edit, or delete any file at any time.
 
@@ -104,8 +104,8 @@ When rebuilding omits entries, the saved warning reports the dropped count and u
 
 Put hand-curated documents that automatic memory maintenance should preserve
 under `pinned/` in a managed-memory directory, for example
-`~/.qwen/projects/<project>/memory/pinned/architecture.md` or
-`~/.qwen/memories/pinned/preferences.md`. Use the same frontmatter as other
+`~/.mariadb-shell-agent/projects/<project>/memory/pinned/architecture.md` or
+`~/.mariadb-shell-agent/memories/pinned/preferences.md`. Use the same frontmatter as other
 memory documents. Valid pinned files are readable by Qwen and are included the
 next time `MEMORY.md` is rebuilt, under the same size and file-count limits as
 other memory documents.
@@ -139,7 +139,7 @@ Your session continues normally while cleanup runs in the background.
 
 Auto-memory is on by default. To toggle it, open `/memory` and use the switches at the top. You can turn off just the automatic saving, just the periodic cleanup, or both.
 
-You can also set them in `~/.qwen/settings.json` (applies to all projects) or `.qwen/settings.json` (this project only):
+You can also set them in `~/.mariadb-shell-agent/settings.json` (applies to all projects) or `.mariadb-shell-agent/settings.json` (this project only):
 
 ```json
 {
@@ -172,7 +172,7 @@ Turning it on starts a background metadata migration: each memory file gains the
 
 By default, auto-memory is **private to you** — it lives under your home directory and is never shared. Team memory is an opt-in tier that the whole team shares **through git**.
 
-When enabled, Qwen gains a third memory directory at `.qwen/team-memory/` **inside the repository**. It uses the same one-file-per-memory layout and `MEMORY.md` index as the private tiers. Because it is committed to the repo, it is shared with every collaborator the normal way: you `git pull` to receive teammates' memories and commit/push to share yours. Qwen routes durable, project-wide knowledge here — conventions every contributor must follow, shared reference pointers (trackers, dashboards) — while personal and fast-decaying notes stay private.
+When enabled, Qwen gains a third memory directory at `.mariadb-shell-agent/team-memory/` **inside the repository**. It uses the same one-file-per-memory layout and `MEMORY.md` index as the private tiers. Because it is committed to the repo, it is shared with every collaborator the normal way: you `git pull` to receive teammates' memories and commit/push to share yours. Qwen routes durable, project-wide knowledge here — conventions every contributor must follow, shared reference pointers (trackers, dashboards) — while personal and fast-decaying notes stay private.
 
 Enable it per project (or globally) in `settings.json`:
 
@@ -187,16 +187,16 @@ Enable it per project (or globally) in `settings.json`:
 It is **off by default**. Keep these caveats in mind:
 
 - **It is source-controlled and visible to everyone with repo access.** Treat a team memory like committing to the repo.
-- **Secrets are blocked.** Writes to `.qwen/team-memory/` are scanned for credentials (API keys, tokens, private keys); a detected secret is rejected, never written. The scan is a backstop, not a guarantee — don't put sensitive data there.
+- **Secrets are blocked.** Writes to `.mariadb-shell-agent/team-memory/` are scanned for credentials (API keys, tokens, private keys); a detected secret is rejected, never written. The scan is a backstop, not a guarantee — don't put sensitive data there.
 - **Changes are reviewable.** Team memory writes appear in `git status` / the PR diff like any other file, so they can be reviewed before they're committed. In the default approval mode Qwen also asks before each team write; in `AUTO_EDIT`/YOLO mode (where you've opted into auto-approval) they are applied without a prompt but still surface in the diff.
-- **The directory must be git-tracked.** If your project's `.gitignore` excludes `.qwen/*`, re-include the path so it can be shared:
+- **The directory must be git-tracked.** If your project's `.gitignore` excludes `.mariadb-shell-agent/*`, re-include the path so it can be shared:
 
   ```gitignore
-  !.qwen/team-memory/
-  !.qwen/team-memory/**
+  !.mariadb-shell-agent/team-memory/
+  !.mariadb-shell-agent/team-memory/**
   ```
 
-  Caveat: use the file-glob ignore form (`.qwen/*`), not a directory form with a trailing slash (`.qwen/`). A directory-form ignore makes git skip the folder entirely, so a `!`-reinclude below it is a no-op and the team tier stays silently empty in git. Qwen warns once at startup when the tier is enabled but its directory is git-ignored or outside any git repository, so this misconfiguration does not pass unnoticed.
+  Caveat: use the file-glob ignore form (`.mariadb-shell-agent/*`), not a directory form with a trailing slash (`.mariadb-shell-agent/`). A directory-form ignore makes git skip the folder entirely, so a `!`-reinclude below it is a no-op and the team tier stays silently empty in git. Qwen warns once at startup when the tier is enabled but its directory is git-ignored or outside any git repository, so this misconfiguration does not pass unnoticed.
 
 `QWEN_CODE_MEMORY_TEAM=1` / `=0` overrides the setting for a single run.
 
@@ -213,11 +213,11 @@ By default you share team memory with the normal git workflow (`pull` to receive
 }
 ```
 
-When on, at session start Qwen best-effort syncs the `.qwen/team-memory/` directory: it rebuilds the shared `MEMORY.md` index, fast-forward-pulls collaborators' updates **first**, then commits your team-memory changes on top, and pushes **only that sync commit** (via an explicit single-branch refspec) — so the index you load reflects the latest. It only **stages** the team directory (your other working changes are never committed), and never blocks the session on a git failure. Off by default. `QWEN_CODE_MEMORY_TEAM_SYNC=1` / `=0` overrides the setting for a single run.
+When on, at session start Qwen best-effort syncs the `.mariadb-shell-agent/team-memory/` directory: it rebuilds the shared `MEMORY.md` index, fast-forward-pulls collaborators' updates **first**, then commits your team-memory changes on top, and pushes **only that sync commit** (via an explicit single-branch refspec) — so the index you load reflects the latest. It only **stages** the team directory (your other working changes are never committed), and never blocks the session on a git failure. Off by default. `QWEN_CODE_MEMORY_TEAM_SYNC=1` / `=0` overrides the setting for a single run.
 
 Two things to know before enabling it:
 
-- **The fast-forward pull acts on your whole current branch, not just `.qwen/team-memory/`** (git has no path-scoped pull). So sync will fast-forward your branch to the remote tip. The push, by contrast, is scoped: it publishes **only the commit this sync just created**, so it never pushes other unpushed commits you have — if your branch is already ahead of upstream, sync commits locally and skips the push. Enable it on branches where the fast-forward pull is fine — or run it on a dedicated checkout.
+- **The fast-forward pull acts on your whole current branch, not just `.mariadb-shell-agent/team-memory/`** (git has no path-scoped pull). So sync will fast-forward your branch to the remote tip. The push, by contrast, is scoped: it publishes **only the commit this sync just created**, so it never pushes other unpushed commits you have — if your branch is already ahead of upstream, sync commits locally and skips the push. Enable it on branches where the fast-forward pull is fine — or run it on a dedicated checkout.
 - **A diverged branch is left untouched** (`--ff-only` never merges). When that happens sync simply does nothing that session; resolve the divergence (`git pull`) and it resumes. A branch with no upstream (no tracking configuration) still commits locally but skips the push — there is nowhere to push to.
 
 ---
@@ -230,17 +230,17 @@ Opens the Memory panel. From here you can:
 
 - Turn auto-memory saving on or off
 - Turn periodic cleanup (dream) on or off
-- Open your personal QWEN.md (`~/.qwen/QWEN.md`)
-- Open the project QWEN.md
+- Open your personal MARIADB-SHELL-AGENT.md (`~/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md`)
+- Open the project MARIADB-SHELL-AGENT.md
 - Browse the auto-memory folder
 
 ### `/memory migrate-team`
 
-Migrates the **team memory** tier (`.qwen/team-memory/`) to the structured metadata format: each file gains the frontmatter (name, description, category, keywords, usage scenarios) that memory recall needs. Personal and project memory are migrated automatically in the background once [structured recall](#structured-recall-opt-in) is enabled; team memory is shared through git, so the rewrite runs only on explicit request and shows up as a reviewable commit. Run it once per repository in a trusted workspace with team memory enabled.
+Migrates the **team memory** tier (`.mariadb-shell-agent/team-memory/`) to the structured metadata format: each file gains the frontmatter (name, description, category, keywords, usage scenarios) that memory recall needs. Personal and project memory are migrated automatically in the background once [structured recall](#structured-recall-opt-in) is enabled; team memory is shared through git, so the rewrite runs only on explicit request and shows up as a reviewable commit. Run it once per repository in a trusted workspace with team memory enabled.
 
 ### `/init`
 
-Generates a starter QWEN.md for your project. Qwen reads your codebase and fills in build commands, test instructions, and conventions it discovers.
+Generates a starter MARIADB-SHELL-AGENT.md for your project. Qwen reads your codebase and fills in build commands, test instructions, and conventions it discovers.
 
 ### `/remember <text>`
 
@@ -271,16 +271,16 @@ Runs the memory cleanup now instead of waiting for the automatic schedule:
 
 ## Troubleshooting
 
-### Qwen isn't following my QWEN.md
+### Qwen isn't following my MARIADB-SHELL-AGENT.md
 
-Open `/memory` to see which files are loaded. If your file isn't listed, Qwen can't see it — make sure it's in the project root or `~/.qwen/`.
+Open `/memory` to see which files are loaded. If your file isn't listed, Qwen can't see it — make sure it's in the project root or `~/.mariadb-shell-agent/`.
 
 Instructions work better when they're specific:
 
 - ✓ `Use 2-space indentation for TypeScript files`
 - ✗ `Format code nicely`
 
-If you have multiple QWEN.md files with conflicting instructions, Qwen may behave inconsistently. Review them and remove any contradictions.
+If you have multiple MARIADB-SHELL-AGENT.md files with conflicting instructions, Qwen may behave inconsistently. Review them and remove any contradictions.
 
 ### I want to see what Qwen has saved
 
@@ -290,4 +290,4 @@ Run `/memory` and select **Open auto-memory folder**. All saved memories are rea
 
 If auto-memory is on but Qwen doesn't seem to remember things across sessions, try running `/dream` to force a cleanup pass. Also check `/memory` to confirm both toggles are enabled.
 
-For things you always want Qwen to remember, add them to QWEN.md instead — auto-memory is best-effort, QWEN.md is guaranteed.
+For things you always want Qwen to remember, add them to MARIADB-SHELL-AGENT.md instead — auto-memory is best-effort, MARIADB-SHELL-AGENT.md is guaranteed.

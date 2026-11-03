@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -81,7 +82,9 @@ export class SleepInhibitor {
     this.logger = config.logger ?? debugLogger;
   }
 
-  acquire(reason = 'Qwen Code is processing a request'): SleepInhibitorHandle {
+  acquire(
+    reason = 'MariaDB Shell Agent is processing a request',
+  ): SleepInhibitorHandle {
     this.activeCount += 1;
 
     if (this.activeCount === 1) {
@@ -316,7 +319,7 @@ export class SleepInhibitor {
         }
         args.push(
           '--what=sleep',
-          '--who=Qwen Code',
+          '--who=MariaDB Shell Agent',
           `--why=${sanitizeInhibitorReason(reason)}`,
           '--mode=block',
           'sleep',

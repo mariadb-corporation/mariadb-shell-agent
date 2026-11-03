@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,7 +29,7 @@ export const aboutCommand: SlashCommand = {
 
     if (context.executionMode !== 'interactive') {
       const lines = [
-        `Qwen Code v${systemInfo.cliVersion}`,
+        `MariaDB Shell Agent v${systemInfo.cliVersion}`,
         `Model: ${systemInfo.modelVersion}`,
         `Fast Model: ${systemInfo.fastModel ?? 'not set'}`,
         `Auth: ${systemInfo.selectedAuthType}`,

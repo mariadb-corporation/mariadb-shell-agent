@@ -4,7 +4,7 @@
 
 状态：provider/1 已实现；生产部署验收独立推进。
 日期：2026-10-07
-Issue：[#13039](https://github.com/QwenLM/qwen-code/issues/13039)，包含[根因评论](https://github.com/QwenLM/qwen-code/issues/13039#issuecomment-5895577269)。
+Issue：[#13039](https://github.invalid/QwenLM/qwen-code/issues/13039)，包含[根因评论](https://github.invalid/QwenLM/qwen-code/issues/13039#issuecomment-5895577269)。
 代码基线：上游与本地均为 `a764fb9698e6e1152e0a8bc5808c30a765744152`。
 
 ## 1. 决策与范围

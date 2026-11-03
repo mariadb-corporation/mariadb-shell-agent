@@ -11,7 +11,7 @@ refer to that document.
 ## 1. Problem
 
 `/autofix-pr` always fixes a PR in a dedicated worktree
-(`.qwen/tmp/autofix-pr-<n>`, branch `qwen-autofix/pr-<n>`). That isolation is
+(`.mariadb-shell-agent/tmp/autofix-pr-<n>`, branch `qwen-autofix/pr-<n>`). That isolation is
 what makes an unattended watch safe, but it is the wrong shape for
 human-machine co-driving — the user sitting in a session, working on the PR
 branch together with the agent:
@@ -175,7 +175,7 @@ New checks, all before anything is written, in this order:
 6. **The checkout is clean.** The `checkoutHoldsWork` semantics: porcelain
    status with untracked files, NUL-delimited (`-z`) so a C-quoted path
    cannot masquerade as user work, where untracked watch files under
-   `.qwen/tmp` do not count.
+   `.mariadb-shell-agent/tmp` do not count.
 7. **No unpushed local commits.** After fetching `refs/pull/<n>/head` into
    the watch's private ref `refs/qwen-autofix/pr-<n>/head` (outside
    `refs/heads`, moving no branch — not `FETCH_HEAD`, which the user's
@@ -330,7 +330,7 @@ one.
 `prepare` gains the `in_place` parameter (allowlisted like `take_over`);
 the confirmed-watch record gains `inPlace` from the prepare report, and
 the reply-plan location check derives the plan directory from it: an
-in-place watch's plan sits in `<checkout>/.qwen/tmp`, not beside the
+in-place watch's plan sits in `<checkout>/.mariadb-shell-agent/tmp`, not beside the
 checkout (its parent), which is where a worktree watch's plan sits.
 `unattended` refuses in-place watches (6.6).
 
@@ -381,7 +381,7 @@ stop and ask — not discard it.
 - `packages/core/src/skills/bundled/autofix-pr/SKILL.md` — Sections 4, 6.8.
 - `packages/web-shell` PR-watches listing — pass-through verified during
   implementation.
-- This design pair; the E2E test plan under `.qwen/e2e-tests/`.
+- This design pair; the E2E test plan under `.mariadb-shell-agent/e2e-tests/`.
 
 ## 9. Constraints and risks
 
@@ -421,7 +421,7 @@ Unit tests (collocated, vitest):
 - `schedule` / `fix-start` / `unattended`: refuse in-place watches.
 - Regression: every existing worktree-mode test passes unchanged.
 
-E2E (full plan in `.qwen/e2e-tests/autofix-pr-in-place-copilot.md`, Phase 3):
+E2E (full plan in `.mariadb-shell-agent/e2e-tests/autofix-pr-in-place-copilot.md`, Phase 3):
 a scratch PR whose head branch is checked out in a real clone; an attended
 `--in-place` round fixes a failing check in the user's checkout and pushes;
 a dirty checkout stops the round with a question and survives untouched;

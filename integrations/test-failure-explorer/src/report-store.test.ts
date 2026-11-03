@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 import { execFileSync } from 'node:child_process';
@@ -76,7 +77,9 @@ describe('workspace report snapshots', () => {
       ),
     ).toBe(true);
     expect(
-      await readdir(join(root, '.qwen/test-failure-explorer/reports')),
+      await readdir(
+        join(root, '.mariadb-shell-agent/test-failure-explorer/reports'),
+      ),
     ).toEqual([`${snapshots[0].reportId}.json`]);
   });
 
@@ -92,13 +95,16 @@ describe('workspace report snapshots', () => {
       storeB.importReport('report.json'),
     ]);
     expect(snapshotA.reportId).not.toBe(snapshotB.reportId);
-    const directory = join(b, '.qwen/test-failure-explorer/reports');
+    const directory = join(
+      b,
+      '.mariadb-shell-agent/test-failure-explorer/reports',
+    );
     await writeFile(
       join(directory, `${snapshotA.reportId}.json`),
       await readFile(
         join(
           a,
-          '.qwen/test-failure-explorer/reports',
+          '.mariadb-shell-agent/test-failure-explorer/reports',
           `${snapshotA.reportId}.json`,
         ),
       ),
@@ -177,7 +183,7 @@ describe('workspace report snapshots', () => {
     await expect(store.importReport('directory.json')).rejects.toMatchObject({
       code: 'INVALID_REPORT',
     });
-    expect(await readdir(root)).not.toContain('.qwen');
+    expect(await readdir(root)).not.toContain('.mariadb-shell-agent');
   });
 
   it.skipIf(process.platform === 'win32')(
@@ -282,14 +288,18 @@ describe('workspace report snapshots', () => {
       code: 'REPORT_TOO_LARGE',
     });
     expect(
-      (await readdir(join(root, '.qwen/test-failure-explorer/reports'))).sort(),
+      (
+        await readdir(
+          join(root, '.mariadb-shell-agent/test-failure-explorer/reports'),
+        )
+      ).sort(),
     ).toEqual([`${baseline.reportId}.json`, `${exact.reportId}.json`].sort());
   });
 
   it('rejects a symlinked cache and never writes outside the workspace', async () => {
     const [root, outside] = await Promise.all([workspace(), workspace()]);
     await source(root);
-    await symlink(outside, join(root, '.qwen'), 'dir');
+    await symlink(outside, join(root, '.mariadb-shell-agent'), 'dir');
     await expect(
       (await ReportStore.create(root)).importReport('report.json'),
     ).rejects.toMatchObject({ code: 'PATH_OUTSIDE_WORKSPACE' });
@@ -303,7 +313,7 @@ describe('workspace report snapshots', () => {
     const snapshot = await store.importReport('report.json');
     const path = join(
       root,
-      '.qwen/test-failure-explorer/reports',
+      '.mariadb-shell-agent/test-failure-explorer/reports',
       `${snapshot.reportId}.json`,
     );
     const altered = JSON.stringify({
@@ -325,7 +335,7 @@ describe('workspace report snapshots', () => {
     async () => {
       const root = await workspace();
       await source(root);
-      const directory = join(root, '.qwen');
+      const directory = join(root, '.mariadb-shell-agent');
       await mkdir(directory);
       await chmod(directory, 0o500);
       try {
@@ -342,13 +352,16 @@ describe('workspace report snapshots', () => {
   it('fails safely for an unusable cache and ignores interrupted temporary files', async () => {
     const root = await workspace();
     await source(root);
-    await writeFile(join(root, '.qwen'), 'not a directory');
+    await writeFile(join(root, '.mariadb-shell-agent'), 'not a directory');
     const store = await ReportStore.create(root);
     await expect(store.importReport('report.json')).rejects.toMatchObject({
       code: 'PATH_OUTSIDE_WORKSPACE',
     });
-    await rm(join(root, '.qwen'));
-    const directory = join(root, '.qwen/test-failure-explorer/reports');
+    await rm(join(root, '.mariadb-shell-agent'));
+    const directory = join(
+      root,
+      '.mariadb-shell-agent/test-failure-explorer/reports',
+    );
     await mkdir(directory, { recursive: true });
     await writeFile(join(directory, '.import-interrupted.tmp'), '{');
     const snapshot = await store.importReport('report.json');

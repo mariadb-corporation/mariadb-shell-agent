@@ -1160,7 +1160,7 @@ documents cancel-first reset, file retention, and marker recovery;
 `docs/developers/daemon/08-session-lifecycle.md` define the new route,
 capability, and typed errors.
 
-Tests remain collocated. An E2E plan lands in `.qwen/e2e-tests/` during
+Tests remain collocated. An E2E plan lands in `.mariadb-shell-agent/e2e-tests/` during
 implementation and is not committed.
 
 ## Verification plan

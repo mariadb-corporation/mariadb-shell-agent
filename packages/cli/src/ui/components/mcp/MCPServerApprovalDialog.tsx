@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,7 +24,7 @@ interface MCPServerApprovalDialogProps {
   serverName: string;
   /** One-line summary of its transport/config (e.g. `node slack.js (stdio)`). */
   summary: string;
-  /** Where the config came from (e.g. `.mcp.json`, `.qwen/settings.json`). */
+  /** Where the config came from (e.g. `.mcp.json`, `.mariadb-shell-agent/settings.json`). */
   source: string;
   /** All pending servers that would be approved by "Approve all". */
   pendingServers: PendingMcpServer[];
@@ -79,7 +80,7 @@ export const MCPServerApprovalDialog: React.FC<
             {`Untrusted MCP server in ${source}`}
           </Text>
           <Text color={theme.text.primary}>
-            {`This workspace declares an MCP server. Approving lets Qwen Code start it and run its tools. Approval is bound to this exact configuration — if ${source} changes, you will be asked again.`}
+            {`This workspace declares an MCP server. Approving lets MariaDB Shell Agent start it and run its tools. Approval is bound to this exact configuration — if ${source} changes, you will be asked again.`}
           </Text>
         </Box>
 

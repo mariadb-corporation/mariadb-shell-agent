@@ -16,7 +16,7 @@ OpenTUI 基础、大量对话框、长记录窗口化及稳定光标已经进入
 #14044 的 Hooks 与 sandbox Diff 工作合并到了旧功能分支，没有进入 main。
 PTY #14046 与 standalone 更新栈 #14134/#14139/#14142/#14187/#14210
 仍未合并。当前 npm 安装不提供完整的 Bun/OpenTUI 运行时。
-全局 `qwen` 0.23.0 只能作为历史基线：strict OpenTUI 因缺少原生包无法启动。
+全局 `mariadb-shell-agent` 0.23.0 只能作为历史基线：strict OpenTUI 因缺少原生包无法启动。
 
 ## 目标与边界
 

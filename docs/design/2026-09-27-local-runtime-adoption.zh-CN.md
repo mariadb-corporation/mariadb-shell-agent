@@ -40,8 +40,8 @@ machine ID 必须非空且稳定。服务管理器必须允许 Broker 退出后 
 
 真实 Broker 进程在 SIGKILL 后必须接管原真实 worker，身份、token、endpoint 与执行回执均不改变。覆盖两种 boot、启动中断（包括未 fork 的失败）、并发 Broker、迟到 lease 丢弃、共享观察者关闭、placement 不匹配、记录缺失或损坏、不安全权限、符号链接、PID 复用、僵尸状态和缺失启动身份。负向案例不能启动第二个 worker 或清除物理 pin。继续执行 Stage F、HTTP、Java SQL 和 CLI 回归，以及 build/typecheck 和两轮干净全量 diff 审计。模拟 boot 身份仅验证决策；真实 Linux 重启验收属于 W0e-3，必须使用专用宿主。
 
-针对 [#12956](https://github.com/QwenLM/qwen-code/issues/12956)，使用真实未回收 Linux 僵尸进程和未发布的 ready 记录覆盖启动接管，断言及时返回不可重试失败、原登记退休、资源身份不变、不启动替代 worker，且不产生写入者停止证据。默认单测使用固定文件系统身份夹具，分别覆盖发现成功和 machine ID 缺失时拒绝。具备全部必要身份来源的 Linux 宿主还执行原生发现测试；缺少这些来源的宿主仅跳过原生成功检查。生产启动仍拒绝缺失或无效的身份，即使可移植单测可以在该宿主运行。
+针对 [#12956](https://github.invalid/QwenLM/qwen-code/issues/12956)，使用真实未回收 Linux 僵尸进程和未发布的 ready 记录覆盖启动接管，断言及时返回不可重试失败、原登记退休、资源身份不变、不启动替代 worker，且不产生写入者停止证据。默认单测使用固定文件系统身份夹具，分别覆盖发现成功和 machine ID 缺失时拒绝。具备全部必要身份来源的 Linux 宿主还执行原生发现测试；缺少这些来源的宿主仅跳过原生成功检查。生产启动仍拒绝缺失或无效的身份，即使可移植单测可以在该宿主运行。
 
 ## 待验证事项
 
-本地开发宿主为 macOS。可移植真实进程测试使用仅测试可用的身份源。[PR #12865](https://github.com/QwenLM/qwen-code/pull/12865) 记录了独立的生产 Linux 接管验证；物理重启验收门属于 W0e-3。
+本地开发宿主为 macOS。可移植真实进程测试使用仅测试可用的身份源。[PR #12865](https://github.invalid/QwenLM/qwen-code/pull/12865) 记录了独立的生产 Linux 接管验证；物理重启验收门属于 W0e-3。

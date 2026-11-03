@@ -24,7 +24,7 @@ git commit -q -m "initial"
 
 Each group uses a unique tmux session name (e.g. `wt-test-a`, `wt-test-b`) and a unique temp dir.
 
-Baseline binary: globally installed `qwen` (0.15.10).
+Baseline binary: globally installed `mariadb-shell-agent` (0.15.10).
 Local build binary: `node /Users/mochi/code/qwen-code/.claude/worktrees/trusting-euclid-6fdfb9/bundle/qwen.js`.
 
 ## Test Group A: EnterWorktree tool registration and basic creation
@@ -52,12 +52,12 @@ Local build binary: `node /Users/mochi/code/qwen-code/.claude/worktrees/trusting
 <qwen> "create a new git worktree using the enter_worktree tool" \
   --approval-mode yolo --output-format json 2>/dev/null > /tmp/a2.json
 # Check worktree dir created
-ls -la .qwen/worktrees/ | grep -v "^\." | wc -l
+ls -la .mariadb-shell-agent/worktrees/ | grep -v "^\." | wc -l
 # Should have a directory matching the auto-generated slug pattern
 ```
 
-**Pre-implementation:** model says it can't find the tool; no `.qwen/worktrees/` directory.
-**Post-implementation:** `.qwen/worktrees/<slug>` exists with auto-generated slug (format: `{adj}-{noun}-{4hex}`).
+**Pre-implementation:** model says it can't find the tool; no `.mariadb-shell-agent/worktrees/` directory.
+**Post-implementation:** `.mariadb-shell-agent/worktrees/<slug>` exists with auto-generated slug (format: `{adj}-{noun}-{4hex}`).
 
 ### A3: Create worktree with custom name
 
@@ -66,12 +66,12 @@ ls -la .qwen/worktrees/ | grep -v "^\." | wc -l
 ```bash
 <qwen> "use the enter_worktree tool with name='my-feature' to create a worktree" \
   --approval-mode yolo --output-format json 2>/dev/null
-ls .qwen/worktrees/my-feature/
+ls .mariadb-shell-agent/worktrees/my-feature/
 git branch | grep worktree-my-feature
 ```
 
 **Pre-implementation:** tool unknown.
-**Post-implementation:** `.qwen/worktrees/my-feature/` directory exists; branch `worktree-my-feature` exists.
+**Post-implementation:** `.mariadb-shell-agent/worktrees/my-feature/` directory exists; branch `worktree-my-feature` exists.
 
 ### A4: Invalid slug rejected
 
@@ -98,7 +98,7 @@ git branch | grep worktree-my-feature
 <qwen> "create a worktree named 'temp-keep' using enter_worktree, then immediately exit it with action='keep' using exit_worktree" \
   --approval-mode yolo --output-format json 2>/dev/null > /tmp/b1.json
 # Directory should still exist (keep preserves it)
-ls -d .qwen/worktrees/temp-keep
+ls -d .mariadb-shell-agent/worktrees/temp-keep
 # Branch should still exist
 git branch | grep worktree-temp-keep
 # CWD should be original
@@ -114,7 +114,7 @@ git branch | grep worktree-temp-keep
 ```bash
 <qwen> "create a worktree named 'temp-remove' using enter_worktree, then immediately exit it with action='remove' using exit_worktree" \
   --approval-mode yolo --output-format json 2>/dev/null
-ls -d .qwen/worktrees/temp-remove 2>&1
+ls -d .mariadb-shell-agent/worktrees/temp-remove 2>&1
 git branch | grep worktree-temp-remove
 ```
 
@@ -137,7 +137,7 @@ for i in $(seq 1 30); do
   tmux capture-pane -t wt-test-b3 -p | grep -q "Type your message" && break
 done
 # Create dirty file in worktree
-echo "dirty" > "$TEST_DIR/.qwen/worktrees/dirty-test/dirty.txt"
+echo "dirty" > "$TEST_DIR/.mariadb-shell-agent/worktrees/dirty-test/dirty.txt"
 # Try to remove without discard_changes
 tmux send-keys -t wt-test-b3 "use exit_worktree with action='remove' to exit the worktree"
 sleep 0.5
@@ -163,9 +163,9 @@ SESSION_ID=$(<qwen> "create a worktree named 'persist-test' using enter_worktree
   --approval-mode yolo --output-format json 2>/dev/null \
   | jq -r 'select(.type=="system") | .session_id' | head -1)
 # Check session storage for worktree state
-find ~/.qwen -name "*${SESSION_ID}*" 2>/dev/null | head
-grep -l "persist-test" ~/.qwen/projects/*/sessions/*.json 2>/dev/null || \
-  grep -rl "worktreeSession\|persist-test" ~/.qwen/projects/ 2>/dev/null | head -5
+find ~/.mariadb-shell-agent -name "*${SESSION_ID}*" 2>/dev/null | head
+grep -l "persist-test" ~/.mariadb-shell-agent/projects/*/sessions/*.json 2>/dev/null || \
+  grep -rl "worktreeSession\|persist-test" ~/.mariadb-shell-agent/projects/ 2>/dev/null | head -5
 ```
 
 **Pre-implementation:** no worktree session state stored anywhere.
@@ -181,7 +181,7 @@ grep -l "persist-test" ~/.qwen/projects/*/sessions/*.json 2>/dev/null || \
 <qwen> "spawn an agent using the agent tool with isolation='worktree' to run 'echo hello'" \
   --approval-mode yolo --output-format json 2>/dev/null \
   | jq 'select(.type=="assistant") | .message.content[] | select(.type=="tool_use" and .name=="agent") | .input'
-# Check that .qwen/worktrees/ contains an agent-* slug during execution
+# Check that .mariadb-shell-agent/worktrees/ contains an agent-* slug during execution
 ```
 
 **Pre-implementation:** agent tool schema has no isolation parameter; model either omits it or the schema rejects it.
@@ -192,10 +192,10 @@ grep -l "persist-test" ~/.qwen/projects/*/sessions/*.json 2>/dev/null || \
 **Steps:**
 
 ```bash
-ls .qwen/worktrees/ > /tmp/d2-before.txt 2>/dev/null
+ls .mariadb-shell-agent/worktrees/ > /tmp/d2-before.txt 2>/dev/null
 <qwen> "spawn an agent with isolation='worktree' to list files in the current directory using ls" \
   --approval-mode yolo --output-format json 2>/dev/null
-ls .qwen/worktrees/ > /tmp/d2-after.txt 2>/dev/null
+ls .mariadb-shell-agent/worktrees/ > /tmp/d2-after.txt 2>/dev/null
 # After should equal before (no leftover agent-* dirs)
 diff /tmp/d2-before.txt /tmp/d2-after.txt
 ```
@@ -211,14 +211,14 @@ diff /tmp/d2-before.txt /tmp/d2-after.txt
 <qwen> "spawn an agent with isolation='worktree' to write 'test content' to a new file called test.txt" \
   --approval-mode yolo --output-format json 2>/dev/null > /tmp/d3.json
 # Worktree should be preserved with the change
-ls .qwen/worktrees/agent-* 2>/dev/null
-ls .qwen/worktrees/agent-*/test.txt 2>/dev/null
+ls .mariadb-shell-agent/worktrees/agent-* 2>/dev/null
+ls .mariadb-shell-agent/worktrees/agent-*/test.txt 2>/dev/null
 # Agent result should include worktreePath/worktreeBranch
 jq 'select(.type=="user") | .message.content[] | select(.tool_use_id) | .content' /tmp/d3.json | head
 ```
 
 **Pre-implementation:** N/A.
-**Post-implementation:** `.qwen/worktrees/agent-<7hex>/test.txt` exists; agent result mentions worktree path and branch.
+**Post-implementation:** `.mariadb-shell-agent/worktrees/agent-<7hex>/test.txt` exists; agent result mentions worktree path and branch.
 
 ## Test Group E: Stale cleanup
 
@@ -232,17 +232,17 @@ This is harder to test e2e because it requires aging. Cover via unit tests in `w
 - Worktree with uncommitted changes → preserved (fail-closed)
 - Worktree with unpushed commits → preserved (fail-closed)
 
-E2E spot check (optional): manually `touch -t 200001010000 .qwen/worktrees/agent-aabcdef0` and invoke cleanup; verify removal.
+E2E spot check (optional): manually `touch -t 200001010000 .mariadb-shell-agent/worktrees/agent-aabcdef0` and invoke cleanup; verify removal.
 
 ## Test Group F: Arena compatibility (no regression)
 
 ### F1: Arena worktree path unchanged
 
-**Steps:** Run an Arena session (separate from EnterWorktree); verify it still creates worktrees under `~/.qwen/arena/<sessionId>/worktrees/` and not under `.qwen/worktrees/`.
+**Steps:** Run an Arena session (separate from EnterWorktree); verify it still creates worktrees under `~/.mariadb-shell-agent/arena/<sessionId>/worktrees/` and not under `.mariadb-shell-agent/worktrees/`.
 
 ```bash
 # Setup: requires Arena-enabled config. Detailed steps depend on Arena CLI invocation.
-# Pre-implementation: arena worktrees are under ~/.qwen/arena/.
+# Pre-implementation: arena worktrees are under ~/.mariadb-shell-agent/arena/.
 # Post-implementation: SAME — arena path is independent.
 ```
 
@@ -261,19 +261,19 @@ Outside of the E2E plan, these unit tests must accompany the implementation:
 
 ## Pass criteria
 
-| Group | Pre-build expected | Post-build expected                                  |
-| ----- | ------------------ | ---------------------------------------------------- |
-| A1    | tools not listed   | both tools listed                                    |
-| A2    | error/no-op        | `.qwen/worktrees/<auto-slug>` created                |
-| A3    | error/no-op        | `.qwen/worktrees/my-feature` created, branch present |
-| A4    | error/no-op        | tool result is_error with validation message         |
-| B1    | error/no-op        | worktree dir + branch preserved                      |
-| B2    | error/no-op        | worktree dir + branch removed                        |
-| B3    | error/no-op        | exit refuses with uncommitted-changes message        |
-| C1    | no worktree state  | session has worktreeSession field                    |
-| D1    | no isolation param | agent runs in `agent-<7hex>` worktree                |
-| D2    | N/A                | worktrees dir unchanged after agent with no changes  |
-| D3    | N/A                | `agent-<7hex>` preserved with changes                |
+| Group | Pre-build expected | Post-build expected                                                 |
+| ----- | ------------------ | ------------------------------------------------------------------- |
+| A1    | tools not listed   | both tools listed                                                   |
+| A2    | error/no-op        | `.mariadb-shell-agent/worktrees/<auto-slug>` created                |
+| A3    | error/no-op        | `.mariadb-shell-agent/worktrees/my-feature` created, branch present |
+| A4    | error/no-op        | tool result is_error with validation message                        |
+| B1    | error/no-op        | worktree dir + branch preserved                                     |
+| B2    | error/no-op        | worktree dir + branch removed                                       |
+| B3    | error/no-op        | exit refuses with uncommitted-changes message                       |
+| C1    | no worktree state  | session has worktreeSession field                                   |
+| D1    | no isolation param | agent runs in `agent-<7hex>` worktree                               |
+| D2    | N/A                | worktrees dir unchanged after agent with no changes                 |
+| D3    | N/A                | `agent-<7hex>` preserved with changes                               |
 
 ## Reproduction report (post-implementation)
 
@@ -282,7 +282,7 @@ Local build at `dist/cli.js` (commit at the tip of `claude/trusting-euclid-6fdfb
 | Group | Result                               | Notes                                                                                                                                                                 |
 | ----- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | A1    | ✅                                   | `enter_worktree` and `exit_worktree` listed in `system.tools`                                                                                                         |
-| A3    | ✅                                   | `.qwen/worktrees/my-feature` created, branch `worktree-my-feature` present                                                                                            |
+| A3    | ✅                                   | `.mariadb-shell-agent/worktrees/my-feature` created, branch `worktree-my-feature` present                                                                             |
 | A4    | covered by unit test                 | `validateUserWorktreeSlug` rejects path-traversal etc. (`enter-worktree.test.ts`)                                                                                     |
 | B1    | ✅                                   | `keep` action preserved both directory and branch                                                                                                                     |
 | B2    | ✅                                   | `remove` action deleted directory and branch                                                                                                                          |

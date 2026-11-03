@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -69,10 +70,10 @@ function manifestForBytes(version: string, bytes: Buffer) {
 describe('LiveHostInstaller', () => {
   it('prefers the OSS mirror and retains the independent GitHub fallback', () => {
     expect(LIVE_HOST_OSS_BASE_URL).toBe(
-      'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/live-host',
+      'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/live-host',
     );
     expect(LIVE_HOST_RELEASE_BASE_URL).toBe(
-      'https://github.com/QwenLM/qwen-code/releases/download/live-host-latest',
+      'https://github.invalid/QwenLM/qwen-code/releases/download/live-host-latest',
     );
     expect(resolveLiveHostManifestUrls()).toEqual([
       `${LIVE_HOST_OSS_BASE_URL}/latest/Qwen-Live-Host-manifest.json`,

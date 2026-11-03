@@ -2,7 +2,7 @@
 
 ## Overview
 
-`packages/vscode-ide-companion/src/services/daemonIdeConnection.ts` is the **VS Code extension's daemon adapter**. It lets the IDE companion connect to a running `qwen serve` daemon over HTTP + SSE instead of launching an in-process `qwen --acp` stdio child (the legacy `AcpConnectionState` path). It is the sibling-transport equivalent of [`14-cli-tui-adapter.md`](./14-cli-tui-adapter.md) for VS Code hosts.
+`packages/vscode-ide-companion/src/services/daemonIdeConnection.ts` is the **VS Code extension's daemon adapter**. It lets the IDE companion connect to a running `mariadb-shell-agent serve` daemon over HTTP + SSE instead of launching an in-process `mariadb-shell-agent --acp` stdio child (the legacy `AcpConnectionState` path). It is the sibling-transport equivalent of [`14-cli-tui-adapter.md`](./14-cli-tui-adapter.md) for VS Code hosts.
 
 The IDE's chat webview consumes daemon events through this adapter; permission prompts surface as native VS Code quick-pick dialogs.
 

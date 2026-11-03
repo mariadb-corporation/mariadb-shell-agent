@@ -2,12 +2,12 @@
 
 ## Goal
 
-Let Code Mode consume the media shapes that Qwen Code already returns from
+Let Code Mode consume the media shapes that MariaDB Shell Agent already returns from
 nested MCP and `image_gen` tool calls:
 
 - `image(result.content[0])` accepts a Qwen MCP image content block.
 - `generatedImage(await tools.image_gen(...))` accepts the complete
-  `CodeModeToolResult` returned by Qwen Code's built-in image generator.
+  `CodeModeToolResult` returned by MariaDB Shell Agent's built-in image generator.
 
 ## Data contract
 
@@ -30,7 +30,7 @@ independent of the scheduler's internal `functionResponse` wrapper.
 `generatedImage()` accepts the complete successful result from `image_gen`,
 appends its image content, and appends the existing `output` string as the
 generated-image save hint. It does not introduce Codex's
-`{ image_url, output_hint }` shape because that is not what Qwen Code returns.
+`{ image_url, output_hint }` shape because that is not what MariaDB Shell Agent returns.
 
 ## Limits and validation
 

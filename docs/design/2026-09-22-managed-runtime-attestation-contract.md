@@ -24,7 +24,7 @@ The preview implementation remains useful evidence for the route set and the 404
 - Store a language-neutral closed schema and positive and negative fixtures.
 - Execute those fixtures through a real raw Node HTTP server and consume the same files from the Java Runtime Broker build.
 - Start a minimal separately owned process from one bounded boot document on standard input, bind only to loopback, and publish a token-free ready record on standard output.
-- Keep ordinary `qwen serve`, public APIs, and existing daemon routes unchanged until the Hosted profile is introduced.
+- Keep ordinary `mariadb-shell-agent serve`, public APIs, and existing daemon routes unchanged until the Hosted profile is introduced.
 
 ## Non-Goals
 

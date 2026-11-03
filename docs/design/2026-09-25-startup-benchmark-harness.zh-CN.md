@@ -6,7 +6,7 @@
 
 ## 1. 问题
 
-[#12622](https://github.com/QwenLM/qwen-code/pull/12622)（设计文档 `2026-09-24-fresh-startup-performance.zh-CN.md`）中的全新启动优化，是用一个从未提交进仓库的基准工具度量的。其第 9 节（决定 7）把它留给了本后续工作：任何人都应能按相同的定义复现这些度量，而不必重新搭建工具。同一决定还提议对确定性计数增加 CI 棘轮；第 3.5 节说明了本设计为何不加入它。
+[#12622](https://github.invalid/QwenLM/qwen-code/pull/12622)（设计文档 `2026-09-24-fresh-startup-performance.zh-CN.md`）中的全新启动优化，是用一个从未提交进仓库的基准工具度量的。其第 9 节（决定 7）把它留给了本后续工作：任何人都应能按相同的定义复现这些度量，而不必重新搭建工具。同一决定还提议对确定性计数增加 CI 棘轮；第 3.5 节说明了本设计为何不加入它。
 
 为独立验证那个 PR 而重新搭建基准工具时，发现了一些会悄悄扭曲数据的陷阱。基准工具应当把它们固化下来，免得别人再踩一遍。
 
@@ -34,7 +34,7 @@
 
 ### 3.2 干净环境
 
-每次启动都会得到新的 `HOME`、`QWEN_HOME`、`QWEN_RUNTIME_DIR`、`XDG_*` 目录和工作区，工作区是一个空的 git 仓库。设置文件选择 OpenAI 认证并指向本地回环 stub，环境变量只保留终端会传递的那些：`PATH`、`LANG`、`TERM`，以及 stub 的密钥与地址。`--credentials settings` 或 `--credentials dotenv` 会把密钥与地址从 shell 移到设置文件的 `env` 块（`/auth` 存放它们的位置）或 `~/.qwen/.env`（文档推荐的位置），以便度量 env 文件触发的重启规则。CLI 通过真实的 bin 入口 `cli-entry.js` 启动，运行在 120×40 的 node-pty 终端中，屏幕由 `@xterm/headless` 重建。
+每次启动都会得到新的 `HOME`、`QWEN_HOME`、`QWEN_RUNTIME_DIR`、`XDG_*` 目录和工作区，工作区是一个空的 git 仓库。设置文件选择 OpenAI 认证并指向本地回环 stub，环境变量只保留终端会传递的那些：`PATH`、`LANG`、`TERM`，以及 stub 的密钥与地址。`--credentials settings` 或 `--credentials dotenv` 会把密钥与地址从 shell 移到设置文件的 `env` 块（`/auth` 存放它们的位置）或 `~/.mariadb-shell-agent/.env`（文档推荐的位置），以便度量 env 文件触发的重启规则。CLI 通过真实的 bin 入口 `cli-entry.js` 启动，运行在 120×40 的 node-pty 终端中，屏幕由 `@xterm/headless` 重建。
 
 ### 3.3 指标
 
@@ -44,7 +44,7 @@
 | --- | ------------------------------------------------------------------------- |
 | J1  | 从启动到 "Type your message" 可见、已输入一个按键、且该按键出现在输入框中 |
 | J3  | 从启动到第一个可见字符                                                    |
-| J2  | 从启动 `qwen -p` 到它的第一个请求到达 stub                                |
+| J2  | 从启动 `mariadb-shell-agent -p` 到它的第一个请求到达 stub                 |
 | M1  | J1 时进程树的 RSS 之和；`-p` 取退出前的峰值 RSS                           |
 | S1  | J1 之后屏幕上已有的文字是否被替换或清除                                   |
 | D1  | J1 之前（`-p` 为退出之前）启动的 Node 进程映像数，按 `execve` 计数        |

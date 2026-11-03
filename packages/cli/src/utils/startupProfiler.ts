@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +10,7 @@
  *
  * Activated by setting QWEN_CODE_PROFILE_STARTUP=1. When enabled, collects
  * high-resolution timestamps at key phases of CLI startup and writes a JSON
- * report to ~/.qwen/startup-perf/ on finalization.
+ * report to ~/.mariadb-shell-agent/startup-perf/ on finalization.
  *
  * Usage (already wired in index.ts / llm.tsx):
  *   initStartupProfiler()        — call once at process start to record T0
@@ -18,7 +19,7 @@
  *   finalizeStartupProfile(id)   — call after last checkpoint to write report
  *
  * By default profiles inside the sandbox child process to avoid duplicate
- * reports. `qwen serve` has no sandbox child, so it is profiled directly.
+ * reports. `mariadb-shell-agent serve` has no sandbox child, so it is profiled directly.
  * Set QWEN_CODE_PROFILE_STARTUP_OUTER=1 to also profile the outer
  * (pre-sandbox) process for non-serve runs; outer reports are written with an
  * `outer-` filename prefix to keep them separate from sandbox-child reports.
@@ -336,7 +337,7 @@ export function finalizeStartupProfile(sessionId?: string): void {
   }
 
   try {
-    const dir = path.join(os.homedir(), '.qwen', 'startup-perf');
+    const dir = path.join(os.homedir(), '.mariadb-shell-agent', 'startup-perf');
     fs.mkdirSync(dir, { recursive: true });
 
     const prefix = report.outerProcess ? 'outer-' : '';

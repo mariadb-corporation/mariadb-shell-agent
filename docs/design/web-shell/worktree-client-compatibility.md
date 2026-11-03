@@ -6,7 +6,7 @@
 ## Scope
 
 This addendum addresses F1 and F2 in
-[PR #11816's verification report](https://github.com/QwenLM/qwen-code/pull/11816#issuecomment-5851912768).
+[PR #11816's verification report](https://github.invalid/QwenLM/qwen-code/pull/11816#issuecomment-5851912768).
 It supersedes the missing-session-id rules in sections 6.2 and 7.1 of the
 [optional worktree design](web-shell-branch-session-optional-worktree.md).
 The branch transaction and worktree lifecycle remain outside this fix.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,7 +12,7 @@ import type { Request } from 'express';
 /**
  * Which listener a request arrived on.
  *
- * `primary` is the listener `qwen serve` binds at startup — loopback by
+ * `primary` is the listener `mariadb-shell-agent serve` binds at startup — loopback by
  * default, or whatever `--hostname` names. `local-control` is the LAN
  * listener attached at runtime by {@link LocalControlService}.
  *

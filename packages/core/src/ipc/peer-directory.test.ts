@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -152,7 +153,7 @@ describe('listMessageablePeers', () => {
   });
 
   it('collapses one session id hosted by two live processes', async () => {
-    // `qwen --resume <id>` in a second pane registers a second pid for the
+    // `mariadb-shell-agent --resume <id>` in a second pane registers a second pid for the
     // same session. Both records flatten to the same name AND the same ref,
     // so every address in the grammar would resolve `ambiguous` and the
     // session would vanish from list_agents until one process exits.
@@ -199,7 +200,7 @@ describe('listMessageablePeers', () => {
   });
 
   it('keeps differently named incarnations of one session id', async () => {
-    // Names are cwd-derived, so `qwen --resume <id>` from another directory
+    // Names are cwd-derived, so `mariadb-shell-agent --resume <id>` from another directory
     // (or a later `/cd`) registers a second, differently named process.
     // Each bare name resolves on its own; only the shared ref is ambiguous.
     // Collapsing them would turn the older, still-listening process into

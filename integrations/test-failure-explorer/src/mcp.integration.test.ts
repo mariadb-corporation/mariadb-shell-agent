@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 import { execFileSync } from 'node:child_process';
@@ -279,12 +280,12 @@ describe('actual stdio MCP artifact', () => {
       expect(rejected.structuredContent).toMatchObject({ code });
     }
     expect(
-      await readdir(join(root, '.qwen/test-failure-explorer/reports')).catch(
-        (error: NodeJS.ErrnoException) => {
-          if (error.code === 'ENOENT') return [];
-          throw error;
-        },
-      ),
+      await readdir(
+        join(root, '.mariadb-shell-agent/test-failure-explorer/reports'),
+      ).catch((error: NodeJS.ErrnoException) => {
+        if (error.code === 'ENOENT') return [];
+        throw error;
+      }),
     ).toEqual([]);
     const imported = await call(client, 'test_report_import', {
       relativePath: 'report.json',

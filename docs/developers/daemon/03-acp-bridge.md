@@ -2,13 +2,13 @@
 
 ## Overview
 
-`packages/acp-bridge/` owns the boundary between the daemon's HTTP layer and the ACP child process. It is consumed by `packages/cli/src/serve/` (the `qwen serve` daemon) and was extracted in #4175 F1 step 3 so future consumers (`channels/base/AcpBridge.ts`, the VS Code IDE companion) can use the same bridge core without reaching into the CLI package.
+`packages/acp-bridge/` owns the boundary between the daemon's HTTP layer and the ACP child process. It is consumed by `packages/cli/src/serve/` (the `mariadb-shell-agent serve` daemon) and was extracted in #4175 F1 step 3 so future consumers (`channels/base/AcpBridge.ts`, the VS Code IDE companion) can use the same bridge core without reaching into the CLI package.
 
 Each active `WorkspaceRuntime` owns one `HttpAcpBridge` instance. Production attempts to preheat the trusted primary child for compatibility; trusted secondaries open their `AcpChannel` on the first runtime command or Session, and untrusted secondaries cannot start ACP. Legacy primary routes retain their existing compatibility behavior. Within the runtime, the bridge provides multiplexed sessions over the channel, per-session `EventBus`es, a `MultiClientPermissionMediator`, a `BridgeFileSystem` adapter, and ACP-oriented helpers (`spawnOrAttach`, `loadSession`, `resumeSession`, `sendPrompt`, `cancelSession`, `respondToPermission`, plus extMethod RPCs for workspace status and MCP restart). Bridges and children are never shared across workspace runtimes.
 
 ## Responsibilities
 
-- Spawn or attach to the ACP child via a pluggable `ChannelFactory`. Default factory: `defaultSpawnChannelFactory` (subprocess `qwen --acp`). Tests inject `inMemoryChannel`.
+- Spawn or attach to the ACP child via a pluggable `ChannelFactory`. Default factory: `defaultSpawnChannelFactory` (subprocess `mariadb-shell-agent --acp`). Tests inject `inMemoryChannel`.
 - Maintain `aliveChannels` (channel registry) and `byId` (session registry).
 - Multiplex N HTTP-side sessions for one workspace runtime onto its ACP child via `connection.newSession()`.
 - Serialize per-session prompts through `promptQueue` (ACP enforces one active prompt per session).
@@ -74,7 +74,7 @@ sequenceDiagram
         B-->>R: {sessionId, attached: true, restoreState?}
     else cold path
         B->>CF: factory(workspaceCwd, childEnvOverrides)
-        CF->>ACP: spawn qwen --acp + pipes
+        CF->>ACP: spawn mariadb-shell-agent --acp + pipes
         CF-->>B: AcpChannel
         B->>ACP: ACP initialize (timeout=DEFAULT_INIT_TIMEOUT_MS)
         ACP-->>B: initialize response
@@ -180,7 +180,7 @@ sequenceDiagram
 
 ## Channel factory
 
-`AcpChannel` (`channel.ts`) is the bridge's transport abstraction. Production uses `defaultSpawnChannelFactory` in `spawnChannel.ts`, which runs `qwen --acp` as a subprocess with a stdio pipe pair. Tests inject `inMemoryChannel` to run the agent in-process. The bridge knows nothing about the underlying mechanism — it only needs `{ stream, kill, killSync, exited }`.
+`AcpChannel` (`channel.ts`) is the bridge's transport abstraction. Production uses `defaultSpawnChannelFactory` in `spawnChannel.ts`, which runs `mariadb-shell-agent --acp` as a subprocess with a stdio pipe pair. Tests inject `inMemoryChannel` to run the agent in-process. The bridge knows nothing about the underlying mechanism — it only needs `{ stream, kill, killSync, exited }`.
 
 `ChannelFactory` accepts `childEnvOverrides` so each daemon handle can pass its own MCP-budget env vars (`QWEN_SERVE_MCP_CLIENT_BUDGET`, `QWEN_SERVE_MCP_BUDGET_MODE`) without mutating `process.env` (which would race when two embedded daemons run in the same Node process).
 
@@ -292,4 +292,4 @@ calls; it carries `clientId`, `fromLoopback: boolean`, and `promptId`.
 - `packages/acp-bridge/src/channel.ts`
 - `packages/acp-bridge/src/spawnChannel.ts`
 - `packages/acp-bridge/src/bridgeErrors.ts`
-- Issues: [#3803](https://github.com/QwenLM/qwen-code/issues/3803), [#4175](https://github.com/QwenLM/qwen-code/issues/4175).
+- Issues: [#3803](https://github.invalid/QwenLM/qwen-code/issues/3803), [#4175](https://github.invalid/QwenLM/qwen-code/issues/4175).

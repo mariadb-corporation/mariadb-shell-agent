@@ -4,9 +4,9 @@
 
 Status: implemented; local validation passed, deployment acceptance pending.
 Integrated with main `d5c22d33`, including the merged file-history dependency
-[#13110](https://github.com/QwenLM/qwen-code/pull/13110) at `e083d6a6b`.
+[#13110](https://github.invalid/QwenLM/qwen-code/pull/13110) at `e083d6a6b`.
 Its final preparation rollback fixes and recovery tests are preserved.
-Part of [#12380](https://github.com/QwenLM/qwen-code/issues/12380).
+Part of [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380).
 Completes the W1b slice of the [W1 recovery design](2026-09-29-managed-workspace-w1-recovery.md),
 without implementing W1c placement promotion.
 
@@ -145,7 +145,7 @@ source and ownership checks are retained. No connection pool or online service
 behavior changes.
 
 Plan the offline window by filesystem entry count as well as byte size. The
-[independent Linux report](https://github.com/QwenLM/qwen-code/pull/13138#issuecomment-5933639978)
+[independent Linux report](https://github.invalid/QwenLM/qwen-code/pull/13138#issuecomment-5933639978)
 measured a 20,916-entry, 77-Session capture at 829 seconds and verification at
 765 seconds on a 4-vCPU/8-GiB VM before connection reuse. Its separately tested
 single-connection candidate reduced a 20,500-entry capture from 806 to 221
@@ -302,8 +302,8 @@ integrated. Do not mark ready before real Linux/MySQL acceptance.
 
 ## 7. Validation and acceptance
 
-Write the working plan in `.qwen/e2e-tests/managed-workspace-w1b-bundle.md`.
-Dry-run global `qwen` first and report the absent private entry honestly; use a
+Write the working plan in `.mariadb-shell-agent/e2e-tests/managed-workspace-w1b-bundle.md`.
+Dry-run global `mariadb-shell-agent` first and report the absent private entry honestly; use a
 maintenance-process test-script fallback rather than a fake model success.
 
 - Capture two Workspaces and multiple files/Shell Sessions sharing storage,
@@ -364,7 +364,7 @@ and V29 admission backfill, plus V30 Session-owned tool-output retention.
 This also includes #13144 file-history/undo guards, #13172 Hosted smoke gates
 and #12965 migration uniqueness checks. Only unmerged W1b recovery metadata moves to V31,
 with its SQL bytes unchanged. Main's migration history is not rewritten.
-The [round-3 deployment report](https://github.com/QwenLM/qwen-code/pull/13138#issuecomment-5944274897)
+The [round-3 deployment report](https://github.invalid/QwenLM/qwen-code/pull/13138#issuecomment-5944274897)
 confirms V28 on `e50e2c37`, but identifies missing ordinary Hosted model route/usage
 support; its successful Linux runbook and interruption checks use that revision
 plus a candidate allowlist fix. This change includes those two resource kinds

@@ -142,6 +142,6 @@ snapshot is reclaimed, earlier versions survive, and the published URL remains
 readable. Run the global
 CLI baseline first, then build/typecheck/bundle, focused unit tests and the
 browser scenario on the local daemon. See
-`.qwen/e2e-tests/web-shell-preview-snapshots.md` for commands and results.
+`.mariadb-shell-agent/e2e-tests/web-shell-preview-snapshots.md` for commands and results.
 
 There are no open design questions for this bounded increment.

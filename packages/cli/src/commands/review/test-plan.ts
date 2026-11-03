@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review test-plan`: rule on the claims the PR author already wrote down.
+// `mariadb-shell-agent review test-plan`: rule on the claims the PR author already wrote down.
 //
 // A Test Plan is the one place in a pull request where the author states, in
 // their own words, what they ran and what they saw — a list of falsifiable
@@ -342,7 +343,7 @@ export function extractClaims(section: string): Array<{
   // path tokens (via isPathClaim) and cd bases (which legitimately carry no
   // file extension, so the evidence bar below does not apply to them).
   const isExcludedPath = (bare: string): boolean =>
-    bare.startsWith('.qwen/') ||
+    bare.startsWith('.mariadb-shell-agent/') ||
     /(?:^|\/)(?:dist|build|out|bundle|coverage|node_modules)\//.test(bare);
 
   // A slash token is claimed as a repo path only with EVIDENCE it is one: a
@@ -570,7 +571,7 @@ function rulePath(
   }
   // A gitignored path (a build output the Environment section names — the
   // template's own example is a dist/ entry point) is absent at the reviewed
-  // commit BY CONSTRUCTION, the same reasoning that excludes `.qwen/` paths.
+  // commit BY CONSTRUCTION, the same reasoning that excludes `.mariadb-shell-agent/` paths.
   if (ignored) {
     return {
       kind: 'path',
@@ -1009,7 +1010,7 @@ export const testPlanCommand: CommandModule = {
       .option('host', {
         type: 'string',
         describe:
-          "The host the target lives on. The canonical Aone hosts (code.alibaba-inc.com / gitlab.alibaba-inc.com) select the a1 backend (the body is the MR description) — a non-canonical *.alibaba-inc.com host is a GitHub Enterprise instance and stays on gh; omitted: detected from the clone's origin, else GitHub (GH_HOST, then github.com).",
+          "The host the target lives on. The canonical Aone hosts (code.alibaba-inc.invalid / gitlab.alibaba-inc.invalid) select the a1 backend (the body is the MR description) — a non-canonical *.alibaba-inc.invalid host is a GitHub Enterprise instance and stays on gh; omitted: detected from the clone's origin, else GitHub (GH_HOST, then github.com).",
       }),
   handler: (argv) => {
     const args = argv as unknown as TestPlanArgs;

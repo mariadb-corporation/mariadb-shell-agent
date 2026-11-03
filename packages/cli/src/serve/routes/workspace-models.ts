@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -172,7 +173,9 @@ export function registerWorkspaceModelsRoutes(
       res.json({ models: listModelConfigurations(loaded) });
     } catch (error) {
       if (sendGenerationClosedError(res, error)) return;
-      writeStderrLine('qwen serve: GET /workspace/models failed');
+      writeStderrLine(
+        'mariadb-shell-agent serve: GET /workspace/models failed',
+      );
       res.status(500).json({ error: 'Unable to load model configurations' });
     }
   });
@@ -224,7 +227,9 @@ export function registerWorkspaceModelsRoutes(
       try {
         broadcastSettingsChanged('modelProviders', undefined, scope, clientId);
       } catch {
-        writeStderrLine('qwen serve: model configuration broadcast failed');
+        writeStderrLine(
+          'mariadb-shell-agent serve: model configuration broadcast failed',
+        );
       }
       let runtimeSync: ServeModelProviderRuntimeSyncResult | undefined;
       try {
@@ -244,7 +249,9 @@ export function registerWorkspaceModelsRoutes(
       });
     } catch (error) {
       if (sendGenerationClosedError(res, error)) return;
-      writeStderrLine('qwen serve: PATCH /workspace/models failed');
+      writeStderrLine(
+        'mariadb-shell-agent serve: PATCH /workspace/models failed',
+      );
       res.status(500).json({ error: 'Unable to update model configuration' });
     }
   });
@@ -284,7 +291,7 @@ export function registerWorkspaceModelsRoutes(
           );
         } catch (err) {
           writeStderrLine(
-            `qwen serve: DELETE /workspace/models broadcast error (key=${write.key}): ${
+            `mariadb-shell-agent serve: DELETE /workspace/models broadcast error (key=${write.key}): ${
               err instanceof Error ? err.message : String(err)
             }`,
           );
@@ -679,7 +686,7 @@ export function registerWorkspaceModelsRoutes(
         }
         if (sendGenerationClosedError(res, err)) return;
         writeStderrLine(
-          `qwen serve: DELETE /workspace/models error (authType=${parsed.authType}, modelId=${parsed.modelId}): ${
+          `mariadb-shell-agent serve: DELETE /workspace/models error (authType=${parsed.authType}, modelId=${parsed.modelId}): ${
             err instanceof Error ? err.message : String(err)
           }`,
         );
@@ -702,7 +709,7 @@ export function registerWorkspaceModelsRoutes(
             } catch (syncError) {
               if (sendGenerationClosedError(res, syncError)) return;
               writeStderrLine(
-                'qwen serve: DELETE /workspace/models runtime sync failed after partial persistence',
+                'mariadb-shell-agent serve: DELETE /workspace/models runtime sync failed after partial persistence',
               );
             }
             try {
@@ -745,7 +752,7 @@ export function registerWorkspaceModelsRoutes(
         } catch (err) {
           if (sendGenerationClosedError(res, err)) return;
           writeStderrLine(
-            'qwen serve: DELETE /workspace/models runtime sync failed after persistence',
+            'mariadb-shell-agent serve: DELETE /workspace/models runtime sync failed after persistence',
           );
           runtimeSync = { status: 'failed' };
         }

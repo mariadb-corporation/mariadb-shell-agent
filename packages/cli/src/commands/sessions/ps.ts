@@ -1,13 +1,14 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * `qwen sessions ps` — list registered and managed Qwen Code sessions.
+ * `mariadb-shell-agent sessions ps` — list registered and managed MariaDB Shell Agent sessions.
  *
- * The sibling `qwen sessions list` walks saved transcripts. This command shows
+ * The sibling `mariadb-shell-agent sessions list` walks saved transcripts. This command shows
  * live registry records and Agent View records marked `managed`. The latter are
  * persistent records, not a liveness claim.
  */
@@ -172,7 +173,7 @@ async function handlePs(argv: PsArgs): Promise<void> {
 
   if (records.length === 0 && managed.length === 0) {
     writeStdoutLine(
-      'No Qwen Code sessions are registered or managed right now.',
+      'No MariaDB Shell Agent sessions are registered or managed right now.',
     );
     return;
   }
@@ -182,7 +183,7 @@ async function handlePs(argv: PsArgs): Promise<void> {
 
 export const psCommand: CommandModule<unknown, PsArgs> = {
   command: 'ps',
-  describe: 'List registered and managed Qwen Code sessions',
+  describe: 'List registered and managed MariaDB Shell Agent sessions',
   builder: (yargs: Argv) =>
     yargs.option('json', {
       type: 'boolean',

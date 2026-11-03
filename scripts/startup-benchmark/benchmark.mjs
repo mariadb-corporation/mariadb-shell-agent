@@ -2,13 +2,14 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 // Interleaved A/B wall-clock benchmark of fresh startup, for manual runs:
 //   J1  launch until a typed key shows in the input box
 //   J3  launch until the first visible glyph
-//   J2  `qwen -p` launch until its first model request
+//   J2  `mariadb-shell-agent -p` launch until its first model request
 //   M1  process-tree RSS when the prompt is typeable (peak RSS for `-p`)
 //   S1  whether the screen changes after the prompt is typeable
 //
@@ -17,7 +18,7 @@
 //
 // Lay both builds out at the same path depth; each keeps its own compile
 // cache unless --cold. `--credentials settings|dotenv` moves the model key
-// and URL from the shell into the settings file or `~/.qwen/.env`. Linux only
+// and URL from the shell into the settings file or `~/.mariadb-shell-agent/.env`. Linux only
 // (RSS comes from /proc). See
 // docs/design/2026-09-25-startup-benchmark-harness.md.
 
@@ -100,7 +101,9 @@ async function runOnce(build, mode) {
     runId: run.runId,
   });
   if (r.exitCode !== 0)
-    throw new Error(`${build}: qwen -p exited with ${r.exitCode}`);
+    throw new Error(
+      `${build}: mariadb-shell-agent -p exited with ${r.exitCode}`,
+    );
   return r;
 }
 

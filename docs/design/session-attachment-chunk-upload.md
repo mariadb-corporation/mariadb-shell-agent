@@ -4,7 +4,7 @@
 
 ## Status
 
-Implemented on the PR branch, rebased onto main on 2026-09-28. Tracks [#11958](https://github.com/QwenLM/qwen-code/issues/11958).
+Implemented on the PR branch, rebased onto main on 2026-09-28. Tracks [#11958](https://github.invalid/QwenLM/qwen-code/issues/11958).
 Source investigation used `af4da3471` (v0.23.4) and verified the reported raw
 upload route and SDK method at the issue's pinned commit `3fc1133d`.
 
@@ -26,7 +26,7 @@ with the SDK's request shape, and a Node HTTP proxy imposing a 1 MiB body limit:
 
 This verifies the size-boundary failure, not actual nginx/OpenResty or browser
 clipboard interaction. The local investigation record is
-`.qwen/issues/issue-11958.md`; it is not a published documentation dependency.
+`.mariadb-shell-agent/issues/issue-11958.md`; it is not a published documentation dependency.
 
 ## Goals and scope
 
@@ -367,7 +367,7 @@ and update them; do not mask missing implementations with optional methods.
 | HTTP integration         | Cross-origin preflight uses existing headers/methods; metadata/raw parser limits work for JSON file attachments, malformed bodies, case variants and trailing slashes; telemetry uses fixed route templates.                                                                                                                                                                                                                                                                     |
 
 Verification uses the global CLI baseline and the built local CLI, with scripts
-and results under `.qwen/e2e-tests/session-attachment-chunk-upload.md`. Real SDK
+and results under `.mariadb-shell-agent/e2e-tests/session-attachment-chunk-upload.md`. Real SDK
 uploads of PNG and binary fixtures at 524,289, 1,048,577, 8,388,607 and 8,388,608
 bytes passed through a Node proxy with a 1 MiB request cap and matched byte for
 byte. Lost append/completion responses reused the same upload ID and stored one

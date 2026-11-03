@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -158,7 +159,7 @@ function somethingRemainsAt(target: string): boolean {
  *
  * Asking about one that does not is worse than not asking:
  * `getGitWorkingTreeStatus` resolves the repository by walking *up* from the
- * path it is given, so a broken entry under `<repo>/.qwen/worktrees/` gets
+ * path it is given, so a broken entry under `<repo>/.mariadb-shell-agent/worktrees/` gets
  * answered with the **main** worktree's branch and counters, attributed to the
  * worktree the caller asked about.
  *

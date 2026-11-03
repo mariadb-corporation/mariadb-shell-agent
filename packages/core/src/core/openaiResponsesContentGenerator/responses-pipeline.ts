@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -613,10 +614,10 @@ export class ResponsesPipeline {
       // The same stamp the Chat wire sends (openaiContentGenerator/provider/
       // default.ts buildHeaders). This wire assembles its request by hand, so
       // without it the gateway sees the transport's default agent string and
-      // cannot attribute the traffic to Qwen Code (issue #11936). Placed
+      // cannot attribute the traffic to MariaDB Shell Agent (issue #11936). Placed
       // before the customHeaders merge below so a user-configured
       // `User-Agent` still overrides it, as it does on every other wire.
-      'user-agent': `QwenCode/${version} (${process.platform}; ${process.arch})`,
+      'user-agent': `MariaDBShellAgent/${version} (${process.platform}; ${process.arch})`,
     };
 
     const apiKey =

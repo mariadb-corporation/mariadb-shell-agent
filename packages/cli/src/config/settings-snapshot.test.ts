@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,7 +29,9 @@ describe('readSettingsSnapshot', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-settings-snapshot-')),
     );
     workspace = path.join(root, 'workspace');
-    fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+    fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     environment = {
       QWEN_HOME: path.join(root, 'qwen-home'),
       QWEN_CODE_SYSTEM_SETTINGS_PATH: path.join(
@@ -45,7 +48,11 @@ describe('readSettingsSnapshot', () => {
     fs.mkdirSync(environment['QWEN_HOME']!, { recursive: true });
     fs.mkdirSync(path.join(root, 'system'), { recursive: true });
     userFile = path.join(environment['QWEN_HOME']!, 'settings.json');
-    workspaceFile = path.join(workspace, '.qwen', 'settings.json');
+    workspaceFile = path.join(
+      workspace,
+      '.mariadb-shell-agent',
+      'settings.json',
+    );
     systemFile = environment['QWEN_CODE_SYSTEM_SETTINGS_PATH']!;
     // Point the process at the same tree, with a home .env that sets a
     // bootstrap key, so a step that writes through process-level paths or the
@@ -170,9 +177,9 @@ describe('readSettingsSnapshot', () => {
     // A process whose QWEN_HOME has moved away from a home that still holds
     // settings warns about the move after swapping QWEN_HOME to find them.
     const home = path.join(root, 'home');
-    fs.mkdirSync(path.join(home, '.qwen'), { recursive: true });
+    fs.mkdirSync(path.join(home, '.mariadb-shell-agent'), { recursive: true });
     fs.writeFileSync(
-      path.join(home, '.qwen', 'settings.json'),
+      path.join(home, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ $version: 4, ui: { theme: 'Old Home' } }),
     );
     vi.stubEnv('HOME', home);

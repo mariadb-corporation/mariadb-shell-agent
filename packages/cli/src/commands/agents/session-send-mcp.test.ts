@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -76,7 +77,7 @@ describe('session-send-mcp', () => {
   });
 
   it('loads the MCP server only when the command runs', async () => {
-    // config.ts registers this command on every `qwen` start.
+    // config.ts registers this command on every `mariadb-shell-agent` start.
     const source = readFileSync(
       path.join(
         path.dirname(fileURLToPath(import.meta.url)),

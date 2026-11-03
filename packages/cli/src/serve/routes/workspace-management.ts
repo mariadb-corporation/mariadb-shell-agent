@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -313,7 +314,7 @@ export function registerWorkspaceManagementRoutes(
   };
   // Case-folded containment is deliberately conservative: on a
   // case-insensitive filesystem `Documents/qwen code` is the physical
-  // ancestor of `Documents/Qwen Code/Conversations`, and a clone target there
+  // ancestor of `Documents/MariaDB Shell Agent/Conversations`, and a clone target there
   // must not own the reserved root's cleanup scope.
   const isWithinOrEqual = (child: string, parent: string): boolean =>
     child === parent ||
@@ -579,7 +580,7 @@ export function registerWorkspaceManagementRoutes(
         } catch (error) {
           try {
             writeStderrLine(
-              `qwen serve: workspace runtime adapter notification failed after registry add: ${
+              `mariadb-shell-agent serve: workspace runtime adapter notification failed after registry add: ${
                 error instanceof Error ? error.message : String(error)
               }`,
             );
@@ -795,7 +796,7 @@ export function registerWorkspaceManagementRoutes(
       } catch (err) {
         try {
           writeStderrLine(
-            `qwen serve: workspace runtime adapter notification failed after registry add: ${
+            `mariadb-shell-agent serve: workspace runtime adapter notification failed after registry add: ${
               err instanceof Error ? err.message : String(err)
             }`,
           );
@@ -812,7 +813,7 @@ export function registerWorkspaceManagementRoutes(
       });
     } catch (err) {
       writeStderrLine(
-        `qwen serve: scratch workspace registration failed: ${
+        `mariadb-shell-agent serve: scratch workspace registration failed: ${
           err instanceof Error ? err.message : String(err)
         }${canonical ? `; retained directory: ${canonical}` : ''}`,
       );
@@ -1101,7 +1102,7 @@ export function registerWorkspaceManagementRoutes(
         const detail = error instanceof Error ? error.message : String(error);
         if (error instanceof NativeDirectoryPickerUnavailableError) {
           writeStderrLine(
-            `qwen serve: native directory picker unavailable: ${detail}`,
+            `mariadb-shell-agent serve: native directory picker unavailable: ${detail}`,
           );
           res.status(501).json({
             error: 'Native directory picker is unavailable',
@@ -1110,7 +1111,7 @@ export function registerWorkspaceManagementRoutes(
           return;
         }
         writeStderrLine(
-          `qwen serve: native directory picker failed: ${detail}`,
+          `mariadb-shell-agent serve: native directory picker failed: ${detail}`,
         );
         res.status(500).json({
           error: 'Failed to open native directory picker',
@@ -1234,7 +1235,7 @@ export function registerWorkspaceManagementRoutes(
         return;
       }
       writeStderrLine(
-        `qwen serve: git workspace clone failed to start: ${
+        `mariadb-shell-agent serve: git workspace clone failed to start: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );
@@ -1588,7 +1589,7 @@ export function registerWorkspaceManagementRoutes(
               }
               added = true;
               try {
-                writeStderrLine(`qwen serve: ${err.message}`);
+                writeStderrLine(`mariadb-shell-agent serve: ${err.message}`);
               } catch {
                 // The registration is committed; diagnostics are best-effort.
               }
@@ -1621,7 +1622,7 @@ export function registerWorkspaceManagementRoutes(
           });
         } catch (err) {
           writeStderrLine(
-            `qwen serve: failed to persist existing workspace registration: ${
+            `mariadb-shell-agent serve: failed to persist existing workspace registration: ${
               err instanceof Error ? err.message : String(err)
             }`,
           );
@@ -1707,7 +1708,7 @@ export function registerWorkspaceManagementRoutes(
                 }
                 persistedRecordAdded = true;
                 try {
-                  writeStderrLine(`qwen serve: ${err.message}`);
+                  writeStderrLine(`mariadb-shell-agent serve: ${err.message}`);
                 } catch {
                   // The registration is committed; diagnostics are best-effort.
                 }
@@ -1737,7 +1738,7 @@ export function registerWorkspaceManagementRoutes(
             } catch (err) {
               try {
                 writeStderrLine(
-                  `qwen serve: workspace runtime adapter notification failed after registry add: ${
+                  `mariadb-shell-agent serve: workspace runtime adapter notification failed after registry add: ${
                     err instanceof Error ? err.message : String(err)
                   }`,
                 );
@@ -1769,7 +1770,7 @@ export function registerWorkspaceManagementRoutes(
               );
             } catch (rollbackErr) {
               writeStderrLine(
-                `qwen serve: failed to roll back workspace persistence after runtime registration failure: ${
+                `mariadb-shell-agent serve: failed to roll back workspace persistence after runtime registration failure: ${
                   rollbackErr instanceof Error
                     ? rollbackErr.message
                     : String(rollbackErr)
@@ -1806,7 +1807,7 @@ export function registerWorkspaceManagementRoutes(
         // Log the full error server-side but return a generic message so the
         // response can't leak internal filesystem paths / implementation detail.
         writeStderrLine(
-          `qwen serve: POST /workspaces failed for ${canonical}: ${
+          `mariadb-shell-agent serve: POST /workspaces failed for ${canonical}: ${
             err instanceof Error ? err.message : String(err)
           }`,
         );
@@ -1934,7 +1935,7 @@ export function registerWorkspaceManagementRoutes(
               throw err;
             }
             try {
-              writeStderrLine(`qwen serve: ${err.message}`);
+              writeStderrLine(`mariadb-shell-agent serve: ${err.message}`);
             } catch {
               // The update is committed; diagnostics are best-effort.
             }
@@ -1958,7 +1959,7 @@ export function registerWorkspaceManagementRoutes(
         });
       } catch (err) {
         writeStderrLine(
-          `qwen serve: failed to persist workspace display name: ${
+          `mariadb-shell-agent serve: failed to persist workspace display name: ${
             err instanceof Error ? err.message : String(err)
           }`,
         );
@@ -2105,7 +2106,7 @@ export function registerWorkspaceManagementRoutes(
           getAcpHandle?.()?.commitWorkspaceRemoval(runtime.workspaceId);
         } catch (err) {
           logCleanupFailure(
-            `qwen serve: failed to commit workspace ACP removal: ${
+            `mariadb-shell-agent serve: failed to commit workspace ACP removal: ${
               err instanceof Error ? err.message : String(err)
             }`,
           );
@@ -2114,7 +2115,7 @@ export function registerWorkspaceManagementRoutes(
           .disposeRuntime(runtime, 'workspace_removed')
           .catch((err) => {
             logCleanupFailure(
-              `qwen serve: workspace runtime cleanup failed: ${
+              `mariadb-shell-agent serve: workspace runtime cleanup failed: ${
                 err instanceof Error ? err.message : String(err)
               }`,
             );
@@ -2128,7 +2129,7 @@ export function registerWorkspaceManagementRoutes(
           getAcpHandle?.()?.disposeWorkspace(runtime.workspaceId);
         } catch (err) {
           logCleanupFailure(
-            `qwen serve: failed to dispose workspace ACP mount: ${
+            `mariadb-shell-agent serve: failed to dispose workspace ACP mount: ${
               err instanceof Error ? err.message : String(err)
             }`,
           );
@@ -2137,7 +2138,7 @@ export function registerWorkspaceManagementRoutes(
           runtimeRemoval.completeDrain(runtime);
         } catch (err) {
           logCleanupFailure(
-            `qwen serve: failed to complete workspace admission drain: ${
+            `mariadb-shell-agent serve: failed to complete workspace admission drain: ${
               err instanceof Error ? err.message : String(err)
             }`,
           );
@@ -2147,7 +2148,7 @@ export function registerWorkspaceManagementRoutes(
           deps.onWorkspaceRemoved?.(runtime.workspaceCwd);
         } catch (err) {
           logCleanupFailure(
-            `qwen serve: failed to complete workspace registry drain: ${
+            `mariadb-shell-agent serve: failed to complete workspace registry drain: ${
               err instanceof Error ? err.message : String(err)
             }`,
           );
@@ -2203,7 +2204,7 @@ export function registerWorkspaceManagementRoutes(
               }
               persistedRegistrationRemoved = true;
               try {
-                writeStderrLine(`qwen serve: ${err.message}`);
+                writeStderrLine(`mariadb-shell-agent serve: ${err.message}`);
               } catch {
                 // Persistence committed; diagnostics are best-effort.
               }
@@ -2211,7 +2212,7 @@ export function registerWorkspaceManagementRoutes(
           } catch (err) {
             rollbackDrain();
             writeStderrLine(
-              `qwen serve: failed to remove workspace persistence: ${
+              `mariadb-shell-agent serve: failed to remove workspace persistence: ${
                 err instanceof Error ? err.message : String(err)
               }`,
             );
@@ -2230,7 +2231,7 @@ export function registerWorkspaceManagementRoutes(
           workspaceRegistry.commitDrain(runtime);
         } catch (err) {
           logCleanupFailure(
-            `qwen serve: failed to commit workspace registry drain: ${
+            `mariadb-shell-agent serve: failed to commit workspace registry drain: ${
               err instanceof Error ? err.message : String(err)
             }`,
           );
@@ -2248,7 +2249,7 @@ export function registerWorkspaceManagementRoutes(
       } catch (err) {
         rollbackDrain();
         writeStderrLine(
-          `qwen serve: DELETE /workspaces/:workspace failed: ${
+          `mariadb-shell-agent serve: DELETE /workspaces/:workspace failed: ${
             err instanceof Error ? err.message : String(err)
           }`,
         );
@@ -2307,7 +2308,7 @@ export function registerWorkspaceManagementRoutes(
       });
     } catch (err) {
       writeStderrLine(
-        `qwen serve: failed to read workspace registrations: ${
+        `mariadb-shell-agent serve: failed to read workspace registrations: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );
@@ -2361,7 +2362,7 @@ export function registerWorkspaceManagementRoutes(
             );
           } catch (err) {
             writeStderrLine(
-              `qwen serve: failed to read workspace registration before forget: ${
+              `mariadb-shell-agent serve: failed to read workspace registration before forget: ${
                 err instanceof Error ? err.message : String(err)
               }`,
             );
@@ -2416,7 +2417,7 @@ export function registerWorkspaceManagementRoutes(
           }
           removed = true;
           try {
-            writeStderrLine(`qwen serve: ${err.message}`);
+            writeStderrLine(`mariadb-shell-agent serve: ${err.message}`);
           } catch {
             // The forget committed; diagnostics are best-effort.
           }
@@ -2441,7 +2442,7 @@ export function registerWorkspaceManagementRoutes(
         });
       } catch (err) {
         writeStderrLine(
-          `qwen serve: failed to forget workspace registration: ${
+          `mariadb-shell-agent serve: failed to forget workspace registration: ${
             err instanceof Error ? err.message : String(err)
           }`,
         );

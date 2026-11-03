@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,7 +15,7 @@ import { HttpManagedChannelControlPlane } from './managed-channel-client.js';
 import { loadChannelsConfig, parseConfiguredChannels } from './runtime.js';
 
 // H5b/H5c of #12827: the email reference adapter on the managed path. An
-// experimental, explicitly selected entry: `qwen channel start` never picks
+// experimental, explicitly selected entry: `mariadb-shell-agent channel start` never picks
 // it, and it drives no model — it routes inbound mail into bound Sessions
 // through the control plane and sends the receipted replies back.
 

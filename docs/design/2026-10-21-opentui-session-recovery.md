@@ -4,7 +4,7 @@
 
 ## Status and dependency
 
-This B source proposal depends on the complete replay/recovery batch [#15384](https://github.com/QwenLM/qwen-code/pull/15384) and A's complete shared restore repair. C is committed; B now integrates A's committed 83213983 source from [#15386](https://github.com/QwenLM/qwen-code/pull/15386). Clean B 6b92fc5c passed the named local session and hot/cold checkpoint suites. Its compact-summary correction and final runtime/installed/platform union still require their own verification. Exact source bindings belong in the candidate manifest and verification report. B adds the complete OpenTUI producer and consumer chain. No validated combined artifact is implied. Historical aggregate results remain in the preserved investigation and do not validate this extraction.
+This B source proposal depends on the complete replay/recovery batch [#15384](https://github.invalid/QwenLM/qwen-code/pull/15384) and A's complete shared restore repair. C is committed; B now integrates A's committed 83213983 source from [#15386](https://github.invalid/QwenLM/qwen-code/pull/15386). Clean B 6b92fc5c passed the named local session and hot/cold checkpoint suites. Its compact-summary correction and final runtime/installed/platform union still require their own verification. Exact source bindings belong in the candidate manifest and verification report. B adds the complete OpenTUI producer and consumer chain. No validated combined artifact is implied. Historical aggregate results remain in the preserved investigation and do not validate this extraction.
 
 ## Problem and delivery boundary
 

@@ -208,7 +208,7 @@ describe('LiveVoiceSettingsCard', () => {
     act(() => {
       setInputValue(
         container.querySelector<HTMLInputElement>('#live-realtime-endpoint')!,
-        ' https://dashscope-intl.aliyuncs.com/compatible-mode/v1 ',
+        ' https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1 ',
       );
       setInputValue(
         container.querySelector<HTMLInputElement>('#live-realtime-key')!,
@@ -249,7 +249,7 @@ describe('LiveVoiceSettingsCard', () => {
     );
     expect(setup.update).toHaveBeenCalledExactlyOnceWith({
       enabled: true,
-      endpoint: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+      endpoint: 'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
       apiKey: { operation: 'replace', value: 'new-key' },
       model: 'new-model',
       voice: 'Ethan',
@@ -314,7 +314,7 @@ describe('LiveVoiceSettingsCard', () => {
     act(() => {
       setInputValue(
         container.querySelector<HTMLInputElement>('#live-realtime-endpoint')!,
-        'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+        'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
       );
       setInputValue(
         container.querySelector<HTMLInputElement>('#live-realtime-key')!,
@@ -346,12 +346,12 @@ describe('LiveVoiceSettingsCard', () => {
   it.each([
     undefined,
     '',
-    'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+    'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
   ])(
     'only submits an explicitly edited endpoint (%s) when leaving a route',
     async (endpointDraft) => {
       const setup = setupResult({
-        endpoint: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+        endpoint: 'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
         keySource: 'route',
         model: 'route-model',
         models: [{ id: 'route-model', provider: 'openai' }],
@@ -1252,7 +1252,7 @@ describe('LiveVoiceSettingsCard', () => {
 
   describe('endpoint', () => {
     const dedicated =
-      'https://llm-abc.cn-beijing.maas.aliyuncs.com/compatible-mode/v1';
+      'https://llm-abc.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1';
 
     function endpointInput(container: HTMLElement): HTMLInputElement {
       const input = container.querySelector<HTMLInputElement>(
@@ -1281,7 +1281,7 @@ describe('LiveVoiceSettingsCard', () => {
       const input = endpointInput(container);
       expect(input.value).toBe('');
       expect(input.placeholder).toBe(
-        'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       );
       const fields = Array.from(
         container.querySelectorAll(
@@ -1336,7 +1336,7 @@ describe('LiveVoiceSettingsCard', () => {
         setupResult({
           endpoint: 'https://example.com/compatible-mode/v1',
           endpointError:
-            'The endpoint must be a DashScope or Model Studio (*.maas.aliyuncs.com) base URL, such as https://dashscope.aliyuncs.com/compatible-mode/v1.',
+            'The endpoint must be a DashScope or Model Studio (*.maas.aliyuncs.invalid) base URL, such as https://dashscope.aliyuncs.invalid/compatible-mode/v1.',
         }),
       );
       expect(
@@ -1347,7 +1347,7 @@ describe('LiveVoiceSettingsCard', () => {
     it('shows a route base URL read-only', () => {
       const container = mount(
         setupResult({
-          endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+          endpoint: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
           keySource: 'route',
           keyEnv: 'DASHSCOPE_API_KEY',
         }),
@@ -1355,7 +1355,7 @@ describe('LiveVoiceSettingsCard', () => {
       const section = container.querySelector('[data-live-endpoint]')!;
       expect(section.querySelector('input')).toBeNull();
       expect(section.textContent).toContain(
-        'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       );
       expect(section.textContent).toContain(
         'settings.liveSetup.endpointFromRoute',

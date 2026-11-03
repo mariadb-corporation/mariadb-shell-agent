@@ -1,6 +1,6 @@
 # Test Failure Explorer
 
-Private Qwen Code extension for importing and exploring an existing Vitest 3.2 JSON report. Text and structured queries work in any MCP host; an interactive MCP App adds filtering, pagination and diagnostic details in compatible graphical hosts. Fixed views are the default, with optional bounded model-generated layouts for evidence grouping and investigation order.
+Private MariaDB Shell Agent extension for importing and exploring an existing Vitest 3.2 JSON report. Text and structured queries work in any MCP host; an interactive MCP App adds filtering, pagination and diagnostic details in compatible graphical hosts. Fixed views are the default, with optional bounded model-generated layouts for evidence grouping and investigation order.
 
 ## Build and configure
 
@@ -11,7 +11,7 @@ corepack pnpm install --frozen-lockfile
 corepack pnpm --filter @qwen-code/test-failure-explorer run build
 ```
 
-Use Qwen Code's extension install/link command with this directory (check your installed CLI's `extensions --help`). The manifest binds both stdio cwd and `QWEN_TEST_EXPLORER_WORKSPACE_ROOT` to `${workspacePath}`. The server requires an existing, expanded absolute root and does not fall back to cwd. A running server remains bound to its startup root; changing workspace requires a newly configured transport.
+Use MariaDB Shell Agent's extension install/link command with this directory (check your installed CLI's `extensions --help`). The manifest binds both stdio cwd and `QWEN_TEST_EXPLORER_WORKSPACE_ROOT` to `${workspacePath}`. The server requires an existing, expanded absolute root and does not fall back to cwd. A running server remains bound to its startup root; changing workspace requires a newly configured transport.
 
 For another MCP host, use an explicit absolute root in both fields:
 
@@ -31,14 +31,14 @@ The package is private and is not automatically published. Its package version f
 Run from the relevant test package with its normal build prerequisites. Choose an absolute output path because Vitest resolves relative outputs against its config root:
 
 ```sh
-corepack pnpm exec vitest run src/example.test.ts --coverage.enabled=false --reporter=default --reporter=json --outputFile.json=/absolute/workspace/.qwen/test-reports/example.json
+corepack pnpm exec vitest run src/example.test.ts --coverage.enabled=false --reporter=default --reporter=json --outputFile.json=/absolute/workspace/.mariadb-shell-agent/test-reports/example.json
 ```
 
 Record the command and actual process exit code separately. The extension does not execute this command or capture its exit code. The adapter is verified with Vitest **3.2.7** JSON reporter output. Coverage JSON, JUnit and other runners are not supported; a conforming JSON shape is not proof of its producer version.
 
 ## Tools
 
-- `test_report_import({ relativePath: ".qwen/test-reports/example.json" })`: validate the report, persist an immutable workspace snapshot, return its reportId, source hash, summary and a small first failure page. This writes only the extension cache.
+- `test_report_import({ relativePath: ".mariadb-shell-agent/test-reports/example.json" })`: validate the report, persist an immutable workspace snapshot, return its reportId, source hash, summary and a small first failure page. This writes only the extension cache.
 - `test_report_show({ reportId, view? })`: open the fixed explorer for an already imported snapshot, or supply a ViewSpec v1 for a generated layout. Text-only hosts receive the same evidence and reportId.
 - `test_report_query({ reportId, query: { kind: "summary" } })`: distinguish reported counters from computed file/assertion counts.
 - `test_report_query({ reportId, query: { kind: "list", collection: "failures", text: "timeout", offset: 0, limit: 25 } })`: literal whole-snapshot search; collections also include `assertions` and `file-errors`. Optional status filtering preserves individual assertion statuses. Optional `failureIds` accepts 1–128 unique, verified failed IDs and intersects the other filters without changing snapshot order.
@@ -50,9 +50,9 @@ Import and show are model-visible only. Query is also App-visible and does not c
 
 The card starts with failed assertions and file errors. Switch collections, submit a case-sensitive literal search over the whole snapshot, and page through the matches. Open an entry to read diagnostics, the full title or the full path in separate chunks. Reported suite counts and computed file/assertion counts remain distinct; the source path, hash, import time and report-only provenance identify the evidence.
 
-Select up to 20 failed entries across pages to prepare a short analysis request. Hosts with MCP App text messaging offer **Review selected failures**. In Qwen Code, this opens a host dialog showing the full request, its server/resource and its original session; only explicit confirmation submits it. Qwen Code preserves the composer draft and reports acceptance only after the daemon returns a prompt receipt; acceptance does not mean analysis has completed. Other messaging hosts apply their own confirmation and acceptance policy. Hosts without messaging retain the selectable text for manual copy into the conversation.
+Select up to 20 failed entries across pages to prepare a short analysis request. Hosts with MCP App text messaging offer **Review selected failures**. In MariaDB Shell Agent, this opens a host dialog showing the full request, its server/resource and its original session; only explicit confirmation submits it. MariaDB Shell Agent preserves the composer draft and reports acceptance only after the daemon returns a prompt receipt; acceptance does not mean analysis has completed. Other messaging hosts apply their own confirmation and acceptance policy. Hosts without messaging retain the selectable text for manual copy into the conversation.
 
-Qwen Code refuses known-busy sessions without queueing this request. Before dispatch, cancellation or a changed session/client invalidates the review; request a new review after recovery. If acceptance is unknown, check the host review and original conversation before sending again. Requests are never resent automatically, and closing the card does not cancel an accepted turn. The generated request asks for read-only analysis; the card itself does not execute tests or apply fixes, and downstream tools retain the host's normal permission checks. It sends one user text block through standard `ui/message`; Qwen Code accepts at most 16 KiB of UTF-8 text. Report strings are rendered as plain text without automatic links.
+MariaDB Shell Agent refuses known-busy sessions without queueing this request. Before dispatch, cancellation or a changed session/client invalidates the review; request a new review after recovery. If acceptance is unknown, check the host review and original conversation before sending again. Requests are never resent automatically, and closing the card does not cancel an accepted turn. The generated request asks for read-only analysis; the card itself does not execute tests or apply fixes, and downstream tools retain the host's normal permission checks. It sends one user text block through standard `ui/message`; MariaDB Shell Agent accepts at most 16 KiB of UTF-8 text. Report strings are rendered as plain text without automatic links.
 
 The self-contained HTML resource is `ui://test-failure-explorer/v1/index.html`. It contains no report data and requests no external CSP domains. Data arrives through the show result and standard App tool calls; there are no external assets or separate network data requests. Refresh resets filters, pages and selection to the initial card result. If a host offers no tool callback, the saved summary and first page remain readable with query controls disabled. Query failures retain that saved evidence and display an error. If historical HTML has been evicted, use the text fallback or call show again with the saved reportId.
 
@@ -72,7 +72,7 @@ Each show is an independent completed result. In-card queries update that card's
 
 Sources and diagnostic strings are data, never executable instructions. Report-internal paths are not opened. Output text removes terminal controls. Search and detail offsets address this terminal-safe representation (identified by `textRepresentation`); snapshot strings retain the original evidence. Title detail includes the suite ancestors through Vitest’s full name. Import rejects traversal, symlink escape, non-regular files and detectable changes during reading; cache directories must be real directories. This is a local trusted-filesystem tool, not an OS security sandbox against hostile concurrent mutations by another local process.
 
-Snapshots live in `.qwen/test-failure-explorer/reports/` under the bound workspace, use exclusive atomic publication, and have integrity checks. Same source path/bytes/root returns the same reportId and first importedAt. Source overwrite/deletion does not change imported evidence; server restart preserves queries. IDs are scoped to the workspace and one report, not cross-run test identities or session-private capabilities.
+Snapshots live in `.mariadb-shell-agent/test-failure-explorer/reports/` under the bound workspace, use exclusive atomic publication, and have integrity checks. Same source path/bytes/root returns the same reportId and first importedAt. Source overwrite/deletion does not change imported evidence; server restart preserves queries. IDs are scoped to the workspace and one report, not cross-run test identities or session-private capabilities.
 
 Missing/corrupt snapshots return `REPORT_UNAVAILABLE`. Corrupt existing IDs are never silently overwritten. After inspecting the cache, remove the specific damaged snapshot and reimport the source. No automatic cleanup or total quota is provided: cache disk use grows with imports. Inspect that directory and remove only snapshots you no longer need; historical details then become unavailable.
 

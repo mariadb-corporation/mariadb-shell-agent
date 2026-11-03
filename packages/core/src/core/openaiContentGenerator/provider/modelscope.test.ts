@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,7 +21,7 @@ describe('ModelScopeOpenAICompatibleProvider', () => {
   beforeEach(() => {
     mockContentGeneratorConfig = {
       apiKey: 'test-api-key',
-      baseUrl: 'https://api.modelscope.cn/v1',
+      baseUrl: 'https://api.modelscope.invalid/v1',
       model: 'qwen-max',
     } as ContentGeneratorConfig;
 
@@ -37,9 +38,9 @@ describe('ModelScopeOpenAICompatibleProvider', () => {
   describe('isModelScopeProvider', () => {
     it('should return true for ModelScope hostnames', () => {
       const configs = [
-        { baseUrl: 'https://api-inference.modelscope.cn/v1' },
-        { baseUrl: 'https://api.modelscope.cn/v1' },
-        { baseUrl: 'https://modelscope.cn/v1' },
+        { baseUrl: 'https://api-inference.modelscope.invalid/v1' },
+        { baseUrl: 'https://api.modelscope.invalid/v1' },
+        { baseUrl: 'https://modelscope.invalid/v1' },
       ];
 
       configs.forEach((config) => {
@@ -55,7 +56,7 @@ describe('ModelScopeOpenAICompatibleProvider', () => {
       const configs = [
         { baseUrl: 'https://api.openai.com/v1' },
         { baseUrl: 'https://example.com/modelscope/v1' },
-        { baseUrl: 'https://modelscope.cn.evil.example/v1' },
+        { baseUrl: 'https://modelscope.invalid.evil.example/v1' },
         { baseUrl: 'not a url with modelscope' },
         { baseUrl: undefined },
       ];

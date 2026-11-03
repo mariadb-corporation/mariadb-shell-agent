@@ -55,7 +55,7 @@ Preset mode provides a set of built-in data items that you can pick and combine 
 
 ### Configuration
 
-Add a `statusLine` object under the `ui` key in `~/.qwen/settings.json`:
+Add a `statusLine` object under the `ui` key in `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -98,7 +98,7 @@ Add a `statusLine` object under the `ui` key in `~/.qwen/settings.json`:
 | `branch-changes`       |         | Session file change stats (e.g. `+120 -30`)                        |
 | `context-used`         | Yes     | Percentage of context window used (e.g. `Context 34.3% used`)      |
 | `run-state`            |         | Compact session state (`Ready`, `Working`, or `Confirm`)           |
-| `qwen-version`         |         | Qwen Code version (e.g. `v0.14.1`)                                 |
+| `qwen-version`         |         | MariaDB Shell Agent version (e.g. `v0.14.1`)                       |
 | `context-window-size`  |         | Total context window size (e.g. `131.1k window`)                   |
 | `used-tokens`          |         | Current prompt token count (e.g. `45.0k used`)                     |
 | `session-id`           |         | Current session identifier                                         |
@@ -158,7 +158,7 @@ Command mode runs a shell command whose stdout is displayed in the status line. 
 
 ### Configuration
 
-Add a `statusLine` object under the `ui` key in `~/.qwen/settings.json`:
+Add a `statusLine` object under the `ui` key in `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -206,7 +206,7 @@ The command receives a JSON object via stdin with the following fields:
   },
   "worktree": {
     "name": "fix-auth",
-    "path": "/home/user/project/.qwen/worktrees/fix-auth",
+    "path": "/home/user/project/.mariadb-shell-agent/worktrees/fix-auth",
     "branch": "fix-auth",
     "original_cwd": "/home/user/project",
     "original_branch": "main"
@@ -242,7 +242,7 @@ The command receives a JSON object via stdin with the following fields:
 | Field                                 | Type             | Description                                                                        |
 | ------------------------------------- | ---------------- | ---------------------------------------------------------------------------------- |
 | `session_id`                          | string           | Unique session identifier                                                          |
-| `version`                             | string           | Qwen Code version                                                                  |
+| `version`                             | string           | MariaDB Shell Agent version                                                        |
 | `model.display_name`                  | string           | Current model name                                                                 |
 | `context_window.context_window_size`  | number           | Total context window size in tokens                                                |
 | `context_window.used_percentage`      | number           | Context window usage as percentage (0–100)                                         |
@@ -335,7 +335,7 @@ Output (refreshed every second): `14:32:07  (main)`
 
 #### Script file for complex commands
 
-For longer commands, save a script file at `~/.qwen/statusline-command.sh`:
+For longer commands, save a script file at `~/.mariadb-shell-agent/statusline-command.sh`:
 
 ```bash
 #!/bin/bash
@@ -362,7 +362,7 @@ Then reference it in settings:
   "ui": {
     "statusLine": {
       "type": "command",
-      "command": "bash ~/.qwen/statusline-command.sh"
+      "command": "bash ~/.mariadb-shell-agent/statusline-command.sh"
     }
   }
 }
@@ -381,7 +381,7 @@ Then reference it in settings:
 
 - **Timeout**: Commands that take longer than 5 seconds are killed. The status line clears on failure.
 - **Refresh**: Set `refreshInterval` (seconds) to additionally re-run the command on a timer — useful for data that changes without an Agent event (clock, rate limits, build status).
-- **Shell**: Commands run via `/bin/sh` on macOS/Linux. On Windows, `cmd.exe` is used by default — wrap POSIX commands with `bash -c "..."` or point to a bash script (e.g. `bash ~/.qwen/statusline-command.sh`).
+- **Shell**: Commands run via `/bin/sh` on macOS/Linux. On Windows, `cmd.exe` is used by default — wrap POSIX commands with `bash -c "..."` or point to a bash script (e.g. `bash ~/.mariadb-shell-agent/statusline-command.sh`).
 
 **Preset mode only:**
 

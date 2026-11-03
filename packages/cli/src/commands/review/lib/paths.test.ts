@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -68,8 +69,8 @@ describe('trusted review state paths', () => {
   });
 
   it('shares one lock scope across nested review worktrees', () => {
-    const outer = join(repo, '.qwen', 'tmp', 'review-pr-9');
-    const inner = join(outer, '.qwen', 'tmp', 'review-pr-1');
+    const outer = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-9');
+    const inner = join(outer, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     expect(reviewTrustStateDir(outer)).toBe(reviewTrustStateDir(repo));
     expect(reviewRepositoryRootForWorktree(inner)).toBe(repo);
   });
@@ -140,7 +141,7 @@ describe('trusted review state paths', () => {
   it.skipIf(process.platform === 'win32')(
     'recognizes a nested review worktree reached through a symlink',
     () => {
-      const nested = join(repo, '.qwen', 'tmp', 'review-pr-9');
+      const nested = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-9');
       const links = realpathSync(
         mkdtempSync(join(tmpdir(), 'review-state-nested-links-')),
       );
@@ -158,7 +159,7 @@ describe('trusted review state paths', () => {
   it('refuses a worktree outside the review geometry', () => {
     expect(() =>
       reviewRepositoryRootForWorktree(join(repo, 'arbitrary-worktree')),
-    ).toThrow(/not shaped like <root>\/\.qwen\/tmp\/<name>/);
+    ).toThrow(/not shaped like <root>\/\.mariadb-shell-agent\/tmp\/<name>/);
   });
 });
 
@@ -173,18 +174,18 @@ describe('lastReviewEffortPath', () => {
     const first = lastReviewEffortPath('/workspace/one');
     const second = lastReviewEffortPath('/workspace/two');
     expect(first).not.toBe(second);
-    expect(first).not.toContain('/workspace/one/.qwen');
-    expect(second).not.toContain('/workspace/two/.qwen');
+    expect(first).not.toContain('/workspace/one/.mariadb-shell-agent');
+    expect(second).not.toContain('/workspace/two/.mariadb-shell-agent');
   });
 });
 
 describe('PARSE_ARGS_REPORT', () => {
   it('is the literal path the skill writes in Step 0', () => {
-    // The skill's Step 0 hard-codes `.qwen/tmp/qwen-review-parse-args.json` as
+    // The skill's Step 0 hard-codes `.mariadb-shell-agent/tmp/qwen-review-parse-args.json` as
     // `parse-args --out`. If this constant drifts from that literal the
     // fallback silently stops reading the report and the original bug returns.
     expect(PARSE_ARGS_REPORT).toBe(
-      join('.qwen', 'tmp', 'qwen-review-parse-args.json'),
+      join('.mariadb-shell-agent', 'tmp', 'qwen-review-parse-args.json'),
     );
   });
 });
@@ -200,11 +201,11 @@ describe('tmpFile — target is a single safe component', () => {
   });
 
   it('flattens a file-path target so its parent is not a missing directory', () => {
-    // `src/foo.ts` used to make `.qwen/tmp/qwen-review-src/foo.ts-diff.txt`, whose
+    // `src/foo.ts` used to make `.mariadb-shell-agent/tmp/qwen-review-src/foo.ts-diff.txt`, whose
     // `src/` parent nobody created — ENOENT.
     const p = tmpFile('src/foo.ts', 'diff.txt');
     expect(p).not.toContain('src/foo.ts');
-    expect(dirname(p)).toBe(join('.qwen', 'tmp'));
+    expect(dirname(p)).toBe(join('.mariadb-shell-agent', 'tmp'));
     // The separator is flattened to an underscore, so the target survives as a
     // single component directly under the temp dir.
     expect(basename(p)).toBe('qwen-review-src_foo.ts-diff.txt');
@@ -212,7 +213,7 @@ describe('tmpFile — target is a single safe component', () => {
 
   it('refuses to escape the temp dir with a crafted target', () => {
     const p = tmpFile('../../evil', 'diff.txt');
-    expect(dirname(p)).toBe(join('.qwen', 'tmp'));
+    expect(dirname(p)).toBe(join('.mariadb-shell-agent', 'tmp'));
     expect(p).not.toContain('..');
     // The dot-segment traversal is stripped to a plain component, not nested.
     expect(basename(p)).toBe('qwen-review-evil-diff.txt');
@@ -229,8 +230,8 @@ describe('probeWorktreePath', () => {
     // The probe drives `git worktree add` with the shared worktree as cwd, so a
     // relative probe path would resolve against that worktree and nest the probe
     // tree inside it. Absolute keeps it a sibling wherever it is called from.
-    expect(probeWorktreePath('.qwen/tmp/review-pr-1')).toBe(
-      `${resolve('.qwen/tmp/review-pr-1')}-probe`,
+    expect(probeWorktreePath('.mariadb-shell-agent/tmp/review-pr-1')).toBe(
+      `${resolve('.mariadb-shell-agent/tmp/review-pr-1')}-probe`,
     );
   });
 
@@ -260,9 +261,9 @@ describe('scratchWorktreePath', () => {
   it('resolves a relative worktree so the tree is a SIBLING, not a child', () => {
     // `git worktree add` runs with the review worktree as cwd. A relative path
     // would land the scratch tree inside the one tree it must never touch.
-    expect(scratchWorktreePath('.qwen/tmp/review-pr-1', 'verify')).toBe(
-      `${resolve('.qwen/tmp/review-pr-1')}-scratch-verify`,
-    );
+    expect(
+      scratchWorktreePath('.mariadb-shell-agent/tmp/review-pr-1', 'verify'),
+    ).toBe(`${resolve('.mariadb-shell-agent/tmp/review-pr-1')}-scratch-verify`);
   });
 
   it('flattens a crafted label instead of following it out of the temp dir', () => {
@@ -365,7 +366,7 @@ describe('repoRelativeOf — the repository root is inside the repository', () =
 describe('assertUnredirectedParent', () => {
   it('refuses a write whose parent chain traverses a symlink', () => {
     // `noFollow` protects the FINAL element only, and the threat is satisfied
-    // one layer up: plant `.qwen/tmp` (or `.qwen/review-cache`) as a link —
+    // one layer up: plant `.mariadb-shell-agent/tmp` (or `.mariadb-shell-agent/review-cache`) as a link —
     // gitignore does not stop `git add -f` — and `mkdirSync(…,
     // {recursive:true})` succeeds through it while the atomic tmp+rename
     // lands the file wherever the link points. Worse for a candidate: the
@@ -437,9 +438,9 @@ describe('assertUnredirectedParent', () => {
  */
 describe('ensureReviewTmpDir', () => {
   it.skipIf(process.platform === 'win32')(
-    'creates a real .qwen/tmp and refuses a symlinked one — or a symlinked .qwen',
+    'creates a real .mariadb-shell-agent/tmp and refuses a symlinked one — or a symlinked .mariadb-shell-agent',
     () => {
-      // Every side file a round writes lands in `.qwen/tmp` under a
+      // Every side file a round writes lands in `.mariadb-shell-agent/tmp` under a
       // deterministic name, and the directory is in-repo: a contributor
       // branch can commit it as a link. One refusal here, before the first
       // write, is what closes the class the per-writer guards kept
@@ -449,12 +450,14 @@ describe('ensureReviewTmpDir', () => {
       process.chdir(root);
       try {
         ensureReviewTmpDir('capture-local');
-        expect(lstatSync(join(root, '.qwen', 'tmp')).isDirectory()).toBe(true);
+        expect(
+          lstatSync(join(root, '.mariadb-shell-agent', 'tmp')).isDirectory(),
+        ).toBe(true);
 
         const victim = join(root, 'victim');
         mkdirSync(victim);
-        rmSync(join(root, '.qwen', 'tmp'), { recursive: true });
-        symlinkSync(victim, join(root, '.qwen', 'tmp'));
+        rmSync(join(root, '.mariadb-shell-agent', 'tmp'), { recursive: true });
+        symlinkSync(victim, join(root, '.mariadb-shell-agent', 'tmp'));
         expect(() => ensureReviewTmpDir('capture-local')).toThrow(
           /^capture-local: .*tmp is a symbolic link/s,
         );
@@ -462,14 +465,20 @@ describe('ensureReviewTmpDir', () => {
 
         // One layer up, and a DANGLING link both: `lstat` sees the link
         // itself, so neither needs a target to be refused by name.
-        rmSync(join(root, '.qwen'), { recursive: true, force: true });
-        symlinkSync(victim, join(root, '.qwen'));
+        rmSync(join(root, '.mariadb-shell-agent'), {
+          recursive: true,
+          force: true,
+        });
+        symlinkSync(victim, join(root, '.mariadb-shell-agent'));
         expect(() => ensureReviewTmpDir('fetch-pr')).toThrow(
-          /^fetch-pr: \.qwen is a symbolic link/,
+          /^fetch-pr: \.mariadb-shell-agent is a symbolic link/,
         );
-        rmSync(join(root, '.qwen'), { force: true });
-        mkdirSync(join(root, '.qwen'));
-        symlinkSync(join(root, 'nowhere'), join(root, '.qwen', 'tmp'));
+        rmSync(join(root, '.mariadb-shell-agent'), { force: true });
+        mkdirSync(join(root, '.mariadb-shell-agent'));
+        symlinkSync(
+          join(root, 'nowhere'),
+          join(root, '.mariadb-shell-agent', 'tmp'),
+        );
         expect(() => ensureReviewTmpDir('fetch-pr')).toThrow(
           /tmp is a symbolic link/,
         );
@@ -498,7 +507,7 @@ describe('ensureReviewTmpDir', () => {
     const git = (...args: string[]) =>
       execFileSync('git', args, { cwd: root, encoding: 'utf8' });
     git('init', '-q', '--template=', '.');
-    mkdirSync(join(root, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(root, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     const blob = execFileSync('git', ['hash-object', '-w', '--stdin'], {
       cwd: root,
       encoding: 'utf8',
@@ -517,7 +526,7 @@ describe('ensureReviewTmpDir', () => {
   }
 
   it.skipIf(process.platform === 'win32')(
-    'refuses a TRACKED symlink inside .qwen/tmp by its index entry',
+    'refuses a TRACKED symlink inside .mariadb-shell-agent/tmp by its index entry',
     () => {
       // The directory itself is real; the plant is one level down, at the
       // deterministic name of a file the round writes with `writeFileSync`.
@@ -530,7 +539,7 @@ describe('ensureReviewTmpDir', () => {
           'update-index',
           '--add',
           '--cacheinfo',
-          `120000,${blob},.qwen/tmp/qwen-review-local-diff.txt`,
+          `120000,${blob},.mariadb-shell-agent/tmp/qwen-review-local-diff.txt`,
         );
         expect(() => ensureReviewTmpDir('capture-local')).toThrow(
           /^capture-local: the workspace tracks a symbolic link at .*qwen-review-local-diff\.txt.*git rm -f/s,
@@ -547,18 +556,28 @@ describe('ensureReviewTmpDir', () => {
       // `git rm --cached` removes only the index entry. The sweep used to
       // read nothing else and pass, while the link stayed on disk for the
       // round's plain `writeFileSync` to follow out of the tree — and
-      // `.qwen/*` is gitignored, so `git status` never shows it again.
+      // `.mariadb-shell-agent/*` is gitignored, so `git status` never shows it again.
       const { root, git, dispose } = plantedRepo();
       try {
         const victim = join(root, 'victim.txt');
         writeFileSync(victim, 'ORIGINAL');
-        const leaf = join(root, '.qwen', 'tmp', 'qwen-review-local-diff.txt');
+        const leaf = join(
+          root,
+          '.mariadb-shell-agent',
+          'tmp',
+          'qwen-review-local-diff.txt',
+        );
         symlinkSync(victim, leaf);
-        git('add', '-f', '.qwen/tmp/qwen-review-local-diff.txt');
+        git('add', '-f', '.mariadb-shell-agent/tmp/qwen-review-local-diff.txt');
         expect(() => ensureReviewTmpDir('capture-local')).toThrow(
           /tracks a symbolic link/,
         );
-        git('rm', '-q', '--cached', '.qwen/tmp/qwen-review-local-diff.txt');
+        git(
+          'rm',
+          '-q',
+          '--cached',
+          '.mariadb-shell-agent/tmp/qwen-review-local-diff.txt',
+        );
         expect(lstatSync(leaf).isSymbolicLink()).toBe(true);
         expect(() => ensureReviewTmpDir('capture-local')).toThrow(
           /^capture-local: .*qwen-review-local-diff\.txt is a symbolic link on disk/s,
@@ -566,33 +585,69 @@ describe('ensureReviewTmpDir', () => {
         // One level down, inside a round-owned directory the round writes
         // INTO, is the same redirect.
         rmSync(leaf);
-        mkdirSync(join(root, '.qwen', 'tmp', 'qwen-review-local-records'));
+        mkdirSync(
+          join(
+            root,
+            '.mariadb-shell-agent',
+            'tmp',
+            'qwen-review-local-records',
+          ),
+        );
         symlinkSync(
           victim,
-          join(root, '.qwen', 'tmp', 'qwen-review-local-records', 'r1.json'),
+          join(
+            root,
+            '.mariadb-shell-agent',
+            'tmp',
+            'qwen-review-local-records',
+            'r1.json',
+          ),
         );
         expect(() => ensureReviewTmpDir('capture-local')).toThrow(
           /qwen-review-local-records.r1\.json is a symbolic link on disk/s,
         );
-        rmSync(join(root, '.qwen', 'tmp', 'qwen-review-local-records'), {
-          recursive: true,
-        });
+        rmSync(
+          join(
+            root,
+            '.mariadb-shell-agent',
+            'tmp',
+            'qwen-review-local-records',
+          ),
+          {
+            recursive: true,
+          },
+        );
         // A worktree name is checked at its own entry.
-        symlinkSync(root, join(root, '.qwen', 'tmp', 'review-pr-7'));
+        symlinkSync(
+          root,
+          join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-7'),
+        );
         expect(() => ensureReviewTmpDir('fetch-pr')).toThrow(
           /review-pr-7 is a symbolic link on disk/,
         );
-        rmSync(join(root, '.qwen', 'tmp', 'review-pr-7'));
+        rmSync(join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-7'));
         // Case-folded: on a case-insensitive filesystem the round's write to
         // `qwen-review-…` resolves through this spelling.
         symlinkSync(
           victim,
-          join(root, '.qwen', 'tmp', 'QWEN-Review-local-plan.json'),
+          join(
+            root,
+            '.mariadb-shell-agent',
+            'tmp',
+            'QWEN-Review-local-plan.json',
+          ),
         );
         expect(() => ensureReviewTmpDir('capture-local')).toThrow(
           /QWEN-Review-local-plan\.json is a symbolic link on disk/,
         );
-        rmSync(join(root, '.qwen', 'tmp', 'QWEN-Review-local-plan.json'));
+        rmSync(
+          join(
+            root,
+            '.mariadb-shell-agent',
+            'tmp',
+            'QWEN-Review-local-plan.json',
+          ),
+        );
         expect(readFileSync(victim, 'utf8')).toBe('ORIGINAL');
       } finally {
         dispose();
@@ -609,8 +664,11 @@ describe('ensureReviewTmpDir', () => {
       // the checkout's own (`node_modules`).
       const { root, dispose } = plantedRepo();
       try {
-        symlinkSync(root, join(root, '.qwen', 'tmp', 'someone-elses-link'));
-        const wt = join(root, '.qwen', 'tmp', 'review-pr-7');
+        symlinkSync(
+          root,
+          join(root, '.mariadb-shell-agent', 'tmp', 'someone-elses-link'),
+        );
+        const wt = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-7');
         mkdirSync(join(wt, 'node_modules'), { recursive: true });
         symlinkSync(root, join(wt, 'node_modules', 'pkg'));
         expect(() => ensureReviewTmpDir('capture-local')).not.toThrow();
@@ -621,13 +679,16 @@ describe('ensureReviewTmpDir', () => {
   );
 
   it.skipIf(process.platform === 'win32')(
-    'leaves a tracked REGULAR file under .qwen/tmp alone — the review overwrites it',
+    'leaves a tracked REGULAR file under .mariadb-shell-agent/tmp alone — the review overwrites it',
     () => {
       // A fixture that `git add -A`s its whole tree must keep running.
       const { root, git, dispose } = plantedRepo();
       try {
-        writeFileSync(join(root, '.qwen', 'tmp', 'plain.txt'), 'x');
-        git('add', '-f', '.qwen/tmp/plain.txt');
+        writeFileSync(
+          join(root, '.mariadb-shell-agent', 'tmp', 'plain.txt'),
+          'x',
+        );
+        git('add', '-f', '.mariadb-shell-agent/tmp/plain.txt');
         expect(() => ensureReviewTmpDir('capture-local')).not.toThrow();
       } finally {
         dispose();
@@ -638,7 +699,7 @@ describe('ensureReviewTmpDir', () => {
   it.skipIf(process.platform === 'win32')(
     'folds case: the spelling a case-insensitive filesystem resolves through',
     () => {
-      // `.QWEN/tmp/<name>` is the same file as `.qwen/tmp/<name>` there, and
+      // `.MARIADB-SHELL-AGENT/tmp/<name>` is the same file as `.mariadb-shell-agent/tmp/<name>` there, and
       // the index can carry either spelling. Matched by folding the index,
       // not by a pathspec, so the refusal is the same on a case-sensitive
       // filesystem. Staged straight into the index (`--cacheinfo`), so the
@@ -649,10 +710,10 @@ describe('ensureReviewTmpDir', () => {
           'update-index',
           '--add',
           '--cacheinfo',
-          `120000,${blob},.QWEN/tmp/qwen-review-local-plan.json`,
+          `120000,${blob},.MARIADB-SHELL-AGENT/tmp/qwen-review-local-plan.json`,
         );
         expect(() => ensureReviewTmpDir('capture-local')).toThrow(
-          /tracks a symbolic link at .*\.QWEN\/tmp\/qwen-review-local-plan\.json/s,
+          /tracks a symbolic link at .*\.MARIADB-SHELL-AGENT\/tmp\/qwen-review-local-plan\.json/s,
         );
       } finally {
         dispose();
@@ -671,10 +732,10 @@ describe('ensureReviewTmpDir', () => {
           'update-index',
           '--add',
           '--cacheinfo',
-          '160000,4b825dc642cb6eb9a060e54bf8d69288fbee4904,.qwen/tmp',
+          '160000,4b825dc642cb6eb9a060e54bf8d69288fbee4904,.mariadb-shell-agent/tmp',
         );
         expect(() => ensureReviewTmpDir('capture-local')).toThrow(
-          /tracks a submodule at .*\.qwen\/tmp/s,
+          /tracks a submodule at .*\.mariadb-shell-agent\/tmp/s,
         );
       } finally {
         dispose();
@@ -685,8 +746,8 @@ describe('ensureReviewTmpDir', () => {
   it.skipIf(process.platform === 'win32')(
     "does not refuse the review's OWN worktree, tracked as a gitlink below",
     () => {
-      // `fetch-pr` creates a worktree at `.qwen/tmp/review-pr-<n>`, and a
-      // `git add -A` in a checkout that does not ignore `.qwen/tmp` records
+      // `fetch-pr` creates a worktree at `.mariadb-shell-agent/tmp/review-pr-<n>`, and a
+      // `git add -A` in a checkout that does not ignore `.mariadb-shell-agent/tmp` records
       // it as a gitlink with only a hint — refusing on that blocked every
       // review in the checkout over the round's own scratch directory, and
       // removing the worktree leaves the entry behind. It hides nothing:
@@ -699,7 +760,7 @@ describe('ensureReviewTmpDir', () => {
           '--add',
           '--cacheinfo',
           `160000,4b825dc642cb6eb9a060e54bf8d69288fbee4904,${join(
-            '.qwen',
+            '.mariadb-shell-agent',
             'tmp',
             basename(worktreePath(7)),
           )}`,
@@ -713,7 +774,7 @@ describe('ensureReviewTmpDir', () => {
         // the failure a hand-written literal here would hide — in a checkout
         // that would then refuse every review over its own worktree.
         const wt = worktreePath(7);
-        const pr = join('.qwen', 'tmp', basename(wt));
+        const pr = join('.mariadb-shell-agent', 'tmp', basename(wt));
         for (const tree of [
           probeWorktreePath(wt),
           baseWorktreePath(wt),
@@ -724,7 +785,7 @@ describe('ensureReviewTmpDir', () => {
             '--add',
             '--cacheinfo',
             `160000,4b825dc642cb6eb9a060e54bf8d69288fbee4904,${join(
-              '.qwen',
+              '.mariadb-shell-agent',
               'tmp',
               basename(tree),
             )}`,
@@ -740,7 +801,7 @@ describe('ensureReviewTmpDir', () => {
           'update-index',
           '--add',
           '--cacheinfo',
-          '160000,4b825dc642cb6eb9a060e54bf8d69288fbee4904,.qwen/tmp/qwen-review-local-plan-prompts',
+          '160000,4b825dc642cb6eb9a060e54bf8d69288fbee4904,.mariadb-shell-agent/tmp/qwen-review-local-plan-prompts',
         );
         expect(() => ensureReviewTmpDir('fetch-pr')).toThrow(
           /tracks a submodule at .*qwen-review-local-plan-prompts/s,
@@ -748,7 +809,7 @@ describe('ensureReviewTmpDir', () => {
         git(
           'update-index',
           '--force-remove',
-          '.qwen/tmp/qwen-review-local-plan-prompts',
+          '.mariadb-shell-agent/tmp/qwen-review-local-plan-prompts',
         );
 
         // …and a SYMLINK at exactly that name still is the plant: the
@@ -792,14 +853,24 @@ describe('ensureReviewTmpDir', () => {
       // still says plant.
       const { git, blob, dispose } = plantedRepo();
       try {
-        git('update-index', '--add', '--cacheinfo', `120000,${blob},.qwen/tmp`);
-        expect(() => ensureReviewTmpDir('capture-local')).toThrow(
-          /tracks a symbolic link at .*\.qwen\/tmp\b/s,
+        git(
+          'update-index',
+          '--add',
+          '--cacheinfo',
+          `120000,${blob},.mariadb-shell-agent/tmp`,
         );
-        git('update-index', '--force-remove', '.qwen/tmp');
-        git('update-index', '--add', '--cacheinfo', `120000,${blob},.qwen`);
         expect(() => ensureReviewTmpDir('capture-local')).toThrow(
-          /tracks a symbolic link at .*\.qwen\b/s,
+          /tracks a symbolic link at .*\.mariadb-shell-agent\/tmp\b/s,
+        );
+        git('update-index', '--force-remove', '.mariadb-shell-agent/tmp');
+        git(
+          'update-index',
+          '--add',
+          '--cacheinfo',
+          `120000,${blob},.mariadb-shell-agent`,
+        );
+        expect(() => ensureReviewTmpDir('capture-local')).toThrow(
+          /tracks a symbolic link at .*\.mariadb-shell-agent\b/s,
         );
       } finally {
         dispose();
@@ -815,7 +886,7 @@ describe('ensureReviewTmpDir', () => {
         const bulk = Array.from(
           { length: 20000 },
           (_, i) =>
-            `100644 ${blob} 0\t.qwen/tmp/plain/${'p'.repeat(60)}-${i}.txt`,
+            `100644 ${blob} 0\t.mariadb-shell-agent/tmp/plain/${'p'.repeat(60)}-${i}.txt`,
         ).join('\n');
         execFileSync('git', ['update-index', '--add', '--index-info'], {
           cwd: root,
@@ -998,8 +1069,11 @@ describe('commandPrefixed', () => {
       'plan-diff: no such file',
     );
     expect(
-      commandPrefixed('plan-diff', 'plan-diff: .qwen/tmp is a symbolic link'),
-    ).toBe('plan-diff: .qwen/tmp is a symbolic link');
+      commandPrefixed(
+        'plan-diff',
+        'plan-diff: .mariadb-shell-agent/tmp is a symbolic link',
+      ),
+    ).toBe('plan-diff: .mariadb-shell-agent/tmp is a symbolic link');
     // Another command's prefix is part of the message, not this one's.
     expect(commandPrefixed('plan-diff', 'fetch-diff: upstream said no')).toBe(
       'plan-diff: fetch-diff: upstream said no',
@@ -1009,9 +1083,9 @@ describe('commandPrefixed', () => {
 
 describe('ensureReviewTmpDir — the scratch directory as the target itself', () => {
   it.skipIf(process.platform === 'win32')(
-    'refuses when .qwen/tmp itself is the link, not only a path under it',
+    'refuses when .mariadb-shell-agent/tmp itself is the link, not only a path under it',
     () => {
-      // `--out .qwen/tmp` is the one spelling that is equal to the scratch
+      // `--out .mariadb-shell-agent/tmp` is the one spelling that is equal to the scratch
       // directory rather than under it; both predicates that gate the guard
       // have to admit it, so the guard has to answer for it.
       const root = realpathSync(mkdtempSync(join(tmpdir(), 'tmpdir-')));
@@ -1020,8 +1094,8 @@ describe('ensureReviewTmpDir — the scratch directory as the target itself', ()
       try {
         const victim = join(root, 'victim');
         mkdirSync(victim);
-        mkdirSync(join(root, '.qwen'));
-        symlinkSync(victim, join(root, '.qwen', 'tmp'));
+        mkdirSync(join(root, '.mariadb-shell-agent'));
+        symlinkSync(victim, join(root, '.mariadb-shell-agent', 'tmp'));
         expect(() => ensureReviewTmpDir('fetch-diff')).toThrow(
           /^fetch-diff: .*tmp is a symbolic link/s,
         );

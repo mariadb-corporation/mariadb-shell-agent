@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -306,7 +307,7 @@ describe('PROJECT_ENV_HARDCODED_EXCLUSIONS', () => {
   // The serve daemon bearer token must come from the operator (--token, an
   // exported env var, or a home-scoped .env) — never from repository content
   // — so the key sits in the hardcoded project exclusions: a cloned repo's
-  // project .env/.qwen/.env or settings.env must not preset the credential
+  // project .env/.mariadb-shell-agent/.env or settings.env must not preset the credential
   // that guards the daemon the operator launches.
   it('keeps QWEN_SERVER_TOKEN in the hardcoded exclusions', () => {
     expect(PROJECT_ENV_HARDCODED_EXCLUSIONS).toContain('QWEN_SERVER_TOKEN');
@@ -745,7 +746,7 @@ describe('scrubAndReportInheritedLoaderEnv', () => {
     const breadcrumb = captureStderr(() => {
       removedKeys = scrubAndReportInheritedLoaderEnv(
         env,
-        'qwen serve',
+        'mariadb-shell-agent serve',
         'daemon',
       );
     });
@@ -753,7 +754,7 @@ describe('scrubAndReportInheritedLoaderEnv', () => {
     expect(removedKeys).toEqual(['NODE_OPTIONS', 'LD_PRELOAD']);
     expect(env['HOME']).toBe('/home/user');
     expect(breadcrumb).toContain(
-      'qwen serve: scrubbed inherited loader env vars from the daemon ' +
+      'mariadb-shell-agent serve: scrubbed inherited loader env vars from the daemon ' +
         'process; session subprocesses will not inherit them: ' +
         'NODE_OPTIONS, LD_PRELOAD',
     );
@@ -795,7 +796,7 @@ describe('acquireInheritedLoaderEnvScrub', () => {
       // Daemon A boots and scrubs the shared env.
       const daemonA = acquireInheritedLoaderEnvScrub(
         process.env,
-        'qwen serve',
+        'mariadb-shell-agent serve',
         'daemon',
       );
       expect(daemonA.removedKeys).toContain('NODE_OPTIONS');
@@ -804,7 +805,7 @@ describe('acquireInheritedLoaderEnvScrub', () => {
       // Daemon B boots into the already-scrubbed env: nothing left to remove.
       const daemonB = acquireInheritedLoaderEnvScrub(
         process.env,
-        'qwen serve',
+        'mariadb-shell-agent serve',
         'daemon',
       );
       expect(daemonB.removedKeys).toEqual([]);
@@ -832,7 +833,7 @@ describe('acquireInheritedLoaderEnvScrub', () => {
     try {
       const handle = acquireInheritedLoaderEnvScrub(
         process.env,
-        'qwen serve',
+        'mariadb-shell-agent serve',
         'daemon',
       );
       expect(process.env['LD_PRELOAD']).toBeUndefined();
@@ -860,7 +861,7 @@ describe('acquireInheritedLoaderEnvScrub', () => {
       // Daemon A boots and scrubs the shared env.
       const daemonA = acquireInheritedLoaderEnvScrub(
         process.env,
-        'qwen serve',
+        'mariadb-shell-agent serve',
         'daemon',
       );
       expect(process.env['NODE_OPTIONS']).toBeUndefined();
@@ -871,7 +872,7 @@ describe('acquireInheritedLoaderEnvScrub', () => {
       // Daemon B boots and its scrub removes the host assignment.
       const daemonB = acquireInheritedLoaderEnvScrub(
         process.env,
-        'qwen serve',
+        'mariadb-shell-agent serve',
         'daemon',
       );
       expect(daemonB.removedKeys).toContain('NODE_OPTIONS');
@@ -901,7 +902,7 @@ describe('acquireInheritedLoaderEnvScrub', () => {
     try {
       const daemonA = acquireInheritedLoaderEnvScrub(
         process.env,
-        'qwen serve',
+        'mariadb-shell-agent serve',
         'daemon',
       );
       expect(process.env['NODE_OPTIONS']).toBeUndefined();
@@ -909,7 +910,7 @@ describe('acquireInheritedLoaderEnvScrub', () => {
       process.env['NODE_OPTIONS'] = '--current';
       const daemonB = acquireInheritedLoaderEnvScrub(
         process.env,
-        'qwen serve',
+        'mariadb-shell-agent serve',
         'daemon',
       );
       expect(daemonB.removedKeys).toContain('NODE_OPTIONS');
@@ -936,7 +937,7 @@ describe('acquireInheritedLoaderEnvScrub', () => {
     try {
       const firstCycle = acquireInheritedLoaderEnvScrub(
         process.env,
-        'qwen serve',
+        'mariadb-shell-agent serve',
         'daemon',
       );
       firstCycle.release();
@@ -947,7 +948,7 @@ describe('acquireInheritedLoaderEnvScrub', () => {
 
       const secondCycle = acquireInheritedLoaderEnvScrub(
         process.env,
-        'qwen serve',
+        'mariadb-shell-agent serve',
         'daemon',
       );
       expect(secondCycle.removedKeys).not.toContain('NODE_OPTIONS');
@@ -969,13 +970,17 @@ describe('acquireInheritedLoaderEnvScrub', () => {
       .mockImplementation(() => true);
     try {
       // Simulate a holder that never releases before the reset runs.
-      acquireInheritedLoaderEnvScrub(process.env, 'qwen serve', 'daemon');
+      acquireInheritedLoaderEnvScrub(
+        process.env,
+        'mariadb-shell-agent serve',
+        'daemon',
+      );
       resetInheritedLoaderEnvScrubForTesting();
       delete process.env['LD_PRELOAD'];
 
       const handle = acquireInheritedLoaderEnvScrub(
         process.env,
-        'qwen serve',
+        'mariadb-shell-agent serve',
         'daemon',
       );
       expect(handle.removedKeys).toEqual([]);
@@ -1001,7 +1006,7 @@ describe('acquireInheritedLoaderEnvScrub', () => {
     try {
       const handle = acquireInheritedLoaderEnvScrub(
         env,
-        'qwen serve',
+        'mariadb-shell-agent serve',
         'daemon',
       );
       expect(handle.removedKeys).toEqual(['NODE_OPTIONS']);

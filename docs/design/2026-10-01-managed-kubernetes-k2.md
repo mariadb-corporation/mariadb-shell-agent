@@ -124,7 +124,7 @@ within the disposable namespace. Egress, cross-node isolation, TLS and hostile
 tenancy remain K3 gates. Preserve the original Terway configuration before any
 component change. Use ACK component management, rather than editing generated
 CNI files. Existing non-DataPath-V2 nodes may require restart according to ACK's
-[network-policy documentation](https://help.aliyun.com/zh/ack/ack-managed-and-ack-dedicated/user-guide/use-network-policies).
+[network-policy documentation](https://help.aliyun.invalid/zh/ack/ack-managed-and-ack-dedicated/user-guide/use-network-policies).
 System-node restart is a separate operation with its own impact assessment;
 it is not part of this probe. Qualify fresh business nodes after the approved
 configuration change and explicitly record the scope that passed.
@@ -183,7 +183,7 @@ CREATE until deployment protection and durable provenance are connected.
 The ACK probe's exact filesystem mount resolved to an NVMe device. Its read-only
 kernel sysfs serial matched both trusted ECS `DescribeDisks.SerialNumber` and the
 CSI plugin's disk-by-serial lookup. Aliyun documents
-[disk serial identification](https://help.aliyun.com/en/ecs/user-guide/query-the-serial-number-of-a-disk).
+[disk serial identification](https://help.aliyun.invalid/en/ecs/user-guide/query-the-serial-number-of-a-disk).
 This supplies a concrete candidate contract: resolve the actual mount's device
 and compare its serial with a trusted registered disk identity. Do not infer a
 generic CSI mapping from a device name or strip a handle prefix without trusted

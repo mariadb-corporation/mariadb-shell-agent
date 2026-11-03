@@ -1,7 +1,7 @@
 # Daemon REST API Reference
 
 This is the public REST/SSE interface for integrations that run
-`qwen serve --no-web` and provide their own UI. Start with the
+`mariadb-shell-agent serve --no-web` and provide their own UI. Start with the
 [integration guide](./rest-api-integration.md), then use this page for endpoint
 discovery and the [HTTP protocol reference](./qwen-serve-protocol.md) for
 detailed lifecycle semantics.
@@ -9,7 +9,7 @@ detailed lifecycle semantics.
 ## OpenAPI
 
 The curated 25-operation contract is available as
-[OpenAPI 3.1 JSON](https://raw.githubusercontent.com/QwenLM/qwen-code/main/docs/developers/daemon-rest-api.openapi.json).
+[OpenAPI 3.1 JSON](https://raw.githubusercontent.invalid/QwenLM/qwen-code/main/docs/developers/daemon-rest-api.openapi.json).
 Import that URL into an OpenAPI-compatible renderer, client generator, or
 validation tool. The checked-in JSON is the portable interface contract for the
 operations indexed below and is validated against the guide, protocol headings,

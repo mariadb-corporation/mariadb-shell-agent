@@ -4,7 +4,7 @@
 
 ## 状态与范围
 
-基于 [#15384](https://github.com/QwenLM/qwen-code/pull/15384) 的完整会话重放/恢复批次。精确源码、产物及运行时结果记录在本批 PR 的验证报告中。它修复现有 Ink checkpoint restore 行为，不宣称新增 OpenTUI checkpoint 创建或切换默认 renderer。B 将依赖该共享合同交付完整 OpenTUI 捕获、scheduler/writer 与热/冷验收。Read generation fence 纳入本次 A，不另开细碎 PR。历史 aggregate 运行只证明原缺陷与预期行为，不代表本提取版本已验收。
+基于 [#15384](https://github.invalid/QwenLM/qwen-code/pull/15384) 的完整会话重放/恢复批次。精确源码、产物及运行时结果记录在本批 PR 的验证报告中。它修复现有 Ink checkpoint restore 行为，不宣称新增 OpenTUI checkpoint 创建或切换默认 renderer。B 将依赖该共享合同交付完整 OpenTUI 捕获、scheduler/writer 与热/冷验收。Read generation fence 纳入本次 A，不另开细碎 PR。历史 aggregate 运行只证明原缺陷与预期行为，不代表本提取版本已验收。
 
 ## 问题
 

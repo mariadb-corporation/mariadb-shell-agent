@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1114,13 +1115,15 @@ it('reads Workspace context on its own tool-session route, through the result pa
   // The parser is the only gate between the Broker's reply and the system
   // instruction: a name outside the closed list must not get through.
   const paths: string[] = [];
-  let files: unknown = [{ name: 'QWEN.md', text: 'project rules' }];
+  let files: unknown = [
+    { name: 'MARIADB-SHELL-AGENT.md', text: 'project rules' },
+  ];
   const broker = await fixture((path) => {
     paths.push(path);
     return { body: { ...identity, result: { files } } };
   });
   await expect(broker.workspaceContext()).resolves.toEqual([
-    { name: 'QWEN.md', text: 'project rules' },
+    { name: 'MARIADB-SHELL-AGENT.md', text: 'project rules' },
   ]);
   expect(paths[0]).toBe(
     '/internal/runtime-broker/v1/tool-sessions/turn/control',

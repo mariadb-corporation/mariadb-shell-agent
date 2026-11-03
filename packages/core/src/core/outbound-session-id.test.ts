@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,9 +26,9 @@ describe('outbound session ID', () => {
   });
 
   it.each([
-    'routify.alibaba-inc.com',
-    'routify-online.alibaba-inc.com',
-    'routify-pub.alibaba-inc.com',
+    'routify.alibaba-inc.invalid',
+    'routify-online.alibaba-inc.invalid',
+    'routify-pub.alibaba-inc.invalid',
   ])('matches the documented Routify host %s', (host) => {
     expect(
       buildSessionIdHeaders(config(), `https://${host}/protocol/openai/v1`),
@@ -43,7 +44,7 @@ describe('outbound session ID', () => {
     const wrappedFetch = wrapFetchWithSessionId(baseFetch, cliConfig);
 
     await wrappedFetch(
-      'https://routify-pub.alibaba-inc.com/protocol/openai/v1',
+      'https://routify-pub.alibaba-inc.invalid/protocol/openai/v1',
       {
         headers: {
           Authorization: 'Bearer token',
@@ -53,7 +54,7 @@ describe('outbound session ID', () => {
     );
     vi.mocked(cliConfig.getSessionId).mockReturnValue('session-2');
     await wrappedFetch(
-      'https://routify-pub.alibaba-inc.com/protocol/anthropic/v1',
+      'https://routify-pub.alibaba-inc.invalid/protocol/anthropic/v1',
     );
 
     const firstHeaders = new Headers(baseFetch.mock.calls[0][1]?.headers);
@@ -64,10 +65,10 @@ describe('outbound session ID', () => {
   });
 
   it.each([
-    'https://sub.routify-pub.alibaba-inc.com/protocol/openai/v1',
-    'https://routify-preview.alibaba-inc.com/protocol/openai/v1',
+    'https://sub.routify-pub.alibaba-inc.invalid/protocol/openai/v1',
+    'https://routify-preview.alibaba-inc.invalid/protocol/openai/v1',
     'https://api.openai.com/v1',
-    'http://routify.alibaba-inc.com/protocol/openai/v1',
+    'http://routify.alibaba-inc.invalid/protocol/openai/v1',
     'not a URL',
   ])('does not inject the header into %s', async (url) => {
     const baseFetch = vi.fn(
@@ -90,7 +91,7 @@ describe('outbound session ID', () => {
     expect(
       buildSessionIdHeaders(
         config(''),
-        'https://routify.alibaba-inc.com/protocol/openai/v1',
+        'https://routify.alibaba-inc.invalid/protocol/openai/v1',
       ),
     ).toEqual({});
   });
@@ -103,9 +104,12 @@ describe('outbound session ID', () => {
     const wrappedFetch = wrapFetchWithSessionId(baseFetch, config());
 
     await wrappedFetch(
-      new Request('https://routify-pub.alibaba-inc.com/protocol/openai/v1', {
-        headers: { Authorization: 'Bearer token' },
-      }),
+      new Request(
+        'https://routify-pub.alibaba-inc.invalid/protocol/openai/v1',
+        {
+          headers: { Authorization: 'Bearer token' },
+        },
+      ),
     );
 
     const headers = new Headers(baseFetch.mock.calls[0][1]?.headers);
@@ -121,12 +125,15 @@ describe('outbound session ID', () => {
     const wrappedFetch = wrapFetchWithSessionId(baseFetch, config());
 
     await wrappedFetch(
-      new Request('https://routify-pub.alibaba-inc.com/protocol/openai/v1', {
-        headers: {
-          Authorization: 'Bearer token',
-          'X-Shared': 'request',
+      new Request(
+        'https://routify-pub.alibaba-inc.invalid/protocol/openai/v1',
+        {
+          headers: {
+            Authorization: 'Bearer token',
+            'X-Shared': 'request',
+          },
         },
-      }),
+      ),
       { headers: { 'X-Extra': 'value', 'X-Shared': 'init' } },
     );
 
@@ -145,7 +152,7 @@ describe('outbound session ID', () => {
     const sessionAwareFetch = buildSessionAwareFetch(runtimeFetch, config());
 
     await sessionAwareFetch(
-      'https://routify-pub.alibaba-inc.com/protocol/openai/v1',
+      'https://routify-pub.alibaba-inc.invalid/protocol/openai/v1',
     );
 
     const headers = new Headers(runtimeFetch.mock.calls[0][1]?.headers);
@@ -161,7 +168,7 @@ describe('outbound session ID', () => {
     const sessionAwareFetch = buildSessionAwareFetch(undefined, config());
 
     await sessionAwareFetch(
-      'https://routify-pub.alibaba-inc.com/protocol/openai/v1',
+      'https://routify-pub.alibaba-inc.invalid/protocol/openai/v1',
     );
 
     const headers = new Headers(fetchStub.mock.calls[0][1]?.headers);

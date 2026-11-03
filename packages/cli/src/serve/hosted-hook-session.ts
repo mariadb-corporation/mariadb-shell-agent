@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -588,7 +589,7 @@ export class HostedHookSession {
         // attached — the one outcome worth a line on the daemon's default
         // channel, where a debug logger is silent without --debug.
         writeStderrLineSafe(
-          `qwen serve: earlier Hook owner release refused (left attached, retried on a later turn): ${id} ${refusal}`,
+          `mariadb-shell-agent serve: earlier Hook owner release refused (left attached, retried on a later turn): ${id} ${refusal}`,
         );
         this.fencedOwners.add(id);
         return;
@@ -597,7 +598,7 @@ export class HostedHookSession {
       // reconstructed Session re-walks its whole activation history — so it
       // stays off the daemon's default channel.
       debugLogger.debug(
-        `qwen serve: earlier Hook owner release refused (owner absent, booked released): ${id} ${refusal}`,
+        `mariadb-shell-agent serve: earlier Hook owner release refused (owner absent, booked released): ${id} ${refusal}`,
       );
     }
     this.recoveredBrokers.delete(id);
@@ -619,7 +620,7 @@ export class HostedHookSession {
             await this.releaseOwner(id, false);
           } catch (cause) {
             writeStderrLineSafe(
-              `qwen serve: earlier Hook owner release retry failed, left attached: ${id} ${String(cause)}`,
+              `mariadb-shell-agent serve: earlier Hook owner release retry failed, left attached: ${id} ${String(cause)}`,
             );
           }
         }
@@ -1050,7 +1051,7 @@ export class HostedHookSession {
           // is the fence, and only its typed refusal may reach the caller
           // while a record's outcome is still unknown.
           writeStderrLineSafe(
-            `qwen serve: Hook reconcile before dispatch failed: ${String(cause)}`,
+            `mariadb-shell-agent serve: Hook reconcile before dispatch failed: ${String(cause)}`,
           );
         }
         if (this.hasPendingOperations)
@@ -2021,7 +2022,7 @@ export class HostedHookSession {
         // Broker refusal reach the route.
         if (!holdFencedRelease(cause)) throw cause;
         writeStderrLineSafe(
-          `qwen serve: Hook owner release held by unfinished work: ${
+          `mariadb-shell-agent serve: Hook owner release held by unfinished work: ${
             this.broker.runtimeSessionId
           } ${
             cause instanceof HostedWorkspaceBrokerRejection

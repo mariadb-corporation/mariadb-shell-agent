@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -184,7 +185,7 @@ describe('SuggestionsDisplay', () => {
             value: 'doctor',
             argumentHint:
               '[memory|cpu-profile|rollback] [--sample] [--snapshot] [--duration]',
-            description: 'Diagnose Qwen Code environment.',
+            description: 'Diagnose MariaDB Shell Agent environment.',
           },
         ]}
         activeIndex={0}

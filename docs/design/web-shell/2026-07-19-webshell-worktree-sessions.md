@@ -61,14 +61,14 @@ Web Shell UI (createSession)
 ```
 
 关键约束：`workspaceCwd` 必须是 `workspaceRegistry` 中已注册的 workspace。
-worktree 路径（如 `<repo>/.qwen/worktrees/my-task/`）不在注册表中，不能
+worktree 路径（如 `<repo>/.mariadb-shell-agent/worktrees/my-task/`）不在注册表中，不能
 直接作为 `workspaceCwd` 传入。
 
 ### worktree 基础设施
 
 - `GitWorktreeService.createUserWorktree(slug, baseBranch?, opts?)`：
   创建 worktree + 分支 `worktree-<slug>`，返回 `{ success, worktree: { path, branch } }`。
-- worktree 存放路径：`<repoRoot>/.qwen/worktrees/<slug>/`。
+- worktree 存放路径：`<repoRoot>/.mariadb-shell-agent/worktrees/<slug>/`。
 - `writeWorktreeSessionMarker(path, sessionId)`：写入 `.qwen-session` 标记。
 - `GitWorktreeService.removeWorktree(slug)`：清理 worktree + 分支。
 - `GitWorktreeService.cleanupStaleAgentWorktrees()`：启动时清理孤儿 worktree。
@@ -110,11 +110,11 @@ POST /session { cwd: "/repo", worktree: { slug?: "my-task" } }
   │
   ├─ 创建 worktree
   │   GitWorktreeService("/repo").createUserWorktree("my-task", currentBranch)
-  │   → /repo/.qwen/worktrees/my-task/  (branch: worktree-my-task)
+  │   → /repo/.mariadb-shell-agent/worktrees/my-task/  (branch: worktree-my-task)
   │
   ├─ bridge.spawnOrAttach({
   │     workspaceCwd: "/repo",          ← workspace 注册 / runtime 解析
-  │     initialCwd: "/repo/.qwen/worktrees/my-task/",  ← 子进程实际 cwd
+  │     initialCwd: "/repo/.mariadb-shell-agent/worktrees/my-task/",  ← 子进程实际 cwd
   │     worktree: { slug, path, branch }               ← session 元数据
   │   })
   │
@@ -341,7 +341,7 @@ worktree session 的 git 状态刷新与普通 session 一致（focus / branch �
 - **worktree 创建失败**（磁盘满、权限、分支冲突）：返回 `500`，session
   不创建，client 提示错误。
 - **session 异常退出**（daemon 崩溃、kill -9）：worktree 残留在
-  `.qwen/worktrees/` 下。已有的 `cleanupStaleAgentWorktrees` 在 daemon 重启时
+  `.mariadb-shell-agent/worktrees/` 下。已有的 `cleanupStaleAgentWorktrees` 在 daemon 重启时
   清理无 session marker 的孤儿 worktree。
 
 ## 关键修改点

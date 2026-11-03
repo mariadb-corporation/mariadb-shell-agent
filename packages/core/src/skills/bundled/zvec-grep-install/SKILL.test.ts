@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -55,7 +56,7 @@ describe('bundled zvec-grep-install skill', () => {
       normalizedBody.indexOf('npm install -g @zvec/zvec-grep'),
     );
     expect(confirmation).toBeLessThan(
-      normalizedBody.indexOf('zg install --target qwen --yes'),
+      normalizedBody.indexOf('zg install --target mariadb-shell-agent --yes'),
     );
   });
 

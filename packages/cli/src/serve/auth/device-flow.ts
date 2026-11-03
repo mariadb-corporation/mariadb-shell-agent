@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Device-flow authorization registry for `qwen serve`. The registry
+ * Device-flow authorization registry for `mariadb-shell-agent serve`. The registry
  * brokers an OAuth 2.0 Device Authorization Grant (RFC 8628) initiated
  * through `POST /workspace/auth/device-flow` so a remote SDK client can
  * ask the daemon to log in. Tokens land on the **daemon** filesystem,

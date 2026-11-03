@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -35,9 +36,9 @@ let preconnectInFlight: Promise<void> | undefined;
  */
 const DEFAULT_BASE_URLS: Record<string, string> = {
   openai: 'https://api.openai.com',
-  'qwen-oauth': 'https://coding.dashscope.aliyuncs.com',
+  'qwen-oauth': 'https://coding.dashscope.aliyuncs.invalid',
   anthropic: 'https://api.anthropic.com',
-  dashscope: 'https://dashscope.aliyuncs.com',
+  dashscope: 'https://dashscope.aliyuncs.invalid',
 };
 
 /**
@@ -209,7 +210,7 @@ export function preconnectApi(
       method: 'HEAD',
       signal: AbortSignal.timeout(5_000),
       headers: {
-        'User-Agent': 'QwenCode-Preconnect/1.0',
+        'User-Agent': 'MariaDBShellAgent-Preconnect/1.0',
       },
       dispatcher,
     });

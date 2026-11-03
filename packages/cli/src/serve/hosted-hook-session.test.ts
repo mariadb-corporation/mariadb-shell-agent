@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2440,7 +2441,7 @@ it.each([
         // reported only on the debug logger, never the default channel.
         expect(log).not.toHaveBeenCalled();
         expect(hostedHookDebug).toHaveBeenCalledExactlyOnceWith(
-          `qwen serve: earlier Hook owner release refused (owner absent, booked released): ${unacquired.broker.runtimeSessionId} ${status} ${code}`,
+          `mariadb-shell-agent serve: earlier Hook owner release refused (owner absent, booked released): ${unacquired.broker.runtimeSessionId} ${status} ${code}`,
         );
         await replacement.close();
       }

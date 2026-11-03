@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -35,7 +36,7 @@ describe('original built-in registry', () => {
   it('help output matches the original dialog content', async () => {
     const commands = await loadInteractiveCommands(null);
     const text = formatHelpText(commands);
-    expect(text).toContain('Qwen Code');
+    expect(text).toContain('MariaDB Shell Agent');
     expect(text).toContain('Shortcuts');
     expect(text).toContain('↑/↓');
     expect(text).toContain('Browse built-in commands:');

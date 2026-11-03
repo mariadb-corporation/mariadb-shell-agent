@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -34,7 +35,7 @@ describe('rulesDiscovery', () => {
     return fullPath;
   }
 
-  // Writes each `files` entry (name → body), in order, under <root>/.qwen/rules.
+  // Writes each `files` entry (name → body), in order, under <root>/.mariadb-shell-agent/rules.
   async function writeRules(files: Record<string, string>, root = projectRoot) {
     for (const [name, body] of Object.entries(files)) {
       await createTestFile(path.join(root, QWEN_DIR, 'rules', name), body);
@@ -272,7 +273,7 @@ Also visible.
         path.join(customQwenHome, 'rules', 'fromCustomHome.md'),
         'CustomHome rule.',
       );
-      // A stale rule in the legacy ~/.qwen/rules must NOT load once
+      // A stale rule in the legacy ~/.mariadb-shell-agent/rules must NOT load once
       // QWEN_HOME points elsewhere.
       await writeRules({ 'fromLegacyHome.md': 'LegacyHome rule.' }, homedir);
 

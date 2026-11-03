@@ -138,5 +138,5 @@
     }
   },
   "outcomesRecorded": true,
-  "markdownReportPath": ".qwen/reviews/contract-v1.md"
+  "markdownReportPath": ".mariadb-shell-agent/reviews/contract-v1.md"
 }

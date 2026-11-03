@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -75,7 +76,7 @@ export function HooksDisabledStep({
       <Box marginBottom={1}>
         <Text color={theme.text.secondary}>
           {t(
-            'To re-enable hooks, remove "disableAllHooks" from settings.json or ask Qwen Code.',
+            'To re-enable hooks, remove "disableAllHooks" from settings.json or ask MariaDB Shell Agent.',
           )}
         </Text>
       </Box>

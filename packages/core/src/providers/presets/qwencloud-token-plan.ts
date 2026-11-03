@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,12 +19,12 @@ export const QWENCLOUD_TOKEN_PLAN_CHINA_BASE_URL =
   'https://token-plan.maas.qianwenaiapi.com/compatible-mode/v1';
 /** QwenCloud (International) Token Plan — dedicated subscription endpoint. */
 export const QWENCLOUD_TOKEN_PLAN_GLOBAL_BASE_URL =
-  'https://token-plan.maas.qwencloudapi.com/compatible-mode/v1';
+  'https://token-plan.maas.qwencloudapi.invalid/compatible-mode/v1';
 
 export const QWENCLOUD_TOKEN_PLAN_CHINA_DOC_URL =
   'https://platform.qianwenai.com/docs/token-plan/overview';
 export const QWENCLOUD_TOKEN_PLAN_GLOBAL_DOC_URL =
-  'https://docs.qwencloud.com/token-plan/overview';
+  'https://docs.qwencloud.invalid/token-plan/overview';
 
 // ---------------------------------------------------------------------------
 // Provider config

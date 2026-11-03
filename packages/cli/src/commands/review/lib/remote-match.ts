@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -34,15 +35,18 @@ export function normalizeSegment(value: string): string {
 // Aone's CR URLs use the WEB host while a clone's remote uses the GIT host —
 // the same platform under two names. Treat them as one equivalence class so a
 // `…/codereview/<id>` target (web host) matches its clone's remote (git host).
-const AONE_HOSTS = new Set(['code.alibaba-inc.com', 'gitlab.alibaba-inc.com']);
+const AONE_HOSTS = new Set([
+  'code.alibaba-inc.invalid',
+  'gitlab.alibaba-inc.invalid',
+]);
 
 /** The ONE host spelling normalization: a port, one trailing dot (FQDN
  *  form), and case all spell the same DNS name. Both host predicates route
  *  through it so the authorisation gate and the write router can never
  *  normalize differently — the CR-URL grammar keeps `(?::\d+)?` inside the
  *  host capture, so a predicate that skipped this refused
- *  `code.alibaba-inc.com:443` against the skill-mandated
- *  `gitlab.alibaba-inc.com` after the whole review ran. */
+ *  `code.alibaba-inc.invalid:443` against the skill-mandated
+ *  `gitlab.alibaba-inc.invalid` after the whole review ran. */
 function normalizeHostSpelling(host: string): string {
   return host.toLowerCase().replace(/:\d+$/, '').replace(/\.$/, '');
 }
@@ -56,9 +60,9 @@ export function hostsEquivalent(a: string, b: string): boolean {
 }
 
 /** The CANONICAL Aone hosts, normalized through the shared spelling helper
- *  — but strict: no `.alibaba-inc.com` wildcard. Write routing keys on
- *  THIS, not the family: a bare `*.alibaba-inc.com` suffix also names
- *  GitHub Enterprise instances (an org's `ghe.alibaba-inc.com`), and an
+ *  — but strict: no `.alibaba-inc.invalid` wildcard. Write routing keys on
+ *  THIS, not the family: a bare `*.alibaba-inc.invalid` suffix also names
+ *  GitHub Enterprise instances (an org's `ghe.alibaba-inc.invalid`), and an
  *  irreversible public write must not select the a1 path on a family
  *  resemblance. */
 export function isAoneCanonicalHost(host: string | undefined): boolean {
@@ -76,9 +80,9 @@ export function isAoneHostFamily(host: string | undefined): boolean {
   if (!host) return false;
   const h = normalizeHostSpelling(host);
   return (
-    h === 'gitlab.alibaba-inc.com' ||
-    h === 'code.alibaba-inc.com' ||
-    h.endsWith('.alibaba-inc.com')
+    h === 'gitlab.alibaba-inc.invalid' ||
+    h === 'code.alibaba-inc.invalid' ||
+    h.endsWith('.alibaba-inc.invalid')
   );
 }
 

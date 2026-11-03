@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -184,12 +185,12 @@ describe('CdpReverseLink (Plan C #5626)', () => {
       p.catch(() => undefined);
 
       expect(log).toHaveBeenCalledWith(
-        'qwen serve: /cdp forwarded command id=2 method=Page.navigate to extension',
+        'mariadb-shell-agent serve: /cdp forwarded command id=2 method=Page.navigate to extension',
       );
 
       await vi.advanceTimersByTimeAsync(30_000);
       expect(log).toHaveBeenCalledWith(
-        'qwen serve: /cdp still waiting for command id=2 method=Page.navigate after 30000ms',
+        'mariadb-shell-agent serve: /cdp still waiting for command id=2 method=Page.navigate after 30000ms',
       );
 
       await vi.advanceTimersByTimeAsync(20_000);

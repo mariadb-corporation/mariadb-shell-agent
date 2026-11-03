@@ -6,13 +6,13 @@ parses the call's arguments against your schema, and exposes the
 validated payload on stdout (or in the JSON / stream-json result
 envelope). The first valid call ends the run.
 
-Headless only — works with `qwen -p`, a positional prompt, or a prompt
+Headless only — works with `mariadb-shell-agent -p`, a positional prompt, or a prompt
 piped via stdin.
 
 ## Quick start
 
 ```bash
-qwen --prompt "Summarize the changes in HEAD with risk_level" \
+mariadb-shell-agent --prompt "Summarize the changes in HEAD with risk_level" \
   --json-schema '{
     "type": "object",
     "properties": {
@@ -35,7 +35,7 @@ envelope, no event log. Pipe it straight into `jq` or another consumer.
 
 In **text** mode, stdout is reserved for the JSON payload on success
 and is empty on failure; error messages and log lines go to stderr.
-That makes `$(qwen --json-schema …) || exit 1` capture patterns safe
+That makes `$(mariadb-shell-agent --json-schema …) || exit 1` capture patterns safe
 under text mode — failures land in stderr, not mixed into the captured
 variable. The model's incidental prose during planning is **not**
 mirrored to stderr either — text mode discards it; reach for
@@ -62,10 +62,10 @@ Two equivalent forms:
 
 ```bash
 # Inline JSON literal
-qwen -p "…" --json-schema '{"type":"object", "properties":{…}}'
+mariadb-shell-agent -p "…" --json-schema '{"type":"object", "properties":{…}}'
 
 # Read from a file
-qwen -p "…" --json-schema @./schemas/summary.json
+mariadb-shell-agent -p "…" --json-schema @./schemas/summary.json
 ```
 
 The `@path` form expands `~`, normalizes the path, and reads the file
@@ -210,7 +210,7 @@ the machine, args are redacted with the placeholder
 - The `ToolCallEvent` telemetry path (OTLP exports, QwenLogger,
   ui-telemetry stream, chat-recording UI event mirror).
 - The on-disk chat-recording JSONL at
-  `~/.qwen/projects/<sanitized-cwd>/chats/<sessionId>.jsonl` (re-fed
+  `~/.mariadb-shell-agent/projects/<sanitized-cwd>/chats/<sessionId>.jsonl` (re-fed
   into model context on `--continue` / `--resume`), including every
   validation-failure retry.
 
@@ -290,7 +290,7 @@ sees.
 ## Example: gating a multi-step run on the structured output
 
 ```bash
-RESULT=$(qwen --prompt "Audit this diff and rate its risk." \
+RESULT=$(mariadb-shell-agent --prompt "Audit this diff and rate its risk." \
   --json-schema @./schemas/audit.json) || exit 1
 
 risk=$(jq -r '.risk_level' <<<"$RESULT")

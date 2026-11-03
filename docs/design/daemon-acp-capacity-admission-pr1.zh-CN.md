@@ -10,9 +10,9 @@ PR1 提供显式开启的进程数量限制，以及可操作的容量不足提�
 
 建议实现 PR 标题：`feat(serve): add budget-based ACP child admission`。
 
-三个阶段的提案统一由 [#11907](https://github.com/QwenLM/qwen-code/issues/11907) 跟踪。本文细化其中第一阶段，空闲回收和用户主动选择关闭仍由独立后续 PR 推进。
+三个阶段的提案统一由 [#11907](https://github.invalid/QwenLM/qwen-code/issues/11907) 跟踪。本文细化其中第一阶段，空闲回收和用户主动选择关闭仍由独立后续 PR 推进。
 
-2026-09-15 读取的 [#8182](https://github.com/QwenLM/qwen-code/issues/8182) 仍为 open，剩余范围包括固定堆限额执行及代表性证据；[#11386](https://github.com/QwenLM/qwen-code/issues/11386) 已关闭。PR1 属于相关后续工作，使用 `Related to #8182` 并引用 #11386 作为背景，不使用关闭关键词。仅限制数量不能完成 #8182。
+2026-09-15 读取的 [#8182](https://github.invalid/QwenLM/qwen-code/issues/8182) 仍为 open，剩余范围包括固定堆限额执行及代表性证据；[#11386](https://github.invalid/QwenLM/qwen-code/issues/11386) 已关闭。PR1 属于相关后续工作，使用 `Related to #8182` 并引用 #11386 作为背景，不使用关闭关键词。仅限制数量不能完成 #8182。
 
 ## 2. 当前行为与缺口
 
@@ -54,11 +54,11 @@ PR1 只把名额数用于实际准入。544 MiB 仍是模型值，真实子进�
 | `observe`（默认不变）     | 是            | 否                | 否             |
 | `admit`（新增、显式开启） | 是            | 是                | 否             |
 
-实现后的使用示例：`qwen serve --child-heap-mode admit`。现有 `--memory-budget-mb` 覆盖项通过原有公式影响名额，也保留其既有 journal 预算效果，并不是专用并发开关。预算和模式在 daemon 生命周期内固定，修改需要重启。PR1 不增加 `enforce`，也不暗示 `admit` 强制执行堆/RSS 预算。
+实现后的使用示例：`mariadb-shell-agent serve --child-heap-mode admit`。现有 `--memory-budget-mb` 覆盖项通过原有公式影响名额，也保留其既有 journal 预算效果，并不是专用并发开关。预算和模式在 daemon 生命周期内固定，修改需要重启。PR1 不增加 `enforce`，也不暗示 `admit` 强制执行堆/RSS 预算。
 
 同时更新快速解析、完整 CLI choices/help、编程接口选项、策略类型和 SDK 状态镜像。保留 `off`/`observe` 行为、旧子进程参数、workspace 注册上限及 workspace/全局 session 上限。未显式开启的升级不得引入容量拒绝。
 
-支持托管的 `runQwenServe` 启动链路。对注入 bridge 或未接入准入的直接嵌入工厂，拒绝 `admit`，不能接受一个实际无效的配置。公开的准入工厂必须显式接收共享登记表。缺少托管准入接线的直接 `createServeApp` 调用拒绝 `admit`；托管 server 构建应传递真实的共享登记表/策略引用，不能把仅用于状态的快照回调当作限制已生效的证明。普通直接嵌入、IDE 及独立 `qwen --acp` 行为保持不变。
+支持托管的 `runQwenServe` 启动链路。对注入 bridge 或未接入准入的直接嵌入工厂，拒绝 `admit`，不能接受一个实际无效的配置。公开的准入工厂必须显式接收共享登记表。缺少托管准入接线的直接 `createServeApp` 调用拒绝 `admit`；托管 server 构建应传递真实的共享登记表/策略引用，不能把仅用于状态的快照回调当作限制已生效的证明。普通直接嵌入、IDE 及独立 `mariadb-shell-agent --acp` 行为保持不变。
 
 零名额的 `admit` 配置无法工作。应在启动监听器或预热前校验，以配置错误报告预算/模型失败。`off`、`observe` 保留既有小内存宿主行为。有效配置启动后，在登记表/策略安装前，bootstrap 状态仍明确表示尚未接线。
 
@@ -148,9 +148,9 @@ Runtime 初始化的容量原因应在通用 `runtime_initialization_failed` 及
 5. 包装/结果测试覆盖回滚成功、副作用不确定、generation 变化和预热失败。容量原因不被 `runtime_initialization_failed` 或通用重连错误吞掉，也不覆盖更重要的回滚结果。
 6. Web Shell 展示一次容量原因，结束 spinner/重试循环，保留新会话文本/附件或恢复状态。取消不产生删除副作用。释放名额后用户主动重试成功，不重复 prompt 或 worktree。
 7. 状态准确区分数量准入与模型堆值，正确处理 bootstrap/直接嵌入/旧服务字段，读取启动准入使用的同一登记表。
-8. 实现阶段执行 build、typecheck 和对应 package 的定向测试。E2E 先使用全局 `qwen` 跑基线，再使用打包后的实现，在隔离目录和确定性的本地 provider 上验证。证明名额统计及错误交互不需要再跑模型负载/堆校准。
+8. 实现阶段执行 build、typecheck 和对应 package 的定向测试。E2E 先使用全局 `mariadb-shell-agent` 跑基线，再使用打包后的实现，在隔离目录和确定性的本地 provider 上验证。证明名额统计及错误交互不需要再跑模型负载/堆校准。
 
-详细 E2E 计划存放在 `.qwen/e2e-tests/daemon-acp-capacity-admission-pr1.md`。验证结合全局 CLI 基线、package 定向测试及隔离的打包 daemon 进程检查；结果和未验证边界记录在测试计划中。此前的堆校准不能作为本次准入实现的验证依据。
+详细 E2E 计划存放在 `.mariadb-shell-agent/e2e-tests/daemon-acp-capacity-admission-pr1.md`。验证结合全局 CLI 基线、package 定向测试及隔离的打包 daemon 进程检查；结果和未验证边界记录在测试计划中。此前的堆校准不能作为本次准入实现的验证依据。
 
 ## 9. 交付顺序与限制
 

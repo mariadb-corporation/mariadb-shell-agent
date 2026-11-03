@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -358,15 +359,17 @@ function writeDistPackageJson(rootDir, distDir, npmDistribution) {
   );
 
   const distPackageJson = {
-    name: rootPackageJson.name,
-    version: rootPackageJson.version,
+    name: '@mariadb/mariadb-shell-agent',
+    version: process.env['MARIADB_FORK_VERSION'] || rootPackageJson.version,
     description:
-      rootPackageJson.description || 'Qwen Code - AI-powered coding assistant',
+      rootPackageJson.description ||
+      'MariaDB Shell Agent - AI-powered coding assistant',
     repository: rootPackageJson.repository,
     type: 'module',
     main: 'cli.js',
     bin: {
-      qwen: 'cli-entry.js',
+      'mariadb-shell-agent': 'cli-entry.js',
+      msa: 'cli-entry.js',
     },
     files: [
       'cli-entry.js',

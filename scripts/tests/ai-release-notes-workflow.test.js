@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -60,7 +61,7 @@ describe('stable release notes workflow', () => {
       'generate_notes > "${notes_file}" || : > "${notes_file}"',
     );
     // Step-scoped on purpose: release.yml sets this exact token on two steps,
-    // 'Create GitHub Release and Tag' and 'Trigger ECS runner qwen update', so
+    // 'Create GitHub Release and Tag' and 'Trigger ECS runner mariadb-shell-agent update', so
     // a workflow-wide toContain is satisfied by the other step's occurrence and
     // can never fail on the step it was written to protect.
     const createReleaseStep = getStep(
@@ -188,7 +189,7 @@ describe('stable release notes workflow', () => {
       const dir = mkdtempSync(join(tmpdir(), 'finalize-release-'));
       const output = join(dir, 'output');
       const log = join(dir, 'calls');
-      const url = 'https://github.com/QwenLM/qwen-code/pull/15468';
+      const url = 'https://github.invalid/QwenLM/qwen-code/pull/15468';
       const step = getStep(
         finalizeWorkflow,
         'Create PR to merge release branch into main',

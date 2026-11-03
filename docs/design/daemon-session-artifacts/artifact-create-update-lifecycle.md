@@ -4,7 +4,7 @@
 
 - Status: In implementation (PR 1)
 - Date: 2026-10-15
-- Issue: [#14282](https://github.com/QwenLM/qwen-code/issues/14282)
+- Issue: [#14282](https://github.invalid/QwenLM/qwen-code/issues/14282)
 - Related designs: [session-artifacts-persistence-v2-design.md](session-artifacts-persistence-v2-design.md), [session-artifacts-directory-expansion.md](../session-artifacts-directory-expansion.md), [web-shell-tool-file-preview.md](../web-shell-tool-file-preview.md)
 
 ## 1. Background and problem
@@ -231,7 +231,7 @@ Extend the existing transcript-based reference grouping to completed `write_file
 
 ## 8. Validation
 
-Before implementation, write an E2E plan in `.qwen/e2e-tests/` and dry-run it against the global `qwen` CLI to record the baseline.
+Before implementation, write an E2E plan in `.mariadb-shell-agent/e2e-tests/` and dry-run it against the global `mariadb-shell-agent` CLI to record the baseline.
 
 1. Upload `orders.csv` and ask the agent to add a column with `edit` → artifact created, shown in this turn, previewable and downloadable.
 2. Modify again next turn → same id emits `updated`, status `available`, shown in the latest turn.

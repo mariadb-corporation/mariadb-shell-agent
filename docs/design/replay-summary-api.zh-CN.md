@@ -70,4 +70,4 @@ full/summary load 响应相互独立、两条 transcript 路由，以及 Web She
 完全一致。在下一轮执行中及两轮均结束后，load 和 transcript 对同一 call ID 返回
 相同汇总。测试页均为完整小页（`hasMore=false`），未验证跨页、浏览器或真实模型。
 提交 PR 时附 E2E 报告摘要；原始证据保存在被忽略的
-`.qwen/issues/pr1-summary-terminal-usage.md` 及配套目录中。
+`.mariadb-shell-agent/issues/pr1-summary-terminal-usage.md` 及配套目录中。

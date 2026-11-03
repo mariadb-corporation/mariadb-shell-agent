@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1078,7 +1079,7 @@ describe('BackgroundAgentResumeService', () => {
     // try/catch turns this red (recovered is empty).
     subagentManager.loadSubagent.mockRejectedValue(
       new SubagentError(
-        'Agent file /test/project/.qwen/agents/researcher.md has an invalid executor block: it declares an executor but failed to load.',
+        'Agent file /test/project/.mariadb-shell-agent/agents/researcher.md has an invalid executor block: it declares an executor but failed to load.',
         SubagentErrorCode.INVALID_CONFIG,
         'researcher',
       ),

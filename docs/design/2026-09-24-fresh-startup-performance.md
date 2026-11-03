@@ -6,9 +6,9 @@ Status: implemented. Section 9 records the design decisions.
 
 ## 1. Problem
 
-On a clean machine, `qwen` takes about 2.5 s before the user can type. For
+On a clean machine, `mariadb-shell-agent` takes about 2.5 s before the user can type. For
 the first ~2 s the terminal is blank, and the process tree holds about 575 MB
-of RSS. `qwen -p` takes about 2.1 s before its first model request leaves the
+of RSS. `mariadb-shell-agent -p` takes about 2.1 s before its first model request leaves the
 process, even against a local model server that answers instantly.
 
 Nothing measured this. The existing startup profiler starts its clock inside
@@ -45,23 +45,23 @@ We followed the approach in
   empty git repo, and `settings.json` holds only the auth type and model
   name. The environment is reduced to `PATH`, `LANG` and `TERM`.
 - **Model.** A loopback OpenAI-compatible stub that answers instantly.
-- **Entry point.** The real `qwen` bin entry, `scripts/cli-entry.js`.
+- **Entry point.** The real `mariadb-shell-agent` bin entry, `scripts/cli-entry.js`.
 - **Terminal.** A node-pty terminal at 120×40, with the screen reconstructed
   by `@xterm/headless`. It answers DA1 and OSC 11 the way a modern terminal
   does; a "silent" variant answers nothing.
 
 ### 2.2 Metrics
 
-| ID  | Metric                         | Kind                     | Definition                                                                                                           |
-| --- | ------------------------------ | ------------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| J1  | Interactive TTI                | wall-clock, p75          | From spawning `qwen` until "Type your message" is visible, a key has been typed, and that key shows in the input box |
-| J2  | Headless TTFR                  | wall-clock, p75          | From spawning `qwen -p` until the first request reaches the model server                                             |
-| J3  | First content                  | wall-clock, p75          | From spawn until the first visible glyph (how long the screen stays blank)                                           |
-| M1  | RSS at TTI                     | memory                   | Summed RSS of the process tree at TTI; for `-p`, peak RSS until exit                                                 |
-| S1  | Post-TTI stability             | rate                     | Share of launches where the screen changes after TTI with no input                                                   |
-| D1  | Node boots before TTI          | deterministic (strace)   | Number of Node processes started before TTI                                                                          |
-| D2  | JS bytes loaded before TTI     | deterministic (strace)   | Bytes of JS read, summed over all processes                                                                          |
-| D3  | CPU instructions, `-p` to exit | deterministic (Valgrind) | Measured with ASLR off, V8 `--predictable --hash-seed=1 --random-seed=1`, and a warm compile cache                   |
+| ID  | Metric                         | Kind                     | Definition                                                                                                                          |
+| --- | ------------------------------ | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| J1  | Interactive TTI                | wall-clock, p75          | From spawning `mariadb-shell-agent` until "Type your message" is visible, a key has been typed, and that key shows in the input box |
+| J2  | Headless TTFR                  | wall-clock, p75          | From spawning `mariadb-shell-agent -p` until the first request reaches the model server                                             |
+| J3  | First content                  | wall-clock, p75          | From spawn until the first visible glyph (how long the screen stays blank)                                                          |
+| M1  | RSS at TTI                     | memory                   | Summed RSS of the process tree at TTI; for `-p`, peak RSS until exit                                                                |
+| S1  | Post-TTI stability             | rate                     | Share of launches where the screen changes after TTI with no input                                                                  |
+| D1  | Node boots before TTI          | deterministic (strace)   | Number of Node processes started before TTI                                                                                         |
+| D2  | JS bytes loaded before TTI     | deterministic (strace)   | Bytes of JS read, summed over all processes                                                                                         |
+| D3  | CPU instructions, `-p` to exit | deterministic (Valgrind) | Measured with ASLR off, V8 `--predictable --hash-seed=1 --random-seed=1`, and a warm compile cache                                  |
 
 **Proxy validation:**
 
@@ -229,7 +229,7 @@ that `execve` replaces.
    `/update`, or an update requested for exit, installs the update but exits
    with code 44 instead of reopening, because the new image has no launcher
    exit hook. It needs folder trust, a trust change and an update in one
-   session; the next `qwen` runs the new version.
+   session; the next `mariadb-shell-agent` runs the new version.
 3. **Stack traces.** With `minifyWhitespace`, frames keep function names and
    exact line and column, but lines average about 2 KB, so a line number alone
    no longer points at readable code. Neither build ships source maps.
@@ -333,12 +333,12 @@ New tests cover:
   interactive, `-p`, ACP, stream-json, and `advanced.autoConfigureMemory`. This
   holds on Node 22.23, on Node 22.3 (which has no `process.execve`), and after
   a folder-trust restart.
-- `qwen review --help` works.
+- `mariadb-shell-agent review --help` works.
 - Update-on-exit on a pnpm global install, with a local registry serving a
   newer version: after `/quit`, a double Ctrl+C, or a third Ctrl+D during
   shutdown, the update was installed and the new version reopened, as on
   `main`.
-- With a value in `~/.qwen/.env`, interactive and `-p` sessions relaunch and
+- With a value in `~/.mariadb-shell-agent/.env`, interactive and `-p` sessions relaunch and
   see the value at boot.
 - Under Bun 1.3.14 and 1.4.2, the launcher reaches the CLI.
 

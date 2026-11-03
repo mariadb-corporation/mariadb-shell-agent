@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -695,7 +696,7 @@ export async function resolveSessionManagedGitCwd(
   const repoTop = await fsPromises.realpath(stdout.trim()).catch(() => null);
   if (repoTop === null) return null;
   if (requested === workspace) return requested;
-  const managedRoot = path.join(repoTop, '.qwen', 'worktrees');
+  const managedRoot = path.join(repoTop, '.mariadb-shell-agent', 'worktrees');
   if (
     isWithinRoot(requested, workspace) &&
     !isWithinRoot(requested, managedRoot)

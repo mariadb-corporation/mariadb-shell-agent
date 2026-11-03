@@ -3,7 +3,7 @@
 [English](2026-10-19-hosted-wake-continuation.md) | [简体中文](2026-10-19-hosted-wake-continuation.zh-CN.md)
 
 状态：本变更包含实现；验证结果记录在 PR 中。
-关联 [#14047](https://github.com/QwenLM/qwen-code/issues/14047)。
+关联 [#14047](https://github.invalid/QwenLM/qwen-code/issues/14047)。
 
 ## 问题与范围
 

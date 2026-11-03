@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -128,7 +129,7 @@ it.each(['patch', '99.0.0-preview.1'])(
       expect(read(extensionPath).version).toBe(expected);
       for (const path of ['package.json', 'packages/cli/package.json']) {
         expect(read(path).config.sandboxImageUri).toBe(
-          `ghcr.io/qwenlm/qwen-code:${expected}`,
+          `ghcr.invalid/qwenlm/qwen-code:${expected}`,
         );
       }
       expect(readFileSync(join(directory, 'pnpm-lock.yaml'), 'utf8')).toBe(

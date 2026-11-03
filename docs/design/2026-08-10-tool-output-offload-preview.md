@@ -2,7 +2,7 @@
 
 [English](2026-08-10-tool-output-offload-preview.md) | [简体中文](2026-08-10-tool-output-offload-preview.zh-CN.md)
 
-> Design note required by [#4184](https://github.com/QwenLM/qwen-code/issues/4184)
+> Design note required by [#4184](https://github.invalid/QwenLM/qwen-code/issues/4184)
 > (acceptance criterion: "A design note documents the offload/preview state
 > transition and privacy model"). Mitigation implemented in #4880; retention
 > diagnostics added in the accompanying `/doctor memory` change.
@@ -68,7 +68,7 @@ Key properties:
   so history never holds an unbounded payload.
 - **Recoverable, never dropped.** Oversized output is persisted to a session
   temp file: the gate writes `tool-results/<callId>.txt`, while in-tool
-  truncation (shell, MCP) writes `~/.qwen/tmp/<project-hash>/<tool>_<hex>.output`.
+  truncation (shell, MCP) writes `~/.mariadb-shell-agent/tmp/<project-hash>/<tool>_<hex>.output`.
   The retained preview carries a pointer; the model can read the full payload
   back with `read_file`. Truncation keeps head and tail (`keep: 'both'`)
   because shell failure summaries appear at the end.

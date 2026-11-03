@@ -6,7 +6,7 @@
 
 This plan verifies the [recovery design](../design/2026-10-22-managed-recovery-continuation.md) ([简体中文](../design/2026-10-22-managed-recovery-continuation.zh-CN.md)). It covers Hosted Workspace failure cancellation, original-input settlement, cleanup and subsequent use, plus WebShell recovery and editable text handoff. Cross-host HA, complete history cloning and new MCP/Hook continuation remain outside this release.
 
-Before implementation, record `qwen --version` and attempt the relevant behavior with the globally installed CLI in an isolated runtime. The Java coordinator is a separate control plane: when the global entry cannot reach it, document that limitation and use a focused Java/Hosted test fallback against the exact baseline commit. The initial investigation uses `21337f0e5131`; retain failed assertions before changing the implementation. Do not build and substitute a new binary for the baseline.
+Before implementation, record `mariadb-shell-agent --version` and attempt the relevant behavior with the globally installed CLI in an isolated runtime. The Java coordinator is a separate control plane: when the global entry cannot reach it, document that limitation and use a focused Java/Hosted test fallback against the exact baseline commit. The initial investigation uses `21337f0e5131`; retain failed assertions before changing the implementation. Do not build and substitute a new binary for the baseline.
 
 ## Isolated prerequisites
 
@@ -16,7 +16,7 @@ MySQL must have `performance_schema` enabled. Before concurrency checks, use a r
 
 The positive `recovery-settlement` fixture keeps a separate Broker process and its original worker alive while killing only the Java coordinator. Both use the real JDBC authority and Workspace mount; the coordinator suppresses its optional local prewarm through instance-local test wiring, while native acquisition and tool execution use the resident Broker. Assert that the Broker and same worker survive, and that the coordinator never creates a replacement worker. Durable workers use private runtime state outside Workspace roots; trusted whole-host reboot recovery stays disabled. Recovering an embedded Broker after its own loss is a separate Linux-only boundary requiring the existing trusted reboot authority. Without it, preserving the marker and staying blocked after Broker loss is the expected negative result.
 
-Record tool versions, commit, selected tests, database engine and process identities. Keep credentials and machine-specific paths in ignored working artifacts. The detailed local report belongs in `.qwen/e2e-tests/managed-recovery-continuation.md`; this committed plan is not a claim that every scenario has passed.
+Record tool versions, commit, selected tests, database engine and process identities. Keep credentials and machine-specific paths in ignored working artifacts. The detailed local report belongs in `.mariadb-shell-agent/e2e-tests/managed-recovery-continuation.md`; this committed plan is not a claim that every scenario has passed.
 
 ## Behavioral matrix
 

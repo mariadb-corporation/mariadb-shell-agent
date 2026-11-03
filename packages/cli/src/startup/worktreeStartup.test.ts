@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -136,7 +137,7 @@ describe('setupStartupWorktree', () => {
       expect(res!.context.slug).toMatch(/^[a-z]+-[a-z]+-[0-9a-f]{6}$/);
       expect(res!.context.branch).toBe(`worktree-${res!.context.slug}`);
       expect(res!.context.worktreePath).toContain(
-        path.join('.qwen', 'worktrees', res!.context.slug),
+        path.join('.mariadb-shell-agent', 'worktrees', res!.context.slug),
       );
       expect(res!.context.repoRoot).toBe(tempRepo);
       expect(res!.context.originalBranch).toBe('main');
@@ -164,7 +165,7 @@ describe('setupStartupWorktree', () => {
       expect(res!.context.slug).toBe('my-feature');
       expect(res!.context.branch).toBe('worktree-my-feature');
       expect(res!.context.worktreePath).toBe(
-        path.join(tempRepo, '.qwen', 'worktrees', 'my-feature'),
+        path.join(tempRepo, '.mariadb-shell-agent', 'worktrees', 'my-feature'),
       );
     }
   });
@@ -184,7 +185,7 @@ describe('setupStartupWorktree', () => {
 
     // No worktree directory was created.
     const exists = await fs
-      .stat(path.join(tempRepo, '.qwen', 'worktrees'))
+      .stat(path.join(tempRepo, '.mariadb-shell-agent', 'worktrees'))
       .then(() => true)
       .catch(() => false);
     expect(exists).toBe(false);
@@ -209,7 +210,7 @@ describe('setupStartupWorktree', () => {
 
     // No worktree directory was created — fail-close means no side effect.
     const exists = await fs
-      .stat(path.join(tempRepo, '.qwen', 'worktrees'))
+      .stat(path.join(tempRepo, '.mariadb-shell-agent', 'worktrees'))
       .then(() => true)
       .catch(() => false);
     expect(exists).toBe(false);
@@ -220,7 +221,7 @@ describe('setupStartupWorktree', () => {
     process.chdir(tempRepo);
 
     const res = await setupStartupWorktree(
-      'https://github.com/QwenLM/qwen-code/pull/4174',
+      'https://github.invalid/QwenLM/qwen-code/pull/4174',
     );
     expect(res).not.toBeNull();
     expect(res!.ok).toBe(false);
@@ -275,7 +276,7 @@ describe('setupStartupWorktree', () => {
         expect(res!.context.branch).toBe('worktree-pr-42');
         expect(res!.context.isPullRequest).toBe(true);
         expect(res!.context.worktreePath).toBe(
-          path.join(tempRepo, '.qwen', 'worktrees', 'pr-42'),
+          path.join(tempRepo, '.mariadb-shell-agent', 'worktrees', 'pr-42'),
         );
 
         // The PR file lives inside the worktree (proving FETCH_HEAD was
@@ -313,8 +314,8 @@ describe('setupStartupWorktree', () => {
   });
 
   it('re-attaches an existing PR-backed worktree by its literal pr-<N> slug', async () => {
-    // `qwen --worktree=#42` created `.qwen/worktrees/pr-42`; a later
-    // `qwen --resume <sid> --worktree pr-42` names that same worktree by
+    // `mariadb-shell-agent --worktree=#42` created `.mariadb-shell-agent/worktrees/pr-42`; a later
+    // `mariadb-shell-agent --resume <sid> --worktree pr-42` names that same worktree by
     // its slug. The reserved shape must not lock the user out of it:
     // re-attach creates no slug and binds nothing.
     const upstream = await fs.mkdtemp(
@@ -368,7 +369,9 @@ describe('setupStartupWorktree', () => {
     expect(res!.error).toContain('reserved for PR-backed worktrees');
     expect(res!.error).toContain('--worktree=#42');
     await expect(
-      fs.stat(path.join(tempRepo, '.qwen', 'worktrees', 'pr-42')),
+      fs.stat(
+        path.join(tempRepo, '.mariadb-shell-agent', 'worktrees', 'pr-42'),
+      ),
     ).rejects.toThrow();
   });
 
@@ -384,7 +387,7 @@ describe('setupStartupWorktree', () => {
     expect(first!.context.wasReattached).toBe(false);
 
     // Restore cwd so the second call starts from launch cwd, mirroring
-    // the real `qwen --resume <sid> --worktree foo` invocation flow.
+    // the real `mariadb-shell-agent --resume <sid> --worktree foo` invocation flow.
     process.chdir(tempRepo);
 
     // Second call with the same slug now re-attaches, doesn't create.
@@ -407,7 +410,7 @@ describe('setupStartupWorktree', () => {
     // is NOT a git worktree (just a plain dir with a file in it).
     const slotPath = path.join(
       tempRepo,
-      '.qwen',
+      '.mariadb-shell-agent',
       'worktrees',
       'plain-dir-conflict',
     );
@@ -437,11 +440,16 @@ describe('setupStartupWorktree', () => {
     expect(survived).toBe('oops');
   });
 
-  it('refuses nested worktree creation from inside .qwen/worktrees/', async () => {
+  it('refuses nested worktree creation from inside .mariadb-shell-agent/worktrees/', async () => {
     tempRepo = await makeTempRepo();
     // Pre-create a fake worktree path and chdir into it. We don't need a
     // real git worktree — the guard fires on path shape, not git state.
-    const nestedPath = path.join(tempRepo, '.qwen', 'worktrees', 'outer');
+    const nestedPath = path.join(
+      tempRepo,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'outer',
+    );
     await fs.mkdir(nestedPath, { recursive: true });
     process.chdir(nestedPath);
 
@@ -556,7 +564,12 @@ describe('persistStartupWorktreeSidecar', () => {
       config.getSessionService().getWorktreeSessionPath('new-session'),
       {
         slug: 'other-slug',
-        worktreePath: path.join(tempRepo, '.qwen', 'worktrees', 'other-slug'),
+        worktreePath: path.join(
+          tempRepo,
+          '.mariadb-shell-agent',
+          'worktrees',
+          'other-slug',
+        ),
         worktreeBranch: 'worktree-other-slug',
         originalCwd: tempRepo,
         originalBranch: 'main',
@@ -807,7 +820,7 @@ describe('persistStartupWorktreeSidecar', () => {
     process.chdir(tempRepo);
     const packageDir = path.join(tempRepo, 'packages', 'app');
     await fs.mkdir(packageDir, { recursive: true });
-    Storage.setRuntimeBaseDir('.qwen', packageDir);
+    Storage.setRuntimeBaseDir('.mariadb-shell-agent', packageDir);
 
     const setup = await setupStartupWorktree('owner-subdir-runtime');
     expect(setup?.ok).toBe(true);
@@ -822,7 +835,10 @@ describe('persistStartupWorktreeSidecar', () => {
       },
     );
 
-    Storage.setRuntimeBaseDir('.qwen', setup.context.worktreePath);
+    Storage.setRuntimeBaseDir(
+      '.mariadb-shell-agent',
+      setup.context.worktreePath,
+    );
     await expect(
       persistStartupWorktreeSidecar(
         makeConfig(setup.context.worktreePath, 'new-session'),
@@ -841,7 +857,7 @@ describe('buildStartupWorktreeNotice', () => {
   // signature lets us keep the fixture minimal so adding new
   // StartupWorktreeContext fields doesn't churn this file.
   const baseContext = {
-    worktreePath: '/repo/.qwen/worktrees/foo',
+    worktreePath: '/repo/.mariadb-shell-agent/worktrees/foo',
     slug: 'foo',
     branch: 'worktree-foo',
     wasReattached: false,
@@ -852,7 +868,7 @@ describe('buildStartupWorktreeNotice', () => {
     expect(notice).toContain('[Startup]');
     expect(notice).toContain('Active worktree');
     expect(notice).toContain('"foo"');
-    expect(notice).toContain('/repo/.qwen/worktrees/foo');
+    expect(notice).toContain('/repo/.mariadb-shell-agent/worktrees/foo');
     expect(notice).toContain('worktree-foo');
     expect(notice).not.toContain('Re-attached');
     expect(notice).not.toContain('overrode');
@@ -877,7 +893,7 @@ describe('buildStartupWorktreeNotice', () => {
     expect(notice).toContain('[Startup]');
     expect(notice).toContain('overrode');
     expect(notice).toContain('"old-slug"');
-    expect(notice).toContain('qwen --worktree old-slug');
+    expect(notice).toContain('mariadb-shell-agent --worktree old-slug');
   });
 
   it('does NOT append the override hint when overrodeResumedWorktree is false', () => {

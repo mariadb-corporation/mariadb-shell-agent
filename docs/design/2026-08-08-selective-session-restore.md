@@ -1275,8 +1275,8 @@ behavior rather than inventing a new fallback.
 
 ### E2E and benchmark
 
-Before implementation, dry-run the scenario with the installed global `qwen`
-CLI and retain the baseline result in `.qwen/e2e-tests/`.
+Before implementation, dry-run the scenario with the installed global `mariadb-shell-agent`
+CLI and retain the baseline result in `.mariadb-shell-agent/e2e-tests/`.
 
 Compare the current full loader and selective projection under the same runtime
 with 64 KiB, 1 MiB, and 4 MiB fixtures. Report absolute wall time plus peak and

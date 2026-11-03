@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -491,7 +492,7 @@ async function runHousekeeping(
     },
   );
 
-  // Session debug logs (`~/.qwen/debug/<sessionId>.txt`) accumulate one file
+  // Session debug logs (`~/.mariadb-shell-agent/debug/<sessionId>.txt`) accumulate one file
   // per session whenever QWEN_DEBUG_LOG_FILE is enabled. Sweep alongside
   // file-history using the same cutoff; the sweeper skips the `latest` symlink
   // and the size-rotated `daemon/` subdir. Runs unconditionally so residue
@@ -499,7 +500,7 @@ async function runHousekeeping(
   // Interactive sessions only: the sole caller startBackgroundHousekeeping is
   // gated on config.isInteractive(), so headless/ACP/serve processes never
   // sweep (and per-workspace runtime dirs are never resolved here). The
-  // shared ~/.qwen/debug backlog is self-healing — the next interactive run
+  // shared ~/.mariadb-shell-agent/debug backlog is self-healing — the next interactive run
   // in the same runtime dir sweeps it. Non-interactive coverage is a
   // recorded follow-up (the #8860 → #8893 precedent).
   const debugLogsMarkerPath = getDebugLogsMarkerPath(

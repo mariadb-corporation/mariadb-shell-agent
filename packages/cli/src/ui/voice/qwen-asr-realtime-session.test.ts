@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -53,11 +54,11 @@ describe('qwen-asr-realtime-session', () => {
   it('derives the Qwen realtime endpoint from the provider host', () => {
     expect(
       deriveQwenRealtimeUrl(
-        'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
         'qwen3-asr-flash-realtime',
       ),
     ).toBe(
-      'wss://dashscope.aliyuncs.com/api-ws/v1/realtime?model=qwen3-asr-flash-realtime',
+      'wss://dashscope.aliyuncs.invalid/api-ws/v1/realtime?model=qwen3-asr-flash-realtime',
     );
     expect(
       deriveQwenRealtimeUrl(

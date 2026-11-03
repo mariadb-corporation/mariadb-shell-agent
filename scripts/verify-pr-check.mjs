@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -54,7 +55,7 @@ const HEADING = /^ {0,3}#{1,6}\s/;
 // giant text however well-formed the Markdown is.
 const HEADING_TITLE_MAX = 120;
 const FOOTER =
-  /^_— .+ via Qwen Code \/verify-pr \(v[^;]+; skill [0-9a-f]{12}\)_$/;
+  /^_— .+ via MariaDB Shell Agent \/verify-pr \(v[^;]+; skill [0-9a-f]{12}\)_$/;
 
 const HELP = `Usage: node scripts/verify-pr-check.mjs <artifact-dir>
 
@@ -390,7 +391,7 @@ export function checkArtifacts({ files, evidence = [], expectedHead = null }) {
     const lines = comment.split('\n').filter((line) => line.trim() !== '');
     if (!FOOTER.test(lines[lines.length - 1] ?? '')) {
       warnings.push(
-        'comment.md does not end with the attribution footer `_— <model> via Qwen Code /verify-pr (v<version>; skill <12-hex>)_`: append the resolved footer before posting — omit it only when the model cannot be resolved',
+        'comment.md does not end with the attribution footer `_— <model> via MariaDB Shell Agent /verify-pr (v<version>; skill <12-hex>)_`: append the resolved footer before posting — omit it only when the model cannot be resolved',
       );
     }
   }

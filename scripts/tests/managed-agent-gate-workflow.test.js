@@ -522,7 +522,7 @@ describe('Managed Agent gate tier selection', () => {
     return readFileSync(output, 'utf8').trim();
   };
   const url = (run) =>
-    `https://github.com/QwenLM/qwen-code/actions/runs/${run}/job/9`;
+    `https://github.invalid/QwenLM/qwen-code/actions/runs/${run}/job/9`;
 
   it.each(['pull_request', 'push', 'merge_group'])(
     'runs the fast tier for a touched %s',

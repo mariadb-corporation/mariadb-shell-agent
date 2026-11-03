@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +39,7 @@ vi.mock('./index.js', () => ({
 // Mock @qwen-code/qwen-code-core
 vi.mock('@qwen-code/qwen-code-core', () => ({
   Storage: {
-    getGlobalQwenDir: vi.fn(() => '/mock/home/.qwen'),
+    getGlobalQwenDir: vi.fn(() => '/mock/home/.mariadb-shell-agent'),
   },
 }));
 
@@ -197,7 +198,7 @@ describe('languageUtils', () => {
     it('should create directory and write file', () => {
       writeOutputLanguageFile('Chinese');
 
-      const globalDir = '/mock/home/.qwen';
+      const globalDir = '/mock/home/.mariadb-shell-agent';
       const expectedDir = path.join(globalDir);
       const expectedFilePath = path.join(globalDir, 'output-language.md');
 
@@ -277,13 +278,16 @@ describe('languageUtils', () => {
     });
 
     it('should write to custom targetPath when provided', () => {
-      writeOutputLanguageFile('Korean', '/proj/.qwen/output-language.md');
+      writeOutputLanguageFile(
+        'Korean',
+        '/proj/.mariadb-shell-agent/output-language.md',
+      );
 
-      expect(fs.mkdirSync).toHaveBeenCalledWith('/proj/.qwen', {
+      expect(fs.mkdirSync).toHaveBeenCalledWith('/proj/.mariadb-shell-agent', {
         recursive: true,
       });
       expect(fs.writeFileSync).toHaveBeenCalledWith(
-        '/proj/.qwen/output-language.md',
+        '/proj/.mariadb-shell-agent/output-language.md',
         expect.stringContaining('Korean'),
         'utf-8',
       );
@@ -590,8 +594,8 @@ Always use formal tone.
 
   describe('output-language.md path resolution priority', () => {
     it('should prefer project-level path over global path', () => {
-      const projectPath = '/project/.qwen/output-language.md';
-      const globalPath = '/mock/home/.qwen/output-language.md';
+      const projectPath = '/project/.mariadb-shell-agent/output-language.md';
+      const globalPath = '/mock/home/.mariadb-shell-agent/output-language.md';
 
       vi.mocked(fs.existsSync).mockImplementation((p) => {
         if (p.toString() === projectPath) return true;
@@ -610,8 +614,8 @@ Always use formal tone.
     });
 
     it('should fall back to global path when project-level does not exist', () => {
-      const projectPath = '/project/.qwen/output-language.md';
-      const globalPath = '/mock/home/.qwen/output-language.md';
+      const projectPath = '/project/.mariadb-shell-agent/output-language.md';
+      const globalPath = '/mock/home/.mariadb-shell-agent/output-language.md';
 
       vi.mocked(fs.existsSync).mockImplementation((p) => {
         if (p.toString() === projectPath) return false;
@@ -630,8 +634,8 @@ Always use formal tone.
     });
 
     it('should return undefined when neither path exists', () => {
-      const projectPath = '/project/.qwen/output-language.md';
-      const globalPath = '/mock/home/.qwen/output-language.md';
+      const projectPath = '/project/.mariadb-shell-agent/output-language.md';
+      const globalPath = '/mock/home/.mariadb-shell-agent/output-language.md';
 
       vi.mocked(fs.existsSync).mockReturnValue(false);
 
@@ -656,14 +660,14 @@ Always use formal tone.
       const config = {
         getOutputLanguageFilePath: vi
           .fn()
-          .mockReturnValue('/proj/.qwen/output-language.md'),
+          .mockReturnValue('/proj/.mariadb-shell-agent/output-language.md'),
         setOutputLanguageFilePath: vi.fn(),
       };
 
       writeOutputLanguageAndRegisterPath('Chinese', config);
 
       expect(fs.writeFileSync).toHaveBeenCalledWith(
-        '/proj/.qwen/output-language.md',
+        '/proj/.mariadb-shell-agent/output-language.md',
         expect.stringContaining('Chinese'),
         'utf-8',
       );

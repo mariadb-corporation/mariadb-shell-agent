@@ -23,7 +23,7 @@ export class ChannelPromptCancelledError extends Error {
   }
 }
 export const CHANNEL_BTW_METHOD = 'qwen/control/session/btw';
-// Private-parent capability handshake with the spawned `qwen --acp` child
+// Private-parent capability handshake with the spawned `mariadb-shell-agent --acp` child
 // (packages/core/src/utils/invocation-context.ts owns the same constants).
 // channel-base keeps a minimal dependency footprint, so the wire contract is
 // pinned by value in a cross-package test instead of imported.

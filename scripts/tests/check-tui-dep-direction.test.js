@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -513,7 +514,7 @@ describe('end-to-end gate run (main wiring)', () => {
   // Regression guard for the root-path check wired into main(): the helper
   // is unit-tested above, but nothing but a full run proves main() actually
   // invokes it before trusting the scan. Build a fixture checkout inside the
-  // (git-ignored) .qwen dir so the copied script resolves `typescript` from
+  // (git-ignored) .mariadb-shell-agent dir so the copied script resolves `typescript` from
   // the real node_modules, run it as a subprocess, and assert exit codes.
   const gatePath = fileURLToPath(
     new URL('../check-tui-dep-direction.mjs', import.meta.url),
@@ -521,8 +522,10 @@ describe('end-to-end gate run (main wiring)', () => {
   const repoRoot = fileURLToPath(new URL('../..', import.meta.url));
 
   function makeFixtureCheckout() {
-    mkdirSync(join(repoRoot, '.qwen'), { recursive: true });
-    const base = mkdtempSync(join(repoRoot, '.qwen', 'gate-e2e-'));
+    mkdirSync(join(repoRoot, '.mariadb-shell-agent'), { recursive: true });
+    const base = mkdtempSync(
+      join(repoRoot, '.mariadb-shell-agent', 'gate-e2e-'),
+    );
     temporaryDirectories.push(base);
     mkdirSync(join(base, 'scripts'));
     mkdirSync(join(base, 'packages', 'core', 'src'), { recursive: true });

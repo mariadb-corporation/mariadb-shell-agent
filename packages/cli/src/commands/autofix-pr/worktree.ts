@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -407,13 +408,13 @@ export function remoteRef(
 /**
  * Whether a checkout holds work git reports, or null when git cannot read it.
  * The flags override `status.showUntrackedFiles` and submodule `ignore`
- * settings, as this directory's other scans do. Only `.qwen` is the watch's:
+ * settings, as this directory's other scans do. Only `.mariadb-shell-agent` is the watch's:
  * anything beside its `tmp` directory under there is the user's work. An
- * in-place watch's checkout holds the watch's own files under `.qwen/tmp`,
+ * in-place watch's checkout holds the watch's own files under `.mariadb-shell-agent/tmp`,
  * so its dirty checks use this, not `hasUncommittedChanges`.
  */
 export function checkoutHoldsWork(path: string): boolean | null {
-  // -z: porcelain v1 C-quotes a non-ASCII path, and a quoted `.qwen/tmp`
+  // -z: porcelain v1 C-quotes a non-ASCII path, and a quoted `.mariadb-shell-agent/tmp`
   // watch file would read as the user's work. NUL-delimited records carry
   // the path as git stores it; a rename's old path is its own record and,
   // not starting `??`, still counts as work.
@@ -433,7 +434,7 @@ export function checkoutHoldsWork(path: string): boolean | null {
     record.startsWith('??') && isUnderQwen(record.slice(3));
   if (records.some((record) => !onlyWatchDir(record))) return true;
   if (records.length === 0) return false;
-  // Only `.qwen` is untracked: ask what it holds besides the watch's `tmp`.
+  // Only `.mariadb-shell-agent` is untracked: ask what it holds besides the watch's `tmp`.
   const userFiles = gitOpt(
     '--no-optional-locks',
     '-C',
@@ -442,16 +443,18 @@ export function checkoutHoldsWork(path: string): boolean | null {
     '--others',
     '--exclude-standard',
     '--',
-    '.qwen',
-    ':(exclude).qwen/tmp',
+    '.mariadb-shell-agent',
+    ':(exclude).mariadb-shell-agent/tmp',
   );
   if (userFiles === null) return null;
   return userFiles.trim() !== '';
 }
 
-/** A porcelain path at or under `.qwen`. */
+/** A porcelain path at or under `.mariadb-shell-agent`. */
 function isUnderQwen(file: string): boolean {
-  return file === '.qwen' || file.startsWith('.qwen/');
+  return (
+    file === '.mariadb-shell-agent' || file.startsWith('.mariadb-shell-agent/')
+  );
 }
 
 /**

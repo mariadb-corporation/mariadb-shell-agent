@@ -131,7 +131,7 @@ partial-prepare 裂缝。partial-prepare 裂缝里每个兄弟都已决，因此
 fire-once 闩；仅当值等于当前 session ID 时触发；仅经新的
 `startReplacementHarness(name, holdPendingSiblingApproval = false)` 参数武装在
 gen2（gen3 不传）。在 `commitDurableWait` 之后打日志
-`qwen serve: E2E holding pending sibling approval for Session <id> call <callId>`，
+`mariadb-shell-agent serve: E2E holding pending sibling approval for Session <id> call <callId>`，
 并 park 在一个 abort signal 触发即 reject 的 promise 上，因此泄漏的 flag 不会把
 真实 Session 不可取消地挂死。`process-env-guard.test.ts` allowlist 条目以精确
 访问计数钉住新 key。
@@ -239,4 +239,4 @@ npm run typecheck && npm run bundle`。专用钩子单测（匹配/不匹配/abo
   支路、M1 变异红、env-guard 访问计数与契约钉覆盖，其感知 abort 的 hold 镜像了已单测
   的 B3a 模式。
 
-[issue]: https://github.com/QwenLM/qwen-code/issues/14481
+[issue]: https://github.invalid/QwenLM/qwen-code/issues/14481

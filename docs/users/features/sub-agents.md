@@ -1,6 +1,6 @@
 # Subagents
 
-Subagents are specialized AI assistants that handle specific types of tasks within Qwen Code. They allow you to delegate focused work to AI agents that are configured with task-specific prompts, tools, and behaviors.
+Subagents are specialized AI assistants that handle specific types of tasks within MariaDB Shell Agent. They allow you to delegate focused work to AI agents that are configured with task-specific prompts, tools, and behaviors.
 
 ## What are Subagents?
 
@@ -14,11 +14,11 @@ Subagents are independent AI assistants that:
 
 ## Claude Code and Codex subagents
 
-The built-in `claude-code` and `codex` agents delegate to separately installed native tools. Install and authenticate Claude Code with its `claude-agent-acp` adapter, or Codex with its `codex` executable, and make the executable available on `PATH`. These agents use their native model and authentication settings. Qwen Code does not fall back to its own model when the executable is missing.
+The built-in `claude-code` and `codex` agents delegate to separately installed native tools. Install and authenticate Claude Code with its `claude-agent-acp` adapter, or Codex with its `codex` executable, and make the executable available on `PATH`. These agents use their native model and authentication settings. MariaDB Shell Agent does not fall back to its own model when the executable is missing.
 
 Both agents default to foreground execution; set `run_in_background: true` to receive a background completion notification. They require a trusted workspace and are unavailable in safe mode. Both executors support macOS/Linux (including WSL); native Windows launches are rejected before startup with platform guidance.
 
-Claude Code uses the ACP executor and supports continued input while its session is retained. Codex uses an ephemeral app-server thread for a single task and returns the final answer. Codex tasks cannot receive messages or resume; start a new task instead. Native tool progress, token counts, and cost are not reported for Codex. Native sessions cannot be restored after restarting Qwen Code.
+Claude Code uses the ACP executor and supports continued input while its session is retained. Codex uses an ephemeral app-server thread for a single task and returns the final answer. Codex tasks cannot receive messages or resume; start a new task instead. Native tool progress, token counts, and cost are not reported for Codex. Native sessions cannot be restored after restarting MariaDB Shell Agent.
 
 For a custom Codex agent, use the existing `executor` frontmatter:
 
@@ -41,7 +41,7 @@ Codex runs unattended. Without an agent override, default, plan, and auto sessio
 
 ## Fork Subagent
 
-In addition to named subagents, Qwen Code supports **forking** — selected explicitly with `subagent_type: "fork"`. A fork inherits the parent's full conversation context and normally runs detached in the background. Forks work in both interactive and headless sessions; headless forks always use the background path. Omitting `subagent_type` does **not** fork; it launches the general-purpose subagent. Top-level named subagents run in the background by default and deliver their results through completion notifications. Set `run_in_background: false` when the current turn must wait for a regular subagent's result inline.
+In addition to named subagents, MariaDB Shell Agent supports **forking** — selected explicitly with `subagent_type: "fork"`. A fork inherits the parent's full conversation context and normally runs detached in the background. Forks work in both interactive and headless sessions; headless forks always use the background path. Omitting `subagent_type` does **not** fork; it launches the general-purpose subagent. Top-level named subagents run in the background by default and deliver their results through completion notifications. Set `run_in_background: false` when the current turn must wait for a regular subagent's result inline.
 
 ## Fork Context with `fork_turns`
 
@@ -68,7 +68,7 @@ This is a per-invocation restriction supplied by the caller. It narrows a child 
 
 ## Reusing Fork Restrictions with `fork_profile`
 
-A project can save a named fork restriction in `.qwen/fork-profiles/<name>.md` and select it with `fork_profile`. This is useful when several calls need the same tool boundary and task guidance:
+A project can save a named fork restriction in `.mariadb-shell-agent/fork-profiles/<name>.md` and select it with `fork_profile`. This is useful when several calls need the same tool boundary and task guidance:
 
 ```markdown
 ---
@@ -90,7 +90,7 @@ agent(description="Research", prompt="Inspect the retry path", subagent_type="fo
 ```
 
 - `fork_profile` is valid only for a fork and cannot be combined with `fork_tools` or a named teammate.
-- Profiles are currently project-only. The requested name, filename, and frontmatter `name` must match exactly. The profile must resolve to a regular file inside `.qwen/fork-profiles/` and cannot exceed 64 KiB.
+- Profiles are currently project-only. The requested name, filename, and frontmatter `name` must match exactly. The profile must resolve to a regular file inside `.mariadb-shell-agent/fork-profiles/` and cannot exceed 64 KiB.
 - `tools` is required and follows the `fork_tools` rules, including empty-array deny-all behavior.
 - `promptHint` is optional and limited to 200 characters. It is escaped and framed as project-supplied guidance after the fork directive and before the authoritative tool restriction; it does not change the inherited system instruction or model-visible tool declarations. Profile files are frontmatter-only, so non-blank Markdown after the closing `---` is rejected instead of silently ignored.
 - The profile is resolved once at launch. A retained fork continues with the resolved tool snapshot even if the project file later changes.
@@ -148,7 +148,7 @@ Fork children cannot spawn any further sub-agent. This is enforced at runtime �
 
 ## Background Agent Continuation
 
-Top-level regular subagents run in the background by default. After a background agent finishes, Qwen Code keeps enough state to continue related work without launching a duplicate agent:
+Top-level regular subagents run in the background by default. After a background agent finishes, MariaDB Shell Agent keeps enough state to continue related work without launching a duplicate agent:
 
 - `list_agents` returns the addressable background agents in the current session, including compatible agents restored with a resumed session. Each entry includes a `task_id`, status, and whether it can receive a message.
 - `send_message` with that `task_id` queues a message for a running agent, resumes a paused agent, or continues a completed agent. Completed agents reuse their resident runtime when available and otherwise revive from their retained transcript.
@@ -162,7 +162,7 @@ Use continuation for related follow-up work. Launch a new agent when the task is
 
 In the interactive TUI and ACP session, completion notifications from background agents, shells, monitors and workflows share a queue that drains into a model turn once the session is idle. These queues hold at most 20 notifications so a noisy producer cannot accumulate an unbounded backlog. The headless CLI's local queue is not capped by this rule.
 
-When a 21st notification arrives, Qwen Code evicts an interim monitor pulse first — the monitor's next poll supersedes it — and otherwise the oldest queued notification. Agent results, workflow results and scheduled prompts are never evicted in the interactive TUI; a notification that would displace one is dropped instead, and so is an arriving pulse when only terminal results are queued.
+When a 21st notification arrives, MariaDB Shell Agent evicts an interim monitor pulse first — the monitor's next poll supersedes it — and otherwise the oldest queued notification. Agent results, workflow results and scheduled prompts are never evicted in the interactive TUI; a notification that would displace one is dropped instead, and so is an arriving pulse when only terminal results are queued.
 
 Discarded notifications are reported rather than dropped quietly. The summary appears before the next notification in the live transcript. ACP also prefixes it to that turn's model input; the TUI keeps it parked for the next Notification batch so cron prompts still pass unchanged through slash, shell and `@` preprocessing. A daemon notification is recorded before it is acknowledged, so after a reload its durable record can precede the later overflow summary. ACP can discard a pending summary if the session is cleared or switched, or if a client cancels or preempts the notification turn. Discarding a notification never stops or deletes its task, and completed tasks retain their results; the summary points at `/tasks` and task output files when there is a task to inspect. A discarded scheduled prompt was never delivered and is not retried. A daemon notification that was recorded but could not be delivered live remains available in the session transcript and is reported separately from lost notifications.
 
@@ -170,7 +170,7 @@ Discarded notifications are reported rather than dropped quietly. The summary ap
 
 For a named regular subagent, `working_dir` pins the agent to an existing git worktree of the current repository. Relative paths resolve from the current directory, and the worktree must already be registered with git as a linked worktree of this repository.
 
-`working_dir` cannot be combined with `subagent_type: "fork"`. An unnamed caller-owned `working_dir` launch runs in the foreground because Qwen Code does not own that worktree's lifecycle: an explicit `run_in_background: true` request is rejected, while a configured background default (`background: true` in a subagent definition) is rejected at the top level and downgraded to the foreground when nested. If both `working_dir` and `isolation: "worktree"` are supplied, Qwen Code reuses the caller-owned worktree instead of creating another one. Workflow scripts are deliberately stricter: a workflow `agent()` call that receives both `workingDir` and `isolation` is rejected rather than run with `isolation` ignored.
+`working_dir` cannot be combined with `subagent_type: "fork"`. An unnamed caller-owned `working_dir` launch runs in the foreground because MariaDB Shell Agent does not own that worktree's lifecycle: an explicit `run_in_background: true` request is rejected, while a configured background default (`background: true` in a subagent definition) is rejected at the top level and downgraded to the foreground when nested. If both `working_dir` and `isolation: "worktree"` are supplied, MariaDB Shell Agent reuses the caller-owned worktree instead of creating another one. Workflow scripts are deliberately stricter: a workflow `agent()` call that receives both `workingDir` and `isolation` is rejected rather than run with `isolation` ignored.
 
 ## Getting Started
 
@@ -214,8 +214,8 @@ Subagents are managed through the `/agents` slash command and its subcommands:
 
 Subagents are stored as Markdown files in multiple locations:
 
-- **Project-level**: `.qwen/agents/` (highest precedence)
-- **User-level**: `~/.qwen/agents/` (fallback)
+- **Project-level**: `.mariadb-shell-agent/agents/` (highest precedence)
+- **User-level**: `~/.mariadb-shell-agent/agents/` (fallback)
 - **Extension-level**: Provided by installed extensions
 
 This allows you to have project-specific agents, personal agents that work across all projects, and extension-provided agents that add specialized capabilities.
@@ -264,7 +264,7 @@ Use the optional `model` frontmatter field to control which model a subagent use
 - Omit the field: Same as `inherit`.
 - `fast`: Use the configured `fastModel`. If no valid fast model is configured,
   the subagent falls back to `inherit`.
-- `glm-5`: Use that model ID. Qwen Code first checks the main conversation's
+- `glm-5`: Use that model ID. MariaDB Shell Agent first checks the main conversation's
   auth type; if the model is not available there, it can resolve the model from
   another configured provider.
 - `openai:gpt-4o`: Use an explicit provider and model ID. This is useful when a
@@ -299,13 +299,13 @@ tools:
 The `fast` selector uses the same `fastModel` setting configured in
 `settings.json` or with `/model --fast`. That setting may itself refer to a
 model under another configured auth type, such as `openai:deepseek-v4-flash`.
-When the selector resolves to another auth type, Qwen Code creates a dedicated
+When the selector resolves to another auth type, MariaDB Shell Agent creates a dedicated
 runtime provider for that subagent request and sends the provider only the bare
 model ID.
 
 The built-in Explore agent inherits the main session model by default. To
 select a different model for only that built-in agent, configure
-`agents.builtin.exploreModel` in `settings.json` and restart Qwen Code:
+`agents.builtin.exploreModel` in `settings.json` and restart MariaDB Shell Agent:
 
 Earlier versions used `fastModel` for Explore by default. To preserve that
 behavior, set `agents.builtin.exploreModel` to `fast`.
@@ -321,7 +321,7 @@ behavior, set `agents.builtin.exploreModel` to `fast`.
 ```
 
 This setting accepts the same selectors described above. It is applied only
-when Qwen Code resolves the built-in Explore definition; a session, project,
+when MariaDB Shell Agent resolves the built-in Explore definition; a session, project,
 user, or extension agent named Explore keeps its own `model` setting.
 
 To let the model select from user-defined grades without exposing concrete
@@ -430,8 +430,8 @@ disallowedTools:
 
 #### Claude Code Compatibility Fields
 
-Qwen Code accepts the Claude Code 2.1.168 frontmatter fields below so you
-can drop a CC agent file into `.qwen/agents/` and have the supported fields
+MariaDB Shell Agent accepts the Claude Code 2.1.168 frontmatter fields below so you
+can drop a CC agent file into `.mariadb-shell-agent/agents/` and have the supported fields
 parse identically. Optional fields with invalid values are silently dropped
 at parse time rather than rejected — the same lenient posture CC uses.
 
@@ -508,7 +508,7 @@ new contributors and end users understand the project.
 
 ### Automatic Delegation
 
-Qwen Code proactively delegates tasks based on:
+MariaDB Shell Agent proactively delegates tasks based on:
 
 - The task description in your request
 - The description field in Subagents configurations

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -119,11 +120,13 @@ describe('runtime shell policy admission', () => {
 
   it('canonicalizes workspace-local masks and rejects masks outside it', () => {
     setSandbox({
-      maskedPaths: [path.join(root, 'workspace', '.qwen', 'review-leases')],
+      maskedPaths: [
+        path.join(root, 'workspace', '.mariadb-shell-agent', 'review-leases'),
+      ],
     });
     const policy = admit(params, root)!;
     expect(policy.maskedPaths).toEqual([
-      path.join(root, 'workspace', '.qwen', 'review-leases'),
+      path.join(root, 'workspace', '.mariadb-shell-agent', 'review-leases'),
     ]);
     expect(Object.isFrozen(policy.maskedPaths)).toBe(true);
     setSandbox({ maskedPaths: [path.join(root, 'outside')] });

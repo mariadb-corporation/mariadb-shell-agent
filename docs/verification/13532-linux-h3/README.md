@@ -1,6 +1,6 @@
 # H3 Linux physical acceptance — 2026-10-09
 
-This records the acceptance requested by [#13532](https://github.com/QwenLM/qwen-code/issues/13532) at production commit `669b2f0f91b0c787f7d8a26971c7c34210b935e1`. The five H3 behaviours remain blocked, not passed. This report does not enable a capability or implement the findings tracked by [#13533](https://github.com/QwenLM/qwen-code/issues/13533).
+This records the acceptance requested by [#13532](https://github.invalid/QwenLM/qwen-code/issues/13532) at production commit `669b2f0f91b0c787f7d8a26971c7c34210b935e1`. The five H3 behaviours remain blocked, not passed. This report does not enable a capability or implement the findings tracked by [#13533](https://github.invalid/QwenLM/qwen-code/issues/13533).
 
 ## Exact source state
 
@@ -10,7 +10,7 @@ The [Hosted Shell/Monitor admission checks](../../../packages/cli/src/serve/host
 
 ## Native environment and legacy control
 
-The packaged stack ran in an isolated Ubuntu 24.04 arm64 VM with Linux 6.8.0-146-generic, Node 22.23.3, Java 21.0.12.1, Maven 3.9.9 and MySQL 8.4.11. A non-root `qwen` service received a delegated cgroup v2 subtree. A real child cgroup accepted `cgroup.kill`, reached `populated 0` and was removed. This establishes an available Linux prerequisite; it does not establish an H3 run's stop/drain behaviour.
+The packaged stack ran in an isolated Ubuntu 24.04 arm64 VM with Linux 6.8.0-146-generic, Node 22.23.3, Java 21.0.12.1, Maven 3.9.9 and MySQL 8.4.11. A non-root `mariadb-shell-agent` service received a delegated cgroup v2 subtree. A real child cgroup accepted `cgroup.kill`, reached `populated 0` and was removed. This establishes an available Linux prerequisite; it does not establish an H3 run's stop/drain behaviour.
 
 The Broker, Spring SQL store, packaged CLI and Runtime worker were real processes. Only the model endpoint returned deterministic tool calls. The production bundle SHA256 was `11db529ca76a62e3b19c95269da45583ffb6b820b5e9619ae38bb973661c5c2d`. A 5,042-file manifest matched core/CLI src/**, Java src/main/** and four existing Node helpers; it excludes the separate #12904 test overlays in the guest checkout. No production file was patched for this acceptance.
 
@@ -65,7 +65,7 @@ Provision an explicit test publication configuration, then rerun at a named prod
 
 # H3 Linux 物理验收 — 2026-10-09
 
-本报告记录 [#13532](https://github.com/QwenLM/qwen-code/issues/13532) 要求的验收，生产 commit 为 `669b2f0f91b0c787f7d8a26971c7c34210b935e1`。五项 H3 行为均受阻，未通过。本报告不启用能力，也不实现 [#13533](https://github.com/QwenLM/qwen-code/issues/13533) 跟踪的发现。
+本报告记录 [#13532](https://github.invalid/QwenLM/qwen-code/issues/13532) 要求的验收，生产 commit 为 `669b2f0f91b0c787f7d8a26971c7c34210b935e1`。五项 H3 行为均受阻，未通过。本报告不启用能力，也不实现 [#13533](https://github.invalid/QwenLM/qwen-code/issues/13533) 跟踪的发现。
 
 ## 精确源码状态
 
@@ -75,7 +75,7 @@ Provision an explicit test publication configuration, then rerun at a named prod
 
 ## 原生环境与 legacy 控制
 
-打包栈运行于独立 Ubuntu 24.04 arm64 VM，Linux 6.8.0-146-generic、Node 22.23.3、Java 21.0.12.1、Maven 3.9.9、MySQL 8.4.11。非 root 的 `qwen` 服务获得 delegated cgroup v2 子树。真实子 cgroup 接受 `cgroup.kill`，达到 `populated 0` 后被移除；这只证明 Linux 前置条件可用，不证明 H3 run 的 stop/drain 行为。
+打包栈运行于独立 Ubuntu 24.04 arm64 VM，Linux 6.8.0-146-generic、Node 22.23.3、Java 21.0.12.1、Maven 3.9.9、MySQL 8.4.11。非 root 的 `mariadb-shell-agent` 服务获得 delegated cgroup v2 子树。真实子 cgroup 接受 `cgroup.kill`，达到 `populated 0` 后被移除；这只证明 Linux 前置条件可用，不证明 H3 run 的 stop/drain 行为。
 
 Broker、Spring SQL Store、打包 CLI 与 Runtime worker 均为真实进程；只有模型端点返回确定性工具调用。bundle SHA256：`11db529ca76a62e3b19c95269da45583ffb6b820b5e9619ae38bb973661c5c2d`。5,042 个文件的清单匹配 core/CLI src/**、Java src/main/** 及四个既有 Node helper；排除了 guest 中另一个 #12904 的测试覆盖文件。验收没有修改生产文件。
 

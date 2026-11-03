@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1050,7 +1051,7 @@ function createConcreteLogger(input: {
       if (!overflowEpisode) {
         overflowEpisode = true;
         input.stderr(
-          'qwen serve: daemon log queue limit reached; dropping file copies until capacity recovers',
+          'mariadb-shell-agent serve: daemon log queue limit reached; dropping file copies until capacity recovers',
         );
       }
     }
@@ -1062,7 +1063,7 @@ function createConcreteLogger(input: {
       input.monotonicNow() + input.policy.rotationRetryIntervalMs;
     input.warnOnce(
       `rotation:${message}`,
-      `qwen serve: daemon log rotation failed; ${message}${
+      `mariadb-shell-agent serve: daemon log rotation failed; ${message}${
         error
           ? `: ${error instanceof Error ? error.message : String(error)}`
           : ''
@@ -1074,7 +1075,7 @@ function createConcreteLogger(input: {
     input.issues.add('retention_failed');
     input.warnOnce(
       'retention',
-      `qwen serve: daemon log retention cleanup failed: ${
+      `mariadb-shell-agent serve: daemon log retention cleanup failed: ${
         error instanceof Error ? error.message : String(error)
       }`,
     );
@@ -1227,7 +1228,7 @@ function createConcreteLogger(input: {
       input.issues.add('write_failed');
       input.warnOnce(
         'write-failed',
-        `qwen serve: daemon log write failed; file logging disabled for this run: ${
+        `mariadb-shell-agent serve: daemon log write failed; file logging disabled for this run: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );
@@ -1276,7 +1277,7 @@ function createConcreteLogger(input: {
           input.issues.add('write_failed');
           input.warnOnce(
             'queue-failed',
-            `qwen serve: daemon log queue failed; file logging disabled for this run: ${
+            `mariadb-shell-agent serve: daemon log queue failed; file logging disabled for this run: ${
               error instanceof Error ? error.message : String(error)
             }`,
           );
@@ -1370,7 +1371,7 @@ function createConcreteLogger(input: {
       await input.family.releaseLease().catch((error) => {
         input.warnOnce(
           'release-failed',
-          `qwen serve: daemon log lease release failed: ${
+          `mariadb-shell-agent serve: daemon log lease release failed: ${
             error instanceof Error ? error.message : String(error)
           }`,
         );
@@ -1416,7 +1417,7 @@ function createConcreteLogger(input: {
         try {
           input.warnOnce(
             'close-failed',
-            `qwen serve: daemon log close failed: ${
+            `mariadb-shell-agent serve: daemon log close failed: ${
               error instanceof Error ? error.message : String(error)
             }`,
           );
@@ -1430,7 +1431,7 @@ function createConcreteLogger(input: {
           try {
             input.warnOnce(
               'close-timeout',
-              `qwen serve: daemon log close drain exceeded ${input.policy.closeDrainBudgetMs}ms; ownership will release after pending I/O settles or process exit`,
+              `mariadb-shell-agent serve: daemon log close drain exceeded ${input.policy.closeDrainBudgetMs}ms; ownership will release after pending I/O settles or process exit`,
             );
           } catch {
             // close() is non-rejecting even if stderr itself is unavailable.
@@ -1490,7 +1491,7 @@ export async function initDaemonLogger(
     issues.add('init_failed');
     warnOnce(
       'init',
-      `qwen serve: daemon log disabled — init failed: ${
+      `mariadb-shell-agent serve: daemon log disabled — init failed: ${
         error instanceof Error ? error.message : String(error)
       }`,
     );
@@ -1509,7 +1510,7 @@ export async function initDaemonLogger(
     if (currentState) currentState.poisoned = true;
     warnOnce(
       'lease-compromised',
-      `qwen serve: daemon log lease compromised; file logging disabled for this run: ${error.message}`,
+      `mariadb-shell-agent serve: daemon log lease compromised; file logging disabled for this run: ${error.message}`,
     );
   };
 
@@ -1545,7 +1546,7 @@ export async function initDaemonLogger(
           issues.add('rotation_failed');
           warnOnce(
             `archive-init:${family.mode}`,
-            `qwen serve: daemon log archive unavailable; active file will remain bounded: ${
+            `mariadb-shell-agent serve: daemon log archive unavailable; active file will remain bounded: ${
               error instanceof Error ? error.message : String(error)
             }`,
           );
@@ -1650,7 +1651,7 @@ export async function initDaemonLogger(
             monotonicNow() + policy.rotationRetryIntervalMs;
           warnOnce(
             'startup-retention',
-            `qwen serve: daemon log retention cleanup failed: ${
+            `mariadb-shell-agent serve: daemon log retention cleanup failed: ${
               error instanceof Error ? error.message : String(error)
             }`,
           );
@@ -1660,7 +1661,7 @@ export async function initDaemonLogger(
     } catch (error) {
       warnOnce(
         `family-init:${family.mode}`,
-        `qwen serve: daemon ${family.mode} log initialization failed: ${
+        `mariadb-shell-agent serve: daemon ${family.mode} log initialization failed: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );
@@ -1708,7 +1709,7 @@ export async function initDaemonLogger(
             issues.add('retention_failed');
             warnOnce(
               'fallback-retention',
-              `qwen serve: daemon fallback log cleanup failed: ${
+              `mariadb-shell-agent serve: daemon fallback log cleanup failed: ${
                 error instanceof Error ? error.message : String(error)
               }`,
             );
@@ -1723,7 +1724,7 @@ export async function initDaemonLogger(
     } catch (error) {
       warnOnce(
         'stable-release',
-        `qwen serve: daemon stable log lease release failed; trying fallback: ${
+        `mariadb-shell-agent serve: daemon stable log lease release failed; trying fallback: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );
@@ -1732,13 +1733,13 @@ export async function initDaemonLogger(
     if (isErrno(error, 'ELOCKED')) {
       warnOnce(
         'stable-contention',
-        `qwen serve: daemon stable log is owned by another daemon instance; using a fallback log for runId=${runId}`,
+        `mariadb-shell-agent serve: daemon stable log is owned by another daemon instance; using a fallback log for runId=${runId}`,
       );
     } else {
       issues.add('init_failed');
       warnOnce(
         'stable-lock',
-        `qwen serve: daemon stable log unavailable; trying a fallback: ${
+        `mariadb-shell-agent serve: daemon stable log unavailable; trying a fallback: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );
@@ -1801,7 +1802,7 @@ export async function initDaemonLogger(
     } catch (error) {
       warnOnce(
         'fallback-locator',
-        `qwen serve: daemon fallback locator update failed; use ${activeFallbackFamily.activePath}: ${
+        `mariadb-shell-agent serve: daemon fallback locator update failed; use ${activeFallbackFamily.activePath}: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );
@@ -1812,7 +1813,7 @@ export async function initDaemonLogger(
     await fallbackFamily?.releaseLease().catch(() => {});
     warnOnce(
       'fallback-init',
-      `qwen serve: daemon log disabled — fallback init failed: ${
+      `mariadb-shell-agent serve: daemon log disabled — fallback init failed: ${
         error instanceof Error ? error.message : String(error)
       }`,
     );

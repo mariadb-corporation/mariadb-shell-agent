@@ -24,7 +24,7 @@ rate limiting, request bounds, output sanitization, and provider-side logging.
 For a one-off deployment, skip the Extension and register the endpoint directly:
 
 ```bash
-qwen mcp add \
+mariadb-shell-agent mcp add \
   --scope project \
   --transport http \
   --include-tools context_search \

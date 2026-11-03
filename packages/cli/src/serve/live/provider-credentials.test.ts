@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -105,11 +106,11 @@ describe('Live provider credentials', () => {
   it.each([
     [
       'plaintext realtime endpoint',
-      'ws://dashscope.aliyuncs.com/api-ws/v1/realtime',
+      'ws://dashscope.aliyuncs.invalid/api-ws/v1/realtime',
     ],
     [
       'credential-bearing realtime URL',
-      'wss://dashscope.aliyuncs.com/api-ws/v1/realtime?token=secret',
+      'wss://dashscope.aliyuncs.invalid/api-ws/v1/realtime?token=secret',
     ],
     ['foreign realtime endpoint', 'wss://example.com/realtime'],
   ])('rejects %s', (_name, endpoint) => {
@@ -140,7 +141,7 @@ describe('Live provider credentials', () => {
   describe('realtimeOnly routes', () => {
     const route = {
       id: 'qwen3.5-omni-plus-realtime',
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       envKey: 'DASHSCOPE_API_KEY',
       realtimeOnly: true,
     };
@@ -176,7 +177,8 @@ describe('Live provider credentials', () => {
         routed(
           {
             apiKey: 'legacy-secret',
-            endpoint: 'wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime',
+            endpoint:
+              'wss://dashscope-intl.aliyuncs.invalid/api-ws/v1/realtime',
           },
           undefined,
         ),
@@ -248,7 +250,8 @@ describe('Live provider credentials', () => {
               openai: [
                 {
                   ...route,
-                  baseUrl: 'http://dashscope.aliyuncs.com/compatible-mode/v1',
+                  baseUrl:
+                    'http://dashscope.aliyuncs.invalid/compatible-mode/v1',
                 },
               ],
             },
@@ -316,7 +319,8 @@ describe('Live provider credentials', () => {
           'dashscope-intl': [
             {
               ...route,
-              baseUrl: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+              baseUrl:
+                'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
             },
           ],
         },
@@ -335,7 +339,7 @@ describe('Live provider credentials', () => {
         { env: { DASHSCOPE_API_KEY: 'env-secret' } },
       );
       expect(credential.endpoint).toBe(
-        'wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime',
+        'wss://dashscope-intl.aliyuncs.invalid/api-ws/v1/realtime',
       );
       // The upstream sees the bare model id, not the selector.
       expect(credential.realtimeModel).toBe(route.id);
@@ -349,33 +353,34 @@ describe('Live provider credentials', () => {
           liveVoice: {
             enabled: true,
             apiKey: 'settings-secret',
-            endpoint: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+            endpoint:
+              'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
           },
         },
       } as Partial<Settings>),
     );
     expect(credential.endpoint).toBe(
-      'wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime',
+      'wss://dashscope-intl.aliyuncs.invalid/api-ws/v1/realtime',
     );
   });
 
   describe('normalizeLiveRealtimeEndpoint', () => {
     it.each([
       [
-        'wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime',
-        'wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime',
+        'wss://dashscope-intl.aliyuncs.invalid/api-ws/v1/realtime',
+        'wss://dashscope-intl.aliyuncs.invalid/api-ws/v1/realtime',
       ],
       [
-        'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
-        'wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime',
+        'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
+        'wss://dashscope-intl.aliyuncs.invalid/api-ws/v1/realtime',
       ],
       [
-        '  https://llm-abc.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/  ',
-        'wss://llm-abc.cn-beijing.maas.aliyuncs.com/api-ws/v1/realtime',
+        '  https://llm-abc.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1/  ',
+        'wss://llm-abc.cn-beijing.maas.aliyuncs.invalid/api-ws/v1/realtime',
       ],
       [
-        'https://dashscope.aliyuncs.com/api-ws/v1/realtime',
-        'wss://dashscope.aliyuncs.com/api-ws/v1/realtime',
+        'https://dashscope.aliyuncs.invalid/api-ws/v1/realtime',
+        'wss://dashscope.aliyuncs.invalid/api-ws/v1/realtime',
       ],
     ])('accepts %s', (input, expected) => {
       expect(normalizeLiveRealtimeEndpoint(input)).toBe(expected);
@@ -385,10 +390,10 @@ describe('Live provider credentials', () => {
       'not a url',
       'wss://example.com/api-ws/v1/realtime',
       'https://example.com/compatible-mode/v1',
-      'http://dashscope.aliyuncs.com/compatible-mode/v1',
-      'ws://dashscope.aliyuncs.com/api-ws/v1/realtime',
-      'https://dashscope.aliyuncs.com/compatible-mode/v1?api_key=secret',
-      'https://user:pass@dashscope.aliyuncs.com/compatible-mode/v1',
+      'http://dashscope.aliyuncs.invalid/compatible-mode/v1',
+      'ws://dashscope.aliyuncs.invalid/api-ws/v1/realtime',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1?api_key=secret',
+      'https://user:pass@dashscope.aliyuncs.invalid/compatible-mode/v1',
     ])('refuses %s', (input) => {
       expect(() => normalizeLiveRealtimeEndpoint(input)).toThrow(
         LiveProviderConfigError,

@@ -29,7 +29,7 @@ Workspace creation root、legacy cwd、私有 Runtime state 和 Runtime home 必
 文件和默认审批的前台 Shell。关闭 publication 和 child agents。本次不实现后台
 Shell、Monitor、command Hooks 或 cgroup 委派。
 
-新增 `qwen serve --managed-web-config <file>`，进入独立网关 runner。配置仅包含
+新增 `mariadb-shell-agent serve --managed-web-config <file>`，进入独立网关 runner。配置仅包含
 `apiUrl`、`tenantId`、`actorId`、`signingKeyFile`。上游必须是 loopback HTTP
 origin，签名密钥按精确 UTF-8 字节读取，并要求独立的浏览器 bearer token。复用
 当前签名代理、静态资源与 Host/Origin/认证中间件，仅暴露 Managed 代理、artifact

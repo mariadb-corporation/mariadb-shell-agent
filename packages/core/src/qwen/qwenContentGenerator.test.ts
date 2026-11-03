@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -287,7 +288,8 @@ describe('QwenContentGenerator', () => {
     refresh_token: 'test-refresh-token',
     resource_url: 'https://test-endpoint.com/v1',
   };
-  const DEFAULT_ENDPOINT = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+  const DEFAULT_ENDPOINT =
+    'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
   const TOKEN_FAILURE = 'Failed to obtain valid Qwen access token';
 
   // Private members the tests reach into.
@@ -402,7 +404,7 @@ describe('QwenContentGenerator', () => {
         model: 'qwen-turbo',
         apiKey: 'test-api-key',
         authType: 'qwen',
-        baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
         enableOpenAILogging: false,
         timeout: 120000,
         maxRetries: 3,
@@ -430,7 +432,7 @@ describe('QwenContentGenerator', () => {
       model: 'qwen-turbo',
       apiKey: 'test-api-key',
       authType: AuthType.QWEN_OAUTH,
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       timeout: 120000,
       maxRetries: 3,
     };

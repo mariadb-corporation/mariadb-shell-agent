@@ -21,9 +21,9 @@ cross-restart exactly-once execution.
 
 Two telemetry changes are prerequisites:
 
-- [PR #8176](https://github.com/QwenLM/qwen-code/pull/8176) makes terminal
+- [PR #8176](https://github.invalid/QwenLM/qwen-code/pull/8176) makes terminal
   `status` authoritative and normalizes cancellation and error fields.
-- [PR #8180](https://github.com/QwenLM/qwen-code/pull/8180) adds the independent
+- [PR #8180](https://github.invalid/QwenLM/qwen-code/pull/8180) adds the independent
   `executionStatus` axis and fixes ACP permission-cancellation classification.
 
 Enforcement must remain disabled when either contract is unavailable or
@@ -322,7 +322,7 @@ The mode is an operator-controlled deployment policy, not a user-facing
 setting. `QWEN_CODE_ACP_REPEATED_TOOL_FAILURE_GUARD` selects `off`, `shadow`,
 `warn`, or `enforce` when the Session starts; missing or invalid values resolve
 to `shadow`, and a non-empty invalid value records an operator diagnostic.
-Project `.env`, project `.qwen/.env`, and workspace `settings.env` sources are
+Project `.env`, project `.mariadb-shell-agent/.env`, and workspace `settings.env` sources are
 not allowed to set this policy; an exported process value or a user-level
 environment file remains valid. The deployment control plane must set it above
 `shadow` only on the assigned version-pinned cohort. This feature does not
@@ -552,7 +552,7 @@ Telemetry tests cover:
   preserving standard OpenTelemetry correlation fields, plus exclusion of
   sensitive tool fields from guard-specific telemetry.
 
-The behavioral change will use a local E2E plan under `.qwen/e2e-tests/`.
+The behavioral change will use a local E2E plan under `.mariadb-shell-agent/e2e-tests/`.
 Preparing that plan and completing its manual ACP fixture run are still pending
 and are required before merge. Ready for review means maintainer review may
 proceed; it does not claim that the pre-merge manual ACP fixture validation is

@@ -2,7 +2,7 @@
 
 [English](2026-10-22-managed-session-mcp-management.md) | [简体中文](2026-10-22-managed-session-mcp-management.zh-CN.md)
 
-状态：设计和实现进行中。与[普通 Workspace 工具和 MCP 组合](2026-10-21-managed-mcp-management-reuse.zh-CN.md)共同完成 [#15079](https://github.com/QwenLM/qwen-code/issues/15079) 的运行期管理范围。
+状态：设计和实现进行中。与[普通 Workspace 工具和 MCP 组合](2026-10-21-managed-mcp-management-reuse.zh-CN.md)共同完成 [#15079](https://github.invalid/QwenLM/qwen-code/issues/15079) 的运行期管理范围。
 
 ## 问题
 
@@ -63,8 +63,8 @@ Managed 提供已提交的 MCP 目录，但没有公开管理命令。daemon 管
 
 ## 验证
 
-先用全局 `qwen` dry-run 基线，将管理能力缺失与既有组合验证分开记录。使用一次性 MySQL、两个真实 stdio server 和确定性模型，联合验证构建后的 CLI、Java 服务和 WebShell。在同一会话中执行全部操作，验证对话身份稳定、原定义 pins 不变、响应不含凭据、模型声明变化、Harness 重启并冷加载后保留禁用状态、重试幂等、旧修订拒绝、会话隔离和最终关闭。
+先用全局 `mariadb-shell-agent` dry-run 基线，将管理能力缺失与既有组合验证分开记录。使用一次性 MySQL、两个真实 stdio server 和确定性模型，联合验证构建后的 CLI、Java 服务和 WebShell。在同一会话中执行全部操作，验证对话身份稳定、原定义 pins 不变、响应不含凭据、模型声明变化、Harness 重启并冷加载后保留禁用状态、重试幂等、旧修订拒绝、会话隔离和最终关闭。
 
 验证失败或未知的释放不会报告重启成功或启动替代连接，活动 Turn 和未获授权的 actor 不能变更。覆盖空会话、只读会话、不支持的 profile、旧日志、provider/会话切换、响应式管理控件，以及既有 daemon 管理回归。运行受影响包测试、根 build/typecheck/bundle、Java API/surface 门禁、Maven verify 和适用的 MySQL/Hosted profile。完整自审两遍并独立审查。局部进程和浏览器证据不代表 Linux cgroup、SSH/CSI、Windows 或真实上游 provider 验收。
 
-入口统一到 Plugin 管理的专项 UI 计划位于 `.qwen/e2e-tests/managed-mcp-plugin-only/plan.md`：以正在运行的 main 版本服务作为基线，验证 Plugin 管理查询当前选中的会话并保留对话草稿，在独立工作树构建静态前端后发布，不重启服务。本次 UI 调整不改变管理命令、授权、Runtime 所有权或更广泛的验收矩阵。
+入口统一到 Plugin 管理的专项 UI 计划位于 `.mariadb-shell-agent/e2e-tests/managed-mcp-plugin-only/plan.md`：以正在运行的 main 版本服务作为基线，验证 Plugin 管理查询当前选中的会话并保留对话草稿，在独立工作树构建静态前端后发布，不重启服务。本次 UI 调整不改变管理命令、授权、Runtime 所有权或更广泛的验收矩阵。

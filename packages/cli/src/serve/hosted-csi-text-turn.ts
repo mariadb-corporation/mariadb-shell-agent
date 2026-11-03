@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -200,7 +201,7 @@ export async function runHostedCsiTextTurn(
           stopReason = state;
           if (!abort.signal.aborted)
             writeStderrLineSafe(
-              `qwen serve: Private CSI text turn ${promptId} failed: ${String(cause)}`,
+              `mariadb-shell-agent serve: Private CSI text turn ${promptId} failed: ${String(cause)}`,
             );
         }
         if (result && !finalOutputCommitted)

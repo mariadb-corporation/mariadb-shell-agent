@@ -14,12 +14,12 @@ export default {
   'integration-zed': 'Zed IDE',
   'integration-jetbrains': 'JetBrains IDEs',
   'integration-github-action': 'GitHub Actions',
-  'qwen-serve': 'Daemon mode (qwen serve)',
+  'qwen-serve': 'Daemon mode (mariadb-shell-agent serve)',
   'qwen-serve-deploy-local': 'Daemon mode — local launch templates',
   'conversations-recovery': 'Conversations writer locks and recovery',
-  'Code with Qwen Code': {
+  'Code with MariaDB Shell Agent': {
     type: 'separator',
-    title: 'Code with Qwen Code', // Title is optional
+    title: 'Code with MariaDB Shell Agent', // Title is optional
   },
   features: 'Features',
   configuration: 'Configuration',

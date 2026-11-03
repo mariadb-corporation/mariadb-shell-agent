@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -98,7 +99,7 @@ export interface LiveConfig {
   defaultCwd?: string;
   /** Data root: session logs live in `<dataDir>/sessions`. */
   dataDir: string;
-  /** Where the Host discovery file lives (`~/.qwen` for the shipped Host). */
+  /** Where the Host discovery file lives (`~/.mariadb-shell-agent` for the shipped Host). */
   discoveryDir: string;
   /** Global shortcut advertised to the Host. */
   shortcut?: string;
@@ -111,7 +112,7 @@ export interface LiveConfig {
   port: number;
 }
 
-const DEFAULT_REALTIME_ENDPOINT = 'https://dashscope.aliyuncs.com';
+const DEFAULT_REALTIME_ENDPOINT = 'https://dashscope.aliyuncs.invalid';
 const DEFAULT_REALTIME_MODEL = 'qwen3.5-omni-plus-realtime';
 const DEFAULT_VISUAL_FPS = 1;
 const MIN_VISUAL_FPS = 0.1;

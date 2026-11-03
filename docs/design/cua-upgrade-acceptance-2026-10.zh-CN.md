@@ -43,7 +43,7 @@ Native Wayland 实现已删除，X11 应用（包括 XWayland 中的 X11 应用�
 
 最终原生源清单为 P6 v5：688 文件，树 SHA-256 `c8a662cdc5c53eaa4cbbd14b146b8e844a86fc060d1b8f16a8f7bb4014c7dbee`。v5 再次通过 Linux/Windows GNU all-target、真实 MCP initialize/list 11/11、精确桌面链 96/96、实际下载 14/14 和缓存加载 SDK GUI 链 14/14。v5 SDK/driver 重新构建；桥因源和 ABI 未变，明确复用 v2 的 fresh build。早期 v2/v3/v4 证据仍保留各自版本。
 
-详细原始日志与独立测试报告保存在当前 worktree 的 `.qwen/e2e-tests/cua-upgrade-2026-10-artifacts/`，主报告为 `.qwen/e2e-tests/cua-upgrade-2026-10.md`，P6 报告为 `p6-validation.md`；自审记录位于 `.qwen/investigations/cua-upgrade-2026-10/parent-self-audit.md`。
+详细原始日志与独立测试报告保存在当前 worktree 的 `.mariadb-shell-agent/e2e-tests/cua-upgrade-2026-10-artifacts/`，主报告为 `.mariadb-shell-agent/e2e-tests/cua-upgrade-2026-10.md`，P6 报告为 `p6-validation.md`；自审记录位于 `.mariadb-shell-agent/investigations/cua-upgrade-2026-10/parent-self-audit.md`。
 
 完整差异和消费者自审在修复后连续两轮无新发现，独立测试工程师的 P6 边界复核为 CLEAN。当前环境未提供 Codex `/review` 工作流，未使用 Qwen Review 代替。
 
@@ -103,7 +103,7 @@ G34 的 #5124/#4856 一律禁止 native omnibox 粘贴/换行策略明确不采�
 
 G07 最新生产入口实测表明 SSH Session0 在 SDK 创建时就因缺少交互用户会话而退出（23ms），尚未进入 named-pipe 接受循环；私有 pipe 不存在，共享驱动未变。管道本身可运行于 Session0，但这不等于当前生产入口可达。G23 第二版独立启动诊断正常编译，唯一启动 8 秒无 readiness 或阶段日志。后续同一 binary、相同普通 Node 启动路径的一格诊断，原 8 秒窗口结束后仍未就绪；一次 1 秒进程采样 exit0，仅得到 89 条 `_dyld_start +0` 主线程采样，映像信息不可用，不能定位具体等待机制。独立 Electron 宿主加任务自有 native addon 夹具正在准备；此前两格仍未执行，两格均未派发 AXPress，后续诊断完全不创建 SDK/AX 会话，没有据此推断 TCC/EDR 原因或修改安全设置。
 
-499 条上游变更已完成逐项分类，原“证据不足”和“仅引用 P4 未复核”项已归零；仍有适用差异待复现、移植或明确取舍，分类完成不等于验收完成。2026-10-19 最新 JavaScript 整库 build、typecheck 通过，SDK 测试 51 通过、6 明确跳过；缺少 corepack 的首次构建失败保留，后续使用任务内入口和本机已有工具/固定缓存版本完成，未全局安装。当前普通 v7 的 453 文件统一原生清单通过 Mac/SDK、Linux/driver/SDK 和 Windows GNU/driver/SDK all-target 检查，默认 SDK 构建通过；12 个精确编译支持文件另列，树为 `70001802535ebff45ed2f9bc8a0a55b0ba7edfb6f07d1c76aae1b5eb6a002693`。Linux x64 和 Windows MSVC 的 driver/SDK release 均从此清单构建通过；Windows 本轮 2 项 COM、11 项 autostart、1 项有界捕获回归通过。Linux 当前正常 direct-MCP GUI 批次 GTK 7/7、Chrome 3/3 通过。相对 G05 v4 新增上述录制引用及 raw 语义错误不回放修复；v7 独立七格滚动真机全部通过，使用 SDK SHA-256 `4d2b048131c42055991f1716b41691715da9abf3b7b176fc125548a12dff60fe`。独立 fixture IPC 确认 inner +114px/page +404px、耗尽边界偏移不变；143 个层序/鼠标/剪贴板计数采样均保持 A，自有进程和 LaunchAgent 已清理，共享进程生命周期不变；主代理逐字核验 634 项引用。8.444–12.213Hz 采样不证明零瞬时干扰或真人并发。未变更 core 沿用八项通过的精确源检查点。12 个精确编译支持文件另附清单，早期遗漏夹具的失败保留。P7 第一轮已覆盖 89 个当前变更路径并发现上述问题；后续完整一轮干净审查之后，第二轮发现设计文档缺少双语版本，补齐翻译后连续干净计数重置。最终更新范围的完整两轮干净自审尚未完成。三端完整真机回归仍在进行。详细 before/after、无效批次与产物身份保存在 `.qwen/e2e-tests/cua-upgrade-2026-10-artifacts/p7-*`；不得把历史 P6 检查结果用于证明后续 P7 改动已全部通过。
+499 条上游变更已完成逐项分类，原“证据不足”和“仅引用 P4 未复核”项已归零；仍有适用差异待复现、移植或明确取舍，分类完成不等于验收完成。2026-10-19 最新 JavaScript 整库 build、typecheck 通过，SDK 测试 51 通过、6 明确跳过；缺少 corepack 的首次构建失败保留，后续使用任务内入口和本机已有工具/固定缓存版本完成，未全局安装。当前普通 v7 的 453 文件统一原生清单通过 Mac/SDK、Linux/driver/SDK 和 Windows GNU/driver/SDK all-target 检查，默认 SDK 构建通过；12 个精确编译支持文件另列，树为 `70001802535ebff45ed2f9bc8a0a55b0ba7edfb6f07d1c76aae1b5eb6a002693`。Linux x64 和 Windows MSVC 的 driver/SDK release 均从此清单构建通过；Windows 本轮 2 项 COM、11 项 autostart、1 项有界捕获回归通过。Linux 当前正常 direct-MCP GUI 批次 GTK 7/7、Chrome 3/3 通过。相对 G05 v4 新增上述录制引用及 raw 语义错误不回放修复；v7 独立七格滚动真机全部通过，使用 SDK SHA-256 `4d2b048131c42055991f1716b41691715da9abf3b7b176fc125548a12dff60fe`。独立 fixture IPC 确认 inner +114px/page +404px、耗尽边界偏移不变；143 个层序/鼠标/剪贴板计数采样均保持 A，自有进程和 LaunchAgent 已清理，共享进程生命周期不变；主代理逐字核验 634 项引用。8.444–12.213Hz 采样不证明零瞬时干扰或真人并发。未变更 core 沿用八项通过的精确源检查点。12 个精确编译支持文件另附清单，早期遗漏夹具的失败保留。P7 第一轮已覆盖 89 个当前变更路径并发现上述问题；后续完整一轮干净审查之后，第二轮发现设计文档缺少双语版本，补齐翻译后连续干净计数重置。最终更新范围的完整两轮干净自审尚未完成。三端完整真机回归仍在进行。详细 before/after、无效批次与产物身份保存在 `.mariadb-shell-agent/e2e-tests/cua-upgrade-2026-10-artifacts/p7-*`；不得把历史 P6 检查结果用于证明后续 P7 改动已全部通过。
 
 ## 外部验收历史检查点
 
@@ -176,7 +176,7 @@ macOS 画布指针输入仍使目标覆盖 A 约 100–200 毫秒，虽然前台
 
 正常 v20 fresh 滑块替代路径通过：唯一 `setValue('80')` 同时得到 value80 与独立原生 callback80，未观察到打扰。Excel 原有选中网格状态与 LibreOffice 刚打开文档的状态均在派发前返回 `no_focused_text_input`，不计文档保存成功；Excel Edit 后续通过原生公式编辑栏 description 确认输入标记，通过 A2 确认 Return。首次保存遇到 Automation 弹窗及 caller deadline，结果未知；正常授权后，新文档唯一保存明确返回 `automation_failed (-50)`、`sent:true`，磁盘没有标记；以上 v22 原生保存修复已验证，指针覆盖仍为独立失败。LibreOffice 公共正文 click 后仍聚焦 group；另一次只读正文检查确认 AXValue/AXFocused 可写，但实际焦点为 false。不以替代写入或保存成功计分。原生 still-launching 公共链现已通过：独立确认的已安装 accessory 夹具在唯一 `getApp` 开始时仍未完成启动，真实启动延迟尚余 900 毫秒以上；1.056 秒后返回精确 AX 标记，独立观察随后确认启动完成。动作加 settle 的 20 份层序采样未见自有窗口遮挡，六次合成 canary 均到 A。这不能证明具体执行了哪次 retry，也不能证明旧 400 毫秒实现失败：首个 AX IPC 本身可能阻塞至 ready。先前无请求与 scratch helper 被排除的尝试单独保留。MCP 一项 overlap 前采样有外部 System Settings 窗口在 A 上方，缺少逐 RPC 绝对时间，不能归因给候选，也不能称全程 A 在最上。
 
-不可变报告、失败原始文件和 manifest 保留在 `.qwen/e2e-tests/cua-upgrade-2026-10-artifacts/`，包括 `p7-normal-v20-native-regression-independent-report.md`、`p7-windows-first4-final-v19-20261019.md`、`p7-linux-final19-first4-acceptance.md`、`p7-mac-zero-cover-causal-boundary-review.md` 及各版本打包附录。仅证据的 clean pass 不计入最终完整源码连续两轮自审。先前 main 合并检查属于历史记录，最终源码验证和可合并性仍需覆盖完成后的整树。没有 push、PR、merge 或 release。
+不可变报告、失败原始文件和 manifest 保留在 `.mariadb-shell-agent/e2e-tests/cua-upgrade-2026-10-artifacts/`，包括 `p7-normal-v20-native-regression-independent-report.md`、`p7-windows-first4-final-v19-20261019.md`、`p7-linux-final19-first4-acceptance.md`、`p7-mac-zero-cover-causal-boundary-review.md` 及各版本打包附录。仅证据的 clean pass 不计入最终完整源码连续两轮自审。先前 main 合并检查属于历史记录，最终源码验证和可合并性仍需覆盖完成后的整树。没有 push、PR、merge 或 release。
 
 ### 历史 v25 检查点（2026-10-20）
 

@@ -122,7 +122,7 @@ function lineNumber(value: unknown, label: string): number {
 // containment, but the document's own contract is checked here like every
 // other field: relative, no traversal, the durable report's extension, and
 // the directory the writer guarantees — save-artifact confines its report to
-// .qwen/reviews/, so the renderer never follows a report the CLI would not
+// .mariadb-shell-agent/reviews/, so the renderer never follows a report the CLI would not
 // have written.
 function markdownReportPath(value: unknown): string {
   const path = string(value, 'markdownReportPath');
@@ -135,8 +135,10 @@ function markdownReportPath(value: unknown): string {
       'markdownReportPath must be a relative .md path without ".." segments.',
     );
   }
-  if (!path.startsWith('.qwen/reviews/')) {
-    throw new Error('markdownReportPath must be a file under .qwen/reviews/.');
+  if (!path.startsWith('.mariadb-shell-agent/reviews/')) {
+    throw new Error(
+      'markdownReportPath must be a file under .mariadb-shell-agent/reviews/.',
+    );
   }
   return path;
 }
@@ -692,7 +694,7 @@ export function CodeReviewArtifactDetail({
 
 // A local evidence file (`assetFiles`): an inline image when the workspace
 // file is readable, the bare path when it is not. Local evidence usually
-// lives under `.qwen/tmp/`, which review cleanup removes, so a path that no
+// lives under `.mariadb-shell-agent/tmp/`, which review cleanup removes, so a path that no
 // longer resolves is an ordinary state — the caption stays either way.
 function EvidenceFile({
   path,

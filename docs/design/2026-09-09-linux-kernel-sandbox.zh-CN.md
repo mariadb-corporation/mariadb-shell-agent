@@ -175,8 +175,8 @@ C 源码就放在旁边 `packages/core/vendor/landlock-run/src/qwen-landlock-run
 profile 词汇表。
 
 `closed` 是整个网络命名空间的切断，而不是出口过滤：它同时移除 loopback，
-于是 IDE companion（通过 `~/.qwen/ide` 锁文件里的端口发现，
-`core/src/ide/ide-client.ts:644-678`）、主机侧监听 `:4170` 的 `qwen serve`，
+于是 IDE companion（通过 `~/.mariadb-shell-agent/ide` 锁文件里的端口发现，
+`core/src/ide/ide-client.ts:644-678`）、主机侧监听 `:4170` 的 `mariadb-shell-agent serve`，
 以及任何 localhost MCP server 都会变得不可达。抽象命名空间的 unix socket 也是
 按网络命名空间隔离的，因此解析到抽象 socket 的 X11 连接会随之失效。所以
 `closed` 只对单次一发的受约束运行是正确的；§ 已核实的兼容性影响 表把这一点
@@ -380,7 +380,7 @@ sandbox-exec 分支（它们是原地 hop，不是镜像——没有
 `return sandbox`（`:156`）已经会把未知的 `SANDBOX` 值原样渲染，因此 `bwrap` 本身
 就能正确显示。强制等级后缀（`landlock (partial)`）随 P1 落地——P1 才是真正可能
 产出 `full` 之外等级的阶段；更早交付这个后缀，等于为一个尚不存在的后端交付一个
-不可达分支。P0 仍然在有意义的地方暴露等级：`qwen sandbox` 会从
+不可达分支。P0 仍然在有意义的地方暴露等级：`mariadb-shell-agent sandbox` 会从
 `SANDBOX_ENFORCEMENT` 打印 `Enforcement: <level>`。
 
 ### 模型可见的边界
@@ -399,20 +399,20 @@ sandbox-exec 分支（它们是原地 hop，不是镜像——没有
 正文里点出 `Read-only file system`——只点 `EROFS` 这个符号名并不匹配模型实际
 看到的内容。
 
-### `qwen sandbox` 自检子命令
+### `mariadb-shell-agent sandbox` 自检子命令
 
 新增 `packages/cli/src/commands/sandbox.ts`（+ 测试），与既有 command 模块并列
 注册。之所以拉进 P0 而不是延后：§ 已核实的兼容性影响 里的每一项影响，在任务
 中途出错之前都是不可见的，所以后端和证明它能工作的手段必须一起交付——下面的
 计划中的 CI 通道与 E2E 表也都要求这一点。本 PR 尚未实现 Linux bwrap CI 通道。
 
-从宿主机上的项目目录运行 `QWEN_SANDBOX=bwrap qwen sandbox`，显式检查该后端。原始会话的一次性环境变量赋值不会保留在宿主 shell 中。报告使用该目录的 settings；会话单独传入的 `--include-directories` 授权可能不同。
+从宿主机上的项目目录运行 `QWEN_SANDBOX=bwrap mariadb-shell-agent sandbox`，显式检查该后端。原始会话的一次性环境变量赋值不会保留在宿主 shell 中。报告使用该目录的 settings；会话单独传入的 `--include-directories` 授权可能不同。
 
-- `qwen sandbox` —— 打印解析出的后端、探测结果、强制等级、可写根（含解析出的
+- `mariadb-shell-agent sandbox` —— 打印解析出的后端、探测结果、强制等级、可写根（含解析出的
   git 目录）与网络模式。
-- `qwen sandbox <cmd>…` —— 通过解析出的后端跑一条命令并报告结果（对应
+- `mariadb-shell-agent sandbox <cmd>…` —— 通过解析出的后端跑一条命令并报告结果（对应
   `codex sandbox`）。
-- `qwen sandbox --verify` —— 行为电池：工作区外的写入必须失败；工作区内的写入
+- `mariadb-shell-agent sandbox --verify` —— 行为电池：工作区外的写入必须失败；工作区内的写入
   必须成功；载荷读取的 `/proc/self/ns/pid` 标识必须与宿主一致（D6 的回归守卫）；无法读取标识时验证失败；网络检查只查看接口可见性：`closed` 必须仅有 `lo`，`open`/`proxied` 必须存在非 loopback 接口。这不验证互联网可达性、代理可用性或强制经由代理的路由；这些需要单独的集成检查。
 
 ### 审查跟进契约
@@ -529,12 +529,12 @@ seccomp 钩子，而用那个就意味着要分发一个编译好的 BPF 程序�
 | 领域                                                                       | 影响                    | 机制                                                                                                                                                                                                                | v1 中的处理                                                                                                      |
 | -------------------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | worktree 检出里的 git                                                      | 会完全不可用            | git dir 与 common dir 解析到 cwd 之外（布局已在 § Phase P0 核实）                                                                                                                                                   | **已修** —— 两者都是可写根                                                                                       |
-| 跨进程 owner 存活性                                                        | 会静默挂起              | `process.kill(pid, 0)` 返回非 `ESRCH` ⇒ 存活，而 PID 通过 `~/.qwen` 共享（`conversation-runtime-ownership.ts:44-65`、`serve/live/discovery.ts:147`、`worktreeSessionService.ts:424-446`）                           | **已规避** —— 完全不用 PID 命名空间（D6）                                                                        |
+| 跨进程 owner 存活性                                                        | 会静默挂起              | `process.kill(pid, 0)` 返回非 `ESRCH` ⇒ 存活，而 PID 通过 `~/.mariadb-shell-agent` 共享（`conversation-runtime-ownership.ts:44-65`、`serve/live/discovery.ts:147`、`worktreeSessionService.ts:424-446`）            | **已规避** —— 完全不用 PID 命名空间（D6）                                                                        |
 | GUI 启动（OAuth 登录、`artifact` 打开）                                    | 浏览器无法在约束下运行  | `xdg-open` 子进程继承约束，而 `~/.config/<browser>` 不是可写根                                                                                                                                                      | 删除 display 变量 ⇒ 确定地走打印 URL 路径                                                                        |
 | `git push` 的 ssh-agent 认证                                               | 不受影响                | agent socket 通常位于 `/run/user/$UID`（经只读主机绑定保持可达）；`/tmp/ssh-*` 下的 socket 也可用，因为主机 `/tmp` 保持绑定、没有被 tmpfs 替换 —— 共享 `/tmp` 暴露的面见 § 安全考量                                 | ——                                                                                                               |
 | 语音输入                                                                   | 不可用                  | `--dev /dev` 遮蔽 `/dev/snd`；`voice-availability.ts:50` 还需要 `PULSE_SERVER`                                                                                                                                      | 已记录 —— 改用容器后端或无约束运行                                                                               |
 | 自更新                                                                     | 部分受影响              | 默认受管更新根是 `QWEN_DIR/updates/npm`（Qwen home 遵循 `QWEN_HOME`）；暂存目录、版本目录和 active 清单需要可写，宿主启动器随后会执行其中的代码；自定义固定更新根可能位于授权之外，npm-global 更新则写入全局 prefix | 保留默认受管更新授权及其宿主执行风险；安装目标位于可写根之外时从主机侧更新                                       |
-| IDE companion、主机 `qwen serve`、localhost MCP                            | 仅在 `closed` 下不可达  | `--unshare-net` 移除 loopback（D5）                                                                                                                                                                                 | `open` / `proxied` 下仍可用                                                                                      |
+| IDE companion、主机 `mariadb-shell-agent serve`、localhost MCP             | 仅在 `closed` 下不可达  | `--unshare-net` 移除 loopback（D5）                                                                                                                                                                                 | `open` / `proxied` 下仍可用                                                                                      |
 | 对 `~/.config`、`~/.kube`、`~/.ssh`、`/usr/local` 的写入                   | 被拒绝                  | 它们不是可写根 —— 这正是沙箱的意义                                                                                                                                                                                  | 拒绝额外的 home 内部根；home 之外的路径可通过 `--include-directories` 授权                                       |
 | 会话数据、检查点、worktree、Arena、IDE 锁文件、MCP OAuth token、token 账本 | 不受影响                | 全部位于 `QWEN_DIR` / `RUNTIME_DIR` 之下（`storage.ts:193-241`、`gitWorktreeService.ts:419`、`ArenaManager.ts:136`）                                                                                                | ——                                                                                                               |
 | `docker.sock`、D-Bus、Wayland 及其他主机 unix socket                       | 在 bwrap 上可达（实测） | 内核的只读文件系统写检查豁免 `S_ISSOCK`（只有 `S_ISREG`/`S_ISDIR`/`S_ISLNK` 会返回 `EROFS`），因此 `--ro-bind / /` 之下的 socket 仍接受 `connect()`                                                                 | 在 bwrap 上**已核实** —— 位于所有可写根之外的 socket 仍接受 `connect()`；Landlock 后端留作 P1 的 `--verify` 用例 |
@@ -673,13 +673,13 @@ seccomp 钩子，而用那个就意味着要分发一个编译好的 BPF 程序�
 | `kernel.unprivileged_userns_clone=0` 的机器          | 指名 `bwrap` ⇒ "已安装但无法运行"；指名 `landlock` ⇒ 可用  |
 | 内核 < 5.13（无 Landlock）                           | `landlock` 探测 ⇒ unusable；显式请求 ⇒ `FatalSandboxError` |
 | Ctrl-C / CLI 崩溃                                    | 没有遗留的受约束孤儿进程                                   |
-| `qwen sandbox --verify`                              | 电池通过                                                   |
+| `mariadb-shell-agent sandbox --verify`               | 电池通过                                                   |
 
 ## 推进节奏与兼容性
 
 - P0：任何平台的默认行为都不变；`bwrap` 可按名使用。全部是新增 ——
   `VALID_SANDBOX_COMMANDS`、一个 `start_sandbox` 分支、类型放宽、交接分支放宽、
-  提示词分支，以及 `qwen sandbox` 子命令。
+  提示词分支，以及 `mariadb-shell-agent sandbox` 子命令。
 - P1：新增 vendored 二进制（约 70 KB × 2 种架构）与 `landlock` 指名 command；
   默认行为不变。
 - P2：用 seccomp 收紧 landlock 后端 —— 这是 P3 之前唯一改变一个已发布指名后端
@@ -724,9 +724,9 @@ seccomp 钩子，而用那个就意味着要分发一个编译好的 BPF 程序�
 - Linux 上的实机验证，2026-09-10 —— Lima VM，内核 `7.0.0-28-generic`，
   bubblewrap 0.11.1，git 2.53.0，`unprivileged_userns_clone=1`，Landlock 出现在
   `/sys/kernel/security/lsm` 中。探测脚本曾位于
-  `.qwen/scripts/verify-bwrap-assumptions.sh`，而 `.gitignore` 按仓库约定排除该
+  `.mariadb-shell-agent/scripts/verify-bwrap-assumptions.sh`，而 `.gitignore` 按仓库约定排除该
   目录，因此它不属于本次改动 —— 它产出的测量结果改为记录在下方，而
-  `qwen sandbox --verify` 是已提交且有测试的四项检查子集，不能替代手动 Git 与 socket 检查。
+  `mariadb-shell-agent sandbox --verify` 是已提交且有测试的四项检查子集，不能替代手动 Git 与 socket 检查。
   该脚本演练了本文档中的十项主张：九项通过，一项失败（D6 中的 `--proc` 主张，
   已在上文就地修正）。经测量确认：文档中的探测 argv 能启动；可写根之外的写入
   返回 `EROFS`；一个 `--bind` 根是可写的；不带 `--unshare-pid` 时主机 PID 保持

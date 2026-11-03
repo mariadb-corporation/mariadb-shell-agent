@@ -89,7 +89,7 @@ library; turning Memory off preserves its selection and stored contents.
 The Host uses an English overlay panel with inline name editing, Save/Cancel,
 and a bounded scrolling library list. Input drafts, focus and selection survive
 normal audio/status updates. No browser prompt dialog or extra management HTTP
-server is needed. Built-in qwen serve omits the optional memory capability.
+server is needed. Built-in mariadb-shell-agent serve omits the optional memory capability.
 
 ## Visual observations
 
@@ -117,5 +117,5 @@ toggle/selection lifecycle and all orb actions. Model/network/camera behavior
 uses local controlled fixtures rather than recording user media.
 
 The detailed baseline and results are kept in
-`.qwen/e2e-tests/2026-09-05-qwen-live-memory.md`. Existing Proactive, Appshot and
+`.mariadb-shell-agent/e2e-tests/2026-09-05-qwen-live-memory.md`. Existing Proactive, Appshot and
 audio regression suites remain required.

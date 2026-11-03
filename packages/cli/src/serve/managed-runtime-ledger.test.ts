@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -266,7 +267,7 @@ describe('Managed Runtime ledger', () => {
       'creates the ledger directory and staging-written file owner-only',
       async () => {
         // The ledger names live pids and call ids: another local user able
-        // to traverse $HOME/.qwen must not read them, so both the directory
+        // to traverse $HOME/.mariadb-shell-agent must not read them, so both the directory
         // and every file the tmp+rename dance produces land owner-only
         // regardless of the ambient umask.
         const ledgerDir = path.join(root, 'owned');

@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,7 +31,7 @@ const SERVE_PRE_LISTEN_ROOTS = [
     ],
   },
   {
-    label: 'run qwen serve entry',
+    label: 'run mariadb-shell-agent serve entry',
     suffixes: [
       'packages/cli/src/serve/run-qwen-serve.ts',
       'packages/cli/dist/src/serve/run-qwen-serve.js',

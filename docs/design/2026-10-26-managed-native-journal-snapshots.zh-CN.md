@@ -4,7 +4,7 @@
 
 ## 问题与当前状态
 
-Issue [#13184](https://github.com/QwenLM/qwen-code/issues/13184) 需要先建立原生恢复边界，才能安全删除 journal 或淘汰 authority 状态。Java 公共消息快照不能恢复 Harness。在协议与 HTTP 恢复增量之前，原生 journal 提供 head 与从 revision 0 开始的事务分页；活跃 Session 的 `compacted_through_revision` 仍为零。
+Issue [#13184](https://github.invalid/QwenLM/qwen-code/issues/13184) 需要先建立原生恢复边界，才能安全删除 journal 或淘汰 authority 状态。Java 公共消息快照不能恢复 Harness。在协议与 HTTP 恢复增量之前，原生 journal 提供 head 与从 revision 0 开始的事务分页；活跃 Session 的 `compacted_through_revision` 仍为零。
 
 Authority 从原生已提交前缀重建命令重放、事件身份、receipt、checkpoint、Action、领域版本、扩展唯一性、Hook once key 与 occurrence，以及 child continuation。Harness checkpoint 和 Java 最新记录投影都不包含全部这些事实。
 
@@ -12,7 +12,7 @@ Authority 从原生已提交前缀重建命令重放、事件身份、receipt、
 
 PR1（activation/inbox 身份查询）与本 PR2 可以独立开发。PR3（Hosted HTTP 恢复）与 PR4（本地租约感知替换）依赖快照契约；PR5 必须等持久身份查询和两条恢复路径验证完成后才启用驻留窗口。这更新了[有界保留设计](2026-10-19-managed-session-bounded-retention.zh-CN.md)中此前建议的串行开发顺序。
 
-PR3 [#15599](https://github.com/QwenLM/qwen-code/pull/15599) 已合入 PR2 分支。[#15569](https://github.com/QwenLM/qwen-code/pull/15569) 将两个增量一起交付到 main。本文描述协议/存储切片，配套的 [HTTP 恢复设计](2026-10-26-managed-http-snapshot-recovery.zh-CN.md)描述生产消费者。合并 PR 的验收要求两个切片均通过。
+PR3 [#15599](https://github.invalid/QwenLM/qwen-code/pull/15599) 已合入 PR2 分支。[#15569](https://github.invalid/QwenLM/qwen-code/pull/15569) 将两个增量一起交付到 main。本文描述协议/存储切片，配套的 [HTTP 恢复设计](2026-10-26-managed-http-snapshot-recovery.zh-CN.md)描述生产消费者。合并 PR 的验收要求两个切片均通过。
 
 存储切片提供发布、不可变存储、完整性检查、资源 ownership 与有界分页读取。HTTP 切片让 Core journal 从已发布快照与连续尾部恢复，同时保留仅查询 head 的结果核验，以及没有符合条件且已公布快照时的旧恢复路径。自动发布、原生事务删除、公共事件快照修改、本地 journal 替换和 authority 淘汰继续不在范围内。首个 payload 格式明确命名为 `committed-prefix-v1`：无损重放映像，不声称是紧凑 authority 状态。其大小和重放工作量仍与历史成正比。未来紧凑格式必须明确保留每个 authority 索引和历史查询契约，不能重新解释本版本。
 
@@ -62,7 +62,7 @@ HTTP 快照重建不授权删除 journal。未来删除任何 journal 前，必�
 
 ## 验证与验收
 
-- 基线：检查全局 `qwen` 能力；CLI 不暴露这些 API 时直接验证 internal store。
+- 基线：检查全局 `mariadb-shell-agent` 能力；CLI 不暴露这些 API 时直接验证 internal store。
 - 往返读取 genesis 与多个已提交事务、准确的命令重放元数据、资源引用、append 后旧快照稳定，以及接管后读取。
 - 拒绝旧 writer/generation、错误 scope/token、错误 revision/sequence/digest、blocked 或 retired Session、缺失/损坏的事务/页面/资源，以及 ID 冲突。
 - 在资源与 ownership 插入中注入故障；重开后只能看到原状态或完整快照，不能存在部分 pin。

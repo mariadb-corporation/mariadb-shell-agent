@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -106,7 +107,7 @@ describe('managed memory refresh helper', () => {
     const memoryFile = memoryPath('project.md');
     const teamFile = path.join(
       projectRoot,
-      '.qwen',
+      '.mariadb-shell-agent',
       'team-memory',
       'shared.md',
     );

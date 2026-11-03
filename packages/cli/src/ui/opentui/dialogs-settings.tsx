@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -330,7 +331,7 @@ export function OpenTuiSettingsDialog(props: OpenTuiSettingsDialogProps) {
 
   const showRestartPrompt = restartRequiredSettings.size > 0;
   const restartText = t(
-    'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.',
+    'To see changes, MariaDB Shell Agent must be restarted. Press r to exit and apply changes now.',
   );
 
   // Rebase the pending snapshot on scope switches, mirroring the ink effect.

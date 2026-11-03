@@ -136,7 +136,7 @@ PR #4336 shipped F2 as 6 atomic commits + 6 fix commits over ~4 hours. Wenshao r
 | C12 | Status route refactor section (new path: `QwenAgent.getMcpPoolAccounting()`)                          | `httpAcpBridge.ts:733-770` currently reads bootstrap session's manager — must change       |
 | C13 | Generation counter on `PoolEntry` for stale `tools/list_changed` handler guard                        | Opencode pattern: `if (s.clients[name] !== client) return`                                 |
 | C14 | Sub-PR breakdown 4 → **6**                                                                            | v1 underestimated; A2/B1/B3/C6 each add real work                                          |
-| C15 | Lazy pool construction (only when N≥2 sessions seen) — optional                                       | `qwen serve --foreground` single-session won't benefit; saves init cost                    |
+| C15 | Lazy pool construction (only when N≥2 sessions seen) — optional                                       | `mariadb-shell-agent serve --foreground` single-session won't benefit; saves init cost     |
 
 ---
 
@@ -189,11 +189,11 @@ acpAgent.newSession(sessionId)
 
 **Already-shared state (pool inherits, does not introduce):**
 
-| State                                          | Location                         | Note                                                              |
-| ---------------------------------------------- | -------------------------------- | ----------------------------------------------------------------- |
-| `serverStatuses: Map<string, MCPServerStatus>` | mcp-client.ts:292 (module-level) | Process-wide today; pool key still by name → "any-CONNECTED-wins" |
-| `mcpServerRequiresOAuth: Map<string, boolean>` | mcp-client.ts:302 (module-level) | Same                                                              |
-| `MCPOAuthTokenStorage` on-disk tokens          | `~/.qwen/mcp-oauth/<name>.json`  | Daemon-host shared; pool just exploits more efficiently           |
+| State                                          | Location                                       | Note                                                              |
+| ---------------------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------- |
+| `serverStatuses: Map<string, MCPServerStatus>` | mcp-client.ts:292 (module-level)               | Process-wide today; pool key still by name → "any-CONNECTED-wins" |
+| `mcpServerRequiresOAuth: Map<string, boolean>` | mcp-client.ts:302 (module-level)               | Same                                                              |
+| `MCPOAuthTokenStorage` on-disk tokens          | `~/.mariadb-shell-agent/mcp-oauth/<name>.json` | Daemon-host shared; pool just exploits more efficiently           |
 
 ---
 
@@ -213,10 +213,10 @@ acpAgent.newSession(sessionId)
 ### 4.1 Process layout
 
 ```
-HTTP daemon (packages/cli/src/serve, qwen serve)
+HTTP daemon (packages/cli/src/serve, mariadb-shell-agent serve)
   │ spawns
   ▼
-ACP child (qwen --acp, single process per workspace)
+ACP child (mariadb-shell-agent --acp, single process per workspace)
   │
   QwenAgent (acpAgent.ts)
   ├── McpTransportPool ◄── new, workspace-scoped, 1 instance
@@ -703,7 +703,7 @@ Status route surfaces `entryCount: number` so operators see when name → multip
 
 ### 8.2 OAuth token storage
 
-`MCPOAuthTokenStorage` writes to `~/.qwen/mcp-oauth/<serverName>.json` — already daemon-host-shared. Pool benefits incidentally (first session's OAuth completes → token on disk → pool entry's reconnect picks up token → all other sessions piggy-back).
+`MCPOAuthTokenStorage` writes to `~/.mariadb-shell-agent/mcp-oauth/<serverName>.json` — already daemon-host-shared. Pool benefits incidentally (first session's OAuth completes → token on disk → pool entry's reconnect picks up token → all other sessions piggy-back).
 
 **Caveat — multi-fingerprint case**: 2 entries for same name (different headers/env) but same OAuth provider → both read the same token file. If tokens are server-scoped (OAuth typical), this works. If tokens are env-scoped (rare), explicit storage key extension needed. **Punt to F3** with a documented known-limitation.
 
@@ -777,7 +777,7 @@ When two sessions inject same-name server with different env/headers → differe
 
 ### 10.2 Auth divergence
 
-Static `~/.qwen/settings.json` mcpServers are identical across sessions → all share → 80% case. Per-session injected mcpServers with per-user tokens → unique fingerprints → no sharing. Both safe.
+Static `~/.mariadb-shell-agent/settings.json` mcpServers are identical across sessions → all share → 80% case. Per-session injected mcpServers with per-user tokens → unique fingerprints → no sharing. Both safe.
 
 ### 10.3 HTTP transport opt-in (recap from §5.2)
 
@@ -1051,7 +1051,7 @@ Avoids drain firing during a restore window.
 
 ### 16.1 Implicit reload via fingerprint change
 
-User edits `~/.qwen/settings.json` mid-flight, changes a server's env:
+User edits `~/.mariadb-shell-agent/settings.json` mid-flight, changes a server's env:
 
 1. Old sessions keep old `Config`/`McpServers` snapshot → keep acquiring old fingerprint → entry-OLD ref persists
 2. New session reads fresh settings → new fingerprint → entry-NEW created → coexists with entry-OLD
@@ -1287,7 +1287,7 @@ export function isWorkspaceScopedBudgetEvent(
 
 ### 21.9 Backward compat (F2-3)
 
-- Standalone `qwen` (no daemon) → `mcpPool === undefined` → all existing `mcp-client-manager.test.ts` tests pass unchanged
+- Standalone `mariadb-shell-agent` (no daemon) → `mcpPool === undefined` → all existing `mcp-client-manager.test.ts` tests pass unchanged
 - `--no-mcp-pool` daemon flag → falls back to per-session, all existing daemon e2e tests pass
 
 ### 21.10 Credential isolation (F2-3)
@@ -1427,8 +1427,8 @@ Folded into first commit before opening:
 
 ### Backward compatibility
 
-- Standalone `qwen` (non-daemon): pool not constructed; existing behavior preserved
-- Daemon `qwen serve --no-mcp-pool`: kill switch falls back to per-session
+- Standalone `mariadb-shell-agent` (non-daemon): pool not constructed; existing behavior preserved
+- Daemon `mariadb-shell-agent serve --no-mcp-pool`: kill switch falls back to per-session
 - SDK: all new fields additive (`entryCount`, `scope?`); EVENT_SCHEMA_VERSION stays at 1
 - Old SDK clients: unknown `scope: 'workspace'` ignored per PR 14 contract
 - Old daemons: SDK consumers can detect absence of `mcp_workspace_pool` capability and fall back

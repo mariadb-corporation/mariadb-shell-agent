@@ -2,7 +2,7 @@
 
 [English](2026-09-18-web-shell-git-history-graph.md) | [简体中文](2026-09-18-web-shell-git-history-graph.zh-CN.md)
 
-Status: implemented. Part of [#11941](https://github.com/QwenLM/qwen-code/issues/11941); the worktree manager from the same issue is a separate design.
+Status: implemented. Part of [#11941](https://github.invalid/QwenLM/qwen-code/issues/11941); the worktree manager from the same issue is a separate design.
 
 ## Problem
 

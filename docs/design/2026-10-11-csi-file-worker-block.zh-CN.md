@@ -50,7 +50,7 @@ Hosted turn 或 Kubernetes 部署。
 和 executor 中有实际 read site。普通 worker 不选择该 backend，保留已有行为。
 
 私有 team-memory secret 检查以 composer 提供的已验证 Session 工作目录为根，
-具体保护其 `.qwen/team-memory` 子树。即使工作目录位于仓库根目录之下，也不向上
+具体保护其 `.mariadb-shell-agent/team-memory` 子树。即使工作目录位于仓库根目录之下，也不向上
 查找 Git 根目录。普通工具保留最近 Git 根目录和 realpath 的分类规则。这是有意的
 差异：私有工具不能发现准入描述符根目录之外的宿主仓库；backend 拒绝根目录之外
 的路径及 symlink 遍历。

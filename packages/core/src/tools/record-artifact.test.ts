@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -29,7 +30,7 @@ import { arePermissionBitsEnforced } from '../test-utils/permission-bits.js';
 const signal = new AbortController().signal;
 const RES = 'https://example.com/resource';
 const RECORDED = 'Recorded artifact';
-const WORKTREE = path.join('.qwen', 'worktrees', 'my-feature');
+const WORKTREE = path.join('.mariadb-shell-agent', 'worktrees', 'my-feature');
 
 function makeTool(targetDir = '/') {
   return new RecordArtifactTool(makeFakeConfig({ targetDir, cwd: targetDir }));
@@ -386,7 +387,7 @@ describe('RecordArtifactTool', () => {
 
     const result = await ws.record('Worktree report', 'report.csv');
 
-    const canonical = '.qwen/worktrees/my-feature/report.csv';
+    const canonical = '.mariadb-shell-agent/worktrees/my-feature/report.csv';
     expectFirst(result, { workspacePath: canonical });
     expectText(result, [`workspacePath: ${canonical}`]);
   });
@@ -595,8 +596,14 @@ describe('RecordArtifactTool', () => {
     await ws.write('reports/b.docx', 'docx');
 
     expectAll(await ws.record('Worktree reports', 'reports'), [
-      { workspacePath: '.qwen/worktrees/my-feature/reports/a.xlsx' },
-      { workspacePath: '.qwen/worktrees/my-feature/reports/b.docx' },
+      {
+        workspacePath:
+          '.mariadb-shell-agent/worktrees/my-feature/reports/a.xlsx',
+      },
+      {
+        workspacePath:
+          '.mariadb-shell-agent/worktrees/my-feature/reports/b.docx',
+      },
     ]);
   });
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -198,7 +199,7 @@ describe.skipIf(process.platform === 'win32')(
       // deliberate no-op (`findAttributableCommitSegment`), and a `cd` behind
       // a noise keyword suppresses both (the never-executing-branch row).
       expect(lastLog('%B')).toContain(
-        'Co-authored-by: Qwen-Coder <qwen-coder@alibabacloud.com>',
+        'Co-authored-by: Qwen-Coder <qwen-coder@alibabacloud.invalid>',
       );
     }
 
@@ -359,7 +360,7 @@ describe.skipIf(process.platform === 'win32')(
           commit: true,
           pr: true,
           name: 'Qwen-Coder',
-          email: 'qwen-coder@alibabacloud.com',
+          email: 'qwen-coder@alibabacloud.invalid',
         }),
         getShouldUseNodePtyShell: vi.fn().mockReturnValue(false),
         getShellDefaultTimeoutMs: vi.fn().mockReturnValue(undefined),
@@ -991,7 +992,7 @@ describe.skipIf(process.platform === 'win32')(
         commit: false,
         pr: false,
         name: 'Qwen-Coder',
-        email: 'qwen-coder@alibabacloud.com',
+        email: 'qwen-coder@alibabacloud.invalid',
       });
 
       // The amend exemption works, because session tracking does not consult

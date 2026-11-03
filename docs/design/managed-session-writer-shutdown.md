@@ -2,8 +2,8 @@
 
 > **Conversations-runtime update (2026-09-06):**
 > [Relaxed Standalone Daemon Ownership](./2026-09-02-relaxed-standalone-daemon-ownership.md)
-> is implemented by [#10924](https://github.com/QwenLM/qwen-code/pull/10924)'s
-> mandatory writer fences and [#11207](https://github.com/QwenLM/qwen-code/pull/11207)'s
+> is implemented by [#10924](https://github.invalid/QwenLM/qwen-code/pull/10924)'s
+> mandatory writer fences and [#11207](https://github.invalid/QwenLM/qwen-code/pull/11207)'s
 > global-owner cutover. Conversations ACP writers and standalone lifecycle
 > operations select the hardened local reclaim policy. This supersedes the
 > no-SIGKILL-recovery rule only for a well-formed active record proved stale in
@@ -13,7 +13,7 @@
 
 ## Problem
 
-A managed `qwen serve` replacement can start on a new hostname while the
+A managed `mariadb-shell-agent serve` replacement can start on a new hostname while the
 previous ACP child still owns a session writer lock. A foreign-host v1 lock
 cannot be proven stale, so the replacement correctly returns
 `session_writer_conflict`. Reclaiming by hostname or age would allow two live

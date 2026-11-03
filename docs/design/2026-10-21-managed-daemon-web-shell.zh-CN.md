@@ -10,8 +10,8 @@
 用户还需要一条命令启动普通 daemon，并在同一个应用中使用 Local 会话。现有
 WebShell 在传入 Java provider 后已经支持 Local 与 Managed 导航。
 
-`qwen serve --managed --open` 统一监督普通 daemon、Java 和私有 Harness，公开
-一个需要认证的 loopback origin。普通 `qwen serve` 保持现有行为。继续遵循 runtime
+`mariadb-shell-agent serve --managed --open` 统一监督普通 daemon、Java 和私有 Harness，公开
+一个需要认证的 loopback origin。普通 `mariadb-shell-agent serve` 保持现有行为。继续遵循 runtime
 安装、H2 持久化、Managed Workspace 所有权与既有恢复限制。
 
 ## 实现方案

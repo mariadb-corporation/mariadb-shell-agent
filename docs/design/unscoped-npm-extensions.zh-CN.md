@@ -35,7 +35,7 @@
 无 scope 裸包名/latest 安装和升级、精确版本固定、beta 标签升级、重复检查已最新，
 以及显式缺失路径不会请求 npm。单元测试覆盖来源分类、registry 解析、下载 URL
 及 daemon 预检查。执行构建、类型检查、bundle、定向测试及两轮自审。
-基线和 E2E 证据记录在 `.qwen/e2e-tests/unscoped-npm-extensions.md`。
+基线和 E2E 证据记录在 `.mariadb-shell-agent/e2e-tests/unscoped-npm-extensions.md`。
 
 ## 风险与待定问题
 

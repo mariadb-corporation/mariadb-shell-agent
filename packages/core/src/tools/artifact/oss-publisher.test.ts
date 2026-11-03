@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -94,14 +95,14 @@ describe('OssPublisher', () => {
       captured = { url, headers, body };
     };
     const pub = new OssPublisher(
-      { bucket: 'bkt', endpoint: 'oss-cn-hangzhou.aliyuncs.com' },
+      { bucket: 'bkt', endpoint: 'oss-cn-hangzhou.aliyuncs.invalid' },
       { httpPut, credentials: () => creds, now: fixedNow },
     );
 
     const res = await pub.publish(input);
 
     const expectedUrl =
-      'https://bkt.oss-cn-hangzhou.aliyuncs.com/artifacts/cafe1234/index.html';
+      'https://bkt.oss-cn-hangzhou.aliyuncs.invalid/artifacts/cafe1234/index.html';
     expect(captured?.url).toBe(expectedUrl);
     expect(captured?.headers['Authorization']).toMatch(/^OSS AKID:/);
     expect(captured?.headers['Content-MD5']).toMatch(/^[A-Za-z0-9+/]+=*$/);
@@ -117,7 +118,7 @@ describe('OssPublisher', () => {
     const res = await new OssPublisher(
       {
         bucket: 'bkt',
-        endpoint: 'oss-cn-hangzhou.aliyuncs.com',
+        endpoint: 'oss-cn-hangzhou.aliyuncs.invalid',
         publicBaseUrl: 'https://cdn.example.com/',
       },
       { httpPut, credentials: () => creds, now: fixedNow },
@@ -133,7 +134,7 @@ describe('OssPublisher', () => {
       new OssPublisher(
         {
           bucket: 'bkt',
-          endpoint: 'oss-cn-hangzhou.aliyuncs.com',
+          endpoint: 'oss-cn-hangzhou.aliyuncs.invalid',
           publicBaseUrl: 'cdn.example.com',
         },
         { httpPut, credentials: () => creds, now: fixedNow },
@@ -150,7 +151,7 @@ describe('OssPublisher', () => {
     vi.stubGlobal('fetch', fetchMock);
     try {
       await new OssPublisher(
-        { bucket: 'bkt', endpoint: 'oss-cn-hangzhou.aliyuncs.com' },
+        { bucket: 'bkt', endpoint: 'oss-cn-hangzhou.aliyuncs.invalid' },
         { credentials: () => creds, now: fixedNow },
       ).publish(input);
     } finally {
@@ -167,13 +168,13 @@ describe('OssPublisher', () => {
     try {
       await expect(
         new OssPublisher(
-          { bucket: 'bkt', endpoint: 'oss-cn-hangzhou.aliyuncs.com' },
+          { bucket: 'bkt', endpoint: 'oss-cn-hangzhou.aliyuncs.invalid' },
           { credentials: () => creds, now: fixedNow },
         ).publish(input),
       ).rejects.toThrow('OSS upload failed: 403');
       await expect(
         new OssPublisher(
-          { bucket: 'bkt', endpoint: 'oss-cn-hangzhou.aliyuncs.com' },
+          { bucket: 'bkt', endpoint: 'oss-cn-hangzhou.aliyuncs.invalid' },
           { credentials: () => creds, now: fixedNow },
         ).publish(input),
       ).rejects.not.toThrow('AccessKeyId');
@@ -188,10 +189,12 @@ describe('OssPublisher', () => {
       url = u;
     };
     await new OssPublisher(
-      { bucket: 'bkt', endpoint: 'e.aliyuncs.com', keyPrefix: '/pages/' },
+      { bucket: 'bkt', endpoint: 'e.aliyuncs.invalid', keyPrefix: '/pages/' },
       { httpPut, credentials: () => creds, now: fixedNow },
     ).publish(input);
-    expect(url).toBe('https://bkt.e.aliyuncs.com/pages/cafe1234/index.html');
+    expect(url).toBe(
+      'https://bkt.e.aliyuncs.invalid/pages/cafe1234/index.html',
+    );
   });
 
   it('rejects invalid keyPrefix values', async () => {
@@ -200,7 +203,7 @@ describe('OssPublisher', () => {
       new OssPublisher(
         {
           bucket: 'bkt',
-          endpoint: 'oss-cn-hangzhou.aliyuncs.com',
+          endpoint: 'oss-cn-hangzhou.aliyuncs.invalid',
           keyPrefix: '/',
         },
         { httpPut, credentials: () => creds, now: fixedNow },
@@ -210,7 +213,7 @@ describe('OssPublisher', () => {
       new OssPublisher(
         {
           bucket: 'bkt',
-          endpoint: 'oss-cn-hangzhou.aliyuncs.com',
+          endpoint: 'oss-cn-hangzhou.aliyuncs.invalid',
           keyPrefix: 'bad prefix',
         },
         { httpPut, credentials: () => creds, now: fixedNow },
@@ -235,7 +238,7 @@ describe('OssPublisher', () => {
     ).rejects.toThrow(/endpoint/i);
     await expect(
       new OssPublisher(
-        { bucket: 'b', endpoint: 'oss-cn-hangzhou.aliyuncs.com' },
+        { bucket: 'b', endpoint: 'oss-cn-hangzhou.aliyuncs.invalid' },
         { httpPut, credentials: () => undefined },
       ).publish(input),
     ).rejects.toThrow(/credentials/i);
@@ -259,7 +262,7 @@ describe('OssPublisher', () => {
     };
     await expect(
       new OssPublisher(
-        { bucket: 'b', endpoint: 'oss-cn-hangzhou.aliyuncs.com' },
+        { bucket: 'b', endpoint: 'oss-cn-hangzhou.aliyuncs.invalid' },
         { httpPut, credentials: () => creds, now: fixedNow },
       ).publish(input),
     ).rejects.toThrow(/403/);

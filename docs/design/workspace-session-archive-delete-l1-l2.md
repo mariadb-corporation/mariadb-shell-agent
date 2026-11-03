@@ -7,22 +7,22 @@ This document preserves the original L1/L2 and reliable-close protocol. Newly ad
 ## 1. Status and baseline
 
 Implemented and synchronized with main, 2026-10-02, on `codex/workspace-session-l1-l2`. This document
-covers L1 and L2 of [#13164](https://github.com/QwenLM/qwen-code/issues/13164).
+covers L1 and L2 of [#13164](https://github.invalid/QwenLM/qwen-code/issues/13164).
 Verification and remaining environment limits are recorded in section 8.
 
 The integrated baselines are:
 
-- [Reliable Workspace close, #13135](https://github.com/QwenLM/qwen-code/pull/13135),
+- [Reliable Workspace close, #13135](https://github.invalid/QwenLM/qwen-code/pull/13135),
   merged commit `9478f28731f45ff6df66062e7e05d29e92906f19`.
-- [O4-1 Session retirement, #13084](https://github.com/QwenLM/qwen-code/pull/13084),
+- [O4-1 Session retirement, #13084](https://github.invalid/QwenLM/qwen-code/pull/13084),
   merged commit `e1167c1f9ca3d54747c8c0145c1d805259ab0226`.
-- The existing [D4 lifecycle design](https://github.com/QwenLM/qwen-code/blob/63e840cedf87fa54cf80c826112b8cc77272cff4/docs/design/2026-09-28-managed-agent-durable-lifecycle.md)
-  and [Workspace close design](https://github.com/QwenLM/qwen-code/blob/9478f28731f45ff6df66062e7e05d29e92906f19/docs/design/workspace-session-reliable-close.md).
+- The existing [D4 lifecycle design](https://github.invalid/QwenLM/qwen-code/blob/63e840cedf87fa54cf80c826112b8cc77272cff4/docs/design/2026-09-28-managed-agent-durable-lifecycle.md)
+  and [Workspace close design](https://github.invalid/QwenLM/qwen-code/blob/9478f28731f45ff6df66062e7e05d29e92906f19/docs/design/workspace-session-reliable-close.md).
 
 Both prerequisite PRs are merged into main. This branch retains their final
 locking, close recovery and retirement implementations. L1 and L2 target main;
 L2 uses actual retirement, not a placeholder. Main's follow-up
-[#13223](https://github.com/QwenLM/qwen-code/pull/13223) resolved the close
+[#13223](https://github.invalid/QwenLM/qwen-code/pull/13223) resolved the close
 migration's collision with recovery bundle V31; that fix is retained here.
 
 ## 2. Problem and existing behavior
@@ -350,7 +350,7 @@ check, not a result L2 can demonstrate using the files profile.
 ## 8. Validation and acceptance
 
 The executable plan and results are recorded under
-`.qwen/e2e-tests/workspace-session-archive-delete-l1-l2.md`. The global `qwen`
+`.mariadb-shell-agent/e2e-tests/workspace-session-archive-delete-l1-l2.md`. The global `mariadb-shell-agent`
 CLI has no Hosted archive/unarchive/delete commands, so its baseline dry-run
 confirmed the need for an actual HTTP/store test-script fallback. This is
 Hosted API coverage, not CLI command coverage.
@@ -371,7 +371,7 @@ operation lock, so expiry during the wait cannot authorize a tombstone.
 This applies to close completion as well; its focused regressions pass.
 
 The author's host is macOS and its metadata tests use deterministic close
-evidence. Independent reviewer [wenshao's Linux verification](https://github.com/QwenLM/qwen-code/pull/13194#issuecomment-5955445033)
+evidence. Independent reviewer [wenshao's Linux verification](https://github.invalid/QwenLM/qwen-code/pull/13194#issuecomment-5955445033)
 on `2486d3dad` supplies real packaged Hosted Harness, worker-stop, shared-file,
 neighbour isolation and crash/takeover evidence on both API surfaces. The pinned
 [rig and results](https://github.com/wenshao/qwen-code/tree/ff11be0a23ada2f1bdf955ebafd463779aefb670/pr13194)

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -277,7 +278,7 @@ describe('formatMemoryBudgetStderr', () => {
   it('formats a plain derived budget above the minimum', () => {
     const budget = resolveDaemonMemoryBudget({ availableMemoryMb: 32_768 });
     expect(formatMemoryBudgetStderr(budget)).toBe(
-      'qwen serve: memory budget 16384 MB (derived, 32768 MB available via host)',
+      'mariadb-shell-agent serve: memory budget 16384 MB (derived, 32768 MB available via host)',
     );
   });
 

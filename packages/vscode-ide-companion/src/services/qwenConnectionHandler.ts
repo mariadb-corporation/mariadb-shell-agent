@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -85,6 +86,13 @@ export class QwenConnectionHandler {
         '[QwenAgentManager] Using proxy from VSCode settings:',
         proxyUrl,
       );
+    }
+    if (
+      vscode.workspace
+        .getConfiguration('qwen-code')
+        .get<boolean>('experimentalLsp')
+    ) {
+      extraArgs.push('--experimental-lsp');
     }
 
     // Retry loop for connection.connect() to handle transient spawn failures

@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Parent command for 'qwen review'. Hosts the internal helpers used by
+// Parent command for 'mariadb-shell-agent review'. Hosts the internal helpers used by
 // the /review skill (presubmit checks, post-review cleanup) so the prompt
 // can stay short and the logic stays testable.
 

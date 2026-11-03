@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -243,26 +244,29 @@ describe('captureLocalDiff — untracked files', () => {
     expect(res.text).not.toContain('dirlink');
   });
 
-  it('does not capture the review own .qwen/tmp scratch files', () => {
-    // The review writes its args/parse-args/diff/plan under .qwen/tmp before this
-    // capture runs; in a repo that does not ignore .qwen they would show up as
+  it('does not capture the review own .mariadb-shell-agent/tmp scratch files', () => {
+    // The review writes its args/parse-args/diff/plan under .mariadb-shell-agent/tmp before this
+    // capture runs; in a repo that does not ignore .mariadb-shell-agent they would show up as
     // the user's untracked work and the review would report on its own plumbing.
-    write('.qwen/tmp/qwen-skill-args-review.txt', '6771 --comment\n');
-    write('.qwen/tmp/qwen-review-local-plan.json', '{}\n');
+    write(
+      '.mariadb-shell-agent/tmp/qwen-skill-args-review.txt',
+      '6771 --comment\n',
+    );
+    write('.mariadb-shell-agent/tmp/qwen-review-local-plan.json', '{}\n');
     write('real.ts', 'export const r = 1;\n');
 
     const res = capture();
     expect(res.untracked).toEqual(['real.ts']);
-    expect(res.text).not.toContain('.qwen/tmp');
+    expect(res.text).not.toContain('.mariadb-shell-agent/tmp');
   });
 
-  it('does not capture the worktree leases, which moved out of .qwen/tmp', () => {
+  it('does not capture the worktree leases, which moved out of .mariadb-shell-agent/tmp', () => {
     // Leases now live outside the workspace, but an older build may have left
-    // `.qwen/review-leases` residue behind. The filter keeps excluding that
+    // `.mariadb-shell-agent/review-leases` residue behind. The filter keeps excluding that
     // retired directory so its session ids, prompt ids, worktree paths and
     // branches never become review input.
     write(
-      '.qwen/review-leases/qwen-review-lease-pr-1.json',
+      '.mariadb-shell-agent/review-leases/qwen-review-lease-pr-1.json',
       '{"sessionId":"s","promptId":"p"}\n',
     );
     write('real.ts', 'export const r = 1;\n');
@@ -274,20 +278,26 @@ describe('captureLocalDiff — untracked files', () => {
 
   it('excludes plumbing a round in ANOTHER directory wrote', () => {
     // The three `paths.ts` constants are cwd-relative for EVERY invocation,
-    // so a round run from `sub/` writes `sub/.qwen/…`. A filter built from
+    // so a round run from `sub/` writes `sub/.mariadb-shell-agent/…`. A filter built from
     // THIS invocation's cwd matches none of it, and a repo that does not
-    // ignore `.qwen` then hands the next root-invoked round the previous
+    // ignore `.mariadb-shell-agent` then hands the next root-invoked round the previous
     // round's cache, reports and args record as the user's untracked work —
     // and the cache changes every round by construction, so an incremental
     // round could never again report "no changes".
-    write('sub/.qwen/review-cache/local.json', '{"lastCommitSha":"abc"}\n');
-    write('sub/.qwen/reviews/2026-01-01-local.md', '# round\n');
-    write('sub/.qwen/tmp/qwen-review-local-cache-candidate.json', '{}\n');
+    write(
+      'sub/.mariadb-shell-agent/review-cache/local.json',
+      '{"lastCommitSha":"abc"}\n',
+    );
+    write('sub/.mariadb-shell-agent/reviews/2026-01-01-local.md', '# round\n');
+    write(
+      'sub/.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+      '{}\n',
+    );
     write('sub/real.ts', 'export const r = 1;\n');
 
     const res = capture();
     expect(res.untracked).toEqual(['sub/real.ts']);
-    expect(res.text).not.toContain('.qwen');
+    expect(res.text).not.toContain('.mariadb-shell-agent');
   });
 
   it('keeps a directory that merely LOOKS like plumbing', () => {
@@ -303,15 +313,19 @@ describe('captureLocalDiff — untracked files', () => {
   });
 
   it('reviews a plumbing path the user NAMED, instead of dropping it mutely', () => {
-    // `/review .qwen/reviews/round-notes.md` is a deliberate request. Filtered
+    // `/review .mariadb-shell-agent/reviews/round-notes.md` is a deliberate request. Filtered
     // out, the round reported "the working tree is clean — 0 chunks" over the
     // one file it was asked about, with no `Not reviewed` record: mute, which
     // the SkippedFile contract forbids.
-    write('.qwen/reviews/round-notes.md', '# notes\n');
-    write('.qwen/reviews/other.md', '# not asked for\n');
+    write('.mariadb-shell-agent/reviews/round-notes.md', '# notes\n');
+    write('.mariadb-shell-agent/reviews/other.md', '# not asked for\n');
 
-    const res = capture({ file: '.qwen/reviews/round-notes.md' });
-    expect(res.untracked).toEqual(['.qwen/reviews/round-notes.md']);
+    const res = capture({
+      file: '.mariadb-shell-agent/reviews/round-notes.md',
+    });
+    expect(res.untracked).toEqual([
+      '.mariadb-shell-agent/reviews/round-notes.md',
+    ]);
     expect(res.text).toContain('round-notes.md');
     // …and only the named one: its siblings are still plumbing.
     expect(res.text).not.toContain('other.md');
@@ -319,63 +333,73 @@ describe('captureLocalDiff — untracked files', () => {
 
   it('reviews the children of a NAMED plumbing directory target', () => {
     // A directory is a legal file target — a tab-completed `src/` classifies
-    // as one — and `.qwen/reviews/` is the shape the named-path exemption was
+    // as one — and `.mariadb-shell-agent/reviews/` is the shape the named-path exemption was
     // designed for. But the exemption matched `p === pathspec`, and a child
     // path never equals its parent directory: every child was filtered out
     // with no skipped record, and the round reviewed none of the content the
     // user named — the same mute drop the file-shaped exemption closed.
-    write('.qwen/reviews/one.md', '# one\n');
-    write('.qwen/reviews/two.md', '# two\n');
+    write('.mariadb-shell-agent/reviews/one.md', '# one\n');
+    write('.mariadb-shell-agent/reviews/two.md', '# two\n');
 
-    const res = capture({ file: '.qwen/reviews/' });
+    const res = capture({ file: '.mariadb-shell-agent/reviews/' });
     expect(res.untracked.sort()).toEqual([
-      '.qwen/reviews/one.md',
-      '.qwen/reviews/two.md',
+      '.mariadb-shell-agent/reviews/one.md',
+      '.mariadb-shell-agent/reviews/two.md',
     ]);
     expect(res.skipped).toEqual([]);
   });
 
   it('reviews NAMED plumbing even when ignore rules cover it', () => {
-    // The common configuration is `.qwen/` in `.gitignore` — this repo's own
+    // The common configuration is `.mariadb-shell-agent/` in `.gitignore` — this repo's own
     // shape — and `ls-files --others --exclude-standard` applies exclusion to
     // an explicitly pathspec-NAMED file too, so the named plumbing never
     // reached the filter at all: empty candidates, empty diff, no skipped
     // record, and the round reported clean over the one file it was asked
     // about. A deliberately named path wins over ignore rules.
-    write('.gitignore', '.qwen/*\n');
+    write('.gitignore', '.mariadb-shell-agent/*\n');
     git('add', '.gitignore');
     git('commit', '-q', '-m', 'ignore');
-    write('.qwen/reviews/round-notes.md', '# notes\n');
-    write('.qwen/reviews/other.md', '# sibling\n');
+    write('.mariadb-shell-agent/reviews/round-notes.md', '# notes\n');
+    write('.mariadb-shell-agent/reviews/other.md', '# sibling\n');
 
-    const res = capture({ file: '.qwen/reviews/round-notes.md' });
-    expect(res.untracked).toEqual(['.qwen/reviews/round-notes.md']);
+    const res = capture({
+      file: '.mariadb-shell-agent/reviews/round-notes.md',
+    });
+    expect(res.untracked).toEqual([
+      '.mariadb-shell-agent/reviews/round-notes.md',
+    ]);
     expect(res.text).toContain('round-notes.md');
     // …and only the named one: its siblings are still plumbing.
     expect(res.text).not.toContain('other.md');
 
     // The directory shape under the same ignore rules.
-    const dir = capture({ file: '.qwen/reviews/' });
+    const dir = capture({ file: '.mariadb-shell-agent/reviews/' });
     expect(dir.untracked.sort()).toEqual([
-      '.qwen/reviews/other.md',
-      '.qwen/reviews/round-notes.md',
+      '.mariadb-shell-agent/reviews/other.md',
+      '.mariadb-shell-agent/reviews/round-notes.md',
     ]);
   });
 
   it('drops a TRACKED plumbing section, which ignore rules never reach', () => {
     // Ignore rules do not apply to tracked files, so a repo that once
-    // committed its `.qwen` plumbing gets the cache back in `git diff HEAD`
+    // committed its `.mariadb-shell-agent` plumbing gets the cache back in `git diff HEAD`
     // every round — and Step 8 rewrites that cache after every clean round,
     // so the section is there by construction. The round reviews its own
     // ledger JSON and `changedSince` never empties.
-    write('.qwen/review-cache/local.json', '{"lastCommitSha":"old"}\n');
-    git('add', '-f', '.qwen/review-cache/local.json');
+    write(
+      '.mariadb-shell-agent/review-cache/local.json',
+      '{"lastCommitSha":"old"}\n',
+    );
+    git('add', '-f', '.mariadb-shell-agent/review-cache/local.json');
     git('commit', '-q', '--no-verify', '-m', 'committed plumbing');
-    write('.qwen/review-cache/local.json', '{"lastCommitSha":"new"}\n');
+    write(
+      '.mariadb-shell-agent/review-cache/local.json',
+      '{"lastCommitSha":"new"}\n',
+    );
     write('tracked.ts', 'export const a = 2;\n');
 
     const res = capture();
-    expect(res.text).not.toContain('.qwen/review-cache');
+    expect(res.text).not.toContain('.mariadb-shell-agent/review-cache');
     // …while the real tracked change survives.
     expect(res.text).toContain('tracked.ts');
   });
@@ -385,18 +409,18 @@ describe('captureLocalDiff — untracked files', () => {
     // FILE-shaped pathspecs. A directory target kept every tracked plumbing
     // section beneath it while the untracked half dropped plumbing
     // descendants — the two halves of one capture disagreed, and a repo that
-    // committed its own `.qwen` plumbing reviewed its ledger JSON as user
+    // committed its own `.mariadb-shell-agent` plumbing reviewed its ledger JSON as user
     // content, whose every-round churn kept `changedSince` from ever
     // emptying.
-    write('sub/.qwen/review-cache/local.json', '{"round":1}\n');
+    write('sub/.mariadb-shell-agent/review-cache/local.json', '{"round":1}\n');
     write('sub/code.ts', 'export const c = 1;\n');
-    git('add', '-f', 'sub/.qwen/review-cache/local.json');
+    git('add', '-f', 'sub/.mariadb-shell-agent/review-cache/local.json');
     git('add', 'sub/code.ts');
     git('commit', '-q', '--no-verify', '-m', 'committed plumbing');
-    write('sub/.qwen/review-cache/local.json', '{"round":2}\n');
+    write('sub/.mariadb-shell-agent/review-cache/local.json', '{"round":2}\n');
     write('sub/code.ts', 'export const c = 2;\n');
     write('sub/note.md', 'user content\n');
-    write('sub/.qwen/tmp/qwen-review-local-plan.json', '{}\n');
+    write('sub/.mariadb-shell-agent/tmp/qwen-review-local-plan.json', '{}\n');
 
     const res = capture({ file: 'sub/' });
     expect(res.text).toContain('sub/code.ts');
@@ -407,14 +431,14 @@ describe('captureLocalDiff — untracked files', () => {
 
   it('keeps TRACKED plumbing sections the user NAMED', () => {
     // The named-path exemption is deliberate: `/review
-    // .qwen/reviews/saved.md` on a committed report file asks for exactly
+    // .mariadb-shell-agent/reviews/saved.md` on a committed report file asks for exactly
     // the section the plumbing drop exists to remove.
-    write('.qwen/reviews/saved.md', '# old\n');
-    git('add', '-f', '.qwen/reviews/saved.md');
+    write('.mariadb-shell-agent/reviews/saved.md', '# old\n');
+    git('add', '-f', '.mariadb-shell-agent/reviews/saved.md');
     git('commit', '-q', '--no-verify', '-m', 'committed plumbing');
-    write('.qwen/reviews/saved.md', '# new\n');
+    write('.mariadb-shell-agent/reviews/saved.md', '# new\n');
 
-    const res = capture({ file: '.qwen/reviews/saved.md' });
+    const res = capture({ file: '.mariadb-shell-agent/reviews/saved.md' });
     expect(res.text).toContain('saved.md');
     expect(res.text).toContain('-# old');
   });
@@ -443,10 +467,13 @@ describe('captureLocalDiff — untracked files', () => {
     // would have shrunk it UNDER the cap, and confirm it is still rejected
     // whole rather than rescued by the drop.
     const big = '{"pad":"' + 'x'.repeat(MAX_UNTRACKED_TOTAL_BYTES) + '"}\n';
-    write('.qwen/review-cache/local.json', big);
-    git('add', '-f', '.qwen/review-cache/local.json');
+    write('.mariadb-shell-agent/review-cache/local.json', big);
+    git('add', '-f', '.mariadb-shell-agent/review-cache/local.json');
     git('commit', '-q', '--no-verify', '-m', 'committed plumbing');
-    write('.qwen/review-cache/local.json', big.replace('{"pad"', '{"PAD"'));
+    write(
+      '.mariadb-shell-agent/review-cache/local.json',
+      big.replace('{"pad"', '{"PAD"'),
+    );
     write('tracked.ts', 'export const a = 2;\n');
 
     const res = capture();

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -241,7 +242,7 @@ export function createVoiceWsConnectionHandler(
   return (ws: WebSocket) => {
     const admission = (deps.acquireVoiceLease ?? acquireLocalLease)();
     if (admission.kind === 'rejected') {
-      writeStderrLine('qwen serve: voice websocket rejected');
+      writeStderrLine('mariadb-shell-agent serve: voice websocket rejected');
       try {
         if (admission.reason === 'draining') {
           ws.close(1012, 'Workspace removed');
@@ -260,13 +261,15 @@ export function createVoiceWsConnectionHandler(
       return;
     }
     const lease = admission.lease;
-    writeStderrLine('qwen serve: voice websocket accepted');
+    writeStderrLine('mariadb-shell-agent serve: voice websocket accepted');
     let released = false;
     const releaseSlot = () => {
       if (!released) {
         released = true;
         lease.release();
-        writeStderrLine('qwen serve: voice websocket slot released');
+        writeStderrLine(
+          'mariadb-shell-agent serve: voice websocket slot released',
+        );
       }
     };
 
@@ -343,7 +346,9 @@ export function createVoiceWsConnectionHandler(
 
     function fail(message: string): void {
       if (state === 'closed') return;
-      writeStderrLine(`qwen serve: voice websocket failed: ${message}`);
+      writeStderrLine(
+        `mariadb-shell-agent serve: voice websocket failed: ${message}`,
+      );
       sendJson({ type: 'error', message });
       cleanup();
       releaseSlotWhenIdle();
@@ -421,7 +426,9 @@ export function createVoiceWsConnectionHandler(
         );
       }
       sendJson({ type: 'final', text: transcript });
-      writeStderrLine('qwen serve: voice websocket finalized successfully');
+      writeStderrLine(
+        'mariadb-shell-agent serve: voice websocket finalized successfully',
+      );
       cleanup();
       releaseSlotWhenIdle();
       try {
@@ -457,11 +464,15 @@ export function createVoiceWsConnectionHandler(
       if (!control) return;
       switch (control.type) {
         case 'start':
-          writeStderrLine('qwen serve: voice websocket start received');
+          writeStderrLine(
+            'mariadb-shell-agent serve: voice websocket start received',
+          );
           await ensureStarted();
           return;
         case 'stop':
-          writeStderrLine('qwen serve: voice websocket stop received');
+          writeStderrLine(
+            'mariadb-shell-agent serve: voice websocket stop received',
+          );
           await finalize();
           return;
         default:
@@ -474,7 +485,9 @@ export function createVoiceWsConnectionHandler(
       if (!isBinary) {
         const control = parseControl(buf.toString('utf8'));
         if (control?.type === 'abort') {
-          writeStderrLine('qwen serve: voice websocket abort received');
+          writeStderrLine(
+            'mariadb-shell-agent serve: voice websocket abort received',
+          );
           cleanup();
           try {
             ws.close(1000, 'aborted');

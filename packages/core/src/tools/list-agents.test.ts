@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -93,9 +94,11 @@ describe('ListAgentsTool', () => {
       'agents.crossSessionMessaging may also be off',
     );
     expect(result.llmContent).toContain(
-      'Other Qwen Code sessions cannot be discovered from this session',
+      'Other MariaDB Shell Agent sessions cannot be discovered from this session',
     );
-    expect(result.llmContent).not.toContain('no other Qwen Code session');
+    expect(result.llmContent).not.toContain(
+      'no other MariaDB Shell Agent session',
+    );
   });
 
   it('reports an empty roster', async () => {
@@ -104,7 +107,7 @@ describe('ListAgentsTool', () => {
     expect(tool.name).toBe('list_agents');
     expect(result.llmContent).toBe(
       'No ordinary background subagents are available in this session. ' +
-        'Other Qwen Code sessions cannot be discovered from this session (this session publishes no peer inbox address). ' +
+        'Other MariaDB Shell Agent sessions cannot be discovered from this session (this session publishes no peer inbox address). ' +
         'Named Agent Team teammates are not listed here; their results are ' +
         'delivered automatically through team messaging, so do not use ' +
         'list_agents to wait for a teammate.',
@@ -256,14 +259,16 @@ describe('ListAgentsTool — peer sessions', () => {
     );
     expect(result.llmContent).not.toContain('no peer inbox is bound');
     expect(result.llmContent).toContain(
-      'Other Qwen Code sessions cannot be discovered from this session',
+      'Other MariaDB Shell Agent sessions cannot be discovered from this session',
     );
-    expect(result.llmContent).not.toContain('no other Qwen Code session');
+    expect(result.llmContent).not.toContain(
+      'no other MariaDB Shell Agent session',
+    );
   });
 
   it('says so when messaging is on but no other session is reachable', async () => {
     const result = await run();
-    expect(result.llmContent).toContain('no other Qwen Code session');
+    expect(result.llmContent).toContain('no other MariaDB Shell Agent session');
     expect(result.llmContent).toContain('Named Agent Team teammates');
     // The description promises the session's own name; the empty case
     // must keep that promise too.
@@ -431,11 +436,11 @@ describe('ListAgentsTool — peer sessions', () => {
     ]);
     // No peers left: the roster falls back to the plain-text empty case.
     const result = await run();
-    expect(result.llmContent).toContain('no other Qwen Code session');
+    expect(result.llmContent).toContain('no other MariaDB Shell Agent session');
   });
 
   it('excludes a differently named twin of this session', async () => {
-    // `qwen --resume <id>` from another directory: same session id under
+    // `mariadb-shell-agent --resume <id>` from another directory: same session id under
     // a second process. sendToPeer refuses it as self, so advertising it
     // would hand the model a dead address.
     const parsed = await listPeers([

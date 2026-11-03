@@ -2,7 +2,7 @@
 
 [English](2026-09-29-hosted-operator-recovery.md) | [简体中文](2026-09-29-hosted-operator-recovery.zh-CN.md)
 
-状态：[#12904](https://github.com/QwenLM/qwen-code/issues/12904) 的实现设计。依赖 [W0e-3](2026-09-28-local-reboot-recovery.zh-CN.md)。
+状态：[#12904](https://github.invalid/QwenLM/qwen-code/issues/12904) 的实现设计。依赖 [W0e-3](2026-09-28-local-reboot-recovery.zh-CN.md)。
 
 ## 问题与支持边界
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -109,7 +110,7 @@ function normalizeEndpoint(raw: string): string {
     .trim()
     .replace(/^https?:\/\//, '')
     .replace(/\/+$/, '');
-  if (!/^[a-z0-9.-]+\.aliyuncs\.com$/i.test(endpoint)) {
+  if (!/^[a-z0-9.-]+\.aliyuncs\.invalid$/i.test(endpoint)) {
     throw new Error(
       `artifact.oss.endpoint does not look like a valid Aliyun OSS endpoint: ${endpoint}`,
     );
@@ -173,7 +174,7 @@ export class OssPublisher implements ArtifactPublisher {
     }
     if (!rawEndpoint) {
       throw new Error(
-        'artifact.oss.endpoint is not configured (e.g. "oss-cn-hangzhou.aliyuncs.com").',
+        'artifact.oss.endpoint is not configured (e.g. "oss-cn-hangzhou.aliyuncs.invalid").',
       );
     }
     const endpoint = normalizeEndpoint(rawEndpoint);

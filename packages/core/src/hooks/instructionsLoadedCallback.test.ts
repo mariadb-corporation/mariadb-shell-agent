@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,7 +23,7 @@ describe('createInstructionsLoadedCallback', () => {
     );
 
     await callback({
-      filePath: '/repo/QWEN.md',
+      filePath: '/repo/MARIADB-SHELL-AGENT.md',
       memoryType: 'project',
       loadReason: 'include',
       triggerFilePath: '/repo/src/app.ts',
@@ -30,7 +31,7 @@ describe('createInstructionsLoadedCallback', () => {
     });
 
     expect(fireInstructionsLoadedEvent).toHaveBeenCalledWith(
-      '/repo/QWEN.md',
+      '/repo/MARIADB-SHELL-AGENT.md',
       'project',
       'include',
       {
@@ -52,7 +53,7 @@ describe('createInstructionsLoadedCallback', () => {
     );
 
     await callback({
-      filePath: '/repo/QWEN.md',
+      filePath: '/repo/MARIADB-SHELL-AGENT.md',
       memoryType: 'project',
       loadReason: 'session_start',
     });
@@ -65,7 +66,7 @@ describe('createInstructionsLoadedCallback', () => {
 
     await expect(
       callback({
-        filePath: '/repo/QWEN.md',
+        filePath: '/repo/MARIADB-SHELL-AGENT.md',
         memoryType: 'project',
         loadReason: 'session_start',
       }),
@@ -84,7 +85,7 @@ describe('createInstructionsLoadedCallback', () => {
 
     await expect(
       callback({
-        filePath: '/repo/QWEN.md',
+        filePath: '/repo/MARIADB-SHELL-AGENT.md',
         memoryType: 'project',
         loadReason: 'session_start',
       }),

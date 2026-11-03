@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -120,7 +121,7 @@ describe('releaseWorktree', () => {
   });
 
   it('frees a path whose directory was deleted by hand', () => {
-    // What `rm -rf .qwen/tmp` does to a review worktree.
+    // What `rm -rf .mariadb-shell-agent/tmp` does to a review worktree.
     git('worktree', 'add', '-q', 'wt', '-b', 'topic');
     rmSync(join(repo, 'wt'), { recursive: true, force: true });
 
@@ -196,7 +197,7 @@ describe('releaseWorktree', () => {
 
   it('refuses to release through an ANCESTOR symlink, which lstat cannot see', () => {
     // `lstatSync` dereferences every component except the last, so the leaf
-    // guard below is blind one level up: a link at `.qwen/tmp` leaves every
+    // guard below is blind one level up: a link at `.mariadb-shell-agent/tmp` leaves every
     // path under it looking like an ordinary directory while
     // `git worktree remove --force` and the `rmSync` fallback both land in
     // whatever checkout it names. `runCleanup` refuses its whole sweep on
@@ -396,7 +397,7 @@ describe('releaseWorktree', () => {
       // release the other had completed.
       //
       // Staged with real git and no mocks: the launch directory is inside a
-      // `.qwen/tmp` spelling, so the gate consults the kernel; the shim
+      // `.mariadb-shell-agent/tmp` spelling, so the gate consults the kernel; the shim
       // renames that directory out from under the process AFTER the remove
       // has answered 0, which splits the cached spelling from the kernel's
       // and refuses the prune alone. The mirror direction (a refused remove
@@ -406,7 +407,7 @@ describe('releaseWorktree', () => {
       // is the geometry the gate is written for: a plain directory in the
       // main checkout is refused outright by the common-dir question, so the
       // remove would never reach git at all.
-      const launch = join(repo, '.qwen', 'tmp', 'launch-wt');
+      const launch = join(repo, '.mariadb-shell-agent', 'tmp', 'launch-wt');
       git('worktree', 'add', '-q', '--detach', launch, 'HEAD');
       git('worktree', 'add', '-q', 'wt', '-b', 'topic');
 
@@ -420,7 +421,7 @@ describe('releaseWorktree', () => {
         `#!/bin/sh\n` +
           `if [ "$1" = worktree ] && [ "$2" = remove ]; then\n` +
           `  ${realGit} "$@"; st=$?\n` +
-          `  mv "${launch}" "${join(repo, '.qwen', 'tmp', 'renamed')}"\n` +
+          `  mv "${launch}" "${join(repo, '.mariadb-shell-agent', 'tmp', 'renamed')}"\n` +
           `  exit $st\n` +
           `fi\n` +
           `exec ${realGit} "$@"\n`,
@@ -441,7 +442,7 @@ describe('releaseWorktree', () => {
       // The premise, pinned rather than assumed: the prune really was
       // REFUSED (a launch-dir verdict), not merely unable to run — otherwise
       // this case would be re-testing the null-status arm above.
-      process.chdir(join(repo, '.qwen', 'tmp', 'renamed'));
+      process.chdir(join(repo, '.mariadb-shell-agent', 'tmp', 'renamed'));
       try {
         expect(gitProbe('worktree', 'prune').refusal).toBeTruthy();
       } finally {

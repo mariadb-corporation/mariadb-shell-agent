@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -132,7 +133,7 @@ function toAbsoluteResultPath(
 }
 
 function isQwenIgnoreFileName(ignoreFileName: string): boolean {
-  return ignoreFileName === '.qwenignore';
+  return ignoreFileName === '.mariadb-shell-agentignore';
 }
 
 /**
@@ -515,7 +516,7 @@ class GrepToolInvocation extends BaseToolInvocation<
     if (filteringOptions.respectQwenIgnore) {
       // Load ignore files from each workspace directory, not just the primary one.
       const seenIgnoreFiles = new Set<string>();
-      // Pass .qwenignore last so custom ignore negations cannot override it.
+      // Pass .mariadb-shell-agentignore last so custom ignore negations cannot override it.
       const nonQwenIgnorePaths: string[] = [];
       const qwenIgnorePathsForRipgrep: string[] = [];
       const ignoreFileNames = getQwenIgnoreFileNames(

@@ -2,16 +2,17 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Black-box smoke client for the daemon's official ACP Streamable HTTP
- * transport (RFD #721), mounted at `/acp` by `qwen serve`.
+ * transport (RFD #721), mounted at `/acp` by `mariadb-shell-agent serve`.
  *
  * Usage:
  *   1. Start a daemon, e.g.:
- *        qwen serve --listen 127.0.0.1:8765 --token devtoken
+ *        mariadb-shell-agent serve --listen 127.0.0.1:8765 --token devtoken
  *      (or any port; copy the printed address)
  *   2. Run this client against it:
  *        ACP_BASE_URL=http://127.0.0.1:8765 ACP_TOKEN=devtoken \

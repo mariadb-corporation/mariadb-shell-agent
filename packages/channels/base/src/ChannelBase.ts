@@ -4523,7 +4523,7 @@ export abstract class ChannelBase {
           (command.name === 'btw' && !this.bridge.btw),
       );
       if (agentCommands.length > 0) {
-        lines.push('', 'Agent commands (forwarded to Qwen Code):');
+        lines.push('', 'Agent commands (forwarded to MariaDB Shell Agent):');
         for (const cmd of agentCommands) {
           lines.push(`/${cmd.name} — ${cmd.description}`);
         }
@@ -7655,7 +7655,7 @@ export abstract class ChannelBase {
       await this.sendThreadMessage(
         chatId,
         threadId,
-        `Your pairing code is: ${result.code}\n\nAsk the bot operator to approve you with:\n  qwen channel pairing approve ${this.name} ${result.code}`,
+        `Your pairing code is: ${result.code}\n\nAsk the bot operator to approve you with:\n  mariadb-shell-agent channel pairing approve ${this.name} ${result.code}`,
       );
     } else {
       await this.sendThreadMessage(
@@ -7678,7 +7678,7 @@ export abstract class ChannelBase {
       await this.sendThreadMessage(
         chatId,
         threadId,
-        `This group requires approval. Its pairing code is: ${result.code}\n\nAsk the bot operator to approve the group with:\n  qwen channel pairing approve ${this.name} ${result.code}`,
+        `This group requires approval. Its pairing code is: ${result.code}\n\nAsk the bot operator to approve the group with:\n  mariadb-shell-agent channel pairing approve ${this.name} ${result.code}`,
       );
       this.groupPairingNotified.set(chatId, result.code);
     } else {

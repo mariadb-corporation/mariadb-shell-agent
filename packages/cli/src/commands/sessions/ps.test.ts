@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -109,7 +110,7 @@ describe('formatAge', () => {
   });
 });
 
-describe('qwen sessions ps', () => {
+describe('mariadb-shell-agent sessions ps', () => {
   it('prints a table of live sessions', async () => {
     listLiveSessions.mockResolvedValue([record()]);
     await run({ json: false });
@@ -178,7 +179,7 @@ describe('qwen sessions ps', () => {
     listLiveSessions.mockResolvedValue([]);
     await run({ json: false });
     expect(stdout).toEqual([
-      'No Qwen Code sessions are registered or managed right now.',
+      'No MariaDB Shell Agent sessions are registered or managed right now.',
     ]);
   });
 

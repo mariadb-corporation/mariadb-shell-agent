@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,7 +12,7 @@ import { resolveEndpoint } from './batch.js';
 
 const provider = {
   id: 'batch-model',
-  baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
   envKey: 'BATCH_KEY',
   generationConfig: { samplingParams: { temperature: 0.2, max_tokens: 1024 } },
 };

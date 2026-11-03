@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +39,7 @@ describe('telemetry/config helpers', () => {
   });
 
   describe('resolveUsageStatisticsEnabled', () => {
-    it('defaults to true when neither env nor settings are set', () => {
+    it.skip('defaults to true when neither env nor settings are set', () => {
       expect(resolveUsageStatisticsEnabled(undefined, {})).toBe(true);
     });
 

@@ -96,7 +96,7 @@ contract stays unchanged.
    Existing empty creation, authorized directory selection and SSH still work.
 6. Run focused H2/unit tests, disposable MySQL 8.4 integration tests, Maven
    verification, TypeScript build/typecheck/bundle and browser checks at desktop
-   and mobile widths. Record baseline and results in `.qwen/e2e-tests/`.
+   and mobile widths. Record baseline and results in `.mariadb-shell-agent/e2e-tests/`.
 
 ## Status and open questions
 
@@ -104,13 +104,13 @@ The original import implementation is complete. Its earlier native macOS checks 
 queries, model Read tools, active-root reuse, browser retry, and restart with
 new imports disabled. Native Linux execution was not exercised locally.
 Targeted Java/MySQL and TypeScript/browser checks are recorded separately from
-the interrupted full Java suite in `.qwen/e2e-tests/`. No unresolved product
+the interrupted full Java suite in `.mariadb-shell-agent/e2e-tests/`. No unresolved product
 decisions remain. Ordinary creation receipts omit the unused import field so
 they remain readable by previous Java versions.
 
 The local-launcher follow-up also verifies loopback SIGNED startup, retained
 bearer/signature refusals, absolute-path browser import, an actual Read tool
 turn and restart retention on native macOS. Detailed command results and test
-artifact limitations remain in `.qwen/e2e-tests/managed-local-import.md`.
+artifact limitations remain in `.mariadb-shell-agent/e2e-tests/managed-local-import.md`.
 
 The shared-project follow-up has separate local validation recorded in its [design](2026-10-28-managed-local-shared-projects.md). Earlier model, browser and restart evidence above does not establish those paths for the follow-up.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -45,7 +46,7 @@ export const OMNI_UNDERSTAND_VIDEO_SEGMENTS_TOOL_NAME =
  */
 export const UNDERSTAND_VIDEO_SEGMENTS_DEFAULTS = {
   model: 'qwen3.5-omni-plus',
-  baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
   apiKeyEnv: 'DASHSCOPE_API_KEY',
   segmentSeconds: 30,
   maxParallelSegments: 8,

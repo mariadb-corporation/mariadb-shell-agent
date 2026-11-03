@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,7 +21,7 @@ describe('ChatWebviewViewProvider', () => {
 
     const mockWebviewView = {
       webview: {},
-      viewType: 'qwen-code.chatView.sidebar',
+      viewType: 'mariadb-shell-agent.chatView.sidebar',
     };
 
     await viewProvider.resolveWebviewView(mockWebviewView as never);
@@ -28,7 +29,7 @@ describe('ChatWebviewViewProvider', () => {
     expect(factory).toHaveBeenCalledTimes(1);
     expect(mockProvider.attachToView).toHaveBeenCalledWith(
       mockWebviewView,
-      'qwen-code.chatView.sidebar',
+      'mariadb-shell-agent.chatView.sidebar',
     );
   });
 

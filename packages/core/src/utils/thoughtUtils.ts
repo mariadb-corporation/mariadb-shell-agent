@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -52,7 +53,7 @@ export function isOpenAIReasoningThoughtPart(part: Part): boolean {
  * tolerates leading whitespace. `llm-chat.ts`'s
  * `isCompleteResponsesReasoningSignature` is the same check without that
  * tolerance.
- * See https://github.com/QwenLM/qwen-code/issues/9453
+ * See https://github.invalid/QwenLM/qwen-code/issues/9453
  */
 export function isResponsesReasoningSignature(signature: unknown): boolean {
   if (typeof signature !== 'string') return false;

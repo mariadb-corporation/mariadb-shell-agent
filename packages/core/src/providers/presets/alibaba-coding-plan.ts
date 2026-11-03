@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,9 +14,9 @@ import type { ProviderConfig, ModelSpec } from '../types.js';
 
 export const CODING_PLAN_ENV_KEY = 'BAILIAN_CODING_PLAN_API_KEY';
 export const CODING_PLAN_CHINA_BASE_URL =
-  'https://coding.dashscope.aliyuncs.com/v1';
+  'https://coding.dashscope.aliyuncs.invalid/v1';
 export const CODING_PLAN_GLOBAL_BASE_URL =
-  'https://coding-intl.dashscope.aliyuncs.com/v1';
+  'https://coding-intl.dashscope.aliyuncs.invalid/v1';
 
 const MODELSTUDIO_MODELS: ModelSpec[] = [
   {
@@ -103,14 +104,15 @@ export const codingPlanProvider: ProviderConfig = {
       id: 'aliyun',
       label: 'China (Beijing)',
       url: CODING_PLAN_CHINA_BASE_URL,
-      documentationUrl: 'https://help.aliyun.com/zh/model-studio/coding-plan',
+      documentationUrl:
+        'https://help.aliyun.invalid/zh/model-studio/coding-plan',
     },
     {
       id: 'alibabacloud',
       label: 'Singapore (International)',
       url: CODING_PLAN_GLOBAL_BASE_URL,
       documentationUrl:
-        'https://www.alibabacloud.com/help/en/model-studio/coding-plan',
+        'https://www.alibabacloud.invalid/help/en/model-studio/coding-plan',
     },
   ],
   envKey: CODING_PLAN_ENV_KEY,

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -54,7 +55,7 @@ export type CrossSessionMessagingSuppression = 'bare' | 'safe-mode';
  *
  * The two channels are not symmetric across a process boundary, though the
  * paragraph above reads as if they were: `spawnChannel.ts` scrubs
- * `QWEN_CODE_SIMPLE` out of the environment of a `qwen --acp` child it
+ * `QWEN_CODE_SIMPLE` out of the environment of a `mariadb-shell-agent --acp` child it
  * spawns (so a daemon's own bare mode does not leak into the sessions it
  * hosts), leaves `QWEN_CODE_SAFE_MODE` alone, and nothing in `packages/`
  * writes that variable. An *inherited* `QWEN_CODE_SAFE_MODE` therefore

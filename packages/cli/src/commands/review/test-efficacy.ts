@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review test-efficacy`: does the diff's new test actually gate the
+// `mariadb-shell-agent review test-efficacy`: does the diff's new test actually gate the
 // diff's new behaviour?
 //
 // Agent 5 and the test-coverage matrix ask whether a test EXISTS and whether
@@ -1569,7 +1570,7 @@ export function probeCleanupFailureDetail(
  *
  * Same three null cases as `build-test`'s: policy off, no runtime under
  * `auto`, or a tree that is not under a review temp dir (a `/review` of a
- * local checkout, where there is no `.qwen/tmp` layout to mount).
+ * local checkout, where there is no `.mariadb-shell-agent/tmp` layout to mount).
  */
 function probeContainer(
   command: string,
@@ -2639,7 +2640,7 @@ async function runTestEfficacy(args: TestEfficacyArgs): Promise<void> {
     // uncommitted in the shared tree is ever touched or discarded.
     //
     // `node_modules` resolves without a per-tree install because the probe tree
-    // is nested under the repo (`.qwen/tmp/…-probe`), so Node walks up to the
+    // is nested under the repo (`.mariadb-shell-agent/tmp/…-probe`), so Node walks up to the
     // repo-root `node_modules` — exactly how the shared review worktree already
     // runs vitest.
     const headSha = gitOut(worktree, 'rev-parse', 'HEAD');

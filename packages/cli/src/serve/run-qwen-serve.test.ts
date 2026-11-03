@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -580,9 +581,9 @@ it('restores the Conversations runtime for a persisted scheduled task', async ()
     homeDir: linkedHome,
   });
   const { canonicalRoot } = await liveConversationWorkspace.getRoot();
-  fs.mkdirSync(path.join(canonicalRoot, '.qwen'));
+  fs.mkdirSync(path.join(canonicalRoot, '.mariadb-shell-agent'));
   fs.writeFileSync(
-    path.join(canonicalRoot, '.qwen', 'settings.json'),
+    path.join(canonicalRoot, '.mariadb-shell-agent', 'settings.json'),
     JSON.stringify({ advanced: { runtimeOutputDir: runtimeDir } }),
   );
   await qwenCore.Storage.runWithResolvedRuntimeBaseDir(runtimeDir, () =>
@@ -633,8 +634,8 @@ it('restores the Conversations runtime for a persisted scheduled task', async ()
         bridge: makeRuntimeBridge(),
         liveConversationWorkspace,
         // Isolate the Conversations-runtime ownership record from the
-        // machine-global ~/.qwen path: a concurrent live owner there
-        // (another worker / a developer's qwen serve) would fail this boot.
+        // machine-global ~/.mariadb-shell-agent path: a concurrent live owner there
+        // (another worker / a developer's mariadb-shell-agent serve) would fail this boot.
         liveDiscoveryStableBaseDir: path.join(tempRoot, 'stable'),
         resolveOnListen: true,
       },
@@ -674,9 +675,9 @@ it('marks only the live-conversation bridge with the Conversations provenance en
     homeDir: linkedHome,
   });
   const { canonicalRoot } = await liveConversationWorkspace.getRoot();
-  fs.mkdirSync(path.join(canonicalRoot, '.qwen'));
+  fs.mkdirSync(path.join(canonicalRoot, '.mariadb-shell-agent'));
   fs.writeFileSync(
-    path.join(canonicalRoot, '.qwen', 'settings.json'),
+    path.join(canonicalRoot, '.mariadb-shell-agent', 'settings.json'),
     JSON.stringify({ advanced: { runtimeOutputDir: runtimeDir } }),
   );
   await qwenCore.Storage.runWithResolvedRuntimeBaseDir(runtimeDir, () =>
@@ -945,7 +946,9 @@ it.each(
     const home = path.join(root, 'home');
     const workspace = path.join(root, 'workspace');
     fs.mkdirSync(home);
-    fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+    fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     const baseUrl = 'https://delete.example/v1';
     const model = { name: 'gpt-4o', baseUrl };
     const env = {
@@ -977,7 +980,11 @@ it.each(
       path.join(root, 'no-defaults'),
     );
     const userFile = path.join(home, 'settings.json');
-    const workspaceFile = path.join(workspace, '.qwen', 'settings.json');
+    const workspaceFile = path.join(
+      workspace,
+      '.mariadb-shell-agent',
+      'settings.json',
+    );
     fs.writeFileSync(
       userFile,
       JSON.stringify({
@@ -1357,9 +1364,11 @@ describe('workspace skill settings persistence', () => {
     previousQwenHome = process.env['QWEN_HOME'];
     process.env['QWEN_HOME'] = qwenHome;
     settingsRuntime.resetHomeEnvBootstrapForTesting();
-    fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+    fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     fs.writeFileSync(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ skills: { disabled: workspaceDisabled } }),
     );
     fs.writeFileSync(
@@ -1476,7 +1485,7 @@ describe('workspace skill settings persistence', () => {
       expect(
         JSON.parse(
           fs.readFileSync(
-            path.join(workspace, '.qwen', 'settings.json'),
+            path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
             'utf8',
           ),
         ).skills,
@@ -1600,7 +1609,7 @@ describe('workspace skill settings persistence', () => {
       expect(
         JSON.parse(
           fs.readFileSync(
-            path.join(workspace, '.qwen', 'settings.json'),
+            path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
             'utf8',
           ),
         ).skills,
@@ -1666,7 +1675,7 @@ describe('workspace skill settings persistence', () => {
       expect(
         JSON.parse(
           fs.readFileSync(
-            path.join(workspace, '.qwen', 'settings.json'),
+            path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
             'utf8',
           ),
         ).skills,
@@ -1718,7 +1727,7 @@ describe('workspace skill settings persistence', () => {
     expect(setValues).toHaveBeenCalledOnce();
 
     fs.writeFileSync(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ skills: { disabled: ['pdf'] } }),
     );
     setValues.mockClear();
@@ -1735,7 +1744,7 @@ describe('workspace skill settings persistence', () => {
     expect(setValues).toHaveBeenCalledOnce();
 
     fs.writeFileSync(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ skills: { disabled: [] } }),
     );
     setValues.mockClear();
@@ -1787,9 +1796,11 @@ describe('workspace skill settings persistence', () => {
     previousQwenHome = process.env['QWEN_HOME'];
     process.env['QWEN_HOME'] = qwenHome;
     settingsRuntime.resetHomeEnvBootstrapForTesting();
-    fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+    fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     fs.writeFileSync(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         skills: { disabled: ['orphan', ' ReViEw ', 'review'] },
       }),
@@ -1914,7 +1925,10 @@ describe('workspace skill settings persistence', () => {
     });
 
     const saved = JSON.parse(
-      fs.readFileSync(path.join(workspace, '.qwen', 'settings.json'), 'utf8'),
+      fs.readFileSync(
+        path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
+        'utf8',
+      ),
     ) as { skills: { disabled: string[]; enabled: string[] } };
     expect(saved.skills.disabled).toEqual(['orphan', 'alpha', 'beta']);
     expect(saved.skills.enabled).toEqual([
@@ -1965,9 +1979,11 @@ describe('workspace skill settings persistence', () => {
     previousQwenHome = process.env['QWEN_HOME'];
     process.env['QWEN_HOME'] = qwenHome;
     settingsRuntime.resetHomeEnvBootstrapForTesting();
-    fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+    fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     fs.writeFileSync(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         skills: { disabled: ['dual-skill'] },
       }),
@@ -2021,7 +2037,10 @@ describe('workspace skill settings persistence', () => {
     });
 
     const saved = JSON.parse(
-      fs.readFileSync(path.join(workspace, '.qwen', 'settings.json'), 'utf8'),
+      fs.readFileSync(
+        path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
+        'utf8',
+      ),
     ) as { skills: { disabled?: string[]; enabled: string[] } };
     expect(saved.skills.disabled).toBeUndefined();
     expect(saved.skills.enabled).toEqual(['dual-skill']);
@@ -2056,9 +2075,11 @@ describe('workspace skill settings persistence', () => {
     previousQwenHome = process.env['QWEN_HOME'];
     process.env['QWEN_HOME'] = qwenHome;
     settingsRuntime.resetHomeEnvBootstrapForTesting();
-    fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+    fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     fs.writeFileSync(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ skills: { disabled: ['orphan'] } }),
     );
     fs.writeFileSync(
@@ -2137,7 +2158,10 @@ describe('workspace skill settings persistence', () => {
     expect(setValues).toHaveBeenCalledOnce();
 
     const savedAfterDisable = JSON.parse(
-      fs.readFileSync(path.join(workspace, '.qwen', 'settings.json'), 'utf8'),
+      fs.readFileSync(
+        path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
+        'utf8',
+      ),
     ) as { skills: { disabled: string[]; enabled?: string[] } };
     expect(savedAfterDisable.skills.disabled).toEqual([
       'orphan',
@@ -2200,7 +2224,10 @@ describe('workspace skill settings persistence', () => {
     expect(setValues).toHaveBeenCalledTimes(4);
 
     const savedAfterEnable = JSON.parse(
-      fs.readFileSync(path.join(workspace, '.qwen', 'settings.json'), 'utf8'),
+      fs.readFileSync(
+        path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
+        'utf8',
+      ),
     ) as { skills: { disabled: string[]; enabled: string[] } };
     expect(savedAfterEnable.skills.disabled).toEqual([
       'review',
@@ -2237,7 +2264,7 @@ describe('workspace skill settings persistence', () => {
 /**
  * #4297 fold-in 7 (deepseek S1, addresses #3262690842). Lock the
  * `context.fileName` extraction logic so a regression doesn't
- * silently re-enable the P2-1 bug (init writes default `QWEN.md`
+ * silently re-enable the P2-1 bug (init writes default `MARIADB-SHELL-AGENT.md`
  * even when the workspace configured `AGENTS.md` etc.). The four
  * branches the suggestion called out are exercised explicitly here;
  * the runQwenServe boot path itself stays integration-tested
@@ -4959,7 +4986,7 @@ describe('validatePolicyConfig (#4335 boot validation)', () => {
 /**
  * Integration test: verify daemon logger is initialized and written to
  * during `runQwenServe` boot + shutdown. Uses a fake bridge to avoid
- * spawning real `qwen --acp` child processes.
+ * spawning real `mariadb-shell-agent --acp` child processes.
  */
 describe('runQwenServe daemon logger wiring', () => {
   let tmpDir: string;
@@ -5552,9 +5579,9 @@ describe('runQwenServe telemetry validation', () => {
       ).json()) as { features: string[] };
       expect(before.features).not.toContain('workspace_voice_transcription');
 
-      fs.mkdirSync(path.join(workspace, '.qwen'));
+      fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'));
       fs.writeFileSync(
-        path.join(workspace, '.qwen', 'settings.json'),
+        path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({
           modelProviders: {
             openai: [
@@ -6156,14 +6183,14 @@ describe('runQwenServe telemetry validation', () => {
         )?.[0],
       ).toMatchObject({ contextFilename: 'SECONDARY.md' });
       // bootSettings above carries no `context.fileName`, so the primary
-      // workspace must land on the hard-coded `QWEN.md` init default
-      // (`contextFilenameForInit ?? 'QWEN.md'`). Without this assertion the
+      // workspace must land on the hard-coded `MARIADB-SHELL-AGENT.md` init default
+      // (`contextFilenameForInit ?? 'MARIADB-SHELL-AGENT.md'`). Without this assertion the
       // fallback literal could be swapped without any test noticing.
       expect(
         createWorkspaceService.mock.calls.find(
           ([input]) => input.boundWorkspace === canonicalizeWorkspace(primary),
         )?.[0],
-      ).toMatchObject({ contextFilename: 'QWEN.md' });
+      ).toMatchObject({ contextFilename: 'MARIADB-SHELL-AGENT.md' });
     } finally {
       await handle.close();
     }
@@ -6622,9 +6649,9 @@ describe('runQwenServe paired execution engines', () => {
     vi.stubEnv('QWEN_HOME', path.join(tmpDir, 'qwen-home'));
     const storageOf = (dir: string) => `${dir}-sessions`;
     for (const dir of Object.values(workspaces)) {
-      fs.mkdirSync(path.join(dir, '.qwen'), { recursive: true });
+      fs.mkdirSync(path.join(dir, '.mariadb-shell-agent'), { recursive: true });
       fs.writeFileSync(
-        path.join(dir, '.qwen', 'settings.json'),
+        path.join(dir, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({ advanced: { runtimeOutputDir: storageOf(dir) } }),
       );
     }
@@ -6719,9 +6746,9 @@ describe('runQwenServe paired execution engines', () => {
     vi.stubEnv('QWEN_HOME', path.join(tmpDir, 'qwen-home'));
     const storageOf = (dir: string) => `${dir}-sessions`;
     for (const dir of [primary, secondary]) {
-      fs.mkdirSync(path.join(dir, '.qwen'), { recursive: true });
+      fs.mkdirSync(path.join(dir, '.mariadb-shell-agent'), { recursive: true });
       fs.writeFileSync(
-        path.join(dir, '.qwen', 'settings.json'),
+        path.join(dir, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({ advanced: { runtimeOutputDir: storageOf(dir) } }),
       );
     }
@@ -6809,9 +6836,9 @@ describe('runQwenServe paired execution engines', () => {
       homeDir: home,
     });
     const { canonicalRoot } = await liveConversationWorkspace.getRoot();
-    fs.mkdirSync(path.join(canonicalRoot, '.qwen'));
+    fs.mkdirSync(path.join(canonicalRoot, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(canonicalRoot, '.qwen', 'settings.json'),
+      path.join(canonicalRoot, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ advanced: { runtimeOutputDir: runtimeDir } }),
     );
     await qwenCore.Storage.runWithResolvedRuntimeBaseDir(runtimeDir, () =>
@@ -6942,9 +6969,9 @@ describe('runQwenServe deployment profiles', () => {
     const workspace = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-hosted-profile-')),
     );
-    fs.mkdirSync(path.join(workspace, '.qwen'));
+    fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ serve: { channels: ['telegram'] } }),
     );
     const originalCreateServeApp = serverModule.createServeApp;
@@ -7078,7 +7105,7 @@ describe('runQwenServe deployment profiles', () => {
           updateRestartArgv: ['serve', '--profile', 'hosted-harness'],
         },
       );
-      // `qwen serve` has already removed the pair from its environment, so
+      // `mariadb-shell-agent serve` has already removed the pair from its environment, so
       // the replacement gets it only through these options.
       expect(createDaemonUpdateRestarter).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -7203,7 +7230,7 @@ describe('runQwenServe permissionResponseTimeoutMs validation', () => {
     } as unknown as HttpAcpBridge;
 
     // Keep the daemon logger inside the temp dir so the boot path before
-    // the validation throw doesn't write into the real ~/.qwen.
+    // the validation throw doesn't write into the real ~/.mariadb-shell-agent.
     const origEnv = process.env['QWEN_RUNTIME_DIR'];
     process.env['QWEN_RUNTIME_DIR'] = tmpDir;
     try {
@@ -8658,7 +8685,9 @@ describe('runQwenServe pre-listen bridge option validation', () => {
           [optionName]: value,
         }),
       ).rejects.toThrow(message);
-      expect(stdoutWrites.join('')).not.toContain('qwen serve listening on');
+      expect(stdoutWrites.join('')).not.toContain(
+        'mariadb-shell-agent serve listening on',
+      );
     },
   );
 
@@ -8689,7 +8718,9 @@ describe('runQwenServe pre-listen bridge option validation', () => {
           [optionName]: value,
         }),
       ).rejects.toThrow(message);
-      expect(stdoutWrites.join('')).not.toContain('qwen serve listening on');
+      expect(stdoutWrites.join('')).not.toContain(
+        'mariadb-shell-agent serve listening on',
+      );
     },
   );
 
@@ -8718,7 +8749,9 @@ describe('runQwenServe pre-listen bridge option validation', () => {
         { bridge: makeRuntimeBridge() },
       ),
     ).rejects.toThrow(/Injected bridge dependencies/);
-    expect(stdoutWrites.join('')).not.toContain('qwen serve listening on');
+    expect(stdoutWrites.join('')).not.toContain(
+      'mariadb-shell-agent serve listening on',
+    );
   });
 
   it.each(['root', 'child', 'missing-child', 'alias'] as const)(
@@ -8768,7 +8801,9 @@ describe('runQwenServe pre-listen bridge option validation', () => {
           { liveConversationWorkspace },
         ),
       ).rejects.toThrow(/reserved for Conversations/);
-      expect(stdoutWrites.join('')).not.toContain('qwen serve listening on');
+      expect(stdoutWrites.join('')).not.toContain(
+        'mariadb-shell-agent serve listening on',
+      );
     },
   );
 
@@ -8794,7 +8829,9 @@ describe('runQwenServe pre-listen bridge option validation', () => {
         },
       } as unknown as Parameters<typeof runQwenServe>[0]),
     ).rejects.toThrow(/externalToolGuard/);
-    expect(stdoutWrites.join('')).not.toContain('qwen serve listening on');
+    expect(stdoutWrites.join('')).not.toContain(
+      'mariadb-shell-agent serve listening on',
+    );
     expect(process.env['QWEN_CODE_EXTERNAL_TOOL_GUARD_TOKEN']).toBeUndefined();
   });
 
@@ -8821,7 +8858,9 @@ describe('runQwenServe pre-listen bridge option validation', () => {
         },
       }),
     ).rejects.toThrow(/loopback/);
-    expect(stdoutWrites.join('')).not.toContain('qwen serve listening on');
+    expect(stdoutWrites.join('')).not.toContain(
+      'mariadb-shell-agent serve listening on',
+    );
   });
 });
 
@@ -10609,7 +10648,7 @@ describe('runQwenServe runtime startup failures', () => {
         'Restored workspace',
       ]);
       expect(restoredRemovable).toEqual([false, false, true]);
-      // `qwen daemon restart` replays only the explicit startup workspaces;
+      // `mariadb-shell-agent daemon restart` replays only the explicit startup workspaces;
       // the restored registration stays a removable registration.
       expect(
         readDaemonDiscoveries().entries.find(
@@ -16082,9 +16121,9 @@ describe('runQwenServe channel worker supervisor', () => {
       'QWEN_CODE_SYSTEM_DEFAULTS_PATH',
       path.join(tmpDir, 'no-system-defaults.json'),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ serve: { tokenQr: true } }),
     );
     const stderrWrites: string[] = [];
@@ -16867,9 +16906,9 @@ describe('runQwenServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-tls-lazy-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ channels: { telegram: { type: 'telegram' } } }),
     );
     const certPath = path.join(tmpDir, 'cert.pem');
@@ -17128,9 +17167,9 @@ describe('runQwenServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-autostart-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         channels: { telegram: { type: 'telegram' } },
         serve: { channels: ['telegram'] },
@@ -17193,9 +17232,11 @@ describe('runQwenServe channel worker supervisor', () => {
     const primary = path.join(tmpDir, 'primary');
     const secondary = path.join(tmpDir, 'secondary');
     for (const workspace of [primary, secondary])
-      fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+      fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'), {
+        recursive: true,
+      });
     fs.writeFileSync(
-      path.join(primary, '.qwen', 'settings.json'),
+      path.join(primary, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         channels: {
           telegram: { type: 'telegram' },
@@ -17205,7 +17246,7 @@ describe('runQwenServe channel worker supervisor', () => {
       }),
     );
     fs.writeFileSync(
-      path.join(secondary, '.qwen', 'settings.json'),
+      path.join(secondary, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         channels: { discord: { type: 'discord' } },
         serve: { channels: ['discord'] },
@@ -17296,9 +17337,11 @@ describe('runQwenServe channel worker supervisor', () => {
     workspace: string,
     settings: Record<string, unknown>,
   ) {
-    fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+    fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     fs.writeFileSync(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify(settings),
     );
   }
@@ -17855,7 +17898,7 @@ describe('runQwenServe channel worker supervisor', () => {
       // The duplicate claim is recorded, but it cost the operator nothing, so
       // it stays a log line instead of a boot banner.
       expect(written).not.toContain(
-        `qwen serve: workspace ${JSON.stringify(primary)} serve.channels`,
+        `mariadb-shell-agent serve: workspace ${JSON.stringify(primary)} serve.channels`,
       );
       expect(written).toContain('code=claimed_by_multiple_workspaces');
     } finally {
@@ -18142,7 +18185,7 @@ describe('runQwenServe channel worker supervisor', () => {
       await handle.runtimeReady;
       await vi.waitFor(() => expect(daemon.factory).toHaveBeenCalledTimes(1));
 
-      // `qwen channel stop` maps to this. Registering a workspace afterwards
+      // `mariadb-shell-agent channel stop` maps to this. Registering a workspace afterwards
       // is not an instruction to turn hosting back on.
       const stopped = await fetch(`${handle.url}/workspace/channel`, {
         method: 'DELETE',
@@ -19402,9 +19445,9 @@ describe('runQwenServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-failed-startup-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         channels: { telegram: { type: 'telegram' } },
         serve: { channels: ['telegram'] },
@@ -19488,7 +19531,11 @@ describe('runQwenServe channel worker supervisor', () => {
         },
       });
       expect(listed).not.toContain(leakedCredential);
-      const settingsFile = path.join(tmpDir, '.qwen', 'settings.json');
+      const settingsFile = path.join(
+        tmpDir,
+        '.mariadb-shell-agent',
+        'settings.json',
+      );
       const originalSettings = fs.readFileSync(settingsFile, 'utf8');
       fs.writeFileSync(
         settingsFile,
@@ -19667,9 +19714,9 @@ describe('runQwenServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-runtime-control-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ channels: { telegram: { type: 'telegram' } } }),
     );
     const worker = makeWorker({
@@ -19803,9 +19850,9 @@ describe('runQwenServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-runtime-race-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ channels: { telegram: { type: 'telegram' } } }),
     );
     const worker = makeWorker({
@@ -19863,9 +19910,9 @@ describe('runQwenServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-runtime-fifo-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ channels: { telegram: { type: 'telegram' } } }),
     );
     let capturedDeps:
@@ -20026,9 +20073,9 @@ describe('runQwenServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-runtime-conflict-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ channels: { telegram: { type: 'telegram' } } }),
     );
     const workerFactory = vi.fn(() =>
@@ -20088,9 +20135,9 @@ describe('runQwenServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-runtime-race-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ channels: { telegram: { type: 'telegram' } } }),
     );
     const workerFactory = vi.fn(() =>
@@ -20200,9 +20247,9 @@ describe('runQwenServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-worker-reload-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ channels: { telegram: { type: 'telegram' } } }),
     );
     const worker = makeWorker({
@@ -20440,9 +20487,9 @@ describe('runQwenServe channel worker supervisor', () => {
         },
       },
     };
-    fs.mkdirSync(path.join(secondary, '.qwen'));
+    fs.mkdirSync(path.join(secondary, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(secondary, '.qwen', 'settings.json'),
+      path.join(secondary, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ channels: { feishu: secondaryChannelConfig } }),
     );
     vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
@@ -22290,7 +22337,9 @@ describe('runQwenServe channel worker supervisor', () => {
           channelServicePidfile: pidfile,
         },
       ),
-    ).rejects.toThrow('Channel service is already running under qwen serve');
+    ).rejects.toThrow(
+      'Channel service is already running under mariadb-shell-agent serve',
+    );
 
     expect(workerFactory).not.toHaveBeenCalled();
     expect(pidfile.reserveServeServiceInfo).not.toHaveBeenCalled();
@@ -22941,17 +22990,21 @@ describe('runQwenServe startup observability', () => {
       expect(stdoutWrites).toEqual(
         expect.arrayContaining([
           expect.stringMatching(
-            /^qwen serve listening on http:\/\/127\.0\.0\.1:\d+ \(mode=http-bridge, workspace=/,
+            /^mariadb-shell-agent serve listening on http:\/\/127\.0\.0\.1:\d+ \(mode=http-bridge, workspace=/,
           ),
         ]),
       );
       expect(stderrWrites.join('')).toMatch(
-        /qwen serve: startup timing: processToListenMs=\d+ runQwenServeToListenMs=\d+/,
+        /mariadb-shell-agent serve: startup timing: processToListenMs=\d+ runQwenServeToListenMs=\d+/,
       );
-      expect(stderrWrites.join('')).toMatch(/qwen daemon status\b/);
-      expect(stderrWrites.join('')).not.toMatch(/qwen daemon status --port/);
+      expect(stderrWrites.join('')).toMatch(
+        /mariadb-shell-agent daemon status\b/,
+      );
+      expect(stderrWrites.join('')).not.toMatch(
+        /mariadb-shell-agent daemon status --port/,
+      );
       expect(stderrWrites.join('')).not.toContain(
-        'qwen serve: client-hosted MCP tools are accepted over the WebSocket without auth.',
+        'mariadb-shell-agent serve: client-hosted MCP tools are accepted over the WebSocket without auth.',
       );
 
       expect(await readStartup(handle)).toMatchObject({
@@ -23004,7 +23057,7 @@ describe('runQwenServe startup observability', () => {
         'daemon',
       );
       expect(stderrWrites.join('')).toContain(
-        `qwen serve: daemon log → ${expectedDaemonDir}`,
+        `mariadb-shell-agent serve: daemon log → ${expectedDaemonDir}`,
       );
       expect(fs.existsSync(expectedDaemonDir)).toBe(true);
     } finally {
@@ -23046,7 +23099,7 @@ describe('runQwenServe startup observability', () => {
     try {
       const expectedDaemonDir = path.join(logBaseDir, 'daemon');
       expect(stderrWrites.join('')).toContain(
-        `qwen serve: daemon log → ${expectedDaemonDir}`,
+        `mariadb-shell-agent serve: daemon log → ${expectedDaemonDir}`,
       );
       expect(fs.existsSync(expectedDaemonDir)).toBe(true);
     } finally {
@@ -23061,9 +23114,9 @@ describe('runQwenServe startup observability', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-startup-storage-dir-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         advanced: { runtimeOutputDir: '.settings-runtime' },
       }),
@@ -23091,7 +23144,7 @@ describe('runQwenServe startup observability', () => {
       );
       const expectedDaemonDir = path.join(runtimeBaseDir, 'debug', 'daemon');
       expect(stderrWrites.join('')).toContain(
-        `qwen serve: daemon log → ${expectedDaemonDir}`,
+        `mariadb-shell-agent serve: daemon log → ${expectedDaemonDir}`,
       );
       expect(fs.existsSync(expectedDaemonDir)).toBe(true);
     } finally {
@@ -23644,7 +23697,9 @@ describe('runQwenServe startup observability', () => {
       releaseWorkerStart();
       await vi.waitFor(() => {
         if (
-          !stderrWrites.join('').includes('qwen serve: runtime startup failed')
+          !stderrWrites
+            .join('')
+            .includes('mariadb-shell-agent serve: runtime startup failed')
         ) {
           throw new Error('waiting for runtime startup failure');
         }

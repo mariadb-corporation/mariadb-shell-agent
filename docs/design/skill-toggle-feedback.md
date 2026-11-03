@@ -4,7 +4,7 @@
 
 ## Problem
 
-This change addresses [#10152](https://github.com/QwenLM/qwen-code/issues/10152).
+This change addresses [#10152](https://github.invalid/QwenLM/qwen-code/issues/10152).
 A successful settings write can remove the selected Skill from the refreshed
 catalog. The page then returns to the list, where its result notice is missing.
 A Skill disabled by higher-scope settings also has no action to remove a saved

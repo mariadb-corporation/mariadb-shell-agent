@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,18 +37,20 @@ describe('auth command', () => {
   it('builds a removal notice with migration paths and no ANSI in non-TTY', () => {
     const notice = buildRemovalNotice();
 
-    expect(notice).toContain('qwen auth has been removed');
+    expect(notice).toContain('mariadb-shell-agent auth has been removed');
     expect(notice).toContain('/auth');
     expect(notice).toContain('/doctor');
     expect(notice).toContain('BAILIAN_CODING_PLAN_API_KEY');
-    expect(notice).toContain('https://coding.dashscope.aliyuncs.com/v1');
-    expect(notice).toContain('https://coding-intl.dashscope.aliyuncs.com/v1');
+    expect(notice).toContain('https://coding.dashscope.aliyuncs.invalid/v1');
+    expect(notice).toContain(
+      'https://coding-intl.dashscope.aliyuncs.invalid/v1',
+    );
     expect(notice).toContain('BAILIAN_TOKEN_PLAN_API_KEY');
     expect(notice).toContain(
-      'https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+      'https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
     );
     expect(notice).toContain(
-      'https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1',
+      'https://token-plan.ap-southeast-1.maas.aliyuncs.invalid/compatible-mode/v1',
     );
     expect(notice).toContain('OPENROUTER_API_KEY');
     expect(notice).not.toContain('\x1b[');
@@ -96,7 +99,7 @@ describe('auth command', () => {
     }) as never);
 
     await yargs(command.split(' '))
-      .scriptName('qwen')
+      .scriptName('mariadb-shell-agent')
       .command(authCommand)
       .strict()
       .fail((message, error) => {

@@ -10,7 +10,7 @@ The shipped systemd unit gives the Hosted Harness the Runtime Broker through `--
 
 The Broker token is also stored twice. The Harness gets it through `harness.env`, the control plane through `QWEN_MANAGED_AGENT_RUNTIME_BROKER_TOKEN` in `server.env`, and every rotation must change both.
 
-Separately, `qwen serve` moves to the next free port when the requested one is busy. For the Hosted Harness this is never what the operator wants. The control plane names one fixed Harness URL, so a moved Harness starts cleanly while every Session fails until someone edits `server.env`. The deployment guide and systemd README document this trap instead of preventing it.
+Separately, `mariadb-shell-agent serve` moves to the next free port when the requested one is busy. For the Hosted Harness this is never what the operator wants. The control plane names one fixed Harness URL, so a moved Harness starts cleanly while every Session fails until someone edits `server.env`. The deployment guide and systemd README document this trap instead of preventing it.
 
 ## Goals
 
@@ -29,18 +29,18 @@ Separately, `qwen serve` moves to the next free port when the requested one is b
 
 ### Broker environment
 
-`qwen serve` already falls back to `QWEN_MANAGED_RUNTIME_BROKER_URL` and `QWEN_MANAGED_RUNTIME_BROKER_TOKEN` when `--managed-runtime-broker-url` and `--managed-runtime-broker-token` are absent, and removes both variables from its environment once read; the local Managed command (#14928) added this. This design uses those variables rather than adding a second pair. `validateHostedHarnessProfile` still requires both values or neither, and only the Hosted Harness profile accepts them.
+`mariadb-shell-agent serve` already falls back to `QWEN_MANAGED_RUNTIME_BROKER_URL` and `QWEN_MANAGED_RUNTIME_BROKER_TOKEN` when `--managed-runtime-broker-url` and `--managed-runtime-broker-token` are absent, and removes both variables from its environment once read; the local Managed command (#14928) added this. This design uses those variables rather than adding a second pair. `validateHostedHarnessProfile` still requires both values or neither, and only the Hosted Harness profile accepts them.
 
 ### Child environment
 
 The token leaves the Harness's own environment once read, so no process the Harness starts inherits it from there. Every list that strips Qwen-internal secrets carries it as well, for embedded callers and for any path that copies an environment before that point:
 
-- `SCRUBBED_CHILD_ENV_KEYS`, which the ACP bridge removes from every `qwen --acp` child, beside `QWEN_SERVER_TOKEN`;
+- `SCRUBBED_CHILD_ENV_KEYS`, which the ACP bridge removes from every `mariadb-shell-agent --acp` child, beside `QWEN_SERVER_TOKEN`;
 - core's `INTERNAL_SECRET_ENV_VARS`, which shell commands, hooks, the monitor tool and stdio MCP servers start without, and which also stops a repository-supplied `${QWEN_MANAGED_RUNTIME_BROKER_TOKEN}` from resolving in settings, hook or MCP configuration;
 - the channel worker environment, which the supervisor builds and the worker scrubs again;
 - the control plane's Runtime worker filter, which now also removes the `QWEN_MANAGED_RUNTIME_BROKER_` prefix.
 
-A daemon self-update replaces `qwen serve` through `execve`, which keeps the PID, so systemd never hands the replacement the pair again. The restarter adds the resolved pair to the replacement's environment only, beside the server token, and the replacement removes it once read.
+A daemon self-update replaces `mariadb-shell-agent serve` through `execve`, which keeps the PID, so systemd never hands the replacement the pair again. The restarter adds the resolved pair to the replacement's environment only, beside the server token, and the replacement removes it once read.
 
 A prompt-injected agent holding the Broker token could otherwise call the Broker directly.
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -389,7 +390,7 @@ export function parseMaxQueuedQuery(
     // a fresh entry). Matches the `workspace_mismatch` log style in
     // `sendBridgeError`.
     writeStderrLine(
-      `qwen serve: rejected ?maxQueued ${safeLogValue(raw)} ` +
+      `mariadb-shell-agent serve: rejected ?maxQueued ${safeLogValue(raw)} ` +
         `(not a decimal integer)`,
     );
     res.status(400).json({
@@ -405,7 +406,7 @@ export function parseMaxQueuedQuery(
     n > MAX_QUERY_MAX_QUEUED
   ) {
     writeStderrLine(
-      `qwen serve: rejected ?maxQueued ${safeLogValue(raw)} ` +
+      `mariadb-shell-agent serve: rejected ?maxQueued ${safeLogValue(raw)} ` +
         `(outside [${MIN_QUERY_MAX_QUEUED}, ${MAX_QUERY_MAX_QUEUED}])`,
     );
     res.status(400).json({
@@ -441,7 +442,7 @@ export function parseLastEventId(raw: unknown): number | undefined {
     // "first connect, no resume").
     if (typeof raw === 'string' && raw.length > 0) {
       writeStderrLine(
-        `qwen serve: rejected Last-Event-ID ${safeLogValue(raw)} ` +
+        `mariadb-shell-agent serve: rejected Last-Event-ID ${safeLogValue(raw)} ` +
           `(not a decimal integer)`,
       );
     }
@@ -453,7 +454,7 @@ export function parseLastEventId(raw: unknown): number | undefined {
   // tries to resume from beyond that is either malicious or broken.
   if (!Number.isFinite(n) || n > Number.MAX_SAFE_INTEGER) {
     writeStderrLine(
-      `qwen serve: rejected Last-Event-ID ${safeLogValue(raw)} ` +
+      `mariadb-shell-agent serve: rejected Last-Event-ID ${safeLogValue(raw)} ` +
         `(exceeds Number.MAX_SAFE_INTEGER)`,
     );
     return undefined;

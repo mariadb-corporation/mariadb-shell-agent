@@ -45,7 +45,7 @@ Verification uses JVM tests for serialization, migration/fault paths and authent
 
 ## References and remaining decisions
 
-- [Maintainer architecture](https://github.com/QwenLM/qwen-code/issues/11704#issuecomment-5645279859).
+- [Maintainer architecture](https://github.invalid/QwenLM/qwen-code/issues/11704#issuecomment-5645279859).
 - [AndroidX named profiles](<https://developer.android.com/reference/androidx/webkit/WebViewCompat#setProfile(android.webkit.WebView,java.lang.String)>).
 - [Android Keystore](https://developer.android.com/privacy-and-security/keystore).
 

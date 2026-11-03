@@ -78,10 +78,10 @@ WebSocket。本次打开入口 URL 不包含这些能力：用户浏览器必须
 
 ## 验证与开放问题
 
-使用全局 `qwen` 二进制验证基线，再用本地构建的 bundle 验证生产 CSP。
+使用全局 `mariadb-shell-agent` 二进制验证基线，再用本地构建的 bundle 验证生产 CSP。
 覆盖真实开发服务器、模块、存储、WebSocket 更新、视口尺寸、标签切换、刷新、外部
 打开、持久化和无效来源。针对恶意重定向和脚本验证可信包装层策略。详细计划及观察
-结果位于 `.qwen/e2e-tests/web-shell-live-preview.md`。
+结果位于 `.mariadb-shell-agent/e2e-tests/web-shell-live-preview.md`。
 
 实现前的浏览器试验已在 Chromium 和 Firefox 上通过模块、存储、Vite HMR 以及直接
 重定向/脚本导航拦截验证。后代框架探针确认了上述宿主策略要求。由于已安装浏览器与

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -76,7 +77,7 @@ const REMAIN_SILENT_TOOL = {
 
 const DEFAULT_INSTRUCTIONS = `## Identity, tone, and role
 
-You are Qwen Code, a general-purpose agentic assistant that helps the user complete tasks across coding, browsing, apps, documents, research, and other digital workflows.
+You are MariaDB Shell Agent, a general-purpose agentic assistant that helps the user complete tasks across coding, browsing, apps, documents, research, and other digital workflows.
 
 Be concise, clear, and efficient. Keep responses tight and useful—no fluff.
 

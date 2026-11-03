@@ -4,7 +4,7 @@
 
 ## Scope and current state
 
-This is the worker-side step of [#15512](https://github.com/QwenLM/qwen-code/issues/15512), following the [phase-2 design](https://github.com/QwenLM/qwen-code/pull/15520). Container mode previously admitted boot-v1 session workers and the dedicated CSI profiles, but rejected ordinary boot-v2. The change admits an explicit external-storage extension and exposes foreground publication. Local boot-v2 and CSI boot documents remain separate contracts. The broker, adapter, registration HTTP API, provider probe and PUBLIC K8s path are outside this change.
+This is the worker-side step of [#15512](https://github.invalid/QwenLM/qwen-code/issues/15512), following the [phase-2 design](https://github.invalid/QwenLM/qwen-code/pull/15520). Container mode previously admitted boot-v1 session workers and the dedicated CSI profiles, but rejected ordinary boot-v2. The change admits an explicit external-storage extension and exposes foreground publication. Local boot-v2 and CSI boot documents remain separate contracts. The broker, adapter, registration HTTP API, provider probe and PUBLIC K8s path are outside this change.
 
 The worker remains session-isolated. It uses the existing workspace capability digest, context installation and activation checks. Publication covers foreground process pipes (`stdout` and `stderr`); PTY, background Shell, monitor, hook and MCP execution are not admitted by this external profile. The adapter and broker consumers are follow-up work; this surface is inert until they supply the registration descriptor, install context, activate it and begin each capture.
 

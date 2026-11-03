@@ -143,5 +143,5 @@ subject of #10170 and PR #10180.
   produce reasons the validator accepts however long the detail.
 - `goalControlRequest.test.ts`: a Web Shell pause carries the reason and
   `resume`/`clear` carry no `reason` key.
-- An E2E plan in `.qwen/e2e-tests/goal-pause-reasons.md` covers the three
+- An E2E plan in `.mariadb-shell-agent/e2e-tests/goal-pause-reasons.md` covers the three
   interactive cancel shapes and `/goal pause`.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -164,7 +165,7 @@ function mockWorkspaceService(
       .fn()
       .mockResolvedValue({ toolName: 'Bash', enabled: true }),
     initWorkspace: vi.fn().mockResolvedValue({
-      path: path.resolve(WS_BOUND, 'QWEN.md'),
+      path: path.resolve(WS_BOUND, 'MARIADB-SHELL-AGENT.md'),
       action: 'created',
     }),
     restartMcpServer: vi.fn().mockResolvedValue({
@@ -353,7 +354,7 @@ describe('workspace service REST integration', () => {
 
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
-        path: path.resolve(WS_BOUND, 'QWEN.md'),
+        path: path.resolve(WS_BOUND, 'MARIADB-SHELL-AGENT.md'),
         action: 'created',
       });
       expect(workspace.initWorkspace).toHaveBeenCalledTimes(1);

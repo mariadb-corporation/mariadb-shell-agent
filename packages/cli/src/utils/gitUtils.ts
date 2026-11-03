@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -90,7 +91,7 @@ export const getLatestGitHubRelease = async (
   try {
     const controller = new AbortController();
 
-    const endpoint = `https://api.github.com/repos/QwenLM/qwen-code-action/releases/latest`;
+    const endpoint = `https://api.github.invalid/repos/QwenLM/qwen-code-action/releases/latest`;
 
     // Lazy-load undici so it stays out of the eager startup closure
     // (issue #7264).

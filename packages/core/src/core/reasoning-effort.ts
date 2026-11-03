@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -132,12 +133,23 @@ export function getGptReasoningCapabilities(model: string | undefined):
         defaultEnabled: true,
         thinkingMandatory: false,
       };
+    // GPT-6.x: Astra and Sol always reason; Terra and Luna also accept
+    // effort `none`, so thinking can be switched off.
     case 'gpt-6-astra':
+    case 'gpt-6.1-sol':
       return {
         efforts: REASONING_EFFORT_TIERS,
         defaultEffort: 'medium',
         defaultEnabled: true,
         thinkingMandatory: true,
+      };
+    case 'gpt-6-luna':
+    case 'gpt-6.1-terra':
+      return {
+        efforts: REASONING_EFFORT_TIERS,
+        defaultEffort: 'medium',
+        defaultEnabled: true,
+        thinkingMandatory: false,
       };
     default:
       return undefined;

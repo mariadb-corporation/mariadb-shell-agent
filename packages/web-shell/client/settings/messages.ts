@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -66,7 +67,7 @@ export const SETTINGS_MESSAGES_EN: Record<string, SettingsMessage> = {
   'settings.requiresRestart': 'This change requires a restart to take effect.',
   'settings.localControl.title': 'Local Control',
   'settings.localControl.description':
-    'Continue this Qwen Code session from a phone on the same trusted network.',
+    'Continue this MariaDB Shell Agent session from a phone on the same trusted network.',
   'settings.localControl.on': 'On',
   'settings.localControl.off': 'Off',
   'settings.localControl.network': 'Local network',
@@ -99,7 +100,7 @@ export const SETTINGS_MESSAGES_EN: Record<string, SettingsMessage> = {
   'settings.models.loading': 'Loading models…',
   'settings.models.deleteFailed': 'Failed to delete model',
   'settings.models.runtimeSyncFailed':
-    'The change was saved, but running sessions could not be refreshed. Restart qwen serve before using the updated model list.',
+    'The change was saved, but running sessions could not be refreshed. Restart mariadb-shell-agent serve before using the updated model list.',
   'settings.models.fallbacks.title': 'Model Fallbacks',
   'settings.models.fallbacks.hint': (v) =>
     `Select up to ${v?.max ?? 3}; tried in order when the main model is at capacity.`,
@@ -161,7 +162,7 @@ export const SETTINGS_MESSAGES_ZH: Record<string, SettingsMessage> = {
   'settings.requiresRestart': '此更改需要重启后才能生效。',
   'settings.localControl.title': '本地控制',
   'settings.localControl.description':
-    '通过同一受信任网络中的手机继续当前 Qwen Code 会话。',
+    '通过同一受信任网络中的手机继续当前 MariaDB Shell Agent 会话。',
   'settings.localControl.on': '已开启',
   'settings.localControl.off': '关闭',
   'settings.localControl.network': '本地网络',
@@ -194,7 +195,7 @@ export const SETTINGS_MESSAGES_ZH: Record<string, SettingsMessage> = {
   'settings.models.loading': '正在加载模型…',
   'settings.models.deleteFailed': '删除模型失败',
   'settings.models.runtimeSyncFailed':
-    '更改已保存，但无法刷新正在运行的会话。请重启 qwen serve 后再使用更新后的模型列表。',
+    '更改已保存，但无法刷新正在运行的会话。请重启 mariadb-shell-agent serve 后再使用更新后的模型列表。',
   'settings.models.fallbacks.title': '模型回退',
   'settings.models.fallbacks.hint': (v) =>
     `最多选择 ${v?.max ?? 3} 个；主模型容量不足时按顺序回退。`,
@@ -232,16 +233,16 @@ export const SETTINGS_MESSAGES_ZH: Record<string, SettingsMessage> = {
     '终端失焦多少分钟后，下一次重新聚焦时触发自动回顾。默认与 Claude Code 一致为 5 分钟；如果只是短暂切换窗口，可以调高。',
   'settings.label.general.cleanupPeriodDays': '清理周期（天）',
   'settings.description.general.cleanupPeriodDays':
-    '~/.qwen/file-history/ 中用于 /rewind 的会话备份、以及 runtime debug/ 目录下的会话 debug 日志的保留天数。后台清理最多每天运行一次。设为 0 表示最小保留（约 1 小时），仍会保护最近一小时触碰过的会话和当前活动会话。',
+    '~/.mariadb-shell-agent/file-history/ 中用于 /rewind 的会话备份、以及 runtime debug/ 目录下的会话 debug 日志的保留天数。后台清理最多每天运行一次。设为 0 表示最小保留（约 1 小时），仍会保护最近一小时触碰过的会话和当前活动会话。',
   'settings.label.general.gitCoAuthor.commit': '归因：commit',
   'settings.description.general.gitCoAuthor.commit':
-    '通过 Qwen Code 创建 commit 时，添加 Co-authored-by trailer，并写入逐文件 AI 归因 git note。关闭后两者都会跳过。',
+    '通过 MariaDB Shell Agent 创建 commit 时，添加 Co-authored-by trailer，并写入逐文件 AI 归因 git note。关闭后两者都会跳过。',
   'settings.label.general.gitCoAuthor.pr': '归因：PR',
   'settings.description.general.gitCoAuthor.pr':
-    '运行 gh pr create 时，在 PR 描述中追加 Qwen Code 归因行。',
+    '运行 gh pr create 时，在 PR 描述中追加 MariaDB Shell Agent 归因行。',
   'settings.label.general.language': '语言：界面',
   'settings.description.general.language':
-    '用户界面的语言。使用 auto 可根据系统设置自动检测；也可以在 ~/.qwen/locales/ 中放置 JS 语言文件来使用自定义语言代码。',
+    '用户界面的语言。使用 auto 可根据系统设置自动检测；也可以在 ~/.mariadb-shell-agent/locales/ 中放置 JS 语言文件来使用自定义语言代码。',
   'settings.label.general.outputLanguage': '语言：模型输出',
   'settings.description.general.outputLanguage':
     '模型回复使用的语言。留空表示自动跟随你的输入语言（auto）。修改会重写当前会话读取的 output-language.md，并立即作用于当前会话。',
@@ -250,10 +251,10 @@ export const SETTINGS_MESSAGES_ZH: Record<string, SettingsMessage> = {
     `使用“${v?.value ?? ''}”`,
   'settings.label.general.preventSystemSleep': '运行时防止系统睡眠',
   'settings.description.general.preventSystemSleep':
-    '当 Qwen Code 正在流式生成模型回复或执行工具时防止系统睡眠。空闲输入状态和权限确认状态不会阻止睡眠。',
+    '当 MariaDB Shell Agent 正在流式生成模型回复或执行工具时防止系统睡眠。空闲输入状态和权限确认状态不会阻止睡眠。',
   'settings.label.review.attribution': '归因：review',
   'settings.description.review.attribution':
-    '向 GitHub 发布的 review 正文和行内评论会追加标注模型与 CLI 版本的归因页脚（例如“_— qwen3-coder via Qwen Code /review (v0.21.2)_”）。关闭后发布的 review 不带可见 AI 归因：没有页脚，评论和正文列表中也没有“**[Critical]**”/“**[Suggestion]**”严重级别标记。无归因内容在原始文本中仍可识别：每条评论携带不可见的严重级别标记（“<!-- qwen-review critical -->”），review 正文携带 ledger 标记（“<!-- qwen-review-ledger ... -->”）——读取评论内容的自动化（GitHub API 自动化、与此设置联动的工作流）仍能识别 /review 产物，presubmit 重复检测也能凭严重级别标记识别评审账号的历史评论（其他账号的无归因评论除外）。另一影响：qwen-autofix 的仅 Critical 模式（第 5 轮后启用，或计数窗口的 diff 增长预算触发时提前启用）将无法把已发布的发现识别为 Critical 而推迟处理。仅在 User、System、SystemDefaults 作用域生效；Workspace 作用域的值会被忽略，仓库无法为其评审者设定评审策略。',
+    '向 GitHub 发布的 review 正文和行内评论会追加标注模型与 CLI 版本的归因页脚（例如“_— qwen3-coder via MariaDB Shell Agent /review (v0.21.2)_”）。关闭后发布的 review 不带可见 AI 归因：没有页脚，评论和正文列表中也没有“**[Critical]**”/“**[Suggestion]**”严重级别标记。无归因内容在原始文本中仍可识别：每条评论携带不可见的严重级别标记（“<!-- qwen-review critical -->”），review 正文携带 ledger 标记（“<!-- qwen-review-ledger ... -->”）——读取评论内容的自动化（GitHub API 自动化、与此设置联动的工作流）仍能识别 /review 产物，presubmit 重复检测也能凭严重级别标记识别评审账号的历史评论（其他账号的无归因评论除外）。另一影响：qwen-autofix 的仅 Critical 模式（第 5 轮后启用，或计数窗口的 diff 增长预算触发时提前启用）将无法把已发布的发现识别为 Critical 而推迟处理。仅在 User、System、SystemDefaults 作用域生效；Workspace 作用域的值会被忽略，仓库无法为其评审者设定评审策略。',
   'settings.label.review.effort': '默认 effort：review',
   'settings.description.review.effort':
     '/review 在未给出 --effort、也没有项目记住的显式强度时的默认强度。“auto”保持内置规则（PR 用 high，本地改动用 medium）。显式指定或被记住的强度仍然优先；生效的 --comment 仍强制 high，--fix 仍保底 medium。仅在 User、System、SystemDefaults 作用域生效；Workspace 作用域的值会被忽略，仓库无法为其评审者设定评审策略。',
@@ -312,7 +313,7 @@ export const SETTINGS_MESSAGES_ZH: Record<string, SettingsMessage> = {
     '开启后，提示词中提到 `workflow` 一词不再会把本轮软引导向 Workflow 工具（页脚的 `workflow active` 指示也会被抑制）。仅在启用 workflow 功能时生效。',
   'settings.label.ui.showStatusInTitle': '在标题栏显示状态',
   'settings.description.ui.showStatusInTitle':
-    '在终端窗口标题中显示 Qwen Code 会话名称和状态。',
+    '在终端窗口标题中显示 MariaDB Shell Agent 会话名称和状态。',
   'settings.label.ui.showResponseTokensPerSecond': '显示回复 Tokens/秒',
   'settings.label.ui.accessibility.enableLoadingPhrases': '启用加载文案',
   'settings.description.ui.accessibility.enableLoadingPhrases':
@@ -349,9 +350,10 @@ export const SETTINGS_MESSAGES_ZH: Record<string, SettingsMessage> = {
   'settings.label.context.fileFiltering.respectGitIgnore': '遵守 .gitignore',
   'settings.description.context.fileFiltering.respectGitIgnore':
     '搜索时遵守 .gitignore 文件。',
-  'settings.label.context.fileFiltering.respectQwenIgnore': '遵守 .qwenignore',
+  'settings.label.context.fileFiltering.respectQwenIgnore':
+    '遵守 .mariadb-shell-agentignore',
   'settings.description.context.fileFiltering.respectQwenIgnore':
-    '搜索时遵守 .qwenignore 文件。',
+    '搜索时遵守 .mariadb-shell-agentignore 文件。',
   'settings.label.context.fileFiltering.enableFuzzySearch': '启用模糊搜索',
   'settings.description.context.fileFiltering.enableFuzzySearch':
     '搜索文件时启用模糊搜索。',
@@ -412,7 +414,7 @@ export const SETTINGS_MESSAGES_ZH: Record<string, SettingsMessage> = {
   'settings.option.policy.permissionStrategy.local-only': '仅本机',
   'settings.label.serve.maxSessions': '最大并发会话数',
   'settings.description.serve.maxSessions':
-    '单个工作区同时存活的会话数上限；超出的新会话请求返回 503，接入已有会话不受影响。设为 0 表示不限制。仅在用户、系统、系统默认作用域生效；传入 qwen serve --max-sessions 时以命令行参数为准。修改后需要重启 daemon。',
+    '单个工作区同时存活的会话数上限；超出的新会话请求返回 503，接入已有会话不受影响。设为 0 表示不限制。仅在用户、系统、系统默认作用域生效；传入 mariadb-shell-agent serve --max-sessions 时以命令行参数为准。修改后需要重启 daemon。',
   'settings.label.experimental.cron': '启用 Cron/Loop 工具',
   'settings.description.experimental.cron':
     '启用会话内 cron/loop 工具。启用后，模型可以用 cron_create、cron_list 和 cron_delete 创建周期性提示。也可通过 QWEN_CODE_DISABLE_CRON=1 环境变量禁用。',
@@ -450,7 +452,7 @@ export const SETTINGS_MESSAGES_ZH: Record<string, SettingsMessage> = {
   'settings.option.goals.modelProposed.disabled': '禁用',
   'settings.label.omni.enabled': '启用 Omni 媒体投递',
   'settings.description.omni.enabled':
-    '启用 omni 媒体管线。用 @ 引用的媒体文件（视频、图片、音频）以及 @https:// URL 提供的媒体会被识别（ffprobe）、以内容寻址存储在 .qwen/omni/objects/ 下，经 DashScope 临时上传通道上传，并以 oss:// URL 投递，而不是内联 base64。仅对 DashScope 兼容端点生效。也可通过 QWEN_CODE_ENABLE_OMNI=1 启用。',
+    '启用 omni 媒体管线。用 @ 引用的媒体文件（视频、图片、音频）以及 @https:// URL 提供的媒体会被识别（ffprobe）、以内容寻址存储在 .mariadb-shell-agent/omni/objects/ 下，经 DashScope 临时上传通道上传，并以 oss:// URL 投递，而不是内联 base64。仅对 DashScope 兼容端点生效。也可通过 QWEN_CODE_ENABLE_OMNI=1 启用。',
   'settings.label.agents.arena.preserveArtifacts': '保留 Arena 产物',
   'settings.description.agents.arena.preserveArtifacts':
     '启用后，Arena worktree 和会话状态文件会在会话结束或主智能体退出后保留。',

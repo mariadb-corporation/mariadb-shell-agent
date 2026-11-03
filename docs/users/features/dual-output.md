@@ -1,6 +1,6 @@
 # Dual Output
 
-Dual Output is a sidecar mode for the interactive TUI: while Qwen Code keeps
+Dual Output is a sidecar mode for the interactive TUI: while MariaDB Shell Agent keeps
 rendering normally on `stdout`, it concurrently emits a structured JSON event
 stream to a separate channel so an external program — an IDE extension, a web
 frontend, a CI pipeline, an automation script — can observe and steer the
@@ -33,7 +33,7 @@ stream:
 
 ### IDE extensions (VS Code / JetBrains / Cursor / Neovim)
 
-Embed Qwen Code inside the IDE. The TUI runs in the editor's integrated
+Embed MariaDB Shell Agent inside the IDE. The TUI runs in the editor's integrated
 terminal panel for users who want it, while the extension consumes
 `--json-fd` / `--json-file` events to drive:
 
@@ -53,7 +53,7 @@ via `--input-file`. No ANSI parsing on either side.
 
 ### CI / automation observers
 
-A CI job runs Qwen Code with a task prompt. The human sees the TUI in the
+A CI job runs MariaDB Shell Agent with a task prompt. The human sees the TUI in the
 job log; the CI system tails `--json-file` to:
 
 - Fail the job if a `result` event reports an error.
@@ -84,7 +84,7 @@ as first-class metrics in Grafana. No need for log-parsing regex.
 
 ### Testing and QA
 
-Integration tests spawn Qwen Code headlessly, drive it with `--input-file`
+Integration tests spawn MariaDB Shell Agent headlessly, drive it with `--input-file`
 scripts, and assert on `--json-file` events. Unlike parsing stdout ANSI,
 assertions are stable across UI refactors.
 
@@ -101,7 +101,7 @@ rejected to prevent corrupting the TUI's own output.
 
 ## Why two output flags? (`--json-fd` vs `--json-file`)
 
-At first glance `--json-fd` looks sufficient — the caller spawns Qwen Code
+At first glance `--json-fd` looks sufficient — the caller spawns MariaDB Shell Agent
 with an extra file descriptor, the TUI writes events to it, done. In
 practice, fd passing breaks down under the most important embedding
 scenario: running the TUI inside a pseudo-terminal (PTY). That is why
@@ -199,7 +199,7 @@ wrappers that throw away stdout anyway.
 
 ## Quick start
 
-Run Qwen Code with both channels enabled using regular files:
+Run MariaDB Shell Agent with both channels enabled using regular files:
 
 ```bash
 touch /tmp/qwen-events.jsonl /tmp/qwen-input.jsonl
@@ -370,7 +370,7 @@ polling — events are written synchronously as the TUI emits them.
 
 ## Spawn example
 
-A typical embedding parent process spawns Qwen Code with both channels:
+A typical embedding parent process spawns MariaDB Shell Agent with both channels:
 
 ```ts
 import { spawn } from 'node:child_process';
@@ -395,8 +395,8 @@ through every launch. The same channels can be configured in
 `settings.json` under the top-level `dualOutput` key:
 
 ```jsonc
-// ~/.qwen/settings.json  (user-level)
-// or <workspace>/.qwen/settings.json  (workspace-level)
+// ~/.mariadb-shell-agent/settings.json  (user-level)
+// or <workspace>/.mariadb-shell-agent/settings.json  (workspace-level)
 {
   "dualOutput": {
     "jsonFile": "/tmp/qwen-events.jsonl",
@@ -415,7 +415,7 @@ Precedence rules:
   (identical to today's default).
 
 The `requiresRestart: true` flag means changes only take effect on the
-next Qwen Code launch, since the bridge is constructed once during
+next MariaDB Shell Agent launch, since the bridge is constructed once during
 startup.
 
 ## Runnable demos
@@ -435,7 +435,7 @@ mkfifo /tmp/qwen-events.jsonl
 cat /tmp/qwen-events.jsonl | jq -c 'select(.type != "stream_event") | {type, subtype}'
 
 # Terminal B
-qwen --json-file /tmp/qwen-events.jsonl
+mariadb-shell-agent --json-file /tmp/qwen-events.jsonl
 # ...then chat normally; terminal A shows session_start,
 # user/assistant/result/control_request lifecycle in real time.
 ```
@@ -454,7 +454,7 @@ the first:
 ```bash
 # Terminal A
 touch /tmp/qwen-in.jsonl
-qwen --input-file /tmp/qwen-in.jsonl
+mariadb-shell-agent --input-file /tmp/qwen-in.jsonl
 
 # Terminal B — the TUI responds as if you typed it
 echo '{"type":"submit","text":"list files in the current directory"}' \
@@ -473,7 +473,7 @@ touch /tmp/qwen-in.jsonl
   | jq -c 'select(.type == "control_request")') &
 
 # Terminal B
-qwen --json-file /tmp/qwen-out.jsonl --input-file /tmp/qwen-in.jsonl
+mariadb-shell-agent --json-file /tmp/qwen-out.jsonl --input-file /tmp/qwen-in.jsonl
 # Ask Qwen to do something that needs approval, e.g.
 # "run `ls -la /tmp`". A control_request will appear in terminal A.
 # Copy the request_id, then in a third terminal:
@@ -499,7 +499,7 @@ consumer can log it or retry:
 
 ### POC 4 — Node embedder (IDE-like)
 
-The most realistic shape: a parent process spawns Qwen Code, tails
+The most realistic shape: a parent process spawns MariaDB Shell Agent, tails
 events, and injects prompts on its own schedule.
 
 ```ts
@@ -564,13 +564,13 @@ Run with:
 
 ```bash
 npx tsx demo-embedder.ts
-# Qwen Code TUI opens in the current terminal; the embedder logs
+# MariaDB Shell Agent TUI opens in the current terminal; the embedder logs
 # handshake + turn-end + session_end events to the parent's stdout.
 ```
 
 ### POC 5 — capability handshake feature detection
 
-Older Qwen Code versions won't emit `protocol_version`. Treat the field
+Older MariaDB Shell Agent versions won't emit `protocol_version`. Treat the field
 as optional and feature-detect:
 
 ```ts
@@ -608,19 +608,19 @@ If the TUI crashes before `session_end`, the output stream closes
 ### POC 7 — failure drills (prove the flags never break the TUI)
 
 ```bash
-qwen --json-fd 1
+mariadb-shell-agent --json-fd 1
 # stderr: "Warning: dual output disabled — ..."
 # TUI still launches normally.
 
-qwen --json-fd 9999
+mariadb-shell-agent --json-fd 9999
 # stderr: "Warning: dual output disabled — fd 9999 not open"
 # TUI still launches normally.
 
-qwen --json-fd 3 --json-file /tmp/x.jsonl
+mariadb-shell-agent --json-fd 3 --json-file /tmp/x.jsonl
 # yargs rejects: "--json-fd and --json-file are mutually exclusive."
 # Process exits before TUI starts.
 
-qwen --json-file /nonexistent/dir/x.jsonl
+mariadb-shell-agent --json-file /nonexistent/dir/x.jsonl
 # stderr warning; TUI still launches.
 ```
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -424,7 +425,7 @@ test.describe('trajectory panel', () => {
     );
     const evidenceDir = resolve(
       process.cwd(),
-      '../../.qwen/e2e-tests/trajectory-pr2',
+      '../../.mariadb-shell-agent/e2e-tests/trajectory-pr2',
     );
     mkdirSync(evidenceDir, { recursive: true });
     const panel = page.getByTestId('trajectory-panel');
@@ -591,7 +592,7 @@ test.describe('trajectory panel', () => {
         .last();
       const output = resolve(
         process.cwd(),
-        '../../.qwen/e2e-tests/trajectory-pr1',
+        '../../.mariadb-shell-agent/e2e-tests/trajectory-pr1',
       );
       mkdirSync(output, { recursive: true });
       for (const width of [320, 480, 960]) {
@@ -651,7 +652,7 @@ test.describe('trajectory panel', () => {
         await expect(inspector).toBeVisible();
         const evidenceDir = resolve(
           process.cwd(),
-          '../../.qwen/e2e-tests/trajectory-pr2',
+          '../../.mariadb-shell-agent/e2e-tests/trajectory-pr2',
         );
         mkdirSync(evidenceDir, { recursive: true });
         await panel.screenshot({
@@ -702,7 +703,7 @@ test.describe('trajectory panel', () => {
     await page.keyboard.press('Escape');
     const output = resolve(
       process.cwd(),
-      '../../.qwen/e2e-tests/trajectory-pr1',
+      '../../.mariadb-shell-agent/e2e-tests/trajectory-pr1',
     );
     mkdirSync(output, { recursive: true });
     await panel.screenshot({ path: resolve(output, 'all-starts-missing.png') });
@@ -782,7 +783,7 @@ test.describe('trajectory panel', () => {
     expect(await mountedRows(page).count()).toBeGreaterThan(0);
     const output = resolve(
       process.cwd(),
-      '../../.qwen/e2e-tests/trajectory-pr1',
+      '../../.mariadb-shell-agent/e2e-tests/trajectory-pr1',
     );
     mkdirSync(output, { recursive: true });
     await page.getByTestId('trajectory-panel').screenshot({
@@ -1552,7 +1553,7 @@ test.describe('trajectory panel', () => {
       const latest = panel.getByTestId('trajectory-follow-status');
       const evidence = resolve(
         process.cwd(),
-        '../../.qwen/e2e-tests/pr5-evidence',
+        '../../.mariadb-shell-agent/e2e-tests/pr5-evidence',
       );
       mkdirSync(evidence, { recursive: true });
       await expect(grid).toHaveAttribute('aria-rowcount', '400');
@@ -1659,7 +1660,7 @@ test.describe('trajectory panel', () => {
         .toBe(before);
       const evidence = resolve(
         process.cwd(),
-        '../../.qwen/e2e-tests/pr5-evidence',
+        '../../.mariadb-shell-agent/e2e-tests/pr5-evidence',
       );
       mkdirSync(evidence, { recursive: true });
       await panel.screenshot({
@@ -1774,7 +1775,7 @@ test.describe('trajectory panel', () => {
         await expect(grid).toHaveAttribute('aria-rowcount', '400');
         const evidence = resolve(
           process.cwd(),
-          '../../.qwen/e2e-tests/pr5-evidence',
+          '../../.mariadb-shell-agent/e2e-tests/pr5-evidence',
         );
         mkdirSync(evidence, { recursive: true });
         for (const width of [320, 480]) {

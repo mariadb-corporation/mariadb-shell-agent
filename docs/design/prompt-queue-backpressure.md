@@ -2,7 +2,7 @@
 
 ## Summary
 
-`qwen serve` now applies per-session prompt admission backpressure. The default limit is `5` pending prompts per session. A pending prompt is one that the daemon has accepted through `sendPrompt` and that has not settled yet, including prompts waiting in the per-session FIFO and the prompt currently executing.
+`mariadb-shell-agent serve` now applies per-session prompt admission backpressure. The default limit is `5` pending prompts per session. A pending prompt is one that the daemon has accepted through `sendPrompt` and that has not settled yet, including prompts waiting in the per-session FIFO and the prompt currently executing.
 
 `branchSession` remains serialized behind the same per-session FIFO, but it is not a prompt and does not consume this prompt limit.
 

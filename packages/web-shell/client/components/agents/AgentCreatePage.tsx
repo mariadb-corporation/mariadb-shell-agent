@@ -70,7 +70,7 @@ interface AgentCreatePageProps {
   initialHostId?: string;
   /**
    * Program ids this computer's daemon reported it can run. Absent (an older
-   * daemon) means Qwen Code only.
+   * daemon) means MariaDB Shell Agent only.
    */
   localPrograms?: readonly string[];
   onSaveWorkspaceAgent?: (input: {
@@ -182,10 +182,10 @@ export function AgentCreatePage({
     approvalMode === 'bubble' ? [...approvalModes, 'bubble'] : approvalModes;
   const [maxTurns, setMaxTurns] = useState(agent?.maxTurns?.toString() ?? '');
   const [maxConcurrentRuns, setMaxConcurrentRuns] = useState('1');
-  // What this computer can run; Qwen Code when the daemon reported nothing.
+  // What this computer can run; MariaDB Shell Agent when the daemon reported nothing.
   const localRuntimePrograms = runtimePrograms({ programs: localPrograms });
   // Undefined when the chosen runtime offers no program at all: nothing is
-  // selected and Save stays disabled, rather than asserting Qwen Code.
+  // selected and Save stays disabled, rather than asserting MariaDB Shell Agent.
   const [executionProvider, setExecutionProvider] = useState<
     AgentProgramView | undefined
   >(() => {
@@ -855,7 +855,7 @@ export function AgentCreatePage({
                             setExecutionHostIds(new Set([host.id]));
                             // The first program this runtime runs; a runtime
                             // that offers only Claude Code or Codex has no
-                            // Qwen Code to fall back to.
+                            // MariaDB Shell Agent to fall back to.
                             setExecutionProvider(runtimePrograms(host)[0]);
                             setRole('');
                             setModel('');
@@ -890,7 +890,7 @@ export function AgentCreatePage({
                     executionHostIds.has(entry.id),
                   );
                   // This computer offers what its daemon's probe found; an
-                  // older daemon that reports nothing runs Qwen Code only.
+                  // older daemon that reports nothing runs MariaDB Shell Agent only.
                   const offered = host
                     ? runtimePrograms(host)
                     : localRuntimePrograms;

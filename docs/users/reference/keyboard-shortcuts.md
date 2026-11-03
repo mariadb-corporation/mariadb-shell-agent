@@ -1,6 +1,6 @@
-# Qwen Code Keyboard Shortcuts
+# MariaDB Shell Agent Keyboard Shortcuts
 
-This document lists the available keyboard shortcuts in Qwen Code.
+This document lists the available keyboard shortcuts in MariaDB Shell Agent.
 
 ## General
 
@@ -28,7 +28,7 @@ This document lists the available keyboard shortcuts in Qwen Code.
 | `Ctrl+Enter` / `Cmd+Enter` / `Shift+Enter` / `Ctrl+J` | Insert a newline.                                                                                                                                                                                                                                                                                                         |
 | `Down Arrow`                                          | Row down, then snap to end, then history next.                                                                                                                                                                                                                                                                            |
 | `Enter`                                               | Submit the current prompt. While a response is running, steer the current turn.                                                                                                                                                                                                                                           |
-| `Ctrl+Q`                                              | Queue the current prompt or command for the next turn instead of steering; it runs after Qwen Code returns to idle.                                                                                                                                                                                                       |
+| `Ctrl+Q`                                              | Queue the current prompt or command for the next turn instead of steering; it runs after MariaDB Shell Agent returns to idle.                                                                                                                                                                                             |
 | `Up Arrow` (at the top) / `Esc`                       | When queued messages are present, move them back into the input for editing (`Up Arrow` at the top whenever the input is shown; `Esc` only when the agent is idle). While the agent is responding and the input is empty, `Esc` cancels the ongoing request instead (queued messages are then moved back into the input). |
 | `Meta+D` / `Meta+Delete` / `Ctrl+Delete`              | Delete the word to the right of the cursor.                                                                                                                                                                                                                                                                               |
 | `Tab`                                                 | Autocomplete the current suggestion if one exists.                                                                                                                                                                                                                                                                        |
@@ -118,7 +118,7 @@ Press `Ctrl+R` to search prompt history, or shell history while shell mode is ac
 
 ## History scrollback
 
-Active when `ui.useTerminalBuffer` is enabled (Settings → UI → Virtualized History), screen reader mode is off, and Qwen Code is running in a compatible interactive terminal (`stdout` is a TTY, CI is inactive, and `TERM` is not `dumb`), which is the default for ordinary non-screen-reader sessions. In that mode conversation history is rendered inside an in-app viewport instead of the host terminal scrollback, so the keys below replace the terminal's native scroll.
+Active when `ui.useTerminalBuffer` is enabled (Settings → UI → Virtualized History), screen reader mode is off, and MariaDB Shell Agent is running in a compatible interactive terminal (`stdout` is a TTY, CI is inactive, and `TERM` is not `dumb`), which is the default for ordinary non-screen-reader sessions. In that mode conversation history is rendered inside an in-app viewport instead of the host terminal scrollback, so the keys below replace the terminal's native scroll.
 
 | Shortcut        | Description                                                                     |
 | --------------- | ------------------------------------------------------------------------------- |

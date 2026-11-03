@@ -4,7 +4,7 @@
 
 ## Status and scope
 
-Stack on the complete session replay/recovery batch in [#15384](https://github.com/QwenLM/qwen-code/pull/15384). Exact source, artifact and runtime results belong in this batch's PR verification report. It repairs the existing Ink checkpoint restore behavior; it does not claim new OpenTUI checkpoint creation or a default renderer change. B will add complete OpenTUI capture, scheduler/writer and hot/cold acceptance while depending on this shared contract. A keeps Read generation fencing in this same delivery rather than opening a tiny separate PR. Historical aggregate runs are evidence of the original defect/expected behavior, not validation of this extraction.
+Stack on the complete session replay/recovery batch in [#15384](https://github.invalid/QwenLM/qwen-code/pull/15384). Exact source, artifact and runtime results belong in this batch's PR verification report. It repairs the existing Ink checkpoint restore behavior; it does not claim new OpenTUI checkpoint creation or a default renderer change. B will add complete OpenTUI capture, scheduler/writer and hot/cold acceptance while depending on this shared contract. A keeps Read generation fencing in this same delivery rather than opening a tiny separate PR. Historical aggregate runs are evidence of the original defect/expected behavior, not validation of this extraction.
 
 ## Problem
 

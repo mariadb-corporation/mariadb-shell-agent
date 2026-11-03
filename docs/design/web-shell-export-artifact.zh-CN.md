@@ -91,7 +91,7 @@ HTML 和 Markdown 使用统一的字节大小规则：超过 1 MiB（1,048,576 �
 8. 使用指向已发布 renderer 资源的模板，通过真实 daemon 导出，验证 artifact iframe 和下载后未经修改直接打开都能通过真实 CDN 响应完成渲染。记录 renderer 配置，不将这一结果当作未发布源码构建已能公开访问的证据。
 9. 验证 HTML 和 Markdown 恰好 1 MiB 时默认排版、超出时默认源码，包括构造的大聊天导出 HTML。验证源码首尾可达，多语言切换按钮位于最右侧，HTML 在沙箱 iframe 内排版，Markdown 使用现有宿主组件并保留同源图片和脚注行为，下载仍与原文件字节一致。
 
-本地 E2E 报告和截图位于 `.qwen/e2e-tests/web-shell-export-artifact/`，1 MiB 默认源码和直接 Markdown 渲染方案替代此前 10 MiB Markdown iframe 检查；历史报告仅证明各自原始范围内的行为。已发布 renderer 验证使用显式构建期委托和真实 CDN 响应。该实验使用的开发构建辅助入口随后按用户要求撤回；结果证明资源配置匹配时预览和下载兼容，不代表源码构建问题会自动修复。旧的不匹配导出保持原样。本轮未实际运行分栏和次级 workspace 的浏览器流程。
+本地 E2E 报告和截图位于 `.mariadb-shell-agent/e2e-tests/web-shell-export-artifact/`，1 MiB 默认源码和直接 Markdown 渲染方案替代此前 10 MiB Markdown iframe 检查；历史报告仅证明各自原始范围内的行为。已发布 renderer 验证使用显式构建期委托和真实 CDN 响应。该实验使用的开发构建辅助入口随后按用户要求撤回；结果证明资源配置匹配时预览和下载兼容，不代表源码构建问题会自动修复。旧的不匹配导出保持原样。本轮未实际运行分栏和次级 workspace 的浏览器流程。
 
 后续修复验证见本地 `final-read-race/` 报告：实际 UI 配合模拟 daemon 验证 HTML/Markdown 超过 1 MiB 且文本响应截断时的完整分片读取、源码尾部、下载字节一致，以及分片失败后不再显示加载占位。双客户端注册使用实际 hook 与 store 集成测试验证，包括目录收敛和其他 403 仍报错；这不代表已验证真实浏览器分屏或真实 daemon 文件读取。
 

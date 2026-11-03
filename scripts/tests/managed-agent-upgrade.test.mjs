@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Alibaba Group Holding Limited
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -424,7 +425,7 @@ async function rig(t, overrides = {}) {
     [HARNESS]: {
       LoadState: 'loaded',
       ActiveState: 'active',
-      ExecStart: `{ path=${tools}/qwen ; argv[]=${tools}/qwen serve ; ignore_errors=no }`,
+      ExecStart: `{ path=${tools}/qwen ; argv[]=${tools}/mariadb-shell-agent serve ; ignore_errors=no }`,
       EnvironmentFiles: [`${etc}/harness.env (ignore_errors=no)`],
       Environment: `PATH=${tools}`,
       User: 'svc',
@@ -884,7 +885,7 @@ test('check does not tell a newer Harness to go back', async (t) => {
   assert.ok(
     host.output.some((line) =>
       line.endsWith(
-        'Keep Qwen Code 1.2.10 for the Harness only if you have tested it with this release; otherwise, after stop, install 1.2.3 (manual).',
+        'Keep MariaDB Shell Agent 1.2.10 for the Harness only if you have tested it with this release; otherwise, after stop, install 1.2.3 (manual).',
       ),
     ),
   );
@@ -899,7 +900,7 @@ test('check does not tell a newer Harness to go back', async (t) => {
     assert.ok(
       host.output.some((line) =>
         line.endsWith(
-          'After stop, install Qwen Code 1.2.3 for the Harness (manual).',
+          'After stop, install MariaDB Shell Agent 1.2.3 for the Harness (manual).',
         ),
       ),
     );

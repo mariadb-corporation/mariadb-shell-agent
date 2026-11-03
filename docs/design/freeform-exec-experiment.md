@@ -57,4 +57,4 @@ Neither main model produced API errors, retries, or empty final answers in
 these runs. Endpoint compatibility remains the user's responsibility.
 
 Status: implementation and bidirectional real API verification complete.
-Detailed results are recorded under `.qwen/e2e-tests/freeform-original-task/`.
+Detailed results are recorded under `.mariadb-shell-agent/e2e-tests/freeform-original-task/`.

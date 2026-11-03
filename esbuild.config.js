@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -210,7 +211,9 @@ const mainBuild = esbuild.build({
     punycode: require.resolve('punycode/'),
   },
   define: {
-    'process.env.CLI_VERSION': JSON.stringify(pkg.version),
+    'process.env.CLI_VERSION': JSON.stringify(
+      process.env['MARIADB_FORK_VERSION'] || pkg.version,
+    ),
     // react-reconciler ≥0.33 (ink 7) gates its dev build behind NODE_ENV
     // and calls performance.measure() on every render, leaking
     // PerformanceMeasure objects into the global measureEntryBuffer.

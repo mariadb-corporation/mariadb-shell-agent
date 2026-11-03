@@ -12,7 +12,7 @@
 **In scope:**
 
 - @-mentioning agents inside an ordinary chat session.
-- Local and remote agents running Qwen Code, Claude Code or Codex.
+- Local and remote agents running MariaDB Shell Agent, Claude Code or Codex.
 - Agent-to-agent mentions.
 - In-session approvals.
 - Joining a coordinator without a restart.
@@ -27,10 +27,10 @@
 ## 0. Goals
 
 - @-mention an agent in an ordinary chat session, and it answers in that session, streaming. Nothing creates a thread or navigates away.
-- An agent is its own process, on this machine or a remote one. Its program is Qwen Code, Claude Code or Codex.
+- An agent is its own process, on this machine or a remote one. Its program is MariaDB Shell Agent, Claude Code or Codex.
 - Agents can @-mention each other in the session, both by text and by tool (`session_send`).
 - A remote agent has every capability a local one has: streaming, tool approvals, and the same states (queued, running, awaiting approval, stalled, offline, failed).
-- An already-running `qwen serve` can join another instance as a runtime, without a restart or an extra process.
+- An already-running `mariadb-shell-agent serve` can join another instance as a runtime, without a restart or an extra process.
 - Repeated mentions of the same agent in one session resume its native session. Different sessions stay independent.
 
 ## 1. Background
@@ -56,7 +56,7 @@ That model did not match the product intent: the conversation the person is havi
 ### 3.1 Layers
 
 ```
-WebShell ──HTTP/SSE──▶ coordinator `qwen serve` ◀──outbound HTTP── remote `qwen serve` (runtime / Host)
+WebShell ──HTTP/SSE──▶ coordinator `mariadb-shell-agent serve` ◀──outbound HTTP── remote `mariadb-shell-agent serve` (runtime / Host)
                          │ orchestrator, per (session, agent)       │
                          │ session event stream, approvals          │
                      local adapters                            local adapters
@@ -109,10 +109,10 @@ Live state is not in the transcript. After a reload, the web shell fetches the c
 
 ### 3.5 Joining
 
-| Situation                     | How the runtime joins                                                                                                |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| The remote is already running | From its web shell ("Join a coordinator") or `qwen agents join <link>`. Both call the remote's own `/hosts/connect`. |
-| The remote is not running     | `qwen serve --join <link>`.                                                                                          |
+| Situation                     | How the runtime joins                                                                                                               |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| The remote is already running | From its web shell ("Join a coordinator") or `mariadb-shell-agent agents join <link>`. Both call the remote's own `/hosts/connect`. |
+| The remote is not running     | `mariadb-shell-agent serve --join <link>`.                                                                                          |
 
 - The runtime routes do not depend on the boot-time collaboration flag; only authentication is required (§8-5).
 - Connections persist and reconnect after a restart.

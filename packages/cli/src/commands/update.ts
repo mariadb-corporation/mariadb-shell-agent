@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,7 +25,7 @@ const UPDATE_FAILURE_ECHO_LIMIT = 4096;
 export const updateCommand: CommandModule<object, UpdateArgs> = {
   command: 'update',
   get describe() {
-    return t('Check for Qwen Code updates and install if available');
+    return t('Check for MariaDB Shell Agent updates and install if available');
   },
   builder: (yargs) =>
     yargs.option('target-version', {
@@ -92,7 +93,7 @@ export const updateCommand: CommandModule<object, UpdateArgs> = {
 
       if (updateCheck.status === 'up-to-date') {
         writeStdoutLine(
-          t('Qwen Code {{version}} is up to date!', {
+          t('MariaDB Shell Agent {{version}} is up to date!', {
             version: updateCheck.currentVersion,
           }),
         );

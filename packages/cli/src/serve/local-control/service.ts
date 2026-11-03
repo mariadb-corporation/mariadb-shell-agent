@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -131,7 +132,7 @@ export interface LocalControlServiceDeps {
  * This is the whole of what `local_control.rs` did, minus the proxying. The
  * Rust file bound a LAN socket and forwarded bytes to the loopback daemon,
  * rewriting `Host`, `Origin`, `Authorization`, and `Sec-WebSocket-Protocol` on
- * the way through — all of it compensation for one fact: `qwen serve` fixed
+ * the way through — all of it compensation for one fact: `mariadb-shell-agent serve` fixed
  * its bind address at startup and could not add a listener later.
  *
  * Here the second listener serves the same Express app directly. There are no
@@ -275,11 +276,11 @@ export class LocalControlService {
           if (this.#deps.daemonLog) {
             this.#deps.daemonLog.warn(message, { errno: error.errno });
           } else {
-            writeStderrLineSafe(`qwen serve: ${message}`);
+            writeStderrLineSafe(`mariadb-shell-agent serve: ${message}`);
           }
         } catch {
           // A closed log sink must not roll back a successfully bound listener.
-          writeStderrLineSafe(`qwen serve: ${message}`);
+          writeStderrLineSafe(`mariadb-shell-agent serve: ${message}`);
         }
       }
     } catch (error) {
@@ -292,7 +293,7 @@ export class LocalControlService {
 
     server.on('error', (error) => {
       writeStderrLine(
-        `qwen serve: Local Control listener error: ${error.message}`,
+        `mariadb-shell-agent serve: Local Control listener error: ${error.message}`,
       );
     });
     this.#server = server;
@@ -304,7 +305,9 @@ export class LocalControlService {
     // SSH sessions and on hosts without a usable backend. A phone losing its
     // session to a sleeping laptop should be explainable from the status, so
     // `sleepInhibited` reflects what actually happened rather than intent.
-    this.#sleep = sleepInhibitor.acquire('Qwen Code Local Control is active');
+    this.#sleep = sleepInhibitor.acquire(
+      'MariaDB Shell Agent Local Control is active',
+    );
     return this.status();
   }
 

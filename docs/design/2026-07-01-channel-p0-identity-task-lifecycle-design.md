@@ -12,7 +12,7 @@ isolation.
 
 ## Background
 
-`qwen channel` already supports messaging adapters, shared sessions, sender
+`mariadb-shell-agent channel` already supports messaging adapters, shared sessions, sender
 attribution, dispatch modes, streaming chunks, tool-call callbacks, cancellation,
 and platform-specific progress surfaces such as Feishu cards. The missing P0
 product layer is a stable way to say "this channel has its own resident agent

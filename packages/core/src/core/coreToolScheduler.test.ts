@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -4456,7 +4457,7 @@ describe('CoreToolScheduler', () => {
     return { call, execute, ensureTool };
   }
 
-  const SEND_MESSAGE_DENY_RULE_MESSAGE = `Qwen Code requires permission to use "${ToolNames.SEND_MESSAGE}", but that permission was declined. Matching deny rule: "${ToolNames.SEND_MESSAGE}".`;
+  const SEND_MESSAGE_DENY_RULE_MESSAGE = `MariaDB Shell Agent requires permission to use "${ToolNames.SEND_MESSAGE}", but that permission was declined. Matching deny rule: "${ToolNames.SEND_MESSAGE}".`;
 
   it('schedules a memory pressure check after tool execution', async () => {
     const execute = vi.fn().mockResolvedValue(textResult('ok'));
@@ -4536,7 +4537,7 @@ describe('CoreToolScheduler', () => {
 
     expect(call.response.errorType).toBe(ToolErrorType.EXECUTION_DENIED);
     expect(call.response.error?.message).toBe(
-      'Qwen Code requires permission to use edit, but that permission was declined.',
+      'MariaDB Shell Agent requires permission to use edit, but that permission was declined.',
     );
     expect(execute).not.toHaveBeenCalled();
     expect(ensureTool).not.toHaveBeenCalled();
@@ -4596,7 +4597,7 @@ describe('CoreToolScheduler', () => {
 
     expect(call.response.errorType).toBe(ToolErrorType.EXECUTION_DENIED);
     expect(call.response.error?.message).toBe(
-      'Qwen Code requires permission to use "edit", but that permission was declined.',
+      'MariaDB Shell Agent requires permission to use "edit", but that permission was declined.',
     );
     const message = call.response.error?.message ?? '';
     expect(message).not.toContain('permissions.allow');
@@ -4633,7 +4634,7 @@ describe('CoreToolScheduler', () => {
     );
 
     expect(call.response.error?.message).toBe(
-      'Qwen Code requires permission to use "send_message", but that permission was declined.',
+      'MariaDB Shell Agent requires permission to use "send_message", but that permission was declined.',
     );
     expect(execute).not.toHaveBeenCalled();
   });
@@ -4673,7 +4674,7 @@ describe('CoreToolScheduler', () => {
     expect(call.response.errorType).toBe(ToolErrorType.EXECUTION_DENIED);
     const message = call.response.error?.message ?? '';
     expect(message).toBe(
-      'Qwen Code requires permission to use "send_message", but that permission was declined.',
+      'MariaDB Shell Agent requires permission to use "send_message", but that permission was declined.',
     );
     expect(message).not.toContain('permissions.allow');
     expect(message).not.toContain('UNHANDLED_EXCEPTION');
@@ -7466,7 +7467,8 @@ describe('CoreToolScheduler', () => {
       for (const name of ['todo_write', 'TodoWrite']) {
         const message = await scheduler.getToolNotFoundMessage(name);
         expectMessageParts(message, contains, excludes);
-        if (restartHint) expect(message).toMatch(/restart Qwen Code/i);
+        if (restartHint)
+          expect(message).toMatch(/restart MariaDB Shell Agent/i);
       }
     });
 
@@ -7574,7 +7576,7 @@ describe('CoreToolScheduler', () => {
         'prompt-id-excluded',
       );
       expect(errorMessage).toBe(
-        'Qwen Code requires permission to use write_file, but that permission was declined.',
+        'MariaDB Shell Agent requires permission to use write_file, but that permission was declined.',
       );
       expect(errorMessage).not.toContain('not found in registry');
     });
@@ -8383,7 +8385,8 @@ describe('CoreToolScheduler request queueing', () => {
     pendingManualRetryFingerprint?: string;
   };
 
-  const PROTECTED_WRITE_COMMAND = "echo '{}' > .qwen/settings.json";
+  const PROTECTED_WRITE_COMMAND =
+    "echo '{}' > .mariadb-shell-agent/settings.json";
 
   /**
    * Parks a protected shell write in awaiting_approval under AUTO mode, then
@@ -10537,7 +10540,7 @@ describe('CoreToolScheduler telemetry spans', () => {
     );
     expect(mockAcquireSleepInhibitor).toHaveBeenCalledWith(
       expect.any(Object),
-      'Qwen Code is executing tool mockTool',
+      'MariaDB Shell Agent is executing tool mockTool',
     );
     expect(mockSleepInhibitorRelease).toHaveBeenCalledTimes(1);
   });
@@ -10671,7 +10674,7 @@ describe('CoreToolScheduler telemetry spans', () => {
       type: 'vision_bridge_notice' as const,
       summary: 'Failed to read PDF after rendering pages 20-23',
       notice:
-        'Vision bridge (qwen3-vl-plus) failed after sending images to dashscope.aliyuncs.com.',
+        'Vision bridge (qwen3-vl-plus) failed after sending images to dashscope.aliyuncs.invalid.',
     };
     const { call } = await runSingleTool({
       execute: vi.fn().mockResolvedValue({
@@ -14925,7 +14928,7 @@ describe('CoreToolScheduler activation wiring', () => {
       name: 'tsx-helper',
       description,
       level: 'project' as const,
-      filePath: '/p/.qwen/skills/tsx-helper/SKILL.md',
+      filePath: '/p/.mariadb-shell-agent/skills/tsx-helper/SKILL.md',
       body: '',
     };
   }

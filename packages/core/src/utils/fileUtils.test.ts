@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1134,7 +1135,7 @@ describe('fileUtils', () => {
       vi.spyOn(fsService, 'readTextFile').mockRejectedValueOnce({
         code: -32603,
         message:
-          'path escapes workspace: /root/.qwen/skills/dataworks-di-data-processor/instructions/interaction_norms.md',
+          'path escapes workspace: /root/.mariadb-shell-agent/skills/dataworks-di-data-processor/instructions/interaction_norms.md',
         data: { errorKind: 'path_outside_workspace', status: 400 },
       });
 

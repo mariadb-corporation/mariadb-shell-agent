@@ -7,7 +7,7 @@
 The existing `wecom` channel connects intelligent robots with a Bot ID and
 Secret over WebSocket. Enterprise self-built applications instead deliver
 encrypted XML to an HTTP callback and require enterprise/application credentials
-to send replies. Those applications cannot currently connect to Qwen Code.
+to send replies. Those applications cannot currently connect to MariaDB Shell Agent.
 
 Add a `wecom-callback` channel for text direct messages, with one enterprise
 self-built application per named channel. Multiple applications use separate
@@ -88,7 +88,7 @@ Run the existing intelligent-robot tests as regression coverage.
 Record a global CLI baseline, then verify the local built CLI and protocol
 harness. Run build, typecheck, bundle and focused tests. Perform two clean
 self-audit passes and independent review. Keep exact commands and evidence in
-`.qwen/e2e-tests/wecom-callback.md`.
+`.mariadb-shell-agent/e2e-tests/wecom-callback.md`.
 
 Real-platform acceptance requires a WeCom administrator to configure a public
 callback URL and app visibility/trusted outbound IPs, then test verification,

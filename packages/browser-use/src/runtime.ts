@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -61,7 +62,7 @@ export async function createBrowserBackend(): Promise<BrowserBackend> {
           'manifest at ' +
           installed.skippedForeignPaths.join(', ') +
           '. It was left unchanged; if that browser is the one you use, ' +
-          'Chrome will launch that host instead of Qwen Code. ' +
+          'Chrome will launch that host instead of MariaDB Shell Agent. ' +
           'Remove or move the file, then retry Browser Use.\n',
       );
     }

@@ -4,32 +4,32 @@
 
 ## 状态
 
-本变更已实现，新增单元测试与类型检查通过。`qwen serve` 的协议、认证与工作区隔离行为不变；新增面仅面向本地操作者。
+本变更已实现，新增单元测试与类型检查通过。`mariadb-shell-agent serve` 的协议、认证与工作区隔离行为不变；新增面仅面向本地操作者。
 
 ## 问题
 
-`qwen serve` 可以零配置启动本地 HTTP daemon 并托管 Web Shell，但启动后不留下任何机器可读的痕迹。操作者只能从 stdout 解析绑定端口、用 `ps` 找进程、并自行记住运行时目录下的日志路径。第二个终端无法回答“这个工作区是不是已经有一个 daemon 在跑”，只能猜端口再探测。`GET /daemon/status` 虽然存在，但没有 CLI 命令能到达它。
+`mariadb-shell-agent serve` 可以零配置启动本地 HTTP daemon 并托管 Web Shell，但启动后不留下任何机器可读的痕迹。操作者只能从 stdout 解析绑定端口、用 `ps` 找进程、并自行记住运行时目录下的日志路径。第二个终端无法回答“这个工作区是不是已经有一个 daemon 在跑”，只能猜端口再探测。`GET /daemon/status` 虽然存在，但没有 CLI 命令能到达它。
 
 ## 目标
 
 - 为每个存活的监听器发布一条小型发现记录。
-- 提供 `qwen daemon status`、`qwen daemon logs`、`qwen daemon stop`。
+- 提供 `mariadb-shell-agent daemon status`、`mariadb-shell-agent daemon logs`、`mariadb-shell-agent daemon stop`。
 - 发现记录不得包含 bearer token。
-- 记录写入失败时，`qwen serve` 的行为保持不变。
+- 记录写入失败时，`mariadb-shell-agent serve` 的行为保持不变。
 
 ## 非目标
 
 - 不做远程注册表、跨主机联邦或多 daemon 协调。
 - 本切片不提供 restart 命令。
 - 不做 token 持久化；`--token` 与 `QWEN_SERVER_TOKEN` 仍是唯一的 bearer 来源。
-- 不改变 `qwen serve` 的 HTTP 协议或 Web Shell。
+- 不改变 `mariadb-shell-agent serve` 的 HTTP 协议或 Web Shell。
 
 ## 发现记录
 
 监听器绑定成功后，daemon 写入一条 JSON 记录：
 
 ```text
-${QWEN_RUNTIME_DIR:-${QWEN_HOME:-~/.qwen}}/daemon/daemon-<port>.json
+${QWEN_RUNTIME_DIR:-${QWEN_HOME:-~/.mariadb-shell-agent}}/daemon/daemon-<port>.json
 ```
 
 ```json
@@ -43,7 +43,7 @@ ${QWEN_RUNTIME_DIR:-${QWEN_HOME:-~/.qwen}}/daemon/daemon-<port>.json
   "primaryWorkspace": "/repo/project",
   "startedAt": "2026-10-19T06:00:00.000Z",
   "auth": "none",
-  "logPath": "/home/user/.qwen/debug/daemon/daemon.log",
+  "logPath": "/home/user/.mariadb-shell-agent/debug/daemon/daemon.log",
   "pidNamespace": "pid:[4026531836]"
 }
 ```
@@ -59,9 +59,9 @@ ${QWEN_RUNTIME_DIR:-${QWEN_HOME:-~/.qwen}}/daemon/daemon-<port>.json
 ## 命令面
 
 ```bash
-qwen daemon status [--json] [--prune]
-qwen daemon logs [--port <port>] [--lines <n>] [--follow]
-qwen daemon stop [--port <port>] [--all] [--force]
+mariadb-shell-agent daemon status [--json] [--prune]
+mariadb-shell-agent daemon logs [--port <port>] [--lines <n>] [--follow]
+mariadb-shell-agent daemon stop [--port <port>] [--all] [--force]
 ```
 
 - `status` 列出所有记录及其健康状态：`running`、`unreachable`、`stale`。`/health` 返回任何 HTTP 响应都证明监听器存活，包括 `--require-auth` 下的 `401`。
@@ -87,17 +87,17 @@ qwen daemon stop [--port <port>] [--all] [--force]
 
 - 单元测试覆盖：记录往返、POSIX 权限、损坏记录、按 PID 删除保护、运行时目录解析、通配 URL 改写、进程启动时间判定、条目选择、年龄格式化、日志尾部读取。
 - 全仓类型检查通过。
-- 手工验证：启动 `qwen serve`，执行 `qwen daemon status`，跟随日志，再执行 `qwen daemon stop`，确认记录被删除。
+- 手工验证：启动 `mariadb-shell-agent serve`，执行 `mariadb-shell-agent daemon status`，跟随日志，再执行 `mariadb-shell-agent daemon stop`，确认记录被删除。
 
 ## 验收标准
 
 - 第二个终端无需解析 stdout、无需预先知道端口即可发现本地存活 daemon。
-- `qwen daemon stop` 能干净退出默认 loopback daemon 并删除记录。
+- `mariadb-shell-agent daemon stop` 能干净退出默认 loopback daemon 并删除记录。
 - 任何发现文件都不包含 bearer token。
-- 发现目录不可写时，`qwen serve` 仍能启动。
+- 发现目录不可写时，`mariadb-shell-agent serve` 仍能启动。
 
 ## 后续
 
-- `qwen daemon restart` 与启动 Ready 区块。
-- `qwen daemon token`，以及 `--open-with-auth` 的可选 token 持久化。
+- `mariadb-shell-agent daemon restart` 与启动 Ready 区块。
+- `mariadb-shell-agent daemon token`，以及 `--open-with-auth` 的可选 token 持久化。
 - 终端一等客户端（`qwen attach`）。

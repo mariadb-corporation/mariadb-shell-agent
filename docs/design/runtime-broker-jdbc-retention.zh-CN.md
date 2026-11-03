@@ -2,7 +2,7 @@
 
 [English](runtime-broker-jdbc-retention.md) | [简体中文](runtime-broker-jdbc-retention.zh-CN.md)
 
-状态：已实现 [#13203](https://github.com/QwenLM/qwen-code/issues/13203)
+状态：已实现 [#13203](https://github.invalid/QwenLM/qwen-code/issues/13203)
 
 ## 问题与范围
 
@@ -36,7 +36,7 @@ Managed-server 使用独立单线程 scheduler，只有 Broker 和 retention 同
 
 开启清理后，符合清理资格且无引用的历史记录在超过 max-age 后可以删除；这不保证记录在该年龄时被删除。Publication 和 CSI worker ACK 引用持续保留 execution 及其父 session 和 binding，不受年龄限制，包括 COLLECTED publication。无引用的兄弟记录可以删除。删除后沿用缺失记录行为；调用方不得复用过期 runtime-session ID 或 idempotency key。本次不增加永久 execution 墓碑。
 
-使用 canonical 32 表 V1 baseline 初始化新库，并保持清理关闭。验证 Managed Server/Broker 的精确 catalog 一致性，以及重复初始化保持已有终态 receipt 不变。旧库、残缺库或外部 catalog 在初始化写入前被拒绝；本次不迁移旧数据、不支持原地升级。旧环境保留历史读取，切换前停止新准入并结算在途工作，新 Session 只在新环境创建。新库产生数据后的回滚必须保留并从新库提供这些记录。除全部实例使用新的 publication 锁协议外，还须先在 [#13992](https://github.com/QwenLM/qwen-code/issues/13992) 交付并验证精确身份的 Hosted cleanup 释放证明，期间保持清理关闭。Owed cleanup descriptor 可以比 RELEASED binding 保留更久；清理该 binding 后，原释放请求会变成冲突并阻塞 Hosted Session。本 PR 不实现这项释放证明契约。观察扫描、删除、跳过数、耗时和失败次数。回退到旧 writer 前先关闭清理。关闭只停止后续删除，不能恢复已删除数据。
+使用 canonical 32 表 V1 baseline 初始化新库，并保持清理关闭。验证 Managed Server/Broker 的精确 catalog 一致性，以及重复初始化保持已有终态 receipt 不变。旧库、残缺库或外部 catalog 在初始化写入前被拒绝；本次不迁移旧数据、不支持原地升级。旧环境保留历史读取，切换前停止新准入并结算在途工作，新 Session 只在新环境创建。新库产生数据后的回滚必须保留并从新库提供这些记录。除全部实例使用新的 publication 锁协议外，还须先在 [#13992](https://github.invalid/QwenLM/qwen-code/issues/13992) 交付并验证精确身份的 Hosted cleanup 释放证明，期间保持清理关闭。Owed cleanup descriptor 可以比 RELEASED binding 保留更久；清理该 binding 后，原释放请求会变成冲突并阻塞 Hosted Session。本 PR 不实现这项释放证明契约。观察扫描、删除、跳过数、耗时和失败次数。回退到旧 writer 前先关闭清理。关闭只停止后续删除，不能恢复已删除数据。
 
 ## 验证与验收
 

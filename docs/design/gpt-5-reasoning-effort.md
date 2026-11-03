@@ -125,13 +125,13 @@ compatibility.
 
 Verify global CLI baseline and local bundled CLI with a local recording mock
 endpoint, plus focused core/CLI tests, build, typecheck, formatting, and lint.
-The E2E plan and results live in `.qwen/e2e-tests/gpt-5-reasoning-effort.md`.
+The E2E plan and results live in `.mariadb-shell-agent/e2e-tests/gpt-5-reasoning-effort.md`.
 Live tests use the user's configured providers with isolated settings and
 runtime directories. GPT-5.5 and GPT-5.6 Sol pass; GPT-5.4 is unavailable on
 the configured gateway. GPT-6 Astra's pre-extension bundle returns real
 responses but sends nested high, clamps max to xhigh, and loses effort with
 sampling parameters. Its live verification plan is
-`.qwen/e2e-tests/gpt-6-reasoning-effort-live.md`.
+`.mariadb-shell-agent/e2e-tests/gpt-6-reasoning-effort-live.md`.
 
 ## Sources
 

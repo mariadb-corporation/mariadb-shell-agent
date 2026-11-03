@@ -14,7 +14,7 @@
 调用 `/autofix-pr`，`prepare` 拒绝：
 
 ```
-…/git/qwen-code/.qwen/tmp/autofix-pr-15816 is outside this session's working
+…/git/qwen-code/.mariadb-shell-agent/tmp/autofix-pr-15816 is outside this session's working
 directory (…/git/qwen-code-x2): the daemon runs the fix agent's commands only
 there … Prepare the PR from …/git/qwen-code …
 ```
@@ -32,7 +32,7 @@ there … Prepare the PR from …/git/qwen-code …
    （`packages/cli/src/commands/review/lib/git.ts`）返回 clone 的**主
    worktree**（`git worktree list --porcelain` 的第一条）。
    `autofixPrPaths(root, pr)`（`packages/cli/src/commands/autofix-pr/state.ts`）
-   把 worktree 与全部状态文件放在 `<主worktree>/.qwen/tmp/` 下。设计理由：
+   把 worktree 与全部状态文件放在 `<主worktree>/.mariadb-shell-agent/tmp/` 下。设计理由：
    分支由 clone 的所有 worktree 共享，所以 watch 属于 clone，任何 worktree
    里的 helper 都能找到同一个 watch。
 2. **daemon 包含边界。** daemon shell guard
@@ -46,7 +46,7 @@ linked-worktree 会话的 cwd 既不是主 worktree，也不是会话拥有的�
 因此按 clone 落盘的产物永远在其可达范围之外。daemon 的 watch 列表同样按 clone
 落盘：`cloneRootOf()` / `listAutofixPrWatches()`
 （`packages/cli/src/serve/routes/autofix-pr-watches.ts`）扫描主 worktree 的
-`.qwen/tmp`，从而「同一 clone 的两个 workspace 列出相同的 watch」。
+`.mariadb-shell-agent/tmp`，从而「同一 clone 的两个 workspace 列出相同的 watch」。
 
 ## 目标
 
@@ -110,7 +110,7 @@ watch，但兄弟检出的 `.git` 是一个 gitfile，在其中运行过的代�
 嵌套的 watch 担保，`status` 就会执行替换仓库的 `core.fsmonitor`。
 
 genuine clone 身份记录在**每个 workspace 之外的锚存储**：
-`~/.qwen/autofix-anchors/<host>+<owner>+<repo>/<cloneKey>-pr-<n>.json`
+`~/.mariadb-shell-agent/autofix-anchors/<host>+<owner>+<repo>/<cloneKey>-pr-<n>.json`
 （`QWEN_AUTOFIX_ANCHOR_DIR` 供测试覆盖根目录）。`<cloneKey>` 是 clone 主
 worktree 路径的哈希，所以两个独立 clone watch 同一 PR 会保持**各自独立**的锚
 ——prepare 或 resume 其中一个不会撤销另一个的。`prepare`/resume 从当时 helper
@@ -132,7 +132,7 @@ clone 能 resume 其 watch，而不是搁浅在孤立的键上。列表把每个
 
 `status`（默认、未显式指定 root）与 daemon 的 `listAutofixPrWatches` 以 NUL
 安全方式枚举 clone 的各 worktree（`cloneWorktreeRoots`），扫描每个的
-`.qwen/tmp` 并合并 watch。按 PR 编号去重：git 不允许同一分支在两个 worktree
+`.mariadb-shell-agent/tmp` 并合并 watch。按 PR 编号去重：git 不允许同一分支在两个 worktree
 同时检出，所以一个 PR 的 watch worktree 至多存在于一个 worktree，合并绝不会
 重复计入活跃 watch；活 watch worktree 优先于另一根里的陈旧状态文件。daemon
 视图仍把 clone 的主 worktree 作为展示用的 `root`；扫描覆盖所有 worktree，从而
@@ -141,17 +141,17 @@ clone 能 resume 其 watch，而不是搁浅在孤立的键上。列表把每个
 flag。
 
 读取之前，`vouchedScanRoots` 先过滤枚举出的根（仅文件读取、不跑 git 命令，
-所以 daemon 仍只用一次 git 调用）：丢弃嵌套在另一根 `.qwen/tmp` 里的 watch
+所以 daemon 仍只用一次 git 调用）：丢弃嵌套在另一根 `.mariadb-shell-agent/tmp` 里的 watch
 worktree（在那里 force-add 一个状态文件会伪造 watch），并把每个剩余的根对照
 genuine clone 的 worktree 登记项做担保——被无关仓库占据的失效条目、或 `.git`
 被改写的兄弟，都不会被当成本 clone 的 watch 读取。genuine 公共目录对两种布局
 都能解析：非 bare 主 worktree 的 `.git` 目录，或 bare clone 的主条目——它本身
 就是 git 目录（没有 `.git` 子目录）。锚无法解析时**不**当作校验通过：扫描只
 信主根，绝不对未担保的兄弟 fail-open。然后每个 worktree 的目录扫描相互隔离：
-某个兄弟的 `.qwen/tmp` 是普通文件或不可访问（ENOTDIR/EACCES）时跳过它，而不会
+某个兄弟的 `.mariadb-shell-agent/tmp` 是普通文件或不可访问（ENOTDIR/EACCES）时跳过它，而不会
 让其余所有 worktree 的 watch 列表整体中止（经 daemon 那会是整个 clone 的
 500）。**主根**的读取失败会被抛出（surface），而不是吞成空列表——主
-`.qwen/tmp` 不可读是真实的诊断信号。同样的逐根隔离也用于 watch 发现
+`.mariadb-shell-agent/tmp` 不可读是真实的诊断信号。同样的逐根隔离也用于 watch 发现
 （`findWatchRoot`），所以畸形兄弟不会挡住 helper 在别处找到并结束一个健康
 watch。daemon 视图会对 `unreadable[].error` 里的兄弟绝对路径与状态文件名脱敏
 （CLI 保留完整路径）。
@@ -172,10 +172,10 @@ daemon 会话现在会通过（worktree 在 cwd 之内）。当 worktree 仍会�
   `daemon-git-worktree-guard.ts` 分析命令是否在会话边界之外做 git 仓库重定位/
   变更，否则放行（`return denial ?? { allowed: true }`；在会话自身 cwd 里、已
   过权限检查的调用直接放行）。因此 round 能用非 git 命令（`node -e …`、
-  `printf > …`）写任意 same-user 文件——包括 `~/.qwen/autofix-anchors`。锚文件
+  `printf > …`）写任意 same-user 文件——包括 `~/.mariadb-shell-agent/autofix-anchors`。锚文件
   **并不**超出 round 的可达范围。
 - **能写任意 same-user 文件的 round 已是完全 compromise。** 它能读 daemon
-  discovery sidecar、改写 CLI 源码与 bundled skill、编辑 `~/.qwen/settings.json`。
+  discovery sidecar、改写 CLI 源码与 bundled skill、编辑 `~/.mariadb-shell-agent/settings.json`。
   没有任何文件锚能作为对抗这种 round 的信任权威。锚挫败的是 *git 层面*的
   gitfile 改写攻击（在工作目录内改写 `.git` 指针）——即评审 witness 所行使的
   能力——并为可用性区分 clone。它不会、也不能防御拥有无限制 same-user 文件
@@ -217,7 +217,7 @@ daemon 会话现在会通过（worktree 在 cwd 之内）。当 worktree 仍会�
 ## 约束
 
 - ESM、严格 TS、无 `any`；kebab-case 文件名；同目录 `*.test.ts`。
-- 安全检查必须保持 fail-closed；任何 helper 都不在 watch 的 `.qwen/tmp` 之外
+- 安全检查必须保持 fail-closed；任何 helper 都不在 watch 的 `.mariadb-shell-agent/tmp` 之外
   写入。
 - daemon 列表在自己的线程上运行且不得挂起：保留每 worktree 的 git 超时与
   非阻塞文件读取。
@@ -267,7 +267,7 @@ daemon 会话现在会通过（worktree 在 cwd 之内）。当 worktree 仍会�
 - 回退 pin：linked worktree 里的 daemon 会话 prepare 出一个 worktree 落在
   会话 cwd 之内的 watch，且 `assertSessionCanRunWorktree` 通过（即 b1887512
   的 exact 失败场景）。
-- E2E（`.qwen/e2e-tests/`）：从 linked-worktree daemon 会话，
+- E2E（`.mariadb-shell-agent/e2e-tests/`）：从 linked-worktree daemon 会话，
   `/autofix-pr <n>` 能 prepare、跑一轮并 push；Web Shell 的 watch 列表从同
   clone 的兄弟 workspace 能看到该 watch。
 - `npm run build && npm run typecheck` 加上所改包的单元测试。

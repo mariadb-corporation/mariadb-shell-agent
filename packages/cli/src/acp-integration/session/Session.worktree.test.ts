@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Phase C — Session.pendingWorktreeNotice consumption tests.
@@ -264,7 +265,7 @@ describe('Session.pendingWorktreeNotice', () => {
     );
 
     const notice =
-      '[Resumed] Active worktree: "feat" at /repo/.qwen/worktrees/feat ' +
+      '[Resumed] Active worktree: "feat" at /repo/.mariadb-shell-agent/worktrees/feat ' +
       '(branch: worktree-feat). Continue using this path for all file operations.';
     session.pendingWorktreeNotice = notice;
 

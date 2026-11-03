@@ -1,14 +1,15 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * `@qwen-code/sdk/peer`: join the Qwen Code sessions running as this user.
+ * `@qwen-code/sdk/peer`: join the MariaDB Shell Agent sessions running as this user.
  *
  * An implementation of the cross-session protocol for a program that is
- * not itself a Qwen Code session — a voice front-end, a relay, a build
+ * not itself a MariaDB Shell Agent session — a voice front-end, a relay, a build
  * watcher. Node only, and built from Node's own modules alone.
  *
  * ```ts

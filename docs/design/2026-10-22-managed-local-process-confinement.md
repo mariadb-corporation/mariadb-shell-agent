@@ -4,9 +4,9 @@
 
 ## Status and current state
 
-This is a design proposal for [#15081](https://github.com/QwenLM/qwen-code/issues/15081), not an implementation or a runtime qualification result. The Managed `local-process` path currently runs Workspace file and Shell tools with the worker's host permissions. A Workspace root is trusted deployment data, and `isolationClass` names a scope without enforcing a filesystem boundary.
+This is a design proposal for [#15081](https://github.invalid/QwenLM/qwen-code/issues/15081), not an implementation or a runtime qualification result. The Managed `local-process` path currently runs Workspace file and Shell tools with the worker's host permissions. A Workspace root is trusted deployment data, and `isolationClass` names a scope without enforcing a filesystem boundary.
 
-The repository already contains a Linux bubblewrap (`bwrap`) execution foundation and runtime Shell/File stages. Their current policy uses a read-only host-root view and explicitly does not promise read confidentiality. Simply enabling it for Managed Agent would therefore leave cross-Workspace reads possible. Issue [#14667](https://github.com/QwenLM/qwen-code/issues/14667) owns the separate cgroup unit, `setsid`/double-fork containment and Broker-visible empty proof; this proposal consumes that contract.
+The repository already contains a Linux bubblewrap (`bwrap`) execution foundation and runtime Shell/File stages. Their current policy uses a read-only host-root view and explicitly does not promise read confidentiality. Simply enabling it for Managed Agent would therefore leave cross-Workspace reads possible. Issue [#14667](https://github.invalid/QwenLM/qwen-code/issues/14667) owns the separate cgroup unit, `setsid`/double-fork containment and Broker-visible empty proof; this proposal consumes that contract.
 
 ## Goals
 

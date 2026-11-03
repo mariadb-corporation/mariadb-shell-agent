@@ -23,7 +23,7 @@ For deletion, hold the session archive coordinator exclusively so load/archive/d
 
 ## Validation and acceptance
 
-Test live/cold/archived reads, removal surviving reload, unchanged archive/history, no attach/spawn, owner/client separation, workspace mismatch, corruption, concurrent writer refusal and idempotence. Run focused package tests, build, typecheck and bundle. A temporary daemon HTTP test compares the global baseline with the local bundle without model calls or real user sessions. The plan/results live in `.qwen/e2e-tests/session-artifact-library.md`.
+Test live/cold/archived reads, removal surviving reload, unchanged archive/history, no attach/spawn, owner/client separation, workspace mismatch, corruption, concurrent writer refusal and idempotence. Run focused package tests, build, typecheck and bundle. A temporary daemon HTTP test compares the global baseline with the local bundle without model calls or real user sessions. The plan/results live in `.mariadb-shell-agent/e2e-tests/session-artifact-library.md`.
 
 ## Risks and open questions
 

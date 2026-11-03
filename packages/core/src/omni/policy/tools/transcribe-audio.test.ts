@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -229,7 +230,7 @@ describe('OmniTranscribeAudioTool', () => {
     });
     expect(TRANSCRIBE_AUDIO_DEFAULTS).toEqual({
       model: 'qwen3.5-omni-plus',
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       apiKeyEnv: 'DASHSCOPE_API_KEY',
       maxInputBytes: 10 * 1024 * 1024,
       chunkSeconds: 180,
@@ -247,7 +248,7 @@ describe('OmniTranscribeAudioTool', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, init] = fetchCall();
     expect(url).toBe(
-      'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1/chat/completions',
     );
     expect(init.method).toBe('POST');
     expect(init.headers).toEqual({

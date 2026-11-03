@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -43,21 +44,22 @@ describe('workflow ancestor directory safety', () => {
 
   it
     .skipIf(process.platform === 'win32')
-    .each(['', '.qwen', path.join('.qwen', 'workflows')])(
-    'rejects world-writable %s',
-    (component) => {
-      fs.mkdirSync(path.join(directory, '.qwen', 'workflows'), {
-        recursive: true,
-      });
-      const unsafe = path.join(directory, component);
-      fs.chmodSync(unsafe, 0o777);
-      try {
-        expect(isWorkflowAncestorDirectorySafe(directory)).toBe(false);
-      } finally {
-        fs.chmodSync(unsafe, 0o755);
-      }
-    },
-  );
+    .each([
+      '',
+      '.mariadb-shell-agent',
+      path.join('.mariadb-shell-agent', 'workflows'),
+    ])('rejects world-writable %s', (component) => {
+    fs.mkdirSync(path.join(directory, '.mariadb-shell-agent', 'workflows'), {
+      recursive: true,
+    });
+    const unsafe = path.join(directory, component);
+    fs.chmodSync(unsafe, 0o777);
+    try {
+      expect(isWorkflowAncestorDirectorySafe(directory)).toBe(false);
+    } finally {
+      fs.chmodSync(unsafe, 0o755);
+    }
+  });
 
   it.skipIf(process.platform === 'win32')(
     'rejects unexpected optional-directory stat failures',
@@ -65,7 +67,7 @@ describe('workflow ancestor directory safety', () => {
       const { statSync } =
         await vi.importActual<typeof import('node:fs')>('node:fs');
       vi.mocked(fs.statSync).mockImplementation((location, ...args) => {
-        if (String(location) === path.join(directory, '.qwen')) {
+        if (String(location) === path.join(directory, '.mariadb-shell-agent')) {
           throw Object.assign(new Error('denied'), { code: 'EACCES' });
         }
         return statSync(location, ...args);

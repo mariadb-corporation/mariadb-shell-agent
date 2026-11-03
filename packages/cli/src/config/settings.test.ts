@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -3211,7 +3212,7 @@ describe('Settings Loading and Merging', () => {
       delete process.env['HOME_ENV_TOKEN'];
     });
 
-    it('should prefer ~/.qwen/.env over ~/.env for the same key (first-write-wins) (#4466)', () => {
+    it('should prefer ~/.mariadb-shell-agent/.env over ~/.env for the same key (first-write-wins) (#4466)', () => {
       const qwenEnvPath = path.join(path.dirname(USER_SETTINGS_PATH), '.env');
       const homeEnvPath = path.join(
         path.dirname(path.dirname(USER_SETTINGS_PATH)),
@@ -5864,7 +5865,7 @@ describe('Settings Loading and Merging', () => {
       },
     );
 
-    it('uses user .qwen/.env as fallback when the project .env lacks an API key', () => {
+    it('uses user .mariadb-shell-agent/.env as fallback when the project .env lacks an API key', () => {
       delete process.env['OPENCODE_GO_API_KEY'];
       delete process.env['PROJECT_ONLY_VAR'];
       const cwdSpy = vi
@@ -5900,7 +5901,7 @@ describe('Settings Loading and Merging', () => {
       cwdSpy.mockRestore();
     });
 
-    it('lets the project .env win over user .qwen/.env when both define the API key', () => {
+    it('lets the project .env win over user .mariadb-shell-agent/.env when both define the API key', () => {
       delete process.env['OPENCODE_GO_API_KEY'];
       const cwdSpy = vi
         .spyOn(process, 'cwd')
@@ -5935,7 +5936,7 @@ describe('Settings Loading and Merging', () => {
       cwdSpy.mockRestore();
     });
 
-    it('still loads user .qwen/.env fallback when the workspace is untrusted', () => {
+    it('still loads user .mariadb-shell-agent/.env fallback when the workspace is untrusted', () => {
       delete process.env['OPENCODE_GO_API_KEY'];
       delete process.env['PROJECT_ENV_VAR'];
       const cwdSpy = vi
@@ -6435,7 +6436,7 @@ describe('Settings Loading and Merging', () => {
         delete process.env['QWEN_HOME_TEST_VAR'];
       });
 
-      it('does not exclude DEBUG/DEBUG_MODE from .env in a QWEN_HOME dir not named .qwen', () => {
+      it('does not exclude DEBUG/DEBUG_MODE from .env in a QWEN_HOME dir not named .mariadb-shell-agent', () => {
         const customHome = '/tmp/qwen-home-custom';
         process.env['QWEN_HOME'] = customHome;
         const customGlobalEnvPath = path.join(customHome, '.env');
@@ -6546,7 +6547,7 @@ describe('Settings Loading and Merging', () => {
         );
       });
 
-      it('still honors QWEN_HOME from a user-level .env (~/.qwen/.env)', () => {
+      it('still honors QWEN_HOME from a user-level .env (~/.mariadb-shell-agent/.env)', () => {
         delete process.env['QWEN_HOME'];
 
         const cwdSpy = vi
@@ -6609,7 +6610,7 @@ describe('Settings Loading and Merging', () => {
         cwdSpy.mockRestore();
       });
 
-      it('does not exclude DEBUG/DEBUG_MODE from a workspace .qwen/.env', () => {
+      it('does not exclude DEBUG/DEBUG_MODE from a workspace .mariadb-shell-agent/.env', () => {
         const cwdSpy = vi
           .spyOn(process, 'cwd')
           .mockReturnValue(MOCK_WORKSPACE_DIR);
@@ -6637,7 +6638,7 @@ describe('Settings Loading and Merging', () => {
 
         loadEnvironment(loadSettings(MOCK_WORKSPACE_DIR).merged);
 
-        // Per docs, `.qwen/.env` files are never filtered by excludedEnvVars,
+        // Per docs, `.mariadb-shell-agent/.env` files are never filtered by excludedEnvVars,
         // even when nested inside a workspace.
         expect(process.env['DEBUG']).toEqual('true');
         expect(process.env['DEBUG_MODE']).toEqual('1');
@@ -6645,7 +6646,7 @@ describe('Settings Loading and Merging', () => {
         cwdSpy.mockRestore();
       });
 
-      it('still blocks QWEN_HOME from a workspace .qwen/.env', () => {
+      it('still blocks QWEN_HOME from a workspace .mariadb-shell-agent/.env', () => {
         delete process.env['QWEN_HOME'];
         delete process.env['QWEN_RUNTIME_DIR'];
 
@@ -6680,7 +6681,7 @@ describe('Settings Loading and Merging', () => {
 
         loadEnvironment(loadSettings(MOCK_WORKSPACE_DIR).merged);
 
-        // A workspace `.qwen/.env` is exempt from `excludedEnvVars` but must
+        // A workspace `.mariadb-shell-agent/.env` is exempt from `excludedEnvVars` but must
         // still be blocked from redirecting global state.
         expect(process.env['QWEN_HOME']).toBeUndefined();
         expect(process.env['QWEN_RUNTIME_DIR']).toBeUndefined();
@@ -6690,7 +6691,7 @@ describe('Settings Loading and Merging', () => {
         cwdSpy.mockRestore();
       });
 
-      it('redirects user settings path when QWEN_HOME is set in ~/.qwen/.env', () => {
+      it('redirects user settings path when QWEN_HOME is set in ~/.mariadb-shell-agent/.env', () => {
         delete process.env['QWEN_HOME'];
 
         const cwdSpy = vi
@@ -6719,7 +6720,7 @@ describe('Settings Loading and Merging', () => {
 
         const loaded = loadSettings(MOCK_WORKSPACE_DIR);
 
-        // The pre-pass propagates QWEN_HOME from ~/.qwen/.env into
+        // The pre-pass propagates QWEN_HOME from ~/.mariadb-shell-agent/.env into
         // process.env so subsequent path getters (which now read it lazily)
         // route to /tmp/from-user-env consistently.
         expect(process.env['QWEN_HOME']).toEqual('/tmp/from-user-env');
@@ -6727,7 +6728,7 @@ describe('Settings Loading and Merging', () => {
         cwdSpy.mockRestore();
       });
 
-      it('warns when QWEN_HOME redirects but the legacy ~/.qwen still has settings', () => {
+      it('warns when QWEN_HOME redirects but the legacy ~/.mariadb-shell-agent still has settings', () => {
         const customHome = '/tmp/qwen-home-fresh';
         process.env['QWEN_HOME'] = customHome;
         const legacySettings = path.join(
@@ -6735,7 +6736,7 @@ describe('Settings Loading and Merging', () => {
           QWEN_DIR,
           'settings.json',
         );
-        // Active QWEN_HOME has nothing yet; legacy ~/.qwen has settings.json.
+        // Active QWEN_HOME has nothing yet; legacy ~/.mariadb-shell-agent has settings.json.
         const customSettingsPath = path.join(customHome, 'settings.json');
 
         vi.mocked(isWorkspaceTrusted).mockReturnValue({
@@ -6783,7 +6784,7 @@ describe('Settings Loading and Merging', () => {
         expect(warningMatch).toBeUndefined();
       });
 
-      it('does not warn when QWEN_HOME is unset (default ~/.qwen)', () => {
+      it('does not warn when QWEN_HOME is unset (default ~/.mariadb-shell-agent)', () => {
         delete process.env['QWEN_HOME'];
         const legacySettings = path.join(
           '/mock/home/user',
@@ -6841,8 +6842,8 @@ describe('Settings Loading and Merging', () => {
         expect(process.env['QWEN_HOME_TEST_VAR']).toEqual('fromQwenHome');
       });
 
-      it('falls back to legacy ~/.qwen/.env for non-routing keys when <QWEN_HOME>/.env is absent', () => {
-        // User keeps OPENAI_API_KEY in ~/.qwen/.env and adds QWEN_HOME to the
+      it('falls back to legacy ~/.mariadb-shell-agent/.env for non-routing keys when <QWEN_HOME>/.env is absent', () => {
+        // User keeps OPENAI_API_KEY in ~/.mariadb-shell-agent/.env and adds QWEN_HOME to the
         // same file. Adding the redirect must not silently drop credentials
         // sitting in that file when the new dir hasn't been populated yet.
         delete process.env['QWEN_HOME'];
@@ -6859,7 +6860,7 @@ describe('Settings Loading and Merging', () => {
           isTrusted: true,
           source: 'file',
         });
-        // Only the legacy ~/.qwen/.env exists; <QWEN_HOME>/.env, the active
+        // Only the legacy ~/.mariadb-shell-agent/.env exists; <QWEN_HOME>/.env, the active
         // settings.json under <QWEN_HOME>, and ~/.env all do not.
         (mockFsExistsSync as Mock).mockImplementation((p: fs.PathLike) =>
           [USER_SETTINGS_PATH, customSettingsPath, userQwenEnvPath].includes(
@@ -6895,7 +6896,7 @@ describe('Settings Loading and Merging', () => {
       p: fs.PathLike | fs.PathOrFileDescriptor,
     ): string => path.normalize(p.toString());
 
-    it('uses user .qwen/.env as fallback when the project .env lacks an API key', () => {
+    it('uses user .mariadb-shell-agent/.env as fallback when the project .env lacks an API key', () => {
       delete process.env['OPENCODE_GO_API_KEY'];
       delete process.env['PROJECT_ONLY_VAR'];
       const projectEnvPath = path.resolve(MOCK_WORKSPACE_DIR, '.env');
@@ -6933,7 +6934,7 @@ describe('Settings Loading and Merging', () => {
       expect(result.removedKeys).toEqual([]);
     });
 
-    it('keeps the project .env value during reload when user .qwen/.env also defines it', () => {
+    it('keeps the project .env value during reload when user .mariadb-shell-agent/.env also defines it', () => {
       delete process.env['OPENCODE_GO_API_KEY'];
       const projectEnvPath = path.resolve(MOCK_WORKSPACE_DIR, '.env');
       const userQwenEnvPath = path.normalize(

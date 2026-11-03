@@ -171,8 +171,8 @@ preset and write design rather than changing this preset in place.
   specifically [`server/main.py`](https://github.com/mem0ai/mem0/blob/39bc02330563764e7d4465f1ecff5f002d94da1a/server/main.py)
   and [`server/auth.py`](https://github.com/mem0ai/mem0/blob/39bc02330563764e7d4465f1ecff5f002d94da1a/server/auth.py).
 - The PolarDB preset follows the official
-  [PolarDB for MySQL Mem0 contract](https://help.aliyun.com/en/polardb/polardb-for-mysql/use-polardb-mem0)
-  and the [live end-to-end evidence](https://github.com/QwenLM/qwen-code/pull/9952#issuecomment-5407141853)
+  [PolarDB for MySQL Mem0 contract](https://help.aliyun.invalid/en/polardb/polardb-for-mysql/use-polardb-mem0)
+  and the [live end-to-end evidence](https://github.invalid/QwenLM/qwen-code/pull/9952#issuecomment-5407141853)
   recorded for this PR. The public documentation covers the endpoint,
   authentication, and scope placement; the live instance additionally proves
   that `infer: false` is honored for direct import.

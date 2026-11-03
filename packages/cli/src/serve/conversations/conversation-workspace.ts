@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -119,7 +120,7 @@ function liveIdentityError(
 }
 
 export function getConversationRootPath(homeDir: string = homedir()): string {
-  return resolve(homeDir, 'Documents', 'Qwen Code', 'Conversations');
+  return resolve(homeDir, 'Documents', 'MariaDB Shell Agent', 'Conversations');
 }
 
 export async function revalidateConversationRoot(

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -826,7 +827,7 @@ function cases(mapped: boolean) {
   it('keeps the actual team-memory secret guard without private pathname discovery', async () => {
     const owned = await fixture(mapped);
     const composed = await owned.compose();
-    const file = owned.file('.qwen/team-memory/feedback.md');
+    const file = owned.file('.mariadb-shell-agent/team-memory/feedback.md');
     const secret = `ghp_${'a'.repeat(36)}`;
     for (const name of ['write_file', 'edit']) {
       const tool = composed.tools.tools.get(name)!;

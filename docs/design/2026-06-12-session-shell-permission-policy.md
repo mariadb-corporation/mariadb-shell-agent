@@ -22,7 +22,7 @@ the surface and the caller proves it is attached to the target session.
 ## Goals
 
 - Disable direct session shell by default.
-- Require explicit operator opt-in with `qwen serve --enable-session-shell`.
+- Require explicit operator opt-in with `mariadb-shell-agent serve --enable-session-shell`.
 - Require bearer-token configuration or trusted-loopback operator authority before the opt-in becomes effective.
 - Require a client id that is registered on the addressed session.
 - Apply the same policy at the REST route, ACP HTTP dispatcher, and bridge

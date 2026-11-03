@@ -6,7 +6,7 @@
 
 作为[迁移交付方案](2026-10-20-opentui-migration-delivery.zh-CN.md)的 U1，在 main 基线 `2b5c4deadb9e9dd0d9d740a52ae42f28ad14bf92` 恢复本修复。候选验证与实现状态分别记录。
 
-来源：[#14044](https://github.com/QwenLM/qwen-code/pull/14044)，提交 `10a98a72ee2c78323c902f7d01f2a05db371a5d0` 与 `7cb0a86fbf709da0da24f6acb0a14465e59b9c36`，作者为 gary.gq，合作作者为 multica-agent。该 PR 合并到了 `fix/MYWO-7-short-dialog-budgets`，没有进入 main。只恢复它相对 `e16490eccc5aeffbb680da7c0935b5aebfe82f1b` 的八文件差异，保留 main 后续变化。历史通过结果不代表本候选已验收。
+来源：[#14044](https://github.invalid/QwenLM/qwen-code/pull/14044)，提交 `10a98a72ee2c78323c902f7d01f2a05db371a5d0` 与 `7cb0a86fbf709da0da24f6acb0a14465e59b9c36`，作者为 gary.gq，合作作者为 multica-agent。该 PR 合并到了 `fix/MYWO-7-short-dialog-budgets`，没有进入 main。只恢复它相对 `e16490eccc5aeffbb680da7c0935b5aebfe82f1b` 的八文件差异，保留 main 后续变化。历史通过结果不代表本候选已验收。
 
 ## 复现
 

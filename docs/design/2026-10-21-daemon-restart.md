@@ -6,12 +6,12 @@ Status: implemented.
 
 ## Scope
 
-`qwen daemon restart` restarts exactly one registered local `qwen serve` daemon. It requests the daemon's recorded port and hostname, replays its recorded startup workspaces, Web Shell mode, and `--require-auth` setting, keeps its bearer credential, and waits for the new runtime to become ready. It does not add a supervisor, a Windows service, or cross-runtime-directory discovery.
+`mariadb-shell-agent daemon restart` restarts exactly one registered local `mariadb-shell-agent serve` daemon. It requests the daemon's recorded port and hostname, replays its recorded startup workspaces, Web Shell mode, and `--require-auth` setting, keeps its bearer credential, and waits for the new runtime to become ready. It does not add a supervisor, a Windows service, or cross-runtime-directory discovery.
 
 ## Command
 
 ```bash
-qwen daemon restart [--port <port>] [--token <token>]
+mariadb-shell-agent daemon restart [--port <port>] [--token <token>]
                      [--web | --no-web] [--require-auth | --no-require-auth]
                      [--force]
 ```
@@ -20,7 +20,7 @@ qwen daemon restart [--port <port>] [--token <token>]
 
 ## Discovery record
 
-`qwen serve` adds three optional fields to its discovery record so restart can reproduce what the daemon was started with:
+`mariadb-shell-agent serve` adds three optional fields to its discovery record so restart can reproduce what the daemon was started with:
 
 - `startupWorkspaces`: the explicit startup workspaces. `workspaces` also contains the persisted registrations the daemon restored at boot. Replaying those as `--workspace` would turn a registration that can be forgotten into a startup workspace, which the removal route then refuses to remove.
 - `web`: whether the Web Shell was enabled.
@@ -34,13 +34,13 @@ The fields are optional, so older CLIs still read the record and the record vers
 - Decide every refusal that can be decided while the daemon is still running before the stop leg:
   - Reject an HTTPS discovery URL. `daemon start` cannot restore TLS settings, so restart must not downgrade an encrypted listener to plain HTTP.
   - Reject an older record without `startupWorkspaces` when it lists more than one workspace, because its restored registrations cannot be told apart from startup workspaces. An older single-workspace record is replayed, with notices naming the assumed Web Shell and `--require-auth` defaults.
-  - Resolve the bearer token from `--token` or `QWEN_SERVER_TOKEN`. A recorded bearer daemon, `--require-auth`, or an explicit `--token` requires one. The error names a token generated at startup, which the record cannot recover, and notes that a token in a workspace `.env` or settings file is not read by `qwen daemon`.
+  - Resolve the bearer token from `--token` or `QWEN_SERVER_TOKEN`. A recorded bearer daemon, `--require-auth`, or an explicit `--token` requires one. The error names a token generated at startup, which the record cannot recover, and notes that a token in a workspace `.env` or settings file is not read by `mariadb-shell-agent daemon`.
   - For a running bearer daemon whose listener identity is verified, send the token to `/daemon/status`. A 401 refuses the restart, so a wrong token cannot silently rotate the daemon's credential. An unverified or unreachable listener is not sent the token.
   - Refuse when the restart process is a descendant of the target daemon, for example a Web Shell terminal it hosts. Stopping the daemon tears that shell down, and this command with it, before the start leg runs.
   - Validate the startup workspaces with the same check `daemon start` applies, so a workspace that disappeared while the daemon ran does not stop a healthy daemon.
 - Stop through the existing `daemon stop` path, including PID/start-time/command-line checks. `--force` is passed only when the operator passes `restart --force`. It confirms the Windows hard kill and allows SIGKILL on POSIX after the SIGTERM timeout; restart never adds it on the operator's behalf.
 - Start through the existing `daemon start --wait` path with the recorded port, hostname, startup workspaces, Web Shell mode, and `--require-auth`. The new process must report the runtime as serving before restart returns.
-- Run both legs as `qwen daemon stop` and `qwen daemon start` subprocesses. Each leg is the public command with its own checks and output, and the restart process can give the legs a child environment (token added or removed) without changing its own.
+- Run both legs as `mariadb-shell-agent daemon stop` and `mariadb-shell-agent daemon start` subprocesses. Each leg is the public command with its own checks and output, and the restart process can give the legs a child environment (token added or removed) without changing its own.
 - Preserve `process.execArgv` for JavaScript/TypeScript entries so `npm run dev -- daemon restart` keeps its loader.
 - For an `auth: none` daemon without `--require-auth` or `--token`, remove `QWEN_SERVER_TOKEN` from the child environment so an inherited token does not silently add bearer auth. An explicit `--token` configures bearer auth, as it does for `daemon start`.
 
@@ -50,14 +50,14 @@ The fields are optional, so older CLIs still read the record and the record vers
 - A stop or start leg that cannot be launched is reported with the spawn error.
 - A start failure has three outcomes, which are `daemon start`'s:
   - `daemon start` refused before spawning (invalid workspace, missing token, duplicate daemon, spawn failure): the daemon is stopped, and retrying is safe.
-  - No discovery record within 30 seconds: the detached child may still start. Check `qwen daemon status` before retrying.
-  - The record was published but the runtime did not report ready within 30 seconds: the daemon is usually running but not ready, though it may have exited during startup. Check `qwen daemon status`, and use `qwen daemon stop --port <port>` before starting again; a bare `qwen daemon start` is refused while it runs.
+  - No discovery record within 30 seconds: the detached child may still start. Check `mariadb-shell-agent daemon status` before retrying.
+  - The record was published but the runtime did not report ready within 30 seconds: the daemon is usually running but not ready, though it may have exited during startup. Check `mariadb-shell-agent daemon status`, and use `mariadb-shell-agent daemon stop --port <port>` before starting again; a bare `mariadb-shell-agent daemon start` is refused while it runs.
 - `serve` moves to the next free port when the recorded one is in use. Restart then exits non-zero, because the daemon did not come back on its recorded port; the start summary prints the actual URL.
 - The restart command never persists or prints the bearer token.
 
 ## Limitations and follow-up
 
-- Restart reproduces only the port, hostname, startup workspaces, Web Shell mode, `--require-auth`, and bearer credential. Every other `qwen serve` option, such as `--profile`, `--http-bridge`, `--channel`, `--join`, `--local-control`, `--allow-origin`, `--rate-limit-*`, and the session and memory limits, resets to its default. Relaunch a daemon configured with those options through `qwen serve`.
+- Restart reproduces only the port, hostname, startup workspaces, Web Shell mode, `--require-auth`, and bearer credential. Every other `mariadb-shell-agent serve` option, such as `--profile`, `--http-bridge`, `--channel`, `--join`, `--local-control`, `--allow-origin`, `--rate-limit-*`, and the session and memory limits, resets to its default. Relaunch a daemon configured with those options through `mariadb-shell-agent serve`.
 - To rotate the bearer token, stop the daemon and start it with the new token.
 - Restart currently emits the stop and start summaries. A structured `--json` result is a follow-up.
 

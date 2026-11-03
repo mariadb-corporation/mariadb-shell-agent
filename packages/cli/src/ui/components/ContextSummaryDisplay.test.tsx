@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,7 +28,7 @@ const renderWithWidth = (
 describe('<ContextSummaryDisplay />', () => {
   const baseProps = {
     memoryFileCount: 1,
-    contextFileNames: ['QWEN.md'],
+    contextFileNames: ['MARIADB-SHELL-AGENT.md'],
     mcpServers: { 'test-server': { command: 'test' } },
     showToolDescriptions: false,
     ideContext: {
@@ -41,7 +42,7 @@ describe('<ContextSummaryDisplay />', () => {
     const { lastFrame } = renderWithWidth(120, baseProps);
     const output = lastFrame();
     expect(output).toContain(
-      'Using: 1 open file (ctrl+g to view) | 1 QWEN.md file | 1 MCP server (ctrl+t to view)',
+      'Using: 1 open file (ctrl+g to view) | 1 MARIADB-SHELL-AGENT.md file | 1 MCP server (ctrl+t to view)',
     );
     // Check for absence of newlines
     expect(output.includes('\n')).toBe(false);
@@ -53,7 +54,7 @@ describe('<ContextSummaryDisplay />', () => {
     const expectedLines = [
       'Using:',
       '  - 1 open file (ctrl+g to view)',
-      '  - 1 QWEN.md file',
+      '  - 1 MARIADB-SHELL-AGENT.md file',
       '  - 1 MCP server (ctrl+t to view)',
     ];
     const actualLines = output.split('\n');

@@ -4,7 +4,7 @@
 
 ## 状态与依赖
 
-本 B 源码提案依赖完整重放/恢复批次 [#15384](https://github.com/QwenLM/qwen-code/pull/15384) 及 A 的完整共享恢复修复。C 已提交；B 现以 [#15386](https://github.com/QwenLM/qwen-code/pull/15386) 的 A 已提交源码 83213983 进行整合。干净 B 6b92fc5c 的具名本地 session 与冷热 checkpoint suite 已通过；compact-summary 修复及最终 runtime/安装/平台联合仍须独立验证。精确源码绑定记录在候选 manifest 和验证报告中。B 补齐 OpenTUI 的生产消费链，不假定已验收组合产物。历史 aggregate 证据保留在调查目录，不代表本次抽取通过。
+本 B 源码提案依赖完整重放/恢复批次 [#15384](https://github.invalid/QwenLM/qwen-code/pull/15384) 及 A 的完整共享恢复修复。C 已提交；B 现以 [#15386](https://github.invalid/QwenLM/qwen-code/pull/15386) 的 A 已提交源码 83213983 进行整合。干净 B 6b92fc5c 的具名本地 session 与冷热 checkpoint suite 已通过；compact-summary 修复及最终 runtime/安装/平台联合仍须独立验证。精确源码绑定记录在候选 manifest 和验证报告中。B 补齐 OpenTUI 的生产消费链，不假定已验收组合产物。历史 aggregate 证据保留在调查目录，不代表本次抽取通过。
 
 ## 问题与交付边界
 

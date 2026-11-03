@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -73,7 +74,7 @@ vi.mock('vscode', () => ({
   },
 }));
 
-vi.mock('./extension.js', () => ({ DIFF_SCHEME: 'qwen-diff' }));
+vi.mock('./extension.js', () => ({ DIFF_SCHEME: 'mariadb-shell-agent-diff' }));
 
 vi.mock('./utils/editorGroupUtils.js', () => ({
   findLeftGroupOfChatWebview: () => undefined,
@@ -507,8 +508,8 @@ describe('DiffManager permission request id binding', () => {
     expect(manager.getPermissionRequestId(rightUri as never)).toBe('req-1');
   });
 
-  // R5-1: the entry is keyed on the writable right side only. `qwen.diff.accept`
-  // and `qwen.diff.cancel` resolve the vote through the active editor's uri,
+  // R5-1: the entry is keyed on the writable right side only. `mariadb-shell-agent.diff.accept`
+  // and `mariadb-shell-agent.diff.cancel` resolve the vote through the active editor's uri,
   // which is the modified side, so keying the map on the left document would
   // silently break both — and while the uri mock rendered a `with()` copy with
   // the original's scheme and query, both sides shared one key and nothing here

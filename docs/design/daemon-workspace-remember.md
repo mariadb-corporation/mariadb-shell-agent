@@ -1,6 +1,6 @@
 # Daemon Workspace Memory Tasks — Sessionless Managed Memory
 
-> **Status**: Proposed — implementation in [PR #5884](https://github.com/QwenLM/qwen-code/pull/5884) (branch `codex/sessionless-daemon-remember`), not yet merged.
+> **Status**: Proposed — implementation in [PR #5884](https://github.invalid/QwenLM/qwen-code/pull/5884) (branch `codex/sessionless-daemon-remember`), not yet merged.
 
 ---
 
@@ -41,7 +41,7 @@ session, and exposes status via polling.
                                                      └────────────┬────────────┘
                                                                   │ ACP stdio (JSON-RPC)
                                                      ┌────────────▼────────────┐
-                                                     │  qwen --acp child       │
+                                                     │  mariadb-shell-agent --acp child       │
                                                      │  (QwenAgent.extMethod)  │
                                                      │  → remember / forget /  │
                                                      │    dream core logic     │
@@ -150,7 +150,7 @@ Poll task status.
   "updatedAt": "2026-06-01T12:00:05.000Z",
   "result": {
     "summary": "Saved dark-mode preference to user memory.",
-    "filesTouched": ["~/.qwen/memories/user/user.md"],
+    "filesTouched": ["~/.mariadb-shell-agent/memories/user/user.md"],
     "touchedScopes": ["user"]
   }
 }
@@ -366,7 +366,7 @@ In `packages/cli/src/acp-integration/acpAgent.ts`, the handler for
 wrapper that:
 
 - **Write tools** (`write_file`, `edit`): only allowed within the project
-  auto-memory root or user memory root (`~/.qwen/memories`).
+  auto-memory root or user memory root (`~/.mariadb-shell-agent/memories`).
 - **Read tools** (`read_file`, `grep`, `ls`): when `restrictReadsToMemoryPaths`
   is true, only allowed within memory directories.
 - **Shell**: disabled by default; if enabled, only read-only commands allowed.
@@ -481,7 +481,7 @@ The SDK normalizer maps the raw `memory_changed` SSE event (with
 ```
 
 This extends the existing `workspace.memory.changed` event type, which
-previously only carried `scope: 'workspace' | 'global'` for file-based QWEN.md
+previously only carried `scope: 'workspace' | 'global'` for file-based MARIADB-SHELL-AGENT.md
 writes.
 
 ---

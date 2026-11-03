@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -64,7 +65,7 @@ export interface AgentConfigPatch {
   execution?:
     | {
         mode: 'local';
-        /** Program on this computer; Qwen Code when absent. */
+        /** Program on this computer; MariaDB Shell Agent when absent. */
         provider?: AgentProgramView;
       }
     | {
@@ -141,8 +142,8 @@ export interface WorkspaceAgentRuntimeView {
   label: string;
   provider: string;
   /**
-   * Program ids (`qwen` | `claude` | `codex`) the runtime reported it can run,
-   * the local daemon included (from its program probe). None means Qwen Code.
+   * Program ids (`mariadb-shell-agent` | `claude` | `codex`) the runtime reported it can run,
+   * the local daemon included (from its program probe). None means MariaDB Shell Agent.
    */
   programs?: readonly string[];
   status: 'online' | 'offline';

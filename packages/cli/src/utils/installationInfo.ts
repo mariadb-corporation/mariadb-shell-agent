@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -74,9 +75,9 @@ export function getNpmCliPath(
 
 const debugLogger = createDebugLogger('INSTALLATION_INFO');
 const STANDALONE_UNIX_INSTALLER =
-  'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh';
+  'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/installation/install-qwen-standalone.sh';
 const STANDALONE_WINDOWS_INSTALLER =
-  'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.ps1';
+  'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/installation/install-qwen-standalone.ps1';
 // Both the detector message and the formatter's split read this one constant.
 // The sentence must stay byte-identical to the i18n catalogue key in
 // locales/*.js; the trailing space separates the interpolated command and is
@@ -120,7 +121,7 @@ export function formatUpdateInstructions(
     );
     lines.push('Run the following to update:', `  ${updateCmd}`);
   } else if (!installationInfo.updateMessage) {
-    lines.push('Manual update required. Please reinstall Qwen Code.');
+    lines.push('Manual update required. Please reinstall MariaDB Shell Agent.');
   }
 
   return lines;

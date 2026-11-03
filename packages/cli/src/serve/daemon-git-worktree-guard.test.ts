@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2341,17 +2342,17 @@ it -C ${cmdPath(outsideRepo)} reset --hard`,
 
     it('contains a sub-agent to an in-project agent worktree', async () => {
       // `AgentTool` with `isolation: 'worktree'` provisions under
-      // `<projectRoot>/.qwen/worktrees/`, i.e. inside the session — being
+      // `<projectRoot>/.mariadb-shell-agent/worktrees/`, i.e. inside the session — being
       // inside is not enough to leave the boundary alone.
       const agentWorktree = path.join(
         effectiveCwd,
-        '.qwen',
+        '.mariadb-shell-agent',
         'worktrees',
         'agent-abc1234',
       );
       const sibling = path.join(
         effectiveCwd,
-        '.qwen',
+        '.mariadb-shell-agent',
         'worktrees',
         'agent-def5678',
       );

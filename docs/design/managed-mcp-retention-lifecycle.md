@@ -4,7 +4,7 @@
 
 ## Problem and current implementation
 
-Issue [#13883](https://github.com/QwenLM/qwen-code/issues/13883) describes the P2 follow-up to the original stream-capture
+Issue [#13883](https://github.invalid/QwenLM/qwen-code/issues/13883) describes the P2 follow-up to the original stream-capture
 collector. Its October 11 baseline predates the shared schema consolidation.
 On `main` at `06efd789b1`, the collector already covers immutable
 `MYSQL_INLINE` resources in both `PUBLISHED` and `REFERENCED` states,
@@ -66,12 +66,12 @@ The global CLI does not expose the internal SQL collection scheduler. Its
 availability is checked first; producer/transaction/retirement tests are the
 fallback for this server-only lifecycle. This is not a Hosted process crash or
 deployment acceptance claim. The physical GC flag remains disabled by default;
-the deployment gates in [#13090](https://github.com/QwenLM/qwen-code/issues/13090) still apply.
+the deployment gates in [#13090](https://github.invalid/QwenLM/qwen-code/issues/13090) still apply.
 
 ## Scope and acceptance
 
 This change adds tests and corrects historical documentation. It changes no
 schema, wire contract, production predicate, or default. It closes the
-producer-specific SQL lifecycle evidence gap in [#13883](https://github.com/QwenLM/qwen-code/issues/13883). Local filesystem
+producer-specific SQL lifecycle evidence gap in [#13883](https://github.invalid/QwenLM/qwen-code/issues/13883). Local filesystem
 retention, external MCP object-storage results, Hosted deployment acceptance,
-and the media/shared-output follow-up [#13884](https://github.com/QwenLM/qwen-code/issues/13884) remain separate scopes.
+and the media/shared-output follow-up [#13884](https://github.invalid/QwenLM/qwen-code/issues/13884) remain separate scopes.

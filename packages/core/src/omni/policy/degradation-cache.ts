@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -95,7 +96,7 @@ export function computePolicyFingerprint(
 /**
  * Persistent map from `(originalSha256, policyFingerprint)` to the
  * degraded derivative's identity (decision D2). Lives at
- * `.qwen/omni/policy-cache.json`; a hit whose object still exists in
+ * `.mariadb-shell-agent/omni/policy-cache.json`; a hit whose object still exists in
  * `objects/` lets the orchestrator skip a minutes-long transcode. The
  * existence check is the orchestrator's job — this cache only answers
  * "what did this policy produce last time".
@@ -128,7 +129,7 @@ export class OmniDegradationCache {
       const key = this.key(originalSha256, policyFingerprint);
       const entry = entries[key];
       if (!entry) return { result: null };
-      // The cache file sits inside the workspace (`.qwen/omni/`), so a
+      // The cache file sits inside the workspace (`.mariadb-shell-agent/omni/`), so a
       // hostile repository can ship a crafted one. Entries are only
       // trusted when every field that later becomes a filesystem path or
       // a model-visible text is well-formed: the hash must be exactly

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,7 +20,8 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const workflow = readFileSync('.github/workflows/repo-hygiene.yml', 'utf8');
-const runnerScriptPath = '.qwen/skills/repo-hygiene/scripts/run-agent.mjs';
+const runnerScriptPath =
+  '.mariadb-shell-agent/skills/repo-hygiene/scripts/run-agent.mjs';
 const gitAvailable = spawnSync('git', ['--version']).status === 0;
 
 function escapeRegExp(value) {

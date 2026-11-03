@@ -2,7 +2,7 @@
 
 [English](daemon-batch-session-catalog.md) | [简体中文](daemon-batch-session-catalog.zh-CN.md)
 
-Status: implemented alongside this document for [#12249](https://github.com/QwenLM/qwen-code/issues/12249).
+Status: implemented alongside this document for [#12249](https://github.invalid/QwenLM/qwen-code/issues/12249).
 
 ## Problem and scope
 

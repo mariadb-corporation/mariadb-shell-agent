@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -77,7 +78,7 @@ const img = (url: string) => ({
 });
 const tier = (effort: ReasoningEffort) => ({ reasoning: { effort } });
 const ua = (version: string) =>
-  `QwenCode/${version} (${process.platform}; ${process.arch})`;
+  `MariaDBShellAgent/${version} (${process.platform}; ${process.arch})`;
 const DASHSCOPE_HEADERS = {
   'User-Agent': ua('1.0.0'),
   'X-DashScope-CacheControl': 'enable',
@@ -149,7 +150,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
 
     mockContentGeneratorConfig = {
       apiKey: 'test-api-key',
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       timeout: 60000,
       maxRetries: 2,
       model: 'qwen-max',
@@ -255,7 +256,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
     const PROXY_MISMATCH =
       'DASHSCOPE_PROXY_BASE_URL is configured but the request baseUrl does not match';
     const INTERNAL_ORIGIN_LOG =
-      'DashScope provider activated via internal origin: gateway.alibaba-inc.com';
+      'DashScope provider activated via internal origin: gateway.alibaba-inc.invalid';
 
     it('should return true for QWEN_OAUTH auth type', () => {
       expect(
@@ -266,51 +267,51 @@ describe('DashScopeOpenAICompatibleProvider', () => {
     it.each([
       [
         'should return true for DashScope domestic URL',
-        'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       ],
       [
         'should return true for DashScope international URL',
-        'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+        'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
       ],
       [
         'should return true for DashScope US regional URL',
-        'https://dashscope-us.aliyuncs.com/compatible-mode/v1',
+        'https://dashscope-us.aliyuncs.invalid/compatible-mode/v1',
       ],
       [
         'should return true for DashScope coding plan URL',
-        'https://coding.dashscope.aliyuncs.com/v1',
+        'https://coding.dashscope.aliyuncs.invalid/v1',
       ],
       [
         'should return true for DashScope international coding plan URL',
-        'https://coding-intl.dashscope-intl.aliyuncs.com/v1',
+        'https://coding-intl.dashscope-intl.aliyuncs.invalid/v1',
       ],
       [
         'should return true for Token Plan URL',
-        'https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+        'https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
       ],
       [
         'should return true for Model Studio workspace-dedicated URL',
-        'https://llm-abc123.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+        'https://llm-abc123.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
       ],
       [
         'should return true for international workspace-dedicated URL',
-        'https://llm-abc123.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1',
+        'https://llm-abc123.ap-southeast-1.maas.aliyuncs.invalid/compatible-mode/v1',
       ],
       [
         'should return true for Model Studio trial URL',
-        'https://trial.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+        'https://trial.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
       ],
       [
-        'should return true for internal aliyun-inc.com subdomain',
-        'https://model-gateway.aliyun-inc.com/dashscope/v1',
+        'should return true for internal aliyun-inc.invalid subdomain',
+        'https://model-gateway.aliyun-inc.invalid/dashscope/v1',
       ],
       [
         'should return true for multi-level internal subdomain',
-        'https://a.b.alibaba-inc.com/dashscope/v1',
+        'https://a.b.alibaba-inc.invalid/dashscope/v1',
       ],
       [
         'should return true for port-bearing internal URL',
-        'https://gateway.alibaba-inc.com:8443/dashscope/v1',
+        'https://gateway.alibaba-inc.invalid:8443/dashscope/v1',
       ],
       [
         'should return true for port-bearing alicloudapi.com URL',
@@ -322,7 +323,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
       ],
       [
         'should return true for QwenCloud International MaaS URL',
-        'https://maas.qwencloudapi.com/compatible-mode/v1',
+        'https://maas.qwencloudapi.invalid/compatible-mode/v1',
       ],
       [
         'should return true for QwenCloud Token Plan URL',
@@ -330,7 +331,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
       ],
       [
         'should return true for QwenCloud Global Token Plan URL',
-        'https://token-plan.maas.qwencloudapi.com/compatible-mode/v1',
+        'https://token-plan.maas.qwencloudapi.invalid/compatible-mode/v1',
       ],
     ])('%s', (_title, baseUrl) => {
       expect(isDashScope(baseUrl)).toBe(true);
@@ -342,30 +343,30 @@ describe('DashScopeOpenAICompatibleProvider', () => {
         'https://alicloudapi.com/v1',
       ],
       [
-        'should return false for bare alibaba-inc.com domain',
-        'https://alibaba-inc.com/v1',
+        'should return false for bare alibaba-inc.invalid domain',
+        'https://alibaba-inc.invalid/v1',
       ],
       [
-        'should return false for bare aliyun-inc.com domain',
-        'https://aliyun-inc.com/v1',
+        'should return false for bare aliyun-inc.invalid domain',
+        'https://aliyun-inc.invalid/v1',
       ],
       [
         'should return false when the dashscope domain only appears in the URL path',
-        'https://evil.example.com/dashscope.aliyuncs.com/v1',
+        'https://evil.example.com/dashscope.aliyuncs.invalid/v1',
       ],
       [
-        'should return false for a domain that only ends with dashscope.aliyuncs.com as a suffix without a dot',
-        'https://notdashscope.aliyuncs.com/v1',
+        'should return false for a domain that only ends with dashscope.aliyuncs.invalid as a suffix without a dot',
+        'https://notdashscope.aliyuncs.invalid/v1',
       ],
       ['should return false for an unparseable baseUrl', 'not a url'],
     ])('%s', (_title, baseUrl) => {
       expect(isDashScope(baseUrl)).toBe(false);
     });
 
-    it('should return true for internal alibaba-inc.com subdomain', () => {
-      expect(isDashScope('https://gateway.alibaba-inc.com/dashscope/v1')).toBe(
-        true,
-      );
+    it('should return true for internal alibaba-inc.invalid subdomain', () => {
+      expect(
+        isDashScope('https://gateway.alibaba-inc.invalid/dashscope/v1'),
+      ).toBe(true);
       expect(mockDebugLogger.debug).toHaveBeenCalledWith(INTERNAL_ORIGIN_LOG);
     });
 
@@ -382,19 +383,19 @@ describe('DashScopeOpenAICompatibleProvider', () => {
       [
         'https://notalibaba-inc.com/v1',
         'https://notaliyun-inc.com/v1',
-        'https://alibaba-inc.com.evil.com/v1',
-        'https://aliyun-inc.com.evil.com/v1',
-        'https://maas.aliyuncs.com/v1',
-        'https://notmaas.aliyuncs.com/v1',
-        'https://token-plan.cn-beijing.maas.aliyuncs.com.evil.com/v1',
-        'https://evil.example.com/llm-abc123.cn-beijing.maas.aliyuncs.com/v1',
+        'https://alibaba-inc.invalid.evil.com/v1',
+        'https://aliyun-inc.invalid.evil.com/v1',
+        'https://maas.aliyuncs.invalid/v1',
+        'https://notmaas.aliyuncs.invalid/v1',
+        'https://token-plan.cn-beijing.maas.aliyuncs.invalid.evil.com/v1',
+        'https://evil.example.com/llm-abc123.cn-beijing.maas.aliyuncs.invalid/v1',
         'https://notalicloudapi.com/v1',
         'https://alicloudapi.com.evil.com/v1',
         'https://notmaas.qianwenaiapi.com/v1',
         'https://maas.qianwenaiapi.com.evil.com/v1',
-        'https://maas.qwencloudapi.com.evil.com/v1',
-        'https://notmaas.qwencloudapi.com/v1',
-        'https://token-plan.maas.qwencloudapi.com.evil.com/v1',
+        'https://maas.qwencloudapi.invalid.evil.com/v1',
+        'https://notmaas.qwencloudapi.invalid/v1',
+        'https://token-plan.maas.qwencloudapi.invalid.evil.com/v1',
       ].forEach((baseUrl) => {
         expect(isDashScope(baseUrl)).toBe(false);
       });
@@ -420,7 +421,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
     });
 
     it('admits a MaaS subdomain that attribution deliberately leaves unattributed', () => {
-      const unattributed = 'https://other.maas.qwencloudapi.com/v1';
+      const unattributed = 'https://other.maas.qwencloudapi.invalid/v1';
       expect(isDashScope(unattributed)).toBe(true);
       expect(buildDashScopeSourceConfig(unattributed)).toBeUndefined();
     });
@@ -463,9 +464,9 @@ describe('DashScopeOpenAICompatibleProvider', () => {
     });
 
     it('should log internal-origin activation instead of proxy mismatch for internal domains', () => {
-      expect(withProxy('https://gateway.alibaba-inc.com/dashscope/v1')).toBe(
-        true,
-      );
+      expect(
+        withProxy('https://gateway.alibaba-inc.invalid/dashscope/v1'),
+      ).toBe(true);
       expect(mockDebugLogger.debug).toHaveBeenCalledWith(INTERNAL_ORIGIN_LOG);
       expect(mockDebugLogger.debug).not.toHaveBeenCalledWith(
         expect.stringContaining(PROXY_MISMATCH),
@@ -521,8 +522,10 @@ describe('DashScopeOpenAICompatibleProvider', () => {
         },
       }).buildHeaders();
 
-      expect(headers['User-Agent']).toContain('QwenCode/1.0.0');
-      expect(headers['X-DashScope-UserAgent']).toContain('QwenCode/1.0.0');
+      expect(headers['User-Agent']).toContain('MariaDBShellAgent/1.0.0');
+      expect(headers['X-DashScope-UserAgent']).toContain(
+        'MariaDBShellAgent/1.0.0',
+      );
       expect(headers['X-DashScope-AuthType']).toBe(AuthType.QWEN_OAUTH);
       expect(headers['X-Custom']).toBe('1');
       expect(headers['X-DashScope-CacheControl']).toBe('disable');
@@ -557,7 +560,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
         const headers = gen(
           {
             authType: AuthType.USE_OPENAI,
-            baseUrl: 'https://maas.qwencloudapi.com/compatible-mode/v1',
+            baseUrl: 'https://maas.qwencloudapi.invalid/compatible-mode/v1',
             customHeaders: {
               'x-dashscope-source-config': 'user',
               'X-Custom': '1',
@@ -582,7 +585,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
       [
         'Bailian',
         AuthType.USE_OPENAI,
-        'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       ],
       // The registry's Qwen OAuth baseUrl; the real endpoint is swapped in at
       // runtime from the OAuth credentials and is never a QwenCloud host.
@@ -601,7 +604,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
       expect(OpenAI).toHaveBeenCalledWith(
         expect.objectContaining({
           apiKey: 'test-api-key',
-          baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+          baseURL: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
           timeout: 60000,
           maxRetries: 2,
           defaultHeaders: DASHSCOPE_HEADERS,
@@ -624,7 +627,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
         config: { fetch: typeof fetch };
       };
       await client.config.fetch(
-        'https://routify-pub.alibaba-inc.com/protocol/openai/v1',
+        'https://routify-pub.alibaba-inc.invalid/protocol/openai/v1',
       );
 
       const headers = new Headers(runtimeFetch.mock.calls[0][1]?.headers);
@@ -638,7 +641,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
       expect(OpenAI).toHaveBeenCalledWith(
         expect.objectContaining({
           apiKey: 'test-api-key',
-          baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+          baseURL: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
           timeout: DEFAULT_TIMEOUT,
           maxRetries: DEFAULT_MAX_RETRIES,
           defaultHeaders: expect.any(Object),
@@ -669,7 +672,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
       gen(
         {
           authType: AuthType.USE_OPENAI,
-          baseUrl: 'https://maas.qwencloudapi.com/compatible-mode/v1',
+          baseUrl: 'https://maas.qwencloudapi.invalid/compatible-mode/v1',
           customHeaders: { 'x-dashscope-source-config': '${session_id}' },
         },
         cli,
@@ -690,7 +693,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
       gen(
         {
           authType: AuthType.USE_OPENAI,
-          baseUrl: 'https://maas.qwencloudapi.com/compatible-mode/v1',
+          baseUrl: 'https://maas.qwencloudapi.invalid/compatible-mode/v1',
           customHeaders: { 'X-Trace-Id': '${session_id}' },
         },
         cli,
@@ -760,7 +763,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
     // tracing object that only its own inference path understands; forwarded to a
     // third-party vendor backend that types `metadata` as a string it fails to
     // deserialize and the request comes back as a flat 400, which made those
-    // models unusable through Qwen Code entirely.
+    // models unusable through MariaDB Shell Agent entirely.
     it.each([['qwen-max'], ['qwen3.8-max'], ['coder-model']] as const)(
       'ships metadata for the qwen-family model %s',
       (model) => {
@@ -885,7 +888,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
           model,
           {
             authType: AuthType.USE_OPENAI,
-            baseUrl: 'https://idealab.alibaba-inc.com/api/openai/v1',
+            baseUrl: 'https://idealab.alibaba-inc.invalid/api/openai/v1',
             ...tier(effort),
             samplingParams: { max_completion_tokens: 1024 },
           },
@@ -1425,7 +1428,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
       expect(mockDebugLogger.warn).not.toHaveBeenCalled();
     });
 
-    it('keeps thinking_budget alongside enable_thinking on legacy qwen models', () => {
+    it('keeps thinking_budget alongside enable_thinking on legacy mariadb-shell-agent models', () => {
       // thinking_budget + enable_thinking is a valid pair on hybrid models;
       // only the reasoning_effort combination is rejected.
       const result = wireM('qwen3.7-max', {

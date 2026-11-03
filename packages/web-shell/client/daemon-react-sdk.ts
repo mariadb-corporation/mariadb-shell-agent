@@ -1,13 +1,14 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Daemon React bindings owned by `@qwen-code/web-shell`.
  *
- * React bindings for the Qwen Code daemon process.
+ * React bindings for the MariaDB Shell Agent daemon process.
  * Provides context Providers, hooks, types, and constants
  * for building UIs that connect to and interact with the daemon.
  *

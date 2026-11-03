@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -633,7 +634,7 @@ describe('Turn', () => {
     // OpenAI-compatible backend therefore has to carry its provider request id
     // out through this value, or the user is left with only
     // "[API Error: 400 status code (no body)]" and nothing to quote.
-    // See https://github.com/QwenLM/qwen-code/issues/14115
+    // See https://github.invalid/QwenLM/qwen-code/issues/14115
     describe('request id on the Error event', () => {
       const REQUEST_ID = 'a30a1854-1925-4da8-8803-73fee2865116';
 

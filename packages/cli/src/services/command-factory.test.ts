@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -33,8 +34,8 @@ describe('createSlashCommandFromDefinition', () => {
 
   it('marks custom file commands with stable source detail', () => {
     const command = createSlashCommandFromDefinition(
-      '/workspace/.qwen/commands/review.toml',
-      '/workspace/.qwen/commands',
+      '/workspace/.mariadb-shell-agent/commands/review.toml',
+      '/workspace/.mariadb-shell-agent/commands',
       {
         prompt: 'Review the current changes',
       },
@@ -49,8 +50,8 @@ describe('createSlashCommandFromDefinition', () => {
 
   it('marks extension commands with stable source detail', () => {
     const command = createSlashCommandFromDefinition(
-      '/workspace/.qwen/extensions/demo/commands/review.md',
-      '/workspace/.qwen/extensions/demo/commands',
+      '/workspace/.mariadb-shell-agent/extensions/demo/commands/review.md',
+      '/workspace/.mariadb-shell-agent/extensions/demo/commands',
       {
         prompt: 'Review the current changes',
       },
@@ -88,8 +89,8 @@ describe('custom command file contents', () => {
 
   function setup(prompt: string, args = 'USER_ARG') {
     const command = createSlashCommandFromDefinition(
-      '/workspace/.qwen/commands/probe.toml',
-      '/workspace/.qwen/commands',
+      '/workspace/.mariadb-shell-agent/commands/probe.toml',
+      '/workspace/.mariadb-shell-agent/commands',
       { prompt },
       undefined,
       '.toml',

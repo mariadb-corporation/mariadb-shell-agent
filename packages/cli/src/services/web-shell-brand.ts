@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -44,7 +45,7 @@ export interface ResolvedWebShellBrand {
  *
  * Reads the system-defaults, user and system layers only, in the same
  * precedence `mergeSettings` gives them. The workspace layer is deliberately
- * excluded: a workspace `.qwen/settings.json` usually arrives from a repository
+ * excluded: a workspace `.mariadb-shell-agent/settings.json` usually arrives from a repository
  * the person opening the shell did not write, so it must not be able to rename
  * the product or name a file for the daemon to read and inline into every
  * connected browser. `general.voice.keytermsFile` excludes it for the same
@@ -113,7 +114,7 @@ function readBrandLeaf(
   ]) {
     // Read the pre-substitution snapshot, not `file.settings`: loadSettings
     // substitutes placeholders from the process-wide environment, which a
-    // workspace's own `.qwen/.env` or `env` block populates first at boot —
+    // workspace's own `.mariadb-shell-agent/.env` or `env` block populates first at boot —
     // so the substituted text is workspace-influenced even though the layer
     // that wrote it is not.
     const value = file.originalSettings.ui?.brand?.[key];

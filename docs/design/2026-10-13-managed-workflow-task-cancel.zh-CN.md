@@ -4,7 +4,7 @@
 
 状态：本变更实现，Stage F 待验证。`workflow` 任务类型加入公开任务取消路径：`CANCELLABLE_TASK_KINDS` 放宽以准纳它，契约在 `1.46.0` 中予以点名。它所走的每一个停止机构都已存在且与 kind 无关；本变更打开这道闸门，并用 workflow 链路测试把路径钉住。该类型的 F 阶段故障轮次（决定 6）欠账未跑 —— 下文引用的证据仅为单元、契约与记录层。
 
-这是 [#13746](https://github.com/QwenLM/qwen-code/issues/13746) F1 剩余的一个 `child_run` 类型。H4f 切片（#13823）实现了 `child_agent` 任务的取消，其余类型全部推迟；其 follow-up 表点名了这一片 ——「Workflow, automation: with the workflow runtime (#13803) … a stop request on their records, then the same delivery and stop arms」——[workflow 运行时设计](2026-10-10-managed-workflow-child-runtime.zh-CN.md)（「public cancel —— 各自具名的切片」）与 `CANCELLABLE_TASK_KINDS` 注释本身也各自点名。本片唯一的前置 —— workflow child 运行时 —— 已由 #13858 落地。本片是 [#12827](https://github.com/QwenLM/qwen-code/issues/12827) 的 H4f-b 切片，即 [#12380](https://github.com/QwenLM/qwen-code/issues/12380) 的 H 阶段。
+这是 [#13746](https://github.invalid/QwenLM/qwen-code/issues/13746) F1 剩余的一个 `child_run` 类型。H4f 切片（#13823）实现了 `child_agent` 任务的取消，其余类型全部推迟；其 follow-up 表点名了这一片 ——「Workflow, automation: with the workflow runtime (#13803) … a stop request on their records, then the same delivery and stop arms」——[workflow 运行时设计](2026-10-10-managed-workflow-child-runtime.zh-CN.md)（「public cancel —— 各自具名的切片」）与 `CANCELLABLE_TASK_KINDS` 注释本身也各自点名。本片唯一的前置 —— workflow child 运行时 —— 已由 #13858 落地。本片是 [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827) 的 H4f-b 切片，即 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380) 的 H 阶段。
 
 ## 问题
 
@@ -51,7 +51,7 @@
 - **真实记录**（`ManagedExtensionRecordStoreTest`）：一条 workflow 链经 Session store 提交，走过停止请求与取消 —— 每一步公布的动作、`draining` 运行时状态、落日志的 `state_changed` 事件与输出游标，与 child_agent 的钉住相对称。
 - **契约**（`ManagedAgentApiContractTest`、`PlannedTaskContractTest`、`SurfaceAdmissionAcceptanceTest`）：一个 workflow 任务在两个面上的取消往返，以及描述文本钉住的更新。
 - **TS**：无新行为；funnel 的 workflow 取消动词与 workflow Turn 的 abort 接线均已钉住（`hosted-child-agent-session.test.ts:1123`、`hosted-workflow-turn.test.ts`）。
-- **真实栈**：决定 6 的 F 阶段轮次，计划写在 `.qwen/e2e-tests/2026-10-13-managed-workflow-task-cancel.md`。
+- **真实栈**：决定 6 的 F 阶段轮次，计划写在 `.mariadb-shell-agent/e2e-tests/2026-10-13-managed-workflow-task-cancel.md`。
 
 ## 后续工作
 
@@ -62,4 +62,4 @@
 | Channel delivery 取消 | **已在 [#13746 F3](2026-10-17-managed-delivery-task-cancel.zh-CN.md) 交付：** 投递投影为其路由 Session 的任务（`channel_delivery`），在尚无适配器认领时走同一条任务取消；不再需要决策 10 所说的独立路由。                                               |
 | Child 输出事件        | 已由 [child Session 链接](2026-10-17-managed-child-task-session-link.zh-CN.md)（#13746 F2）交付：workflow 任务像 child agent 任务一样给出其 child Session。                                                                                             |
 | WebShell 面板         | **已交付：** 面板与其他所有类型一起列出 workflow 任务，并在任务公布取消时接受取消（[面板文档](2026-10-12-managed-child-task-panel.zh-CN.md)）。                                                                                                         |
-| Close 停止 child      | [#13875](https://github.com/QwenLM/qwen-code/issues/13875)，不变：relay 的停止臂仍跳过不再 `ACTIVE` 的父 Session。                                                                                                                                      |
+| Close 停止 child      | [#13875](https://github.invalid/QwenLM/qwen-code/issues/13875)，不变：relay 的停止臂仍跳过不再 `ACTIVE` 的父 Session。                                                                                                                                  |

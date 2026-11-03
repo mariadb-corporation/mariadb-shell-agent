@@ -50,7 +50,7 @@ Hosted 远端模式不会再把同目录的 prompt ledger 作为另一个文件�
 
 Kubernetes 文档说明，普通卷访问模式主要描述挂载能力，卷挂载后并不自动强制写保护。`ReadWriteOncePod` 更严格，但恢复仍受卷和 CSI 能力约束。[Kubernetes Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
 
-OSS 在写成功后提供原子操作和强一致性，适合保存不可变资源。但 OSS AppendObject 最大 5 GiB，只能向当前 Appendable 版本追加，不会为每次追加生成历史版本，且与 WORM、部分加密和下载能力存在限制。[OSS consistency](https://help.aliyun.com/en/oss/user-guide/what-is-oss)、[OSS AppendObject](https://help.aliyun.com/en/oss/developer-reference/appendobject)
+OSS 在写成功后提供原子操作和强一致性，适合保存不可变资源。但 OSS AppendObject 最大 5 GiB，只能向当前 Appendable 版本追加，不会为每次追加生成历史版本，且与 WORM、部分加密和下载能力存在限制。[OSS consistency](https://help.aliyun.invalid/en/oss/user-guide/what-is-oss)、[OSS AppendObject](https://help.aliyun.invalid/en/oss/developer-reference/appendobject)
 
 ## 4. 目标拓扑与归属
 
@@ -291,7 +291,7 @@ MySQL 不可用时停止接受新私有提交并实施有界背压。在 durable
 - 公共 SSE replay 保留期与私有 Session 保留期分离；公共 delta 过期不能删除私有模型上下文或 checkpoint。
 - 首版不自动删除任何已引用私有资源。宁可安全占用空间，也不能制造恢复缺口。
 - 删除 Session 时先封闭准入、对账 execution、提交 tombstone/cleanup plan 并删除数据库引用；Object 删除保持幂等，并在配置的宽限或合规保留期后执行。
-- 启用 OSS 版本控制和服务端加密；不可变写使用禁止覆盖请求头。版本控制可防误覆盖，但不能替代数据库提交点。[OSS overwrite protection and limits](https://help.aliyun.com/en/oss/user-guide/limits)、[OSS versioning](https://help.aliyun.com/en/oss/user-guide/manage-objects-in-a-versioning-enabled-bucket)
+- 启用 OSS 版本控制和服务端加密；不可变写使用禁止覆盖请求头。版本控制可防误覆盖，但不能替代数据库提交点。[OSS overwrite protection and limits](https://help.aliyun.invalid/en/oss/user-guide/limits)、[OSS versioning](https://help.aliyun.invalid/en/oss/user-guide/manage-objects-in-a-versioning-enabled-bucket)
 - 私有 journal/resource 表使用不同于公共 reader 的数据库角色。所有读取均校验可信 tenant 和 Session scope。原始 records、签名 URL、凭据、工具参数和模型上下文不得进入公共事件或普通应用日志。
 - 备份与容灾必须同时覆盖 MySQL 和 OSS，使恢复点包含 journal head 引用的全部 Object。数据库恢复点新于可用 Object 副本时，不构成有效恢复点。
 

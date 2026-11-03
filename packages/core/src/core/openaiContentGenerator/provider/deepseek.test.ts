@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -270,7 +271,7 @@ describe('DeepSeekOpenAICompatibleProvider', () => {
         userPromptId,
       ).messages?.[1] as { role: string; reasoning_content?: string };
 
-    // https://github.com/QwenLM/qwen-code/issues/3695 — DeepSeek's thinking
+    // https://github.invalid/QwenLM/qwen-code/issues/3695 — DeepSeek's thinking
     // mode rejects subsequent requests when any prior assistant turn omits
     // reasoning_content, even if the model itself returned no reasoning text.
     // The provider must always send the field.

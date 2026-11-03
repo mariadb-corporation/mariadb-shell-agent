@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -578,6 +579,147 @@ describe('EmbeddedApp host wiring', () => {
     });
 
     expect(container.textContent).toContain('Get Started');
+  });
+
+  describe('provider setup wizard', () => {
+    const WIZARD_PROVIDERS = [
+      {
+        id: 'openai',
+        label: 'OpenAI API Key',
+        description: 'OpenAI models',
+        wireApiProtocols: [],
+        baseUrl: { kind: 'fixed' },
+        apiKeyPlaceholder: 'sk-...',
+        advancedConfig: false,
+      },
+    ];
+
+    const postFromHost = async (data: unknown) => {
+      await act(async () => {
+        window.dispatchEvent(new MessageEvent('message', { data }));
+        await Promise.resolve();
+      });
+    };
+
+    const wizardOf = (container: HTMLElement) =>
+      container.querySelector('[data-auth-wizard]');
+
+    const submitApiKey = async (container: HTMLElement) => {
+      const option = container.querySelector<HTMLButtonElement>(
+        '[data-wizard-option]',
+      )!;
+      await act(async () => option.click());
+      const input = container.querySelector<HTMLInputElement>(
+        '[data-wizard-input]',
+      )!;
+      const setter = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        'value',
+      )!.set!;
+      await act(async () => {
+        setter.call(input, 'sk-openai');
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      const connect = [...container.querySelectorAll('button')].find(
+        (b) => b.textContent === 'Connect',
+      )!;
+      await act(async () => connect.click());
+    };
+
+    it('opens only from Get Started, which asks the host for the wizard', async () => {
+      await renderApp();
+      const { container } = mounted[mounted.length - 1];
+      await postFromHost({ type: 'authState', data: { authenticated: false } });
+
+      // Nothing starts on its own.
+      expect(wizardOf(container)).toBeNull();
+      expect(mocks.vscode.postMessage).not.toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'auth' }),
+      );
+
+      const getStarted = [...container.querySelectorAll('button')].find(
+        (b) => b.textContent === 'Get Started',
+      )!;
+      await act(async () => getStarted.click());
+      expect(mocks.vscode.postMessage).toHaveBeenCalledWith({
+        type: 'auth',
+        data: {},
+      });
+      // Get Started stays a button; the wizard shows the progress.
+      expect(container.textContent).not.toContain('Connecting…');
+
+      await postFromHost({
+        type: 'authWizard',
+        data: { providers: WIZARD_PROVIDERS },
+      });
+      expect(wizardOf(container)?.textContent).toContain('OpenAI API Key');
+    });
+
+    it('sends the answers and closes once the host is done', async () => {
+      await renderApp();
+      const { container } = mounted[mounted.length - 1];
+      await postFromHost({ type: 'authState', data: { authenticated: false } });
+      await postFromHost({
+        type: 'authWizard',
+        data: { providers: WIZARD_PROVIDERS },
+      });
+
+      await submitApiKey(container);
+      expect(mocks.vscode.postMessage).toHaveBeenCalledWith({
+        type: 'authWizardSubmit',
+        data: { providerId: 'openai', apiKey: 'sk-openai' },
+      });
+      expect(wizardOf(container)?.textContent).toContain('Connecting…');
+
+      await postFromHost({ type: 'authSuccess', data: {} });
+      await postFromHost({ type: 'authWizardDone' });
+      expect(wizardOf(container)).toBeNull();
+    });
+
+    it('stays open with the error when connecting fails', async () => {
+      await renderApp();
+      const { container } = mounted[mounted.length - 1];
+      await postFromHost({ type: 'authState', data: { authenticated: false } });
+      await postFromHost({
+        type: 'authWizard',
+        data: { providers: WIZARD_PROVIDERS },
+      });
+
+      await submitApiKey(container);
+      await postFromHost({
+        type: 'authError',
+        data: { message: 'Authentication failed.' },
+      });
+      await postFromHost({ type: 'authWizardDone' });
+
+      expect(
+        wizardOf(container)?.querySelector('[role="alert"]')?.textContent,
+      ).toBe('Authentication failed.');
+    });
+
+    it('opens over a live session and cancels back to it', async () => {
+      await renderApp();
+      const { container } = mounted[mounted.length - 1];
+      await postFromHost({ type: 'authState', data: { authenticated: true } });
+      await postFromHost({
+        type: 'authWizard',
+        data: { providers: WIZARD_PROVIDERS },
+      });
+      expect(wizardOf(container)).not.toBeNull();
+
+      const cancel = [...container.querySelectorAll('button')].find(
+        (b) => b.textContent === 'Cancel',
+      )!;
+      await act(async () => cancel.click());
+      expect(mocks.vscode.postMessage).toHaveBeenCalledWith({
+        type: 'authWizardCancel',
+        data: {},
+      });
+      await postFromHost({ type: 'authCancelled' });
+
+      expect(wizardOf(container)).toBeNull();
+      expect(container.textContent).not.toContain('Get Started');
+    });
   });
 
   it('keeps an explicit active-file exclusion across editor changes', async () => {

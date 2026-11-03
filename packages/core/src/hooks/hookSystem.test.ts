@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -333,16 +334,16 @@ describe('HookSystem', () => {
       event: HookEventName.InstructionsLoaded,
       outputType: DefaultHookOutput,
       args: [
-        '/repo/QWEN.md',
+        '/repo/MARIADB-SHELL-AGENT.md',
         'local',
         'include',
         {
           triggerFilePath: '/repo/src/app.ts',
-          parentFilePath: '/repo/QWEN.md',
+          parentFilePath: '/repo/MARIADB-SHELL-AGENT.md',
         },
         signal,
       ],
-      required: ['/repo/QWEN.md', 'project', 'session_start'],
+      required: ['/repo/MARIADB-SHELL-AGENT.md', 'project', 'session_start'],
       defaults: [{}, undefined],
     },
     {

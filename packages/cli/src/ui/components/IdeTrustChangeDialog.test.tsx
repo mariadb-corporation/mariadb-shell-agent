@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,8 +24,8 @@ describe('IdeTrustChangeDialog', () => {
     expect(frameText).toContain(
       'Workspace trust has changed due to a change in the IDE connection.',
     );
-    expect(frameText).toContain("Press 'r' to restart Qwen");
-    expect(frameText).toContain('Code and apply the changes.');
+    expect(frameText).toContain("Press 'r' to restart");
+    expect(frameText).toContain('Shell Agent and apply the changes.');
   });
 
   it('renders the correct message for TRUST_CHANGE', () => {
@@ -36,7 +37,7 @@ describe('IdeTrustChangeDialog', () => {
     expect(frameText).toContain(
       'Workspace trust has changed due to a change in the IDE trust.',
     );
-    expect(frameText).toContain("Press 'r' to restart Qwen Code");
+    expect(frameText).toContain("Press 'r' to restart MariaDB");
   });
 
   it('renders a generic message for NONE reason', () => {

@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted in [PR #10828](https://github.com/QwenLM/qwen-code/pull/10828) for
-[Issue #10810](https://github.com/QwenLM/qwen-code/issues/10810).
+Accepted in [PR #10828](https://github.invalid/QwenLM/qwen-code/pull/10828) for
+[Issue #10810](https://github.invalid/QwenLM/qwen-code/issues/10810).
 This decision supersedes the process-global cross-daemon
 ownership requirement in the [standalone daemon sessions
 contract](./standalone-daemon-sessions.md), which accompanies Issue #8908. All
@@ -12,7 +12,7 @@ change implements the cutover locally; release still requires coordinated
 backend/client delivery and the platform verification recorded below.
 
 The additive writer fences landed in
-[PR #10924](https://github.com/QwenLM/qwen-code/pull/10924). The
+[PR #10924](https://github.invalid/QwenLM/qwen-code/pull/10924). The
 cutover, client treatment, and verification are tracked in the
 [implementation plan](../plans/2026-09-06-conversations-ownership-cutover.md).
 That PR does not remove the process-global owner or enable cross-daemon
@@ -28,7 +28,7 @@ proactive `activeElsewhere` listing hint remains a follow-up.
 
 ## Decision
 
-Allow every updated `qwen serve` process to lazily create its own Conversations
+Allow every updated `mariadb-shell-agent serve` process to lazily create its own Conversations
 runtime for the shared Conversations root after the legacy compatibility check
 passes. The daemon no longer acquires a user-global process owner before serving
 standalone APIs. Every standalone session instead acquires the existing
@@ -483,7 +483,7 @@ mode `0700`, and newly created directories use that mode. The stable state root
 and any existing ancestors must still be owned, non-symlink directories whose
 canonical identity remains stable, but their historical mode is not required
 to be `0700` and is not changed. In particular, an existing mode-`0755`
-`~/.qwen` remains valid.
+`~/.mariadb-shell-agent` remains valid.
 
 `StandaloneDeletionJournal` validates that parent before entering its journal
 subtree on every read, recovery, clear, and write path. Reads treat a missing

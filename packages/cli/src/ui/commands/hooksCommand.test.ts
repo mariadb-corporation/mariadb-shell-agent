@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -246,7 +247,7 @@ describe('hooksCommand', () => {
       config.getTopTierMcpServers.mockReturnValue({
         'external-context': {
           command: 'node',
-          args: ['/repo/.qwen/shim/loader.js'],
+          args: ['/repo/.mariadb-shell-agent/shim/loader.js'],
           env: { QWEN_BUNDLED_MEM0_CONFIG: '{}' },
           includeTools: ['context_search', 'context_remember'],
           scope: 'project',

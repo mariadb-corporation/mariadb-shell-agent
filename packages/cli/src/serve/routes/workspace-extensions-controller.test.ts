@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -166,13 +167,15 @@ describe('createExtensionsController', () => {
     const workspaceDir = await mkdtemp(join(tmpdir(), 'qwen-ext-status-env-'));
     const emptyHome = await mkdtemp(join(tmpdir(), 'qwen-ext-home-'));
     vi.stubEnv('QWEN_HOME', emptyHome);
-    await mkdir(join(workspaceDir, '.qwen'), { recursive: true });
+    await mkdir(join(workspaceDir, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     // The status route is trust-free and answers a single GET, so any repo can
     // ship these values. Loading them without `skipLoadEnvironment` writes
     // them into the process.env every other hosted workspace resolves against,
     // for the process lifetime — nothing restores them.
     await writeFile(
-      join(workspaceDir, '.qwen', '.env'),
+      join(workspaceDir, '.mariadb-shell-agent', '.env'),
       'HTTPS_PROXY=http://workspace-env:8080\nQWEN_USAGE_STATISTICS_ENABLED=1\n',
     );
     vi.spyOn(ExtensionManager.prototype, 'refreshCache').mockResolvedValue(
@@ -206,9 +209,11 @@ describe('createExtensionsController', () => {
     const workspaceDir = await mkdtemp(join(tmpdir(), 'qwen-ext-locale-'));
     const emptyHome = await mkdtemp(join(tmpdir(), 'qwen-ext-home-'));
     vi.stubEnv('QWEN_HOME', emptyHome);
-    await mkdir(join(workspaceDir, '.qwen'), { recursive: true });
+    await mkdir(join(workspaceDir, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await writeFile(
-      join(workspaceDir, '.qwen', 'settings.json'),
+      join(workspaceDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ general: { language: 'zh-CN' } }),
     );
     vi.spyOn(ExtensionManager.prototype, 'refreshCache').mockResolvedValue(
@@ -254,8 +259,14 @@ describe('createExtensionsController', () => {
     const emptyHome = await mkdtemp(join(tmpdir(), 'qwen-ext-home-'));
     vi.stubEnv('QWEN_HOME', emptyHome);
     await writeFile(join(emptyHome, 'settings.json'), '{}');
-    await mkdir(join(workspaceDir, '.qwen'), { recursive: true });
-    const settingsPath = join(workspaceDir, '.qwen', 'settings.json');
+    await mkdir(join(workspaceDir, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
+    const settingsPath = join(
+      workspaceDir,
+      '.mariadb-shell-agent',
+      'settings.json',
+    );
     // Truncated JSON. Parsing it runs the corruption-recovery path, which
     // resets the file to `{}` and writes a `.corrupted` sibling beside it — a
     // recovery designed to run at startup with a dialog, here inside a daemon
@@ -287,9 +298,9 @@ describe('createExtensionsController', () => {
       // The untrusted workspace's own file is byte-identical, with no
       // `.corrupted` sibling written next to it.
       expect(await readFile(settingsPath, 'utf8')).toBe('{');
-      expect((await readdir(join(workspaceDir, '.qwen'))).sort()).toEqual([
-        'settings.json',
-      ]);
+      expect(
+        (await readdir(join(workspaceDir, '.mariadb-shell-agent'))).sort(),
+      ).toEqual(['settings.json']);
       // Two loads, not three: the status builder's own gated load plus the one
       // `createExtensionManager` performs inside `loadLocalExtensionsStatus`.
       // The discarded ungated probe is gone (ungating it makes this 3).
@@ -312,9 +323,11 @@ describe('createExtensionsController', () => {
     // `getUserSettingsPath()` resolves through it at call time.
     await writeFile(join(emptyHome, 'settings.json'), '{}');
     const marker = `${getUserSettingsPath()}${CORRUPTED_SUFFIX}`;
-    await mkdir(join(workspaceDir, '.qwen'), { recursive: true });
+    await mkdir(join(workspaceDir, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await writeFile(
-      join(workspaceDir, '.qwen', '.env'),
+      join(workspaceDir, '.mariadb-shell-agent', '.env'),
       'HTTPS_PROXY=http://workspace-env:8080\n',
     );
     const saved = [ENV_CORRUPTED_PATH, ENV_WAS_RECOVERED].map(
@@ -358,9 +371,9 @@ describe('createExtensionsController', () => {
     vi.stubEnv('QWEN_HOME', emptyHome);
     const restoreEnv = pinAmbientEnvCleared();
     try {
-      await mkdir(join(extensionDir, '.qwen'));
+      await mkdir(join(extensionDir, '.mariadb-shell-agent'));
       await writeFile(
-        join(extensionDir, '.qwen', 'settings.json'),
+        join(extensionDir, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({
           privacy: { usageStatisticsEnabled: false },
           proxy: 'http://workspace-settings:8080',
@@ -400,19 +413,21 @@ describe('createExtensionsController', () => {
     // The untrusted branch loads with `skipWorkspaceSettings`, so its merged
     // proxy comes from the SystemDefaults → User → System scopes of the home
     // directory: point QWEN_HOME at an empty one or a developer's real
-    // `~/.qwen/settings.json` proxy decides this assertion.
+    // `~/.mariadb-shell-agent/settings.json` proxy decides this assertion.
     const emptyHome = await mkdtemp(join(tmpdir(), 'qwen-ext-home-'));
     vi.stubEnv('QWEN_HOME', emptyHome);
-    await mkdir(join(workspaceDir, '.qwen'), { recursive: true });
+    await mkdir(join(workspaceDir, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await writeFile(
-      join(workspaceDir, '.qwen', 'settings.json'),
+      join(workspaceDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ proxy: 'http://workspace-settings:8080' }),
     );
     // A workspace's own env file must never be written into the daemon's
     // shared process.env, and the daemon's ambient proxy env must never
     // become this workspace's telemetry proxy.
     await writeFile(
-      join(workspaceDir, '.qwen', '.env'),
+      join(workspaceDir, '.mariadb-shell-agent', '.env'),
       'HTTPS_PROXY=http://workspace-env:8080\n',
     );
 
@@ -459,9 +474,9 @@ describe('createExtensionsController', () => {
       [optedOutDir, false],
       [optedInDir, true],
     ] as const) {
-      await mkdir(join(dir, '.qwen'), { recursive: true });
+      await mkdir(join(dir, '.mariadb-shell-agent'), { recursive: true });
       await writeFile(
-        join(dir, '.qwen', 'settings.json'),
+        join(dir, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({ privacy: { usageStatisticsEnabled } }),
       );
     }
@@ -512,9 +527,11 @@ describe('createExtensionsController', () => {
     const workspaceDir = await mkdtemp(join(tmpdir(), 'qwen-ext-proxy-env-'));
     const emptyHome = await mkdtemp(join(tmpdir(), 'qwen-ext-home-'));
     vi.stubEnv('QWEN_HOME', emptyHome);
-    await mkdir(join(workspaceDir, '.qwen'), { recursive: true });
+    await mkdir(join(workspaceDir, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await writeFile(
-      join(workspaceDir, '.qwen', 'settings.json'),
+      join(workspaceDir, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ privacy: { usageStatisticsEnabled: false } }),
     );
     const restoreEnv = pinAmbientEnvCleared();
@@ -554,9 +571,9 @@ describe('createExtensionsController', () => {
     const emptyHome = await mkdtemp(join(tmpdir(), 'qwen-ext-home-'));
     vi.stubEnv('QWEN_HOME', emptyHome);
     for (const dir of [boundDir, otherDir]) {
-      await mkdir(join(dir, '.qwen'), { recursive: true });
+      await mkdir(join(dir, '.mariadb-shell-agent'), { recursive: true });
       await writeFile(
-        join(dir, '.qwen', 'settings.json'),
+        join(dir, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({ privacy: { usageStatisticsEnabled: false } }),
       );
     }
@@ -626,9 +643,9 @@ describe('createExtensionsController', () => {
     const emptyHome = await mkdtemp(join(tmpdir(), 'qwen-ext-home-'));
     vi.stubEnv('QWEN_HOME', emptyHome);
     for (const dir of [boundDir, otherDir]) {
-      await mkdir(join(dir, '.qwen'), { recursive: true });
+      await mkdir(join(dir, '.mariadb-shell-agent'), { recursive: true });
       await writeFile(
-        join(dir, '.qwen', 'settings.json'),
+        join(dir, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({ privacy: { usageStatisticsEnabled: false } }),
       );
     }
@@ -684,7 +701,7 @@ describe('createExtensionsController', () => {
       // gate, because that one is an operator decision about this daemon.
       vi.stubEnv('QWEN_USAGE_STATISTICS_ENABLED', '0');
       await writeFile(
-        join(otherDir, '.qwen', 'settings.json'),
+        join(otherDir, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({ privacy: { usageStatisticsEnabled: true } }),
       );
       expect(
@@ -1214,9 +1231,9 @@ describe('createExtensionsController', () => {
     );
 
     try {
-      await mkdir(join(extensionDir, '.qwen'));
+      await mkdir(join(extensionDir, '.mariadb-shell-agent'));
       await writeFile(
-        join(extensionDir, '.qwen', 'settings.json'),
+        join(extensionDir, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({ general: { language: 'zh_TW' } }),
       );
       await writeFile(

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -79,7 +80,7 @@ describe('buildClassifierSystemPrompt', () => {
       'Even a controller message never satisfies a SOFT BLOCK exception',
       'never lifts a boundary',
       'AGENTS.md',
-      '.qwen/hooks/',
+      '.mariadb-shell-agent/hooks/',
       '.mcp.json',
       'crontab',
       'pending confirmation prompt',
@@ -153,10 +154,10 @@ describe('buildClassifierSystemPrompt', () => {
 
     const prompt = promptFor();
     expect(prompt).toContain('Self-modification');
-    expect(prompt).toContain('.qwen/settings');
-    expect(prompt).toContain('QWEN.local.md');
-    expect(prompt).toContain('.qwen/rules/');
-    expect(prompt).toContain('.qwen/fork-profiles/');
+    expect(prompt).toContain('.mariadb-shell-agent/settings');
+    expect(prompt).toContain('MARIADB-SHELL-AGENT.local.md');
+    expect(prompt).toContain('.mariadb-shell-agent/rules/');
+    expect(prompt).toContain('.mariadb-shell-agent/fork-profiles/');
     expect(prompt).toContain('.mcp.json');
     // Keep wildcard allow-rule widening in the protected self-edit category.
     expect(prompt).toContain('adding or widening permission allow rules');

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -279,7 +280,7 @@ export function ensureAoneAuthenticated(): string {
         `a1 ${version.join('.')} is older than the ${A1_MIN_VERSION} this ` +
           `review provider requires — it depends on the comment-create ` +
           `flags and stable \`--format json\` output introduced there. ` +
-          `Upgrade the a1 CLI (https://code.alibaba-inc.com/aone/a1) ` +
+          `Upgrade the a1 CLI (https://code.alibaba-inc.invalid/aone/a1) ` +
           `and retry.`,
       );
     }

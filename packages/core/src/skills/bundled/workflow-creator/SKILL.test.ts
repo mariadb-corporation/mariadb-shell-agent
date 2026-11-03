@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,7 +23,7 @@ describe('bundled workflow-creator skill', () => {
   it('targets saved Dynamic Workflow scripts instead of Task Flow YAML', () => {
     const { body } = loadSkill();
 
-    expect(body).toContain('`.qwen/workflows/<name>.js`');
+    expect(body).toContain('`.mariadb-shell-agent/workflows/<name>.js`');
     expect(body).toContain(
       'Do not create or edit `qwen-workflow-design/*.yaml`',
     );

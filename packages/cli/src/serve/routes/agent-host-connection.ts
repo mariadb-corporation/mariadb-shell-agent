@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -157,7 +158,7 @@ export function registerAgentHostRuntimeRoutes(
       }).catch((error: unknown) => {
         // Connected anyway; only the reconnect after a restart is lost.
         writeStderrLine(
-          `qwen serve: could not save the Agent Host connection: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: could not save the Agent Host connection: ${error instanceof Error ? error.message : String(error)}`,
         );
       });
       if (!isCurrent(req, res, runtime)) return;

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -192,7 +193,7 @@ export type WebSearchGateResult =
  * gateways. This overlaps, but is neither a subset nor a superset of, the
  * content provider's DashScope detection: it rejects generic Alibaba Cloud
  * API Gateway and proxy endpoints, but accepts all concrete
- * `*.maas.aliyuncs.com` and QwenCloud MaaS endpoints for the Responses
+ * `*.maas.aliyuncs.invalid` and QwenCloud MaaS endpoints for the Responses
  * search side channel.
  * This only catches obvious misconfiguration; a host that does not serve the
  * Responses API fails loudly on first use.
@@ -225,9 +226,9 @@ function classifyDashScopeBaseUrl(
   const suffixes = [
     ...DASHSCOPE_REGIONAL_HOSTS,
     ...QWENCLOUD_MAAS_HOSTS,
-    'maas.aliyuncs.com',
-    'alibaba-inc.com',
-    'aliyun-inc.com',
+    'maas.aliyuncs.invalid',
+    'alibaba-inc.invalid',
+    'aliyun-inc.invalid',
     ...extraHosts,
   ];
   return suffixes.some(
@@ -316,7 +317,7 @@ function isUsableSearchEntry(entry: {
  * Whether the auto path may adopt an endpoint that matches no provider
  * preset. Preset matching compares base URLs exactly, so it misses a
  * hand-written `modelProviders` entry pointing at DashScope and the
- * workspace-specific Token Plan hosts (`llm-*.<region>.maas.aliyuncs.com`);
+ * workspace-specific Token Plan hosts (`llm-*.<region>.maas.aliyuncs.invalid`);
  * the host check covers both.
  *
  * Coding Plan endpoints are deliberately excluded: whether they serve the
@@ -1067,7 +1068,7 @@ export class WebSearchTool extends BaseDeclarativeTool<
 
   /**
    * The description embeds the current month; recompute it on schema access
-   * so a long-lived process (qwen serve, the ACP bridge) crossing a month
+   * so a long-lived process (mariadb-shell-agent serve, the ACP bridge) crossing a month
    * boundary does not pin search queries to a stale year. Within a month the
    * string is identical, preserving prompt-cache stability.
    */

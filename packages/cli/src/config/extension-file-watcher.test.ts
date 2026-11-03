@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -90,7 +91,9 @@ function fireAllEvent(
 }
 
 describe('ExtensionFileWatcher', () => {
-  const extensionsDir = path.resolve('/home/user/.qwen/extensions');
+  const extensionsDir = path.resolve(
+    '/home/user/.mariadb-shell-agent/extensions',
+  );
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -514,13 +517,13 @@ describe('ExtensionFileWatcher', () => {
             path: activeSource,
             config: {},
             installMetadata: { type: 'link', source: activeSource },
-            contextFiles: [`${activeSource}/QWEN.md`],
+            contextFiles: [`${activeSource}/MARIADB-SHELL-AGENT.md`],
           },
           {
             path: inactiveSource,
             config: {},
             installMetadata: { type: 'link', source: inactiveSource },
-            contextFiles: [`${inactiveSource}/QWEN.md`],
+            contextFiles: [`${inactiveSource}/MARIADB-SHELL-AGENT.md`],
           },
         ],
         getActiveExtensions: () => [
@@ -528,7 +531,7 @@ describe('ExtensionFileWatcher', () => {
             path: activeSource,
             config: {},
             installMetadata: { type: 'link', source: activeSource },
-            contextFiles: [`${activeSource}/QWEN.md`],
+            contextFiles: [`${activeSource}/MARIADB-SHELL-AGENT.md`],
           },
         ],
         getExtensionManager: () => ({
@@ -546,7 +549,7 @@ describe('ExtensionFileWatcher', () => {
       activeSource,
     ]);
 
-    fireAllEvent(0, 'change', `${inactiveSource}/QWEN.md`);
+    fireAllEvent(0, 'change', `${inactiveSource}/MARIADB-SHELL-AGENT.md`);
     fireAllEvent(0, 'change', `${inactiveSource}/commands/run.toml`);
 
     expect(refreshState.markExtensionsChanged).not.toHaveBeenCalled();
@@ -571,11 +574,13 @@ describe('ExtensionFileWatcher', () => {
     const ignored = mockWatchers[0].options['ignored'] as (
       filePath: string,
     ) => boolean;
-    expect(ignored('C:/Users/me/.qwen/extensions/alpha/.git/config')).toBe(
-      true,
-    );
     expect(
-      ignored('C:/Users/me/.qwen/extensions/alpha/node_modules/pkg/index.js'),
+      ignored('C:/Users/me/.mariadb-shell-agent/extensions/alpha/.git/config'),
+    ).toBe(true);
+    expect(
+      ignored(
+        'C:/Users/me/.mariadb-shell-agent/extensions/alpha/node_modules/pkg/index.js',
+      ),
     ).toBe(true);
   });
 
@@ -592,9 +597,13 @@ describe('ExtensionFileWatcher', () => {
 
     expect(mockWatch).toHaveBeenCalledTimes(2);
     expect(mockWatchers[0].target).toEqual([
-      path.resolve('/home/user/.qwen/extension-store/state.json'),
+      path.resolve(
+        '/home/user/.mariadb-shell-agent/extension-store/state.json',
+      ),
     ]);
-    expect(mockWatchers[1].target).toBe(path.resolve('/home/user/.qwen'));
+    expect(mockWatchers[1].target).toBe(
+      path.resolve('/home/user/.mariadb-shell-agent'),
+    );
     expect(mockWatchers[1].options).toEqual(
       expect.objectContaining({
         ignoreInitial: true,

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -190,7 +191,7 @@ describe('parseA1Version / a1VersionAtLeast (the version-floor helpers)', () => 
     // the `version` anchor keeps the parse on the real version either way.
     expect(
       parseA1Version(
-        'a1 version 0.1.90\nhttps://code.alibaba-inc.com/aone/a1/tags/v0.1.90',
+        'a1 version 0.1.90\nhttps://code.alibaba-inc.invalid/aone/a1/tags/v0.1.90',
       ),
     ).toEqual([0, 1, 90]);
   });
@@ -330,7 +331,7 @@ describe('ensureAoneAuthenticated — presence, version floor, and the account',
     }
     expect(message).toMatch(/a1 0\.1\.89 is older than the 0\.1\.90/);
     expect(message).toMatch(/Upgrade the a1 CLI/);
-    expect(message).toContain('code.alibaba-inc.com/aone/a1');
+    expect(message).toContain('code.alibaba-inc.invalid/aone/a1');
     // The probe is `a1 --version`, and the whoami call never ran.
     expect(mockExecFileSync).toHaveBeenCalledTimes(1);
     expect(mockExecFileSync.mock.calls[0][1]).toEqual(['--version']);

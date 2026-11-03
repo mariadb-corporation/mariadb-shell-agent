@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Orchestration for the agent-prepared Batch workflow (`qwen batch
+// Orchestration for the agent-prepared Batch workflow (`mariadb-shell-agent batch
 // run|collect|list|retry|cancel`). The agent owns understanding the
 // task and writing a small plan file; everything here is deterministic:
 // assemble requests, persist intent before money moves, submit, later
@@ -473,17 +474,17 @@ async function submitAttempt(
     // and reconcile, not report success.
     throw new Error(
       `task ${task.id}: the create request did not complete cleanly, so the batch may exist and be billing. ` +
-        `Run \`qwen batch collect ${task.id}\` to reconcile before doing anything else.`,
+        `Run \`mariadb-shell-agent batch collect ${task.id}\` to reconcile before doing anything else.`,
     );
   }
 }
 
 /**
  * Plans live in the project (the agent writes them with its normal file
- * tools) under `.qwen/batch/plans/`; they are working files, not source.
+ * tools) under `.mariadb-shell-agent/batch/plans/`; they are working files, not source.
  */
 function keepPlansOutOfGit(cwd: string, planPath: string): void {
-  const plansHome = path.join(cwd, '.qwen', 'batch');
+  const plansHome = path.join(cwd, '.mariadb-shell-agent', 'batch');
   if (!planPath.startsWith(plansHome + path.sep)) return;
   const ignore = path.join(plansHome, '.gitignore');
   if (!fs.existsSync(ignore)) fs.writeFileSync(ignore, '*\n');
@@ -613,7 +614,7 @@ export async function runPlan(
   deps.out(cost.text);
   if (options.dryRun) {
     deps.out(
-      `snapshot ${digest}; submit exactly this batch with: qwen batch run ${planFile} --expect ${digest}`,
+      `snapshot ${digest}; submit exactly this batch with: mariadb-shell-agent batch run ${planFile} --expect ${digest}`,
     );
     return;
   }
@@ -622,7 +623,7 @@ export async function runPlan(
     () => submitAttempt(deps, task, attempt, store, assembly),
     { waitMs: deps.lockWaitMs },
   );
-  deps.out(`collect later with: qwen batch collect ${task.id}`);
+  deps.out(`collect later with: mariadb-shell-agent batch collect ${task.id}`);
 }
 
 async function reconcileUnknownAttempt(
@@ -666,7 +667,7 @@ async function reconcileUnknownAttempt(
     deps.err(
       `[batch] no batch references input file ${attempt.inputFileId}. The create likely never landed; ` +
         `the provider's batch list is the source of truth. If you confirm none exists, ` +
-        `edit task.json to set this attempt's submitState back to "intent", then run \`qwen batch retry ${task.id}\`.`,
+        `edit task.json to set this attempt's submitState back to "intent", then run \`mariadb-shell-agent batch retry ${task.id}\`.`,
     );
   }
   return false;
@@ -879,7 +880,7 @@ async function collectLocked(
       if (!attempt.collected && job && !SETTLED_STATUSES.has(job.status)) {
         deps.out(
           `${batchId} is ${job.status} (${job.request_counts?.completed ?? 0}/${job.request_counts?.total ?? attempt.itemIds.length}); ` +
-            `re-run \`qwen batch collect ${taskId}\` later or add --wait.`,
+            `re-run \`mariadb-shell-agent batch collect ${taskId}\` later or add --wait.`,
         );
         return;
       }
@@ -1211,11 +1212,13 @@ async function collectLocked(
     );
   }
   if (failed.length > 0) {
-    deps.out(`retry failed items with: qwen batch retry ${task.id}`);
+    deps.out(
+      `retry failed items with: mariadb-shell-agent batch retry ${task.id}`,
+    );
   }
   if (held.length > 0) {
     deps.out(
-      `resolve the held conflicts above, then re-run: qwen batch collect ${task.id}`,
+      `resolve the held conflicts above, then re-run: mariadb-shell-agent batch collect ${task.id}`,
     );
   }
   const summary: CollectSummary = {
@@ -1269,7 +1272,7 @@ async function retryLocked(
 
   if (task.attempts.some(isAmbiguous)) {
     throw new Error(
-      `task ${taskId} has an ambiguous submission; run \`qwen batch collect ${taskId}\` to reconcile before retrying.`,
+      `task ${taskId} has an ambiguous submission; run \`mariadb-shell-agent batch collect ${taskId}\` to reconcile before retrying.`,
     );
   }
   // Failed items, plus items whose only submission provably never became a
@@ -1324,9 +1327,9 @@ async function retryLocked(
     deps.out(
       `task ${taskId}: nothing to retry — no failed items` +
         (awaiting > 0
-          ? `; ${awaiting} item(s) still await their batch (\`qwen batch collect ${taskId}\`)`
+          ? `; ${awaiting} item(s) still await their batch (\`mariadb-shell-agent batch collect ${taskId}\`)`
           : '') +
-        ` (held target conflicts need resolving; then run \`qwen batch collect ${taskId}\`).`,
+        ` (held target conflicts need resolving; then run \`mariadb-shell-agent batch collect ${taskId}\`).`,
     );
     return;
   }
@@ -1340,7 +1343,7 @@ async function retryLocked(
       // about to pay for again: either way, collect (or cancel) comes first.
       throw new Error(
         `batch ${attempt.batchId} is not collected yet and may still be running; ` +
-          `run \`qwen batch collect ${taskId}\` (or cancel it) before retrying.`,
+          `run \`mariadb-shell-agent batch collect ${taskId}\` (or cancel it) before retrying.`,
       );
     }
   }
@@ -1370,7 +1373,7 @@ async function retryLocked(
       `${newLimit === undefined ? '' : ` with max output ${newLimit} tokens`}: ${cost.text}`,
   );
   await submitAttempt(deps, task, attempt, store, assembly);
-  deps.out(`collect later with: qwen batch collect ${task.id}`);
+  deps.out(`collect later with: mariadb-shell-agent batch collect ${task.id}`);
 }
 
 /**
@@ -1485,7 +1488,7 @@ export async function cleanTask(
             .join(
               ', ',
             )}); the remote copies are already deleted, so this record is their only one. ` +
-            `Resolve the held targets and re-run \`qwen batch collect ${taskId}\`, or pass --force.`,
+            `Resolve the held targets and re-run \`mariadb-shell-agent batch collect ${taskId}\`, or pass --force.`,
         );
       }
       if (held.length > 0) {
@@ -1540,7 +1543,7 @@ async function cancelLocked(
   if (task.attempts.some(isAmbiguous)) {
     throw new Error(
       `task ${taskId} has an ambiguous submission that may exist and be billing; ` +
-        `run \`qwen batch collect ${taskId}\` to reconcile it before cancelling.`,
+        `run \`mariadb-shell-agent batch collect ${taskId}\` to reconcile it before cancelling.`,
     );
   }
   const attempt = [...task.attempts]
@@ -1559,13 +1562,13 @@ async function cancelLocked(
   const job = await api.getBatch(deps.ep, attempt.batchId as string);
   if (SETTLED_STATUSES.has(job.status)) {
     deps.out(
-      `${attempt.batchId} already settled (${job.status}); run \`qwen batch collect ${taskId}\` to pick up results.`,
+      `${attempt.batchId} already settled (${job.status}); run \`mariadb-shell-agent batch collect ${taskId}\` to pick up results.`,
     );
     return;
   }
   const cancelled = await api.cancelBatch(deps.ep, attempt.batchId as string);
   deps.out(
     `${cancelled.id} is ${cancelled.status}; already-completed requests are still billed. ` +
-      `Run \`qwen batch collect ${taskId}\` once it settles to harvest partial results.`,
+      `Run \`mariadb-shell-agent batch collect ${taskId}\` once it settles to harvest partial results.`,
   );
 }

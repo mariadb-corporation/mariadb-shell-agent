@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -405,6 +406,7 @@ export interface ChatRecord {
     | 'session_source'
     | 'session_execution_engine'
     | 'omni_recall'
+    | 'sent_user_content'
     | 'session_model'
     | 'session_approval_mode'
     | 'session_workflow_mode'
@@ -543,7 +545,8 @@ export interface ChatRecord {
     | GoalTurnEndRecordPayload
     | TurnResultRecordPayload
     | AgentMessageRecordPayload
-    | AgentMentionRecordPayload;
+    | AgentMentionRecordPayload
+    | SentUserContentRecordPayload;
 
   /** Background subagent that produced this record (e.g. "explore-7f3c"). */
   agentId?: string;
@@ -601,6 +604,15 @@ export interface NotificationRecordPayload {
     eventCount?: number;
     droppedLines?: number;
   };
+}
+
+/**
+ * The user content of a turn as the model received it: the recorded request
+ * plus the reminders and context added after the user record was written.
+ * Parts unchanged from the user record are stored as references to it.
+ */
+export interface SentUserContentRecordPayload {
+  parts: Array<Part | { recordedPart: number }>;
 }
 
 export interface UserPromptRecordPayload {
@@ -1184,7 +1196,7 @@ export interface ChatRecordingRestoreState {
  * - Linear history reconstruction
  * - Future conversation branching (fork from any historical point)
  *
- * File location: ~/.qwen/tmp/<project_id>/chats/
+ * File location: ~/.mariadb-shell-agent/tmp/<project_id>/chats/
  *
  * For session management (list, load, remove), use SessionService.
  */
@@ -3066,7 +3078,7 @@ export class ChatRecordingService {
     // unset their fast model (which would break `/rename --auto`, recap,
     // compression, and other fast-model features).
     if (autoTitleDisabledByEnv()) return;
-    // Headless/one-shot CLI flows (`qwen -p "…"`, cron, CI scripts) run a
+    // Headless/one-shot CLI flows (`mariadb-shell-agent -p "…"`, cron, CI scripts) run a
     // single prompt and throw the session away. Spending fast-model tokens
     // on a title no one will ever resume is pure waste; skip entirely.
     // Daemon (ACP) sessions are long-lived and user-resumable, so they
@@ -3524,6 +3536,43 @@ export class ChatRecordingService {
    * this record the transcript would never show what memory the model was
    * given — the trajectory exporter reads it back as `turn.recall`.
    */
+  /**
+   * Records the user content of a UserQuery or Cron turn as it was sent.
+   * The reminders (date, plan mode, output style, memory recall) and the IDE
+   * context are added after the user record is persisted; replaying them on
+   * resume keeps the restored prompt identical to the live one, so a provider
+   * prompt cache keeps matching the whole earlier conversation.
+   */
+  recordSentUserContent(
+    sent: PartListUnion,
+    recorded: PartListUnion,
+    promptId?: string,
+  ): void {
+    try {
+      const sentParts = createUserContent(sent).parts ?? [];
+      const recordedParts = createUserContent(recorded).parts ?? [];
+      if (isDeepStrictEqual(sentParts, recordedParts)) return;
+      const payload: SentUserContentRecordPayload = {
+        parts: sentParts.map((part) => {
+          const index = recordedParts.findIndex((recordedPart) =>
+            isDeepStrictEqual(recordedPart, part),
+          );
+          // The write is queued; copy so later in-place edits of the live
+          // history cannot change what is recorded.
+          return index >= 0 ? { recordedPart: index } : structuredClone(part);
+        }),
+      };
+      this.appendRecord({
+        ...this.createBaseRecord('system'),
+        subtype: 'sent_user_content',
+        ...(promptId ? { promptId } : {}),
+        systemPayload: payload,
+      });
+    } catch (error) {
+      debugLogger.error('Error saving sent user content:', error);
+    }
+  }
+
   recordOmniRecallReminder(payload: unknown): void {
     try {
       const record: ChatRecord = {

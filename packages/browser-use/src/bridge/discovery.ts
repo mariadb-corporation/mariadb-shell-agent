@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +39,7 @@ export function chromeDiscoveryDirectory(): string {
   return (
     process.env['QWEN_BROWSER_USE_DISCOVERY_DIR']?.trim() ||
     (process.platform === 'win32'
-      ? join(homedir(), '.qwen', 'browser-use', 'profiles')
+      ? join(homedir(), '.mariadb-shell-agent', 'browser-use', 'profiles')
       : join(
           dirname(defaultChromeBridgeSocketPath()),
           DISCOVERY_DIRECTORY_NAME,

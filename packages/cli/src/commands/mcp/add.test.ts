@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -203,7 +204,7 @@ describe('mcp add command', () => {
   });
 
   it('should keep a -v token in the add tail when this parser is reached', async () => {
-    // Parser-level only: a real `qwen mcp add my-server node server.js -v`
+    // Parser-level only: a real `mariadb-shell-agent mcp add my-server node server.js -v`
     // never gets here. resolveBootstrapRoute intercepts every exact version
     // token before `--` and prints the version instead (base parity — see the
     // version intercept in cli.ts and its cli.test.ts coverage). Pinned so the

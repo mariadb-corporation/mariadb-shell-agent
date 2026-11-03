@@ -8,7 +8,7 @@ Status: implemented; focused local verification is recorded below. Acceptance on
 
 Public and WebShell Session event streams duplicate the replay, live delivery, heartbeat, grant recheck and termination loop. Share that loop within the existing Maven boundaries while retaining both wire projections.
 
-Session creation convergence has already landed upstream in [PR #15955](https://github.com/QwenLM/qwen-code/pull/15955). The current PR uses that existing `SessionCreationCommand`, its named builder and the inherited single-entry contract gate unchanged. Session creation, SQL, repository roles, provisioners, recovery state machines and digest helpers are outside the remaining diff.
+Session creation convergence has already landed upstream in [PR #15955](https://github.invalid/QwenLM/qwen-code/pull/15955). The current PR uses that existing `SessionCreationCommand`, its named builder and the inherited single-entry contract gate unchanged. Session creation, SQL, repository roles, provisioners, recovery state machines and digest helpers are outside the remaining diff.
 
 ## Design
 

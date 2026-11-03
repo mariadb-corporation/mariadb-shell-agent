@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * `qwen sessions controllers` — mint, list and revoke the tokens that let
+ * `mariadb-shell-agent sessions controllers` — mint, list and revoke the tokens that let
  * a program outside any session drive this user's sessions.
  *
  * Deliberately a CLI command rather than only a slash command: minting
@@ -115,7 +116,7 @@ async function handleAdd(argv: AddArgs): Promise<void> {
   );
   writeStdoutLine(`  {"msgV":1,"type":"auth","token":"${token}"}`);
   writeStdoutLine(
-    'The target session must not have agents.crossSessionMessaging turned off (it is on by default), and must be restarted after changing that setting. It must also have a bound inbox: qwen sessions ps --json must show an ipcPath for it. --bare and --safe-mode bind none, and neither does the OpenTUI renderer.',
+    'The target session must not have agents.crossSessionMessaging turned off (it is on by default), and must be restarted after changing that setting. It must also have a bound inbox: mariadb-shell-agent sessions ps --json must show an ipcPath for it. --bare and --safe-mode bind none, and neither does the OpenTUI renderer.',
   );
   writeStdoutLine(
     'Messages it sends are delivered without per-message review, unless agents.crossSessionInbound is "hold" or "refuse".',
@@ -158,7 +159,7 @@ async function handleControllerList(argv: ListArgs): Promise<void> {
 
   if (records.length === 0) {
     writeStdoutLine(
-      'No trusted controllers. Add one with: qwen sessions controllers add --label <name>',
+      'No trusted controllers. Add one with: mariadb-shell-agent sessions controllers add --label <name>',
     );
     return;
   }
@@ -198,7 +199,7 @@ async function handleRemove(argv: RemoveArgs): Promise<void> {
 
   if (!removed) {
     writeStderrLine(
-      `Error: no controller has the id "${sanitize(argv.id ?? '')}". Run "qwen sessions controllers list" to see them.`,
+      `Error: no controller has the id "${sanitize(argv.id ?? '')}". Run "mariadb-shell-agent sessions controllers list" to see them.`,
     );
     process.exit(1);
     return;
@@ -258,7 +259,8 @@ export const controllersCommand: CommandModule = {
         builder: (remove: Argv) =>
           remove.positional('id', {
             type: 'string',
-            describe: 'The id shown by "qwen sessions controllers list"',
+            describe:
+              'The id shown by "mariadb-shell-agent sessions controllers list"',
           }),
         handler: async (argv) => {
           await handleRemove(argv as RemoveArgs);

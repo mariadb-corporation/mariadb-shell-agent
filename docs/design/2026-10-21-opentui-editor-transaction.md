@@ -4,7 +4,7 @@
 [简体中文](2026-10-21-opentui-editor-transaction.zh-CN.md)
 
 Current delivery (2026-10-21): this work is consolidated with input ownership,
-editing and status lines in [#14964](https://github.com/QwenLM/qwen-code/pull/14964).
+editing and status lines in [#14964](https://github.invalid/QwenLM/qwen-code/pull/14964).
 The original batch boundaries, source bases, validation results and stack-promotion
 steps below are historical. Follow the [delivery plan](2026-10-20-opentui-migration-delivery.md)
 for the active sequence. Combined acceptance requires fresh results for the
@@ -15,7 +15,7 @@ integrated commit and is still pending.
 The [clipboard/source lifecycle batch](2026-10-24-opentui-clipboard-source-lifetime.md) keeps external editing on the same raw expanded draft and final submit owner. Model-facing framing is applied only after pending paste settlement, never by the editor or prepared Retry. Its candidate verification is separate from the historical results below.
 
 This A batch starts at U2A `269600799782a5c507d62f3ae0db011c768be234`
-([#14946](https://github.com/QwenLM/qwen-code/pull/14946)). It is split from the
+([#14946](https://github.invalid/QwenLM/qwen-code/pull/14946)). It is split from the
 preserved U2B v10 candidate to keep one complete transaction within the intended
 2–3k-line review size. Local author and independent validation passed on this
 new A source and bundle: build/typecheck, 488 focused tests, two native scripts,
@@ -114,7 +114,7 @@ cannot validate A by changing an environment variable. Preserve first failures,
 input bytes, raw ANSI, visible frames, runtime hashes and cleanup results.
 Finish two clean full-diff audits after fixes and verification.
 
-The local A test plan in `.qwen/e2e-tests/u2b-editor-transaction-plan.md` records
+The local A test plan in `.mariadb-shell-agent/e2e-tests/u2b-editor-transaction-plan.md` records
 the source mapping and historical evidence. The separate native Markdown rendering
 of `HELD_HEAD_1HELD_TAIL_1` drops internal underscores; changing a cancellation
 sentinel did not fix that transcript discrepancy. OpenTUI 0.6.6 retains the

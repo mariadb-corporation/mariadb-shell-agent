@@ -4,7 +4,7 @@
 
 当前状态：新建目录切换的准入和界面已移除，仅保留既有操作查询与清算。见[移除设计](2026-10-26-retire-managed-cwd-change.zh-CN.md)。
 
-状态:已在本次变更中实现。属于 [proposal #12380](https://github.com/QwenLM/qwen-code/issues/12380)(2026-10-02 交付快照中的"W2 同 Workspace 内 cwd 变更:受控目录变更准入与结算;公开/WebShell 路由仍为 `planned`")。
+状态:已在本次变更中实现。属于 [proposal #12380](https://github.invalid/QwenLM/qwen-code/issues/12380)(2026-10-02 交付快照中的"W2 同 Workspace 内 cwd 变更:受控目录变更准入与结算;公开/WebShell 路由仍为 `planned`")。
 调研基线:main `d5c22d336b`(2026-10-02);随后合入 #13138(W1b,V31)、#13135 + #13223(绑定 close,V32)、#13142(D8a,契约 v1.29.0,V33)、#13194(绑定 archive/delete)与 #13112(绑定会话后续 Turn)之上——PR 并入的 origin/main 已越过以上全部;V34 被 #13090 占用、V35 被会话工具画像占用、V36–V39 被会话 journal 链占用(`V36` activation、`V37` event-type index、`V38` deferral marker、`V39` sequence index),V40–V44 又被会话创建者记录与 CSI 链占用、V45 被任务 journal 占用,迁移号改为 V46。
 目标契约是 [Workspace v1.12 第 4 节](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-workspace-context.en.md),以及仓库内已评审的 OpenAPI 契约 v1.27.0——后者已固定两条 `planned` 路由及其 schema。
 
@@ -139,7 +139,7 @@ WebShell 请求体携带 `sessionId`、`idempotencyKey`、`cwdRelative`、`expec
 - **结算**:探针失败时会话原样保留且 `failure_code=workspace_unavailable`;外部 revision 变动后提交以 `context_revision_conflict` 失败;出现新的活动 Turn 或保留 Runtime 上下文时以 `session_context_busy` 失败;瞬时错误重试后成功一次;永不停歇的瞬时失败在 8 次尝试预算用尽后以类型化终态结算——可投递集合清空、两道准入屏障重新放行;消失的挂载根或目标判为终态(对照真实删除的目录钉住),一时的 I/O 形态判为可重试(以确定性的 ENAMETOOLONG 探测钉住);属主死亡的 LEASED 行回收后恰好完成一次;legacy 生命周期 operation 与 `ACTION_RESPONSE` 不受影响(其测试保持绿色)。
 - **契约**:映射 vs planned 漂移测试、六个触及 schema 的钉、WebShell 孪生、事件文档一致性。
 - **Hosted 集成(H2,镜像 G0 套件;加入 MySQL CI 车道)**:在目录 A 以初始文件 Turn 创建绑定会话(为后续 Turn 准备一次真实的变更前安装),等待该 Turn 完成,再经两侧 API 变更目录并做归一化重放,轮询 operation 到 `completed` 并断言会话行 revision/cwd 与公开流上的 `session.context.changed` 事件及 `/operations/query` 读取——随后经已合入的 #13112 提交一个绑定后续 Turn,断言其文件写入落在已提交的目录,而初始 Turn 自己的文件保持完整。负向组:开关关闭、legacy 会话、busy、CAS 冲突、幂等重放与冲突,以及 WebShell 失败投影携带 `failureCode`;store 层双向钉住后续 Turn 繁忙屏障(op 未关闭挡 Turn;完成后放行)与两面在终态失败后的释放。
-- **E2E 计划**:`.qwen/e2e-tests/managed-workspace-w2-cwd-change.md`,先用全局 `qwen` CLI 基线做干跑(该路由今天未映射)。
+- **E2E 计划**:`.mariadb-shell-agent/e2e-tests/managed-workspace-w2-cwd-change.md`,先用全局 `mariadb-shell-agent` CLI 基线做干跑(该路由今天未映射)。
 - 构建、typecheck、bundle、两轮干净自审,然后 `/review`。
 
 ## 验收标准

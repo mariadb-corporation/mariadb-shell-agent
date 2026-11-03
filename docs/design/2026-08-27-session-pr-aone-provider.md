@@ -21,9 +21,9 @@ The two AUTOMATIC paths are GitHub-only:
    worktree slug/branch convention's number to a URL through gh, falling back
    to `<origin web URL>/pull/<N>`. On an Aone workspace, `gh` fails against
    the non-GitHub remote, and the fallback fabricates a
-   `https://gitlab.alibaba-inc.com/<g>/<p>/pull/<N>` URL — a page that does
+   `https://gitlab.alibaba-inc.invalid/<g>/<p>/pull/<N>` URL — a page that does
    not exist (Aone CR pages live at `…/codereview/<global-id>` on the WEB
-   host `code.alibaba-inc.com`).
+   host `code.alibaba-inc.invalid`).
 2. **State refresh** (`packages/cli/src/serve/server/session-pr-refresh.ts`):
    a 5-minute daemon sweep that keeps each binding's `state` snapshot
    (open/merged/closed badge) fresh via `gh pr list --state all`. An Aone
@@ -41,7 +41,7 @@ and `jspt/agentic_coding` (fully permitted).
 | Capability      | a1 command                                                                       | Notes                                                                                                                                                                                                                                                                                                               |
 | --------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | List MRs        | `a1 repo mr list --state opened\|merged --format json [--page N] [--repo <g/p>]` | page size fixed at 20; `--page` max 100; default order `updated_at desc`. Entries carry `id` (global), `iid`, `state`, `sourceBranch`, `projectPath`. **`detailUrl`/`webUrl` are empty strings in list output.** `--state` has `opened` (includes `reopened` entries), `accepted`, `merged` — no `closed`, no `all` |
-| Single MR       | `a1 repo mr view <global-id> [--repo <g/p>] --format json`                       | → `{mergeRequest: {state, detailUrl, sourceBranch, targetBranch, …}}`; `detailUrl` = `https://code.alibaba-inc.com/<groupPath>/codereview/<global-id>` — the ONLY sanctioned URL source (the review provider's `composeUrl` forbids assembling Aone links because nested-group collapse is non-injective)           |
+| Single MR       | `a1 repo mr view <global-id> [--repo <g/p>] --format json`                       | → `{mergeRequest: {state, detailUrl, sourceBranch, targetBranch, …}}`; `detailUrl` = `https://code.alibaba-inc.invalid/<groupPath>/codereview/<global-id>` — the ONLY sanctioned URL source (the review provider's `composeUrl` forbids assembling Aone links because nested-group collapse is non-injective)       |
 | State values    | list/view `state`                                                                | observed: `opened`, `reopened`, `merged`; `accepted` is a filter value (approved, unmerged); `closed` never observed (nothing listable) — mapped defensively                                                                                                                                                        |
 | Errors          | exit code UNRELIABLE                                                             | a1 may answer `{"schemaVersion":"a1.error/v1","code","message","retryable","exitCode"}` with exit 0 OR exit 1 — the parsed shape, not the exit code, is the error signal. 403 on `mr view` is possible even when `mr list` works (per-MR visibility)                                                                |
 | id semantics    | global                                                                           | `id` is unique platform-wide (the CR URL keys on it), so within Aone a number alone identifies one MR                                                                                                                                                                                                               |
@@ -73,7 +73,7 @@ in these paths), parsed by review's `parseRemoteUrl`, gated by
 `isAoneCanonicalHost`. Undefined host / unreadable origin / non-canonical
 host → GitHub path (today's behavior).
 
-The gate is CANONICAL-only (not the `*.alibaba-inc.com` family): that suffix
+The gate is CANONICAL-only (not the `*.alibaba-inc.invalid` family): that suffix
 also names GitHub Enterprise instances, and a family match would displace a
 GHE workspace onto a1 — before this feature `gh` served it (resolving the
 enterprise host from the origin), while a1 would either fail every read

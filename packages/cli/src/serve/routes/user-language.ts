@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -43,7 +44,7 @@ export interface UserLanguageRouteDeps {
  * #10234) for hosts that need to switch language before any session exists.
  *
  * Ownership classification: process-global. The route mutates user-global
- * state (`~/.qwen/settings.json`, the global `output-language.md`, every
+ * state (`~/.mariadb-shell-agent/settings.json`, the global `output-language.md`, every
  * runtime's process i18n and sessions), so it takes neither a workspace
  * selector nor a session id.
  *
@@ -111,7 +112,7 @@ export function registerUserLanguageRoutes(
       }
     } catch (err) {
       writeStderrLine(
-        `qwen serve: POST /language persist error: ${
+        `mariadb-shell-agent serve: POST /language persist error: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );
@@ -128,7 +129,7 @@ export function registerUserLanguageRoutes(
       await setLanguageAsync(language);
     } catch (err) {
       writeStderrLine(
-        `qwen serve: POST /language daemon i18n switch failed: ${
+        `mariadb-shell-agent serve: POST /language daemon i18n switch failed: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );
@@ -161,7 +162,7 @@ export function registerUserLanguageRoutes(
       if (result.reason instanceof SessionNotFoundError) return;
       failed += 1;
       writeStderrLine(
-        `qwen serve: POST /language fan-out failed for workspace ${runtimes[index]?.workspaceCwd}: ${
+        `mariadb-shell-agent serve: POST /language fan-out failed for workspace ${runtimes[index]?.workspaceCwd}: ${
           result.reason instanceof Error
             ? result.reason.message
             : String(result.reason)
@@ -178,7 +179,7 @@ export function registerUserLanguageRoutes(
         });
       } catch (err) {
         writeStderrLine(
-          `qwen serve: POST /language event publish failed for workspace ${runtime.workspaceCwd}: ${
+          `mariadb-shell-agent serve: POST /language event publish failed for workspace ${runtime.workspaceCwd}: ${
             err instanceof Error ? err.message : String(err)
           }`,
         );

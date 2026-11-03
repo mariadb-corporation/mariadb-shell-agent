@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 // @vitest-environment jsdom
 //
-// Reproduction for https://github.com/QwenLM/qwen-code/issues/12826
+// Reproduction for https://github.invalid/QwenLM/qwen-code/issues/12826
 // "Calls to EditorView.update are not allowed while an update is in progress"
 // when submitting a prompt that contains an inline @file chip.
 //

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -423,7 +424,7 @@ describe('/peers', () => {
       isTrusted: true,
       workspaceSettingsActive: true,
     });
-    expect(result.content).toContain('.qwen/settings.json');
+    expect(result.content).toContain('.mariadb-shell-agent/settings.json');
     expect(result.content).toContain('cannot turn it back on here');
     expect(result.content).not.toContain('Set it to true');
   });
@@ -1046,7 +1047,9 @@ describe('/peers controllers', () => {
     expect(out.content).toContain('process this session started');
     expect(out.content).toContain('asserts no review class');
     expect(out.content).toContain('crossSessionInbound to "hold"');
-    expect(out.content).toContain('qwen sessions controllers add');
+    expect(out.content).toContain(
+      'mariadb-shell-agent sessions controllers add',
+    );
   });
 
   it('lists the grants with their ids', async () => {

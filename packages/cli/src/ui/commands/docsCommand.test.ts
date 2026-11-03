@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -44,7 +45,7 @@ describe('docsCommand', () => {
       throw new Error('docsCommand must have an action.');
     }
 
-    const docsUrl = 'https://qwenlm.github.io/qwen-code-docs/en';
+    const docsUrl = 'https://qwenlm.github.invalid/qwen-code-docs/en';
 
     await docsCommand.action(mockContext, '');
 
@@ -66,7 +67,7 @@ describe('docsCommand', () => {
 
     // Simulate a sandbox environment
     vi.stubEnv('SANDBOX', 'gemini-sandbox');
-    const docsUrl = 'https://qwenlm.github.io/qwen-code-docs/en';
+    const docsUrl = 'https://qwenlm.github.invalid/qwen-code-docs/en';
 
     await docsCommand.action(mockContext, '');
 
@@ -89,7 +90,7 @@ describe('docsCommand', () => {
 
     // Simulate the specific 'sandbox-exec' environment
     vi.stubEnv('SANDBOX', 'sandbox-exec');
-    const docsUrl = 'https://qwenlm.github.io/qwen-code-docs/en';
+    const docsUrl = 'https://qwenlm.github.invalid/qwen-code-docs/en';
 
     await docsCommand.action(mockContext, '');
 
@@ -111,7 +112,7 @@ describe('docsCommand', () => {
       throw new Error('docsCommand must have an action.');
     }
 
-    const docsUrl = 'https://qwenlm.github.io/qwen-code-docs/en';
+    const docsUrl = 'https://qwenlm.github.invalid/qwen-code-docs/en';
     mockOpenBrowserSecurely.mockRejectedValueOnce(new Error('bad url'));
 
     await docsCommand.action(mockContext, '');
@@ -138,7 +139,7 @@ describe('docsCommand', () => {
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',
-        content: expect.stringContaining('qwenlm.github.io'),
+        content: expect.stringContaining('qwenlm.github.invalid'),
       });
       expect(mockOpenBrowserSecurely).not.toHaveBeenCalled();
       expect(nonInteractiveContext.ui.addItem).not.toHaveBeenCalled();

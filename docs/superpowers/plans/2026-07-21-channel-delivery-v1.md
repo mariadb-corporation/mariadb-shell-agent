@@ -178,7 +178,7 @@
 - Modify/Test: `packages/cli/src/serve/capabilities.ts`
 - Test: `packages/cli/src/serve/server.test.ts`
 - Modify: `docs/developers/qwen-serve-protocol.md`
-- Modify: `.qwen/e2e-tests/channel-delivery-v1.md`
+- Modify: `.mariadb-shell-agent/e2e-tests/channel-delivery-v1.md`
 
 **Interfaces:**
 

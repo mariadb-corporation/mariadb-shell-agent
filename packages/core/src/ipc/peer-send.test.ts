@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -337,7 +338,7 @@ describe('sendToPeer', () => {
   });
 
   it('treats a differently named twin of this session as itself', async () => {
-    // `qwen --resume <id>` from another directory runs this very session
+    // `mariadb-shell-agent --resume <id>` from another directory runs this very session
     // id under a second process with another name. Its inbound gate would
     // accept a frame pinned to the shared id, so it must not be reachable.
     peers(

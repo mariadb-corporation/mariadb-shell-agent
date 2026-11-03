@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Integration coverage for the runtime.json sidecar wiring through
@@ -197,7 +198,7 @@ describe('Config.startNewSession session-registry patch', () => {
 
     config.startNewSession(sessionB);
 
-    // Without the patch seam, `qwen sessions ps --json` would keep
+    // Without the patch seam, `mariadb-shell-agent sessions ps --json` would keep
     // advertising sessionA's transcript for this live session — the exact
     // stale-pointer bug the seam exists to prevent.
     const after = await waitFor(async () => {

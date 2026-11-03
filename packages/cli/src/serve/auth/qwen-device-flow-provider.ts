@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -48,7 +49,7 @@ function truncateForStderr(detail: string): string {
 }
 
 /**
- * Qwen-OAuth implementation of `DeviceFlowProvider` for `qwen serve`.
+ * Qwen-OAuth implementation of `DeviceFlowProvider` for `mariadb-shell-agent serve`.
  *
  * Uses the lower-level `QwenOAuth2Client` primitives (`requestDeviceAuthorization`
  * / `pollDeviceToken`) directly rather than the high-level

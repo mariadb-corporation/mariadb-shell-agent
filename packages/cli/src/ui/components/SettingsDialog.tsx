@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -227,7 +228,7 @@ export function SettingsDialog({
     // them under Workspace scope is a trap: the dialog renders from the raw
     // scope file, so a toggle here would keep displaying the value it wrote
     // while the feature stayed at its merged value, leaving a dead entry in
-    // the repo's .qwen/settings.json. They stay listed under the scopes that
+    // the repo's .mariadb-shell-agent/settings.json. They stay listed under the scopes that
     // do honor them.
     const settingKeys = getDialogSettingKeys({
       excludeWorkspaceRestricted: selectedScope === SettingScope.Workspace,
@@ -1424,7 +1425,7 @@ export function SettingsDialog({
         showRestartPrompt && (
           <Text color={theme.status.warning}>
             {t(
-              'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.',
+              'To see changes, MariaDB Shell Agent must be restarted. Press r to exit and apply changes now.',
             )}
           </Text>
         )}

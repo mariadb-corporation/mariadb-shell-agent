@@ -325,8 +325,8 @@ production-line core `refactor`, the repository's maintainer-only gate applies.
 
 ## Phase 5: Verification
 
-- Dry-run the baseline with the installed global `qwen` CLI and record an E2E
-  plan/result under `.qwen/e2e-tests/`.
+- Dry-run the baseline with the installed global `mariadb-shell-agent` CLI and record an E2E
+  plan/result under `.mariadb-shell-agent/e2e-tests/`.
 - Run focused core reader/service/config/client/recording/goal tests from
   `packages/core`.
 - Run focused ACP agent/session and daemon route/bridge tests from their package

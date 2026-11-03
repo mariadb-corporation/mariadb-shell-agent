@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -108,12 +109,12 @@ function isQwenBaseUrl(baseUrl: string): boolean {
   try {
     const hostname = new URL(baseUrl).hostname.toLowerCase();
     return (
-      hostname === 'dashscope.aliyuncs.com' ||
-      hostname === 'dashscope-intl.aliyuncs.com' ||
-      hostname === 'dashscope-us.aliyuncs.com' ||
-      hostname.endsWith('.dashscope.aliyuncs.com') ||
-      hostname.endsWith('.dashscope-intl.aliyuncs.com') ||
-      hostname.endsWith('.dashscope-us.aliyuncs.com')
+      hostname === 'dashscope.aliyuncs.invalid' ||
+      hostname === 'dashscope-intl.aliyuncs.invalid' ||
+      hostname === 'dashscope-us.aliyuncs.invalid' ||
+      hostname.endsWith('.dashscope.aliyuncs.invalid') ||
+      hostname.endsWith('.dashscope-intl.aliyuncs.invalid') ||
+      hostname.endsWith('.dashscope-us.aliyuncs.invalid')
     );
   } catch {
     return false;

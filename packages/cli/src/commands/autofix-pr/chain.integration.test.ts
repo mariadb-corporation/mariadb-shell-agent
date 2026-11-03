@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -264,7 +265,12 @@ describe.skipIf(process.platform === 'win32')(
     }
 
     function writePlan(plan: object) {
-      const path = join(clone, '.qwen', 'tmp', 'autofix-pr-7-plan.json');
+      const path = join(
+        clone,
+        '.mariadb-shell-agent',
+        'tmp',
+        'autofix-pr-7-plan.json',
+      );
       writeFileSync(path, JSON.stringify(plan));
       return path;
     }
@@ -312,11 +318,11 @@ describe.skipIf(process.platform === 'win32')(
     }
 
     function checkoutState() {
-      // The watch's own files sit under `.qwen/tmp` of the clone (design
+      // The watch's own files sit under `.mariadb-shell-agent/tmp` of the clone (design
       // Section 5), the user's files never do.
       const status = run(clone, 'status', '--porcelain=v1', '-uall')
         .split('\n')
-        .filter((line) => !line.startsWith('?? .qwen/tmp/'))
+        .filter((line) => !line.startsWith('?? .mariadb-shell-agent/tmp/'))
         .join('\n');
       return [
         run(clone, 'symbolic-ref', 'HEAD'),

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -49,7 +50,7 @@ function makeWorkspaceServiceWithProvider(
   return createDaemonWorkspaceService({
     boundWorkspace: WS_A,
     isWorkspaceTrusted: () => true,
-    contextFilename: 'QWEN.md',
+    contextFilename: 'MARIADB-SHELL-AGENT.md',
     statusProvider,
     isChannelLive: opts.isChannelLive ?? (() => false),
     persistDisabledTools: async () => {},

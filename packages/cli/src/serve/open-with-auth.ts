@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +39,7 @@ export function applyOpenWithAuth(options: OpenWithAuthOptions): void {
 
   options.token = randomBytes(32).toString('base64url');
   writeStderrLine(
-    'qwen serve: temporary bearer authentication enabled for this Web Shell ' +
+    'mariadb-shell-agent serve: temporary bearer authentication enabled for this Web Shell ' +
       'launch; use an explicit shared token for additional clients.',
   );
 }

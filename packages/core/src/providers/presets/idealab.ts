@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,7 +14,7 @@ export const idealabProvider: ProviderConfig = {
   description:
     'Alibaba internal LLM service (Qwen3.6-Plus-DogFooding, DeepSeek V4, Kimi K2.6)',
   protocol: AuthType.USE_OPENAI,
-  baseUrl: 'https://idealab.alibaba-inc.com/api/openai/v1',
+  baseUrl: 'https://idealab.alibaba-inc.invalid/api/openai/v1',
   envKey: 'IDEALAB_API_KEY',
   models: [
     {

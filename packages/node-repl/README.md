@@ -6,7 +6,7 @@ Node.js kernel in a dedicated child process; top-level bindings, closures, and
 module state persist across calls within a session.
 
 This package is **fully independent of `@qwen-code/qwen-code-core`** — any MCP
-client (Qwen Code via `mcpServers`, Claude, Codex, etc.) can run it.
+client (MariaDB Shell Agent via `mcpServers`, Claude, Codex, etc.) can run it.
 
 ## Tools
 
@@ -72,21 +72,21 @@ checksum. Allow npm installation scripts and network access to npm and GitHub
 Releases. No separate SDK install, manual SDK import, skill installation,
 or standalone `qwen-cua-driver` CLI installation is needed.
 
-Claude Code and Codex do not require Qwen Code to use this server. These
-component versions do not require a Qwen Code CLI or Web Shell release with
+Claude Code and Codex do not require MariaDB Shell Agent to use this server. These
+component versions do not require a MariaDB Shell Agent CLI or Web Shell release with
 the same version. For direct native MCP tools instead of JavaScript, see the
 [CUA Driver README](../cua-driver/README.md#agent-integration).
 
-### Qwen Code
+### MariaDB Shell Agent
 
 On macOS/Linux:
 
 ```bash
-qwen mcp add --scope user node-repl npx -y @qwen-code/node-repl-mcp@0.27.0
+mariadb-shell-agent mcp add --scope user node-repl npx -y @qwen-code/node-repl-mcp@0.27.0
 ```
 
-This writes the server entry to `~/.qwen/settings.json`. Use `--scope project`
-for the current project's `.qwen/settings.json` instead. The equivalent
+This writes the server entry to `~/.mariadb-shell-agent/settings.json`. Use `--scope project`
+for the current project's `.mariadb-shell-agent/settings.json` instead. The equivalent
 settings entry is:
 
 ```jsonc
@@ -142,8 +142,8 @@ In PowerShell, use `cmd.exe` to launch npm's `npx` command. Run the command for
 your chosen client:
 
 ```powershell
-# Qwen Code
-qwen mcp add --scope user node-repl cmd.exe /d /c npx -y @qwen-code/node-repl-mcp@0.27.0
+# MariaDB Shell Agent
+mariadb-shell-agent mcp add --scope user node-repl cmd.exe /d /c npx -y @qwen-code/node-repl-mcp@0.27.0
 
 # Claude Code
 claude mcp add --scope user --transport stdio node-repl -- cmd.exe /d /c npx -y @qwen-code/node-repl-mcp@0.27.0
@@ -157,7 +157,7 @@ and `args` to `["/d", "/c", "npx", "-y", "@qwen-code/node-repl-mcp@0.27.0"]`.
 
 ### Permissions and connection check
 
-Restart the client, then check `qwen mcp list`, `claude mcp list`, or
+Restart the client, then check `mariadb-shell-agent mcp list`, `claude mcp list`, or
 `codex mcp list`. Inside the session, use `/mcp` to check that `node-repl`
 is connected and exposes `js` and `js_reset`. Ask the agent to execute this
 first `js` call:
@@ -188,7 +188,7 @@ These SDK grants follow the host's OS responsibility chain; the standalone
 `QwenCuaDriver.app` grant does not replace them. On Linux, pass the desktop
 environment as described below. Browser automation uses Chrome 125 or later on
 macOS/Linux and requires the
-[Qwen Code browser extension](https://chromewebstore.google.com/detail/qwen-code/hdhmmjclhibojdddmancfgbkleahfaph)
+[MariaDB Shell Agent browser extension](https://chromewebstore.google.com/detail/qwen-code/hdhmmjclhibojdddmancfgbkleahfaph)
 installed in the Chrome profile you want to control.
 
 ### Local development and environment
@@ -246,7 +246,7 @@ have happened when an error is thrown; use those diagnostics before retrying.
 
 ## Desktop relay
 
-`node-repl-mcp desktop-relay` lends this server to a Qwen Code session running
+`node-repl-mcp desktop-relay` lends this server to a MariaDB Shell Agent session running
 somewhere else, typically a headless dev box, so the Computer Use runtime can
 drive the desktop you are sitting at. On macOS:
 
@@ -254,11 +254,11 @@ drive the desktop you are sitting at. On macOS:
 npx -y @qwen-code/node-repl-mcp@0.27.0 desktop-relay install
 ```
 
-This installs the server and `@qwen-code/cua-sdk` under `~/.qwen/desktop-relay`
+This installs the server and `@qwen-code/cua-sdk` under `~/.mariadb-shell-agent/desktop-relay`
 and registers a launchd socket on `127.0.0.1:47821` in inetd mode: nothing runs
 until something connects, and each connection gets its own short-lived process.
 
-- **Web Shell.** In a session served by a remote `qwen serve` (started with
+- **Web Shell.** In a session served by a remote `mariadb-shell-agent serve` (started with
   `QWEN_SERVE_CLIENT_MCP_OVER_WS=1`), choose **Use this computer** in the sidebar
   footer. A native dialog on this computer asks for approval; once allowed, the
   relay starts the JavaScript MCP server here and registers it for that one session over the
@@ -274,7 +274,7 @@ If the browser cannot reach the relay, the remote connection may still be
 running. Request a local disconnect without using the loopback socket:
 
 ```bash
-~/.qwen/desktop-relay/node_modules/.bin/node-repl-mcp desktop-relay disconnect
+~/.mariadb-shell-agent/desktop-relay/node_modules/.bin/node-repl-mcp desktop-relay disconnect
 ```
 
 This checks the recorded process identity before sending SIGTERM; it does not
@@ -300,7 +300,7 @@ npm run smoke:lifecycle # proves the kernel child is reaped on stdin EOF / signa
 
 ## Provenance
 
-Ported from the Qwen Code PR #9499 Node REPL core (kernel, module loader, cell
+Ported from the MariaDB Shell Agent PR #9499 Node REPL core (kernel, module loader, cell
 transform, protocol, security policy, kernel manager). The qwen-coupled result
 converter was replaced by `output-adapter.ts`, which emits MCP content blocks.
 The empty-in-production trusted-package / sha256-pinning layer was removed

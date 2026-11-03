@@ -2,7 +2,7 @@
   "name": "@qwen-code/channel-email",
   "private": true,
   "version": "0.26.5",
-  "description": "IMAP and SMTP Email channel for Qwen Code",
+  "description": "IMAP and SMTP Email channel for MariaDB Shell Agent",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -140,7 +141,7 @@ describe('A2A transport', () => {
 
     const card = await request(app).get('/.well-known/agent-card.json');
     expect(card.body).toMatchObject({
-      name: 'Qwen Code workspace agents',
+      name: 'MariaDB Shell Agent workspace agents',
       supportedInterfaces: [
         expect.objectContaining({
           protocolBinding: 'JSONRPC',

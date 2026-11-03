@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +10,7 @@
  *
  * The credential of a joined Host already survives a restart; this record is
  * what says "reconnect on boot". It sits next to the credentials in
- * `~/.qwen/agent-hosts/connections.json` (0600), and holds no secret.
+ * `~/.mariadb-shell-agent/agent-hosts/connections.json` (0600), and holds no secret.
  * Several daemons on one machine share it, so writes are locked.
  */
 
@@ -82,7 +83,7 @@ export async function readAgentHostConnections(): Promise<
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
       writeStderrLine(
-        `qwen serve: ignoring unreadable ${agentHostConnectionsPath()}.`,
+        `mariadb-shell-agent serve: ignoring unreadable ${agentHostConnectionsPath()}.`,
       );
     }
     return [];
@@ -198,7 +199,7 @@ export async function restoreAgentHostConnections(
         if (credential === undefined) {
           // Unreadable is not revoked: keep the record and try again later.
           writeStderrLine(
-            `qwen serve: could not read the Agent Host credential for ${record.serverUrl}; retrying.`,
+            `mariadb-shell-agent serve: could not read the Agent Host credential for ${record.serverUrl}; retrying.`,
           );
           await pause(retryMs, signal);
           continue;
@@ -206,7 +207,7 @@ export async function restoreAgentHostConnections(
         if (!credential) {
           await removeAgentHostConnection(record).catch(() => undefined);
           writeStderrLine(
-            `qwen serve: dropped the saved Agent Host connection to ${record.serverUrl} (no credential).`,
+            `mariadb-shell-agent serve: dropped the saved Agent Host connection to ${record.serverUrl} (no credential).`,
           );
           return;
         }
@@ -231,7 +232,7 @@ export async function restoreAgentHostConnections(
           }
         } catch (error) {
           writeStderrLine(
-            `qwen serve: could not reconnect to ${record.serverUrl}; retrying: ${error instanceof Error ? error.message : String(error)}`,
+            `mariadb-shell-agent serve: could not reconnect to ${record.serverUrl}; retrying: ${error instanceof Error ? error.message : String(error)}`,
           );
           await pause(retryMs, signal);
           continue;
@@ -243,7 +244,7 @@ export async function restoreAgentHostConnections(
     }
   };
   // One loop per saved connection. The file is read again every watch tick,
-  // so a record saved after boot (`qwen agents join` against this running
+  // so a record saved after boot (`mariadb-shell-agent agents join` against this running
   // daemon) is supervised too, instead of only on the next restart.
   const supervised = new Set<string>();
   const supervise = (record: AgentHostConnectionRecord) => {
@@ -253,7 +254,7 @@ export async function restoreAgentHostConnections(
     void keep(record)
       .catch((error: unknown) =>
         writeStderrLine(
-          `qwen serve: stopped restoring the Agent Host connection to ${record.serverUrl}: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: stopped restoring the Agent Host connection to ${record.serverUrl}: ${error instanceof Error ? error.message : String(error)}`,
         ),
       )
       .finally(() => supervised.delete(key));

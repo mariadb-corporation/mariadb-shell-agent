@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -519,13 +520,13 @@ lOTTGqPpwFUbw2EMOOpFYuIyzGMIpUNMBjE2gvJiqFQ=
   describe('getMcpOAuthDialogInstruction', () => {
     it('builds an authenticate instruction for the named MCP server', () => {
       expect(getMcpOAuthDialogInstruction('authenticate', 'foo')).toBe(
-        "In interactive Qwen Code sessions, open the /mcp dialog to authenticate with MCP server 'foo'. For headless or SDK usage, configure MCP OAuth with qwen mcp add --oauth-* or settings.json, then authenticate once in an interactive session before connecting.",
+        "In interactive MariaDB Shell Agent sessions, open the /mcp dialog to authenticate with MCP server 'foo'. For headless or SDK usage, configure MCP OAuth with mariadb-shell-agent mcp add --oauth-* or settings.json, then authenticate once in an interactive session before connecting.",
       );
     });
 
     it('builds a re-authenticate instruction for the named MCP server', () => {
       expect(getMcpOAuthDialogInstruction('re-authenticate', 'foo')).toBe(
-        "In interactive Qwen Code sessions, open the /mcp dialog to re-authenticate with MCP server 'foo'. For headless or SDK usage, configure MCP OAuth with qwen mcp add --oauth-* or settings.json, then re-authenticate once in an interactive session before connecting.",
+        "In interactive MariaDB Shell Agent sessions, open the /mcp dialog to re-authenticate with MCP server 'foo'. For headless or SDK usage, configure MCP OAuth with mariadb-shell-agent mcp add --oauth-* or settings.json, then re-authenticate once in an interactive session before connecting.",
       );
     });
   });
@@ -1998,7 +1999,7 @@ lOTTGqPpwFUbw2EMOOpFYuIyzGMIpUNMBjE2gvJiqFQ=
     it('discoverAndReturn records the discovery failure cause in the status registry (issue #9944)', async () => {
       // Same carrier as connect()'s catch: a server that connects but fails
       // discovery (up-but-empty) reaches discoverAndReturn()'s catch, which
-      // the manager swallows for best-effort discovery. `qwen mcp reconnect`
+      // the manager swallows for best-effort discovery. `mariadb-shell-agent mcp reconnect`
       // relies on `getMCPServerLastError` to print the cause — the status
       // enum alone only says DISCONNECTED.
       promptServer([]);
@@ -3443,7 +3444,7 @@ lOTTGqPpwFUbw2EMOOpFYuIyzGMIpUNMBjE2gvJiqFQ=
       // Discovery is best-effort and swallows connect errors (the manager's
       // catch logs them via debugLogger only), so the status enum alone
       // cannot tell a consumer WHY a server is not CONNECTED. connect() must
-      // record the cause so `qwen mcp reconnect` can print it.
+      // record the cause so `mariadb-shell-agent mcp reconnect` can print it.
       const cause = 'connect ECONNREFUSED 127.0.0.1:3939';
       const mockedClient = closableClient(
         { close: vi.fn().mockResolvedValue(undefined) },

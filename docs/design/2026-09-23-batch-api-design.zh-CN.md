@@ -21,18 +21,18 @@
 
 - 位于 `packages/core/src/skills/bundled/batch-api/SKILL.md`，与实时并行的 `/batch` 并列，不替代它。
 - `disable-model-invocation: true`：只有用户能进入 Batch 路径；`/batch` 的描述里只允许模型**建议**用户输入 `/batch-api`。
-- `allowedTools` 只预先放行只读工具（`glob`、`grep_search`、`read_file`）；写 plan 和 `qwen batch run`（会花钱）仍要经过审批。
+- `allowedTools` 只预先放行只读工具（`glob`、`grep_search`、`read_file`）；写 plan 和 `mariadb-shell-agent batch run`（会花钱）仍要经过审批。
 - 流程：
-  1. 先用 `qwen batch --help` 确认 CLI 有这些子命令（旧版 CLI 会把 `batch check` 当成计费的提问），再用 `qwen batch check` 检查凭据、endpoint 和 Batch 路由，并显示一次提交会冻结的参数。不产生计费；失败就停止，不在准备上花钱。
+  1. 先用 `mariadb-shell-agent batch --help` 确认 CLI 有这些子命令（旧版 CLI 会把 `batch check` 当成计费的提问），再用 `mariadb-shell-agent batch check` 检查凭据、endpoint 和 Batch 路由，并显示一次提交会冻结的参数。不产生计费；失败就停止，不在准备上花钱。
   2. 判断任务是否适合。不适合就说明原因并停止，**绝不悄悄改用实时模式自己做**。
   3. 轻量准备：glob 出文件，抽样读 2–3 个，写一份共享规则。
-  4. 把 plan 写到 `.qwen/batch/plans/<slug>.json`。
-  5. 先用 `qwen batch run <plan> --dry-run` 预览（不上传），把条目数、冻结参数和估算费用展示给用户；再用 `qwen batch run <plan> --expect <digest>` 提交这份快照。批准这条命令就是付费决定，而且是在看过预览之后做出的；预览之后内容有变化的批次会被拒绝。
-  6. 以后台 shell 启动 `qwen batch collect <task-id> --wait`，然后结束本轮（§6）。
+  4. 把 plan 写到 `.mariadb-shell-agent/batch/plans/<slug>.json`。
+  5. 先用 `mariadb-shell-agent batch run <plan> --dry-run` 预览（不上传），把条目数、冻结参数和估算费用展示给用户；再用 `mariadb-shell-agent batch run <plan> --expect <digest>` 提交这份快照。批准这条命令就是付费决定，而且是在看过预览之后做出的；预览之后内容有变化的批次会被拒绝。
+  6. 以后台 shell 启动 `mariadb-shell-agent batch collect <task-id> --wait`，然后结束本轮（§6）。
   7. 后台进程退出时 agent 被唤醒一次：汇报结果，只做用户要求的后续动作；从不重试（重试要再付钱），也不自己重做任何条目。
 - 所有命令都以 `"${QWEN_CODE_CLI:-qwen}" batch …` 调用，确保用的是当前会话这个 CLI。
 
-### 2.2 `qwen batch` 子命令（确定性执行器）
+### 2.2 `mariadb-shell-agent batch` 子命令（确定性执行器）
 
 | 命令                | 行为                                                                                                                                |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
@@ -72,7 +72,7 @@ batch.ts：endpoint / 鉴权解析，CLI 命令注册
 ### 设计不变量
 
 - **账本不靠猜就能回答"远端可能存在哪些对象"。** 上传前先落盘提交意图，create 前先落盘上传得到的 file id。create 的响应丢失，或进程在 create 途中死掉，都把 attempt 记为 `submit-unknown`；`collect` 按 `input_file_id` 到服务端的 batch 列表里对账，**绝不盲目重交**，因为判断错了就要付两次钱。
-- **记录跟着用户，不跟仓库。** 任务记录放在 `~/.qwen/batch`（可用 `QWEN_BATCH_HOME` 覆盖），权限 0700/0600，记录中保存项目根目录，在任何目录下都能操作。只有 agent 写的 plan 文件留在项目里，且被 git 忽略。
+- **记录跟着用户，不跟仓库。** 任务记录放在 `~/.mariadb-shell-agent/batch`（可用 `QWEN_BATCH_HOME` 覆盖），权限 0700/0600，记录中保存项目根目录，在任何目录下都能操作。只有 agent 写的 plan 文件留在项目里，且被 git 忽略。
 - **任务绑定 endpoint。** `run` 冻结 base URL 和 API key 的短哈希（不保存 key 本身）；之后 `collect` / `retry` / `cancel` 发现配置变了就拒绝执行，因为换了账号或地域就看不到原来的 batch。
 - **同一任务同一时刻只有一个命令在跑。** 每个任务一个锁文件，记录 pid 和主机名。只有确定释放了才接管：锁写在本机、且那个 pid 已经不存在。另一台主机的锁永远不接管。旧锁恢复通过独占的 `lock.recover` 文件串行执行，删除前再次核对持有者。如果恢复本身崩溃，下一次旧锁恢复会拒绝执行；错误信息列出两个待清理文件，确认没有命令运行后才能删除。
 - **custom_id = `<itemId>#<attempt>`**，重试之后结果仍能准确对回条目。每个条目记下拥有它的 attempt，只有这个 attempt 的结果行能改变它：旧 attempt 的失败不会把条目重新打开、导致再付一次钱。
@@ -120,7 +120,7 @@ batch.ts：endpoint / 鉴权解析，CLI 命令注册
 - 由 `batch-task.ts` 用 zod `.strict()` 校验：
   - item id 须匹配 `[A-Za-z0-9][A-Za-z0-9_-]{0,59}`，因为它会进入 custom_id；
   - id 和 target 都必须唯一；
-  - target 必须在项目内，且不能位于任何隐藏路径下（任意层级的 `.git/`、`.github/`、`.qwen/` 等）：交付发生在批准几小时之后、无人值守，不能生成配置工具或执行代码的文件；写不进去的目标在计费前就被拒绝；
+  - target 必须在项目内，且不能位于任何隐藏路径下（任意层级的 `.git/`、`.github/`、`.mariadb-shell-agent/` 等）：交付发生在批准几小时之后、无人值守，不能生成配置工具或执行代码的文件；写不进去的目标在计费前就被拒绝；
   - 未知字段直接报错，agent 写错字段要大声失败，不能悄悄改变行为。
 - `kind` 是字面量；新的 kind 使用新的 schema 版本。
 - `enableThinking` 只在用户明确要求时才设置；对必须开 thinking 的模型，设为 `false` 会被拒绝。
@@ -158,7 +158,7 @@ batch.ts：endpoint / 鉴权解析，CLI 命令注册
 
 等待期间不跑 agent loop：轮询由程序用 HTTP 完成，模型只在结果回来时参与一次。
 
-- **后台等待（主路径）。** `run` 之后，skill 用 shell 工具的 `is_background: true` 启动 `qwen batch collect <task-id> --wait`。进程按 10s → 60s 退避轮询，只在收取时持有任务锁，写完目标文件后打印摘要并退出。随后 shell 注册表给模型发一条带输出末尾的 `task-notification`，唤醒 agent 恰好一轮。它在 `/tasks` 里可见，也可以在那里停止。
+- **后台等待（主路径）。** `run` 之后，skill 用 shell 工具的 `is_background: true` 启动 `mariadb-shell-agent batch collect <task-id> --wait`。进程按 10s → 60s 退避轮询，只在收取时持有任务锁，写完目标文件后打印摘要并退出。随后 shell 注册表给模型发一条带输出末尾的 `task-notification`，唤醒 agent 恰好一轮。它在 `/tasks` 里可见，也可以在那里停止。
 - **会话内自动收取（兜底）。** 覆盖会话在批次结束前已关闭的情况，以及不经 skill 提交的任务：
   - 首次渲染后启动。扫描本地记录中属于本项目的未完成任务，对每个任务按 1 → 5 分钟退避用 HTTP 轮询，batch 结束后调用同一个 `collectTask`。
   - 启动时的第一轮会补收会话关闭期间完成的任务。
@@ -168,7 +168,7 @@ batch.ts：endpoint / 鉴权解析，CLI 命令注册
     - 安全性与手动 collect 一致：同样的锁、幂等、不覆盖。
     - 收不了的情况只提示一次：会话没有可用的 Batch 凭据、某次提交在服务端找不到对应 batch、任务绑定到别的 endpoint 或 key（退避等待会话切回），或者连续三轮收取失败。
   - `general.batchAutoCollect`（默认 `true`）可以关闭它。
-  - 不覆盖：headless、`qwen serve`、ACP、web-shell——这些场景没有不经过模型的提示通道，请用 `qwen batch collect`。
+  - 不覆盖：headless、`mariadb-shell-agent serve`、ACP、web-shell——这些场景没有不经过模型的提示通道，请用 `mariadb-shell-agent batch collect`。
 
 ## 7. 非目标
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -582,7 +583,7 @@ describe('runStartupRecoveryOnce', () => {
         const victims = await makeOmniShapedVictimTree(outside);
         const root = store.getOmniRootDir();
         await fs.rm(root, { recursive: true, force: true });
-        // The reviewer's probe: a repo ships `.qwen/omni` itself as a
+        // The reviewer's probe: a repo ships `.mariadb-shell-agent/omni` itself as a
         // symlink; every per-directory guard lstats only the final
         // component and would pass through this link.
         await fs.symlink(outside, root);

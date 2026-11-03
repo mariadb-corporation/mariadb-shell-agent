@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -34,6 +35,7 @@ const {
   mockQwenAgentManagerInstances,
   mockClipboardWriteText,
   mockEnvRemoteName,
+  mockEnvUiKind,
   mockAsExternalUri,
   mockProbePreAuthHostGateRejection,
 } = vi.hoisted(() => ({
@@ -114,6 +116,8 @@ const {
   // `vscode.env.remoteName` is undefined in a local window and a string
   // ('ssh-remote', 'dev-container', 'wsl', ...) in a remote one.
   mockEnvRemoteName: { current: undefined as string | undefined },
+  // `vscode.env.uiKind`: 1 (Desktop) or 2 (Web, a browser-based host).
+  mockEnvUiKind: { current: 1 },
   mockAsExternalUri: vi.fn(),
   mockProbePreAuthHostGateRejection: vi.fn<
     (daemonBaseUrl: string, externalAuthority: string) => Promise<boolean>
@@ -213,9 +217,13 @@ vi.mock('vscode', () => ({
     file: vi.fn((filePath: string) => ({ fsPath: filePath })),
     parse: vi.fn((value: string) => ({ toString: () => value })),
   },
+  UIKind: { Desktop: 1, Web: 2 },
   env: {
     get remoteName() {
       return mockEnvRemoteName.current;
+    },
+    get uiKind() {
+      return mockEnvUiKind.current;
     },
     asExternalUri: mockAsExternalUri,
     openExternal: mockOpenExternal,
@@ -503,7 +511,7 @@ async function setupAttachedProvider(options?: {
         return { dispose: vi.fn() };
       }),
     } as never,
-    'qwen-code.chatView.sidebar',
+    'mariadb-shell-agent.chatView.sidebar',
   );
 
   return {
@@ -526,6 +534,7 @@ beforeEach(() => {
   mockClipboardWriteText.mockReset();
   mockClipboardWriteText.mockResolvedValue(undefined);
   mockEnvRemoteName.current = undefined;
+  mockEnvUiKind.current = 1;
   mockAsExternalUri.mockReset();
   mockProbePreAuthHostGateRejection.mockReset();
   mockProbePreAuthHostGateRejection.mockResolvedValue(false);
@@ -590,7 +599,7 @@ describe('WebViewProvider.attachToView', () => {
         onDidChangeVisibility: vi.fn(() => ({ dispose: vi.fn() })),
         onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
       } as never,
-      'qwen-code.chatView.sidebar',
+      'mariadb-shell-agent.chatView.sidebar',
     );
 
     const roots = (
@@ -630,6 +639,40 @@ describe('WebViewProvider.attachToView', () => {
         requestId: 7,
       },
     });
+  });
+
+  it('opens the setup wizard through the auth handler on the auth command', async () => {
+    const { provider } = await setupAttachedProvider();
+    const route = (
+      provider as unknown as {
+        messageHandler: { route: ReturnType<typeof vi.fn> };
+      }
+    ).messageHandler.route;
+    route.mockClear();
+
+    await provider.startInteractiveAuth();
+
+    expect(route).toHaveBeenCalledWith({ type: 'auth' });
+  });
+
+  it('replays an open setup wizard after webviewReady until it finishes', async () => {
+    const { messageHandler, postMessage, provider } =
+      await setupAttachedProvider({ captureMessageHandler: true });
+    const send = (message: unknown) =>
+      (
+        provider as unknown as { sendMessageToWebView(m: unknown): void }
+      ).sendMessageToWebView(message);
+    const wizard = { type: 'authWizard', data: { providers: [] } };
+
+    send(wizard);
+    postMessage.mockClear();
+    await messageHandler?.({ type: 'webviewReady', data: {} });
+    expect(postMessage).toHaveBeenCalledWith(wizard);
+
+    send({ type: 'authWizardDone' });
+    postMessage.mockClear();
+    await messageHandler?.({ type: 'webviewReady', data: {} });
+    expect(postMessage).not.toHaveBeenCalledWith(wizard);
   });
 
   it('reports clipboard copy success back to the requesting webview', async () => {
@@ -872,7 +915,7 @@ describe('WebViewProvider.attachToView', () => {
         onDidChangeVisibility: vi.fn(() => ({ dispose: vi.fn() })),
         onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
       } as never,
-      'qwen-code.chatView.sidebar',
+      'mariadb-shell-agent.chatView.sidebar',
     );
 
     await messageHandler?.({
@@ -930,7 +973,7 @@ describe('WebViewProvider.attachToView', () => {
         onDidChangeVisibility: vi.fn(() => ({ dispose: vi.fn() })),
         onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
       } as never,
-      'qwen-code.chatView.sidebar',
+      'mariadb-shell-agent.chatView.sidebar',
     );
 
     const agentManager = (
@@ -996,7 +1039,7 @@ describe('WebViewProvider.attachToView', () => {
         onDidChangeVisibility: vi.fn(() => ({ dispose: vi.fn() })),
         onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
       } as never,
-      'qwen-code.chatView.sidebar',
+      'mariadb-shell-agent.chatView.sidebar',
     );
 
     const agentManager = (
@@ -1101,7 +1144,7 @@ describe('WebViewProvider settings sync', () => {
     expect(mockWriteModelProvidersConfig).not.toHaveBeenCalled();
   });
 
-  it('only syncs non-secret VS Code settings from ~/.qwen/settings.json', async () => {
+  it('only syncs non-secret VS Code settings from ~/.mariadb-shell-agent/settings.json', async () => {
     mockReadQwenSettingsForVSCode.mockReturnValue({
       provider: 'coding-plan',
       apiKey: 'sk-updated',
@@ -1189,7 +1232,7 @@ describe('WebViewProvider settings sync', () => {
     expect(configChangeHandler).toBeDefined();
 
     await configChangeHandler?.(
-      createConfigChangeEvent('qwen-code', 'qwen-code.apiKey'),
+      createConfigChangeEvent('qwen-code', 'mariadb-shell-agent.apiKey'),
     );
 
     expect(syncSpy).toHaveBeenCalledTimes(1);
@@ -1225,7 +1268,7 @@ describe('WebViewProvider settings sync', () => {
     expect(configChangeHandler).toBeDefined();
 
     await configChangeHandler?.(
-      createConfigChangeEvent('qwen-code', 'qwen-code.apiKey'),
+      createConfigChangeEvent('qwen-code', 'mariadb-shell-agent.apiKey'),
     );
 
     // Should clear persisted auth
@@ -1275,7 +1318,10 @@ describe('WebViewProvider settings sync', () => {
 
     // Changing codingPlanRegion should NOT trigger de-auth
     await configChangeHandler?.(
-      createConfigChangeEvent('qwen-code', 'qwen-code.codingPlanRegion'),
+      createConfigChangeEvent(
+        'qwen-code',
+        'mariadb-shell-agent.codingPlanRegion',
+      ),
     );
 
     expect(mockClearPersistedAuth).not.toHaveBeenCalled();
@@ -1522,7 +1568,7 @@ describe('Notification & dot indicator', () => {
 
     // Notification should be shown
     expect(mockShowInformationMessage).toHaveBeenCalledWith(
-      'Qwen Code: Waiting for your input.',
+      'MariaDB Shell Agent: Waiting for your input.',
       'Show',
     );
   });
@@ -1624,7 +1670,7 @@ describe('Notification & dot indicator', () => {
       }),
     });
     expect(mockShowInformationMessage).not.toHaveBeenCalledWith(
-      'Qwen Code: Waiting for your input.',
+      'MariaDB Shell Agent: Waiting for your input.',
       'Show',
     );
   });
@@ -1745,7 +1791,7 @@ describe('Notification & dot indicator', () => {
 
     // User is in VS Code but not looking at the panel — should notify
     expect(mockShowInformationMessage).toHaveBeenCalledWith(
-      'Qwen Code: Waiting for your input.',
+      'MariaDB Shell Agent: Waiting for your input.',
       'Show',
     );
   });
@@ -1768,7 +1814,7 @@ describe('Notification & dot indicator', () => {
 
     // User left VS Code — should notify even though panel is visible
     expect(mockShowInformationMessage).toHaveBeenCalledWith(
-      'Qwen Code: Waiting for your input.',
+      'MariaDB Shell Agent: Waiting for your input.',
       'Show',
     );
   });
@@ -2650,6 +2696,25 @@ describe('WebViewProvider web-shell daemon bootstrap', () => {
     expect(mockAsExternalUri).not.toHaveBeenCalled();
   });
 
+  it('bridges daemon requests through the extension host in a browser-based host', async () => {
+    // Theia, code-server, VS Code for the Web: the webview runs in the user's
+    // browser, cannot reach this machine's loopback, and has no port forwarding.
+    mockEnvUiKind.current = 2;
+    mockEnvRemoteName.current = 'theia';
+    const setup = await setupAttachedProvider({
+      captureMessageHandler: true,
+      context: createSharedContext(),
+    });
+
+    await setup.messageHandler?.({ type: 'webShellReady' });
+
+    const [bootstrap] = bootstrapPayloads(setup.postMessage);
+    expect(bootstrap?.baseUrl).toBe('http://127.0.0.1:4101');
+    expect(bootstrap?.daemonBridge).toBe(true);
+    expect(mockAsExternalUri).not.toHaveBeenCalled();
+    expect(mockProbePreAuthHostGateRejection).not.toHaveBeenCalled();
+  });
+
   it('re-resolves the tunnel on every bootstrap instead of caching it', async () => {
     mockEnvRemoteName.current = 'dev-container';
     mockAsExternalUri
@@ -2880,8 +2945,8 @@ describe('WebViewProvider web-shell permission bridge', () => {
   it('does not vote when the trigger is the original workspace file', async () => {
     const { postMessage, provider } = await setupPendingWebShellPermission();
 
-    // qwen.diff.isVisible is also true on the user's own file while a diff
-    // is open, so Ctrl+S there invokes qwen.diff.accept with a file: uri.
+    // mariadb-shell-agent.diff.isVisible is also true on the user's own file while a diff
+    // is open, so Ctrl+S there invokes mariadb-shell-agent.diff.accept with a file: uri.
     // That must not resolve an approval the user may never have looked at.
     provider.respondToPendingPermission('allow', {
       fromDiffEditor: false,

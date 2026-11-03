@@ -8,13 +8,13 @@ Status: implemented. Part of #13057. Stacks on #13166.
 
 A Hosted model turn runs with `safeMode: true`, so `refreshHierarchicalMemory`
 returns before discovery and the turn starts without the Workspace's
-`QWEN.md` / `AGENTS.md`. Safe mode is an indivisible bundle (hooks, extensions,
+`MARIADB-SHELL-AGENT.md` / `AGENTS.md`. Safe mode is an indivisible bundle (hooks, extensions,
 skills, MCP, tool lists), so it must stay on; the turn's `cwd` is the Harness's
 own bound workspace, which the design forbids the model from depending on.
 Instructions therefore need a Workspace-sourced path, not a lifted guard.
 
 This slice delivers one: the first time a Hosted Workspace turn acquires the
-Runtime, the Harness reads the Session working directory’s instruction files (`QWEN.md`, `AGENTS.md`)
+Runtime, the Harness reads the Session working directory’s instruction files (`MARIADB-SHELL-AGENT.md`, `AGENTS.md`)
 through a `workspace-context` Runtime control and keeps the assembled text
 on the attached Session. The Harness injects the fetched
 text through `Config.setUserMemory` and refreshes the cached system instruction
@@ -63,7 +63,7 @@ failure is logged on the Harness's stderr. Cancellation stops waiting for the re
 slot, even if the underlying request finishes later. The slot records a completed
 fetch — including "the Workspace has no instruction files" — so the read
 happens once per attached Session until something the Harness sees changes
-an instruction file: a native `write_file`/`edit` batch naming `QWEN.md` or
+an instruction file: a native `write_file`/`edit` batch naming `MARIADB-SHELL-AGENT.md` or
 `AGENTS.md` (invalidated before it runs, whatever its outcome), or a file
 rewind whose `filesChanged` names one. Either returns the slot to undefined,
 and the next native tool turn reads again (#13564).
@@ -108,9 +108,9 @@ Upgrade the Broker and worker bundle before the Hosted Harness. An older
 Broker rejects the `workspace-context` control with
 `400 runtime_control_operation_invalid`, and an older worker refuses it
 through its own closed operation union. Because the read is best-effort, the
-skew is silent to the API and the model: no Session receives `QWEN.md` or
+skew is silent to the API and the model: no Session receives `MARIADB-SHELL-AGENT.md` or
 `AGENTS.md`, the slot never latches, and the read repeats on every turn. The
-signal is a recurring `qwen serve: Hosted Workspace context read failed`
+signal is a recurring `mariadb-shell-agent serve: Hosted Workspace context read failed`
 line on the Harness's stderr.
 
 ## Risks and open questions

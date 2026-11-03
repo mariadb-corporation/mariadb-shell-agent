@@ -170,7 +170,7 @@ base MCP/Hook state, commit/drain/enable/ACK loss, permissions and old logs/prof
 Use real MySQL/process/SSH evidence and distinguish Linux cleanup from macOS scope.
 Follow affected-package checks and the Java module's shared ten-minute local budget;
 CI owns complete platform/fault matrices. Evidence lives in
-`.qwen/e2e-tests/managed-extension-packages.md`; incomplete gates stay explicit.
+`.mariadb-shell-agent/e2e-tests/managed-extension-packages.md`; incomplete gates stay explicit.
 
 ## Implementation and qualification
 

@@ -2,7 +2,7 @@
 
 [English](2026-09-25-managed-context-envelope.md) | [简体中文](2026-09-25-managed-context-envelope.zh-CN.md)
 
-Status: contract defined. The worker serves it since W0c-1 ([Managed Context Worker](2026-09-26-managed-context-worker.md)); no Broker writes boot v2 yet. Updated: 2026-09-26. This is the second W0 slice of the Managed Agent proposal [#12380](https://github.com/QwenLM/qwen-code/issues/12380). It builds on the [Workspace binding contract](2026-09-25-managed-workspace-binding-contract.md) (W0a, #12681). [This reply](https://github.com/QwenLM/qwen-code/issues/12380#issuecomment-5825755703) asked for the envelope shape to be decided now, contract first: "envelope shape + shared schema/fixtures first, handlers after". Below, "the reference design" is the proposal's [Workspace and Session cwd design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-workspace-context.en.md), [contract closure](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-contract-closure.en.md) and [attestation design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-runtime-attestation.md), all at the commit that #12380 links.
+Status: contract defined. The worker serves it since W0c-1 ([Managed Context Worker](2026-09-26-managed-context-worker.md)); no Broker writes boot v2 yet. Updated: 2026-09-26. This is the second W0 slice of the Managed Agent proposal [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380). It builds on the [Workspace binding contract](2026-09-25-managed-workspace-binding-contract.md) (W0a, #12681). [This reply](https://github.invalid/QwenLM/qwen-code/issues/12380#issuecomment-5825755703) asked for the envelope shape to be decided now, contract first: "envelope shape + shared schema/fixtures first, handlers after". Below, "the reference design" is the proposal's [Workspace and Session cwd design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-workspace-context.en.md), [contract closure](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-contract-closure.en.md) and [attestation design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-runtime-attestation.md), all at the commit that #12380 links.
 
 ## Problem
 
@@ -188,7 +188,7 @@ An implementation independent of both languages computed the expected values and
 - A conformance test in `packages/managed-agent-server/src/test/java/com/alibaba/qwen/code/runtimebroker/managedworkspace/` (new).
 - `packages/cli/src/serve/managed-workspace-binding.ts` exports three of its W0a checks for reuse; their behavior does not change.
 - This design document in both languages (new), and the "Boot envelope" section and follow-up table of the W0a document, which now point here.
-- The runtime-broker `README.md` and `QWEN.md`, whose maintenance rule for the digest now names these fixtures too.
+- The runtime-broker `README.md` and `MARIADB-SHELL-AGENT.md`, whose maintenance rule for the digest now names these fixtures too.
 
 The worker, the attestation contract, the provisioner, the transport, the fake worker and the CI workflows do not change.
 

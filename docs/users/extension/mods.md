@@ -1,12 +1,12 @@
 # Experimental Mods
 
-Qwen Code can run a small subset of the Claude Code Mod API in headless and interactive terminal sessions.
+MariaDB Shell Agent can run a small subset of the Claude Code Mod API in headless and interactive terminal sessions.
 This feature is opt-in and requires a trusted workspace and an enabled Claude or
 native Qwen extension. Agent Plugins v1 packages continue to ignore hooks.
 
 In the Ink or OpenTUI terminal, open `/settings`, search for **Mods**, and turn on
 **Mods (Experimental)**. The setting is disabled by default. Changes take effect
-after restarting Qwen Code; the current session keeps its startup state.
+after restarting MariaDB Shell Agent; the current session keeps its startup state.
 
 You can also configure the same setting directly, including for headless use:
 
@@ -70,15 +70,15 @@ export function register(on) {
 Install the plugin and run its command:
 
 ```bash
-qwen extensions install ./hello-mod --consent
-qwen -p '/hello Qwen' --output-format json
+mariadb-shell-agent extensions install ./hello-mod --consent
+mariadb-shell-agent -p '/hello Qwen' --output-format json
 ```
 
 Normal CLI authentication configuration is still required at startup. The Mod
 command itself makes no model request. Text, JSON and stream-json headless output
 are supported. A stream-json or interactive process retains module variables between turns.
 
-To use the same `/hello Qwen` command in the terminal UI, start `qwen` without
+To use the same `/hello Qwen` command in the terminal UI, start `mariadb-shell-agent` without
 `-p`. Both Ink and OpenTUI load Mod commands with the same opt-in setting.
 Interactive `session.start` receives `surface: 'terminal'` and
 `isInteractive: true`; `command.run` receives `origin: { kind: 'composer' }`
@@ -163,7 +163,7 @@ Patterns select among the engine events `session.start`, `session.end`,
 `*`, or a single negation such as `!session.*`. The patterns `!*` and `!!...` are
 rejected.
 
-Claude Code 2.1.310 also defines events that Qwen Code does not run yet, such as
+Claude Code 2.1.310 also defines events that MariaDB Shell Agent does not run yet, such as
 `prompt.fill` or `classic.Stop`. `prompt.submit` runs only in headless runs, and
 `ui.render` only where a host draws it. A registration for one of them,
 or for a prefix such as `prompt.*` that matches none of the events above, loads
@@ -272,7 +272,7 @@ approval mode's decision flow. If a native PermissionRequest hook rebuilds the
 arguments, they are checked again. A Mod-authored `rule`, `hook`, `setting`,
 `ceiling` or `plugin` cannot create host permissions. The host sets `plugin`.
 It drops a `setting` a hook writes: in Claude Code that field names a Claude
-Code option's own check, and Qwen Code reports none.
+Code option's own check, and MariaDB Shell Agent reports none.
 
 Return `{deny: reason}` to block, or `{result: value}` to supply a JSON result
 without executing. Native next returns `{ref, result, text, isError?}`.
@@ -409,7 +409,7 @@ Claude Code 2.1.301.
 `await $.ui.log(...)` does not wait for interceptors. The headless boundary drains
 queued notifications before returning output.
 
-`$.session.version()` resolves to the Qwen Code version and what this runtime
+`$.session.version()` resolves to the MariaDB Shell Agent version and what this runtime
 supports:
 
 ```json
@@ -519,7 +519,7 @@ declares:
 | Method                                | Resolves to                                                                             |
 | ------------------------------------- | --------------------------------------------------------------------------------------- |
 | `$.session.id()`                      | the session's id; it changes after `/clear` and `/resume`                               |
-| `$.session.cwd()`, `$.session.root()` | the session's working directory; the two are the same in Qwen Code                      |
+| `$.session.cwd()`, `$.session.root()` | the session's working directory; the two are the same in MariaDB Shell Agent            |
 | `$.session.model()`                   | the main model's id                                                                     |
 | `$.session.turns()`                   | the user turns in the session's transcript, counting resumed turns and not rewound ones |
 | `$.session.surfaces()`                | `["terminal"]` in a terminal, `[]` in a headless run                                    |
@@ -534,7 +534,7 @@ input of the main conversation's last response, including cached tokens, and
 window size is unknown, `window` is 0 and `percent` is absent. `startedAt` is when the session began;
 for a resumed session it is the session's first record. A branch made with
 `/branch` copies its parent's records, so it keeps the parent's `startedAt` and
-its `turns` include the parent's turns. Qwen Code keeps no cost
+its `turns` include the parent's turns. MariaDB Shell Agent keeps no cost
 ledger, so `cost` is absent, and `rateLimits` is always empty. `breakdown` and
 `columns` are accepted, but no breakdown is computed. With chat recording turned
 off, `turns` is 0.
@@ -624,7 +624,7 @@ back in the composer. Queued prompts then run. The call rejects when no turn is
 running, when `turnId` is not the running turn's id, or when the turn is already
 ending. In a headless run the turn ends with the error result
 `A Mod ended the turn.` and exit code 130, and a stream-json session goes on to
-its next message. Qwen Code has no `$.prompt.submit` yet, so a Mod cannot send a
+its next message. MariaDB Shell Agent has no `$.prompt.submit` yet, so a Mod cannot send a
 prompt after it ends a turn.
 
 ## Submitted prompts
@@ -724,11 +724,11 @@ JSX in a `.tsx` or `.jsx` file compiles to these calls, as described in
 
 A tree a hook returns is judged with Claude Code 2.1.310's rules for `Box` and
 `Text`, and any other element refuses it with
-`<Element> is not drawn by Qwen Code yet`.
+`<Element> is not drawn by MariaDB Shell Agent yet`.
 
 `$.ui.invalidate("ui.render")` returns at once and asks for a redraw of the
 sites the plugin's `ui.render` hooks may draw. The cached-answer events
-Claude Code also accepts, such as `prompt.section`, do nothing in Qwen Code.
+Claude Code also accepts, such as `prompt.section`, do nothing in MariaDB Shell Agent.
 Any other name throws. Both methods work in every host, so a `turn.complete`
 hook that asks for a redraw does not fail where nothing is drawn.
 
@@ -758,7 +758,7 @@ A hook receives Claude Code's input:
 }
 ```
 
-`isFullscreen` is true when Qwen Code draws on the alternate screen. A hook may
+`isFullscreen` is true when MariaDB Shell Agent draws on the alternate screen. A hook may
 rewrite the props but keep their kinds; changing `surface`, `component`,
 `requestId`, `viewport` or `props.view` fails the hook. `next(e)` resolves to
 the engine's own node, `{ type: 'engine', ref: 0 }`, which draws nothing here.
@@ -786,7 +786,7 @@ The band is drawn with these conversions:
   `dir` are dropped, as Claude Code's terminal drops them. `hover` is checked
   but not drawn.
 - The theme keys `text`, `subtle`, `inactive`, `success`, `error`, `warning`,
-  `claude` and `suggestion` follow the active Qwen Code theme. Claude Code's
+  `claude` and `suggestion` follow the active MariaDB Shell Agent theme. Claude Code's
   other theme keys, such as `permission` or `diffAdded`, draw in the default
   color. Other colors draw when they are an ANSI color name such as `cyan` or
   `redBright`, a hex value, `rgb(r, g, b)` or `ansi256(n)`.
@@ -813,7 +813,7 @@ These differ from Claude Code:
   last tree meanwhile. A tool call, command or turn event queued behind a
   running render waits for it, up to 10 seconds for each `ui.render` hook in
   the chain.
-- Refusal lines go only to the debug log, since Qwen Code has no hot reload.
+- Refusal lines go only to the debug log, since MariaDB Shell Agent has no hot reload.
 - OpenTUI has no session survey, so `hasSurvey` is always `false` there, and
   `isWorking` stays `false` while a `!` shell command runs. OpenTUI takes
   colors as hex values, so ANSI color names and `ansi256()` colors draw as
@@ -952,7 +952,7 @@ The execution budgets described above include a 60-second startup limit for all
 worker initialization, compilation and startup hooks together. The guest memory
 limit does not cover the compiler's host memory.
 
-Values that cross between a Mod and Qwen Code nest at most 512 levels, so walking
+Values that cross between a Mod and MariaDB Shell Agent nest at most 512 levels, so walking
 them never exhausts a native stack:
 
 - A hook answer, or a value a hook passes to `next` or a `$` method, that nests
@@ -966,7 +966,7 @@ them never exhausts a native stack:
   complete result.
 
 Own `__proto__` keys in tool inputs and results are ordinary data on both sides.
-A hook answer whose getter throws while Qwen Code reads it fails as a whole;
+A hook answer whose getter throws while MariaDB Shell Agent reads it fails as a whole;
 Claude Code 2.1.299 drops only that key.
 
 The author API follows the Claude Code 2.1.310 declarations, event names

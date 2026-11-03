@@ -4,7 +4,7 @@
 
 ## 状态与范围
 
-已实现。本切片终结 [#13800](https://github.com/QwenLM/qwen-code/issues/13800) 的跨会话楔死：进入 recovery-blocked 的 Hosted Workspace 工具轮归还其 Workspace 执行挂载，使同一存储上无关会话的后续工具轮得以继续，而不是在 `409 workspace_busy` 上永久停摆。覆盖普通工具 lane、Hook lane 的会话级 owner 与 MCP lane 的会话级 owner，并覆盖持有挂载的轮次把会话停在 blocked 的每个入口：prompt 路由的 recovery block、释放欠在 cleanup 欠账上的轮次其 cleanup 失败或因终态记录未落地而从未执行，以及恢复队列使用的 `POST /session/:id/managed-runtime/continue` 的每个停驻分支。不在范围内：A1 本身（[#13533](https://github.com/QwenLM/qwen-code/issues/13533)，已由 [#13789](https://github.com/QwenLM/qwen-code/pull/13789) 修复）、daemon 死亡残留（LOST 族既有清扫，`#12670` 族）、`POST /session/:id/files/rewind` 通道的按请求挂载（失败的 rewind 会把会话停在 blocked 而不归还其挂载——既有泄漏，已记入跟踪后续），以及启用 `monitor_run` 或 `child_run` 的 `shell` kind。
+已实现。本切片终结 [#13800](https://github.invalid/QwenLM/qwen-code/issues/13800) 的跨会话楔死：进入 recovery-blocked 的 Hosted Workspace 工具轮归还其 Workspace 执行挂载，使同一存储上无关会话的后续工具轮得以继续，而不是在 `409 workspace_busy` 上永久停摆。覆盖普通工具 lane、Hook lane 的会话级 owner 与 MCP lane 的会话级 owner，并覆盖持有挂载的轮次把会话停在 blocked 的每个入口：prompt 路由的 recovery block、释放欠在 cleanup 欠账上的轮次其 cleanup 失败或因终态记录未落地而从未执行，以及恢复队列使用的 `POST /session/:id/managed-runtime/continue` 的每个停驻分支。不在范围内：A1 本身（[#13533](https://github.invalid/QwenLM/qwen-code/issues/13533)，已由 [#13789](https://github.invalid/QwenLM/qwen-code/pull/13789) 修复）、daemon 死亡残留（LOST 族既有清扫，`#12670` 族）、`POST /session/:id/files/rewind` 通道的按请求挂载（失败的 rewind 会把会话停在 blocked 而不归还其挂载——既有泄漏，已记入跟踪后续），以及启用 `monitor_run` 或 `child_run` 的 `shell` kind。
 
 ## 问题与被点名的机制
 

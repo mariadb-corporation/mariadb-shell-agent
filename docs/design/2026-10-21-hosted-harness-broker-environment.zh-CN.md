@@ -10,7 +10,7 @@
 
 Broker token 还被存了两份：Harness 通过 `harness.env` 获得它，控制面通过 `server.env` 里的 `QWEN_MANAGED_AGENT_RUNTIME_BROKER_TOKEN` 获得它，每次轮换都要改两处。
 
-另外，请求的端口被占用时，`qwen serve` 会顺延到下一个空闲端口。对 Hosted Harness 来说，这从来不是运维想要的。控制面写死了一个 Harness URL，因此顺延后的 Harness 能正常启动，却让每个 Session 都失败，直到有人修改 `server.env`。部署文档和 systemd README 只是记录了这个陷阱，而没有阻止它。
+另外，请求的端口被占用时，`mariadb-shell-agent serve` 会顺延到下一个空闲端口。对 Hosted Harness 来说，这从来不是运维想要的。控制面写死了一个 Harness URL，因此顺延后的 Harness 能正常启动，却让每个 Session 都失败，直到有人修改 `server.env`。部署文档和 systemd README 只是记录了这个陷阱，而没有阻止它。
 
 ## 目标
 
@@ -29,18 +29,18 @@ Broker token 还被存了两份：Harness 通过 `harness.env` 获得它，控�
 
 ### Broker 环境变量
 
-缺少 `--managed-runtime-broker-url` 和 `--managed-runtime-broker-token` 时，`qwen serve` 已经会回落到 `QWEN_MANAGED_RUNTIME_BROKER_URL` 和 `QWEN_MANAGED_RUNTIME_BROKER_TOKEN`，并在读取后把这两个变量从自己的环境中删除；这是本地 Managed 命令（#14928）加入的。本设计直接使用这两个变量，不再另加一对。`validateHostedHarnessProfile` 仍要求两个值同时存在或同时缺省，并且只有 Hosted Harness profile 接受它们。
+缺少 `--managed-runtime-broker-url` 和 `--managed-runtime-broker-token` 时，`mariadb-shell-agent serve` 已经会回落到 `QWEN_MANAGED_RUNTIME_BROKER_URL` 和 `QWEN_MANAGED_RUNTIME_BROKER_TOKEN`，并在读取后把这两个变量从自己的环境中删除；这是本地 Managed 命令（#14928）加入的。本设计直接使用这两个变量，不再另加一对。`validateHostedHarnessProfile` 仍要求两个值同时存在或同时缺省，并且只有 Hosted Harness profile 接受它们。
 
 ### 子进程环境
 
 token 在读取后就离开了 Harness 自身的环境，因此 Harness 启动的进程都无法从那里继承它。为了照顾嵌入式调用方，以及在此之前复制过环境的路径，每份剔除 Qwen 内部 secret 的名单也都加入了它：
 
-- `SCRUBBED_CHILD_ENV_KEYS`：ACP bridge 从每个 `qwen --acp` 子进程中剔除，与 `QWEN_SERVER_TOKEN` 并列；
+- `SCRUBBED_CHILD_ENV_KEYS`：ACP bridge 从每个 `mariadb-shell-agent --acp` 子进程中剔除，与 `QWEN_SERVER_TOKEN` 并列；
 - core 的 `INTERNAL_SECRET_ENV_VARS`：shell 命令、hook、monitor 工具和 stdio MCP server 启动时不带这些变量；它同时阻止仓库提供的 `${QWEN_MANAGED_RUNTIME_BROKER_TOKEN}` 在 settings、hook 或 MCP 配置中被替换；
 - channel worker 的环境：supervisor 构建时剔除，worker 自己再清理一次；
 - 控制面的 Runtime worker 过滤：现在也剔除 `QWEN_MANAGED_RUNTIME_BROKER_` 前缀。
 
-daemon 自更新通过 `execve` 替换 `qwen serve`，PID 不变，systemd 不会再把这对变量交给替换进程。重启器只把已解析的这对值加进替换进程的环境（与 server token 并列），替换进程读取后再次删除。
+daemon 自更新通过 `execve` 替换 `mariadb-shell-agent serve`，PID 不变，systemd 不会再把这对变量交给替换进程。重启器只把已解析的这对值加进替换进程的环境（与 server token 并列），替换进程读取后再次删除。
 
 否则，被提示注入的 agent 可以拿着 Broker token 直接调用 Broker。
 

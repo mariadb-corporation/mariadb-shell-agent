@@ -3,7 +3,7 @@
 ## Goal
 
 Let the VS Code companion extension dogfood Mode B by connecting from the
-extension host to `qwen serve` through `DaemonSessionClient`.
+extension host to `mariadb-shell-agent serve` through `DaemonSessionClient`.
 
 The webview must not call the daemon directly. The extension host owns daemon
 URL, token, session id, and SSE replay state, then forwards sanitized app events
@@ -46,8 +46,8 @@ The first implementation introduces a sibling connection path, not replace
 
 ```text
 QwenAgentManager
-  current default -> AcpConnection -> qwen --acp child
-  experimental    -> DaemonIdeConnection -> qwen serve HTTP/SSE
+  current default -> AcpConnection -> mariadb-shell-agent --acp child
+  experimental    -> DaemonIdeConnection -> mariadb-shell-agent serve HTTP/SSE
 ```
 
 Both paths should feed the same higher-level webview callbacks where practical.
@@ -106,7 +106,7 @@ the daemon.
 - Unit-test daemon event to existing extension-host callback mapping.
 - Unit-test prompt, cancel, model switch, and permission response forwarding.
 - Unit-test settings/env resolution when the feature flag is wired.
-- Smoke-test local extension host against `qwen serve`:
+- Smoke-test local extension host against `mariadb-shell-agent serve`:
   - prompt streams into chat
   - cancel works
   - permission UI can resolve a request

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -79,7 +80,7 @@ describe('loadUsageDashboard', () => {
   beforeEach(() => {
     tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-usage-dashboard-'));
     originalQwenHome = process.env['QWEN_HOME'];
-    process.env['QWEN_HOME'] = path.join(tmpHome, '.qwen');
+    process.env['QWEN_HOME'] = path.join(tmpHome, '.mariadb-shell-agent');
     fs.mkdirSync(process.env['QWEN_HOME'], { recursive: true });
   });
 

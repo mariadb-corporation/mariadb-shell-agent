@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -250,7 +251,7 @@ function assertReusableScheduledTaskSession(
     owner = target.resolveLiveSessionOwner?.(sessionId);
   } catch (error) {
     writeStderrLine(
-      `qwen serve: failed to resolve scheduled-task session owner '${sessionId}': ${error instanceof Error ? error.message : String(error)}`,
+      `mariadb-shell-agent serve: failed to resolve scheduled-task session owner '${sessionId}': ${error instanceof Error ? error.message : String(error)}`,
     );
     throw new ExistingSessionScheduledTaskCreateError(
       500,
@@ -292,7 +293,7 @@ function assertReusableScheduledTaskSession(
       );
     }
     writeStderrLine(
-      `qwen serve: failed to look up scheduled-task session '${sessionId}': ${error instanceof Error ? error.message : String(error)}`,
+      `mariadb-shell-agent serve: failed to look up scheduled-task session '${sessionId}': ${error instanceof Error ? error.message : String(error)}`,
     );
     throw new ExistingSessionScheduledTaskCreateError(
       500,
@@ -417,7 +418,7 @@ export async function createScheduledTaskWithExistingSession(
         );
       }
       writeStderrLine(
-        `qwen serve: failed to persist scheduled-task session '${input.sessionId}': ${error instanceof Error ? error.message : String(error)}`,
+        `mariadb-shell-agent serve: failed to persist scheduled-task session '${input.sessionId}': ${error instanceof Error ? error.message : String(error)}`,
       );
       throw new ExistingSessionScheduledTaskCreateError(
         500,
@@ -523,7 +524,7 @@ async function rollbackCronMutation(
     ),
   ).catch((error) => {
     writeStderrLine(
-      `qwen serve: ${route} failed to roll back a stale task mutation: ${error instanceof Error ? error.message : String(error)}`,
+      `mariadb-shell-agent serve: ${route} failed to roll back a stale task mutation: ${error instanceof Error ? error.message : String(error)}`,
     );
   });
 }
@@ -579,7 +580,7 @@ async function restoreConsumedOneShot(
     ),
   ).catch((error) => {
     writeStderrLine(
-      `qwen serve: ${route} failed to restore the consumed one-shot task: ${error instanceof Error ? error.message : String(error)}`,
+      `mariadb-shell-agent serve: ${route} failed to restore the consumed one-shot task: ${error instanceof Error ? error.message : String(error)}`,
     );
   });
 }
@@ -668,7 +669,7 @@ async function dispatchTaskToFreshSession(
     );
     void turn.catch((error) => {
       writeStderrLine(
-        `qwen serve: scheduled-task session ${child.sessionId} prompt failed: ${error instanceof Error ? error.message : String(error)}`,
+        `mariadb-shell-agent serve: scheduled-task session ${child.sessionId} prompt failed: ${error instanceof Error ? error.message : String(error)}`,
       );
     });
     await Promise.race([
@@ -691,7 +692,7 @@ async function dispatchTaskToFreshSession(
         bridge.markSessionCatalogChanged?.();
       } catch (error) {
         writeStderrLine(
-          `qwen serve: scheduled-task session ${child.sessionId} could not be assigned to group ${task.groupId}: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: scheduled-task session ${child.sessionId} could not be assigned to group ${task.groupId}: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }
@@ -961,7 +962,7 @@ function registerScheduledTaskCrudRoutes(
         // reading as empty — surface it instead of hiding the user's tasks
         // behind a silent [].
         writeStderrLine(
-          `qwen serve: GET ${base} failed: ${err instanceof Error ? err.message : String(err)}`,
+          `mariadb-shell-agent serve: GET ${base} failed: ${err instanceof Error ? err.message : String(err)}`,
         );
         res.status(500).json({
           error:
@@ -1204,7 +1205,7 @@ function registerScheduledTaskCrudRoutes(
           if (sendActivityGateError(res, error)) return;
           if (sendGenerationClosedError(res, error)) return;
           writeStderrLine(
-            `qwen serve: POST ${base} failed to create a task for session '${providedSessionId}': ${error instanceof Error ? error.message : String(error)}`,
+            `mariadb-shell-agent serve: POST ${base} failed to create a task for session '${providedSessionId}': ${error instanceof Error ? error.message : String(error)}`,
           );
           res.status(500).json({
             error: 'Failed to create scheduled task',
@@ -1264,7 +1265,7 @@ function registerScheduledTaskCrudRoutes(
           if (sendActivityGateError(res, err)) return;
           if (sendGenerationClosedError(res, err)) return;
           writeStderrLine(
-            `qwen serve: POST ${base} failed to create the task's session: ${err instanceof Error ? err.message : String(err)}`,
+            `mariadb-shell-agent serve: POST ${base} failed to create the task's session: ${err instanceof Error ? err.message : String(err)}`,
           );
           res.status(500).json({
             error: "Failed to create the task's session",
@@ -1340,7 +1341,7 @@ function registerScheduledTaskCrudRoutes(
         if (sendActivityGateError(res, err)) return;
         if (sendGenerationClosedError(res, err)) return;
         writeStderrLine(
-          `qwen serve: POST ${base} failed: ${err instanceof Error ? err.message : String(err)}`,
+          `mariadb-shell-agent serve: POST ${base} failed: ${err instanceof Error ? err.message : String(err)}`,
         );
         res.status(500).json({
           error: 'Failed to create scheduled task',
@@ -1764,7 +1765,7 @@ function registerScheduledTaskCrudRoutes(
         if (sendActivityGateError(res, err)) return;
         if (sendGenerationClosedError(res, err)) return;
         writeStderrLine(
-          `qwen serve: PATCH ${base}/${id} failed: ${err instanceof Error ? err.message : String(err)}`,
+          `mariadb-shell-agent serve: PATCH ${base}/${id} failed: ${err instanceof Error ? err.message : String(err)}`,
         );
         res.status(500).json({
           error: 'Failed to update scheduled task',
@@ -1956,7 +1957,7 @@ function registerScheduledTaskCrudRoutes(
         if (sendActivityGateError(res, err)) return;
         if (sendGenerationClosedError(res, err)) return;
         writeStderrLine(
-          `qwen serve: DELETE ${base}/${id} failed: ${err instanceof Error ? err.message : String(err)}`,
+          `mariadb-shell-agent serve: DELETE ${base}/${id} failed: ${err instanceof Error ? err.message : String(err)}`,
         );
         res.status(500).json({
           error: 'Failed to delete scheduled task',
@@ -2108,7 +2109,7 @@ function registerScheduledTaskCrudRoutes(
         if (sendActivityGateError(res, err)) return;
         if (sendGenerationClosedError(res, err)) return;
         writeStderrLine(
-          `qwen serve: POST ${base}/${id}/run failed: ${err instanceof Error ? err.message : String(err)}`,
+          `mariadb-shell-agent serve: POST ${base}/${id}/run failed: ${err instanceof Error ? err.message : String(err)}`,
         );
         res.status(500).json({
           error: 'Failed to record scheduled task run',
@@ -2182,7 +2183,7 @@ function registerScheduledTaskCrudRoutes(
                 // marker leaves a run record indistinguishable from an
                 // un-attributed run, so say so rather than swallowing it.
                 writeStderrLine(
-                  `qwen serve: POST ${base}/${id}/run could not record the failed dispatch: ${persistError instanceof Error ? persistError.message : String(persistError)}`,
+                  `mariadb-shell-agent serve: POST ${base}/${id}/run could not record the failed dispatch: ${persistError instanceof Error ? persistError.message : String(persistError)}`,
                 );
               },
             );
@@ -2200,7 +2201,7 @@ function registerScheduledTaskCrudRoutes(
             );
           }
           writeStderrLine(
-            `qwen serve: POST ${base}/${id}/run could not create a fresh session: ${error instanceof Error ? error.message : String(error)}`,
+            `mariadb-shell-agent serve: POST ${base}/${id}/run could not create a fresh session: ${error instanceof Error ? error.message : String(error)}`,
           );
           res.status(500).json({
             error: 'Failed to create a fresh session for the scheduled task',
@@ -2213,7 +2214,7 @@ function registerScheduledTaskCrudRoutes(
         });
         await persistOutcome({ sessionId: childSessionId }).catch((error) => {
           writeStderrLine(
-            `qwen serve: POST ${base}/${id}/run could not attribute fresh session ${childSessionId}: ${error instanceof Error ? error.message : String(error)}`,
+            `mariadb-shell-agent serve: POST ${base}/${id}/run could not attribute fresh session ${childSessionId}: ${error instanceof Error ? error.message : String(error)}`,
           );
         });
       }

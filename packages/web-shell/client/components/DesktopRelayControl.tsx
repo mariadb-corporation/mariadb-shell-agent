@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -344,8 +345,8 @@ export function DesktopRelayPanel({
             {t('desktopRelay.unknownHint')}
           </p>
           <code className="block break-all rounded bg-muted px-2 py-1 font-mono text-xs">
-            ~/.qwen/desktop-relay/node_modules/.bin/node-repl-mcp desktop-relay
-            disconnect
+            ~/.mariadb-shell-agent/desktop-relay/node_modules/.bin/node-repl-mcp
+            desktop-relay disconnect
           </code>
           {phase === 'unknown' ? (
             <Button

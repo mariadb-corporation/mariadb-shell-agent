@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -72,13 +73,15 @@ describe('/hooks reload with real settings files', () => {
       settingsFile(path.join(directory, 'user/settings.json'), {
         hooks: { Stop: hook('echo user') },
       }),
-      settingsFile(path.join(repo, '.qwen/settings.json'), {
+      settingsFile(path.join(repo, '.mariadb-shell-agent/settings.json'), {
         hooks: { PreToolUse: hook('echo project') },
       }),
       trusted,
       new Set(),
     );
-    const cwd = worktree ? path.join(repo, '.qwen/worktrees/session') : repo;
+    const cwd = worktree
+      ? path.join(repo, '.mariadb-shell-agent/worktrees/session')
+      : repo;
     fs.mkdirSync(cwd, { recursive: true });
     const config = new Config({
       sessionId: 'hooks-reload',

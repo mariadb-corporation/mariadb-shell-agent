@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,7 +27,7 @@ import {
  * proceed anyway. Well short of the 60s default command hook timeout
  * (`DEFAULT_COMMAND_HOOK_TIMEOUT_SECONDS` in hooks/hook-timeout.ts)
  * because a slow or hung MessageDisplay hook shouldn't be able to freeze
- * `qwen -p` or an ACP stream loop's `finally` for anywhere near that long.
+ * `mariadb-shell-agent -p` or an ACP stream loop's `finally` for anywhere near that long.
  * The budget is shared across finish() calls (client.ts calls it from an
  * explicit exit site and again from a finally), so this constant is the
  * ceiling itself, not a per-call increment. The hook has already received

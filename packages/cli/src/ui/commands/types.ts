@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -361,7 +362,7 @@ export type CommandSource =
   | 'skill-dir-command' // FileCommandLoader (user/project, no extensionName)
   | 'plugin-command' // FileCommandLoader (extension, extensionName set)
   | 'mcp-prompt' // McpPromptLoader
-  | 'workflow-command'; // SavedWorkflowLoader (.qwen/workflows/<name>.js)
+  | 'workflow-command'; // SavedWorkflowLoader (.mariadb-shell-agent/workflows/<name>.js)
 // Reserved for future loaders (not implemented in Phase 1):
 // | 'plugin-skill'
 // | 'dynamic-skill'

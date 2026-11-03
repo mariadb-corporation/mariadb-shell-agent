@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -256,7 +257,7 @@ describe('target-pinned artifact patterns', () => {
   });
 
   it('pins each target class to its exact composed filename', () => {
-    // Two concurrent `review run`s share `.qwen/tmp`; the generic
+    // Two concurrent `review run`s share `.mariadb-shell-agent/tmp`; the generic
     // newest-composed scan republished the OTHER run's verdict on two of
     // three live parallel reviews. Exact names, not shape heuristics.
     const pr = composedPatternFor({ kind: 'pr', number: '9014' });
@@ -721,7 +722,7 @@ describe('review run (handler)', () => {
 
   it('names the artifact it waited for when no verdict appears', async () => {
     // The pin is an exact-filename contract with the skill's naming
-    // template. When the two drift, Step 9 has already swept `.qwen/tmp` by
+    // template. When the two drift, Step 9 has already swept `.mariadb-shell-agent/tmp` by
     // the time anyone investigates — so the expectation has to be in the
     // failure report itself, in both output modes.
     armChild(0);
@@ -878,7 +879,7 @@ describe('review run (handler)', () => {
     });
 
     it.skipIf(process.platform === 'win32')(
-      'keeps the bare-`qwen` fallback when a shell could not exec this build',
+      'keeps the bare-`mariadb-shell-agent` fallback when a shell could not exec this build',
       async () => {
         // A stamp the consumer's spawn filter would blank is worse than none:
         // `${QWEN_CODE_CLI:-qwen}` falls back on empty, but a set-and-unusable
@@ -905,7 +906,7 @@ describe('review run (handler)', () => {
         // source `index.ts` (mode 0644, shebang and all). An extension
         // allowlist answered "usable" for it — every skill subcommand then
         // died on exit 126 — where the positive-evidence gate sees a file a
-        // shell cannot exec and preserves the bare-`qwen` fallback.
+        // shell cannot exec and preserves the bare-`mariadb-shell-agent` fallback.
         const entry = asEntry('index.ts', '#!/usr/bin/env node\n', 0o644);
         const origArgv1 = process.argv[1];
         process.argv[1] = entry;

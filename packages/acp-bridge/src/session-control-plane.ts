@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -586,7 +587,7 @@ function takeRestoreAskUserQuestionHint(state: BridgeSessionState): {
  *     target that workspace; cross-workspace requests throw
  *     `WorkspaceMismatchError`. A multi-workspace daemon owns one bridge per
  *     registered runtime and selects the bridge before dispatch.
- *   - At most one `qwen --acp` child per bridge. Secondary daemon routing
+ *   - At most one `mariadb-shell-agent --acp` child per bridge. Secondary daemon routing
  *     admits only trusted runtime-backed work and starts the child on demand;
  *     the primary may be preheated for legacy compatibility. Multiple sessions
  *     multiplex onto the child via
@@ -1107,7 +1108,7 @@ function isServeDebugLoggingEnabled(): boolean {
 
 function writeServeDebugLine(message: string): void {
   if (!isServeDebugLoggingEnabled()) return;
-  writeStderrLine(`qwen serve debug: ${message}`);
+  writeStderrLine(`mariadb-shell-agent serve debug: ${message}`);
 }
 
 const MAX_DISPLAY_NAME_LENGTH = 256;
@@ -1956,7 +1957,7 @@ function appendPromptLedgerBestEffort(
     ledger.appendSync(entry.sessionId, record);
   } catch (error) {
     writeStderrLine(
-      `qwen serve: prompt ledger append failed for session=${entry.sessionId} promptId=${record.promptId}: ${
+      `mariadb-shell-agent serve: prompt ledger append failed for session=${entry.sessionId} promptId=${record.promptId}: ${
         error instanceof Error ? error.message : String(error)
       }`,
     );
@@ -2431,7 +2432,7 @@ const DEFAULT_SESSION_REAP_INTERVAL_MS = 60_000;
 const DEFAULT_SESSION_IDLE_TIMEOUT_MS = 30 * 60_000;
 /** Default grace period for the prompt-settled close deferral. 0 = disabled
  * (original behavior). Poll-based CLI callers opt in via BridgeOptions or the
- * `qwen serve --session-prompt-settled-close-grace-ms` flag. */
+ * `mariadb-shell-agent serve --session-prompt-settled-close-grace-ms` flag. */
 const DEFAULT_SESSION_PROMPT_SETTLED_CLOSE_GRACE_MS = 0;
 
 /** Goal and workflow actions that start work rather than stop or record it. */
@@ -2635,7 +2636,7 @@ export function createSessionControlPlane(
       reservation.release();
     } catch (err) {
       opts.onDiagnosticLine?.(
-        `qwen serve: fresh session admission release failed: ${
+        `mariadb-shell-agent serve: fresh session admission release failed: ${
           err instanceof Error ? err.message : String(err)
         }`,
         'warn',
@@ -2665,7 +2666,7 @@ export function createSessionControlPlane(
     try {
       opts.sessionLifecycle?.(event);
     } catch (err) {
-      const message = `qwen serve: session lifecycle callback failed: ${
+      const message = `mariadb-shell-agent serve: session lifecycle callback failed: ${
         err instanceof Error ? err.message : String(err)
       }`;
       opts.onDiagnosticLine?.(message, 'warn');
@@ -3280,7 +3281,7 @@ export function createSessionControlPlane(
       entry.attachCount === 0
     ) {
       writeStderrLine(
-        `qwen serve: completing deferred kill of session ${JSON.stringify(entry.sessionId)} (${reason})`,
+        `mariadb-shell-agent serve: completing deferred kill of session ${JSON.stringify(entry.sessionId)} (${reason})`,
       );
       await bridgeApi.killSession(entry.sessionId).catch(() => {
         /* best-effort; channel.exited will eventually reap anyway */
@@ -3353,7 +3354,7 @@ export function createSessionControlPlane(
         ...(agentCloseTimeoutMs !== undefined ? { agentCloseTimeoutMs } : {}),
       }).catch((err) => {
         writeStderrLine(
-          `qwen serve: deferred close (${opts.trigger}) failed for ` +
+          `mariadb-shell-agent serve: deferred close (${opts.trigger}) failed for ` +
             `${JSON.stringify(entry.sessionId)}: ${err instanceof Error ? (err.stack ?? err.message) : extractErrorMessage(err)}`,
         );
       });
@@ -3456,7 +3457,7 @@ export function createSessionControlPlane(
       entry.activeWorkCloseRetryAt =
         delayMs === null ? null : Date.now() + delayMs;
       writeStderrLine(
-        `qwen serve: close-if-unheld for session ${JSON.stringify(entry.sessionId)} ` +
+        `mariadb-shell-agent serve: close-if-unheld for session ${JSON.stringify(entry.sessionId)} ` +
           `did not resolve (${extractErrorMessage(err)}); ` +
           (delayMs === null
             ? `leaving it in place for the next snapshot to settle`
@@ -3754,7 +3755,7 @@ export function createSessionControlPlane(
     episode.drainTimer.unref();
     ci.quarantine = episode;
     writeStderrLine(
-      `qwen serve: quarantining ${ci.harness.executionEngine ?? 'legacy'} ACP channel ${ci.id} (${reason}); ` +
+      `mariadb-shell-agent serve: quarantining ${ci.harness.executionEngine ?? 'legacy'} ACP channel ${ci.id} (${reason}); ` +
         `refusing new sessions and turns, terminating it in ${quarantineDrainTimeoutMs}ms unless it drains first`,
     );
     telemetry.event('channel.quarantine.started', {
@@ -3795,7 +3796,7 @@ export function createSessionControlPlane(
     if (episode.exitTimer) clearTimeout(episode.exitTimer);
     if (shuttingDown && !episode.exitUnverified) return;
     writeStderrLine(
-      `qwen serve: quarantine of ACP channel ${ci.id} ended after ${Date.now() - episode.startedAt}ms; its process is gone`,
+      `mariadb-shell-agent serve: quarantine of ACP channel ${ci.id} ended after ${Date.now() - episode.startedAt}ms; its process is gone`,
     );
     telemetry.event('channel.quarantine.ended', {
       ...quarantineTelemetry(ci, episode),
@@ -3823,7 +3824,7 @@ export function createSessionControlPlane(
         : [];
     });
     writeStderrLine(
-      `qwen serve: quarantined ACP channel ${ci.id} reached its ${quarantineDrainTimeoutMs}ms drain deadline; ` +
+      `mariadb-shell-agent serve: quarantined ACP channel ${ci.id} reached its ${quarantineDrainTimeoutMs}ms drain deadline; ` +
         `cancelling ${unsettled.length} unsettled session(s) and terminating it`,
     );
     telemetry.event('channel.quarantine.deadline', {
@@ -3864,7 +3865,7 @@ export function createSessionControlPlane(
       episode.exitUnverified = true;
       const engine = ci.harness.executionEngine ?? 'legacy';
       writeStderrLine(
-        `qwen serve: quarantined ${engine} ACP channel ${ci.id} is not confirmed gone ${exitCheckMs}ms after termination; ` +
+        `mariadb-shell-agent serve: quarantined ${engine} ACP channel ${ci.id} is not confirmed gone ${exitCheckMs}ms after termination; ` +
           `operator action required — new ${engine} sessions stay refused until it is`,
       );
       telemetry.event(
@@ -4011,7 +4012,7 @@ export function createSessionControlPlane(
       if (ci.harness.isDying || !harness.has(ci.harness)) return;
       ci.overdueAbandonedRestores.add(sessionId);
       writeStderrLine(
-        `qwen serve: abandoned session/${action} for ${JSON.stringify(sessionId)} has not settled ` +
+        `mariadb-shell-agent serve: abandoned session/${action} for ${JSON.stringify(sessionId)} has not settled ` +
           `${restoreSettlementGraceMs}ms after its deadline; refusing fresh sessions on channel ${ci.id} until it settles or drains`,
       );
       telemetry.event('session.restore.settlement_overdue', {
@@ -4043,7 +4044,7 @@ export function createSessionControlPlane(
       if (ci.harness.isDying || !harness.has(ci.harness)) return;
       ci.overdueAbandonedNewSessions.add(token);
       writeStderrLine(
-        `qwen serve: abandoned newSession${requestedSessionId ? ` for ${JSON.stringify(requestedSessionId)}` : ''} has not settled ` +
+        `mariadb-shell-agent serve: abandoned newSession${requestedSessionId ? ` for ${JSON.stringify(requestedSessionId)}` : ''} has not settled ` +
           `${newSessionSettlementGraceMs}ms after its deadline; refusing fresh sessions on channel ${ci.id} until it settles or drains`,
       );
       telemetry.event('session.new.settlement_overdue', {
@@ -4222,7 +4223,7 @@ export function createSessionControlPlane(
   ): void {
     (ci.workspaceChangesMissing ??= new Set()).add(revision);
     writeStderrLine(
-      `qwen serve: ACP channel ${ci.id} did not acknowledge workspace change ${revision}` +
+      `mariadb-shell-agent serve: ACP channel ${ci.id} did not acknowledge workspace change ${revision}` +
         (tightening ? '; cancelling its running turns' : ''),
     );
     if (tightening) {
@@ -4279,7 +4280,7 @@ export function createSessionControlPlane(
     ) {
       if (episode && fenced) {
         writeStderrLine(
-          `qwen serve: ACP channel ${ci.id} acknowledged the workspace changes it missed; ` +
+          `mariadb-shell-agent serve: ACP channel ${ci.id} acknowledged the workspace changes it missed; ` +
             `its permission fence is lifted, and its quarantine continues`,
         );
       }
@@ -4288,7 +4289,7 @@ export function createSessionControlPlane(
     clearTimeout(episode.drainTimer);
     ci.quarantine = undefined;
     writeStderrLine(
-      `qwen serve: ACP channel ${ci.id} acknowledged the workspace changes it missed; ` +
+      `mariadb-shell-agent serve: ACP channel ${ci.id} acknowledged the workspace changes it missed; ` +
         `its quarantine ended after ${Date.now() - episode.startedAt}ms`,
     );
     telemetry.event(
@@ -4300,7 +4301,7 @@ export function createSessionControlPlane(
   function startSessionReaper(): void {
     if (sessionReapIntervalMs <= 0) return;
     writeStderrLine(
-      `qwen serve: session reaper started ` +
+      `mariadb-shell-agent serve: session reaper started ` +
         `(interval ${sessionReapIntervalMs}ms, ` +
         `idle threshold ${sessionIdleTimeoutMs}ms)`,
     );
@@ -4323,7 +4324,7 @@ export function createSessionControlPlane(
         const idle = now - lastActive;
         if (idle < sessionIdleTimeoutMs) continue;
         writeStderrLine(
-          `qwen serve: reaping idle session ${JSON.stringify(id)} ` +
+          `mariadb-shell-agent serve: reaping idle session ${JSON.stringify(id)} ` +
             `(idle for ${Math.round(idle / 1000)}s, ` +
             `threshold ${Math.round(sessionIdleTimeoutMs / 1000)}s)`,
         );
@@ -4586,7 +4587,10 @@ export function createSessionControlPlane(
   const teeServeDebugLine = (message: string): void => {
     writeServeDebugLine(message);
     if (opts.onDiagnosticLine && isServeDebugLoggingEnabled()) {
-      opts.onDiagnosticLine(`qwen serve debug: ${message}`, 'info');
+      opts.onDiagnosticLine(
+        `mariadb-shell-agent serve debug: ${message}`,
+        'info',
+      );
     }
   };
 
@@ -4824,7 +4828,7 @@ export function createSessionControlPlane(
       permissionTimeoutMs,
       maxPendingPerSession,
       // Forward the optional `BridgeFileSystem` injection so
-      // production `qwen serve` can wire the `WorkspaceFileSystem`
+      // production `mariadb-shell-agent serve` can wire the `WorkspaceFileSystem`
       // adapter into BridgeClient's fs proxy methods. Tests + Mode A
       // consumers + channels / IDE companion omit it; BridgeClient
       // falls back to its inline fs proxy.
@@ -5081,7 +5085,7 @@ export function createSessionControlPlane(
     // `session_died` frame and disconnects, the daemon's
     // child-stderr forwarder emits whatever the child wrote before
     // dying (often nothing on a SIGKILL / segfault), and operators
-    // can't tell from `qwen serve`'s own output that the agent
+    // can't tell from `mariadb-shell-agent serve`'s own output that the agent
     // process is gone.
     //
     // Suppressed during `shuttingDown` because the operator
@@ -5122,7 +5126,7 @@ export function createSessionControlPlane(
           : {}),
       });
       writeStderrLine(
-        `qwen serve: channel exited (code=${exitInfo?.exitCode ?? 'none'}, signal=${exitInfo?.signalCode ?? 'none'}, transport=${info.harness.transportFailed ? (info.harness.transportFailureCode ?? 'failed') : 'ok'}${info.harness.transportFailureDetail ? `, transport_detail=${info.harness.transportFailureDetail}` : ''}, ${sessions.length} session(s) torn down)`,
+        `mariadb-shell-agent serve: channel exited (code=${exitInfo?.exitCode ?? 'none'}, signal=${exitInfo?.signalCode ?? 'none'}, transport=${info.harness.transportFailed ? (info.harness.transportFailureCode ?? 'failed') : 'ok'}${info.harness.transportFailureDetail ? `, transport_detail=${info.harness.transportFailureDetail}` : ''}, ${sessions.length} session(s) torn down)`,
       );
     }
     const stoppedByRuntimeStop = runtimeStop?.channels.includes(info) === true;
@@ -5165,7 +5169,7 @@ export function createSessionControlPlane(
       byId.delete(sid);
       void sessEntry.attachments.close().catch((error) => {
         writeStderrLine(
-          `qwen serve: failed to close attachments for closed channel session ${JSON.stringify(sid)}: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: failed to close attachments for closed channel session ${JSON.stringify(sid)}: ${error instanceof Error ? error.message : String(error)}`,
         );
       });
       telemetry.metrics?.sessionLifecycle('die');
@@ -5242,7 +5246,7 @@ export function createSessionControlPlane(
       ...(requestedSessionId ? { 'session.id': requestedSessionId } : {}),
     });
     writeStderrLine(
-      `qwen serve: newSession timed out after ${initTimeoutMs}ms${requestedSessionId ? ` for ${JSON.stringify(requestedSessionId)}` : ''} on channel ${ci.id}; decision=${channelWasEmpty ? 'kill_empty' : 'fence_shared'}`,
+      `mariadb-shell-agent serve: newSession timed out after ${initTimeoutMs}ms${requestedSessionId ? ` for ${JSON.stringify(requestedSessionId)}` : ''} on channel ${ci.id}; decision=${channelWasEmpty ? 'kill_empty' : 'fence_shared'}`,
     );
     return channelWasEmpty;
   }
@@ -5303,7 +5307,7 @@ export function createSessionControlPlane(
       }
       if (byId.get(lateSessionId)?.channel === ci.channel) {
         writeStderrLine(
-          `qwen serve: skipping abandoned newSession cleanup for ${JSON.stringify(lateSessionId)}: the id is owned by a live session`,
+          `mariadb-shell-agent serve: skipping abandoned newSession cleanup for ${JSON.stringify(lateSessionId)}: the id is owned by a live session`,
         );
         telemetry.event('session.new.cleanup', {
           'qwen-code.daemon.session_new.cleanup_result': 'id_reclaimed',
@@ -5366,7 +5370,7 @@ export function createSessionControlPlane(
         }
         ci.newSessionCleanupFailed = true;
         writeStderrLine(
-          `qwen serve: quarantining ACP channel after timed-out newSession cleanup failed for ${JSON.stringify(lateSessionId)}: ${extractErrorMessage(error)}`,
+          `mariadb-shell-agent serve: quarantining ACP channel after timed-out newSession cleanup failed for ${JSON.stringify(lateSessionId)}: ${extractErrorMessage(error)}`,
         );
         telemetry.event('session.new.cleanup', {
           'qwen-code.daemon.session_new.cleanup_result': 'quarantined',
@@ -5869,7 +5873,7 @@ export function createSessionControlPlane(
         if (parentSessionPersisted === false) {
           // One diagnostic covering both the cause and the API consequence.
           writeStderrLine(
-            `qwen serve: parentSessionId for ${entry.sessionId} was not persisted ` +
+            `mariadb-shell-agent serve: parentSessionId for ${entry.sessionId} was not persisted ` +
               `(${lastParentErr ?? 'unknown'}) — the parent link is live-only ` +
               `until restart (reported to the caller via parentSessionPersisted=false)`,
           );
@@ -6965,7 +6969,7 @@ export function createSessionControlPlane(
     if (info.userLanguageDelivery === undefined) {
       void sendUserLanguage(info, params).catch((err: unknown) => {
         writeStderrLine(
-          `qwen serve: could not send the user language to Managed ACP channel ${info.id}: ${extractErrorMessage(err)}`,
+          `mariadb-shell-agent serve: could not send the user language to Managed ACP channel ${info.id}: ${extractErrorMessage(err)}`,
         );
       });
     }
@@ -7028,7 +7032,7 @@ export function createSessionControlPlane(
     if (!ci || ci.channel !== entry.channel) {
       if (opts?.throwOnFailure === true) {
         writeStderrLine(
-          `qwen serve: ${label} ACP session close channel unavailable ` +
+          `mariadb-shell-agent serve: ${label} ACP session close channel unavailable ` +
             `for session ${JSON.stringify(entry.sessionId)}; agent close skipped`,
         );
         throw new Error(
@@ -7071,7 +7075,7 @@ export function createSessionControlPlane(
       // error record (plain object with `code`/`message`), not an `Error`
       // instance — `String()` would collapse it to `[object Object]`.
       writeStderrLine(
-        `qwen serve: ${label} ACP session close notification failed ` +
+        `mariadb-shell-agent serve: ${label} ACP session close notification failed ` +
           `for session ${JSON.stringify(entry.sessionId)}: ${extractErrorMessage(
             err,
           )}`,
@@ -7130,7 +7134,7 @@ export function createSessionControlPlane(
         if (shuttingDown) {
           teeServeDebugLine(detail);
         } else {
-          writeStderrLine(`qwen serve: ${detail}`);
+          writeStderrLine(`mariadb-shell-agent serve: ${detail}`);
         }
       }
     }
@@ -7147,7 +7151,7 @@ export function createSessionControlPlane(
     const eligible = sessions.length - skippedCount;
     if (eligible > 0 && successCount === 0 && !shuttingDown) {
       writeStderrLine(
-        `qwen serve: broadcastWorkspaceEvent type=${envelope.type} dropped on ALL ${failureCount} session bus(es); SSE subscribers will miss this event (GET fallback still authoritative)`,
+        `mariadb-shell-agent serve: broadcastWorkspaceEvent type=${envelope.type} dropped on ALL ${failureCount} session bus(es); SSE subscribers will miss this event (GET fallback still authoritative)`,
       );
     }
   };
@@ -7217,7 +7221,7 @@ export function createSessionControlPlane(
         // session, so the sessionId context is injected here.
         onCompactionError: (err) => {
           writeStderrLine(
-            `qwen serve: compaction degraded for session=${JSON.stringify(sessionId)}; replay snapshot may lag behind live events: ${
+            `mariadb-shell-agent serve: compaction degraded for session=${JSON.stringify(sessionId)}; replay snapshot may lag behind live events: ${
               err instanceof Error ? err.message : String(err)
             }`,
           );
@@ -7595,7 +7599,7 @@ export function createSessionControlPlane(
             ? 'transport_closed'
             : 'rpc_rejected';
     }
-    const message = `qwen serve: source_persistence_failed sessionId=${entry.sessionId} reason=${reason} sourcePersisted=false`;
+    const message = `mariadb-shell-agent serve: source_persistence_failed sessionId=${entry.sessionId} reason=${reason} sourcePersisted=false`;
     try {
       opts.onDiagnosticLine?.(message, 'warn');
     } catch {
@@ -8907,7 +8911,7 @@ export function createSessionControlPlane(
       const usurper = byId.get(req.sessionId);
       if (usurper?.channel === channel.channel) {
         writeStderrLine(
-          `qwen serve: skipping abandoned session/${action} cleanup for ${JSON.stringify(req.sessionId)}: the id is now owned by a live session`,
+          `mariadb-shell-agent serve: skipping abandoned session/${action} cleanup for ${JSON.stringify(req.sessionId)}: the id is now owned by a live session`,
         );
         telemetry.event('session.restore.cleanup', {
           'qwen-code.daemon.session_restore.action': action,
@@ -8999,7 +9003,7 @@ export function createSessionControlPlane(
           // fresh-admission blocker, so there is no separate flag to set here.
           channel.isQuarantined = true;
           writeStderrLine(
-            `qwen serve: quarantining ACP channel after timed-out session/${action} cleanup failed for ${JSON.stringify(req.sessionId)}: ${extractErrorMessage(error)}`,
+            `mariadb-shell-agent serve: quarantining ACP channel after timed-out session/${action} cleanup failed for ${JSON.stringify(req.sessionId)}: ${extractErrorMessage(error)}`,
           );
           telemetry.event('session.restore.cleanup', {
             'qwen-code.daemon.session_restore.action': action,
@@ -9221,7 +9225,7 @@ export function createSessionControlPlane(
               'session.id': req.sessionId,
             });
             writeStderrLine(
-              `qwen serve: session/${action} timed out after ${sessionRestoreTimeoutMs}ms for ${JSON.stringify(req.sessionId)} on channel ${restoreChannel.id}; decision=${channelWasEmpty ? 'kill_empty' : 'fence_shared'}`,
+              `mariadb-shell-agent serve: session/${action} timed out after ${sessionRestoreTimeoutMs}ms for ${JSON.stringify(req.sessionId)} on channel ${restoreChannel.id}; decision=${channelWasEmpty ? 'kill_empty' : 'fence_shared'}`,
             );
             if (channelWasEmpty) {
               void harness.killChannelWithLog(
@@ -9650,7 +9654,7 @@ export function createSessionControlPlane(
           byId.delete(req.sessionId);
           await restoreEntry.attachments.close().catch((error) => {
             writeStderrLine(
-              `qwen serve: failed to close attachments after restoring session ${JSON.stringify(req.sessionId)}: ${error instanceof Error ? error.message : String(error)}`,
+              `mariadb-shell-agent serve: failed to close attachments after restoring session ${JSON.stringify(req.sessionId)}: ${error instanceof Error ? error.message : String(error)}`,
             );
           });
           ci?.sessionIds.delete(req.sessionId);
@@ -9790,7 +9794,7 @@ export function createSessionControlPlane(
     clearPromptSettledClose(entry);
     const reason = closeOpts?.reason ?? 'client_close';
     writeStderrLine(
-      `qwen serve: closing session ${JSON.stringify(sessionId)}` +
+      `mariadb-shell-agent serve: closing session ${JSON.stringify(sessionId)}` +
         ` (reason: ${reason})` +
         (originatorClientId
           ? ` by client ${JSON.stringify(originatorClientId)}`
@@ -9815,7 +9819,7 @@ export function createSessionControlPlane(
     const ci = channelInfoForEntry(entry);
     if (!ci) {
       writeStderrLine(
-        `qwen serve: closeSession channelInfoForEntry returned undefined ` +
+        `mariadb-shell-agent serve: closeSession channelInfoForEntry returned undefined ` +
           `for session ${JSON.stringify(sessionId)} — channel cleanup skipped (entry's channel already torn down)`,
       );
     }
@@ -9953,7 +9957,7 @@ export function createSessionControlPlane(
     entry.events.close();
     await entry.attachments.close().catch((error) => {
       writeStderrLine(
-        `qwen serve: failed to close attachments for session ${JSON.stringify(sessionId)}: ${error instanceof Error ? error.message : String(error)}`,
+        `mariadb-shell-agent serve: failed to close attachments for session ${JSON.stringify(sessionId)}: ${error instanceof Error ? error.message : String(error)}`,
       );
     });
     if (!agentSessionClosed) {
@@ -11344,7 +11348,7 @@ export function createSessionControlPlane(
       }
       const eventDetailMode = req.eventDetailMode ?? 'full';
       opts.onDiagnosticLine?.(
-        `qwen serve: bridge sendPrompt for session=${sessionId}`,
+        `mariadb-shell-agent serve: bridge sendPrompt for session=${sessionId}`,
         'info',
       );
       const capturedContext = telemetry.captureContext();
@@ -11480,7 +11484,7 @@ export function createSessionControlPlane(
         tailUuid = entry.promptLedger?.transcriptTailUuid?.(sessionId);
       } catch (error) {
         opts.onDiagnosticLine?.(
-          `qwen serve: prompt ledger dispatch marker failed for session=${sessionId}: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: prompt ledger dispatch marker failed for session=${sessionId}: ${error instanceof Error ? error.message : String(error)}`,
           'warn',
         );
       }
@@ -11495,7 +11499,7 @@ export function createSessionControlPlane(
         context?.onPromptAdmitted?.();
       } catch (error) {
         opts.onDiagnosticLine?.(
-          `qwen serve: prompt admission observer failed for session=${sessionId}: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: prompt admission observer failed for session=${sessionId}: ${error instanceof Error ? error.message : String(error)}`,
           'warn',
         );
       }
@@ -11580,7 +11584,7 @@ export function createSessionControlPlane(
               })
               .catch((error) => {
                 writeStderrLine(
-                  `qwen serve: Todo Stop Guard queued-prompt release failed for ` +
+                  `mariadb-shell-agent serve: Todo Stop Guard queued-prompt release failed for ` +
                     `${JSON.stringify(sessionId)}: ${error instanceof Error ? error.message : String(error)}`,
                 );
               });
@@ -12163,7 +12167,7 @@ export function createSessionControlPlane(
 
     async cancelSession(sessionId, req, context) {
       opts.onDiagnosticLine?.(
-        `qwen serve: bridge cancelSession for session=${sessionId}`,
+        `mariadb-shell-agent serve: bridge cancelSession for session=${sessionId}`,
         'info',
       );
       const entry = byId.get(sessionId);
@@ -12369,7 +12373,7 @@ export function createSessionControlPlane(
         // these clients" (400) from "no such request" (404), creating
         // a cross-session client-registration oracle.
         writeStderrLine(
-          `qwen serve: legacy permission vote ${JSON.stringify(requestId)} ` +
+          `mariadb-shell-agent serve: legacy permission vote ${JSON.stringify(requestId)} ` +
             `has no live session (peek returned ${JSON.stringify(sessionId)}); ` +
             `returning 404.`,
         );
@@ -12407,7 +12411,7 @@ export function createSessionControlPlane(
       // unexpected 404s without debug mode.
       if (actualSessionId === undefined) {
         writeStderrLine(
-          `qwen serve: rejected permission vote ${JSON.stringify(requestId)} ` +
+          `mariadb-shell-agent serve: rejected permission vote ${JSON.stringify(requestId)} ` +
             `for session ${JSON.stringify(sessionId)}; mediator has no ` +
             `pending or resolved record (unknown / timed out / LRU-evicted).`,
         );
@@ -12686,7 +12690,7 @@ export function createSessionControlPlane(
               await branchAttachments.copyFrom(entry.attachments);
             } catch (error) {
               writeStderrLine(
-                `qwen serve: failed to copy attachments for branched session ${result.newSessionId}: ${error instanceof Error ? error.message : String(error)}`,
+                `mariadb-shell-agent serve: failed to copy attachments for branched session ${result.newSessionId}: ${error instanceof Error ? error.message : String(error)}`,
               );
             } finally {
               await copySources(branchAttachments);
@@ -12743,7 +12747,7 @@ export function createSessionControlPlane(
             releaseAdmissionOnce();
           } catch (restoreErr) {
             writeStderrLine(
-              `qwen serve: branchSession load failed for ${result.newSessionId}; closing partial live state while preserving the committed session...`,
+              `mariadb-shell-agent serve: branchSession load failed for ${result.newSessionId}; closing partial live state while preserving the committed session...`,
             );
             try {
               if (!ci.harness.isDying) {
@@ -12773,7 +12777,7 @@ export function createSessionControlPlane(
               // Same wire-shape hazard as `notifyAgentSessionClose`: a
               // child refusal arrives as a plain JSON-RPC error record.
               writeStderrLine(
-                `qwen serve: branchSession live-state close for ${result.newSessionId} failed: ${extractErrorMessage(cleanupErr)}`,
+                `mariadb-shell-agent serve: branchSession live-state close for ${result.newSessionId} failed: ${extractErrorMessage(cleanupErr)}`,
               );
             }
             throw restoreErr;
@@ -12785,7 +12789,7 @@ export function createSessionControlPlane(
               await newEntry.attachments.copyFrom(entry.attachments);
             } catch (error) {
               writeStderrLine(
-                `qwen serve: failed to copy attachments for branched session ${result.newSessionId}: ${error instanceof Error ? error.message : String(error)}`,
+                `mariadb-shell-agent serve: failed to copy attachments for branched session ${result.newSessionId}: ${error instanceof Error ? error.message : String(error)}`,
               );
             }
           }
@@ -12816,7 +12820,7 @@ export function createSessionControlPlane(
             } catch (error) {
               sourcePersisted = false;
               writeStderrLine(
-                `qwen serve: source metadata for branched session ${result.newSessionId} was not persisted: ${
+                `mariadb-shell-agent serve: source metadata for branched session ${result.newSessionId} was not persisted: ${
                   error instanceof Error ? error.message : String(error)
                 }`,
               );
@@ -12994,7 +12998,7 @@ export function createSessionControlPlane(
       );
 
       writeStderrLine(
-        `qwen serve: session ${sessionId} cwd changed: ` +
+        `mariadb-shell-agent serve: session ${sessionId} cwd changed: ` +
           `${result.previousCwd} -> ${result.newCwd}` +
           (result.warnings.length > 0
             ? ` (warnings: ${result.warnings.join('; ')})`
@@ -13330,7 +13334,7 @@ export function createSessionControlPlane(
           // revision never trails the client-visible event.
           markSessionCatalogChanged();
           writeStderrLine(
-            `qwen serve: updated session metadata ${JSON.stringify(sessionId)} ` +
+            `mariadb-shell-agent serve: updated session metadata ${JSON.stringify(sessionId)} ` +
               `displayName=${entry.displayName === undefined ? 'cleared' : 'set'}` +
               (context?.clientId
                 ? ` by client ${JSON.stringify(context.clientId)}`
@@ -13347,13 +13351,13 @@ export function createSessionControlPlane(
                 const r = res as { persisted?: boolean } | undefined;
                 if (r && r.persisted === false) {
                   writeStderrLine(
-                    `qwen serve: displayName for ${sessionId} was not persisted`,
+                    `mariadb-shell-agent serve: displayName for ${sessionId} was not persisted`,
                   );
                 }
               })
               .catch((err: unknown) => {
                 writeStderrLine(
-                  `qwen serve: failed to persist displayName for ${sessionId}: ${
+                  `mariadb-shell-agent serve: failed to persist displayName for ${sessionId}: ${
                     err instanceof Error ? err.message : String(err)
                   }`,
                 );
@@ -13416,7 +13420,7 @@ export function createSessionControlPlane(
           ].slice(-SESSION_PR_LIST_LIMIT);
           markSessionCatalogChanged();
           writeStderrLine(
-            `qwen serve: updated session metadata ${JSON.stringify(sessionId)} ` +
+            `mariadb-shell-agent serve: updated session metadata ${JSON.stringify(sessionId)} ` +
               `pr=${bound.number} bound (${bound.url})` +
               (context?.clientId
                 ? ` by client ${JSON.stringify(context.clientId)}`
@@ -13784,13 +13788,13 @@ export function createSessionControlPlane(
           if (shuttingDown) {
             teeServeDebugLine(detail);
           } else {
-            writeStderrLine(`qwen serve: ${detail}`);
+            writeStderrLine(`mariadb-shell-agent serve: ${detail}`);
           }
         }
       }
       if (sessions.length > 0 && successCount === 0 && !shuttingDown) {
         writeStderrLine(
-          `qwen serve: publishWorkspaceEvent type=${event.type} dropped on ALL ${failureCount} session bus(es); SSE subscribers will miss this event (GET fallback still authoritative)`,
+          `mariadb-shell-agent serve: publishWorkspaceEvent type=${event.type} dropped on ALL ${failureCount} session bus(es); SSE subscribers will miss this event (GET fallback still authoritative)`,
         );
       }
     },
@@ -14896,7 +14900,7 @@ export function createSessionControlPlane(
         }
         rejection ??= settled.reason;
         writeStderrLine(
-          `qwen serve: user language change failed on ACP channel ${channels[index]?.id}: ${extractErrorMessage(settled.reason)}`,
+          `mariadb-shell-agent serve: user language change failed on ACP channel ${channels[index]?.id}: ${extractErrorMessage(settled.reason)}`,
         );
       });
       // A channel that could not apply the change counts as one failure; the
@@ -14982,7 +14986,7 @@ export function createSessionControlPlane(
       if (!info || info.harness.isDying)
         throw new SessionNotFoundError(sessionId);
       opts.onDiagnosticLine?.(
-        `qwen serve: bridge generateSessionRecap dispatching ext-method for session=${sessionId}`,
+        `mariadb-shell-agent serve: bridge generateSessionRecap dispatching ext-method for session=${sessionId}`,
         'info',
       );
       const endSideRequest = beginSideRequest(entry);
@@ -15002,7 +15006,7 @@ export function createSessionControlPlane(
         endSideRequest();
       }
       opts.onDiagnosticLine?.(
-        `qwen serve: bridge generateSessionRecap completed for session=${sessionId} recap=${response.recap ? `len=${response.recap.length}` : 'null'}`,
+        `mariadb-shell-agent serve: bridge generateSessionRecap completed for session=${sessionId} recap=${response.recap ? `len=${response.recap.length}` : 'null'}`,
         'info',
       );
       return {
@@ -15757,7 +15761,7 @@ export function createSessionControlPlane(
         }
 
         opts.onDiagnosticLine?.(
-          `qwen serve: launchSessionForkAgent requested for session=${sessionId}`,
+          `mariadb-shell-agent serve: launchSessionForkAgent requested for session=${sessionId}`,
           'info',
         );
 
@@ -15785,7 +15789,7 @@ export function createSessionControlPlane(
           };
         } catch (error) {
           opts.onDiagnosticLine?.(
-            `qwen serve: launchSessionForkAgent failed for session=${sessionId}: ${
+            `mariadb-shell-agent serve: launchSessionForkAgent failed for session=${sessionId}: ${
               error instanceof Error ? error.message : String(error)
             }`,
             'warn',
@@ -15799,7 +15803,7 @@ export function createSessionControlPlane(
           launched: response.launched === true,
         };
         opts.onDiagnosticLine?.(
-          `qwen serve: launchSessionForkAgent completed for session=${sessionId} launched=${result.launched}`,
+          `mariadb-shell-agent serve: launchSessionForkAgent completed for session=${sessionId} launched=${result.launched}`,
           'info',
         );
         return result;
@@ -15823,7 +15827,7 @@ export function createSessionControlPlane(
       context,
     ): Promise<ShellCommandResult> {
       opts.onDiagnosticLine?.(
-        `qwen serve: bridge executeShellCommand for session=${sessionId}`,
+        `mariadb-shell-agent serve: bridge executeShellCommand for session=${sessionId}`,
         'info',
       );
       if (opts.sessionShellCommandEnabled !== true) {
@@ -16901,7 +16905,7 @@ export function createSessionControlPlane(
         );
         await entry.attachments.close().catch((releaseError) => {
           writeStderrLine(
-            `qwen serve: failed to close attachments for killed session ${JSON.stringify(sessionId)}: ${releaseError instanceof Error ? releaseError.message : String(releaseError)}`,
+            `mariadb-shell-agent serve: failed to close attachments for killed session ${JSON.stringify(sessionId)}: ${releaseError instanceof Error ? releaseError.message : String(releaseError)}`,
           );
         });
         return true;
@@ -16915,7 +16919,7 @@ export function createSessionControlPlane(
       const ci = channelInfoForEntry(entry);
       if (!ci) {
         writeStderrLine(
-          `qwen serve: killSession channelInfoForEntry returned undefined ` +
+          `mariadb-shell-agent serve: killSession channelInfoForEntry returned undefined ` +
             `for session ${JSON.stringify(sessionId)} — channel cleanup skipped (entry's channel already torn down)`,
         );
       }
@@ -17019,7 +17023,7 @@ export function createSessionControlPlane(
       entry.events.close();
       await entry.attachments.close().catch((error) => {
         writeStderrLine(
-          `qwen serve: failed to close attachments for killed session ${JSON.stringify(sessionId)}: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: failed to close attachments for killed session ${JSON.stringify(sessionId)}: ${error instanceof Error ? error.message : String(error)}`,
         );
       });
       // Only kill the channel when no other sessions remain AND no

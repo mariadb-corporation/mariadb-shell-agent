@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,7 +26,7 @@ export function createLlmContentGenerator(
   const version = process.env['CLI_VERSION'] || process.version;
   const userAgent =
     config.userAgent ||
-    `QwenCode/${version} (${process.platform}; ${process.arch})`;
+    `MariaDBShellAgent/${version} (${process.platform}; ${process.arch})`;
   const baseHeaders: Record<string, string> = {
     'User-Agent': userAgent,
   };

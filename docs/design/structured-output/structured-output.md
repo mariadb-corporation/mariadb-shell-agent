@@ -6,7 +6,7 @@ This document captures the implementation decisions behind the
 
 ## Goal
 
-In headless runs (`qwen -p`, piped stdin, or positional prompt), let
+In headless runs (`mariadb-shell-agent -p`, piped stdin, or positional prompt), let
 the caller constrain the model's final answer to a user-supplied JSON
 Schema and surface the validated payload as machine-readable output
 that scripts and downstream tooling can consume directly. The model's
@@ -257,7 +257,7 @@ constant
 - `redactStructuredOutputArgsForRecording` (used by
   `recordAssistantTurn` in `geminiChat.ts`) — covers the on-disk
   chat-recording JSONL at
-  `~/.qwen/projects/<sanitized-cwd>/chats/<sessionId>.jsonl`.
+  `~/.mariadb-shell-agent/projects/<sanitized-cwd>/chats/<sessionId>.jsonl`.
   Validation-failure retries land here too — each retry's args also
   get the same placeholder.
 
@@ -397,7 +397,7 @@ points users at "schema is unsatisfiable" as a likely cause.
   in `--json-schema` arguments.
 - SDK protocol additions (Python / TypeScript / Java SDKs exposing a
   typed `structured_result` field) — track separately;
-  [PR #4001](https://github.com/QwenLM/qwen-code/pull/4001) (closed
+  [PR #4001](https://github.invalid/QwenLM/qwen-code/pull/4001) (closed
   unmerged on 2026-05-11) covered that scope before the cli/core work
   landed and was superseded.
 

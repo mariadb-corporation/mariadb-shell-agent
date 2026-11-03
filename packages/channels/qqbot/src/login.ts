@@ -18,7 +18,7 @@ export interface QQCredentials {
  */
 export async function qrCodeLogin(): Promise<QQCredentials> {
   // In practice qrConnect() always returns a non-empty array — verified by
-  // removing appID from config and running `qwen channel start`, which
+  // removing appID from config and running `mariadb-shell-agent channel start`, which
   // correctly triggers QR login and returns valid credentials. The defensive
   // destructuring + null-guard below is a robustness patch against unexpected
   // external-library behaviour, not a response to an observed failure.

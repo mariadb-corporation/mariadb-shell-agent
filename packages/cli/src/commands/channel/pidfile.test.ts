@@ -15,7 +15,9 @@ const fsFds = vi.hoisted(() => {
   };
   return fds;
 });
-const mockGlobalQwenDir = vi.hoisted(() => '/tmp/qwen-pidfile-test/.qwen');
+const mockGlobalQwenDir = vi.hoisted(
+  () => '/tmp/qwen-pidfile-test/.mariadb-shell-agent',
+);
 const fsControls = vi.hoisted(() => ({ failUnlink: false, failRead: false }));
 const pidfileLock = vi.hoisted(() => ({
   acquire: vi.fn(),

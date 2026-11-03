@@ -2,7 +2,7 @@
 
 ## Decision
 
-Same-host `qwen serve` keeps the ACP filesystem capability at
+Same-host `mariadb-shell-agent serve` keeps the ACP filesystem capability at
 `{ readTextFile: false, writeTextFile: true }`. Final text writes remain
 delegated to the daemon, but the daemon-owned bridge adapter may route a
 strictly marked final write from `write_file`, `edit`, `notebook_edit`, or the
@@ -29,7 +29,7 @@ Hook/Guard refusal and pre-execution cancellation do not send it. There is no
 second daemon confirmation. Cancellation after a tool has already begun a
 non-cancellable filesystem operation keeps that tool's existing semantics.
 
-The metadata is routing provenance, not an OS credential. `qwen serve` has a
+The metadata is routing provenance, not an OS credential. `mariadb-shell-agent serve` has a
 same-machine, same-UID, single-security-principal model; a replaced child with
 that UID already has equivalent filesystem authority through shell.
 

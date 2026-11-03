@@ -8,7 +8,7 @@
 
 Public 与 WebShell 的 Session 事件流重复维护回放、实时投递、心跳、权限复查和终止循环。在现有 Maven 边界内共享该循环，同时保留两种线上消息投影。
 
-Session 创建入口收敛已由上游 [PR #15955](https://github.com/QwenLM/qwen-code/pull/15955) 合入。当前 PR 沿用现有 `SessionCreationCommand`、具名 builder 及继承后的单入口契约门禁，不修改它们。Session 创建、SQL、仓库角色、provisioner、恢复状态机和摘要工具不在剩余差异内。
+Session 创建入口收敛已由上游 [PR #15955](https://github.invalid/QwenLM/qwen-code/pull/15955) 合入。当前 PR 沿用现有 `SessionCreationCommand`、具名 builder 及继承后的单入口契约门禁，不修改它们。Session 创建、SQL、仓库角色、provisioner、恢复状态机和摘要工具不在剩余差异内。
 
 ## 设计
 

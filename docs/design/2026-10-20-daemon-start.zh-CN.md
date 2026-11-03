@@ -4,15 +4,15 @@
 
 ## 状态
 
-本变更已实现。`qwen daemon start` 只做本地进程管理，不改变 serve 协议、认证或工作区隔离。
+本变更已实现。`mariadb-shell-agent daemon start` 只做本地进程管理，不改变 serve 协议、认证或工作区隔离。
 
 ## 问题
 
-此前启动本地 daemon 需要 systemd、tmux 或 `nohup`。discovery 记录与 `qwen daemon stop` 已经让运行中的 daemon 可被检查，但缺少一个受支持的启动方式，让用户启动后能回到 shell。
+此前启动本地 daemon 需要 systemd、tmux 或 `nohup`。discovery 记录与 `mariadb-shell-agent daemon stop` 已经让运行中的 daemon 可被检查，但缺少一个受支持的启动方式，让用户启动后能回到 shell。
 
 ## 行为
 
-`qwen daemon start` 以 detached 子进程启动 `qwen serve`，等待子进程发布 discovery 记录，然后打印绑定 URL、PID、日志路径与停止命令。父进程退出后子进程继续运行。
+`mariadb-shell-agent daemon start` 以 detached 子进程启动 `mariadb-shell-agent serve`，等待子进程发布 discovery 记录，然后打印绑定 URL、PID、日志路径与停止命令。父进程退出后子进程继续运行。
 
 支持参数：`--port`、`--hostname`、`--workspace`（可重复）、`--no-web`、`--require-auth` 与 `--token`。子进程始终带 `--no-token-qr` 启动，避免启动日志中出现 token QR。
 
@@ -36,13 +36,13 @@ Windows 无盘符根路径也会按启动目录所在盘符解析；只有盘符
 
 - 同一主工作区已有存活 daemon 时，除非显式传 `--port`，否则拒绝启动。
 - 工作区不存在、`--require-auth` 缺少 token、非 loopback 缺少 token 时，在 spawn 前失败。
-- 子进程退出或 30 秒内未发布记录时，命令以非零码退出，说明 detached 子进程可能仍会启动、指向 `qwen daemon status`，并打印启动日志路径与尾部。
+- 子进程退出或 30 秒内未发布记录时，命令以非零码退出，说明 detached 子进程可能仍会启动、指向 `mariadb-shell-agent daemon status`，并打印启动日志路径与尾部。
 
 ## 非目标
 
 - 不做进程守护、崩溃重启或服务安装。
 - 不做 Windows 服务封装。
-- 非 loopback 绑定不提供临时 token 模式；请直接使用 `qwen serve`。
+- 非 loopback 绑定不提供临时 token 模式；请直接使用 `mariadb-shell-agent serve`。
 
 ## 验证
 

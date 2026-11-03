@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,7 +15,7 @@
  * allowed, not who opened it, so every field of a frame stays a claim.
  *
  * This inbox accepts exactly one token. It does not keep the review
- * machinery a Qwen Code session keeps for itself — rate limits, holds,
+ * machinery a MariaDB Shell Agent session keeps for itself — rate limits, holds,
  * trusted controllers — because a program that joins the directory decides
  * for itself what to do with a message it receives.
  */

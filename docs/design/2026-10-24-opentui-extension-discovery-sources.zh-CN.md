@@ -2,7 +2,7 @@
 
 [English](2026-10-24-opentui-extension-discovery-sources.md) | [简体中文](2026-10-24-opentui-extension-discovery-sources.zh-CN.md)
 
-实现、验收证据及其范围和未决问题统一记录在 [PR #15671](https://github.com/QwenLM/qwen-code/pull/15671)。下述 E1–E10 仍是最终验收门槛。
+实现、验收证据及其范围和未决问题统一记录在 [PR #15671](https://github.invalid/QwenLM/qwen-code/pull/15671)。下述 E1–E10 仍是最终验收门槛。
 
 ## 问题与现有行为
 

@@ -4,7 +4,7 @@
 
 状态：冻结契约与轮询式 JSON-RPC 传输已经实现；尚未完成跨实现互通验证。更新于 2026-10-06（任务由 thread 改为落到聊天会话）。
 
-本文最初是[接续架构](https://github.com/QwenLM/qwen-code/blob/8ff056f1c7e5842393bc8d0f5b8a6ab1502462b6/docs/design/2026-09-09-agent-service-collaboration.zh-CN.md)与[实施计划](https://github.com/QwenLM/qwen-code/blob/8ff056f1c7e5842393bc8d0f5b8a6ab1502462b6/docs/plans/2026-09-09-agent-service-collaboration-plan.md)的 P1。现在记录 core workspace-agent A2A 模块与 daemon 传输层已经实现的契约；文档与代码不一致时以代码为准。
+本文最初是[接续架构](https://github.invalid/QwenLM/qwen-code/blob/8ff056f1c7e5842393bc8d0f5b8a6ab1502462b6/docs/design/2026-09-09-agent-service-collaboration.zh-CN.md)与[实施计划](https://github.invalid/QwenLM/qwen-code/blob/8ff056f1c7e5842393bc8d0f5b8a6ab1502462b6/docs/plans/2026-09-09-agent-service-collaboration-plan.md)的 P1。现在记录 core workspace-agent A2A 模块与 daemon 传输层已经实现的契约；文档与代码不一致时以代码为准。
 
 ## 1. 冻结的版本与绑定
 
@@ -59,7 +59,7 @@
 
 ## 5. 本地 run 状态的非 `_meta` 通道
 
-本地用 ACP prompt 的 `_meta` 传 run 帧，那是 daemon 的信任边界，**外部不可达也不应可达**。外部任务另用一条：在 `AgentCapabilities.extensions` 里声明扩展 URI `https://qwenlm.github.io/qwen-code/a2a/workspace-agents/v1`，本地 run 状态（`localStatus`）、错误与用量（`tokensUsed`）都放在 `Task.metadata` 该 URI 下。
+本地用 ACP prompt 的 `_meta` 传 run 帧，那是 daemon 的信任边界，**外部不可达也不应可达**。外部任务另用一条：在 `AgentCapabilities.extensions` 里声明扩展 URI `https://qwenlm.github.invalid/qwen-code/a2a/workspace-agents/v1`，本地 run 状态（`localStatus`）、错误与用量（`tokensUsed`）都放在 `Task.metadata` 该 URI 下。
 
 声明为 `required: false`：忽略该扩展的客户端仍能拿到正确的 Task / Message 语义，只是看不到用量。
 

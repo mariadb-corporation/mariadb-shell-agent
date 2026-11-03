@@ -124,5 +124,5 @@ Acceptance criteria:
   missing schemas can be rediscovered and tools invoked and reused; actual
   request history and provider usage establish the cache behavior.
 
-The E2E plan and results are kept in `.qwen/e2e-tests/lazy-code-mode.md`.
+The E2E plan and results are kept in `.mariadb-shell-agent/e2e-tests/lazy-code-mode.md`.
 There are no open design questions for this first version.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -42,7 +43,7 @@ describe('registerChatViewProviders', () => {
       ]
     >;
 
-    expect(calls[0]?.[0]).toBe('qwen-code.chatView.sidebar');
+    expect(calls[0]?.[0]).toBe('mariadb-shell-agent.chatView.sidebar');
     expect(calls[0]?.[2]).toEqual({
       webviewOptions: { retainContextWhenHidden: true },
     });

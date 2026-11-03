@@ -7,7 +7,7 @@ Status: implemented.
 ## 1. Problem
 
 The fresh-startup work in
-[#12622](https://github.com/QwenLM/qwen-code/pull/12622) (design doc
+[#12622](https://github.invalid/QwenLM/qwen-code/pull/12622) (design doc
 `2026-09-24-fresh-startup-performance.md`) measured startup with a harness that
 was never checked in. Its section 9 (decision 7) left it for this follow-up:
 anyone should be able to repeat the measurements, on the same definitions,
@@ -50,7 +50,7 @@ selects OpenAI auth against the loopback stub, and the environment is reduced
 to what a terminal passes: `PATH`, `LANG`, `TERM` and the stub's key and URL.
 `--credentials settings` or `--credentials dotenv` moves that key and URL out
 of the shell into the settings file's `env` block, where `/auth` stores them,
-or into `~/.qwen/.env`, where the docs recommend them, so the env-file
+or into `~/.mariadb-shell-agent/.env`, where the docs recommend them, so the env-file
 relaunch rule can be measured.
 The CLI starts through the real bin entry, `cli-entry.js`, in a node-pty
 terminal of 120×40 whose screen `@xterm/headless` reconstructs.
@@ -63,7 +63,7 @@ The definitions are those of the fresh-startup design.
 | --- | ---------------------------------------------------------------------------------------------------------- |
 | J1  | From spawn until "Type your message" is visible, a key has been typed, and that key shows in the input box |
 | J3  | From spawn until the first visible glyph                                                                   |
-| J2  | From spawning `qwen -p` until its first request reaches the stub                                           |
+| J2  | From spawning `mariadb-shell-agent -p` until its first request reaches the stub                            |
 | M1  | Summed RSS of the process tree at J1; for `-p`, peak RSS until exit                                        |
 | S1  | Whether text already on screen is replaced or cleared after J1                                             |
 | D1  | Node process images started before J1 (for `-p`, before exit), counted from `execve`                       |

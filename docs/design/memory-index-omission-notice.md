@@ -4,7 +4,7 @@
 
 ## Problem and scope
 
-Issue [14877](https://github.com/QwenLM/qwen-code/issues/14877) reports that index rebuilding omits topic files without naming them. The existing scan parses all eligible files but returns only 200; subsequent index budgeting can omit more entries. A generic writer warning loses both sets before prompt loading can explain them.
+Issue [14877](https://github.invalid/QwenLM/qwen-code/issues/14877) reports that index rebuilding omits topic files without naming them. The existing scan parses all eligible files but returns only 200; subsequent index budgeting can omit more entries. A generic writer warning loses both sets before prompt loading can explain them.
 
 This fix changes diagnostics only. Headless post-write rebuilding, retention policy, topic-file deletion, scanner trust rules and existing PRs are out of scope.
 

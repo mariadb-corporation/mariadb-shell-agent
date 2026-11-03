@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -788,9 +789,9 @@ export interface A2AAgentCard {
   skills: Array<{ id: string; name: string; description: string }>;
 }
 
-export const A2A_CARD_NAME = 'Qwen Code workspace agents';
+export const A2A_CARD_NAME = 'MariaDB Shell Agent workspace agents';
 export const A2A_CARD_DESCRIPTION =
-  'Workspace agents answering in Qwen Code chat sessions';
+  'Workspace agents answering in MariaDB Shell Agent chat sessions';
 export const A2A_EXTENSION_DESCRIPTION =
   'Carries the local run status A2A merges (awaiting_approval: the workspace owner must approve a tool call) and token usage, which A2A 1.0 does not model';
 

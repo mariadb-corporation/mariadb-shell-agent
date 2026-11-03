@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -51,7 +52,7 @@ export const MANAGED_RUNTIME_PROVIDER_ROUTE = Object.freeze({
  * working directory, in prompt order.
  */
 export const MANAGED_WORKSPACE_CONTEXT_FILES = [
-  'QWEN.md',
+  'MARIADB-SHELL-AGENT.md',
   'AGENTS.md',
 ] as const;
 

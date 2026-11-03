@@ -8,7 +8,7 @@ legacy stdio implementation under `com.alibaba.qwen.code.cli`.
 
 ## Goals
 
-- Add a Java 11 API for `qwen serve` without creating another Maven artifact.
+- Add a Java 11 API for `mariadb-shell-agent serve` without creating another Maven artifact.
 - Deliver streamed text, thought, tool, usage, permission, and raw events in
   daemon order.
 - Return prompt text only after a matching reliable terminal event.
@@ -221,5 +221,5 @@ destroy.
 
 CI compiles and tests on Java 11, 17, and 21 on Linux, with Java 21 smoke
 coverage on macOS and Windows. Linux CI and the protected release workflow run
-an E2E against a real `qwen serve` process with a temporary workspace and
+an E2E against a real `mariadb-shell-agent serve` process with a temporary workspace and
 model stub.

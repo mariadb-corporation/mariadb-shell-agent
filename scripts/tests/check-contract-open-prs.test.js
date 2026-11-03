@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -188,7 +189,7 @@ async function check(prs, options = {}) {
     root,
     repo: 'QwenLM/qwen-code',
     mainSha: MAIN_SHA,
-    targetUrl: 'https://github.com/QwenLM/qwen-code/actions/runs/1',
+    targetUrl: 'https://github.invalid/QwenLM/qwen-code/actions/runs/1',
     dryRun: options.dryRun ?? false,
     gh: fake.gh,
   });
@@ -213,7 +214,7 @@ describe('check-contract-open-prs', () => {
         state: 'failure',
         context: STATUS_CONTEXT,
         description: "1.38.0 does not advance past main's 1.38.0",
-        targetUrl: 'https://github.com/QwenLM/qwen-code/actions/runs/1',
+        targetUrl: 'https://github.invalid/QwenLM/qwen-code/actions/runs/1',
       },
     ]);
     expect(lines[0]).toBe(
@@ -629,7 +630,7 @@ if (args.includes('graphql')) {
         '-f',
         "description=1.38.0 does not advance past main's 1.38.0",
         '-f',
-        'target_url=https://github.com/QwenLM/qwen-code/actions/runs/7',
+        'target_url=https://github.invalid/QwenLM/qwen-code/actions/runs/7',
       ]);
     });
 

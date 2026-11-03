@@ -1,19 +1,19 @@
 # API-only DaemonClient quickstart (TypeScript)
 
-A minimal end-to-end example: start an API-only `qwen serve` daemon in another terminal, then drive it from a Node script with the SDK's `DaemonClient`. See also: [Daemon mode user guide](../../users/qwen-serve.md) and [HTTP protocol reference](../qwen-serve-protocol.md).
+A minimal end-to-end example: start an API-only `mariadb-shell-agent serve` daemon in another terminal, then drive it from a Node script with the SDK's `DaemonClient`. See also: [Daemon mode user guide](../../users/qwen-serve.md) and [HTTP protocol reference](../qwen-serve-protocol.md).
 
 ## Setup
 
-This walkthrough targets Qwen Code `v0.24.0` and
+This walkthrough targets MariaDB Shell Agent `v0.24.0` and
 `@qwen-code/sdk@0.1.12`.
 
 In one terminal:
 
 ```bash
-qwen serve --no-web --port 4170 \
+mariadb-shell-agent serve --no-web --port 4170 \
   --workspace /path/to/project-a \
   --workspace /path/to/project-b
-# → qwen serve listening on http://127.0.0.1:4170 (mode=http-bridge, workspace=/path/to/project-a)
+# → mariadb-shell-agent serve listening on http://127.0.0.1:4170 (mode=http-bridge, workspace=/path/to/project-a)
 ```
 
 `--no-web` removes the Web Shell assets and the surfaces bound to them: `POST /workspace/local-control/enable` then fails closed with `409 local_control_web_shell_unavailable` on every platform, and on macOS the `/live/*` routes, the `/live/host` WebSocket and the `experimental.liveVoice.*` settings keys are not registered — so an integration that drives the SDK's Live methods must run without `--no-web`. It is not a feature-profile switch: the session, prompt, workspace, permission and SSE routes are unchanged. Each `--workspace` value must be an absolute directory. The first startup workspace is primary and remains the compatibility default for requests that omit `cwd`; `/capabilities.workspaces[]` is the catalog clients should use when selecting any runtime explicitly.
@@ -230,10 +230,10 @@ case 'permission_request': {
 
 ## Shared-session collaboration
 
-Two clients pointed at the **same daemon workspace** end up on the same session when they use the default `sessionScope: 'single'`. For a single-workspace daemon launched as `qwen serve --workspace /work/repo` (or `cd /work/repo && qwen serve`), both clients connect to that primary workspace:
+Two clients pointed at the **same daemon workspace** end up on the same session when they use the default `sessionScope: 'single'`. For a single-workspace daemon launched as `mariadb-shell-agent serve --workspace /work/repo` (or `cd /work/repo && mariadb-shell-agent serve`), both clients connect to that primary workspace:
 
 ```ts
-// Daemon was launched as `qwen serve --workspace /work/repo` so
+// Daemon was launched as `mariadb-shell-agent serve --workspace /work/repo` so
 // `caps.workspaceCwd === '/work/repo'` for both clients.
 
 // Client A (e.g. an IDE plugin)

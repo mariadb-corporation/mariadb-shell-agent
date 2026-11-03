@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,7 +15,7 @@ import type {
 /**
  * Injection seam for the ACP fs proxy on `BridgeClient.readTextFile` /
  * `BridgeClient.writeTextFile`. A serve-side adapter wraps
- * `WorkspaceFileSystem` so production `qwen serve` writes pick up the
+ * `WorkspaceFileSystem` so production `mariadb-shell-agent serve` writes pick up the
  * TOCTOU + symlink + trust-gate + audit machinery. Until that adapter
  * ships and `runQwenServe` wires it through `BridgeOptions.fileSystem`,
  * BridgeClient continues to use its inline fs proxy (preserving

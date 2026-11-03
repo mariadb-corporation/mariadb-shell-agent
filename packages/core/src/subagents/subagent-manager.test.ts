@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -318,7 +319,7 @@ describe('SubagentManager', () => {
     description: 'A test subagent',
     systemPrompt: 'You are a helpful assistant.',
     level: 'project',
-    filePath: '/test/project/.qwen/agents/test-agent.md',
+    filePath: '/test/project/.mariadb-shell-agent/agents/test-agent.md',
   };
 
   // `---\n<fm>\n---\n\n<body>\n`, the shape of the hand-written agent files.
@@ -328,7 +329,7 @@ describe('SubagentManager', () => {
   const validMarkdown = md(TEST_FM);
 
   const projectAgentsDir = () =>
-    path.join(mockConfig.getProjectRoot(), '.qwen', 'agents');
+    path.join(mockConfig.getProjectRoot(), '.mariadb-shell-agent', 'agents');
   // Stubs the agents-directory listing and, when given, every file's content.
   function mockAgentFiles(files: string[], content?: string) {
     vi.mocked(fs.readdir).mockResolvedValue(files as never);
@@ -927,8 +928,8 @@ describe('SubagentManager', () => {
 
     it('should determine level from file path', () => {
       for (const [filePath, level] of [
-        ['/test/project/.qwen/agents/test-agent.md', 'project'],
-        ['/home/user/.qwen/agents/test-agent.md', 'user'],
+        ['/test/project/.mariadb-shell-agent/agents/test-agent.md', 'project'],
+        ['/home/user/.mariadb-shell-agent/agents/test-agent.md', 'user'],
       ] as const) {
         expect(parse(validMarkdown, filePath, level).level).toBe(level);
       }
@@ -1415,12 +1416,12 @@ describe('SubagentManager', () => {
       [
         'should load subagent from project level first',
         () => mockAgentFiles(['test-agent.md'], validMarkdown),
-        '/test/project/.qwen/agents',
+        '/test/project/.mariadb-shell-agent/agents',
       ],
       [
         'should fall back to user level if project level fails',
         mockUserLevelOnly,
-        '/home/user/.qwen/agents',
+        '/home/user/.mariadb-shell-agent/agents',
       ],
     ])('%s', async (_title, mockDirs, dir) => {
       mockDirs();
@@ -1458,11 +1459,13 @@ describe('SubagentManager', () => {
       expect(config).toBeDefined();
       expect(config!.name).toBe('correct-agent-name');
       expect(config!.filePath).toBe(
-        path.normalize('/test/project/.qwen/agents/wrong-filename.md'),
+        path.normalize(
+          '/test/project/.mariadb-shell-agent/agents/wrong-filename.md',
+        ),
       );
       // It scanned the directory instead of using a direct path.
       expect(fs.readdir).toHaveBeenCalledWith(
-        path.normalize('/test/project/.qwen/agents'),
+        path.normalize('/test/project/.mariadb-shell-agent/agents'),
       );
     });
 
@@ -1484,7 +1487,7 @@ describe('SubagentManager', () => {
       expect(config).toBeDefined();
       expect(config!.name).toBe('target-agent');
       expect(config!.filePath).toBe(
-        path.normalize('/home/user/.qwen/agents/user-agent.md'),
+        path.normalize('/home/user/.mariadb-shell-agent/agents/user-agent.md'),
       );
       expect(config!.level).toBe('user');
     });
@@ -1504,7 +1507,9 @@ describe('SubagentManager', () => {
       expect(config).toBeDefined();
       expect(config!.name).toBe('specific-agent');
       expect(config!.filePath).toBe(
-        path.normalize('/test/project/.qwen/agents/misnamed-file.md'),
+        path.normalize(
+          '/test/project/.mariadb-shell-agent/agents/misnamed-file.md',
+        ),
       );
     });
 
@@ -1721,7 +1726,7 @@ describe('SubagentManager', () => {
       });
     };
     const PROJECT_FILE = path.normalize(
-      '/test/project/.qwen/agents/test-agent.md',
+      '/test/project/.mariadb-shell-agent/agents/test-agent.md',
     );
 
     it.each(
@@ -1804,7 +1809,7 @@ describe('SubagentManager', () => {
       expect(fs.unlink).toHaveBeenCalledTimes(2);
       expect(fs.unlink).toHaveBeenCalledWith(PROJECT_FILE);
       expect(fs.unlink).toHaveBeenCalledWith(
-        path.normalize('/home/user/.qwen/agents/test-agent.md'),
+        path.normalize('/home/user/.mariadb-shell-agent/agents/test-agent.md'),
       );
     });
 
@@ -1836,7 +1841,9 @@ describe('SubagentManager', () => {
 
       // Deletes the actual file, not the expected filename.
       expect(fs.unlink).toHaveBeenCalledWith(
-        path.normalize('/test/project/.qwen/agents/wrong-name.md'),
+        path.normalize(
+          '/test/project/.mariadb-shell-agent/agents/wrong-name.md',
+        ),
       );
     });
 
@@ -1852,7 +1859,9 @@ describe('SubagentManager', () => {
 
       expect(fs.unlink).toHaveBeenCalledTimes(1);
       expect(fs.unlink).toHaveBeenCalledWith(
-        path.normalize('/test/project/.qwen/agents/target-file.md'),
+        path.normalize(
+          '/test/project/.mariadb-shell-agent/agents/target-file.md',
+        ),
       );
     });
   });

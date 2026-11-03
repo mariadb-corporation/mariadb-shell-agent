@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Private, non-secret activation marker passed only from `qwen serve` to its
+ * Private, non-secret activation marker passed only from `mariadb-shell-agent serve` to its
  * authenticated ACP child. The child consumes and deletes it before any tool,
  * hook, MCP server, or sub-agent can inherit the process environment.
  */
@@ -13,7 +14,7 @@ export const PRIVATE_EXTERNAL_TOOL_GUARD_ENV =
   'QWEN_CODE_PRIVATE_EXTERNAL_TOOL_GUARD';
 
 /**
- * Private, non-secret marker passed from `qwen serve` to its ACP child only
+ * Private, non-secret marker passed from `mariadb-shell-agent serve` to its ACP child only
  * when a real external tool guard provider is attached. Without it the child
  * still installs the managed guard plumbing (the daemon's built-in policy
  * needs it), but resolves every non-shell tool locally and keeps `/fork` and
@@ -34,12 +35,12 @@ export const EXTERNAL_TOOL_GUARD_READY_META_KEY =
 /**
  * The guard acknowledgment value the ACP child returns for
  * `EXTERNAL_TOOL_GUARD_READY_META_KEY`, and the private activation marker
- * value `qwen serve` passes to the child, when the guard is required.
+ * value `mariadb-shell-agent serve` passes to the child, when the guard is required.
  */
 export const EXTERNAL_TOOL_GUARD_REQUIRED_VALUE = 'required-v1';
 
 /**
- * The provider-attached marker value `qwen serve` passes to the child when a
+ * The provider-attached marker value `mariadb-shell-agent serve` passes to the child when a
  * real external tool guard provider is configured.
  */
 export const EXTERNAL_TOOL_GUARD_PROVIDER_ATTACHED_VALUE = 'attached-v1';

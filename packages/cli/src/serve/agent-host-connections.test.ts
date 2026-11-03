@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -206,7 +207,7 @@ it('supervises a connection saved after boot', async () => {
   await restoring(
     () => work,
     async () => {
-      // `qwen agents join` against the running daemon saves the record later.
+      // `mariadb-shell-agent agents join` against the running daemon saves the record later.
       await saveAgentHostConnection(record);
       await vi.waitFor(() =>
         expect(startConnection).toHaveBeenCalledWith({

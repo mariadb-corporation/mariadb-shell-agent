@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 // The trees a `ui.render` hook draws, judged by Claude Code 2.1.310's rules.
 // The worker checks each hook's answer and the host the tree the chain settles
-// on, so a tree Qwen Code accepts is one Claude Code accepts.
+// on, so a tree MariaDB Shell Agent accepts is one Claude Code accepts.
 
 export const MOD_RENDER_SITES = ['AbovePrompt'] as const;
 export type ModRenderSite = (typeof MOD_RENDER_SITES)[number];
@@ -296,7 +297,7 @@ export function validateRenderTree(tree: unknown): void {
     if (typeof type !== 'string') throw new Error('an element has no type');
     if (!DRAWN.has(type)) {
       if ((TERMINAL_ELEMENTS as readonly string[]).includes(type))
-        throw new Error(`${type} is not drawn by Qwen Code yet`);
+        throw new Error(`${type} is not drawn by MariaDB Shell Agent yet`);
       throw new Error(`${type} is not an element of the terminal`);
     }
     const tag = type as 'Box' | 'Text';

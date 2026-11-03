@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -232,12 +233,14 @@ describe('resolveQwenHome', () => {
     else process.env['QWEN_HOME'] = saved;
   });
 
-  it('prefers an explicit home, then QWEN_HOME, then ~/.qwen', () => {
+  it('prefers an explicit home, then QWEN_HOME, then ~/.mariadb-shell-agent', () => {
     process.env['QWEN_HOME'] = '/from/env';
     expect(resolveQwenHome('/explicit')).toBe(path.resolve('/explicit'));
     expect(resolveQwenHome()).toBe(path.resolve('/from/env'));
     delete process.env['QWEN_HOME'];
-    expect(resolveQwenHome()).toBe(path.join(os.homedir(), '.qwen'));
+    expect(resolveQwenHome()).toBe(
+      path.join(os.homedir(), '.mariadb-shell-agent'),
+    );
   });
 
   it('expands a leading ~ and resolves a relative path against the working directory', () => {

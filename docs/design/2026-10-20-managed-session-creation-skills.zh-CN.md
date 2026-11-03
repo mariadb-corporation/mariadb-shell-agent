@@ -48,7 +48,7 @@ Connector 将已保存目录发布为已有的不可变 `managed-agent-skills` �
 
 基于启用项的 Skills 流程已实现，并于 2026-10-20 部署到本地 Managed 服务。部署后的浏览器导入完整 42 项来源及一个临时的仅手动调用测试 Skill（共 43 项、950238 字节），页面重载后从 IndexedDB 恢复同一请求且不重新发现，并由真实 Kimi 模型返回测试 Skill 的精确结果。停用测试项影响新的导出，已有 Session 仍保留原快照；清理后原 42 项全部恢复原有启用状态。切换前后已有持久数据一致，已有 Session 仍可读取。
 
-build、typecheck、bundle、受影响消费者测试、一次性 MySQL/Hosted profiles、18 组适用进程测试和 8 项部署 UI 检查均通过。最终完整 Java 运行共 5010 项，有 1 项心跳计时失败、0 错误、18 项跳过；未修改的该方法及整个 38 项测试类定向复跑通过，包括 Checkstyle 和 SpotBugs。原完整运行保留失败记录，不记为全绿。已完成两轮干净代码自审和独立评审。完整证据、恢复故障覆盖和平台/模型限制记录在 `.qwen/e2e-tests/managed-session-creation-skills.md`。
+build、typecheck、bundle、受影响消费者测试、一次性 MySQL/Hosted profiles、18 组适用进程测试和 8 项部署 UI 检查均通过。最终完整 Java 运行共 5010 项，有 1 项心跳计时失败、0 错误、18 项跳过；未修改的该方法及整个 38 项测试类定向复跑通过，包括 Checkstyle 和 SpotBugs。原完整运行保留失败记录，不记为全绿。已完成两轮干净代码自审和独立评审。完整证据、恢复故障覆盖和平台/模型限制记录在 `.mariadb-shell-agent/e2e-tests/managed-session-creation-skills.md`。
 
 后续前端部署也补齐了创建前输入框菜单与启用来源的连接。部署后的新建菜单列出全部 42 项，选择后只插入 slash 指令而不发送，已验证重新打开刷新、过滤和错误恢复；已有 Session 仍显示原来的 43 项固定目录。菜单修复通过 146 项定向测试、根 build/typecheck/bundle、两轮干净自审和独立评审。
 

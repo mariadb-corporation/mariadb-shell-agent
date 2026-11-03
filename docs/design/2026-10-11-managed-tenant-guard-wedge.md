@@ -4,11 +4,11 @@
 
 - Status: implemented in this change (witness: `ManagedSessionGuardConvoyIT`);
   the lanes listed under Follow-ups keep unbounded acquisitions
-- Issue: [#13800](https://github.com/QwenLM/qwen-code/issues/13800) — a
+- Issue: [#13800](https://github.invalid/QwenLM/qwen-code/issues/13800) — a
   `recovery_blocked` Session wedges later turns of other Sessions on the same
   daemon. This change does not implement that issue's W1 or W2; see Scope.
 - Related: acceptance report `docs/verification/13532-linux-h3/README.md`
-  (finding A2), reproduction report `.qwen/issues/issue-13800.md` (not
+  (finding A2), reproduction report `.mariadb-shell-agent/issues/issue-13800.md` (not
   committed).
 
 ## Problem
@@ -27,8 +27,8 @@ but not the mechanism.
 mount lease, one row per `(tenantId, storageId)`, held by the parked blocked
 turn. During that wedge `innodb_trx` and the lock-wait tables were empty and
 the broker threads idle, which rules out tenant-wide row locks
-([issue comment](https://github.com/QwenLM/qwen-code/issues/13800#issuecomment-6094220681)).
-W2 is [#13816](https://github.com/QwenLM/qwen-code/pull/13816). This change
+([issue comment](https://github.invalid/QwenLM/qwen-code/issues/13800#issuecomment-6094220681)).
+W2 is [#13816](https://github.invalid/QwenLM/qwen-code/pull/13816). This change
 neither implements W1 nor discharges W2's exit check.
 
 What it fixes is a separate coupling that the investigation demonstrated
@@ -80,7 +80,7 @@ managed_session_writer_conflict` until the dead writer lease expires.
 ### Reproduction (guard-hold evidence)
 
 The full reproduction report with environment, commands, and raw logs lives in
-`.qwen/issues/issue-13800.md`. Summary of the decisive variants, run against a
+`.mariadb-shell-agent/issues/issue-13800.md`. Summary of the decisive variants, run against a
 local MariaDB 10.11 + managed-agent-server + packaged hosted harness + fake
 model endpoint:
 
@@ -373,7 +373,7 @@ witnessed.
    `packages/cli` hosted-harness suites; new unit tests for the named
    settle path.
 4. E2E re-run of the reproduction script (driver kept under
-   `.qwen/issues/13800-repro/`): guard-hold variant now yields named-fast
+   `.mariadb-shell-agent/issues/13800-repro/`): guard-hold variant now yields named-fast
    failures or successful turns, never the 30 s freeze.
 5. Physical-rig re-acceptance for #13532 stays an independent follow-up and
    belongs to #13800's W2 (#13816), not to this change.

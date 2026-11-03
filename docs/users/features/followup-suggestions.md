@@ -1,12 +1,12 @@
 # Followup Suggestions
 
-Qwen Code can predict what you want to type next and show it as placeholder text in the input area. This feature uses an LLM call to analyze the conversation context and generate a natural next step suggestion.
+MariaDB Shell Agent can predict what you want to type next and show it as placeholder text in the input area. This feature uses an LLM call to analyze the conversation context and generate a natural next step suggestion.
 
 This feature works end-to-end in both the CLI and Web Shell. Generation is automatic and server-side: after each cleanly completed turn (the daemon's `end_turn` stop reason — a `cancelled`, `refusal`, `max_tokens`, or `max_turn_requests` turn gets none) the daemon emits the suggestion on the session stream (on by default; set `ui.enableFollowupSuggestions` to `false` to opt out), and Web Shell's composer already wires the `useDaemonFollowupSuggestion` hook, so suggestions render and accept with no additional host wiring.
 
 ## How It Works
 
-After Qwen Code finishes responding, a suggestion appears as dimmed placeholder text in the input area after a short delay (~300ms). For example, after fixing a bug, you might see:
+After MariaDB Shell Agent finishes responding, a suggestion appears as dimmed placeholder text in the input area after a short delay (~300ms). For example, after fixing a bug, you might see:
 
 ```
 > run the tests

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -202,17 +203,28 @@ describe('GitWorktreeService.createUserWorktree() — symlinkDirectories', () =>
     expect(await isSymlink(hooks)).toBe(false);
   });
 
-  it('rejects paths inside .qwen (security guard)', async () => {
-    // `.qwen` is CLI metadata: symlinking `.qwen/worktrees` would create
-    // a worktrees-inside-worktrees loop; symlinking `.qwen/projects` or
-    // `.qwen/tmp` would alias session metadata users have no legitimate
+  it('rejects paths inside .mariadb-shell-agent (security guard)', async () => {
+    // `.mariadb-shell-agent` is CLI metadata: symlinking `.mariadb-shell-agent/worktrees` would create
+    // a worktrees-inside-worktrees loop; symlinking `.mariadb-shell-agent/projects` or
+    // `.mariadb-shell-agent/tmp` would alias session metadata users have no legitimate
     // reason to share across worktrees. Guard rejects the whole subtree.
-    await fs.mkdir(path.join(repoRoot, '.qwen'), { recursive: true });
-    await fs.writeFile(path.join(repoRoot, '.qwen', 'projects'), 'data');
+    await fs.mkdir(path.join(repoRoot, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
+    await fs.writeFile(
+      path.join(repoRoot, '.mariadb-shell-agent', 'projects'),
+      'data',
+    );
 
-    const result = await create('reject-qwen', ['.qwen/projects']);
-    // No symlink at <worktree>/.qwen/projects.
-    const dest = path.join(result.worktree!.path, '.qwen', 'projects');
+    const result = await create('reject-qwen', [
+      '.mariadb-shell-agent/projects',
+    ]);
+    // No symlink at <worktree>/.mariadb-shell-agent/projects.
+    const dest = path.join(
+      result.worktree!.path,
+      '.mariadb-shell-agent',
+      'projects',
+    );
     expect(await isSymlink(dest)).toBe(false);
   });
 
@@ -274,9 +286,9 @@ describe('GitWorktreeService.createUserWorktree() — symlinkDirectories', () =>
     }
   });
 
-  it('refuses sources whose realpath escapes the repo root or lands in .git/.qwen (committed-symlink bypass)', async () => {
+  it('refuses sources whose realpath escapes the repo root or lands in .git/.mariadb-shell-agent (committed-symlink bypass)', async () => {
     // Round-7 security fix: the lexical `isWithinRoot(sourceAbs, …)` and
-    // `.git`/`.qwen` blocklist checks DON'T resolve symlinks, so a symlink
+    // `.git`/`.mariadb-shell-agent` blocklist checks DON'T resolve symlinks, so a symlink
     // committed into the source repo HEAD (or set up out-of-band by a
     // malicious post-install script / repo tarball) can chain through to
     // arbitrary targets. Two flavours:

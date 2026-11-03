@@ -35,7 +35,7 @@ payload built inside `chatCompressionService`.
 
 - **Large-paste externalization to a paste cache.** An earlier draft
   of this design proposed hashing oversize text into
-  `~/.qwen/paste-cache/<sha>.txt` and substituting a placeholder. We
+  `~/.mariadb-shell-agent/paste-cache/<sha>.txt` and substituting a placeholder. We
   rejected it after surveying claude-code's 2026-03 to 2026-05
   releases: the upstream direction is to keep user input visible to
   the model and amortize cost via prompt caching (1h TTL knobs, image

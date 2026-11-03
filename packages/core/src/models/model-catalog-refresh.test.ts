@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -681,7 +682,7 @@ describe('refreshModelCatalog', () => {
     for (const name of ENV_NAMES) {
       delete process.env[name];
     }
-    process.env['QWEN_HOME'] = path.join(tempDir, '.qwen');
+    process.env['QWEN_HOME'] = path.join(tempDir, '.mariadb-shell-agent');
     fetchMock.mockReset();
     vi.stubGlobal('fetch', fetchMock);
     invalidateModelCatalog();

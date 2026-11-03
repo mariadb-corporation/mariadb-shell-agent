@@ -79,7 +79,7 @@ describe('cronTasksFile', () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'cron-test-'));
     // Durable tasks live under the user runtime dir, not the working tree.
     // Redirect that base into the test temp dir so the per-project hash dir
-    // lands under tmpDir instead of the real ~/.qwen.
+    // lands under tmpDir instead of the real ~/.mariadb-shell-agent.
     Storage.setRuntimeBaseDir(tmpDir);
   });
 
@@ -109,7 +109,9 @@ describe('cronTasksFile', () => {
       );
       // Crucially, not in the project working tree.
       expect(file.startsWith('/project')).toBe(false);
-      expect(file).not.toContain(`${path.sep}.qwen${path.sep}scheduled_tasks`);
+      expect(file).not.toContain(
+        `${path.sep}.mariadb-shell-agent${path.sep}scheduled_tasks`,
+      );
     });
   });
 
@@ -318,7 +320,7 @@ describe('cronTasksFile', () => {
       async (field) => {
         for (const value of [
           'x'.repeat(MAX_CRON_TASK_ROUTING_ID_LENGTH + 1),
-          'value\nqwen serve: forged',
+          'value\nmariadb-shell-agent serve: forged',
         ]) {
           await seedTask({ sessionMode: 'per_run', [field]: value });
           await expectInvalidEntry();

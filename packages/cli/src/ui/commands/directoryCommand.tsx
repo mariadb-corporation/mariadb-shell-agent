@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -267,7 +268,7 @@ export const directoryCommand: SlashCommand = {
                 context.ui.setMemoryFileCount(fileCount);
                 messages.push(
                   t(
-                    'Successfully added QWEN.md files from the following directories if there are:\n- {{directories}}',
+                    'Successfully added MARIADB-SHELL-AGENT.md files from the following directories if there are:\n- {{directories}}',
                     { directories: added.join('\n- ') },
                   ),
                 );

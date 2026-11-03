@@ -1,10 +1,10 @@
 # Mem0
 
-Mem0 connects Qwen Code to an external memory service. It is included in the main CLI package: do not install `@qwen-code/external-context-mem0` or register a separate MCP server for this path.
+Mem0 connects MariaDB Shell Agent to an external memory service. It is included in the main CLI package: do not install `@qwen-code/external-context-mem0` or register a separate MCP server for this path.
 
 ## Connect
 
-Merge this into user settings (`~/.qwen/settings.json`), then restart Qwen Code in a trusted project. Like `modelProviders`, `envKey` names the credential variable and the top-level `env` field can supply its value:
+Merge this into user settings (`~/.mariadb-shell-agent/settings.json`), then restart MariaDB Shell Agent in a trusted project. Like `modelProviders`, `envKey` names the credential variable and the top-level `env` field can supply its value:
 
 ```json
 {
@@ -21,7 +21,7 @@ Merge this into user settings (`~/.qwen/settings.json`), then restart Qwen Code 
 }
 ```
 
-This single-file setup does not require a shell export. Credentials in JSON are plaintext: keep them in user settings, do not commit them to a repository, and avoid sharing the file in reports. Alternatively, omit the top-level `env` entry and set the key in the launching shell or `~/.qwen/.env`. Nonempty process environment values take precedence over `.env` values, which take precedence over `settings.env`.
+This single-file setup does not require a shell export. Credentials in JSON are plaintext: keep them in user settings, do not commit them to a repository, and avoid sharing the file in reports. Alternatively, omit the top-level `env` entry and set the key in the launching shell or `~/.mariadb-shell-agent/.env`. Nonempty process environment values take precedence over `.env` values, which take precedence over `settings.env`.
 
 Use the endpoint origin, optionally with a reverse-proxy prefix; do not append `/v2/memories/search` or another operation path. Choose the contract your service actually implements:
 
@@ -39,7 +39,7 @@ Qwen automatically registers `external-context` and discovers `context_search`. 
 
 The default user/repository scope survives restart and starting from Git subdirectories. Moving the repository or using another checkout changes it, including temporary `--worktree` and agent-isolation worktrees. To reuse a known scope across worktrees, set `scope.userId` for V2/OSS or `scope.appId` for V3; optional `scope.agentId` applies only to V2/OSS. Scope identifiers are not provider-side access controls.
 
-Search is read-only by default. To enable saving, add `"enableWrites": true` inside `memory.mem0`, restart the interactive CLI, and ask Qwen to save specific content. The automatically installed Hook asks you to approve the exact content, including in YOLO mode. Rejecting sends no write request. Writes use `infer: false`.
+Search is read-only by default. To enable saving, add `"enableWrites": true` inside `memory.mem0`, restart the interactive CLI, and ask MariaDB Shell Agent to save specific content. The automatically installed Hook asks you to approve the exact content, including in YOLO mode. Rejecting sends no write request. Writes use `infer: false`.
 
 PolarDB can return a single-user message array encoded as JSON for these direct imports. `mem0-v2` restores that message's exact text when the result is marked `infer: false`; the historical `aliyun-polardb-mysql-2026-08` preset, ordinary text, and other protocols are left unchanged.
 

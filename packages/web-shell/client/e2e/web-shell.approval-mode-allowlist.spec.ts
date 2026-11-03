@@ -200,7 +200,9 @@ test('dynamic host changes update an open picker @smoke', async ({
     ),
   );
   await expect(page.locator(menuOptions)).toHaveCount(2);
-  const directory = resolve('../../.qwen/e2e-tests/approval-mode-evidence');
+  const directory = resolve(
+    '../../.mariadb-shell-agent/e2e-tests/approval-mode-evidence',
+  );
   await mkdir(directory, { recursive: true });
   await page.screenshot({
     path: resolve(directory, 'allowed-default-auto-menu.png'),

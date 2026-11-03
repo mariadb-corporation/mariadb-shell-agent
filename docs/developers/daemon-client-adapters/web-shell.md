@@ -2,7 +2,7 @@
 
 ## Goal
 
-Web chat and web terminal clients should consume `qwen serve` through the
+Web chat and web terminal clients should consume `mariadb-shell-agent serve` through the
 daemon HTTP/SSE APIs and render a client-side transcript. Native local TUI,
 channel, and IDE integrations keep their existing default paths for now.
 
@@ -136,7 +136,7 @@ allowed to reach.
 
 ### Local Browser Against Local Daemon
 
-A separate local dev server is cross-origin from `qwen serve`; it must either
+A separate local dev server is cross-origin from `mariadb-shell-agent serve`; it must either
 proxy daemon routes through the same origin or be served by the daemon. The
 daemon intentionally rejects arbitrary browser `Origin` requests.
 
@@ -165,7 +165,7 @@ Ink rendering.
 
 ## Merge Safety
 
-- The native `qwen` TUI remains direct and unchanged.
+- The native `mariadb-shell-agent` TUI remains direct and unchanged.
 - `--acp`, channel, and IDE paths remain unchanged by default.
 - The SDK UI core is additive.
 - The Web Shell React binding is optional and only runs in clients that import

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -40,7 +41,7 @@ describe('extractAtPathCommands', () => {
   // invisible in the error, which named only the host.
   it('keeps the whole query string of a URL ref', () => {
     const presigned =
-      'https://bucket.oss-cn-wulanchabu.aliyuncs.com/dir/movie.mkv' +
+      'https://bucket.oss-cn-wulanchabu.aliyuncs.invalid/dir/movie.mkv' +
       '?x-oss-credential=LTAI%2F20260805%2Fcn-wulanchabu%2Foss%2Faliyun_v4_request' +
       '&x-oss-date=20260805T064817Z&x-oss-expires=32400' +
       '&x-oss-signature-version=OSS4-HMAC-SHA256&x-oss-signature=f1454dcb';
@@ -1037,7 +1038,7 @@ describe('handleAtCommand', () => {
   describe('qwen-ignore filtering', () => {
     it('should skip qwen-ignored files in @ commands', async () => {
       await createTestFile(
-        path.join(testRootDir, '.qwenignore'),
+        path.join(testRootDir, '.mariadb-shell-agentignore'),
         'build/output.js',
       );
       const qwenIgnoredFile = await createTestFile(
@@ -1097,9 +1098,9 @@ describe('handleAtCommand', () => {
       );
     });
   });
-  it('should process non-ignored files when .qwenignore is present', async () => {
+  it('should process non-ignored files when .mariadb-shell-agentignore is present', async () => {
     await createTestFile(
-      path.join(testRootDir, '.qwenignore'),
+      path.join(testRootDir, '.mariadb-shell-agentignore'),
       'build/output.js',
     );
     const validFile = await createTestFile(
@@ -1130,7 +1131,7 @@ describe('handleAtCommand', () => {
 
   it('should handle mixed qwen-ignored and valid files', async () => {
     await createTestFile(
-      path.join(testRootDir, '.qwenignore'),
+      path.join(testRootDir, '.mariadb-shell-agentignore'),
       'dist/bundle.js',
     );
     const validFile = await createTestFile(

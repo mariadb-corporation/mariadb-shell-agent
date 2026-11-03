@@ -1,18 +1,18 @@
 # Commands
 
-This document details all commands supported by Qwen Code, helping you efficiently manage sessions, customize the interface, and control its behavior.
+This document details all commands supported by MariaDB Shell Agent, helping you efficiently manage sessions, customize the interface, and control its behavior.
 
-Qwen Code commands are triggered through specific prefixes and fall into three categories:
+MariaDB Shell Agent commands are triggered through specific prefixes and fall into three categories:
 
 | Prefix Type                | Function Description                                | Typical Use Case                                                 |
 | -------------------------- | --------------------------------------------------- | ---------------------------------------------------------------- |
-| Slash Commands (`/`)       | Meta-level control of Qwen Code itself              | Managing sessions, modifying settings, getting help              |
+| Slash Commands (`/`)       | Meta-level control of MariaDB Shell Agent itself    | Managing sessions, modifying settings, getting help              |
 | At Commands (`@`)          | Quickly inject local file content into conversation | Allowing AI to analyze specified files or code under directories |
 | Exclamation Commands (`!`) | Direct interaction with system Shell                | Executing system commands like `git status`, `ls`, etc.          |
 
 ## 1. Slash Commands (`/`)
 
-Slash commands are used to manage Qwen Code sessions, interface, and basic behavior.
+Slash commands are used to manage MariaDB Shell Agent sessions, interface, and basic behavior.
 
 ### 1.1 Session and Project Management
 
@@ -37,7 +37,7 @@ These commands help you save, restore, and summarize work progress.
 
 > [!note]
 >
-> Opening an HTML export loads the renderer and stylesheet for that exact Qwen Code version from `unpkg.com`. If the version has not been published or either asset cannot be reached, the file shows a load error. Markdown, JSON, and JSONL exports remain self-contained.
+> Opening an HTML export loads the renderer and stylesheet for that exact MariaDB Shell Agent version from `unpkg.com`. If the version has not been published or either asset cannot be reached, the file shows a load error. Markdown, JSON, and JSONL exports remain self-contained.
 
 > [!note]
 >
@@ -45,7 +45,7 @@ These commands help you save, restore, and summarize work progress.
 
 > [!note]
 >
-> `/summary` accepts an optional `[path]` argument to save the summary to a custom location within the project root. Without an argument, it saves to `.qwen/PROJECT_SUMMARY.md`. Custom-path summaries are not detected by the welcome-back flow (`ui.enableWelcomeBack`), which only reads the default `.qwen/PROJECT_SUMMARY.md` location.
+> `/summary` accepts an optional `[path]` argument to save the summary to a custom location within the project root. Without an argument, it saves to `.mariadb-shell-agent/PROJECT_SUMMARY.md`. Custom-path summaries are not detected by the welcome-back flow (`ui.enableWelcomeBack`), which only reads the default `.mariadb-shell-agent/PROJECT_SUMMARY.md` location.
 
 ### 1.2 Interface and Workspace Control
 
@@ -59,7 +59,7 @@ Commands for adjusting interface appearance and work environment.
 | `/history`           | Control history display preferences and visibility                                                                                                                                | `/history collapse-on-resume`, `/history expand-on-resume`, `/history expand-now` |
 | `/diff`              | Open an interactive diff viewer showing uncommitted changes and per-turn diffs. Use ←/→ to switch between current git diff and individual conversation turns, ↑/↓ to browse files | `/diff`                                                                           |
 | `/log`               | Open a commit history viewer for the workspace (Web Shell only)                                                                                                                   | `/log`                                                                            |
-| `/theme`             | Change Qwen Code visual theme                                                                                                                                                     | `/theme`                                                                          |
+| `/theme`             | Change MariaDB Shell Agent visual theme                                                                                                                                           | `/theme`                                                                          |
 | `/vim`               | Turn input area Vim editing mode on/off                                                                                                                                           | `/vim`                                                                            |
 | `/voice`             | Toggle voice dictation input                                                                                                                                                      | `/voice`, `/voice hold`, `/voice tap`, `/voice off`, `/voice status`              |
 | `/directory`         | Manage multi-directory support workspace                                                                                                                                          | `/dir add ./src,./tests`, `/dir show`                                             |
@@ -119,7 +119,7 @@ Commands for managing AI tools and models.
 | `/remember`           | Save a durable memory                                                                            | `/remember Prefer terse responses`                                                                        |
 | `/forget`             | Remove matching entries from auto-memory                                                         | `/forget <query>`                                                                                         |
 | `/dream`              | Manually run auto-memory consolidation                                                           | `/dream`                                                                                                  |
-| `/hooks`              | Manage Qwen Code hooks                                                                           | `/hooks`, `/hooks list`                                                                                   |
+| `/hooks`              | Manage MariaDB Shell Agent hooks                                                                 | `/hooks`, `/hooks list`                                                                                   |
 | `/reload-plugins`     | Reload extension changes (commands, skills, agents, workflows, hooks, MCP/LSP servers) from disk | `/reload-plugins`                                                                                         |
 | `/permissions`        | Manage permission rules                                                                          | `/permissions`                                                                                            |
 | `/agents`             | Manage subagents                                                                                 | `/agents manage`, `/agents create`                                                                        |
@@ -132,7 +132,7 @@ Commands for managing AI tools and models.
 
 > [!warning]
 >
-> Only install extensions (`/extensions install`) from sources you trust. Extensions can bundle MCP servers, skills, and commands that run with the same permissions as Qwen Code itself — they can access your files, API keys, and conversation data. They can also ship workflow scripts, which run in the workflow sandbox without direct file or shell access, act through the subagents they start, and go through the Workflow tool's approval. `/extensions install` does not prompt for confirmation.
+> Only install extensions (`/extensions install`) from sources you trust. Extensions can bundle MCP servers, skills, and commands that run with the same permissions as MariaDB Shell Agent itself — they can access your files, API keys, and conversation data. They can also ship workflow scripts, which run in the workflow sandbox without direct file or shell access, act through the subagents they start, and go through the Workflow tool's approval. `/extensions install` does not prompt for confirmation.
 
 > [!warning]
 >
@@ -150,15 +150,15 @@ Commands for managing AI tools and models.
 
 These commands invoke bundled skills that provide specialized workflows.
 
-| Command       | Description                                                   | Usage Examples                                                                            |
-| ------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `/review`     | Multi-agent code review (12 parallel agents at high effort)   | `/review`, `/review 123`, `/review 123 --comment`, `/review --effort low`                 |
-| `/coordinate` | Coordinate read-only workers and one optional worktree writer | `/coordinate investigate and fix the authentication regression`                           |
-| `/loop`       | Run a prompt on a recurring schedule                          | `/loop 5m check the build`                                                                |
-| `/goal-draft` | Turn a fuzzy intention into a verifiable `/goal` objective    | `/goal-draft make the auth tests pass`                                                    |
-| `/autofix-pr` | Watch a PR and fix its CI, review feedback and conflicts      | `/autofix-pr 123`, `/autofix-pr 123 --once`, `/autofix-pr resume`, `/autofix-pr stop 123` |
-| `/simplify`   | Review recent changes and apply safe cleanup edits directly   | `/simplify`, `/simplify focus on duplication`                                             |
-| `/qc-helper`  | Answer questions about Qwen Code usage and configuration      | `/qc-helper how do I configure MCP?`                                                      |
+| Command       | Description                                                        | Usage Examples                                                                            |
+| ------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `/review`     | Multi-agent code review (12 parallel agents at high effort)        | `/review`, `/review 123`, `/review 123 --comment`, `/review --effort low`                 |
+| `/coordinate` | Coordinate read-only workers and one optional worktree writer      | `/coordinate investigate and fix the authentication regression`                           |
+| `/loop`       | Run a prompt on a recurring schedule                               | `/loop 5m check the build`                                                                |
+| `/goal-draft` | Turn a fuzzy intention into a verifiable `/goal` objective         | `/goal-draft make the auth tests pass`                                                    |
+| `/autofix-pr` | Watch a PR and fix its CI, review feedback and conflicts           | `/autofix-pr 123`, `/autofix-pr 123 --once`, `/autofix-pr resume`, `/autofix-pr stop 123` |
+| `/simplify`   | Review recent changes and apply safe cleanup edits directly        | `/simplify`, `/simplify focus on duplication`                                             |
+| `/qc-helper`  | Answer questions about MariaDB Shell Agent usage and configuration | `/qc-helper how do I configure MCP?`                                                      |
 
 See [Code Review](./code-review.md) for full `/review` documentation, and [Autofix a Pull Request](./autofix-pr.md) for `/autofix-pr`.
 
@@ -396,7 +396,7 @@ In headless (`--prompt`) or non-interactive contexts, `/diff` prints a plain-tex
    +3  -2  README.md
 ```
 
-**Web Shell:** In the Web Shell UI (`qwen serve`), `/diff` opens a graphical diff dialog. A tab bar at the top lets you switch between the **Changes** view and the **History** view (`/log`).
+**Web Shell:** In the Web Shell UI (`mariadb-shell-agent serve`), `/diff` opens a graphical diff dialog. A tab bar at the top lets you switch between the **Changes** view and the **History** view (`/log`).
 
 #### History Viewer (`/log`) — Web Shell only
 
@@ -472,13 +472,13 @@ Commands for obtaining information and performing system settings.
 | → `memory`       | Show current process memory diagnostics                                                                                        | `/doctor memory [--json] [--sample] [--snapshot]`                                   |
 | → `cpu-profile`  | Record a CPU profile for Chrome DevTools analysis                                                                              | `/doctor cpu-profile [--duration <seconds>]`                                        |
 | → `rollback`     | Roll back the standalone CLI binary to the previous version (standalone installs only; for conversation history use `/rewind`) | `/doctor rollback`                                                                  |
-| `/docs`          | Open full Qwen Code documentation in browser                                                                                   | `/docs`                                                                             |
+| `/docs`          | Open full MariaDB Shell Agent documentation in browser                                                                         | `/docs`                                                                             |
 | `/ide`           | Manage IDE integration                                                                                                         | `/ide status`, `/ide install`, `/ide enable`, `/ide disable`                        |
 | `/insight`       | Generate programming insights from chat history                                                                                | `/insight`                                                                          |
 | `/setup-github`  | Set up GitHub Actions                                                                                                          | `/setup-github`                                                                     |
-| `/bug`           | Submit issue about Qwen Code                                                                                                   | `/bug Button click unresponsive`                                                    |
+| `/bug`           | Submit issue about MariaDB Shell Agent                                                                                         | `/bug Button click unresponsive`                                                    |
 | `/copy`          | Copy to clipboard: reply (Nth-last), code (by lang), LaTeX, or Mermaid                                                         | `/copy`, `/copy 2`, `/copy python`, `/copy latex`, `/copy mermaid`                  |
-| `/quit`          | Exit Qwen Code immediately                                                                                                     | `/quit` or `/exit`                                                                  |
+| `/quit`          | Exit MariaDB Shell Agent immediately                                                                                           | `/quit` or `/exit`                                                                  |
 
 > [!warning]
 >
@@ -486,7 +486,7 @@ Commands for obtaining information and performing system settings.
 
 > [!note]
 >
-> `/config` reads and writes individual settings by dot-path key (e.g. `general.vimMode`), complementing the interactive `/settings` editor. Running `/config` with no argument (or `--help`) lists every settable key with its type and current value. `/config <key>` prints the current value — except for boolean keys, where it toggles the value. `/config <key>=<value>` sets the value. Changes are written to user settings (`~/.qwen/settings.json`). Only `boolean`, `string`, `number`, and `enum` settings can be changed this way — `array` and `object` settings must be edited in `settings.json` directly. Sensitive values (API keys, tokens, base URLs) are masked in output, and setting `tools.approvalMode` to `yolo` is blocked.
+> `/config` reads and writes individual settings by dot-path key (e.g. `general.vimMode`), complementing the interactive `/settings` editor. Running `/config` with no argument (or `--help`) lists every settable key with its type and current value. `/config <key>` prints the current value — except for boolean keys, where it toggles the value. `/config <key>=<value>` sets the value. Changes are written to user settings (`~/.mariadb-shell-agent/settings.json`). Only `boolean`, `string`, `number`, and `enum` settings can be changed this way — `array` and `object` settings must be edited in `settings.json` directly. Sensitive values (API keys, tokens, base URLs) are masked in output, and setting `tools.approvalMode` to `yolo` is blocked.
 
 ### 1.11 Common Shortcuts
 
@@ -500,7 +500,7 @@ Commands for obtaining information and performing system settings.
 
 ### 1.12 Authentication Commands
 
-Use `/auth` inside a Qwen Code session to configure authentication. Use `/doctor` to inspect the current authentication and environment status.
+Use `/auth` inside a MariaDB Shell Agent session to configure authentication. Use `/doctor` to inspect the current authentication and environment status.
 
 | Command   | Description                                                            |
 | --------- | ---------------------------------------------------------------------- |
@@ -509,7 +509,7 @@ Use `/auth` inside a Qwen Code session to configure authentication. Use `/doctor
 
 > [!note]
 >
-> The standalone `qwen auth` CLI command has been removed. Legacy invocations such as `qwen auth status` print a removal notice with migration guidance. See the [Authentication](../configuration/auth) page for full details.
+> The standalone `mariadb-shell-agent auth` CLI command has been removed. Legacy invocations such as `mariadb-shell-agent auth status` print a removal notice with migration guidance. See the [Authentication](../configuration/auth) page for full details.
 
 ## 2. @ Commands (Introducing Files)
 
@@ -527,7 +527,7 @@ In the interactive prompt, `@` completion supports Unicode filenames, including 
 
 ## 3. Exclamation Commands (`!`) - Shell Command Execution
 
-Exclamation commands allow you to execute system commands directly within Qwen Code.
+Exclamation commands allow you to execute system commands directly within MariaDB Shell Agent.
 
 | Command Format     | Description                                                        | Examples                               |
 | ------------------ | ------------------------------------------------------------------ | -------------------------------------- |
@@ -546,11 +546,11 @@ Save frequently used prompts as shortcut commands to improve work efficiency and
 
 ### Quick Overview
 
-| Function         | Description                                | Advantages                             | Priority | Applicable Scenarios                                 |
-| ---------------- | ------------------------------------------ | -------------------------------------- | -------- | ---------------------------------------------------- |
-| Namespace        | Subdirectory creates colon-named commands  | Better command organization            |          |                                                      |
-| Global Commands  | `~/.qwen/commands/`                        | Available in all projects              | Low      | Personal frequently used commands, cross-project use |
-| Project Commands | `<project root directory>/.qwen/commands/` | Project-specific, version-controllable | High     | Team sharing, project-specific commands              |
+| Function         | Description                                               | Advantages                             | Priority | Applicable Scenarios                                 |
+| ---------------- | --------------------------------------------------------- | -------------------------------------- | -------- | ---------------------------------------------------- |
+| Namespace        | Subdirectory creates colon-named commands                 | Better command organization            |          |                                                      |
+| Global Commands  | `~/.mariadb-shell-agent/commands/`                        | Available in all projects              | Low      | Personal frequently used commands, cross-project use |
+| Project Commands | `<project root directory>/.mariadb-shell-agent/commands/` | Project-specific, version-controllable | High     | Team sharing, project-specific commands              |
 
 Priority Rules: Project commands > User commands (project command used when names are same)
 
@@ -558,10 +558,10 @@ Priority Rules: Project commands > User commands (project command used when name
 
 #### File Path to Command Name Mapping Table
 
-| File Location                            | Generated Command | Example Call          |
-| ---------------------------------------- | ----------------- | --------------------- |
-| `~/.qwen/commands/test.md`               | `/test`           | `/test Parameter`     |
-| `<project>/.qwen/commands/git/commit.md` | `/git:commit`     | `/git:commit Message` |
+| File Location                                           | Generated Command | Example Call          |
+| ------------------------------------------------------- | ----------------- | --------------------- |
+| `~/.mariadb-shell-agent/commands/test.md`               | `/test`           | `/test Parameter`     |
+| `<project>/.mariadb-shell-agent/commands/git/commit.md` | `/git:commit`     | `/git:commit Message` |
 
 Naming Rules: Path separator (`/` or `\`) converted to colon (`:`)
 
@@ -673,12 +673,12 @@ Review {{args}}, reference standards:
 
 #### "Pure Function Refactoring" Command Creation Steps Table
 
-| Operation                     | Command/Code                              |
-| ----------------------------- | ----------------------------------------- |
-| 1. Create directory structure | `mkdir -p ~/.qwen/commands/refactor`      |
-| 2. Create command file        | `touch ~/.qwen/commands/refactor/pure.md` |
-| 3. Edit command content       | Refer to the complete code below.         |
-| 4. Test command               | `@file.js` → `/refactor:pure`             |
+| Operation                     | Command/Code                                             |
+| ----------------------------- | -------------------------------------------------------- |
+| 1. Create directory structure | `mkdir -p ~/.mariadb-shell-agent/commands/refactor`      |
+| 2. Create command file        | `touch ~/.mariadb-shell-agent/commands/refactor/pure.md` |
+| 3. Edit command content       | Refer to the complete code below.                        |
+| 4. Test command               | `@file.js` → `/refactor:pure`                            |
 
 ```markdown
 ---
@@ -719,15 +719,15 @@ These commands are run from the shell as `qwen <subcommand>` before starting an 
 
 ### Session Management
 
-| Command                     | Description                                 | Usage Examples                                                                   |
-| --------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------- |
-| `qwen sessions list`        | List recent conversation sessions           | `qwen sessions list`, `qwen sessions list --json --limit 50`                     |
-| `qwen sessions ps`          | List interactive sessions running right now | `qwen sessions ps`, `qwen sessions ps --json`                                    |
-| `qwen sessions controllers` | Manage trusted controller tokens            | `qwen sessions controllers add --label <name>`, `qwen sessions controllers list` |
+| Command                                    | Description                                 | Usage Examples                                                                                                 |
+| ------------------------------------------ | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `mariadb-shell-agent sessions list`        | List recent conversation sessions           | `mariadb-shell-agent sessions list`, `mariadb-shell-agent sessions list --json --limit 50`                     |
+| `mariadb-shell-agent sessions ps`          | List interactive sessions running right now | `mariadb-shell-agent sessions ps`, `mariadb-shell-agent sessions ps --json`                                    |
+| `mariadb-shell-agent sessions controllers` | Manage trusted controller tokens            | `mariadb-shell-agent sessions controllers add --label <name>`, `mariadb-shell-agent sessions controllers list` |
 
-#### `qwen sessions list`
+#### `mariadb-shell-agent sessions list`
 
-Lists your recent Qwen Code sessions with metadata.
+Lists your recent MariaDB Shell Agent sessions with metadata.
 
 **Flags:**
 
@@ -754,23 +754,23 @@ The "has more sessions" hint is emitted via stderr so piping to `jq` remains saf
 
 ```bash
 # Show last 20 sessions (default)
-qwen sessions list
+mariadb-shell-agent sessions list
 
 # Show last 50 sessions
-qwen sessions list --limit 50
+mariadb-shell-agent sessions list --limit 50
 
 # Output as JSON for scripting
-qwen sessions list --json | jq .
+mariadb-shell-agent sessions list --json | jq .
 ```
 
-#### `qwen sessions ps`
+#### `mariadb-shell-agent sessions ps`
 
-Lists the Qwen Code session records visible on this machine.
+Lists the MariaDB Shell Agent session records visible on this machine.
 `sessions list` walks saved transcripts ("what have I worked on"). This
 command shows both the live-process registry and Agent View records marked
 `managed`. Records left behind by a killed session are swept from the registry
 as they are found. A managed record is persistent bookkeeping, not evidence
-that its worker is still alive. A one-shot `qwen -p` run never registers and
+that its worker is still alive. A one-shot `mariadb-shell-agent -p` run never registers and
 is not shown.
 
 **Flags:**
@@ -784,10 +784,10 @@ is not shown.
 A table with columns: NAME, KIND, PID, AGE, DIRECTORY.
 
 KIND says what registered the session — `tui` for someone at a terminal,
-`external` for a program that is not a Qwen Code session at all (a voice
+`external` for a program that is not a MariaDB Shell Agent session at all (a voice
 front-end, a relay), and `headless` or `serve` for a session another
 program drives. Several `serve` or `headless` rows can share one PID: a
-`qwen --acp` child hosts all its sessions in one process — `serve` when
+`mariadb-shell-agent --acp` child hosts all its sessions in one process — `serve` when
 the daemon spawned it, `headless` when a client is driving it directly —
 and each of them registers separately when peer messaging is active. A hosted
 session does not register here when its own environment puts it in bare or
@@ -819,7 +819,7 @@ sessionId, cwd, managed: true
 ```
 
 Nothing else is written to stdout — an empty listing prints nothing at
-all — so `qwen sessions ps --json | jq .` is safe to script against. If
+all — so `mariadb-shell-agent sessions ps --json | jq .` is safe to script against. If
 the supervisor store cannot be read, registry records still print and the
 reason is written to stderr.
 
@@ -831,12 +831,12 @@ rendering them in a terminal.
 
 ```bash
 # Show the other live sessions
-qwen sessions ps
+mariadb-shell-agent sessions ps
 
 # Which directories have a visible session record?
 # Note: `jq -r` renders the raw recorded value in your terminal (see the
 # raw-data note above); pipe through a sanitizer if the path is untrusted.
-qwen sessions ps --json | jq -r .cwd
+mariadb-shell-agent sessions ps --json | jq -r .cwd
 ```
 
 ## 6. Messaging Another Running Session
@@ -854,13 +854,13 @@ To disable peer discovery and messaging, turn it off in
 ```
 
 An interactive session with peer messaging disabled can still appear in
-`qwen sessions ps`, but has no `ipcPath` and is not a reachable peer in
+`mariadb-shell-agent sessions ps`, but has no `ipcPath` and is not a reachable peer in
 `list_agents`. The OpenTUI interface does not bind a peer inbox either;
 enabling the setting alone does not make it messageable.
 
 With messaging active, the model in one session can discover the others with
 `list_agents` — each appears under `sessions` with the `name` that
-`qwen sessions ps --json` records (the table view may truncate long
+`mariadb-shell-agent sessions ps --json` records (the table view may truncate long
 names) — and address one with `send_message` using
 that name as `to`. When two sessions share a name, `list_agents` shows
 each with a short `[ref]` and the send must include it (`name [ref]`); a
@@ -887,7 +887,7 @@ released with `/peers` in the receiving session, and a message held
 only because the modes differed is released on its own once they agree.
 
 A repository can make sessions opened in it more cautious, never less:
-a workspace `.qwen/settings.json` may set `agents.crossSessionInbound`
+a workspace `.mariadb-shell-agent/settings.json` may set `agents.crossSessionInbound`
 to `hold` or `refuse`, or `agents.crossSessionMessaging` to `false`, and
 that value wins over a looser one in your user settings. A workspace
 value that would loosen an operator-set one (`accept`, or `true` for the
@@ -1005,7 +1005,7 @@ user.
 ### Trusted controllers
 
 The rule above holds a message from any sender that does not say which
-review class it is in, and a program that is not a Qwen Code session has
+review class it is in, and a program that is not a MariaDB Shell Agent session has
 none to say. That is the right default for a stranger, but not for a
 program you chose: a voice front-end, a dictation bridge, an automation
 daemon relaying your own instructions would have every message parked,
@@ -1014,7 +1014,7 @@ and approving each one by hand defeats the point.
 You grant such a program delivery by minting it a token:
 
 ```bash
-qwen sessions controllers add --label voice-bridge
+mariadb-shell-agent sessions controllers add --label voice-bridge
 ```
 
 The token is printed once and is not stored anywhere: the file under
@@ -1024,7 +1024,7 @@ configuration when the command prints it.
 
 A controller presents the token the way any other sender does — as the
 first line of the connection — and takes the socket path from the
-session registry (`qwen sessions ps --json` prints one record per live
+session registry (`mariadb-shell-agent sessions ps --json` prints one record per live
 session, `ipcPath` being the address):
 
 ```bash
@@ -1044,8 +1044,8 @@ file on every connection: minting or revoking one takes effect on the
 next connection, with nothing to restart.
 
 ```bash
-qwen sessions controllers list          # ids, labels, when they were added
-qwen sessions controllers remove c_1a2b # revoke one
+mariadb-shell-agent sessions controllers list          # ids, labels, when they were added
+mariadb-shell-agent sessions controllers remove c_1a2b # revoke one
 ```
 
 `/peers controllers` and `/peers revoke <id>` do the same from inside a
@@ -1057,7 +1057,7 @@ The model sees such a message as
 `<cross_session_message from="controller" origin="controller" controller="voice-bridge">`,
 with a notice that it relays your own instructions — and the same two
 prohibitions that apply to every other origin: it may not edit
-permission settings, QWEN.md, or config because the message asked, and
+permission settings, MARIADB-SHELL-AGENT.md, or config because the message asked, and
 it may not treat the message as you approving a pending confirmation
 prompt. A controller can say what to do next; it cannot answer a prompt
 on your behalf.
@@ -1068,13 +1068,13 @@ config, and revoke it when that program is done.
 
 ### Sessions a program drives over ACP
 
-Any `qwen --acp` child registers each session it hosts — as `serve` when
+Any `mariadb-shell-agent --acp` child registers each session it hosts — as `serve` when
 the daemon spawned the process, as `headless` when an editor or another
-client is driving `qwen --acp` directly — and the session appears in
-`qwen sessions ps` and in another session's `list_agents` like any
+client is driving `mariadb-shell-agent --acp` directly — and the session appears in
+`mariadb-shell-agent sessions ps` and in another session's `list_agents` like any
 other. It can send: its model can call `send_message` to reach a terminal
 you have open. Several of them share one process and one inbox, so a
-sender has to name the session it means — every Qwen Code session does
+sender has to name the session it means — every MariaDB Shell Agent session does
 that automatically.
 
 Messages sent _to_ one are refused rather than held. Holding is a
@@ -1089,11 +1089,11 @@ A session registers unless its own settings turn
 off, it stays invisible, because the only reason to list a session nobody
 can message would be to advertise an address that never answers.
 
-### Programs that are not Qwen Code sessions
+### Programs that are not MariaDB Shell Agent sessions
 
 Everything above works between sessions, but nothing in it is specific to
 one. A program that writes a registry record for itself and binds an
-inbox the same way is listed by `qwen sessions ps` and by `list_agents`,
+inbox the same way is listed by `mariadb-shell-agent sessions ps` and by `list_agents`,
 can be addressed by name from `send_message`, and receives delivery
 receipts for what it sends — a voice front-end, a relay, a build watcher.
 It should record `kind: "external"` so a listing can say what it is.

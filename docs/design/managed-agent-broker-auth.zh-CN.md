@@ -3,8 +3,8 @@
 [English](managed-agent-broker-auth.md) | [简体中文](managed-agent-broker-auth.zh-CN.md)
 
 状态：已在本地实现，2026-10-02；验证结果记录在
-`.qwen/issues/issue-13180.md`。源码基线：`de2612434a`。
-跟踪 [#13180](https://github.com/QwenLM/qwen-code/issues/13180)。
+`.mariadb-shell-agent/issues/issue-13180.md`。源码基线：`de2612434a`。
+跟踪 [#13180](https://github.invalid/QwenLM/qwen-code/issues/13180)。
 
 ## 1. 问题陈述
 
@@ -364,7 +364,7 @@ false。报错信息点名该选项，使补救方式可被发现。客户端
 - OpenAPI 契约以散文形式（方案 + 共享 `Unauthorized` 组件描述）记录
   新的 `qwenSignature` 方案与 401 错误码；web-shell 生成客户端按契约
   重新生成，其一致性测试（`managed-agent-api.test.ts`）对漂移失败。
-- E2E：现有 dev 拓扑（`qwen` CLI + 回环 Web Shell）零新配置可用；
+- E2E：现有 dev 拓扑（`mariadb-shell-agent` CLI + 回环 Web Shell）零新配置可用；
   针对非回环地址做一次 signed 模式冒烟。
 
 ## 8. 验收标准

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -770,7 +771,7 @@ describe('handleAutoUpdate — Homebrew installs (#9493)', () => {
         type: 'patch',
         name: '@qwen-code/qwen-code',
       },
-      message: 'Qwen Code update available! 0.21.13 → 0.21.14',
+      message: 'MariaDB Shell Agent update available! 0.21.13 → 0.21.14',
     };
     mockGetInstallationInfo.mockReturnValue({
       packageManager: PackageManager.HOMEBREW,
@@ -810,7 +811,7 @@ describe('handleAutoUpdate — Homebrew installs (#9493)', () => {
 
     expect(emitSpy).toHaveBeenCalledWith('update-received', {
       message:
-        'Qwen Code update available! 0.21.13 → 0.21.14\n' +
+        'MariaDB Shell Agent update available! 0.21.13 → 0.21.14\n' +
         'translated Homebrew guidance',
     });
   });
@@ -822,7 +823,7 @@ describe('handleAutoUpdate — Homebrew installs (#9493)', () => {
 
     expect(emitSpy).toHaveBeenCalledWith('update-received', {
       message:
-        'Qwen Code update available! 0.21.13 → 0.21.14\n' +
+        'MariaDB Shell Agent update available! 0.21.13 → 0.21.14\n' +
         'Installed via Homebrew. Please update with "brew upgrade".',
     });
   });

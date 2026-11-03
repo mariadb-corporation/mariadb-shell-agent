@@ -43,7 +43,7 @@ An archive result invalidates any older catalog request before updating the list
 - Unit-test individual, bulk, disabled, restore, capability-gated, stale-list, partial-result, and saved-tab behavior.
 - Unit-test the bridge's atomic idle check, daemon route validation, archive result, and SDK request body.
 - Run the focused Web Shell tests, typecheck, lint, and format checks.
-- Drive a real `qwen serve` Web Shell flow: create completed and running side tasks, archive one completed task, bulk-archive the remainder, confirm running work remains, restore an archived task, and confirm it returns to the active menu.
+- Drive a real `mariadb-shell-agent serve` Web Shell flow: create completed and running side tasks, archive one completed task, bulk-archive the remainder, confirm running work remains, restore an archived task, and confirm it returns to the active menu.
 
 ## Acceptance criteria
 

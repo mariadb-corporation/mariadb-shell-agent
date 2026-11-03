@@ -1,13 +1,13 @@
-# Trusted loopback full API access for `qwen serve`
+# Trusted loopback full API access for `mariadb-shell-agent serve`
 
 - Status: Implemented
 - Baseline: `origin/main` at `f470b122fa22` (2026-08-28)
-- Related issue: [#3803](https://github.com/QwenLM/qwen-code/issues/3803)
+- Related issue: [#3803](https://github.invalid/QwenLM/qwen-code/issues/3803)
 - Historical implementation:
-  [#3889](https://github.com/QwenLM/qwen-code/pull/3889),
-  [#4236](https://github.com/QwenLM/qwen-code/pull/4236),
-  [#9106](https://github.com/QwenLM/qwen-code/pull/9106), and
-  [#9738](https://github.com/QwenLM/qwen-code/pull/9738)
+  [#3889](https://github.invalid/QwenLM/qwen-code/pull/3889),
+  [#4236](https://github.invalid/QwenLM/qwen-code/pull/4236),
+  [#9106](https://github.invalid/QwenLM/qwen-code/pull/9106), and
+  [#9738](https://github.invalid/QwenLM/qwen-code/pull/9738)
 
 ## Decision summary
 
@@ -39,7 +39,7 @@ checks.
 
 ## Problem
 
-`qwen serve` is primarily used as a local companion process. Its existing
+`mariadb-shell-agent serve` is primarily used as a local companion process. Its existing
 loopback default is nevertheless split into two inconsistent authority tiers:
 
 - non-strict routes are open without a token;
@@ -69,7 +69,7 @@ policy seam.
 4. Preserve all non-token authorization and safety checks.
 5. Express the change once at the central authorization boundary instead of
    editing every strict route.
-6. Keep bare `qwen serve`, `qwen serve --open`, and direct tokenless local
+6. Keep bare `mariadb-shell-agent serve`, `mariadb-shell-agent serve --open`, and direct tokenless local
    clients simple: they do not need token discovery or browser credential
    handoff.
 
@@ -177,7 +177,7 @@ desktop proxies as part of the trusted boundary, or use a token.
 The migration rule is explicit:
 
 ```bash
-QWEN_SERVER_TOKEN="<secret>" qwen serve --require-auth
+QWEN_SERVER_TOKEN="<secret>" mariadb-shell-agent serve --require-auth
 ```
 
 Use this on shared workstations, CI hosts, remote development machines,
@@ -444,7 +444,7 @@ need no client change.
 Update the tokenless startup breadcrumb so operators see the actual boundary:
 
 ```text
-qwen serve: trusted loopback mode; local callers have full API access without
+mariadb-shell-agent serve: trusted loopback mode; local callers have full API access without
 bearer authentication, including code execution as the daemon user. Use
 --require-auth with QWEN_SERVER_TOKEN on shared or untrusted hosts.
 ```
@@ -524,7 +524,7 @@ processes must migrate before upgrading:
 
 ```bash
 export QWEN_SERVER_TOKEN="$(openssl rand -hex 32)"
-qwen serve --require-auth
+mariadb-shell-agent serve --require-auth
 ```
 
 The concrete secret-generation mechanism is operator choice; documentation
@@ -655,7 +655,7 @@ to success assertions. At the baseline, 34 `token_required` references across
 
 ### End-to-end scenarios
 
-1. Start `qwen serve --port 0 --open` without token configuration. In the real
+1. Start `mariadb-shell-agent serve --port 0 --open` without token configuration. In the real
    Web Shell, perform file/settings/skill/MCP operations that previously
    returned `token_required`.
 2. Repeat with a TypeScript SDK client and no token.
@@ -679,7 +679,7 @@ active trust boundary visible in terminals, service logs, and bug reports.
 
 Release-note copy:
 
-> `qwen serve` now grants the token-less loopback primary listener full operator API access, including strict routes and explicitly enabled session shell. On shared hosts, CI runners, remote development machines, or environments with untrusted local processes, configure `QWEN_SERVER_TOKEN` and start with `--require-auth` before upgrading.
+> `mariadb-shell-agent serve` now grants the token-less loopback primary listener full operator API access, including strict routes and explicitly enabled session shell. On shared hosts, CI runners, remote development machines, or environments with untrusted local processes, configure `QWEN_SERVER_TOKEN` and start with `--require-auth` before upgrading.
 
 No gradual runtime flag is proposed: adding another default-off flag would
 defeat the requested default. The change is still operationally reversible by

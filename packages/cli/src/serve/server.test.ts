@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2068,7 +2069,7 @@ function fakeBridge(opts: FakeBridgeOpts = {}): FakeBridge {
         sessionId,
         name,
         source: 'project' as const,
-        scriptPath: `${WS_BOUND}/.qwen/workflows/${name}.js`,
+        scriptPath: `${WS_BOUND}/.mariadb-shell-agent/workflows/${name}.js`,
         script: `export const meta = { name: '${name}', description: 'd' }`,
         meta: { name, description: 'd' },
       },
@@ -2263,7 +2264,7 @@ function fakeBridge(opts: FakeBridgeOpts = {}): FakeBridge {
   const initWorkspaceImpl =
     opts.initWorkspaceImpl ??
     (async () => ({
-      path: path.resolve(WS_BOUND, 'QWEN.md'),
+      path: path.resolve(WS_BOUND, 'MARIADB-SHELL-AGENT.md'),
       action: 'created' as const,
     }));
   const restartMcpServerCalls: FakeBridge['restartMcpServerCalls'] = [];
@@ -4453,7 +4454,7 @@ describe('createServeApp', () => {
   describe('Web Shell static serving', () => {
     let webShellDir: string;
     const INDEX_HTML =
-      '<!doctype html><html><head><title>Qwen Code Web terminal</title>' +
+      '<!doctype html><html><head><title>MariaDB Shell Agent Web terminal</title>' +
       '<script type="module" src="/assets/app.js"></script></head>' +
       '<body><div id="root"></div></body></html>';
     const host = `127.0.0.1:${baseOpts.port}`;
@@ -5265,7 +5266,7 @@ describe('createServeApp', () => {
     let previousSystemSettingsPath: string | undefined;
     let previousSystemDefaultsPath: string | undefined;
     const BRAND_INDEX_HTML =
-      '<!doctype html><html><head><title>Qwen Code Web terminal</title>' +
+      '<!doctype html><html><head><title>MariaDB Shell Agent Web terminal</title>' +
       '</head><body><div id="root"></div></body></html>';
 
     beforeEach(async () => {
@@ -5481,7 +5482,11 @@ describe('createServeApp', () => {
       const home = path.join(root, 'home');
       const workspace = path.join(root, 'workspace');
       const disabledWorkspace = path.join(root, 'disabled-workspace');
-      const workspaceSettings = path.join(workspace, '.qwen', 'settings.json');
+      const workspaceSettings = path.join(
+        workspace,
+        '.mariadb-shell-agent',
+        'settings.json',
+      );
       const previousQwenHome = process.env['QWEN_HOME'];
       let app: ReturnType<typeof createServeApp> | undefined;
       try {
@@ -5609,7 +5614,7 @@ describe('createServeApp', () => {
           bridge: primary.bridge,
           workspaceRegistry: createWorkspaceRegistry([primary]),
         }),
-      ).toThrow('Start qwen serve in a local workspace');
+      ).toThrow('Start mariadb-shell-agent serve in a local workspace');
     });
 
     it.each([undefined, '25', '256'])(
@@ -12015,7 +12020,7 @@ describe('createServeApp', () => {
         name: 'deep-review',
         workflow: {
           source: 'project',
-          scriptPath: `${WS_BOUND}/.qwen/workflows/deep-review.js`,
+          scriptPath: `${WS_BOUND}/.mariadb-shell-agent/workflows/deep-review.js`,
           meta: { name: 'deep-review', description: 'd' },
         },
       });
@@ -14357,7 +14362,7 @@ describe('createServeApp', () => {
             Promise.resolve({
               success: true,
               worktree: {
-                path: `${WS_BOUND}/.qwen/worktrees/my-task`,
+                path: `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`,
                 branch: 'worktree-my-task',
               },
             }),
@@ -15595,7 +15600,7 @@ describe('createServeApp', () => {
       const bridge = fakeBridge();
       const createMarker = vi.fn().mockResolvedValue(undefined);
       const writeSidecar = vi.fn().mockResolvedValue(undefined);
-      const worktreePath = `${WS_BOUND}/.qwen/worktrees/my-task`;
+      const worktreePath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`;
       const app = createServeApp(
         { ...baseOpts, workspace: WS_BOUND },
         undefined,
@@ -15634,7 +15639,7 @@ describe('createServeApp', () => {
         expect(bridge.changeSessionCwdCalls).toHaveLength(1);
         expect(bridge.changeSessionCwdCalls[0]?.path).toBe(worktreePath);
         expect(bridge.changeSessionCwdCalls[0]?.allowedRoots).toEqual([
-          path.join(WS_BOUND, '.qwen', 'worktrees'),
+          path.join(WS_BOUND, '.mariadb-shell-agent', 'worktrees'),
         ]);
         expect(mockCreate).toHaveBeenCalledWith('my-task', 'main');
         expect(createMarker).toHaveBeenCalledWith(worktreePath, 'fake-0');
@@ -15659,8 +15664,8 @@ describe('createServeApp', () => {
     });
 
     it('persists the canonical worktree path returned by relocation', async () => {
-      const createdPath = `${WS_BOUND}/.qwen/worktrees/my-task-link`;
-      const canonicalPath = `${WS_BOUND}/.qwen/worktrees/my-task`;
+      const createdPath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task-link`;
+      const canonicalPath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`;
       const bridge = fakeBridge({
         changeSessionCwdImpl: async (sessionId) => ({
           sessionId,
@@ -15717,7 +15722,12 @@ describe('createServeApp', () => {
 
     it('authorizes both workspace and repository worktree roots on create', async () => {
       const repoRoot = path.resolve(path.sep, 'work');
-      const worktreePath = path.join(repoRoot, '.qwen', 'worktrees', 'my-task');
+      const worktreePath = path.join(
+        repoRoot,
+        '.mariadb-shell-agent',
+        'worktrees',
+        'my-task',
+      );
       const bridge = fakeBridge();
       const app = createServeApp(
         { ...baseOpts, workspace: WS_BOUND },
@@ -15747,8 +15757,8 @@ describe('createServeApp', () => {
 
         expect(res.status).toBe(200);
         expect(bridge.changeSessionCwdCalls[0]?.allowedRoots).toEqual([
-          path.join(WS_BOUND, '.qwen', 'worktrees'),
-          path.join(repoRoot, '.qwen', 'worktrees'),
+          path.join(WS_BOUND, '.mariadb-shell-agent', 'worktrees'),
+          path.join(repoRoot, '.mariadb-shell-agent', 'worktrees'),
         ]);
       } finally {
         mockWt.realpath = undefined;
@@ -15788,7 +15798,7 @@ describe('createServeApp', () => {
             Promise.resolve({
               success: true,
               worktree: {
-                path: '/work/a/.qwen/worktrees/my-task',
+                path: '/work/a/.mariadb-shell-agent/worktrees/my-task',
                 branch: 'worktree-my-task',
               },
             }),
@@ -15841,7 +15851,12 @@ describe('createServeApp', () => {
           Promise.resolve({
             success: true,
             worktree: {
-              path: path.join(WS_BOUND, '.qwen', 'worktrees', 'my-task'),
+              path: path.join(
+                WS_BOUND,
+                '.mariadb-shell-agent',
+                'worktrees',
+                'my-task',
+              ),
               branch: 'worktree-my-task',
             },
           }),
@@ -15873,7 +15888,7 @@ describe('createServeApp', () => {
         changeSessionCwdImpl: async (sessionId) => ({
           sessionId,
           previousCwd: WS_BOUND,
-          newCwd: `${WS_BOUND}/.qwen/worktrees/other-task`,
+          newCwd: `${WS_BOUND}/.mariadb-shell-agent/worktrees/other-task`,
           warnings: [],
         }),
       });
@@ -15889,7 +15904,7 @@ describe('createServeApp', () => {
           Promise.resolve({
             success: true,
             worktree: {
-              path: `${WS_BOUND}/.qwen/worktrees/my-task`,
+              path: `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`,
               branch: 'worktree-my-task',
             },
           }),
@@ -15945,7 +15960,7 @@ describe('createServeApp', () => {
             Promise.resolve({
               success: true,
               worktree: {
-                path: `${WS_BOUND}/.qwen/worktrees/my-task`,
+                path: `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`,
                 branch: 'worktree-my-task',
               },
             }),
@@ -16012,7 +16027,7 @@ describe('createServeApp', () => {
           Promise.resolve({
             success: true,
             worktree: {
-              path: '/work/a/.qwen/worktrees/my-task',
+              path: '/work/a/.mariadb-shell-agent/worktrees/my-task',
               branch: 'worktree-my-task',
             },
           }),
@@ -16072,7 +16087,7 @@ describe('createServeApp', () => {
           Promise.resolve({
             success: true,
             worktree: {
-              path: '/work/a/.qwen/worktrees/my-task',
+              path: '/work/a/.mariadb-shell-agent/worktrees/my-task',
               branch: 'worktree-my-task',
             },
           }),
@@ -18739,7 +18754,7 @@ describe('createServeApp', () => {
       mockWt.readSidecar = () =>
         Promise.resolve({
           slug: 'my-task',
-          worktreePath: `${WS_BOUND}/.qwen/worktrees/my-task`,
+          worktreePath: `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`,
           worktreeBranch: 'worktree-my-task',
           originalCwd: WS_BOUND,
           workspaceCwd: WS_BOUND,
@@ -18754,16 +18769,18 @@ describe('createServeApp', () => {
           .send({ cwd: WS_BOUND });
 
         expect(res.status).toBe(200);
-        expect(res.body.currentCwd).toBe(`${WS_BOUND}/.qwen/worktrees/my-task`);
+        expect(res.body.currentCwd).toBe(
+          `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`,
+        );
         expect(res.body.worktree).toEqual({
           slug: 'my-task',
-          path: `${WS_BOUND}/.qwen/worktrees/my-task`,
+          path: `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`,
           branch: 'worktree-my-task',
         });
         expect(res.body.worktreeState).toBe('persisted-v1');
         expect(bridge.changeSessionCwdCalls).toHaveLength(1);
         expect(bridge.changeSessionCwdCalls[0].path).toBe(
-          `${WS_BOUND}/.qwen/worktrees/my-task`,
+          `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`,
         );
         expect(bridge.setSessionWorktreeCalls).toHaveLength(1);
       } finally {
@@ -18790,7 +18807,7 @@ describe('createServeApp', () => {
       mockWt.readSidecar = () =>
         Promise.resolve({
           slug: 'case-task',
-          worktreePath: `${WS_BOUND}/.qwen/worktrees/case-task`,
+          worktreePath: `${WS_BOUND}/.mariadb-shell-agent/worktrees/case-task`,
           worktreeBranch: 'worktree-case-task',
           originalCwd: WS_BOUND,
           originalBranch: 'main',
@@ -18808,7 +18825,7 @@ describe('createServeApp', () => {
         expect(res.status).toBe(200);
         expect(res.body.worktree).toEqual({
           slug: 'case-task',
-          path: `${WS_BOUND}/.qwen/worktrees/case-task`,
+          path: `${WS_BOUND}/.mariadb-shell-agent/worktrees/case-task`,
           branch: 'worktree-case-task',
         });
         expect(bridge.changeSessionCwdCalls).toHaveLength(1);
@@ -18832,7 +18849,7 @@ describe('createServeApp', () => {
       mockWt.readSidecar = () =>
         Promise.resolve({
           slug: 'owned-task',
-          worktreePath: `${WS_BOUND}/.qwen/worktrees/owned-task`,
+          worktreePath: `${WS_BOUND}/.mariadb-shell-agent/worktrees/owned-task`,
           worktreeBranch: 'worktree-owned-task',
           originalCwd: WS_BOUND,
           originalBranch: 'main',
@@ -18862,7 +18879,12 @@ describe('createServeApp', () => {
     it('restores a legacy tool worktree from a monorepo subdirectory workspace', async () => {
       const bridge = fakeBridge();
       const repoRoot = path.resolve(path.sep, 'work');
-      const worktreePath = path.join(repoRoot, '.qwen', 'worktrees', 'my-task');
+      const worktreePath = path.join(
+        repoRoot,
+        '.mariadb-shell-agent',
+        'worktrees',
+        'my-task',
+      );
       const app = createServeApp(
         { ...baseOpts, workspace: WS_BOUND },
         undefined,
@@ -18894,8 +18916,8 @@ describe('createServeApp', () => {
         expect(res.body.worktree).toMatchObject({ path: worktreePath });
         expect(res.body.worktreeState).toBeUndefined();
         expect(bridge.changeSessionCwdCalls[0]?.allowedRoots).toEqual([
-          path.join(WS_BOUND, '.qwen', 'worktrees'),
-          path.join(repoRoot, '.qwen', 'worktrees'),
+          path.join(WS_BOUND, '.mariadb-shell-agent', 'worktrees'),
+          path.join(repoRoot, '.mariadb-shell-agent', 'worktrees'),
         ]);
       } finally {
         mockWt.readSidecar = undefined;
@@ -18906,7 +18928,7 @@ describe('createServeApp', () => {
     });
 
     it('keeps an active legacy tool worktree load compatible', async () => {
-      const worktreePath = `${WS_BOUND}/.qwen/worktrees/my-task`;
+      const worktreePath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`;
       const bridge = fakeBridge({
         loadImpl: async (req) => ({
           sessionId: req.sessionId,
@@ -18969,7 +18991,7 @@ describe('createServeApp', () => {
         .mockResolvedValue({ sourceType: 'channel', sourceId: 'telegram' });
       const sidecar = {
         slug: 'stale-task',
-        worktreePath: `${WS_BOUND}/.qwen/worktrees/stale-task`,
+        worktreePath: `${WS_BOUND}/.mariadb-shell-agent/worktrees/stale-task`,
         worktreeBranch: 'worktree-stale-task',
         originalCwd: WS_BOUND,
         originalBranch: 'main',
@@ -19008,7 +19030,7 @@ describe('createServeApp', () => {
     });
 
     it('fails closed for an unlocated active restored prompt instead of attesting isolation', async () => {
-      const worktreePath = `${WS_BOUND}/.qwen/worktrees/my-task`;
+      const worktreePath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`;
       const bridge = fakeBridge({
         loadImpl: async (req) => ({
           sessionId: req.sessionId,
@@ -19069,7 +19091,7 @@ describe('createServeApp', () => {
     });
 
     it('keeps a fired non-Channel restore prompt unattested instead of killing the session', async () => {
-      const worktreePath = `${WS_BOUND}/.qwen/worktrees/my-task`;
+      const worktreePath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`;
       const bridge = fakeBridge({
         loadImpl: async (req) => ({
           sessionId: req.sessionId,
@@ -19139,7 +19161,12 @@ describe('createServeApp', () => {
     });
 
     it('attests an active route-owned session already inside its worktree', async () => {
-      const worktreePath = path.join(WS_BOUND, '.qwen', 'worktrees', 'my-task');
+      const worktreePath = path.join(
+        WS_BOUND,
+        '.mariadb-shell-agent',
+        'worktrees',
+        'my-task',
+      );
       const bridge = fakeBridge({
         loadImpl: async (req) => ({
           sessionId: req.sessionId,
@@ -19197,7 +19224,7 @@ describe('createServeApp', () => {
     });
 
     it('fails closed when an active route-owned session is outside its worktree', async () => {
-      const worktreePath = `${WS_BOUND}/.qwen/worktrees/my-task`;
+      const worktreePath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`;
       const bridge = fakeBridge({
         loadImpl: async (req) => ({
           sessionId: req.sessionId,
@@ -19261,7 +19288,7 @@ describe('createServeApp', () => {
     });
 
     it('fails closed when a detached active route-owned session reports another cwd', async () => {
-      const worktreePath = `${WS_BOUND}/.qwen/worktrees/my-task`;
+      const worktreePath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`;
       const bridge = fakeBridge({
         loadImpl: async (req) => ({
           sessionId: req.sessionId,
@@ -19320,7 +19347,7 @@ describe('createServeApp', () => {
     });
 
     it('relocates a cold Channel restore before firing its deferred question', async () => {
-      const worktreePath = `${WS_BOUND}/.qwen/worktrees/my-task`;
+      const worktreePath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`;
       let relocated = false;
       const bridge = fakeBridge({
         loadImpl: async (req) => ({
@@ -19393,7 +19420,7 @@ describe('createServeApp', () => {
     });
 
     it('serializes concurrent Channel worktree restores through integrity admission', async () => {
-      const worktreePath = `${WS_BOUND}/.qwen/worktrees/my-task`;
+      const worktreePath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`;
       const relocationStarted = deferred<void>();
       const releaseRelocation = deferred<void>();
       const queuedRestoreReachedGate = deferred<void>();
@@ -19506,7 +19533,7 @@ describe('createServeApp', () => {
     });
 
     it('releases a queued Channel worktree restore after integrity rejection', async () => {
-      const worktreePath = `${WS_BOUND}/.qwen/worktrees/my-task`;
+      const worktreePath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`;
       const markerReadStarted = deferred<void>();
       const releaseMarkerRead = deferred<void>();
       const queuedRestoreReachedGate = deferred<void>();
@@ -19673,7 +19700,7 @@ describe('createServeApp', () => {
       'reconciles a deferred restore question only after admission returns %s',
       async (promptAdmitted) => {
         const sessionId = '550e8400-e29b-41d4-a716-446655440164';
-        const worktreePath = `${WS_BOUND}/.qwen/worktrees/my-task`;
+        const worktreePath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`;
         const sessionService = new SessionService(WS_BOUND);
         const transcriptPath =
           sessionService.getSessionTranscriptPath(sessionId);
@@ -19789,7 +19816,7 @@ describe('createServeApp', () => {
       mockWt.readSidecar = () =>
         Promise.resolve({
           slug: 'my-task',
-          worktreePath: `${WS_BOUND}/.qwen/worktrees/my-task`,
+          worktreePath: `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`,
           worktreeBranch: 'worktree-my-task',
           originalCwd: WS_BOUND,
           workspaceCwd: '/work/other',
@@ -19827,7 +19854,7 @@ describe('createServeApp', () => {
       mockWt.readSidecar = () =>
         Promise.resolve({
           slug: 'my-task',
-          worktreePath: `${WS_BOUND}/.qwen/worktrees/my-task`,
+          worktreePath: `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`,
           worktreeBranch: 'worktree-my-task',
           originalCwd: '/work/foreign',
           originalBranch: 'main',
@@ -19865,7 +19892,7 @@ describe('createServeApp', () => {
       'does not expose a missing sidecar %s path',
       async (_label, field) => {
         const missingPath = '/private/secret/missing-workspace';
-        const worktreePath = `${WS_BOUND}/.qwen/worktrees/my-task`;
+        const worktreePath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`;
         const bridge = fakeBridge();
         const app = createServeApp(
           { ...baseOpts, workspace: WS_BOUND },
@@ -20031,7 +20058,7 @@ describe('createServeApp', () => {
       mockWt.readSidecar = () =>
         Promise.resolve({
           slug: 'my-task',
-          worktreePath: `${WS_BOUND}/.qwen/worktrees/my-task`,
+          worktreePath: `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`,
           worktreeBranch: 'worktree-my-task',
           originalCwd: WS_BOUND,
           workspaceCwd: WS_BOUND,
@@ -20082,7 +20109,7 @@ describe('createServeApp', () => {
       mockWt.readSidecar = () =>
         Promise.resolve({
           slug: 'my-task',
-          worktreePath: `${WS_BOUND}/.qwen/worktrees/my-task`,
+          worktreePath: `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`,
           worktreeBranch: 'worktree-my-task',
           originalCwd: WS_BOUND,
           workspaceCwd: WS_BOUND,
@@ -20126,7 +20153,7 @@ describe('createServeApp', () => {
       mockWt.readSidecar = () =>
         Promise.resolve({
           slug: 'dead-task',
-          worktreePath: `${WS_BOUND}/.qwen/worktrees/dead-task`,
+          worktreePath: `${WS_BOUND}/.mariadb-shell-agent/worktrees/dead-task`,
           worktreeBranch: 'worktree-dead-task',
           originalCwd: WS_BOUND,
           workspaceCwd: WS_BOUND,
@@ -20177,7 +20204,7 @@ describe('createServeApp', () => {
       mockWt.readSidecar = () =>
         Promise.resolve({
           slug: 'my-task',
-          worktreePath: `${WS_BOUND}/.qwen/worktrees/my-task`,
+          worktreePath: `${WS_BOUND}/.mariadb-shell-agent/worktrees/my-task`,
           worktreeBranch: 'worktree-my-task',
           originalCwd: WS_BOUND,
           workspaceCwd: WS_BOUND,
@@ -20203,7 +20230,7 @@ describe('createServeApp', () => {
     });
 
     it('does not expose the missing worktree path through the restore error', async () => {
-      const worktreePath = `${WS_BOUND}/.qwen/worktrees/missing-task`;
+      const worktreePath = `${WS_BOUND}/.mariadb-shell-agent/worktrees/missing-task`;
       const bridge = fakeBridge();
       const app = createServeApp(
         { ...baseOpts, workspace: WS_BOUND },
@@ -20299,7 +20326,11 @@ describe('createServeApp', () => {
           undefined,
           { bridge },
         );
-        const managedRoot = path.join(WS_BOUND, '.qwen', 'worktrees');
+        const managedRoot = path.join(
+          WS_BOUND,
+          '.mariadb-shell-agent',
+          'worktrees',
+        );
         let markerReads = 0;
         mockWt.realpath = (candidate) => candidate;
         mockWt.readMarker = () => {
@@ -23146,7 +23177,7 @@ describe('createServeApp', () => {
       );
       const readSidecar = vi.fn(async () => ({
         slug: 'catalog-worktree',
-        worktreePath: `${WS_BOUND}/.qwen/worktrees/catalog-worktree`,
+        worktreePath: `${WS_BOUND}/.mariadb-shell-agent/worktrees/catalog-worktree`,
         worktreeBranch: 'worktree-catalog-worktree',
         originalCwd: WS_BOUND,
         originalBranch: 'main',
@@ -23249,7 +23280,7 @@ describe('createServeApp', () => {
       });
       mockWt.readSidecar = vi.fn(async () => ({
         slug: 'reowned',
-        worktreePath: `${WS_BOUND}/.qwen/worktrees/reowned`,
+        worktreePath: `${WS_BOUND}/.mariadb-shell-agent/worktrees/reowned`,
         worktreeBranch: 'worktree-reowned',
         originalCwd: WS_BOUND,
         originalBranch: 'main',
@@ -23920,7 +23951,7 @@ describe('createServeApp', () => {
         await sidecarReleased;
         return {
           slug: scannedSlug,
-          worktreePath: `${WS_BOUND}/.qwen/worktrees/${scannedSlug}`,
+          worktreePath: `${WS_BOUND}/.mariadb-shell-agent/worktrees/${scannedSlug}`,
           worktreeBranch: `worktree-${scannedSlug}`,
           originalCwd: WS_BOUND,
           originalBranch: 'main',
@@ -28610,7 +28641,12 @@ describe('createServeApp', () => {
         path.join(os.tmpdir(), 'qwen-branch-runtime-'),
       );
       const slug = 'branch-test';
-      const worktreePath = path.join(repo, '.qwen', 'worktrees', slug);
+      const worktreePath = path.join(
+        repo,
+        '.mariadb-shell-agent',
+        'worktrees',
+        slug,
+      );
       const worktreeBranch = `worktree-${slug}`;
       try {
         await execFileAsync('git', ['init', '-b', 'main'], { cwd: repo });
@@ -28919,7 +28955,12 @@ describe('createServeApp', () => {
           path.join(os.tmpdir(), 'qwen-branch-busy-runtime-'),
         );
         const slug = 'busy-race';
-        const worktreePath = path.join(repo, '.qwen', 'worktrees', slug);
+        const worktreePath = path.join(
+          repo,
+          '.mariadb-shell-agent',
+          'worktrees',
+          slug,
+        );
         const worktreeBranch = `worktree-${slug}`;
         try {
           await execFileAsync('git', ['init', '-b', 'main'], { cwd: repo });
@@ -29742,20 +29783,23 @@ describe('createServeApp', () => {
           .send({});
         expect(res.status).toBe(200);
         expect(res.body.action).toBe('created');
-        expect(res.body.path).toContain('QWEN.md');
+        expect(res.body.path).toContain('MARIADB-SHELL-AGENT.md');
       } finally {
         await fsp.rm(wsRoot, { recursive: true, force: true });
       }
     });
 
     it('forwards force:true to the bridge', async () => {
-      // Create a workspace with an existing non-empty QWEN.md to trigger
+      // Create a workspace with an existing non-empty MARIADB-SHELL-AGENT.md to trigger
       // the conflict → force:true overwrite path.
       const wsRoot = await fsp.mkdtemp(
         path.join(os.tmpdir(), 'qwen-init-force-'),
       );
       try {
-        await fsp.writeFile(path.join(wsRoot, 'QWEN.md'), 'existing content');
+        await fsp.writeFile(
+          path.join(wsRoot, 'MARIADB-SHELL-AGENT.md'),
+          'existing content',
+        );
         const bridge = fakeBridge();
         const opts: ServeOptions = {
           ...baseOpts,
@@ -29838,7 +29882,7 @@ describe('createServeApp', () => {
       );
       try {
         await fsp.writeFile(
-          path.join(wsRoot, 'QWEN.md'),
+          path.join(wsRoot, 'MARIADB-SHELL-AGENT.md'),
           'non-empty content here',
         );
         const bridge = fakeBridge();
@@ -29856,7 +29900,7 @@ describe('createServeApp', () => {
         expect(res.body).toMatchObject({
           code: 'workspace_init_conflict',
         });
-        expect(res.body.path).toContain('QWEN.md');
+        expect(res.body.path).toContain('MARIADB-SHELL-AGENT.md');
       } finally {
         await fsp.rm(wsRoot, { recursive: true, force: true });
       }
@@ -29906,7 +29950,7 @@ describe('createServeApp', () => {
           await fsp.writeFile(path.join(outsideDir, 'target.md'), 'outside');
           await fsp.symlink(
             path.join(outsideDir, 'target.md'),
-            path.join(wsRoot, 'QWEN.md'),
+            path.join(wsRoot, 'MARIADB-SHELL-AGENT.md'),
           );
           const bridge = fakeBridge();
           const opts: ServeOptions = {
@@ -38243,7 +38287,7 @@ describe('createServeApp', () => {
           [primary, 'primary-channel'],
           [secondary, 'secondary-channel'],
         ]) {
-          const qwenDir = path.join(workspace, '.qwen');
+          const qwenDir = path.join(workspace, '.mariadb-shell-agent');
           await fsp.mkdir(qwenDir);
           await fsp.writeFile(
             path.join(qwenDir, 'settings.json'),
@@ -38369,9 +38413,9 @@ describe('createServeApp', () => {
       );
       try {
         process.env['QWEN_HOME'] = tempHome;
-        await fsp.mkdir(path.join(workspace, '.qwen'));
+        await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'));
         await fsp.writeFile(
-          path.join(workspace, '.qwen', 'settings.json'),
+          path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
           JSON.stringify({
             channels: {
               old: {
@@ -38928,7 +38972,7 @@ describe('runQwenServe', () => {
       path.join(os.tmpdir(), 'qwen-serve-runtime-'),
     );
     // Keep real scheduled task state out of startup/shutdown tests; otherwise a
-    // developer's ~/.qwen/scheduled_tasks.json could rehydrate sessions here.
+    // developer's ~/.mariadb-shell-agent/scheduled_tasks.json could rehydrate sessions here.
     Storage.setRuntimeBaseDir(runtimeDir);
   });
 
@@ -39702,7 +39746,7 @@ describe('runQwenServe', () => {
     // once at boot; `/capabilities.workspaceCwd` returns the canonical
     // form, NOT the raw input. Tests inject a fake bridge here so we
     // verify the route layer's canonicalization (not the bridge's),
-    // making this a true E2E that doesn't require a real `qwen --acp`
+    // making this a true E2E that doesn't require a real `mariadb-shell-agent --acp`
     // child.
     const bridge = fakeBridge();
     handle = await runQwenServe(
@@ -39730,7 +39774,7 @@ describe('runQwenServe', () => {
     // Without the boot-time stat check, `canonicalizeWorkspace`'s
     // ENOENT fallback to `path.resolve` would let the daemon boot
     // pointed at a non-existent directory; every `POST /session`
-    // would then spawn a `qwen --acp` child with that cwd and the
+    // would then spawn a `mariadb-shell-agent --acp` child with that cwd and the
     // agent would fail with an opaque ENOENT.
     await expect(
       runQwenServe({
@@ -43404,9 +43448,9 @@ describe('auth device-flow routes', () => {
     const secondary = await fsp.mkdtemp(
       path.join(os.tmpdir(), 'qwen-provider-workspace-secondary-'),
     );
-    await fsp.mkdir(path.join(workspace, '.qwen'));
+    await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'));
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ modelProviders: { openai: [{ id: 'gpt-4o' }] } }),
     );
     try {
@@ -45774,7 +45818,7 @@ describe('Live conversation runtime lifecycle', () => {
       expect(second.status).toBe(503);
       const firstEpisode = captured;
       expect(firstEpisode).toContain(
-        'qwen serve: Conversations runtime boot failed:',
+        'mariadb-shell-agent serve: Conversations runtime boot failed:',
       );
       expect(firstEpisode).toContain('WRAPPED-BOOT-FAILURE-ONE');
       expect(firstEpisode).toContain('ROOT-CAUSE-ONE');
@@ -45795,7 +45839,9 @@ describe('Live conversation runtime lifecycle', () => {
       const episodeLines = captured
         .split('\n')
         .filter((line) =>
-          line.includes('qwen serve: Conversations runtime boot failed:'),
+          line.includes(
+            'mariadb-shell-agent serve: Conversations runtime boot failed:',
+          ),
         );
       expect(episodeLines).toHaveLength(2);
     } finally {
@@ -45811,7 +45857,11 @@ describe('Live conversation runtime lifecycle', () => {
     const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(((
       chunk: unknown,
     ) => {
-      if (String(chunk).includes('qwen serve: Conversations runtime boot')) {
+      if (
+        String(chunk).includes(
+          'mariadb-shell-agent serve: Conversations runtime boot',
+        )
+      ) {
         writeAttempts += 1;
         throw new Error('EPIPE dead stderr');
       }
@@ -46768,7 +46818,11 @@ describe('Live conversation runtime lifecycle', () => {
     const realHome = path.join(tmp, 'real-home');
     const linkedHome = path.join(tmp, 'linked-home');
     const alternateRootAlias = path.join(tmp, 'alternate-root-alias');
-    const relativeRoot = path.join('Documents', 'Qwen Code', 'Conversations');
+    const relativeRoot = path.join(
+      'Documents',
+      'MariaDB Shell Agent',
+      'Conversations',
+    );
     const realRoot = path.join(realHome, relativeRoot);
     const realChild = path.join(realRoot, 'conversation-probe');
     await fsp.mkdir(realChild, { recursive: true });
@@ -47811,7 +47865,9 @@ describe('Live Appshot server integration', () => {
     const qwenHome = path.join(tmp, 'qwen-home');
     const workspace = path.join(tmp, 'workspace');
     await fsp.mkdir(qwenHome, { recursive: true });
-    await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fsp.writeFile(
       path.join(qwenHome, 'settings.json'),
       JSON.stringify({
@@ -47824,7 +47880,7 @@ describe('Live Appshot server integration', () => {
       }),
     );
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ experimental: { liveVoice: { enabled: false } } }),
     );
     const previousQwenHome = process.env['QWEN_HOME'];
@@ -47875,10 +47931,15 @@ it.each(['patch', 'delete', 'delete-workspace'] as const)(
     const workspace = path.join(root, 'workspace');
     const sibling = path.join(root, 'sibling');
     await fsp.mkdir(home);
-    await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fsp.mkdir(sibling);
     const userPath = path.join(home, 'settings.json');
-    const workspacePath = path.join(workspace, '.qwen/settings.json');
+    const workspacePath = path.join(
+      workspace,
+      '.mariadb-shell-agent/settings.json',
+    );
     for (const [k, v] of Object.entries({
       QWEN_HOME: home,
       QWEN_RUNTIME_DIR: path.join(root, 'runtime'),

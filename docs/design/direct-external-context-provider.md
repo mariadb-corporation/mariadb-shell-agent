@@ -11,7 +11,7 @@
 ## Decision
 
 Phase 1 remains the default tool-invoked, retrieval-only surface. It adds one
-private Qwen Code extension with one MCP tool: `context_search({ query })`.
+private MariaDB Shell Agent extension with one MCP tool: `context_search({ query })`.
 The optional Phase 2 profile adds deterministic retrieval through an
 administrator-installed `UserPromptSubmit` Hook. Its detailed design is in
 [Direct External Context Auto Recall](./direct-external-context-auto-recall.md).
@@ -44,7 +44,7 @@ opt-in variant of on-demand v1, not another retrieval path.
 
 ## Problem
 
-Teams want Qwen Code to retrieve shared repository context from an existing
+Teams want MariaDB Shell Agent to retrieve shared repository context from an existing
 memory or knowledge service without first deploying the governed memory
 gateway proposed in #7449. Directly exposing a general provider MCP server is
 not sufficient for a shared enterprise deployment: the model may be able to
@@ -77,7 +77,7 @@ client-provided metadata into authorization.
 - Trusted personal identity, personal memory, or per-user audit.
 - Per-document user ACL evaluation or OAuth token brokerage.
 - DLP, retention policy, deletion workflow, or tamper-resistant approval.
-- Multi-workspace `qwen serve`, ACP routing, or several provider corpora in one
+- Multi-workspace `mariadb-shell-agent serve`, ACP routing, or several provider corpora in one
   Qwen process.
 - A public npm API or dynamically loaded provider plugins.
 
@@ -85,7 +85,7 @@ client-provided metadata into authorization.
 
 ```mermaid
 flowchart TD
-    A["Need external context in Qwen Code"] --> B{"Can one provider credential access exactly one intended corpus?"}
+    A["Need external context in MariaDB Shell Agent"] --> B{"Can one provider credential access exactly one intended corpus?"}
     B -- "No" --> G["Use Governed Gateway / Orchestrator Profile"]
     B -- "Yes" --> C{"Need trusted users, personal scope, document ACLs, DLP, or compliance audit?"}
     C -- "Yes" --> G
@@ -111,7 +111,7 @@ implementation does not import or modify Qwen Core.
 
 ```mermaid
 flowchart LR
-    A["Managed launcher"] -->|"pins --mcp-config + provider env"| Q["Qwen Code"]
+    A["Managed launcher"] -->|"pins --mcp-config + provider env"| Q["MariaDB Shell Agent"]
     U["User or model chooses query"] --> Q
     Q -->|"context_search(query)"| M["External Context MCP process"]
     M --> C["Immutable config + explicit adapter"]
@@ -277,11 +277,11 @@ command with an administrator-owned `--mcp-config`, which has higher precedence
 than user, project, workspace, and system MCP settings. The Phase 1 launcher
 constructs the complete Qwen argument vector and does not pass through arbitrary
 caller arguments, so an end-of-options marker cannot suppress the managed
-flag. Runtime MCP injection in `qwen serve` and ACP remains outside Phase 1.
+flag. Runtime MCP injection in `mariadb-shell-agent serve` and ACP remains outside Phase 1.
 
 The launcher also constructs an administrator-approved environment rather than
 inheriting caller-controlled values. Qwen can subsequently load values from the
-repository's `.env` and `.qwen/.env` files, so Phase 1 requires the repository,
+repository's `.env` and `.mariadb-shell-agent/.env` files, so Phase 1 requires the repository,
 those files, and same-UID code to be trusted. The absolute Node executable,
 checkout, dependency tree, MCP configuration, provider configuration, and
 credential binding are administrator-controlled and cannot be modified by the

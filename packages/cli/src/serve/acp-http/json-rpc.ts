@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +22,7 @@
 /**
  * Vendor extension namespace. ACP reserves any `_`-prefixed method for
  * extensions (the ONLY hard rule); the spec's `_zed.dev/…` example shows a
- * domain-style segment by convention, but `qwen` is distinctive enough that
+ * domain-style segment by convention, but `mariadb-shell-agent` is distinctive enough that
  * we use the shorter bare form `_qwen/…`. Vendor data on standard messages
  * goes under `_meta` keyed by the same name (`_meta: { "qwen": … }`).
  */

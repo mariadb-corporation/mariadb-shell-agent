@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -61,7 +62,7 @@ describe('resolveEndpoint', () => {
       authType: AuthType.USE_OPENAI,
     });
     expect(resolveEndpoint({}).baseUrl).toBe(
-      'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
     );
     mockResolve.mockReturnValue({
       apiKey: 'k',

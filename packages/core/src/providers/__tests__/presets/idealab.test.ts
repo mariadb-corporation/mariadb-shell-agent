@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +16,7 @@ describe('idealabProvider', () => {
       id: 'idealab',
       label: 'Idealab API Key',
       protocol: AuthType.USE_OPENAI,
-      baseUrl: 'https://idealab.alibaba-inc.com/api/openai/v1',
+      baseUrl: 'https://idealab.alibaba-inc.invalid/api/openai/v1',
       envKey: 'IDEALAB_API_KEY',
       uiGroup: 'third-party',
     });
@@ -23,7 +24,7 @@ describe('idealabProvider', () => {
 
   it('creates an install plan with per-model metadata for known IDs', () => {
     const plan = buildInstallPlan(idealabProvider, {
-      baseUrl: 'https://idealab.alibaba-inc.com/api/openai/v1',
+      baseUrl: 'https://idealab.alibaba-inc.invalid/api/openai/v1',
       apiKey: 'sk-idealab',
       modelIds: ['Qwen3.6-Plus-DogFooding', 'bailian/deepseek-v4-pro'],
     });
@@ -47,7 +48,7 @@ describe('idealabProvider', () => {
 
   it('does not mark DeepSeek models as multimodal', () => {
     const plan = buildInstallPlan(idealabProvider, {
-      baseUrl: 'https://idealab.alibaba-inc.com/api/openai/v1',
+      baseUrl: 'https://idealab.alibaba-inc.invalid/api/openai/v1',
       apiKey: 'sk-idealab',
       modelIds: ['bailian/deepseek-v4-pro', 'bailian/deepseek-v4-flash'],
     });
@@ -65,7 +66,7 @@ describe('idealabProvider', () => {
 
   it('does not mark kimi-k2.6 as multimodal', () => {
     const plan = buildInstallPlan(idealabProvider, {
-      baseUrl: 'https://idealab.alibaba-inc.com/api/openai/v1',
+      baseUrl: 'https://idealab.alibaba-inc.invalid/api/openai/v1',
       apiKey: 'sk-idealab',
       modelIds: ['bailian/kimi-k2.6'],
     });
@@ -79,7 +80,7 @@ describe('idealabProvider', () => {
 
   it('falls back gracefully for unknown model IDs', () => {
     const plan = buildInstallPlan(idealabProvider, {
-      baseUrl: 'https://idealab.alibaba-inc.com/api/openai/v1',
+      baseUrl: 'https://idealab.alibaba-inc.invalid/api/openai/v1',
       apiKey: 'sk-idealab',
       modelIds: ['Qwen3.6-Plus-DogFooding', 'some-new-model'],
     });

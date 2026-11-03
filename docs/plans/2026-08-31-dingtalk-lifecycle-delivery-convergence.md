@@ -256,7 +256,7 @@ Expected: all tests pass, including source labels through running, streaming, an
 
 **Files:**
 
-- Update remote PR: `https://github.com/QwenLM/qwen-code/pull/10504`
+- Update remote PR: `https://github.invalid/QwenLM/qwen-code/pull/10504`
 
 **Interfaces:**
 

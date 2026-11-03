@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,7 +19,7 @@ export function sanitizeWindowTitle(title: string): string {
 }
 
 /**
- * Computes the window title for the Qwen Code application.
+ * Computes the window title for the MariaDB Shell Agent application.
  *
  * Priority chain:
  *  1. CLI_TITLE environment variable (if set)
@@ -30,7 +31,8 @@ export function sanitizeWindowTitle(title: string): string {
  */
 export function computeWindowTitle(folderName?: string): string {
   return sanitizeWindowTitle(
-    process.env['CLI_TITLE'] || `Qwen - ${folderName || DEFAULT_WINDOW_TITLE}`,
+    process.env['CLI_TITLE'] ||
+      `MariaDB Shell Agent - ${folderName || DEFAULT_WINDOW_TITLE}`,
   );
 }
 

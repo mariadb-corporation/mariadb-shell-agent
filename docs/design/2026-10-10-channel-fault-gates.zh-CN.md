@@ -93,7 +93,7 @@ Spring 跑在由 IT 杀死的子 JVM 里；adapter 驱动是可杀/可停进程�
 
 **Harness 与模型。** IT 在固定端口以 `dist/cli.js serve --profile hosted-harness` 启动，携带内嵌 broker 的 URL（同 FG6），并由一个 OpenAI 兼容的罐装模型对每轮的 channel 唤醒轮给出一小段固定回复，于是一个轮次产出一份 `<inputId>:reply` 投递、一个小分段。Harness 的 Workspace Session 需要 `hosted-workspace-files/1`，因此 harness 以 `--managed-runtime-broker-url` 启动，broker 以方法级固定端口内嵌运行（固定 harness 端口解开 base-url/broker-url 的启动循环）。IT 一律经 JDBC 等待 journal 事实，而不是 sleep；排序谓词点名驱动标记（读前先泊停），绝不只数行数。
 
-**用例状态。** Legacy 派生的 adapter 状态存储按用户全局 qwen 目录建键，因此 IT 给每个用例自己的 `HOME`（用例目录的子目录）——否则同一用例会踩在上一轮的光标上重跑，并把测试状态漏进真实的 `~/.qwen`。持久化证据（`results-*.json`、`driver-*.log`）落在 `target/fg7-cases/` 下，每个 method 重建，因为 `@TempDir` 在测试结束时被清理。
+**用例状态。** Legacy 派生的 adapter 状态存储按用户全局 qwen 目录建键，因此 IT 给每个用例自己的 `HOME`（用例目录的子目录）——否则同一用例会踩在上一轮的光标上重跑，并把测试状态漏进真实的 `~/.mariadb-shell-agent`。持久化证据（`results-*.json`、`driver-*.log`）落在 `target/fg7-cases/` 下，每个 method 重建，因为 `@TempDir` 在测试结束时被清理。
 
 **CI。** 两个类被 `hosted-harness-mysql` 收编（`Hosted*IT` include；`check-failsafe-reports.js hosted` 强制）。在 macOS 实测（M3、JDK 21、Node 22、MariaDB 10.11）：故障类五个字母共 34.4 s，崩溃类 25.1 s —— 测试时间新增约 60 s，共享分叉上墙钟约 150 s；预算调整为 900 s → 1200 s（分叉）、25 → 35 分钟（Verify 步骤）、148 → 160 分钟（作业），`hosted-process-ci.test.js` 同时钉住三者，并新增 `hosted-channel-gates` 聚焦 profile 供本地使用。本地数据库：系统 `mysqld` 配一次性 datadir —— MariaDB 用 `mariadb-install-db --auth-root-authentication-method=normal` 初始化；MySQL 8 按 `scripts/run-managed-agent-server-e2e.ts` 用 `mysqld --initialize-insecure` 初始化 —— 需要触发器权限，同 FG6b。
 

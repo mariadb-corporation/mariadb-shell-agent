@@ -2,7 +2,7 @@
 
 [English](web-shell-host-directory-picker.md) | [简体中文](web-shell-host-directory-picker.zh-CN.md)
 
-状态：[#15186](https://github.com/QwenLM/qwen-code/issues/15186) 的实现提案。下文的 API 形态与优先级是本轮实现选择，待维护者评审；issue 讨论尚未批准最终公开契约。
+状态：[#15186](https://github.invalid/QwenLM/qwen-code/issues/15186) 的实现提案。下文的 API 形态与优先级是本轮实现选择，待维护者评审；issue 讨论尚未批准最终公开契约。
 
 ## 问题与现有行为
 

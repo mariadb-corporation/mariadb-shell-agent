@@ -4,13 +4,13 @@
 
 ## Status
 
-Implemented in the proposed fix for [#11178](https://github.com/QwenLM/qwen-code/issues/11178), pending maintainer review and release. Verification results belong in the PR.
+Implemented in the proposed fix for [#11178](https://github.invalid/QwenLM/qwen-code/issues/11178), pending maintainer review and release. Verification results belong in the PR.
 
 ## Problem
 
 ACP user prompts can contain `resource_link` content with a URI and display metadata. Live clients may seed attachment cards locally, but that does not persist them. The ACP session records only user text and daemon-native attachment references; URI links disappear before transcript replay. The SDK also discards these links during normalization.
 
-[PR #11194](https://github.com/QwenLM/qwen-code/pull/11194) addresses SDK projection but assumes local-file model input is the durable user record. Original references must be saved separately from model-input expansion.
+[PR #11194](https://github.invalid/QwenLM/qwen-code/pull/11194) addresses SDK projection but assumes local-file model input is the durable user record. Original references must be saved separately from model-input expansion.
 
 ## Persistence and Replay
 

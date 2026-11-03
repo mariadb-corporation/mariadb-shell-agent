@@ -6,7 +6,7 @@
 
 Implemented locally on `codex/workspace-session-l3`, 2026-10-03. Linux physical
 acceptance remains pending. This implements L3 of
-[#13164](https://github.com/QwenLM/qwen-code/issues/13164), on main after
+[#13164](https://github.invalid/QwenLM/qwen-code/issues/13164), on main after
 reliable close #13135, L1/L2 #13194, O4 retirement #13084 and H2 Hooks #13129.
 It admits deletion of idle `hosted-workspace-files/1` Sessions through the
 existing public and WebShell routes. Shell/MCP profiles, buttons, physical
@@ -286,4 +286,4 @@ holders. Simulation is reported separately from physical validation.
 
 Run build, typecheck, bundle, focused TS/Java tests and the E2E plan, then two
 clean self-audit passes and independent review. Results and environment limits
-are recorded in `.qwen/e2e-tests/workspace-session-active-delete-l3.md`.
+are recorded in `.mariadb-shell-agent/e2e-tests/workspace-session-active-delete-l3.md`.

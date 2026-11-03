@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 // @vitest-environment jsdom
@@ -41,7 +42,7 @@ describe('FolderTrustDialog', () => {
 
     expect(lastFrame()).toContain('Do you trust this folder?');
     expect(lastFrame()).toContain(
-      'Trusting a folder allows Qwen Code to execute commands it suggests.',
+      'Trusting a folder allows MariaDB Shell Agent to execute commands it suggests.',
     );
   });
 
@@ -76,7 +77,7 @@ describe('FolderTrustDialog', () => {
       <FolderTrustDialog onSelect={vi.fn()} isRestarting={true} />,
     );
 
-    expect(lastFrame()).toContain(' Qwen Code is restarting');
+    expect(lastFrame()).toContain(' MariaDB Shell Agent is restarting');
   });
 
   it('should call relaunchApp when isRestarting is true', async () => {

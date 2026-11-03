@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -74,7 +75,7 @@ describe('voice service', () => {
           openai: [
             {
               id: 'qwen3-asr-flash',
-              baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+              baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
               envKey: 'DASHSCOPE_API_KEY',
             },
           ],
@@ -233,7 +234,7 @@ describe('voice service', () => {
           openai: [
             {
               id: 'qwen3-asr-flash',
-              baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+              baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
               envKey: 'DASHSCOPE_API_KEY',
             },
           ],
@@ -255,7 +256,7 @@ describe('voice service', () => {
           'internal-asr': [
             {
               id: 'qwen3-asr-flash',
-              baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+              baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
               envKey: 'DASHSCOPE_API_KEY',
             },
           ],
@@ -331,12 +332,13 @@ describe('voice service', () => {
           openai: [
             {
               id: 'qwen3-asr-flash',
-              baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+              baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
               envKey: 'DASHSCOPE_API_KEY',
             },
             {
               id: 'qwen3-asr-flash',
-              baseUrl: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+              baseUrl:
+                'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
               envKey: 'DASHSCOPE_API_KEY',
             },
             {
@@ -370,7 +372,7 @@ describe('voice service', () => {
           openai: [
             {
               id: 'qwen3-asr-flash',
-              baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+              baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
               envKey: 'DASHSCOPE_API_KEY',
             },
           ],
@@ -392,7 +394,7 @@ describe('voice service', () => {
           openai: [
             {
               id: 'qwen3-asr-flash',
-              baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+              baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
               envKey: 'DASHSCOPE_API_KEY',
             },
           ],
@@ -429,7 +431,7 @@ describe('voice service', () => {
           openai: [
             {
               id: 'qwen3-asr-flash-realtime',
-              baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+              baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
               envKey: 'DASHSCOPE_API_KEY',
             },
           ],

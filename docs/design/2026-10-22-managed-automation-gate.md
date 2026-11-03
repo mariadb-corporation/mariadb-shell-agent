@@ -178,7 +178,7 @@ every `<` written `&lt;`) and cut at 16 KiB with the cut noted.
 
 The pull-request watch probes from the [`/autofix-pr`
 design](2026-10-21-autofix-pr-command.md) are gate commands: `qwen autofix-pr
-snapshot <n> --gate --repo <owner>/<repo>` watches one PR, and `qwen review
+snapshot <n> --gate --repo <owner>/<repo>` watches one PR, and `mariadb-shell-agent review
 watch-repo --repo <owner>/<repo>` watches a repository. Each keeps a cursor
 and prints only what changed since the cursor was last written, so a managed
 definition can use them unchanged:
@@ -231,7 +231,7 @@ A gate on these probes then needs:
 
 - **A git repository.** Both probes keep their cursors under the main worktree
   of the repository containing the Session's directory (`<main
-worktree>/.qwen/tmp/`), which they find with `git worktree list`. An empty
+worktree>/.mariadb-shell-agent/tmp/`), which they find with `git worktree list`. An empty
   `git init` is enough. Outside a repository the probe exits 1 and every fire
   settles `gate_failed`.
 - **A cursor that outlives fires, one watch per cursor.** The cursor is how
@@ -245,7 +245,7 @@ worktree>/.qwen/tmp/`), which they find with `git worktree list`. An empty
   worktree, a `snapshot` gate for another repository's PR of the same number
   fails (`gate_failed`) on every fire, while the gate that wrote the cursor
   first keeps it.
-- **`git`, `gh`, `node` and `qwen` where the probe runs.** Workspace Shell
+- **`git`, `gh`, `node` and `mariadb-shell-agent` where the probe runs.** Workspace Shell
   needs a Broker configured with the `local-process` provisioner. Its workers
   run on the server's host, or, for an SSH Workspace, on the SSH node through
   the Broker's `ssh-process` provisioner; the probe reads GitHub through `gh
@@ -274,7 +274,7 @@ api graphql` with the worker's environment.
     shell adds. So `gh` must be logged in under that `HOME`; no `GH_*`
     variable, `GITHUB_TOKEN` or `XDG_CONFIG_HOME` passes.
   - In both cases `git` and `gh` must be on that `PATH`, because the probes
-    run them by name. So must `qwen`, and for an npm install the `node` it
+    run them by name. So must `mariadb-shell-agent`, and for an npm install the `node` it
     starts with, unless the gate names them by absolute path (`/path/to/node
 /path/to/cli.js …`).
 - **The target on the command line.** `watch-repo` always takes `--repo`.

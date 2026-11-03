@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented for [#10377](https://github.com/QwenLM/qwen-code/issues/10377).
+Implemented for [#10377](https://github.invalid/QwenLM/qwen-code/issues/10377).
 The feature is opt-in and defaults off.
 
 Partly superseded by [Lazy Code Mode](lazy-code-mode.md): `tool_search` is now
@@ -15,7 +15,7 @@ describe this MVP; `tool_call` stays hidden.
 Add a `tools.codeModeOnly` setting that replaces the ordinary model-facing
 tool surface with one `exec` JavaScript tool plus the small set of tools that
 must remain direct control-plane calls. `exec` code can call ordinary tools
-through `tools.<name>(args)` without bypassing Qwen Code's validation,
+through `tools.<name>(args)` without bypassing MariaDB Shell Agent's validation,
 permissions, approvals, hooks, telemetry, cancellation, concurrency, or output
 budgets.
 

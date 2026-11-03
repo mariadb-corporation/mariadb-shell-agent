@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Files for 'qwen mcp approve' / 'qwen mcp reject' commands (issue #4615).
+// Files for 'mariadb-shell-agent mcp approve' / 'mariadb-shell-agent mcp reject' commands (issue #4615).
 import type { CommandModule } from 'yargs';
 import type { MCPServerConfig } from '@qwen-code/qwen-code-core';
 import { isGatedMcpScope } from '@qwen-code/qwen-code-core';
@@ -18,7 +19,7 @@ import {
 
 /**
  * All gated (approval-requiring) servers visible from `cwd` — project
- * `.mcp.json` plus workspace `.qwen/settings.json` (#4615). Non-gated sources
+ * `.mcp.json` plus workspace `.mariadb-shell-agent/settings.json` (#4615). Non-gated sources
  * (user/system/extension) never need approval and are excluded.
  */
 function loadGatedServers(cwd: string): Record<string, MCPServerConfig> {
@@ -44,7 +45,7 @@ async function setProjectServerStatus(
   const names = Object.keys(servers);
   if (names.length === 0) {
     writeStdoutLine(
-      'No approval-requiring MCP servers found (looked in .mcp.json and .qwen/settings.json).',
+      'No approval-requiring MCP servers found (looked in .mcp.json and .mariadb-shell-agent/settings.json).',
     );
     return;
   }
@@ -84,10 +85,10 @@ async function setProjectServerStatus(
 export const approveCommand: CommandModule = {
   command: 'approve [name]',
   describe:
-    'Approve a gated MCP server (.mcp.json or workspace .qwen/settings.json)',
+    'Approve a gated MCP server (.mcp.json or workspace .mariadb-shell-agent/settings.json)',
   builder: (yargs) =>
     yargs
-      .usage('Usage: qwen mcp approve [options] [name]')
+      .usage('Usage: mariadb-shell-agent mcp approve [options] [name]')
       .positional('name', {
         describe: 'Name of the gated server to approve',
         type: 'string',
@@ -109,10 +110,10 @@ export const approveCommand: CommandModule = {
 export const rejectCommand: CommandModule = {
   command: 'reject [name]',
   describe:
-    'Reject a gated MCP server (.mcp.json or workspace .qwen/settings.json)',
+    'Reject a gated MCP server (.mcp.json or workspace .mariadb-shell-agent/settings.json)',
   builder: (yargs) =>
     yargs
-      .usage('Usage: qwen mcp reject [options] [name]')
+      .usage('Usage: mariadb-shell-agent mcp reject [options] [name]')
       .positional('name', {
         describe: 'Name of the gated server to reject',
         type: 'string',

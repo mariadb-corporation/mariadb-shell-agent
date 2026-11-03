@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -33,10 +34,10 @@ describe('QwenIgnoreParser', () => {
     vi.restoreAllMocks();
   });
 
-  describe('when .qwenignore exists', () => {
+  describe('when .mariadb-shell-agentignore exists', () => {
     beforeEach(async () => {
       await createTestFile(
-        '.qwenignore',
+        '.mariadb-shell-agentignore',
         'ignored.txt\n# A comment\n/ignored_dir/\n',
       );
       await createTestFile('ignored.txt', 'ignored');
@@ -51,12 +52,12 @@ describe('QwenIgnoreParser', () => {
       );
     });
 
-    it('should ignore files specified in .qwenignore', () => {
+    it('should ignore files specified in .mariadb-shell-agentignore', () => {
       const parser = new QwenIgnoreParser(projectRoot);
       expect(parser.getPatterns()).toEqual(['ignored.txt', '/ignored_dir/']);
       expect(parser.isIgnored('ignored.txt')).toBe(true);
       expect(parser.getIgnoreFileNameForPath('ignored.txt')).toBe(
-        '.qwenignore',
+        '.mariadb-shell-agentignore',
       );
       expect(parser.isIgnored('not_ignored.txt')).toBe(false);
       expect(parser.getIgnoreFileNameForPath('not_ignored.txt')).toBe(
@@ -69,7 +70,7 @@ describe('QwenIgnoreParser', () => {
     });
 
     it('should still evaluate files whose names start with two dots', async () => {
-      await createTestFile('.qwenignore', '..secret.log');
+      await createTestFile('.mariadb-shell-agentignore', '..secret.log');
 
       const parser = new QwenIgnoreParser(projectRoot);
 
@@ -112,18 +113,18 @@ describe('QwenIgnoreParser', () => {
 
   describe('when compatibility ignore files contain negations', () => {
     beforeEach(async () => {
-      await createTestFile('.qwenignore', 'secrets/**\n');
+      await createTestFile('.mariadb-shell-agentignore', 'secrets/**\n');
       await createTestFile('.agentignore', '!secrets/**\n');
       await createTestFile(path.join('secrets', 'token.txt'), 'secret');
     });
 
-    it('should not let custom ignore negations unignore .qwenignore matches', () => {
+    it('should not let custom ignore negations unignore .mariadb-shell-agentignore matches', () => {
       const parser = new QwenIgnoreParser(projectRoot);
 
       expect(parser.isIgnored(path.join('secrets', 'token.txt'))).toBe(true);
       expect(
         parser.getIgnoreFileNameForPath(path.join('secrets', 'token.txt')),
-      ).toBe('.qwenignore');
+      ).toBe('.mariadb-shell-agentignore');
     });
   });
 
@@ -140,7 +141,7 @@ describe('QwenIgnoreParser', () => {
       const parser = new QwenIgnoreParser(projectRoot, ['.cursorignore']);
 
       expect(parser.getIgnoreFileNames()).toEqual([
-        '.qwenignore',
+        '.mariadb-shell-agentignore',
         '.cursorignore',
       ]);
       expect(parser.getPatterns()).toEqual(['cursor-secret.txt']);
@@ -160,7 +161,7 @@ describe('QwenIgnoreParser', () => {
           ' .cursorignore ',
           '.cursorignore',
           'nested\\.ignore',
-          '.qwenignore',
+          '.mariadb-shell-agentignore',
           '',
           '/absolute',
           '../escape',
@@ -170,21 +171,23 @@ describe('QwenIgnoreParser', () => {
       ).toEqual(['.cursorignore', 'nested/.ignore']);
     });
 
-    it('should include .qwenignore plus default custom ignore files by default', () => {
+    it('should include .mariadb-shell-agentignore plus default custom ignore files by default', () => {
       expect(getQwenIgnoreFileNames()).toEqual([
-        '.qwenignore',
+        '.mariadb-shell-agentignore',
         '.agentignore',
         '.aiignore',
       ]);
     });
 
-    it('should keep .qwenignore when custom ignore files are empty', () => {
-      expect(getQwenIgnoreFileNames([])).toEqual(['.qwenignore']);
+    it('should keep .mariadb-shell-agentignore when custom ignore files are empty', () => {
+      expect(getQwenIgnoreFileNames([])).toEqual([
+        '.mariadb-shell-agentignore',
+      ]);
     });
 
     it('should format ignore file names for user-facing messages', () => {
       expect(formatQwenIgnoreFileNames(['.cursorignore'])).toBe(
-        '.qwenignore, .cursorignore',
+        '.mariadb-shell-agentignore, .cursorignore',
       );
     });
   });
@@ -202,7 +205,7 @@ describe('QwenIgnoreParser', () => {
   describe('pattern whitespace', () => {
     it('keeps leading whitespace and strips only a trailing CR', async () => {
       await createTestFile(
-        '.qwenignore',
+        '.mariadb-shell-agentignore',
         ' leading.txt\r\n  #hash.txt\r\n# real comment\r\n',
       );
       const parser = new QwenIgnoreParser(projectRoot);

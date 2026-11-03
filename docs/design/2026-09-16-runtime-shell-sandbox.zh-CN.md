@@ -34,7 +34,7 @@ Core Config 负责不可变准入和受限工具注册。CLI config 传递可信
 
 在真实 Linux 上，测试专用 launcher 调用生产 `loadCliConfig`、认证初始化和 `runNonInteractive`，仅注入可信策略。验证模型 HTTP 与宿主 session 持久化、workspace 写入、根外写入和关闭网络的拒绝、真实 sed 约束、不支持文件工具的拒绝、前后台生命周期，以及两个独立 workspace 的策略。准确称为生产 headless pipeline，不宣称公开 `node dist/cli.js` 可以启用该模式。单独 smoke test 普通 bundle。复用进程 adapter 的 Linux 生命周期证据；改动 adapter 时重跑。
 
-验收要求：无宿主回退、无虚假终结成功、派生/切换目录不隐式授权、默认行为不退化。精确 artifact 与测试证据记录在 `.qwen/e2e-tests/`。完成两轮干净自审和独立代码审查。本阶段没有尚未确定的设计问题。
+验收要求：无宿主回退、无虚假终结成功、派生/切换目录不隐式授权、默认行为不退化。精确 artifact 与测试证据记录在 `.mariadb-shell-agent/e2e-tests/`。完成两轮干净自审和独立代码审查。本阶段没有尚未确定的设计问题。
 
 ## 验证结果（2026-09-16）
 
@@ -42,4 +42,4 @@ Core Config 负责不可变准入和受限工具注册。CLI config 传递可信
 
 在 Lima `qwen-sbx`（Linux `7.0.0-31-generic`、ARM64、Node `v22.22.1`、bwrap `0.11.1`）上，仓库中的 `scripts/sandbox-runtime` 套件通过生产 headless 链路与真实 ShellTool 生命周期完成 22 项检查，已有 adapter 套件通过 31 项，源码输入 hash 未变化，因此该结果继续有效。证据覆盖同一进程内两个 Config 的不同 session ID 与交叉写入拒绝、宿主模型请求和 session JSONL、内核写入/网络拒绝、受限启动/工具注册、Git clean filter 仅在沙箱内执行，以及前台、后台和转后台时的回执丢失失败。namespace 清理检查比较身份，不依赖数值 PID。review lease 清理的生命周期单测同时覆盖正常回合收尾与退出回调，确认仅普通模式会调用宿主清理；未额外构造破坏性 lease 场景。
 
-最终 runtime v4 manifest 包含 4,787 个源码与测试脚本输入 hash，执行后全部与工作区重新比对一致。launcher SHA-256 为 `3be748159cd10d7b1f1054042061b3e6f6678aab707fabe995cb8e49267dd792`。详细基线、中间 LSP 拒绝契约修正、Git 快照与 review lease 清理修复、最终报告和测试边界位于 `.qwen/e2e-tests/runtime-shell-sandbox.md`。本阶段未验证 Linux x64、其他内核、macOS/Windows 内核约束或公开 CLI 启用入口。
+最终 runtime v4 manifest 包含 4,787 个源码与测试脚本输入 hash，执行后全部与工作区重新比对一致。launcher SHA-256 为 `3be748159cd10d7b1f1054042061b3e6f6678aab707fabe995cb8e49267dd792`。详细基线、中间 LSP 拒绝契约修正、Git 快照与 review lease 清理修复、最终报告和测试边界位于 `.mariadb-shell-agent/e2e-tests/runtime-shell-sandbox.md`。本阶段未验证 Linux x64、其他内核、macOS/Windows 内核约束或公开 CLI 启用入口。

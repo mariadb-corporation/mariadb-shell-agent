@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -159,7 +160,11 @@ describe.skipIf(process.platform === 'win32')('bwrap execution adapter', () => {
       command: interpreter,
       runtime: 'bun',
     });
-    const maskedPath = path.join(workspace, '.qwen', 'review-leases');
+    const maskedPath = path.join(
+      workspace,
+      '.mariadb-shell-agent',
+      'review-leases',
+    );
     const launch = mockLaunch({ state: 'confirmed', exitCode: 0 });
     const handle = await run({ ...policy(), maskedPaths: [maskedPath] });
     await expect(handle.result).resolves.toMatchObject({
@@ -171,7 +176,7 @@ describe.skipIf(process.platform === 'win32')('bwrap execution adapter', () => {
     const admittedWorkspace = realpathSync(workspace);
     const admittedMaskedPath = path.join(
       admittedWorkspace,
-      '.qwen',
+      '.mariadb-shell-agent',
       'review-leases',
     );
     expect(argv).toContain('--unshare-pid');
@@ -312,7 +317,11 @@ describe.skipIf(process.platform === 'win32')('bwrap execution adapter', () => {
   });
 
   it('skips absent masks without mutating a read-only workspace', async () => {
-    const maskedPath = path.join(workspace, '.qwen', 'review-leases');
+    const maskedPath = path.join(
+      workspace,
+      '.mariadb-shell-agent',
+      'review-leases',
+    );
     const launch = mockLaunch({ state: 'confirmed', exitCode: 0 });
     await runToResult({
       ...policy(),

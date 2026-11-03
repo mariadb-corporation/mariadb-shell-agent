@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -175,7 +176,8 @@ const sdkMocks = vi.hoisted(() => {
       installWorkspaceSkill.mockResolvedValue({
         skillName: 'review',
         scope: 'workspace',
-        installedPath: '/mock-workspace/.qwen/skills/review/SKILL.md',
+        installedPath:
+          '/mock-workspace/.mariadb-shell-agent/skills/review/SKILL.md',
       });
       deleteWorkspaceSkill.mockReset();
       deleteWorkspaceSkill.mockResolvedValue({
@@ -209,7 +211,10 @@ const sdkMocks = vi.hoisted(() => {
         files: [],
       });
       readWorkspaceFile.mockReset();
-      readWorkspaceFile.mockResolvedValue({ path: 'QWEN.md', text: '' });
+      readWorkspaceFile.mockResolvedValue({
+        path: 'MARIADB-SHELL-AGENT.md',
+        text: '',
+      });
       writeWorkspaceMemory.mockReset();
       writeWorkspaceMemory.mockResolvedValue({ ok: true });
       listWorkspaceAgents.mockReset();

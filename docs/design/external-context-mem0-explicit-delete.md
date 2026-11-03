@@ -1,8 +1,8 @@
 # Mem0 Extension：daemon 显式删除设计
 
-**状态：** 本地实现完成，包内、daemon 和独立协议验收通过；浏览器批准/拒绝已验证，但额外 DOM 全文逐字比较因控制工具超时未完成。Holo 真实协议验收缺少凭证。本文保留设计决策，当前使用说明见 `integrations/external-context-mem0/README.md`，验收明细见 `.qwen/e2e-tests/external-context-mem0-explicit-delete.md`。
+**状态：** 本地实现完成，包内、daemon 和独立协议验收通过；浏览器批准/拒绝已验证，但额外 DOM 全文逐字比较因控制工具超时未完成。Holo 真实协议验收缺少凭证。本文保留设计决策，当前使用说明见 `integrations/external-context-mem0/README.md`，验收明细见 `.mariadb-shell-agent/e2e-tests/external-context-mem0-explicit-delete.md`。
 
-**日期与基线：** 2026-09-08；调研时 `origin/main` 为 `0e572dc82f7c02dc7a99f9499e72674a2e9bdf91`，已包含写入 PR [#11311](https://github.com/QwenLM/qwen-code/pull/11311)。本文引用的 Mem0、MCP 权限与参数展示源码已对照该基线，相关实现与开始实施前的工作树一致。
+**日期与基线：** 2026-09-08；调研时 `origin/main` 为 `0e572dc82f7c02dc7a99f9499e72674a2e9bdf91`，已包含写入 PR [#11311](https://github.invalid/QwenLM/qwen-code/pull/11311)。本文引用的 Mem0、MCP 权限与参数展示源码已对照该基线，相关实现与开始实施前的工作树一致。
 
 ## 1. 决策与范围
 
@@ -24,7 +24,7 @@
 | Holo 文档列出单条 GET/DELETE 使用同一个带记录 ID 的路径，但未给出完整 GET/DELETE 回执或条件删除语义。                                            | 路径可作为验收起点；不能推断 scope 字段、404、响应正文或原子条件删除行为。            |
 | Mem0 Platform 文档的 GET 返回顶层 scope，未找到为 404；当前 OSS server 的 GET 未找到可返回 HTTP 200 + JSON null，删除成功 message 的标点也不同。 | 明确配置未找到的表示；DELETE 按 HTTP 状态和 JSON 解析处理，不自动探测或改用批量接口。 |
 
-Holo 路径依据：[创建和调用长记忆服务](https://www.alibabacloud.com/help/tc/hologres/user-guide/create-and-use-long-memory-service)。Platform 回执依据：[Get Memory](https://docs.mem0.ai/api-reference/memory/get-memory)、[Delete Memory](https://docs.mem0.ai/api-reference/memory/delete-memory)。OSS 依据为固定提交 [dae67f74 的 server](https://github.com/mem0ai/mem0/blob/dae67f74f5cc7bf138c7d7d6f9cec5ce4b4373b3/server/main.py#L443) 和 [memory 实现](https://github.com/mem0ai/mem0/blob/dae67f74f5cc7bf138c7d7d6f9cec5ce4b4373b3/mem0/memory/main.py#L1208)，它们不是 Holo 部署版本的实现证明。此次限定检索未找到独立的外部记忆显式删除 issue，不据此断言没有其他跟踪项。
+Holo 路径依据：[创建和调用长记忆服务](https://www.alibabacloud.invalid/help/tc/hologres/user-guide/create-and-use-long-memory-service)。Platform 回执依据：[Get Memory](https://docs.mem0.ai/api-reference/memory/get-memory)、[Delete Memory](https://docs.mem0.ai/api-reference/memory/delete-memory)。OSS 依据为固定提交 [dae67f74 的 server](https://github.com/mem0ai/mem0/blob/dae67f74f5cc7bf138c7d7d6f9cec5ce4b4373b3/server/main.py#L443) 和 [memory 实现](https://github.com/mem0ai/mem0/blob/dae67f74f5cc7bf138c7d7d6f9cec5ce4b4373b3/mem0/memory/main.py#L1208)，它们不是 Holo 部署版本的实现证明。此次限定检索未找到独立的外部记忆显式删除 issue，不据此断言没有其他跟踪项。
 
 ## 3. 用户流程
 
@@ -192,9 +192,9 @@ deleted 不代表服务搜索索引已同步，也不会移除 Qwen 已有 trans
 
 ## 9. 验收门槛与待确认事实
 
-合成测试必须覆盖：候选 ID 不截断、点路径 ID 不得落到集合、空正文删除、scope 与全文复核、模型伪造参数、审批期间变更、单次 DELETE、删除后一次精确复核、未知回执、跨 workspace 隔离、取消与禁止透明重放、真实浏览器完整显示。计划及执行记录位于 `.qwen/e2e-tests/external-context-mem0-explicit-delete.md`；全局 CLI 基线见同目录 `external-context-mem0-explicit-delete-baseline.md`。
+合成测试必须覆盖：候选 ID 不截断、点路径 ID 不得落到集合、空正文删除、scope 与全文复核、模型伪造参数、审批期间变更、单次 DELETE、删除后一次精确复核、未知回执、跨 workspace 隔离、取消与禁止透明重放、真实浏览器完整显示。计划及执行记录位于 `.mariadb-shell-agent/e2e-tests/external-context-mem0-explicit-delete.md`；全局 CLI 基线见同目录 `external-context-mem0-explicit-delete-baseline.md`。
 
-真实 Holo 验收前先核对当前访问条件。上一轮 2026-09-07 的隔离 scope list 返回 403，create 为零；该旧结果不能代表今天的连通性。2026-09-08 实施预检时，此前临时凭证已不可用，未发送任何真实服务请求；详见 `.qwen/e2e-tests/holo-delete-preflight.json`。
+真实 Holo 验收前先核对当前访问条件。上一轮 2026-09-07 的隔离 scope list 返回 403，create 为零；该旧结果不能代表今天的连通性。2026-09-08 实施预检时，此前临时凭证已不可用，未发送任何真实服务请求；详见 `.mariadb-shell-agent/e2e-tests/holo-delete-preflight.json`。
 
 Holo 待确认的事实为：精确 GET 的完整 ID/正文/真实 scope 形状，未找到的表示，单条 DELETE 的同步回执、无级联/批量副作用，以及 ID/归属的生命周期保证。确认这些事实后，使用本次新建的合成目标和同/异 scope 对照记录完成拒绝、批准、精确 GET 消失、搜索传播和对照记录不变验证，再按精确 ID 清理。不得删除既有业务记录。
 

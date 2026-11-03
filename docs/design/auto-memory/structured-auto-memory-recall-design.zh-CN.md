@@ -36,11 +36,11 @@ Complete Memory Tree + Focused Subtree + on-demand body
 | ------- | ---------------------------------------------- | --------------------------------- |
 | Project | `<memory-base>/projects/<project-key>/memory/` | 当前 Git 根目录或工作区的私有记忆 |
 | User    | `<memory-base>/memories/`                      | 跨项目的用户偏好与背景            |
-| Team    | `<git-root>/.qwen/team-memory/`                | 由 Git 跟踪、团队共享的记忆       |
+| Team    | `<git-root>/.mariadb-shell-agent/team-memory/` | 由 Git 跟踪、团队共享的记忆       |
 
 `QWEN_CODE_MEMORY_BASE_DIR` 覆盖基础目录。只有 Project Memory 认
 `QWEN_CODE_MEMORY_LOCAL=1`，它会把 Project Memory 移到
-`<project>/.qwen/memory/`。User Memory 仍在全局 memory base 之下；Project
+`<project>/.mariadb-shell-agent/memory/`。User Memory 仍在全局 memory base 之下；Project
 根目录下的 `user/*.md` 文件仍属于 Project Memory。作用域来自被扫描的根，
 而不是相对路径的第一段。
 
@@ -54,7 +54,7 @@ Complete Memory Tree + Focused Subtree + on-demand body
 ```yaml
 ---
 name: model-pull-memory-design
-description: Qwen Code Auto Memory uses structured metadata and on-demand body retrieval.
+description: MariaDB Shell Agent Auto Memory uses structured metadata and on-demand body retrieval.
 type: project
 category: tool_experience
 keywords:
@@ -272,7 +272,7 @@ stateDiagram-v2
 ## 托管记忆的工具路由
 
 结构化召回不会把通用 Core 文件工具变成 Memory 文件系统沙箱。`read_file`、Glob、
-Grep、目录列举、写入工具与 Shell 保留 Qwen Code 既有的权限与沙箱语义。
+Grep、目录列举、写入工具与 Shell 保留 MariaDB Shell Agent 既有的权限与沙箱语义。
 结构化提示词告诉主模型：正文读取用 `search_memory`，写入用 `manage_memory`，
 不要通过通用工具访问托管记忆路径。这是一条模型路由契约，不是安全边界。
 

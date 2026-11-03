@@ -6,7 +6,7 @@
 
 ## Goal (historical)
 
-Add a flag-gated TUI transport that talks to `qwen serve` through
+Add a flag-gated TUI transport that talks to `mariadb-shell-agent serve` through
 `DaemonSessionClient` instead of creating an in-process `Config` + agent
 runtime.
 
@@ -17,13 +17,13 @@ permission, and lifecycle diagnostics are stable.
 ## Proposed Entry Point
 
 ```bash
-QWEN_DAEMON_URL=http://127.0.0.1:4170 qwen --experimental-daemon-tui
+QWEN_DAEMON_URL=http://127.0.0.1:4170 mariadb-shell-agent --experimental-daemon-tui
 ```
 
 Optional:
 
 ```bash
-QWEN_DAEMON_TOKEN=... QWEN_DAEMON_WORKSPACE=/repo qwen --experimental-daemon-tui
+QWEN_DAEMON_TOKEN=... QWEN_DAEMON_WORKSPACE=/repo mariadb-shell-agent --experimental-daemon-tui
 ```
 
 The CLI should refuse this mode unless both are true:
@@ -78,14 +78,14 @@ JSONL, stream-json, and dual-output behavior remains unchanged.
 - Additive code path.
 - No existing CLI flags change behavior.
 - If the daemon is unavailable, the experimental path fails before starting the
-  TUI and tells the user to run `qwen serve`.
+  TUI and tells the user to run `mariadb-shell-agent serve`.
 
 ## Validation Plan
 
 - Unit-test event-to-TUI-state mapping with synthetic daemon events.
 - Unit-test prompt, cancel, model switch, and permission vote forwarding.
 - Unit-test flag/env parsing when the feature flag is wired.
-- Smoke-test against a local `qwen serve`:
+- Smoke-test against a local `mariadb-shell-agent serve`:
   - prompt text streams into the TUI
   - cancel resolves the active prompt
   - permission request can be accepted or rejected

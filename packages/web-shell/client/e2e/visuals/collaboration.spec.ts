@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -142,7 +143,7 @@ for (const theme of THEMES) {
   });
 }
 
-/** Runtimes: this computer plus two joined Qwen Code machines. */
+/** Runtimes: this computer plus two joined MariaDB Shell Agent machines. */
 async function setupRuntimes(page: Page, baseURL: string): Promise<void> {
   const scenario = createWebShellDaemonScenario({
     capabilities: { features: ['session_events', 'agent_collaboration_v1'] },
@@ -152,7 +153,7 @@ async function setupRuntimes(page: Page, baseURL: string): Promise<void> {
     id: 'local',
     kind: 'local',
     label: 'This computer',
-    provider: 'Qwen Code ACP',
+    provider: 'MariaDB Shell Agent ACP',
     status: 'online',
     workspaceCwd: scenario.workspaceCwd,
   };
@@ -160,7 +161,7 @@ async function setupRuntimes(page: Page, baseURL: string): Promise<void> {
     id: 'host_build',
     kind: 'external',
     label: 'build-box',
-    provider: 'Qwen Code ACP, Claude Code ACP',
+    provider: 'MariaDB Shell Agent ACP, Claude Code ACP',
     programs: ['qwen', 'claude'],
     status: 'online',
     workspaceCwd: '/srv/checkout/qwen-code',
@@ -173,7 +174,7 @@ async function setupRuntimes(page: Page, baseURL: string): Promise<void> {
     id: 'host_mac',
     kind: 'external',
     label: 'mac-mini',
-    provider: 'Qwen Code ACP',
+    provider: 'MariaDB Shell Agent ACP',
     programs: ['qwen'],
     status: 'offline',
     workspaceCwd: '/Users/dev/qwen-code',
@@ -259,7 +260,9 @@ for (const theme of THEMES) {
     await page.getByRole('radio', { name: 'Runtimes', exact: true }).click();
     await expect(page.getByText('mac-mini', { exact: true })).toBeVisible();
     // Each runtime lists the programs it reported.
-    await expect(page.getByText('Qwen Code, Claude Code')).toBeVisible();
+    await expect(
+      page.getByText('MariaDB Shell Agent, Claude Code'),
+    ).toBeVisible();
     await clearFocus(page);
     await captureScreenshot(page, `collab-runtimes-${theme}`);
 
@@ -291,10 +294,10 @@ for (const theme of THEMES) {
     await dialog
       .getByLabel('Join link')
       .fill('https://coordinator.example:4170/join/ws_team');
-    // The terminal equivalent asks the running `qwen serve` to join.
+    // The terminal equivalent asks the running `mariadb-shell-agent serve` to join.
     await expect(
       dialog.getByText(
-        /qwen agents join 'https:\/\/coordinator\.example:4170\/join\/ws_team'/,
+        /mariadb-shell-agent agents join 'https:\/\/coordinator\.example:4170\/join\/ws_team'/,
       ),
     ).toBeVisible();
   });
@@ -309,7 +312,7 @@ for (const theme of THEMES) {
       .first()
       .click();
     await page.getByRole('button', { name: 'New agent', exact: true }).click();
-    // A runtime offers the programs it reported: here Qwen Code and Claude
+    // A runtime offers the programs it reported: here MariaDB Shell Agent and Claude
     // Code, not Codex.
     await page
       .locator('label', { hasText: '/srv/checkout/qwen-code' })

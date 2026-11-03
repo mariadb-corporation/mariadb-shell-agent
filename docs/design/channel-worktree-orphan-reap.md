@@ -25,7 +25,7 @@ yiliang114 on #10643, `session-archive.ts:656`).
 Scenario: channel worktree session (`POST /session` with `worktree:{}`),
 artifacts = JSONL record, sidecar `<chatsDir>/<sid>.worktree.json`,
 in-worktree marker `.qwen-session`, checkout
-`W/.qwen/worktrees/<slug>` (git-registered), branch `worktree-<slug>`.
+`W/.mariadb-shell-agent/worktrees/<slug>` (git-registered), branch `worktree-<slug>`.
 
 | Path                                             | Record      | Sidecar     | Checkout   | Marker     | Branch     |
 | ------------------------------------------------ | ----------- | ----------- | ---------- | ---------- | ---------- |
@@ -93,7 +93,7 @@ can deadlock (AB-BA).
 ## Safety contract
 
 Cleanup fires only when the whole ownership chain verifies; any doubt
-preserves the checkout and logs a named warning (a `qwen serve:` stderr
+preserves the checkout and logs a named warning (a `mariadb-shell-agent serve:` stderr
 line via `writeStderrLine`).
 
 Classification (before record deletion, under the worktree lock):
@@ -113,7 +113,7 @@ Classification (before record deletion, under the worktree lock):
 4. Marker strict read (`readWorktreeSessionMarkerStrict`) must be
    `valid` and name exactly the session being deleted.
 5. Path containment: the checkout must resolve under the workspace's
-   worktree roots (`<ws>/.qwen/worktrees` or the repo top-level
+   worktree roots (`<ws>/.mariadb-shell-agent/worktrees` or the repo top-level
    equivalent, same allowed-roots derivation as the create route).
 6. Cross-session sharing: a scan of the sidecar dir's `*.worktree.json`
    must find no **other** session's sidecar naming the same (canonical)

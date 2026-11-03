@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -328,7 +329,7 @@ it('refuses the reference arguments as a named follow-up scope', async () => {
 it('refuses a script whose masked source calls workflow() as a nested launch', async () => {
   for (const source of [
     "return await workflow('x');",
-    "return await workflow({ scriptPath: '.qwen/workflows/x.js' });",
+    "return await workflow({ scriptPath: '.mariadb-shell-agent/workflows/x.js' });",
   ]) {
     const responses = await executeWorkflow(
       createTurn(),

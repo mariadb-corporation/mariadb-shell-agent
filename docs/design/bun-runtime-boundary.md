@@ -69,9 +69,9 @@ or compatibility.
 | `packages/cli/src/commands/review/test-efficacy.ts`                   | spawns vitest via `process.execPath` (dev-tooling path)                                                                                                                    | intentionally not; host-tool identity                  |
 
 R3 consolidates the remaining interpreter work from
-[#14134 at c807de17](https://github.com/QwenLM/qwen-code/pull/14134)
+[#14134 at c807de17](https://github.invalid/QwenLM/qwen-code/pull/14134)
 and its regression coverage from
-[#14187 at d14b2ad1](https://github.com/QwenLM/qwen-code/pull/14187).
+[#14187 at d14b2ad1](https://github.invalid/QwenLM/qwen-code/pull/14187).
 It migrates the sandbox diagnostic, Mem0 spawn/identity, cgroup launcher, and
 bwrap/landlock relay/protected-root pairs through the existing helper. cgroup
 retains both hook and managed-child-run consumers and `reapOnParentExit`.
@@ -282,11 +282,11 @@ their own real process and artifact evidence either way.
 ## Standalone update integration (R1)
 
 This integrates chiga0's update work from
-[#14134](https://github.com/QwenLM/qwen-code/pull/14134),
-[#14139](https://github.com/QwenLM/qwen-code/pull/14139),
-[#14142](https://github.com/QwenLM/qwen-code/pull/14142),
-[#14187](https://github.com/QwenLM/qwen-code/pull/14187), and
-[#14210](https://github.com/QwenLM/qwen-code/pull/14210), through
+[#14134](https://github.invalid/QwenLM/qwen-code/pull/14134),
+[#14139](https://github.invalid/QwenLM/qwen-code/pull/14139),
+[#14142](https://github.invalid/QwenLM/qwen-code/pull/14142),
+[#14187](https://github.invalid/QwenLM/qwen-code/pull/14187), and
+[#14210](https://github.invalid/QwenLM/qwen-code/pull/14210), through
 `ce67edaba5631e9deaee418296346370dba4c116`. The unrelated interpreter
 call-site changes remain a separate migration; the inventory above is retained.
 

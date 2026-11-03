@@ -6,8 +6,8 @@ Internal design document for replacing the hand-rolled 192-line YAML parser at
 round-trip safely through subagent / skill / converter code paths.
 
 Companion to [`docs/design/declarative-agents-port.md`](./declarative-agents-port.md).
-Issue: [#4821](https://github.com/QwenLM/qwen-code/issues/4821). Prereq for
-the follow-up to [PR #4842](https://github.com/QwenLM/qwen-code/pull/4842).
+Issue: [#4821](https://github.invalid/QwenLM/qwen-code/issues/4821). Prereq for
+the follow-up to [PR #4842](https://github.invalid/QwenLM/qwen-code/pull/4842).
 
 ## Phase 0 — Sources verified
 
@@ -63,7 +63,7 @@ recommended `js-yaml`'s `FAILSAFE_SCHEMA` / `CORE_SCHEMA`**. We are deviating
 from that guidance for three concrete reasons:
 
 1. **CC parity**. The whole point of porting CC's frontmatter schema is to
-   let users drop a CC agent file into `.qwen/agents/` and have it parse
+   let users drop a CC agent file into `.mariadb-shell-agent/agents/` and have it parse
    identically. Using the same parser CC uses minimizes drift on edge-case
    YAML constructs (multi-doc streams, flow vs block scalars, tag handling).
 2. **`yaml` is already a direct user inside `skill-manager.ts`** — see

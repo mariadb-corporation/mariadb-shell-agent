@@ -4,8 +4,8 @@
 
 Status: D6a (Hosted Harness) and D6b (Java server) implemented.
 Date: 2026-09-30
-Issue: [#12867](https://github.com/QwenLM/qwen-code/issues/12867), part of [#12380](https://github.com/QwenLM/qwen-code/issues/12380)
-Decisions: [#12867 comment](https://github.com/QwenLM/qwen-code/issues/12867#issuecomment-5895205811)
+Issue: [#12867](https://github.invalid/QwenLM/qwen-code/issues/12867), part of [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380)
+Decisions: [#12867 comment](https://github.invalid/QwenLM/qwen-code/issues/12867#issuecomment-5895205811)
 Builds on: [API contract (D1)](2026-09-27-managed-agent-api-contract.md), [durable lifecycle (D4)](2026-09-28-managed-agent-durable-lifecycle.md), [Hosted Workspace tool turn](2026-09-27-hosted-workspace-tool-turn.md) and [Hosted public Workspace admission (G0)](2026-09-29-hosted-public-workspace-admission.md)
 
 ## 1. Problem

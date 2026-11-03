@@ -3,7 +3,7 @@
 [English](ssh-workspaces.md) | [简体中文](ssh-workspaces.zh-CN.md)
 
 状态：已实现。真实 SSH 端到端测试已在隔离的 macOS sshd 和 Python 3.9.6
-环境通过。PR 中还附有针对提交 `a75c998` 的 [Linux 验证报告](https://github.com/QwenLM/qwen-code/pull/12255#issuecomment-5755063787)，报告在 Debian 13、Python 3.13.5 上有 121 项检查通过。
+环境通过。PR 中还附有针对提交 `a75c998` 的 [Linux 验证报告](https://github.invalid/QwenLM/qwen-code/pull/12255#issuecomment-5755063787)，报告在 Debian 13、Python 3.13.5 上有 121 项检查通过。
 
 ## 问题与现状
 
@@ -51,7 +51,7 @@ Agent 编辑时统一比较 CRLF 和 LF，过期检查仍对原始字节计算�
 模型凭据、权限决定、会话历史和输出存储保留在本地。创建 ACP 会话 Config 时，
 读取精确占位目录对应的连接描述。为主会话安装 SSH 执行环境，复用现有工具
 schema 和确认包装器。工具动作通过 SSH 实现，不调用本地工具实现。
-提示 agent 通过文件工具读取远程 QWEN.md 和 AGENTS.md，不把远端可执行配置导入本地运行时。
+提示 agent 通过文件工具读取远程 MARIADB-SHELL-AGENT.md 和 AGENTS.md，不把远端可执行配置导入本地运行时。
 禁用不能正确处理远程路径的本地 hooks 和服务。主会话的结构化输出、Goal 工具、网页获取与搜索，以及显式启用的 todo 工具继续遵守原有配置条件，并由本地会话拥有。SSH 会话覆盖 code-mode-only 设置，让工具通过 SSH 执行。Shell 超时和输出阈值遵守本地设置，截断时保留输出的开头与末尾。
 
 ### Daemon 与 Web Shell
@@ -85,7 +85,7 @@ SSH 服务和临时项目测试。验证文件改动与命令标记仅发生在�
 
 ## 使用方式与限制
 
-在本地工作区启动 `qwen serve`，然后在 Web Shell 选择 **添加工作区**。
+在本地工作区启动 `mariadb-shell-agent serve`，然后在 Web Shell 选择 **添加工作区**。
 输入 `ssh://user@host:2222/absolute/project`；SSH config 别名可以写为
 `ssh://build-box/absolute/project`。路径中的空格使用 `%20`。现有信任对话框
 同样适用于远程项目。启用持久化后，重启本地 daemon 会恢复这个连接。
@@ -93,7 +93,7 @@ daemon 的主工作区必须保留为本地目录。
 
 远端需要 Python 3 和项目所需的工具。Agent shell 命令需要 Bash，文件操作不依赖 Bash。文件工具接受 UTF-8 文本，
 二进制预览和上传使用字节接口。完整文本读取与远程写入上限为 16 MiB，同时保留 Web Shell 原有的更小文本读写限制。SSH 二进制上传也限制为 16 MiB，超限返回 HTTP 413。大文本使用 line/limit 分段读取。字节读取直接定位指定偏移，支持超过 16 MiB 的文件，部分窗口不返回全文件哈希。
-Git 仓库内的搜索遵守 `.gitignore`、`.qwenignore` 与生效的 `context.fileFiltering.customIgnoreFiles`（默认 `.agentignore` 和 `.aiignore`）。自定义列表显式为空时仍保留 `.qwenignore`。包含这些忽略文件的非 Git 项目会明确报错，包括配置为相对路径的忽略文件。遇到不可读条目、超出文本扫描上限的文件、Git 跳过条目的警告或省略已检出的子模块时，搜索标记结果不完整。子模块内容可通过 SSH shell 查看。Git 所有权可疑时明确报错，不修改 Git 信任配置。Git 查看包括状态和工作区差异；改动文件超过 500 个时返回计数并省略文件详情，与本地快速路径一致。大文件的未跟踪预览保留 1,000,000 字节/400 行限制并标记截断，行数统计只覆盖
+Git 仓库内的搜索遵守 `.gitignore`、`.mariadb-shell-agentignore` 与生效的 `context.fileFiltering.customIgnoreFiles`（默认 `.agentignore` 和 `.aiignore`）。自定义列表显式为空时仍保留 `.mariadb-shell-agentignore`。包含这些忽略文件的非 Git 项目会明确报错，包括配置为相对路径的忽略文件。遇到不可读条目、超出文本扫描上限的文件、Git 跳过条目的警告或省略已检出的子模块时，搜索标记结果不完整。子模块内容可通过 SSH shell 查看。Git 所有权可疑时明确报错，不修改 Git 信任配置。Git 查看包括状态和工作区差异；改动文件超过 500 个时返回计数并省略文件详情，与本地快速路径一致。大文件的未跟踪预览保留 1,000,000 字节/400 行限制并标记截断，行数统计只覆盖
 限制内的预览。其他 Git 命令可以通过 SSH 终端或 agent 的 shell 工具执行。
 
 SSH 会话暂不支持后台 shell 任务、操作项目的本地快捷命令、worktree、hooks、skills、

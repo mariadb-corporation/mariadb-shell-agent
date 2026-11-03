@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -78,9 +79,9 @@ describe('memoryImportProcessor', () => {
   });
 
   describe('processImports', () => {
-    const PARENT = path.resolve(BASE, 'QWEN.md');
+    const PARENT = path.resolve(BASE, 'MARIADB-SHELL-AGENT.md');
 
-    // Imports ./test.md into QWEN.md with an import-notification hook.
+    // Imports ./test.md into MARIADB-SHELL-AGENT.md with an import-notification hook.
     const importFromParent = (
       format: 'flat' | 'tree',
       onFileImported: ProcessImportsOptions['onFileImported'],

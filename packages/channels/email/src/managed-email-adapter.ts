@@ -1123,7 +1123,7 @@ export class ManagedEmailAdapter {
       try {
         await this.smtp.sendMail({
           from: {
-            name: 'Qwen Code Agent',
+            name: 'MariaDB Shell Agent Agent',
             address: this.settings.address,
           },
           to: recipient,

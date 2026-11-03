@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -189,7 +190,7 @@ describe('SessionArtifactStore', () => {
       status: 'available',
       title: 'Current published page',
       managedId,
-      url: `file:///root/.qwen/artifacts/${managedId}/index.html`,
+      url: `file:///root/.mariadb-shell-agent/artifacts/${managedId}/index.html`,
       retention: 'restorable',
       clientRetained: false,
       createdAt: '2026-09-17T16:53:00.000Z',
@@ -3261,13 +3262,15 @@ describe('SessionArtifactStore', () => {
   });
 
   it('rejects a path whose intermediate symlink aliases a skipped directory', async () => {
-    await fs.mkdir(path.join(workspace, '.qwen', 'sub'), { recursive: true });
+    await fs.mkdir(path.join(workspace, '.mariadb-shell-agent', 'sub'), {
+      recursive: true,
+    });
     await fs.writeFile(
-      path.join(workspace, '.qwen', 'sub', 'secret.xlsx'),
+      path.join(workspace, '.mariadb-shell-agent', 'sub', 'secret.xlsx'),
       'xlsx',
     );
     await fs.symlink(
-      path.join(workspace, '.qwen'),
+      path.join(workspace, '.mariadb-shell-agent'),
       path.join(workspace, 'link'),
     );
     const store = new SessionArtifactStore({
@@ -7683,7 +7686,9 @@ describe('SessionArtifactStore', () => {
     expect(rebuilt.artifacts).toHaveLength(4);
     expect(
       rebuilt.artifacts.filter((artifact) =>
-        artifact.url?.startsWith('file:///root/.qwen/artifacts/'),
+        artifact.url?.startsWith(
+          'file:///root/.mariadb-shell-agent/artifacts/',
+        ),
       ),
     ).toHaveLength(1);
 

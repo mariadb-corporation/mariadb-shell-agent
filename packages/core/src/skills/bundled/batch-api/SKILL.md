@@ -11,7 +11,7 @@ allowedTools:
 
 # /batch-api — Agent-prepared Batch API workflow
 
-**Hard rule for this whole skill:** if any `qwen batch …` command fails, or
+**Hard rule for this whole skill:** if any `mariadb-shell-agent batch …` command fails, or
 the task turns out to be unsuitable, report what happened in a few lines and
 stop (the one exception, a plan-field error from `run`, is in §4). Never fall back to doing the transform yourself in this session — the
 user chose the half-price asynchronous path explicitly, and silently doing
@@ -24,14 +24,14 @@ trades latency for price: the provider bills Batch requests at 50% of the
 realtime list price (with no context-cache benefit), and a job takes tens of
 minutes to hours to finish (completion window 24h or more). Your job is to
 turn the user's task into a small **plan file** that the deterministic
-executor (`qwen batch run`) submits. You never write request JSONL by hand
+executor (`mariadb-shell-agent batch run`) submits. You never write request JSONL by hand
 and never call the Batch API yourself.
 
 ## 0. Check readiness before anything else
 
-Run every `qwen batch …` command with the shell tool as
+Run every `mariadb-shell-agent batch …` command with the shell tool as
 `"${QWEN_CODE_CLI:-qwen}" batch …` — `QWEN_CODE_CLI` names the CLI running
-this session, so a plain `qwen` on PATH (possibly an older install without
+this session, so a plain `mariadb-shell-agent` on PATH (possibly an older install without
 these subcommands) is only the fallback. First make sure the CLI you reach
 has them. Help output never calls a model:
 
@@ -39,9 +39,9 @@ has them. Help output never calls a model:
 "${QWEN_CODE_CLI:-qwen}" batch --help
 ```
 
-If the output does not list `batch run <plan>`, the `qwen` it reached is an
+If the output does not list `batch run <plan>`, the `mariadb-shell-agent` it reached is an
 older install without these subcommands — say so (the session's CLI is not on
-PATH as `qwen`) and stop. Do not run any other `batch` command there: an older
+PATH as `mariadb-shell-agent`) and stop. Do not run any other `batch` command there: an older
 CLI treats `batch check` as a prompt and answers it with a billed model call.
 Then:
 
@@ -91,7 +91,7 @@ The whole point is saving money, so do not burn the savings in preparation:
 
 ## 3. Write the plan file
 
-Write one JSON file to `.qwen/batch/plans/<slug>.json` (`<slug>` = short
+Write one JSON file to `.mariadb-shell-agent/batch/plans/<slug>.json` (`<slug>` = short
 kebab-case task name) with the write_file tool:
 
 ```json
@@ -121,7 +121,7 @@ Rules:
 - Paths are relative to the current working directory. Every `target` must
   be unique and must not overwrite an existing file — pick fresh output
   paths inside the project and outside any hidden path such as `.git/`,
-  `.github/` or `.qwen/`, at any depth (refused). Results
+  `.github/` or `.mariadb-shell-agent/`, at any depth (refused). Results
   that arrive to a changed source or an occupied target are held, not
   written.
 - Optional fields: `completionWindow` (default `24h`, max `14d`),
@@ -146,14 +146,14 @@ count, the frozen model/thinking/output-limit line, the cost estimate and a
 snapshot digest, but uploads nothing and bills nothing:
 
 ```
-"${QWEN_CODE_CLI:-qwen}" batch run .qwen/batch/plans/<slug>.json --dry-run
+"${QWEN_CODE_CLI:-qwen}" batch run .mariadb-shell-agent/batch/plans/<slug>.json --dry-run
 ```
 
 Show the user those lines verbatim, plus any `[batch]` note. Then submit
 exactly that snapshot, with the digest the preview printed:
 
 ```
-"${QWEN_CODE_CLI:-qwen}" batch run .qwen/batch/plans/<slug>.json --expect <digest>
+"${QWEN_CODE_CLI:-qwen}" batch run .mariadb-shell-agent/batch/plans/<slug>.json --expect <digest>
 ```
 
 Approving this command is the user's decision to spend, made with the preview
@@ -186,15 +186,15 @@ failed and why. Then do the follow-up the user asked for in their original
 request (for example, review the delivered files), and nothing else:
 
 - Never retry automatically — every retry is a new billed request. Offer
-  `qwen batch retry <task-id>` for failed items and for items held because
+  `mariadb-shell-agent batch retry <task-id>` for failed items and for items held because
   their source changed; truncated items need
-  `qwen batch retry <task-id> --max-output-tokens <n>`.
+  `mariadb-shell-agent batch retry <task-id> --max-output-tokens <n>`.
 - Never redo a failed item yourself in this session.
 - A target conflict (held: target exists) is resolved by the user; then
-  `qwen batch collect <task-id>` delivers it without a new request.
+  `mariadb-shell-agent batch collect <task-id>` delivers it without a new request.
 - Estimates never include what this session spent preparing; do not
   describe the Batch estimate as the task's total cost or as a saving.
 
 If the session closes before the batch settles, nothing is lost: an
-interactive session collects the task automatically the next time `qwen`
+interactive session collects the task automatically the next time `mariadb-shell-agent`
 starts in this project (`general.batchAutoCollect: false` turns this off).

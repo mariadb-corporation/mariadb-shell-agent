@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,7 +26,7 @@ describe('qwen-triage-finalize workflow', () => {
     // must be listed — and none without one (a dead entry just adds skipped
     // firings; E2E Tests has no pull_request trigger).
     expect(workflow.on.workflow_run.workflows).toEqual([
-      'Qwen Code CI',
+      'MariaDB Shell Agent CI',
       'Qwen Autofix',
       'Managed Agent gate',
       'SDK Python',

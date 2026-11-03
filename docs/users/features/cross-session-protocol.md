@@ -1,7 +1,7 @@
 # Cross-Session Protocol
 
 This page is the contract for a program that wants to take part in
-cross-session messaging without being a Qwen Code session: a voice
+cross-session messaging without being a MariaDB Shell Agent session: a voice
 front-end, a relay daemon, a script that watches a build. It describes
 what a session writes to the registry, what its inbox reads off a
 connection, and what it sends back. Everything here is what the code
@@ -10,7 +10,7 @@ says what may change and how you will know.
 
 For a Node program, `@qwen-code/sdk/peer` implements the joining side of
 this page — the record, the inbox, the auth line, frames and receipts — with
-nothing but Node, and its tests run it against Qwen Code's own implementation
+nothing but Node, and its tests run it against MariaDB Shell Agent's own implementation
 in both directions. It applies none of §6 to its own inbox: a program that
 needs rate limits, holds or a duplicate window applies them itself. Use it, or
 read on to write your own.
@@ -28,7 +28,7 @@ $QWEN_HOME/sessions/<pid>.json            (directory 0700, file 0600)
 $QWEN_HOME/sessions/<pid>-<8 hex>.json    (a process hosting several sessions)
 ```
 
-`$QWEN_HOME` defaults to `~/.qwen`. The file name is keyed by the
+`$QWEN_HOME` defaults to `~/.mariadb-shell-agent`. The file name is keyed by the
 writer's PID — either the bare PID, or the PID, a dash, and eight
 lowercase hex characters minted at registration (see "Several records
 from one process" below). A record whose `pid` field disagrees with the
@@ -75,7 +75,7 @@ receiving session's own policy (§6). Set `kind` so a listing can group
 sessions honestly; do not expect it to buy you anything.
 
 **Writing your own record.** An external process that wants to be
-found — listed by `qwen sessions ps`, addressable from `send_message`,
+found — listed by `mariadb-shell-agent sessions ps`, addressable from `send_message`,
 able to receive receipts — writes the same record for itself: its own
 `pid`, `procStart` and `pidNs` computed the same way, a `sessionId` it
 mints (any UUID), `kind: "external"`, a `name` (yours, or derived the
@@ -115,7 +115,7 @@ sessions may share a `name`; the address grammar a sender types is
 `name`, `name [ref]`, `[ref]` or the bare `ref`, and an ambiguous
 `name` is an error rather than a guess.
 
-**Several records from one process.** Any `qwen --acp` child — spawned
+**Several records from one process.** Any `mariadb-shell-agent --acp` child — spawned
 by the daemon, or driven directly by an editor or another client —
 writes one record per session, named `<pid>-<8 hex>.json`, from its
 first session on. The suffix is minted at
@@ -166,11 +166,11 @@ When the target record has an `ipcToken`, the first line must be:
 Three kinds of token are accepted, and the inbox remembers which one it
 saw:
 
-| Presented                                                                     | The inbox concludes            | Effect                                                                           |
-| ----------------------------------------------------------------------------- | ------------------------------ | -------------------------------------------------------------------------------- |
-| The `ipcToken` from the target's registry record                              | an ordinary peer               | subject to policy and mode parity (§6)                                           |
-| `QWEN_CODE_MESSAGING_TOKEN` from the target's own environment                 | a process that session started | delivered under the parity default; `origin="own-process"`                       |
-| A controller token `qpc_<64 hex>` minted with `qwen sessions controllers add` | a program the user trusts      | delivered under the parity default; `origin="controller"` with the grant's label |
+| Presented                                                                                    | The inbox concludes            | Effect                                                                           |
+| -------------------------------------------------------------------------------------------- | ------------------------------ | -------------------------------------------------------------------------------- |
+| The `ipcToken` from the target's registry record                                             | an ordinary peer               | subject to policy and mode parity (§6)                                           |
+| `QWEN_CODE_MESSAGING_TOKEN` from the target's own environment                                | a process that session started | delivered under the parity default; `origin="own-process"`                       |
+| A controller token `qpc_<64 hex>` minted with `mariadb-shell-agent sessions controllers add` | a program the user trusts      | delivered under the parity default; `origin="controller"` with the grant's label |
 
 A first line that is not an auth line, or that presents a token matching
 none of the three, drops the connection silently. When the record has no
@@ -283,7 +283,7 @@ In order:
 4. **Hold.** Up to 50 messages wait. A message arriving at a full buffer is `dropped` with `queue-full` rather than evicting one already parked. A held message expires after `agents.crossSessionHeldExpiry` (`1m`, `5m`, `10m`, `never`; default `5m`). The user releases or denies from `/peers`; a mode change re-evaluates the backlog.
 5. **Queue.** An accepted message joins the session's input queue, which holds at most 50 from peers. A full queue is `dropped` with `queue-full` too.
 
-A sender does not have to discover the limits the hard way: a Qwen Code
+A sender does not have to discover the limits the hard way: a MariaDB Shell Agent
 session mirrors them per address and refuses its own send before writing
 it, telling its model to batch instead.
 
@@ -321,7 +321,7 @@ that look like the envelope are defanged inside `content`.
   `name`; today they are told apart only by `ref`. A registration that
   yields to a live name, and a control frame that tells peers a session
   renamed itself, are both still to come.
-- **Same-name reporting.** `qwen sessions ps` and `list_agents` do not
+- **Same-name reporting.** `mariadb-shell-agent sessions ps` and `list_agents` do not
   flag records that still collide.
 - **Inbound messages to ACP-driven sessions.** A session a program
   drives over ACP — daemon-spawned or not — registers and can send, but

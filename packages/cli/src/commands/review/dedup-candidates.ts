@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -310,7 +311,7 @@ function postedEntries(
 
 /**
  * The previous round's deferral entries, from the newest saved findings
- * artifact for this PR (`.qwen/reviews/<date>-<time>-pr-<n>.json`). Only the
+ * artifact for this PR (`.mariadb-shell-agent/reviews/<date>-<time>-pr-<n>.json`). Only the
  * `D<round>-<n>` entries participate: a posted finding is matched through
  * the side file above (the authoritative cross-environment work list), and
  * an artifact `R` entry may predate rounds the ledger has since ruled —

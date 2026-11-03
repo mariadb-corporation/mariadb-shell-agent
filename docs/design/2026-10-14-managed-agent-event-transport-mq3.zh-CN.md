@@ -11,13 +11,13 @@
 
 > **状态：** 已作为门禁实现。这是跨节点 EventTransport 设计
 > （[2026-10-04-managed-agent-event-transport](2026-10-04-managed-agent-event-transport.zh-CN.md)
-> §7）的 **MQ3** 阶段，由 [#12380](https://github.com/QwenLM/qwen-code/issues/12380) 跟踪。
+> §7）的 **MQ3** 阶段，由 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380) 跟踪。
 > 它的前置阶段 MQ2 已分四个切片落地
 > （[2026-10-12-managed-agent-event-transport-mq2](2026-10-12-managed-agent-event-transport-mq2.zh-CN.md)）：
-> MQ2a [#13940](https://github.com/QwenLM/qwen-code/pull/13940)、MQ2b
-> [#14029](https://github.com/QwenLM/qwen-code/pull/14029)、MQ2c
-> [#14080](https://github.com/QwenLM/qwen-code/pull/14080) 与 MQ2d
-> [#14109](https://github.com/QwenLM/qwen-code/pull/14109)。MQ3 不改任何生产代码。
+> MQ2a [#13940](https://github.invalid/QwenLM/qwen-code/pull/13940)、MQ2b
+> [#14029](https://github.invalid/QwenLM/qwen-code/pull/14029)、MQ2c
+> [#14080](https://github.invalid/QwenLM/qwen-code/pull/14080) 与 MQ2d
+> [#14109](https://github.invalid/QwenLM/qwen-code/pull/14109)。MQ3 不改任何生产代码。
 > 它的各行断言的是现有实现的行为；与 §8「要求的行为」不一致的地方，由下文的「发现」记录。
 
 ## 问题

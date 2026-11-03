@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,9 +20,13 @@ bootstrapHomeEnv();
 
 const USER_SETTINGS_DIR = process.env.QWEN_HOME
   ? resolvePath(process.env.QWEN_HOME)
-  : join(os.homedir(), '.qwen');
+  : join(os.homedir(), '.mariadb-shell-agent');
 const USER_SETTINGS_PATH = join(USER_SETTINGS_DIR, 'settings.json');
-const WORKSPACE_SETTINGS_PATH = join(projectRoot, '.qwen', 'settings.json');
+const WORKSPACE_SETTINGS_PATH = join(
+  projectRoot,
+  '.mariadb-shell-agent',
+  'settings.json',
+);
 
 let settingsTarget = undefined;
 

@@ -1,9 +1,9 @@
 # Batch Mode (DashScope)
 
 The DashScope Batch API runs requests asynchronously at half the realtime
-price, with a completion window of at least 24 hours. Qwen Code uses it
+price, with a completion window of at least 24 hours. MariaDB Shell Agent uses it
 through `/batch-api`: you describe a bulk task, the agent prepares a plan,
-and `qwen batch` submits it, tracks it and writes the results as files.
+and `mariadb-shell-agent batch` submits it, tracks it and writes the results as files.
 
 ## Configure a Batch model
 
@@ -18,7 +18,7 @@ unchanged, including when the conversation uses Qwen OAuth or another provider.
     "openai": [
       {
         "id": "qwen3.7-plus",
-        "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "baseUrl": "https://dashscope.aliyuncs.invalid/compatible-mode/v1",
         "envKey": "DASHSCOPE_API_KEY"
       }
     ]
@@ -42,7 +42,7 @@ selection so its background collector uses the same settings as child commands.
 
 Without a Batch selection, the previous behavior remains: Batch reuses the
 main model's configuration and requires OpenAI-compatible API-key auth.
-Qwen OAuth credentials themselves have no Batch route. Run `qwen batch check`
+Qwen OAuth credentials themselves have no Batch route. Run `mariadb-shell-agent batch check`
 to verify readiness without submitting a paid request.
 
 ## When batch is the right tool
@@ -73,17 +73,17 @@ To check a job before committing to it, send one request realtime and compare
 writing them to docs/en with the same file names
 ```
 
-The agent runs `qwen batch check`, confirms the task fits, reads a small
-sample, writes a plan to `.qwen/batch/plans/`, and previews it — nothing is
+The agent runs `mariadb-shell-agent batch check`, confirms the task fits, reads a small
+sample, writes a plan to `.mariadb-shell-agent/batch/plans/`, and previews it — nothing is
 uploaded or billed:
 
 ```bash
-qwen batch run .qwen/batch/plans/<slug>.json --dry-run
+mariadb-shell-agent batch run .mariadb-shell-agent/batch/plans/<slug>.json --dry-run
 # preview: 42 item(s), window 24h — nothing uploaded, nothing billed
 # model qwen-plus, thinking off, max output 8192 tokens (frozen from your current settings; retries reuse them)
 # writes new files to: docs/en/ (42)
 # ~180,000 in / ~190,000 out tokens (rough estimate); ...
-# snapshot 3f9c2a7e5d10b884; submit exactly this batch with: qwen batch run .qwen/batch/plans/<slug>.json --expect 3f9c2a7e5d10b884
+# snapshot 3f9c2a7e5d10b884; submit exactly this batch with: mariadb-shell-agent batch run .mariadb-shell-agent/batch/plans/<slug>.json --expect 3f9c2a7e5d10b884
 ```
 
 It then submits that snapshot. The approval prompt for this command is where
@@ -91,14 +91,14 @@ you decide to spend, with the preview above it; if the plan, a source file or
 your settings changed in between, the submission is refused.
 
 ```bash
-qwen batch run .qwen/batch/plans/<slug>.json --expect 3f9c2a7e5d10b884
+mariadb-shell-agent batch run .mariadb-shell-agent/batch/plans/<slug>.json --expect 3f9c2a7e5d10b884
 # task translate-docs-20260923103000: 42 item(s), window 24h
 # ...
 # batch job: batch_abc123
 ```
 
 `run` returns immediately and **you do not need to collect by hand**. The
-agent starts `qwen batch collect <task-id> --wait` as a background task
+agent starts `mariadb-shell-agent batch collect <task-id> --wait` as a background task
 (visible in `/tasks`) and ends its turn, so you can keep working. That
 process polls the provider over HTTP — no model call while you wait — and when
 the batch finishes it writes the results and exits. The agent is then woken
@@ -109,19 +109,19 @@ automatically, since a retry bills again.
 If the session closes first, nothing is lost: an interactive session collects
 the project's finished tasks at startup and while it is open, and posts one
 notice. Set `general.batchAutoCollect` to `false` to turn that off. Headless
-runs (`qwen -p`), `qwen serve` and IDE/ACP clients do not auto-collect.
+runs (`mariadb-shell-agent -p`), `mariadb-shell-agent serve` and IDE/ACP clients do not auto-collect.
 
 The commands work from any directory, and inside a session with the `!`
-prefix (e.g. `!qwen batch collect <task-id>`) so no model turn is spent:
+prefix (e.g. `!mariadb-shell-agent batch collect <task-id>`) so no model turn is spent:
 
 ```bash
-qwen batch check                         # verify setup; nothing is billed
-qwen batch collect <task-id> [--wait [--timeout <s>]]   # validate + write target files
-qwen batch retry <task-id>               # resubmit only the failed items
-qwen batch retry <task-id> --max-output-tokens 8192  # include truncated ones
-qwen batch list                          # every recorded task, with its project
-qwen batch cancel <task-id>              # partial results are still billed
-qwen batch clean <task-id>               # delete the local record (cancels nothing)
+mariadb-shell-agent batch check                         # verify setup; nothing is billed
+mariadb-shell-agent batch collect <task-id> [--wait [--timeout <s>]]   # validate + write target files
+mariadb-shell-agent batch retry <task-id>               # resubmit only the failed items
+mariadb-shell-agent batch retry <task-id> --max-output-tokens 8192  # include truncated ones
+mariadb-shell-agent batch list                          # every recorded task, with its project
+mariadb-shell-agent batch cancel <task-id>              # partial results are still billed
+mariadb-shell-agent batch clean <task-id>               # delete the local record (cancels nothing)
 ```
 
 `collect` reports each item as:
@@ -139,9 +139,9 @@ output files are deleted.
 
 ## Records, safety and cost
 
-- Task records live in `~/.qwen/batch/tasks/<task-id>/` (`QWEN_BATCH_HOME`
+- Task records live in `~/.mariadb-shell-agent/batch/tasks/<task-id>/` (`QWEN_BATCH_HOME`
   overrides) with owner-only permissions, since they hold full copies of your
-  sources and outputs. Plan files under the project's `.qwen/batch/` get a
+  sources and outputs. Plan files under the project's `.mariadb-shell-agent/batch/` get a
   `.gitignore`.
 - A task is tied to the endpoint and API key it was submitted with (only a
   short hash of the key is stored); after switching accounts or regions,
@@ -149,7 +149,7 @@ output files are deleted.
 - If the create call's answer is lost, `run` fails, the task is marked
   `submit-unknown`, and `collect` reconciles against the provider's batch
   list instead of resubmitting — a duplicate would bill twice.
-- Only one `qwen batch` command works on a task at a time.
+- Only one `mariadb-shell-agent batch` command works on a task at a time.
 - A run freezes your current sampling parameters, output limit and thinking
   mode; retries reuse them.
 - Estimates are token-based unless you set
@@ -167,7 +167,7 @@ output files are deleted.
 - `clean` refuses while a batch may still be running or holds uncollected
   results, unless you pass `--force`.
 - Targets must stay inside the project and outside any hidden path
-  (`.git/`, `.github/`, `.qwen/`, … at any depth): results are written hours
+  (`.git/`, `.github/`, `.mariadb-shell-agent/`, … at any depth): results are written hours
   after you approved the plan. The preview lists the target directories.
 
 Design: [`docs/design/2026-09-23-batch-api-design.md`](../../design/2026-09-23-batch-api-design.md).

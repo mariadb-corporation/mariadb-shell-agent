@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -148,7 +149,9 @@ describe('loadConfig', () => {
       DASHSCOPE_API_KEY: 'env-key',
     });
     expect(defaults.realtime.model).toBe('qwen3.5-omni-plus-realtime');
-    expect(defaults.realtime.endpoint).toBe('https://dashscope.aliyuncs.com');
+    expect(defaults.realtime.endpoint).toBe(
+      'https://dashscope.aliyuncs.invalid',
+    );
     expect(defaults.visualInput).toEqual({
       source: 'screen',
       mode: 'on-demand',
@@ -549,9 +552,9 @@ describe('loadConfig', () => {
     );
   });
 
-  it('defaults discoveryDir to the stable ~/.qwen base', async () => {
+  it('defaults discoveryDir to the stable ~/.mariadb-shell-agent base', async () => {
     const dataDir = await dataDirWithConfig({ realtimeApiKey: 'k' });
     const config = loadConfig({ QWEN_LIVE_DATA_DIR: dataDir });
-    expect(config.discoveryDir).toBe(join(homedir(), '.qwen'));
+    expect(config.discoveryDir).toBe(join(homedir(), '.mariadb-shell-agent'));
   });
 });

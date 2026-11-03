@@ -1,10 +1,10 @@
-# Authenticated Web Shell launch for `qwen serve`
+# Authenticated Web Shell launch for `mariadb-shell-agent serve`
 
-- Status: Implemented in [#9738](https://github.com/QwenLM/qwen-code/pull/9738)
+- Status: Implemented in [#9738](https://github.invalid/QwenLM/qwen-code/pull/9738)
 - Baseline: `main` at `ea872a4621` (2026-08-22)
 - Revalidated: `main` at `7385b278b2` (2026-08-23)
 - Related tracking issue:
-  [#4514](https://github.com/QwenLM/qwen-code/issues/4514)
+  [#4514](https://github.invalid/QwenLM/qwen-code/issues/4514)
 - Implementation plan: [2026-08-22-serve-open-with-auth.md](../plans/2026-08-22-serve-open-with-auth.md)
 
 ## Goal
@@ -13,14 +13,14 @@ Make the interactive Web Shell launch work without asking the operator to
 invent and copy a daemon bearer token:
 
 ```bash
-qwen serve --open-with-auth
+mariadb-shell-agent serve --open-with-auth
 ```
 
 The explicit `--open-with-auth` flag should ensure that the launch uses the
 existing bearer authentication stack. It creates a strong process-lifetime
 token when no configured token exists and hands the selected token to the
 opened browser through the existing URL-fragment flow. Bare
-`qwen serve --open` keeps its current token-less loopback behavior.
+`mariadb-shell-agent serve --open` keeps its current token-less loopback behavior.
 
 This is an interactive convenience for a single-user loopback launch. It is
 not a general daemon credential store or a replacement for an explicitly
@@ -114,23 +114,23 @@ API default.
 
 ## Behavior matrix
 
-| Invocation or environment                                                                    | Automatic token                                            | Result                                                                             |
-| -------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `qwen serve` on loopback with no configured token                                            | No                                                         | Existing token-less developer default                                              |
-| `qwen serve --open` on an interactive loopback host with no configured token                 | No                                                         | Existing browser launch and token-less loopback contract                           |
-| `qwen serve --open-with-auth` on an eligible loopback host                                   | Yes, if no configured token exists                         | Browser receives the token; API routes require it                                  |
-| `qwen serve --open-with-auth --require-auth`                                                 | Yes, if no configured token exists                         | Browser receives the token; `/health` also requires it                             |
-| `QWEN_SERVER_TOKEN=... qwen serve --open-with-auth`                                          | No                                                         | Existing configured token is reused                                                |
-| `qwen serve --token ... --open-with-auth`                                                    | No                                                         | Explicit CLI token is reused                                                       |
-| `qwen serve --open --open-with-auth`                                                         | Yes, if no configured token exists                         | Same as `--open-with-auth`; the extra `--open` is redundant                        |
-| `qwen serve --open-with-auth --no-web`                                                       | No                                                         | CLI validation error before listen                                                 |
-| `qwen serve --open-with-auth` with missing Web Shell assets                                  | No                                                         | CLI validation error before listen                                                 |
-| `qwen serve --open-with-auth` in CI, headless SSH, or another ineligible browser environment | Yes, if no configured token exists                         | The daemon starts and the CLI prints the fragment-bearing manual URL               |
-| `qwen serve --hostname 0.0.0.0 --open-with-auth`                                             | No                                                         | CLI validation error; automatic credentials remain loopback-only                   |
-| `qwen serve --open-with-auth --local-control`                                                | Yes for the primary listener if no configured token exists | Primary uses the selected runtime token; LAN keeps its separate pairing credential |
-| `qwen serve --open-with-auth --enable-session-shell`                                         | Yes, if no configured token exists                         | The explicit shell opt-in becomes active and remains bearer-gated                  |
-| `qwen serve --open-with-auth --allow-origin '*'`                                             | Yes, if no configured token exists                         | Selected bearer intentionally satisfies the existing wildcard-origin boot guard    |
-| `qwen serve --open-with-auth --allow-origin chrome-extension://<id>`                         | Yes, if no configured token exists                         | Opened tab works; the extension does not receive or discover the generated token   |
+| Invocation or environment                                                                                   | Automatic token                                            | Result                                                                             |
+| ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `mariadb-shell-agent serve` on loopback with no configured token                                            | No                                                         | Existing token-less developer default                                              |
+| `mariadb-shell-agent serve --open` on an interactive loopback host with no configured token                 | No                                                         | Existing browser launch and token-less loopback contract                           |
+| `mariadb-shell-agent serve --open-with-auth` on an eligible loopback host                                   | Yes, if no configured token exists                         | Browser receives the token; API routes require it                                  |
+| `mariadb-shell-agent serve --open-with-auth --require-auth`                                                 | Yes, if no configured token exists                         | Browser receives the token; `/health` also requires it                             |
+| `QWEN_SERVER_TOKEN=... mariadb-shell-agent serve --open-with-auth`                                          | No                                                         | Existing configured token is reused                                                |
+| `mariadb-shell-agent serve --token ... --open-with-auth`                                                    | No                                                         | Explicit CLI token is reused                                                       |
+| `mariadb-shell-agent serve --open --open-with-auth`                                                         | Yes, if no configured token exists                         | Same as `--open-with-auth`; the extra `--open` is redundant                        |
+| `mariadb-shell-agent serve --open-with-auth --no-web`                                                       | No                                                         | CLI validation error before listen                                                 |
+| `mariadb-shell-agent serve --open-with-auth` with missing Web Shell assets                                  | No                                                         | CLI validation error before listen                                                 |
+| `mariadb-shell-agent serve --open-with-auth` in CI, headless SSH, or another ineligible browser environment | Yes, if no configured token exists                         | The daemon starts and the CLI prints the fragment-bearing manual URL               |
+| `mariadb-shell-agent serve --hostname 0.0.0.0 --open-with-auth`                                             | No                                                         | CLI validation error; automatic credentials remain loopback-only                   |
+| `mariadb-shell-agent serve --open-with-auth --local-control`                                                | Yes for the primary listener if no configured token exists | Primary uses the selected runtime token; LAN keeps its separate pairing credential |
+| `mariadb-shell-agent serve --open-with-auth --enable-session-shell`                                         | Yes, if no configured token exists                         | The explicit shell opt-in becomes active and remains bearer-gated                  |
+| `mariadb-shell-agent serve --open-with-auth --allow-origin '*'`                                             | Yes, if no configured token exists                         | Selected bearer intentionally satisfies the existing wildcard-origin boot guard    |
+| `mariadb-shell-agent serve --open-with-auth --allow-origin chrome-extension://<id>`                         | Yes, if no configured token exists                         | Opened tab works; the extension does not receive or discover the generated token   |
 
 Static Web Shell assets remain mounted before bearer authentication because
 address-bar navigation and script loading cannot attach an Authorization
@@ -163,14 +163,14 @@ Consequences of this intentionally short lifetime are:
 
 - Refreshing the opened tab keeps working.
 - Closing the only tab loses the browser copy. Restarting
-  `qwen serve --open-with-auth` creates a new token and opens a new
+  `mariadb-shell-agent serve --open-with-auth` creates a new token and opens a new
   authenticated tab.
 - Opening a bookmark, pasting the cleaned URL into another tab, restoring a tab
   after the browser process exits, or refreshing after `sessionStorage` was
   unavailable loads the static shell without the credential. API requests then
   receive plain `401 Unauthorized`. The current Web Shell has no global
   authentication-recovery screen; restart
-  `qwen serve --open-with-auth`, or use an explicitly managed token for
+  `mariadb-shell-agent serve --open-with-auth`, or use an explicitly managed token for
   a workflow that must be reopened or shared.
 - A browser launcher failure, or an environment the eligibility heuristic
   reports as ineligible, follows the existing recovery path, which may print
@@ -188,8 +188,8 @@ terminal output cross trust boundaries.
 ## Compatibility
 
 Apart from help text advertising the new option, all existing serve execution
-modes retain their current runtime behavior. This includes plain `qwen serve`,
-bare `qwen serve --open`, the Chrome extension's documented serve command,
+modes retain their current runtime behavior. This includes plain `mariadb-shell-agent serve`,
+bare `mariadb-shell-agent serve --open`, the Chrome extension's documented serve command,
 daemon-backed channel commands, and direct embedded callers of
 `runQwenServe()`. The new flag is the runtime compatibility boundary.
 
@@ -197,10 +197,10 @@ Inside an explicitly opted-in ephemeral launch, another local curl, SDK, or
 first-party client without the selected bearer receives `401 Unauthorized`.
 An automatically generated token is not published for discovery. Multi-client
 users should instead set `QWEN_SERVER_TOKEN` before starting
-`qwen serve --open` and configure each client with the same stable credential.
+`mariadb-shell-agent serve --open` and configure each client with the same stable credential.
 
-Daemon-backed `qwen channel set` and `qwen channel reload`, plus the
-`--daemon-url` forms of `qwen channel status` and `qwen channel stop`, cannot
+Daemon-backed `mariadb-shell-agent channel set` and `mariadb-shell-agent channel reload`, plus the
+`--daemon-url` forms of `mariadb-shell-agent channel status` and `mariadb-shell-agent channel stop`, cannot
 discover an ephemeral token. The Chrome extension likewise cannot receive it.
 Those clients remain compatible by omitting `--open-with-auth`, or can join an
 authenticated daemon when the operator supplies a shared stable token. No
@@ -298,11 +298,11 @@ all daemon transports.
 
 ## Acceptance criteria
 
-- An eligible `qwen serve --open-with-auth` opens a Web Shell that can
+- An eligible `mariadb-shell-agent serve --open-with-auth` opens a Web Shell that can
   call strict and non-strict API routes without manual token configuration.
 - An unauthenticated local API client receives 401 from protected routes on
   that daemon.
-- Plain `qwen serve`, bare `qwen serve --open`, direct `runQwenServe()` callers,
+- Plain `mariadb-shell-agent serve`, bare `mariadb-shell-agent serve --open`, direct `runQwenServe()` callers,
   headless `--open`, API-only mode, and non-loopback boot checks preserve their
   existing behavior.
 - `--open-with-auth` with an ineligible bind or disabled or missing Web Shell

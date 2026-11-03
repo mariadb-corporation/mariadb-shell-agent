@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -120,7 +121,7 @@ describe('sendNotification', () => {
     sendNotification({ message: 'test' }, terminal, true);
     expect(terminal.notifyITerm2).toHaveBeenCalledWith({
       message: 'test',
-      title: 'Qwen Code',
+      title: 'MariaDB Shell Agent',
     });
   });
 

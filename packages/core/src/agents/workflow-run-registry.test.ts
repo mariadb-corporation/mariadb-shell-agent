@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1994,7 +1995,8 @@ describe('WorkflowRunRegistry', () => {
   it('names an extension workflow in the recovery and diagnostics advice', () => {
     const { r, text, bg } = withCompletion();
     const failed = bg('wf_ext_fail', {
-      scriptPath: '/home/u/.qwen/extensions/gcp/workflows/audit.js',
+      scriptPath:
+        '/home/u/.mariadb-shell-agent/extensions/gcp/workflows/audit.js',
       journalPath: '/runtime/workflows/wf_ext_fail/journal.jsonl',
     });
     failed.workflowName = 'gcp:audit';
@@ -2002,12 +2004,13 @@ describe('WorkflowRunRegistry', () => {
 
     const recovery = text();
     expect(recovery).toContain(
-      'This reads the /gcp:audit workflow the gcp extension ships; copy it into .qwen/workflows before making a run-specific change.',
+      'This reads the /gcp:audit workflow the gcp extension ships; copy it into .mariadb-shell-agent/workflows before making a run-specific change.',
     );
     expect(recovery).not.toContain('saved /gcp:audit');
 
     const completed = bg('wf_ext_done', {
-      scriptPath: '/home/u/.qwen/extensions/gcp/workflows/audit.js',
+      scriptPath:
+        '/home/u/.mariadb-shell-agent/extensions/gcp/workflows/audit.js',
       journalPath: '/runtime/workflows/wf_ext_done/journal.jsonl',
     });
     completed.workflowName = 'gcp:audit';
@@ -2027,7 +2030,7 @@ describe('WorkflowRunRegistry', () => {
     const named = bg('wf_named', {
       workflowName: 'audit',
       resumeName: 'audit',
-      scriptPath: '/proj/.qwen/workflows/audit.js',
+      scriptPath: '/proj/.mariadb-shell-agent/workflows/audit.js',
       journalPath: '/runtime/workflows/wf_named/journal.jsonl',
     });
     r.fail(named.runId, 'boom', 2_000);
@@ -2042,7 +2045,7 @@ describe('WorkflowRunRegistry', () => {
     // a lookup would not lead back to — is not offered.
     const shadowed = bg('wf_shadowed', {
       workflowName: 'audit',
-      scriptPath: '/home/u/.qwen/workflows/audit.js',
+      scriptPath: '/home/u/.mariadb-shell-agent/workflows/audit.js',
       journalPath: '/runs/journal.jsonl',
     });
     r.fail(shadowed.runId, 'boom', 3_000);
@@ -2056,7 +2059,7 @@ describe('WorkflowRunRegistry', () => {
     const completed = bg('wf_named_done', {
       workflowName: 'audit',
       resumeName: 'audit',
-      scriptPath: '/proj/.qwen/workflows/audit.js',
+      scriptPath: '/proj/.mariadb-shell-agent/workflows/audit.js',
       journalPath: '/runs/journal.jsonl',
     });
     r.complete(completed.runId, [], 4_000);
@@ -2070,12 +2073,12 @@ describe('WorkflowRunRegistry', () => {
     const { r, entry, text } = background('wf_unlocked', {
       workflowName: 'audit',
       resumeName: 'audit',
-      scriptPath: '/proj/.qwen/workflows/audit.js',
+      scriptPath: '/proj/.mariadb-shell-agent/workflows/audit.js',
       journalPath: '/runs/wf_unlocked/journal.jsonl',
     });
     r.fail(entry.runId, 'boom', 2_000);
     expect(text()).toContain(
-      'Workflow({ scriptPath: "/proj/.qwen/workflows/audit.js", resumeFromRunId: "wf_unlocked" })',
+      'Workflow({ scriptPath: "/proj/.mariadb-shell-agent/workflows/audit.js", resumeFromRunId: "wf_unlocked" })',
     );
     expect(text()).not.toContain('only whoever started it');
   });

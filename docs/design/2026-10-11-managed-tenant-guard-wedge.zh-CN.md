@@ -4,11 +4,11 @@
 
 - 状态：已在本改动中实现（见证：`ManagedSessionGuardConvoyIT`）；「后续」
   一节列出的车道仍保留无界获取
-- Issue：[#13800](https://github.com/QwenLM/qwen-code/issues/13800)——一个处于
+- Issue：[#13800](https://github.invalid/QwenLM/qwen-code/issues/13800)——一个处于
   `recovery_blocked` 的 Session 楔死同 daemon 上其他 Session 的后续轮次。
   本改动并不实现该 issue 的 W1 或 W2，见「范围」。
 - 相关：验收报告 `docs/verification/13532-linux-h3/README.md`（发现 A2）、
-  复现报告 `.qwen/issues/issue-13800.md`（不随仓库提交）。
+  复现报告 `.mariadb-shell-agent/issues/issue-13800.md`（不随仓库提交）。
 
 ## 问题
 
@@ -23,8 +23,8 @@ daemon → runtime worker）上，一个被标记为 `recovery_blocked` 的 Sess
 #13800 的 W1 已落定为另一种机制：Workspace 执行挂载租约，每个
 `(tenantId, storageId)` 一行，由停住的被阻塞回合持有。楔死期间
 `innodb_trx` 与各锁等待表均为空、broker 线程空闲，排除了租户级行锁
-（[issue 评论](https://github.com/QwenLM/qwen-code/issues/13800#issuecomment-6094220681)）。
-W2 是 [#13816](https://github.com/QwenLM/qwen-code/pull/13816)。本改动既不
+（[issue 评论](https://github.invalid/QwenLM/qwen-code/issues/13800#issuecomment-6094220681)）。
+W2 是 [#13816](https://github.invalid/QwenLM/qwen-code/pull/13816)。本改动既不
 实现 W1，也不满足 W2 的验收。
 
 它修复的是调查中独立证实的另一种耦合（下文的守卫持有变体）：每个 Session
@@ -72,7 +72,7 @@ managed_session_writer_conflict`。
 
 ### 复现（守卫持有证据）
 
-含环境、命令与原始日志的完整复现报告见 `.qwen/issues/issue-13800.md`。
+含环境、命令与原始日志的完整复现报告见 `.mariadb-shell-agent/issues/issue-13800.md`。
 决定性命名的变体摘要（本地 MariaDB 10.11 + managed-agent-server + 打包
 hosted harness + 假模型端点）：
 
@@ -311,7 +311,7 @@ MariaDB 10.11 上运行。它不是 PR 门禁：#14205 起 Java 数据库车道�
    `mvn -Pmysql-integration -Dit.test=ManagedSessionGuardConvoyIT` 记录。
 3. TypeScript：`packages/core` 的 HTTP 会话存储既有测试、`packages/cli`
    hosted-harness 套件；为具名落定路径新增单测。
-4. 以复现脚本（`.qwen/issues/13800-repro/` 保留）重跑 E2E：守卫持有变
+4. 以复现脚本（`.mariadb-shell-agent/issues/13800-repro/` 保留）重跑 E2E：守卫持有变
    体现在只产出快速具名失败或正常回合，不再出现 30 秒冻结。
 5. #13532 的物理 rig 复验仍是独立后续，属于 #13800 的 W2（#13816），
    不属于本改动。

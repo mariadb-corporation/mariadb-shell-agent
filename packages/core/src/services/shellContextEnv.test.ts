@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -32,7 +33,7 @@ vi.mock('../telemetry/trace-context.js', () => ({
 
 describe('getShellContextEnvVars', () => {
   // Cleared before and restored after each test. A test run started from
-  // inside a qwen session inherits these: the CLI exports QWEN_CODE_CLI and
+  // inside a mariadb-shell-agent session inherits these: the CLI exports QWEN_CODE_CLI and
   // QWEN_CODE_PROJECT_DIR to every shell it spawns, and Config claims
   // QWEN_CODE_MODEL (and its provider-qualified twin, QWEN_CODE_MODEL_IDENTITY)
   // into process.env. The exact-equality `.toEqual()` assertions below would
@@ -104,9 +105,9 @@ describe('getShellContextEnvVars', () => {
   const inSession = (sessionId: string) =>
     sessionIdContext.run(sessionId, () => getShellContextEnvVars());
 
-  it('passes the running CLI down, so a subprocess does not resolve `qwen` off PATH', () => {
+  it('passes the running CLI down, so a subprocess does not resolve `mariadb-shell-agent` off PATH', () => {
     // A skill that shells out to `qwen …` would otherwise reach whatever the machine
-    // has installed. Dogfooded: a dev-daemon session ran `qwen review agent-prompt
+    // has installed. Dogfooded: a dev-daemon session ran `mariadb-shell-agent review agent-prompt
     // --role 0`, PATH found a v0.19.10 whose agent-prompt predates --role, and the
     // review died on "Missing required argument: chunk".
     withCliEntry(
@@ -126,7 +127,7 @@ describe('getShellContextEnvVars', () => {
     // every spawn site composes the child env as `{...process.env, ...vars}`,
     // so a key merely omitted from the returned record arrives anyway, inherited
     // through the spread — reproduced: exit 126 on exactly the hosts the filter
-    // was written for. The `:-` expansion falls back to `qwen` on empty.
+    // was written for. The `:-` expansion falls back to `mariadb-shell-agent` on empty.
     withCliEntry('cli-nosb-', { name: 'cli.js', body: BUNDLE_JS }, () => {
       const vars = getShellContextEnvVars();
       expect(vars['QWEN_CODE_CLI']).toBe('');

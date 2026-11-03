@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2141,7 +2142,7 @@ export async function runNonInteractive(
         // runs sequentially in original order. This mirrors the
         // interactive CoreToolScheduler (partitionToolCalls /
         // runConcurrently) via the shared isToolCallConcurrencySafe rule,
-        // so `qwen -p` and the TUI agree on which tools parallelise — a
+        // so `mariadb-shell-agent -p` and the TUI agree on which tools parallelise — a
         // model turn that emits N parallel agent calls no longer executes
         // them one-at-a-time. Regardless of execution order, results are
         // finalised (emitted, recorded, appended to `toolResponseParts`)
@@ -3692,7 +3693,7 @@ export async function runNonInteractive(
             scheduler.setSkipDurableFire((job) =>
               isHeadlessLoopSentinel(job.prompt),
             );
-            // Durable tasks live under ~/.qwen (user-owned, not in the
+            // Durable tasks live under ~/.mariadb-shell-agent (user-owned, not in the
             // working tree), so no folder-trust gate is needed here.
             await scheduler
               .enableDurable(config.getSessionId())
@@ -3988,7 +3989,7 @@ export async function runNonInteractive(
       if (!skipAdapterEmit) {
         // Wrap in try/catch: emitResult eventually hits stdout.write, which
         // can throw on EPIPE / ERR_STREAM_WRITE_AFTER_END when a piped
-        // consumer closes early (`qwen -p ... | head -n 1` is the common
+        // consumer closes early (`mariadb-shell-agent -p ... | head -n 1` is the common
         // case). Letting that throw bubble out skips `handleBudgetExceededError`
         // / `handleError` below, dropping the documented exit code 55
         // contract — precisely when stdout is in trouble. Best-effort emit
@@ -4048,7 +4049,7 @@ export async function runNonInteractive(
       }
 
       // Cancel the wall-clock timer so it doesn't fire after a successful
-      // run completes — important for callers (e.g. the `qwen serve`
+      // run completes — important for callers (e.g. the `mariadb-shell-agent serve`
       // daemon, SDK) that reuse a single process across many runs.
       budgetEnforcer.stop();
       abortController.signal.removeEventListener('abort', stampBudgetAbort);

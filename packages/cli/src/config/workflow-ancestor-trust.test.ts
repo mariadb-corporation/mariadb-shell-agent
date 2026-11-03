@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -109,7 +110,11 @@ describe('local workflow ancestor trust', () => {
     .each(['ancestor', 'qwen', 'workflows'] as const)(
     'R1-30 rejects a forged Git boundary with world-writable %s',
     async (component) => {
-      const workflowDirectory = path.join(repo, '.qwen', 'workflows');
+      const workflowDirectory = path.join(
+        repo,
+        '.mariadb-shell-agent',
+        'workflows',
+      );
       mkdirSync(workflowDirectory, { recursive: true });
       writeFileSync(path.join(repo, '.git'), 'gitdir: /attacker/forged');
       writeFileSync(

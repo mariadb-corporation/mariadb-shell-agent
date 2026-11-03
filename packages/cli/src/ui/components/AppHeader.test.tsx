@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +39,7 @@ const createSettings = (options?: {
     user: {
       settings: { ui },
       originalSettings: { ui },
-      path: '/home/u/.qwen/settings.json',
+      path: '/home/u/.mariadb-shell-agent/settings.json',
     },
     workspace: { settings: {}, originalSettings: {}, path: '' },
   } as never;
@@ -117,12 +118,12 @@ describe('<AppHeader />', () => {
     );
     // When screen reader is enabled, header is not rendered
     expect(lastFrame()).not.toContain('/projects/qwen-code');
-    expect(lastFrame()).not.toContain('Qwen Code');
+    expect(lastFrame()).not.toContain('MariaDB Shell Agent');
   });
 
   it('shows the header with all info when banner is visible', () => {
     const { lastFrame } = renderWithProviders(createMockUIState());
-    expect(lastFrame()).toContain('>_ Qwen Code');
+    expect(lastFrame()).toContain('>_ MariaDB Shell Agent');
     expect(lastFrame()).toContain('Gemini Pro');
     expect(lastFrame()).toContain('/projects/qwen-code');
   });
@@ -132,7 +133,7 @@ describe('<AppHeader />', () => {
       createMockUIState(),
       createSettings({ hideTips: false, hideBanner: true }),
     );
-    expect(lastFrame()).not.toContain('>_ Qwen Code');
+    expect(lastFrame()).not.toContain('>_ MariaDB Shell Agent');
     expect(lastFrame()).not.toContain('██╔═══██╗');
   });
 
@@ -162,7 +163,7 @@ describe('<AppHeader />', () => {
     );
     const frame = lastFrame() ?? '';
     expect(frame).toContain('Acme CLI');
-    expect(frame).not.toContain('>_ Qwen Code');
+    expect(frame).not.toContain('>_ MariaDB Shell Agent');
     expect(frame).toContain('ACME');
     // Default Qwen logo must NOT bleed through when the user supplied art.
     expect(frame).not.toContain('██╔═══██╗');

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -571,11 +572,16 @@ describe('restoreProbeTreeTracked, through runOneMutant', () => {
     () => {
       // THROUGH the production call site, not at predicate level. Every other
       // fixture here builds its tree under a bare `tmpdir()`, which contains no
-      // `.qwen/tmp` segment, so `mountRootFor` answers null and the gate
+      // `.mariadb-shell-agent/tmp` segment, so `mountRootFor` answers null and the gate
       // short-circuits before its logic runs — the wiring could be deleted, or
       // handed the wrong arguments, and the whole suite would stay green.
       const root = realpathSync(mkdtempSync(join(tmpdir(), 'qwen-mounted-')));
-      const probeTree = join(root, '.qwen', 'tmp', 'review-pr-1-probe');
+      const probeTree = join(
+        root,
+        '.mariadb-shell-agent',
+        'tmp',
+        'review-pr-1-probe',
+      );
       try {
         mkdirSync(probeTree, { recursive: true });
         writeFileSync(join(probeTree, 'a.ts'), 'gone.clear();\n');

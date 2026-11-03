@@ -2,7 +2,7 @@
 
 [English](2026-10-08-opentui-transcript-windowing.md) | [简体中文](2026-10-08-opentui-transcript-windowing.zh-CN.md)
 
-Design doc for the fix behind the reported `qwen --resume <id>` blank screen
+Design doc for the fix behind the reported `mariadb-shell-agent --resume <id>` blank screen
 under the OpenTUI renderer. Two changes ship together: the transcript mounts
 only the items near the viewport, and a single item that fails to render can no
 longer take the whole tree down with it.

@@ -4,9 +4,9 @@
 
 ## 问题与基线
 
-本次是 [#13184](https://github.com/QwenLM/qwen-code/issues/13184) 的 HTTP 恢复切片，消费 [PR2 原生快照契约](2026-10-26-managed-native-journal-snapshots.zh-CN.md)。在只有 PR2 的基线中，具名 `committed-prefix-v1` 快照已经可用，但 HTTP 恢复仍从 revision zero 读取全部事务，生产路径没有快照选择器。仅增加没有生产者的客户端选项不能接通恢复。
+本次是 [#13184](https://github.invalid/QwenLM/qwen-code/issues/13184) 的 HTTP 恢复切片，消费 [PR2 原生快照契约](2026-10-26-managed-native-journal-snapshots.zh-CN.md)。在只有 PR2 的基线中，具名 `committed-prefix-v1` 快照已经可用，但 HTTP 恢复仍从 revision zero 读取全部事务，生产路径没有快照选择器。仅增加没有生产者的客户端选项不能接通恢复。
 
-HTTP 切片按 PR2 [#15569](https://github.com/QwenLM/qwen-code/pull/15569) 的契约开发，初始版本为 `c144d2fa65ff1f31e616fd73d205eabdff7dbf18`。PR3 [#15599](https://github.com/QwenLM/qwen-code/pull/15599) 现已合入该分支，#15569 将协议/存储与 HTTP 恢复两个切片一起交付到 main。本文保留 HTTP 切片设计；合并验收要求最终接受的集成版本通过两份设计的 gate。本次传输无损前缀，不是紧凑 authority 状态；快照体积、重放成本和驻留历史仍与历史量成正比。
+HTTP 切片按 PR2 [#15569](https://github.invalid/QwenLM/qwen-code/pull/15569) 的契约开发，初始版本为 `c144d2fa65ff1f31e616fd73d205eabdff7dbf18`。PR3 [#15599](https://github.invalid/QwenLM/qwen-code/pull/15599) 现已合入该分支，#15569 将协议/存储与 HTTP 恢复两个切片一起交付到 main。本文保留 HTTP 切片设计；合并验收要求最终接受的集成版本通过两份设计的 gate。本次传输无损前缀，不是紧凑 authority 状态；快照体积、重放成本和驻留历史仍与历史量成正比。
 
 ## 范围与决策
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -143,7 +144,7 @@ const RECORDED_ARGS_MAX_BYTES = 64 * 1024;
  * flag when present — that spelling carries no URL host, and the flag is
  * the only recorded platform evidence.
  *
- * The scan is HARDENED — the store lives under `.qwen/tmp/`, which also
+ * The scan is HARDENED — the store lives under `.mariadb-shell-agent/tmp/`, which also
  * holds review worktrees checked out from the PR's own tree, so the
  * content there is attacker-influenceable:
  *  - only `s-*` session directories are scanned (never `review-pr-*`
@@ -206,7 +207,7 @@ function lookupRecordedHost(
   ]);
   try {
     for (const entry of readdirSync(SKILL_ARGS_DIR, { withFileTypes: true })) {
-      // Session directories ONLY — `.qwen/tmp/` also holds review
+      // Session directories ONLY — `.mariadb-shell-agent/tmp/` also holds review
       // worktrees materialized from the reviewed PR's own tree; their
       // content is attacker-controlled and must never supply a host.
       if (!entry.isDirectory() || entry.isSymbolicLink()) continue;
@@ -450,8 +451,8 @@ export function reviewWriteAuthorization(req: WriteAuthorizationRequest): {
     // flagless publish of a GHE-recorded review after the whole review ran.
     // Hosts compare through hostsEquivalent, not raw equality — Aone is one
     // platform under TWO names (the CR URL records the web host
-    // `code.alibaba-inc.com`; the skill's own `--host` rule for Aone targets
-    // carries the git host `gitlab.alibaba-inc.com`). Raw equality refused
+    // `code.alibaba-inc.invalid`; the skill's own `--host` rule for Aone targets
+    // carries the git host `gitlab.alibaba-inc.invalid`). Raw equality refused
     // every codereview-URL target that followed that rule — the whole review
     // ran, and the write died at the gate.
     const hostUnasserted =

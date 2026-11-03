@@ -3,7 +3,7 @@
 ## 状态
 
 - 状态：Draft
-- 范围：Qwen Code 内部的多模态文件识别与元数据提取
+- 范围：MariaDB Shell Agent 内部的多模态文件识别与元数据提取
 - 基线：`origin/main`（包含 PR #7484 的工具结果统一处理链路）
 - 后续设计：
   [Omni 多模态数据处理 Policy 编排架构设计](./2026-07-29-omni-multimodal-policy-orchestration.md)、
@@ -12,7 +12,7 @@
 
 ## 1. 背景
 
-Qwen Code 当前已经可以从多个入口接触媒体数据：用户可以附加本地文件，
+MariaDB Shell Agent 当前已经可以从多个入口接触媒体数据：用户可以附加本地文件，
 ACP 可以传入 image、audio 或 resource，内置工具、MCP、Extension 和 Skill
 也可能返回 inline data、本地路径、URL 或资源链接。
 
@@ -27,7 +27,7 @@ ACP 可以传入 image、audio 或 resource，内置工具、MCP、Extension 和
   还不能形成一致的音频、视频和图片元数据结果；
 - URL、base64、data URI 和 bytes 没有先统一成本地文件再识别的共同规则。
 
-因此，本设计在现有 Qwen Code 输入和工具执行链路上增加一个统一的
+因此，本设计在现有 MariaDB Shell Agent 输入和工具执行链路上增加一个统一的
 `MediaRecognitionService`。它只负责回答两个问题：
 
 1. 一个显式提供的资源是否是图片、音频或视频；
@@ -40,7 +40,7 @@ ACP 可以传入 image、audio 或 resource，内置工具、MCP、Extension 和
 - 支持本地路径、HTTP(S) URL、base64、data URI、bytes 和 MCP resource
   等明确结构化的资源表示；
 - 不信任扩展名或声明 MIME，以文件内容作为最终类型判断依据；
-- 将 URL 和内存数据在受控条件下落为 Qwen Code 管理的本地文件，之后统一走
+- 将 URL 和内存数据在受控条件下落为 MariaDB Shell Agent 管理的本地文件，之后统一走
   本地识别链路；
 - 为图片、音频和视频输出统一的公共元数据与各模态技术元数据；
 - 按统一、可追溯的公式，基于原始资源的技术 metadata 估算每个媒体资源进入
@@ -805,7 +805,7 @@ response parts，再由共享 helper 处理。Core scheduler 与 ACP `Session.ru
 
 ## 10. 安全与资源约束
 
-- 复用 Qwen Code 现有的文件访问、workspace trust、网络访问和用户确认机制；
+- 复用 MariaDB Shell Agent 现有的文件访问、workspace trust、网络访问和用户确认机制；
 - 只读取普通文件，不读取 device、FIFO 或 socket；
 - URL 每次 redirect 后重新校验目标，不允许通过 redirect 绕过网络规则；
 - 鉴权 header 仅用于当前读取，不写入 metadata、日志或内容身份；

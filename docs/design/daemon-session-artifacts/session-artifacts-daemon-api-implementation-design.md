@@ -577,7 +577,7 @@ export interface SessionArtifactInput extends ToolArtifact {
 }
 ```
 
-`trustedPublisher` 是 bridge/store 内部输入标志，不是 public schema 或 client/hook 可设置字段。V1 的 daemon/ACP 部署里，`qwen --acp` 子进程由 daemon 启动并以同一用户运行；因此当前实现把 completed `ArtifactTool` session update（`tool_call_update`、`status: 'completed'`、`_meta.toolName: 'artifact'`）视作唯一 trusted publisher 信号。这个信号不从 artifact payload 本身读取，也不对 client POST、hook notification、`record_artifact` 或其它 tool result 开放。
+`trustedPublisher` 是 bridge/store 内部输入标志，不是 public schema 或 client/hook 可设置字段。V1 的 daemon/ACP 部署里，`mariadb-shell-agent --acp` 子进程由 daemon 启动并以同一用户运行；因此当前实现把 completed `ArtifactTool` session update（`tool_call_update`、`status: 'completed'`、`_meta.toolName: 'artifact'`）视作唯一 trusted publisher 信号。这个信号不从 artifact payload 本身读取，也不对 client POST、hook notification、`record_artifact` 或其它 tool result 开放。
 
 如果未来支持远端 sandbox、多方 ACP participant 或非同信任域 agent，应新增不可伪造的 transport / in-process publisher identity，再替换该 V1 信任信号；在那之前不要把 payload 内的 `trustedPublisher` / `source` / `storage` 当作授权依据。
 
@@ -619,7 +619,7 @@ export interface SessionArtifactInput extends ToolArtifact {
 - `url` 只接受明确登记的 URL 或 ArtifactTool 发布 URL。
 - `workspacePath`、`managedId`、`url` 必须且只能存在一个 primary locator；V1 拒绝普通输入同时携带多个 primary locator，避免同一逻辑资源按不同字段生成多个 identity。
 - 唯一例外是可信 `storage: 'published'`：`url` 是 primary locator，`managedId` 可作为可选 managed reference 一起返回，用于未来下载/预览；此时 identity 只按 `url` 计算，`managedId` 不参与 identity。该例外只接受 `trustedPublisher: true` 的内部输入。
-- 普通工具不得把 `~/.qwen`、`/tmp` 或其他本机绝对路径作为 `workspacePath` 返回。
+- 普通工具不得把 `~/.mariadb-shell-agent`、`/tmp` 或其他本机绝对路径作为 `workspacePath` 返回。
 - `title` 必填，trim 后长度 1-200 字符，不允许 ASCII 控制字符；它是 plain text，不承载 HTML 或 markdown 语义。
 - `description` 是 UI 辅助 plain text，不进入模型上下文。
 - `description` trim 后最多 1000 字符，不允许 ASCII 控制字符，不承载 HTML 或 markdown 语义。
@@ -1176,7 +1176,7 @@ SDK singular add 映射到 bridge plural mutation：`addSessionArtifact(a)` 包�
 - workspace 外 path 不作为 file artifact 暴露。
 - `record_artifact` / hook / client POST 如果传 `workspacePath`，必须在 workspace 内。
 - 校验算法见 Section 7.1：`path.resolve` + `path.relative` containment check，目标存在时再做 `fs.realpath` symlink escape check；目标不存在时 artifact 可以进入 store，但必须标记为 `missing`，后续 GET/status refresh 继续重跑同一校验。
-- 拒绝 `..` escape、绝对路径 escape、symlink 指向 workspace 外、`~/.qwen`、`/tmp` 等本机外部路径。
+- 拒绝 `..` escape、绝对路径 escape、symlink 指向 workspace 外、`~/.mariadb-shell-agent`、`/tmp` 等本机外部路径。
 - `managedId` 只能引用 daemon-managed storage；trim 后不能为空，拒绝路径分隔符、`..`、控制字符和本机绝对路径语义。
 
 ### 9.3 Metadata

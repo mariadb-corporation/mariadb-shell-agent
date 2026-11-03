@@ -2,12 +2,12 @@
 
 [English](workspace-capacity-p1.md) | [简体中文](workspace-capacity-p1.zh-CN.md)
 
-状态：已在本地实现，2026-09-09；验证结果记录在 `.qwen/e2e-tests/workspace-capacity-p1.md`。实现基线：`d8c505bf423d6adf68c77a603202cd7b0578be56`。
+状态：已在本地实现，2026-09-09；验证结果记录在 `.mariadb-shell-agent/e2e-tests/workspace-capacity-p1.md`。实现基线：`d8c505bf423d6adf68c77a603202cd7b0578be56`。
 源码基线：`dd4cd4a08bf416f88d9e357045f6ff45aa557d2e`，即合并
-[#11428](https://github.com/QwenLM/qwen-code/pull/11428) 的 main 提交。
-关联 [#11386](https://github.com/QwenLM/qwen-code/issues/11386)，以及配置诉求
-[#9304](https://github.com/QwenLM/qwen-code/issues/9304) 和
-[#9316](https://github.com/QwenLM/qwen-code/issues/9316)。
+[#11428](https://github.invalid/QwenLM/qwen-code/pull/11428) 的 main 提交。
+关联 [#11386](https://github.invalid/QwenLM/qwen-code/issues/11386)，以及配置诉求
+[#9304](https://github.invalid/QwenLM/qwen-code/issues/9304) 和
+[#9316](https://github.invalid/QwenLM/qwen-code/issues/9316)。
 
 ## 1. 建议与范围
 
@@ -259,7 +259,7 @@ policy，以及 SDK capability/status 类型。同步 daemon 协议/配置文档
 ## 9. 验证与尚缺的部署证据
 
 可执行计划和全局 dry-run 结果单独记录在
-`.qwen/e2e-tests/workspace-capacity-p1.md`。本次 dry-run 展示实现前的缺口，
+`.mariadb-shell-agent/e2e-tests/workspace-capacity-p1.md`。本次 dry-run 展示实现前的缺口，
 不验证提议行为，也不把历史测量变成当前生产 benchmark。2026-09-09 对全局有效
 CLI 0.23.0 执行五组隔离运行，确认提议变量会被忽略：2 仍允许注册第三个，256
 仍拒绝第 26 个，abc 仍正常启动。未设置变量时，启动两个工作区声明总 session
@@ -283,5 +283,5 @@ supervisor 单测验证；真实 provider channel 运行仍属于独立的部署
 仍需证据才能决定的是各部署资源阈值，以及实测 runtime 成本是否值得引入 LRU。
 P1 契约明确选择：一个环境变量、默认值与上界均为 256、注册容量大于 25 时默认
 session 总量 800、启动溢出明确失败、有界 channel ownership，以及有文档说明的
-降级流程。默认值变更在 `.qwen/e2e-tests/workspace-capacity-default256.md` 中单独验证；
+降级流程。默认值变更在 `.mariadb-shell-agent/e2e-tests/workspace-capacity-default256.md` 中单独验证；
 此前默认 25 的结果保留为历史证据。

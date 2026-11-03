@@ -1,16 +1,17 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  *
- * Runtime status sidecar for an active interactive Qwen Code session.
+ * Runtime status sidecar for an active interactive MariaDB Shell Agent session.
  *
  * This module writes a small JSON file alongside the session's chat log
  * while an interactive session is alive. It exists so that **external**
  * tools (terminal multiplexers, tab managers, IDE integrations,
  * observability daemons) can answer the question:
  *
- *     "Which Qwen Code session is the running PID X serving?"
+ *     "Which MariaDB Shell Agent session is the running PID X serving?"
  *
  * The CLI does not embed the session id in `argv` for fresh
  * (non-resumed) sessions, and the OS process title can be truncated, so
@@ -42,7 +43,7 @@ import { atomicWriteJSON } from './atomicFileWrite.js';
 
 export const RUNTIME_STATUS_SCHEMA_VERSION = 1;
 
-/** Snapshot of a live Qwen Code session process for external observers. */
+/** Snapshot of a live MariaDB Shell Agent session process for external observers. */
 export interface RuntimeStatus {
   schemaVersion: number;
   pid: number;
@@ -113,7 +114,7 @@ export async function writeRuntimeStatus(
  * coerces null/array/object into a string just to satisfy the
  * dataclass.
  *
- * Note: a returned record only proves that *some* Qwen Code process
+ * Note: a returned record only proves that *some* MariaDB Shell Agent process
  * once claimed this session. The PID may already be dead (clean quit
  * or crash). Consumers must verify liveness themselves before treating
  * the record as a currently-running session.

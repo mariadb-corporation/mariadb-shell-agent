@@ -1,6 +1,6 @@
 # Resident Context Cost
 
-Every request a session sends carries the same prefix before any of your conversation: the system prompt, the schema of every declared tool, your context (`QWEN.md`) files, and the skill listing. You pay for that prefix on **every turn**, including the turns that just answer a question. This page is about measuring it and cutting it.
+Every request a session sends carries the same prefix before any of your conversation: the system prompt, the schema of every declared tool, your context (`MARIADB-SHELL-AGENT.md`) files, and the skill listing. You pay for that prefix on **every turn**, including the turns that just answer a question. This page is about measuring it and cutting it.
 
 [Token caching](token-caching.md) reduces the _price_ of the prefix. This page reduces the _prefix_. They compose — a smaller prefix is cheaper cached too.
 

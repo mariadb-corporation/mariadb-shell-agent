@@ -162,7 +162,7 @@ The Java suite consumes the same contract files.
 
 `acknowledge` is not a Broker operation: the Java transport does not expose or
 send it, and a worker answers it exactly as the schema declares. The ordinary
-(`qwen serve`) Managed host calls it after its own outcome commit. The Java
+(`mariadb-shell-agent serve`) Managed host calls it after its own outcome commit. The Java
 conformance consumer pins the added route and the new state vocabulary so a
 worker that implements it stays compatible.
 

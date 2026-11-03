@@ -6717,7 +6717,7 @@ describe('WebShellSidebar Live group', () => {
     enableChannelOrganization();
     const liveWorkspace: DaemonWorkspaceCapability = {
       id: 'live',
-      cwd: '/Users/test/Documents/Qwen Code/Conversations',
+      cwd: '/Users/test/Documents/MariaDB Shell Agent/Conversations',
       displayName: 'Conversations',
       primary: false,
       trusted: true,

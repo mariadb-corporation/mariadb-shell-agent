@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -69,7 +70,7 @@ async function assertRealDirIfExists(p: string): Promise<void> {
  * funnel, the tool-result funnel) must go through this:
  * `mkdir { recursive: true }` succeeds silently when the path already
  * exists as a symlink to a directory, so a link planted at
- * `.qwen/omni/downloads` would otherwise redirect the write to an
+ * `.mariadb-shell-agent/omni/downloads` would otherwise redirect the write to an
  * attacker-chosen location (and outside the recovery sweep, which
  * deliberately refuses to descend symlinked directories). Fails closed —
  * callers degrade per their own contract (inline part, delivery error).
@@ -88,11 +89,11 @@ export async function prepareOmniDownloadsDir(
 }
 
 /**
- * Content-addressed, immutable object store under `<project>/.qwen/omni/`.
+ * Content-addressed, immutable object store under `<project>/.mariadb-shell-agent/omni/`.
  *
  * Layout (storage design §4):
  *
- *   .qwen/omni/
+ *   .mariadb-shell-agent/omni/
  *   ├── .gitignore            # "*" — self-ignoring
  *   ├── objects/sha256/<h[0:2]>/<sha256><ext>
  *   ├── staging/<invocationId>/   # policy tool work dirs (pre-commit)
@@ -109,7 +110,7 @@ export class OmniObjectStore {
   private readonly omniRoot: string;
   private layoutReady: Promise<void> | undefined;
 
-  /** @param qwenDir Absolute path of the project `.qwen` directory. */
+  /** @param qwenDir Absolute path of the project `.mariadb-shell-agent` directory. */
   constructor(qwenDir: string) {
     this.omniRoot = path.join(qwenDir, 'omni');
   }

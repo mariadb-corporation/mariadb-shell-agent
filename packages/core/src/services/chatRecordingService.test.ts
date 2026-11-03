@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,6 +37,7 @@ import {
   collectSessionTurnState,
   computeInitialTurnFromHistory,
 } from './session-turn-state.js';
+import { buildApiHistoryFromConversation } from './session-api-history.js';
 import type { Content, Part } from '@google/genai';
 import type { FileDiff, McpAppResultDisplay } from '../tools/tools.js';
 import {
@@ -405,6 +407,51 @@ describe('ChatRecordingService', () => {
       await delayed;
 
       expect((await flushed()).backgroundTurn).toBeUndefined();
+    });
+  });
+
+  describe('recordSentUserContent', () => {
+    it('records the sent parts, referring to unchanged recorded parts', async () => {
+      const question: Part = { text: 'Who are you?' };
+      const image: Part = {
+        inlineData: { mimeType: 'image/png', data: 'AAA' },
+      };
+      svc.recordUserMessage([question, image], undefined, undefined, 'p1');
+      svc.recordSentUserContent(
+        [{ text: '<system-reminder>date</system-reminder>' }, question, image],
+        [question, image],
+        'p1',
+      );
+      const [user, sent] = await flushedAll();
+
+      expect(sent.type).toBe('system');
+      expect(sent.subtype).toBe('sent_user_content');
+      expect(sent.parentUuid).toBe(user.uuid);
+      expect(sent.promptId).toBe('p1');
+      expect(sent.systemPayload).toEqual({
+        parts: [
+          { text: '<system-reminder>date</system-reminder>' },
+          { recordedPart: 0 },
+          { recordedPart: 1 },
+        ],
+      });
+      const [entry] = buildApiHistoryFromConversation({
+        messages: [user, sent],
+      });
+      expect(entry!.parts).toEqual([
+        { text: '<system-reminder>date</system-reminder>' },
+        question,
+        image,
+      ]);
+    });
+
+    it('records nothing when the request went out unchanged', async () => {
+      svc.recordUserMessage('hello', undefined, undefined, 'p1');
+      svc.recordSentUserContent('hello', 'hello', 'p1');
+
+      expect((await flushedAll()).map((record) => record.type)).toEqual([
+        'user',
+      ]);
     });
   });
 
@@ -2361,7 +2408,7 @@ describe('ChatRecordingService', () => {
       expect(resultDisplay).not.toContain('CLI history display');
     });
 
-    // https://github.com/QwenLM/qwen-code/issues/10369 - the Web Shell mounts
+    // https://github.invalid/QwenLM/qwen-code/issues/10369 - the Web Shell mounts
     // the sandboxed iframe only when the recorded `html` is non-empty, and it
     // never re-fetches the `ui://` resource. Recording an empty `html` makes
     // every replayed MCP App fall back to plain text permanently.

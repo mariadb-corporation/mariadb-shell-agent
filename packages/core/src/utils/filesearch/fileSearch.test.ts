@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -58,20 +59,28 @@ describe('FileSearch', () => {
     options?: Partial<FileSearchOptions>,
   ) => (await init(files, options)).search(pattern);
 
-  it('should use .qwenignore rules', async () => {
+  it('should use .mariadb-shell-agentignore rules', async () => {
     const results = await search(
-      { '.qwenignore': 'dist/', dist: ['ignored.js'], src: ['not-ignored.js'] },
+      {
+        '.mariadb-shell-agentignore': 'dist/',
+        dist: ['ignored.js'],
+        src: ['not-ignored.js'],
+      },
       '',
       { useQwenignore: true },
     );
-    expect(results).toEqual(['src/', '.qwenignore', 'src/not-ignored.js']);
+    expect(results).toEqual([
+      'src/',
+      '.mariadb-shell-agentignore',
+      'src/not-ignored.js',
+    ]);
   });
 
-  it('should combine .gitignore and .qwenignore rules', async () => {
+  it('should combine .gitignore and .mariadb-shell-agentignore rules', async () => {
     const results = await search(
       {
         '.gitignore': 'dist/',
-        '.qwenignore': 'build/',
+        '.mariadb-shell-agentignore': 'build/',
         dist: ['ignored-by-git.js'],
         build: ['ignored-by-gemini.js'],
         src: ['not-ignored.js'],
@@ -82,7 +91,7 @@ describe('FileSearch', () => {
     expect(results).toEqual([
       'src/',
       '.gitignore',
-      '.qwenignore',
+      '.mariadb-shell-agentignore',
       'src/not-ignored.js',
     ]);
   });

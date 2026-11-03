@@ -2,7 +2,7 @@
 
 ## Motivation
 
-The Tauri app currently blocks first launch on a folder picker because its bundled `qwen serve` process needs a primary workspace. The previous Electron app instead created a protected `Qwen` conversation workspace and let users add projects after entering the app.
+The Tauri app currently blocks first launch on a folder picker because its bundled `mariadb-shell-agent serve` process needs a primary workspace. The previous Electron app instead created a protected `Qwen` conversation workspace and let users add projects after entering the app.
 
 ## Design
 

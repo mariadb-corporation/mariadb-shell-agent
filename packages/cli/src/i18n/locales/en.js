@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// English translations for Qwen Code CLI
+// English translations for MariaDB Shell Agent CLI
 // The key serves as both the translation key and the default English text
 
 export default {
@@ -25,8 +26,8 @@ export default {
 
   'User level': 'User level',
   'Project level': 'Project level',
-  'Clipboard image paste is unavailable because the native clipboard module could not be loaded. Reinstall Qwen Code or use the npm installation method.':
-    'Clipboard image paste is unavailable because the native clipboard module could not be loaded. Reinstall Qwen Code or use the npm installation method.',
+  'Clipboard image paste is unavailable because the native clipboard module could not be loaded. Reinstall MariaDB Shell Agent or use the npm installation method.':
+    'Clipboard image paste is unavailable because the native clipboard module could not be loaded. Reinstall MariaDB Shell Agent or use the npm installation method.',
   'Clipboard image paste is unavailable: no supported clipboard tool was reached. On Linux, install `wl-clipboard` (Wayland) or `xclip` (X11), or set DISPLAY/WAYLAND_DISPLAY if running headless.':
     'Clipboard image paste is unavailable: no supported clipboard tool was reached. On Linux, install `wl-clipboard` (Wayland) or `xclip` (X11), or set DISPLAY/WAYLAND_DISPLAY if running headless.',
 
@@ -337,7 +338,7 @@ export default {
   'For a full list of shortcuts, see {{docPath}}':
     'For a full list of shortcuts, see {{docPath}}',
   'docs/keyboard-shortcuts.md': 'docs/keyboard-shortcuts.md',
-  'for help on Qwen Code': 'for help on Qwen Code',
+  'for help on MariaDB Shell Agent': 'for help on MariaDB Shell Agent',
   'show version info': 'show version info',
   'show paths for current session files and logs':
     'show paths for current session files and logs',
@@ -347,7 +348,7 @@ export default {
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'Qwen Code': 'Qwen Code',
+  'MariaDB Shell Agent': 'MariaDB Shell Agent',
   Runtime: 'Runtime',
   OS: 'OS',
   Auth: 'Auth',
@@ -363,10 +364,10 @@ export default {
   // ============================================================================
   // Commands - General
   // ============================================================================
-  'Analyzes the project and creates a tailored QWEN.md file.':
-    'Analyzes the project and creates a tailored QWEN.md file.',
-  'List available Qwen Code tools. Usage: /tools [desc]':
-    'List available Qwen Code tools. Usage: /tools [desc]',
+  'Analyzes the project and creates a tailored MARIADB-SHELL-AGENT.md file.':
+    'Analyzes the project and creates a tailored MARIADB-SHELL-AGENT.md file.',
+  'List available MariaDB Shell Agent tools. Usage: /tools [desc]':
+    'List available MariaDB Shell Agent tools. Usage: /tools [desc]',
   'Open the skills panel (browse, search, toggle, pick).':
     'Open the skills panel (browse, search, toggle, pick).',
   'Move this session to a new working directory':
@@ -376,15 +377,15 @@ export default {
   'Skills configuration saved.': 'Skills configuration saved.',
   'Skills configuration saved, but refresh failed: {{error}}. Restart to ensure the new state is applied.':
     'Skills configuration saved, but refresh failed: {{error}}. Restart to ensure the new state is applied.',
-  'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.qwen/settings.json directly to manage skills at user scope.':
-    'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.qwen/settings.json directly to manage skills at user scope.',
+  'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.mariadb-shell-agent/settings.json directly to manage skills at user scope.':
+    'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.mariadb-shell-agent/settings.json directly to manage skills at user scope.',
   'SkillManager not available.': 'SkillManager not available.',
   'Loading skills…': 'Loading skills…',
   'Failed to load skills: {{error}}': 'Failed to load skills: {{error}}',
   'Failed to save skills configuration: {{error}}':
     'Failed to save skills configuration: {{error}}',
-  'All available skills are disabled. Edit ~/.qwen/settings.json or .qwen/settings.json (skills.disabled) to re-enable.':
-    'All available skills are disabled. Edit ~/.qwen/settings.json or .qwen/settings.json (skills.disabled) to re-enable.',
+  'All available skills are disabled. Edit ~/.mariadb-shell-agent/settings.json or .mariadb-shell-agent/settings.json (skills.disabled) to re-enable.':
+    'All available skills are disabled. Edit ~/.mariadb-shell-agent/settings.json or .mariadb-shell-agent/settings.json (skills.disabled) to re-enable.',
   'Press esc to close.': 'Press esc to close.',
   '{{count}} skills · ': '{{count}} skills · ',
   '{{matched}} / {{total}} skills · ': '{{matched}} / {{total}} skills · ',
@@ -403,7 +404,8 @@ export default {
   '↑/↓ navigate · backspace edits search':
     '↑/↓ navigate · backspace edits search',
   Bundled: 'Bundled',
-  'Available Qwen Code CLI tools:': 'Available Qwen Code CLI tools:',
+  'Available MariaDB Shell Agent CLI tools:':
+    'Available MariaDB Shell Agent CLI tools:',
   'No tools available': 'No tools available',
   'View or change the approval mode for tool usage':
     'View or change the approval mode for tool usage',
@@ -483,8 +485,8 @@ export default {
     'Compresses the context by replacing it with a summary.',
   'Fast context compression without AI. Strips old tool outputs and thinking parts.':
     'Fast context compression without AI. Strips old tool outputs and thinking parts.',
-  'open full Qwen Code documentation in your browser':
-    'open full Qwen Code documentation in your browser',
+  'open full MariaDB Shell Agent documentation in your browser':
+    'open full MariaDB Shell Agent documentation in your browser',
   'Configuration not available.': 'Configuration not available.',
   'Connect an LLM provider': 'Connect an LLM provider',
   'Copy to clipboard: reply, code (by lang), LaTeX, or Mermaid. N = Nth-latest message, index = block number':
@@ -612,8 +614,10 @@ export default {
   // ============================================================================
   // Agents - Creation Wizard
   // ============================================================================
-  'Project Level (.qwen/agents/)': 'Project Level (.qwen/agents/)',
-  'User Level (~/.qwen/agents/)': 'User Level (~/.qwen/agents/)',
+  'Project Level (.mariadb-shell-agent/agents/)':
+    'Project Level (.mariadb-shell-agent/agents/)',
+  'User Level (~/.mariadb-shell-agent/agents/)':
+    'User Level (~/.mariadb-shell-agent/agents/)',
   '✓ Subagent Created Successfully!': '✓ Subagent Created Successfully!',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     'Subagent "{{name}}" has been saved to {{level}} level.',
@@ -635,8 +639,8 @@ export default {
   'Step {{n}}: Choose Location': 'Step {{n}}: Choose Location',
   'Step {{n}}: Choose Generation Method':
     'Step {{n}}: Choose Generation Method',
-  'Generate with Qwen Code (Recommended)':
-    'Generate with Qwen Code (Recommended)',
+  'Generate with MariaDB Shell Agent (Recommended)':
+    'Generate with MariaDB Shell Agent (Recommended)',
   'Manual Creation': 'Manual Creation',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)',
@@ -752,10 +756,11 @@ export default {
   // ============================================================================
   // Commands - General (continued)
   // ============================================================================
-  'View and edit Qwen Code settings': 'View and edit Qwen Code settings',
+  'View and edit MariaDB Shell Agent settings':
+    'View and edit MariaDB Shell Agent settings',
   Settings: 'Settings',
-  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
-    'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.',
+  'To see changes, MariaDB Shell Agent must be restarted. Press r to exit and apply changes now.':
+    'To see changes, MariaDB Shell Agent must be restarted. Press r to exit and apply changes now.',
   // ============================================================================
   // Settings Labels
   // ============================================================================
@@ -783,8 +788,8 @@ export default {
   'Custom Witty Phrases': 'Custom Witty Phrases',
   'Show Welcome Back Dialog': 'Show Welcome Back Dialog',
   'Enable User Feedback': 'Enable User Feedback',
-  'How is Qwen doing this session? (optional)':
-    'How is Qwen doing this session? (optional)',
+  'How is MariaDB Shell Agent doing this session? (optional)':
+    'How is MariaDB Shell Agent doing this session? (optional)',
   Bad: 'Bad',
   Fine: 'Fine',
   Good: 'Good',
@@ -801,7 +806,7 @@ export default {
   'Load Memory From Include Directories':
     'Load Memory From Include Directories',
   'Respect .gitignore': 'Respect .gitignore',
-  'Respect .qwenignore': 'Respect .qwenignore',
+  'Respect .mariadb-shell-agentignore': 'Respect .mariadb-shell-agentignore',
   'Enable Recursive File Search': 'Enable Recursive File Search',
   'Interactive Shell (PTY)': 'Interactive Shell (PTY)',
   'Show Color': 'Show Color',
@@ -942,8 +947,8 @@ export default {
   remote: 'remote',
   'This extension will add the following commands: {{commands}}.':
     'This extension will add the following commands: {{commands}}.',
-  'This extension will append info to your QWEN.md context using {{fileName}}':
-    'This extension will append info to your QWEN.md context using {{fileName}}',
+  'This extension will append info to your MARIADB-SHELL-AGENT.md context using {{fileName}}':
+    'This extension will append info to your MARIADB-SHELL-AGENT.md context using {{fileName}}',
   'This extension will install the following skills:':
     'This extension will install the following skills:',
   'This extension will install the following subagents:':
@@ -954,8 +959,8 @@ export default {
     'These workflow scripts changed since the installed version: {{names}}.',
   'Installation cancelled for "{{name}}".':
     'Installation cancelled for "{{name}}".',
-  'You are installing an extension from {{originSource}}. Some features may not work perfectly with Qwen Code.':
-    'You are installing an extension from {{originSource}}. Some features may not work perfectly with Qwen Code.',
+  'You are installing an extension from {{originSource}}. Some features may not work perfectly with MariaDB Shell Agent.':
+    'You are installing an extension from {{originSource}}. Some features may not work perfectly with MariaDB Shell Agent.',
   '--ref and --auto-update are not applicable for marketplace extensions.':
     '--ref and --auto-update are not applicable for marketplace extensions.',
   'Extension "{{name}}" installed successfully and enabled.':
@@ -1078,8 +1083,8 @@ export default {
     'install required IDE companion for {{ideName}}',
   'enable IDE integration': 'enable IDE integration',
   'disable IDE integration': 'disable IDE integration',
-  'IDE integration is not supported in your current environment. To use this feature, run Qwen Code in one of these supported IDEs: VS Code or VS Code forks.':
-    'IDE integration is not supported in your current environment. To use this feature, run Qwen Code in one of these supported IDEs: VS Code or VS Code forks.',
+  'IDE integration is not supported in your current environment. To use this feature, run MariaDB Shell Agent in one of these supported IDEs: VS Code or VS Code forks.':
+    'IDE integration is not supported in your current environment. To use this feature, run MariaDB Shell Agent in one of these supported IDEs: VS Code or VS Code forks.',
   'Set up GitHub Actions': 'Set up GitHub Actions',
   'Configure terminal keybindings for multiline input (VS Code, Cursor, Windsurf, Trae)':
     'Configure terminal keybindings for multiline input (VS Code, Cursor, Windsurf, Trae)',
@@ -1113,7 +1118,7 @@ export default {
   // ============================================================================
   // Commands - Hooks
   // ============================================================================
-  'Manage Qwen Code hooks': 'Manage Qwen Code hooks',
+  'Manage MariaDB Shell Agent hooks': 'Manage MariaDB Shell Agent hooks',
   'List all configured hooks': 'List all configured hooks',
   // Hooks - Dialog
   Hooks: 'Hooks',
@@ -1129,8 +1134,8 @@ export default {
   'No hook events found.': 'No hook events found.',
   '{{count}} hook configured': '{{count}} hook configured',
   '{{count}} hooks configured': '{{count}} hooks configured',
-  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask Qwen Code.':
-    'This menu is read-only. To add or modify hooks, edit settings.json directly or ask Qwen Code.',
+  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask MariaDB Shell Agent.':
+    'This menu is read-only. To add or modify hooks, edit settings.json directly or ask MariaDB Shell Agent.',
   'Reopen this menu to reload hook definitions.':
     'Reopen this menu to reload hook definitions.',
   'Hook controls and HTTP security settings require a restart.':
@@ -1142,8 +1147,8 @@ export default {
   'Exit codes:': 'Exit codes:',
   'Configured hooks:': 'Configured hooks:',
   'No hooks configured for this event.': 'No hooks configured for this event.',
-  'To add hooks, edit settings.json directly or ask Qwen.':
-    'To add hooks, edit settings.json directly or ask Qwen.',
+  'To add hooks, edit settings.json directly or ask MariaDB Shell Agent.':
+    'To add hooks, edit settings.json directly or ask MariaDB Shell Agent.',
   'Enter to select · Esc to go back': 'Enter to select · Esc to go back',
   // Hooks - Config Detail Step
   'Hook details': 'Hook details',
@@ -1151,8 +1156,8 @@ export default {
   'Extension:': 'Extension:',
   'Desc:': 'Desc:',
   'No hook config selected': 'No hook config selected',
-  'To modify or remove this hook, edit settings.json directly or ask Qwen to help.':
-    'To modify or remove this hook, edit settings.json directly or ask Qwen to help.',
+  'To modify or remove this hook, edit settings.json directly or ask MariaDB Shell Agent to help.':
+    'To modify or remove this hook, edit settings.json directly or ask MariaDB Shell Agent to help.',
   'Safe mode is on, so no hooks run in this session.':
     'Safe mode is on, so no hooks run in this session.',
   'Bare mode is on, so no hooks run in this session.':
@@ -1178,8 +1183,8 @@ export default {
   'StatusLine will not be displayed': 'StatusLine will not be displayed',
   'Tool operations will proceed without hook validation':
     'Tool operations will proceed without hook validation',
-  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask Qwen Code.':
-    'To re-enable hooks, remove "disableAllHooks" from settings.json or ask Qwen Code.',
+  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask MariaDB Shell Agent.':
+    'To re-enable hooks, remove "disableAllHooks" from settings.json or ask MariaDB Shell Agent.',
   // Hooks - Source
   Project: 'Project',
   User: 'User',
@@ -1200,8 +1205,8 @@ export default {
   'When a slash command expands into a prompt':
     'When a slash command expands into a prompt',
   'When a new session is started': 'When a new session is started',
-  'Right before Qwen Code concludes its response':
-    'Right before Qwen Code concludes its response',
+  'Right before MariaDB Shell Agent concludes its response':
+    'Right before MariaDB Shell Agent concludes its response',
   'When a subagent (Agent tool call) is started':
     'When a subagent (Agent tool call) is started',
   'Right before a subagent concludes its response':
@@ -1256,7 +1261,7 @@ export default {
     'block processing, erase original prompt, and show stderr to user only',
   'block expanded prompt submission and show stderr to user only':
     'block expanded prompt submission and show stderr to user only',
-  'stdout shown to Qwen': 'stdout shown to Qwen',
+  'stdout shown to MariaDB Shell Agent': 'stdout shown to MariaDB Shell Agent',
   'show stderr to user only (blocking errors ignored)':
     'show stderr to user only (blocking errors ignored)',
   'command completes successfully': 'command completes successfully',
@@ -1480,7 +1485,8 @@ export default {
   servers: 'servers',
   'Add MCP servers to your settings to get started.':
     'Add MCP servers to your settings to get started.',
-  'Run qwen --debug to see error logs': 'Run qwen --debug to see error logs',
+  'Run mariadb-shell-agent --debug to see error logs':
+    'Run mariadb-shell-agent --debug to see error logs',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth Authentication',
@@ -1536,8 +1542,8 @@ export default {
   // ===========================================================
   // Commands - Summary
   // ============================================================================
-  'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md':
-    'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md',
+  'Generate a project summary and save it to .mariadb-shell-agent/PROJECT_SUMMARY.md':
+    'Generate a project summary and save it to .mariadb-shell-agent/PROJECT_SUMMARY.md',
   'No chat client available to generate summary.':
     'No chat client available to generate summary.',
   'Already generating summary, wait for previous request to complete':
@@ -1648,8 +1654,8 @@ export default {
     'Microphone access is denied. Enable it for your terminal in System Settings → Privacy & Security → Microphone, then restart voice dictation.',
   'Voice dictation is not supported on {{platform}}.':
     'Voice dictation is not supported on {{platform}}.',
-  'Voice dictation needs microphone access, which is unavailable in this WSL session. Use WSLg/PulseAudio, or run Qwen Code on a host with a microphone.':
-    'Voice dictation needs microphone access, which is unavailable in this WSL session. Use WSLg/PulseAudio, or run Qwen Code on a host with a microphone.',
+  'Voice dictation needs microphone access, which is unavailable in this WSL session. Use WSLg/PulseAudio, or run MariaDB Shell Agent on a host with a microphone.':
+    'Voice dictation needs microphone access, which is unavailable in this WSL session. Use WSLg/PulseAudio, or run MariaDB Shell Agent on a host with a microphone.',
   'Voice dictation needs microphone access. macOS will ask the first time you record — approve it, then start again. Your first recording may be empty while the dialog is open.':
     'Voice dictation needs microphone access. macOS will ask the first time you record — approve it, then start again. Your first recording may be empty while the dialog is open.',
   'Voice: recording': 'Voice: recording',
@@ -1706,8 +1712,8 @@ export default {
   'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.':
     'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.',
   "Error adding '{{path}}': {{error}}": "Error adding '{{path}}': {{error}}",
-  'Successfully added QWEN.md files from the following directories if there are:\n- {{directories}}':
-    'Successfully added QWEN.md files from the following directories if there are:\n- {{directories}}',
+  'Successfully added MARIADB-SHELL-AGENT.md files from the following directories if there are:\n- {{directories}}':
+    'Successfully added MARIADB-SHELL-AGENT.md files from the following directories if there are:\n- {{directories}}',
   'Error refreshing memory: {{error}}': 'Error refreshing memory: {{error}}',
   'Successfully added directories:\n- {{directories}}':
     'Successfully added directories:\n- {{directories}}',
@@ -1892,12 +1898,12 @@ export default {
   Ask: 'Ask',
   Deny: 'Deny',
   Workspace: 'Workspace',
-  "Qwen Code won't ask before using allowed tools.":
-    "Qwen Code won't ask before using allowed tools.",
-  'Qwen Code will ask before using these tools.':
-    'Qwen Code will ask before using these tools.',
-  'Qwen Code is not allowed to use denied tools.':
-    'Qwen Code is not allowed to use denied tools.',
+  "MariaDB Shell Agent won't ask before using allowed tools.":
+    "MariaDB Shell Agent won't ask before using allowed tools.",
+  'MariaDB Shell Agent will ask before using these tools.':
+    'MariaDB Shell Agent will ask before using these tools.',
+  'MariaDB Shell Agent is not allowed to use denied tools.':
+    'MariaDB Shell Agent is not allowed to use denied tools.',
   'Manage trusted directories for this workspace.':
     'Manage trusted directories for this workspace.',
   'Any use of the {{tool}} tool': 'Any use of the {{tool}} tool',
@@ -1907,9 +1913,11 @@ export default {
   'From project settings': 'From project settings',
   'From session': 'From session',
   'Project settings': 'Project settings',
-  'Checked in at .qwen/settings.json': 'Checked in at .qwen/settings.json',
+  'Checked in at .mariadb-shell-agent/settings.json':
+    'Checked in at .mariadb-shell-agent/settings.json',
   'User settings': 'User settings',
-  'Saved in at ~/.qwen/settings.json': 'Saved in at ~/.qwen/settings.json',
+  'Saved in at ~/.mariadb-shell-agent/settings.json':
+    'Saved in at ~/.mariadb-shell-agent/settings.json',
   'Add a new rule…': 'Add a new rule…',
   'Add {{type}} permission rule': 'Add {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1931,10 +1939,10 @@ export default {
   // Workspace directory management
   'Add directory…': 'Add directory…',
   'Add directory to workspace': 'Add directory to workspace',
-  'Qwen Code can read files in the workspace, and make edits when auto-accept edits is on.':
-    'Qwen Code can read files in the workspace, and make edits when auto-accept edits is on.',
-  'Qwen Code will be able to read files in this directory and make edits when auto-accept edits is on.':
-    'Qwen Code will be able to read files in this directory and make edits when auto-accept edits is on.',
+  'MariaDB Shell Agent can read files in the workspace, and make edits when auto-accept edits is on.':
+    'MariaDB Shell Agent can read files in the workspace, and make edits when auto-accept edits is on.',
+  'MariaDB Shell Agent will be able to read files in this directory and make edits when auto-accept edits is on.':
+    'MariaDB Shell Agent will be able to read files in this directory and make edits when auto-accept edits is on.',
   'Enter the path to the directory:': 'Enter the path to the directory:',
   'Enter directory path…': 'Enter directory path…',
   'Tab to complete · Enter to add · Esc to cancel':
@@ -2027,20 +2035,20 @@ export default {
     'Use /bug to submit issues to the maintainers when something goes off.',
   'Switch auth type quickly with /auth.':
     'Switch auth type quickly with /auth.',
-  'You can run any shell commands from Qwen Code using ! (e.g. !ls).':
-    'You can run any shell commands from Qwen Code using ! (e.g. !ls).',
+  'You can run any shell commands from MariaDB Shell Agent using ! (e.g. !ls).':
+    'You can run any shell commands from MariaDB Shell Agent using ! (e.g. !ls).',
   'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.':
     'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.',
-  'You can resume a previous conversation by running qwen --continue or qwen --resume.':
-    'You can resume a previous conversation by running qwen --continue or qwen --resume.',
+  'You can resume a previous conversation by running mariadb-shell-agent --continue or mariadb-shell-agent --resume.':
+    'You can resume a previous conversation by running mariadb-shell-agent --continue or mariadb-shell-agent --resume.',
   'You can switch permission mode quickly with Shift+Tab or /approval-mode.':
     'You can switch permission mode quickly with Shift+Tab or /approval-mode.',
   'You can switch permission mode quickly with Tab or /approval-mode.':
     'You can switch permission mode quickly with Tab or /approval-mode.',
   'Try /insight to generate personalized insights from your chat history.':
     'Try /insight to generate personalized insights from your chat history.',
-  'Add a QWEN.md file to give Qwen Code persistent project context.':
-    'Add a QWEN.md file to give Qwen Code persistent project context.',
+  'Add a MARIADB-SHELL-AGENT.md file to give MariaDB Shell Agent persistent project context.':
+    'Add a MARIADB-SHELL-AGENT.md file to give MariaDB Shell Agent persistent project context.',
   'Use /btw to ask a quick side question without disrupting the conversation.':
     'Use /btw to ask a quick side question without disrupting the conversation.',
   'Context is almost full! Run /compress now or start /new to continue.':
@@ -2520,7 +2528,7 @@ export default {
   'Failed to authenticate with Coding Plan: {{error}}':
     'Failed to authenticate with Coding Plan: {{error}}',
   '中国 (China)': '中国 (China)',
-  '阿里云百炼 (aliyun.com)': '阿里云百炼 (aliyun.com)',
+  '阿里云百炼 (aliyun.invalid)': '阿里云百炼 (aliyun.invalid)',
   'Get or set any setting by dot-path key':
     'Get or set any setting by dot-path key',
   'Invalid boolean value: "{{value}}". Use "true" or "false".':
@@ -2552,7 +2560,8 @@ export default {
     'Setting tools.approvalMode to "yolo" is blocked via /config for security reasons. Edit settings.json directly if you understand the risks.',
   '(empty)': '(empty)',
   Global: 'Global',
-  'Alibaba Cloud (alibabacloud.com)': 'Alibaba Cloud (alibabacloud.com)',
+  'Alibaba Cloud (alibabacloud.invalid)':
+    'Alibaba Cloud (alibabacloud.invalid)',
   'Select region for Coding Plan:': 'Select region for Coding Plan:',
   'Enter your Coding Plan API key: ': 'Enter your Coding Plan API key: ',
   'Select authentication method:': 'Select authentication method:',
@@ -2561,11 +2570,11 @@ export default {
     '⚠  No authentication method configured.\n',
   'Run one of the following commands to get started:\n':
     'Run one of the following commands to get started:\n',
-  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)',
+  '  mariadb-shell-agent auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
+    '  mariadb-shell-agent auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)',
   'Or simply run:': 'Or simply run:',
-  '  qwen auth                - Interactive authentication setup\n':
-    '  qwen auth                - Interactive authentication setup\n',
+  '  mariadb-shell-agent auth                - Interactive authentication setup\n':
+    '  mariadb-shell-agent auth                - Interactive authentication setup\n',
   '✓ Authentication Method: Qwen OAuth': '✓ Authentication Method: Qwen OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Type: Free tier (discontinued 2026-04-15)',
@@ -2584,8 +2593,8 @@ export default {
     '⚠  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)',
   '  Issue: API key not found in environment or settings\n':
     '  Issue: API key not found in environment or settings\n',
-  '  Run `qwen auth coding-plan` to re-configure.\n':
-    '  Run `qwen auth coding-plan` to re-configure.\n',
+  '  Run `mariadb-shell-agent auth coding-plan` to re-configure.\n':
+    '  Run `mariadb-shell-agent auth coding-plan` to re-configure.\n',
   '✓ Authentication Method: {{type}}': '✓ Authentication Method: {{type}}',
   '  Status: Configured\n': '  Status: Configured\n',
   'Failed to check authentication status: {{error}}':
@@ -2612,7 +2621,8 @@ export default {
     'Already in plan mode. Use "/plan exit" to exit plan mode.',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     'Not in plan mode. Use "/plan" to enter plan mode first.',
-  "Set up Qwen Code's status line UI": "Set up Qwen Code's status line UI",
+  "Set up MariaDB Shell Agent's status line UI":
+    "Set up MariaDB Shell Agent's status line UI",
 
   // === Core: added from PR #3328 ===
   'Open the memory manager.': 'Open the memory manager.',
@@ -2792,14 +2802,14 @@ export default {
   // Update command
   'Exact-version updates require a standalone installation. Install version {{version}} manually using your installation method.':
     'Exact-version updates require a standalone installation. Install version {{version}} manually using your installation method.',
-  'Check for Qwen Code updates and install if available':
-    'Check for Qwen Code updates and install if available',
-  'Qwen Code update available! {{current}} → {{latest}}':
-    'Qwen Code update available! {{current}} → {{latest}}',
-  'A new version of Qwen Code is available! {{current}} → {{latest}}':
-    'A new version of Qwen Code is available! {{current}} → {{latest}}',
-  'Qwen Code {{version}} is up to date!':
-    'Qwen Code {{version}} is up to date!',
+  'Check for MariaDB Shell Agent updates and install if available':
+    'Check for MariaDB Shell Agent updates and install if available',
+  'MariaDB Shell Agent update available! {{current}} → {{latest}}':
+    'MariaDB Shell Agent update available! {{current}} → {{latest}}',
+  'A new version of MariaDB Shell Agent is available! {{current}} → {{latest}}':
+    'A new version of MariaDB Shell Agent is available! {{current}} → {{latest}}',
+  'MariaDB Shell Agent {{version}} is up to date!':
+    'MariaDB Shell Agent {{version}} is up to date!',
   'Failed to check for updates ({{reason}}). Please check your network or registry configuration.':
     'Failed to check for updates ({{reason}}). Please check your network or registry configuration.',
   'Update check skipped ({{reason}}) — run /update to retry.':
@@ -2816,8 +2826,8 @@ export default {
     'Update downloaded. It will be applied after you exit this session.',
   'Update failed: {{error}}': 'Update failed: {{error}}',
   'Downloading update...': 'Downloading update...',
-  'Update successful! Please restart Qwen Code to use the new version. Switching model providers before restarting may not work correctly.':
-    'Update successful! Please restart Qwen Code to use the new version. Switching model providers before restarting may not work correctly.',
+  'Update successful! Please restart MariaDB Shell Agent to use the new version. Switching model providers before restarting may not work correctly.':
+    'Update successful! Please restart MariaDB Shell Agent to use the new version. Switching model providers before restarting may not work correctly.',
   'Automatic update failed. Please try updating manually.':
     'Automatic update failed. Please try updating manually.',
   'Automatic update failed: {{error}}. Re-run the installer to update manually.':
@@ -2842,12 +2852,12 @@ export default {
   'Run the following to update:': 'Run the following to update:',
   'Unable to auto-update this standalone installation. Please reinstall from:':
     'Unable to auto-update this standalone installation. Please reinstall from:',
-  'Manual update required. Please reinstall Qwen Code.':
-    'Manual update required. Please reinstall Qwen Code.',
-  'This session uses the custom sandbox image {{image}}. Update that image and restart Qwen Code.':
-    'This session uses the custom sandbox image {{image}}. Update that image and restart Qwen Code.',
-  'Update Qwen Code on the host, then restart the sandbox.':
-    'Update Qwen Code on the host, then restart the sandbox.',
+  'Manual update required. Please reinstall MariaDB Shell Agent.':
+    'Manual update required. Please reinstall MariaDB Shell Agent.',
+  'This session uses the custom sandbox image {{image}}. Update that image and restart MariaDB Shell Agent.':
+    'This session uses the custom sandbox image {{image}}. Update that image and restart MariaDB Shell Agent.',
+  'Update MariaDB Shell Agent on the host, then restart the sandbox.':
+    'Update MariaDB Shell Agent on the host, then restart the sandbox.',
   'The update will be installed after you exit this session.':
     'The update will be installed after you exit this session.',
   'Run /update to install the update on the host.':
@@ -2963,8 +2973,8 @@ export default {
   'Auto-skill curator changes are only available in trusted workspaces. Trust this folder via `/trust` and try again.':
     'Auto-skill curator changes are only available in trusted workspaces. Trust this folder via `/trust` and try again.',
   'Kept model as {{model}}': 'Kept model as {{model}}',
-  'Review messages held from other Qwen Code sessions (accept | deny), and manage trusted controllers (controllers | revoke)':
-    'Review messages held from other Qwen Code sessions (accept | deny), and manage trusted controllers (controllers | revoke)',
+  'Review messages held from other MariaDB Shell Agent sessions (accept | deny), and manage trusted controllers (controllers | revoke)':
+    'Review messages held from other MariaDB Shell Agent sessions (accept | deny), and manage trusted controllers (controllers | revoke)',
   'Create a git commit with an AI-drafted message':
     'Create a git commit with an AI-drafted message',
 };

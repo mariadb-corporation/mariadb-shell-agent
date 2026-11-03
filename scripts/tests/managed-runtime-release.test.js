@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -496,7 +497,7 @@ describe('Managed runtime publication gates', () => {
     const tools = step('Checkout release tooling from the workflow revision');
     expect(tools.with).toEqual({
       ref: '${{ github.workflow_sha }}',
-      path: '.qwen/managed-release-tools',
+      path: '.mariadb-shell-agent/managed-release-tools',
       'sparse-checkout': 'scripts',
       'persist-credentials': false,
     });
@@ -506,7 +507,7 @@ describe('Managed runtime publication gates', () => {
     )) {
       expect(item.run).not.toContain('node scripts/managed-runtime-release.js');
       expect(item.run).toContain(
-        'node .qwen/managed-release-tools/scripts/managed-runtime-release.js',
+        'node .mariadb-shell-agent/managed-release-tools/scripts/managed-runtime-release.js',
       );
     }
 
@@ -620,7 +621,7 @@ describe.skipIf(process.platform === 'win32')('release gate execution', () => {
     const target = path.join(temporary, repairedTest);
     const patch = path.join(
       temporary,
-      '.qwen/managed-release-tools',
+      '.mariadb-shell-agent/managed-release-tools',
       repairPatch,
     );
     fs.mkdirSync(path.dirname(target), { recursive: true });
@@ -713,7 +714,7 @@ describe.skipIf(process.platform === 'win32')('release gate execution', () => {
     }
     const patch = path.join(
       temporary,
-      '.qwen/managed-release-tools/scripts/patches/managed-runtime-v0.26.5-javadoc.patch',
+      '.mariadb-shell-agent/managed-release-tools/scripts/patches/managed-runtime-v0.26.5-javadoc.patch',
     );
     fs.mkdirSync(path.dirname(patch), { recursive: true });
     fs.copyFileSync(

@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review compose-review`: deterministic event selection and body
+// `mariadb-shell-agent review compose-review`: deterministic event selection and body
 // composition for the /review skill's Step 7 submission.
 //
 // This logic used to be prose — a C/S table, three event-capping overrides,
@@ -2046,7 +2047,7 @@ function asListLine(text: string, pr: PrIdentity | null): string {
  *
  * Comment grammar goes inert BEFORE the attribution strips run. Those
  * strips match on the DISPLAYED projection, which drops an HTML comment
- * whole, so a forged footer wrapped as `<!-- _— … via Qwen Code /review
+ * whole, so a forged footer wrapped as `<!-- _— … via MariaDB Shell Agent /review
  * … -->` is invisible to every one of them — and neutralizing the grammar
  * AFTER the chain materialized exactly that footer as visible text in the
  * attribution-off post that exists to carry none (pre-neutralization the
@@ -2070,8 +2071,8 @@ function asListLine(text: string, pr: PrIdentity | null): string {
  * qwen-review-deferred --‹span›> y` joins `<!-` to `- … --` to `>` and
  * posts a live `<!-- qwen-review-deferred -->` (or a forged ledger opener)
  * the grammar strip never saw, because no delimiter existed when it ran.
- * And neutralization JOINS: `via Qwen<!-‹span›-Code /review` strips to
- * `Qwen<!--Code`, which neutralizes to the footer phrase `via Qwen Code
+ * And neutralization JOINS: `via MariaDB Shell<!-‹span›-Agent /review` strips to
+ * `MariaDB Shell<!--Agent`, which neutralizes to the footer phrase `via MariaDB Shell Agent
  * /review` the chain has already finished looking for — so a trailing
  * grammar strip alone (the obvious patch) trades the forged marker for a
  * forged footer. Every strip in the chain deletes or leaves its input
@@ -2107,7 +2108,7 @@ function quotedProse(text: string, attribution: boolean): string {
  * `quotedProse`. The second is not implied by the first: the closure
  * neutralizes comment grammar and re-runs the chain on what that exposes,
  * so an entry held up only by a footer that comment grammar had split —
- * `_— m via Qwen<!-‹span›-Code /review_` — projects as visible prose
+ * `_— m via MariaDB Shell<!-‹span›-Agent /review_` — projects as visible prose
  * as written yet strips to nothing at the exit, and would post as an
  * empty body Critical that still counts toward REQUEST_CHANGES.
  */
@@ -3543,7 +3544,7 @@ function ledgerMarkerFor(
     // reason to skip the check. The recovery side already rules it that way
     // (`certifierMatchesRound` refuses an empty `running` outright), and the
     // asymmetry was load-bearing in the wrong direction: with the runtime
-    // channel empty — a deferred `qwen review submit` run from a terminal
+    // channel empty — a deferred `mariadb-shell-agent review submit` run from a terminal
     // outside a session shell, which `round-model.ts` documents as reachable
     // in normal operation — `certifying` falls back to `input.modelId`, the
     // model-WRITTEN field these docstrings retire. The marker then certifies
@@ -5314,7 +5315,7 @@ function composeReviewBody(
   let coveredChunks: number[] = [];
 
   // The deterministic script-lint gate. `compose-review` is the authority here:
-  // it reads the report the orchestrator's `qwen review script-lint` step wrote
+  // it reads the report the orchestrator's `mariadb-shell-agent review script-lint` step wrote
   // and turns it into the verdict itself, so neither the existence of a blocker
   // nor its severity depends on a model. A finding on a changed line (above
   // cosmetic `style`) is a pre-confirmed `[lint]` Critical; an uninstalled or
@@ -5871,7 +5872,7 @@ function composeReviewBody(
       // have read it — and relaunching it would produce another agent that
       // cannot either. Do not call this a whiff; the prompt is the bug.
       // The rebuild command goes to stderr with the other remediation, not into
-      // this line: the line lands in the posted body, and `qwen review
+      // this line: the line lands in the posted body, and `mariadb-shell-agent review
       // agent-prompt` is not something a PR author can run.
       for (const label of cov.blindAgents) {
         coverageEntries.push({
@@ -9131,7 +9132,7 @@ export function scriptLintGate(
     // The one gap this leaves — a SHEBANG-only script (`hasExecutableScript` is
     // path-only, so `owed` is false for it) whose command was skipped — is closed by
     // a CONTRACT, not by this predicate: SKILL.md has the orchestrator run
-    // `qwen review script-lint` on EVERY same-repo review, unconditionally. So a
+    // `mariadb-shell-agent review script-lint` on EVERY same-repo review, unconditionally. So a
     // compliant run always writes a report (even "nothing to lint"), the shebang
     // script is linted and appears in it, and it is handled below on its own
     // findings regardless of `owed`. "No report" therefore means the command did not
@@ -9139,7 +9140,7 @@ export function scriptLintGate(
     // on the always-run contract above, which is why it is stated there in prose.
     if (owed) {
       unreviewed.push(
-        'the executable-script lint — `qwen review script-lint` produced no report',
+        'the executable-script lint — `mariadb-shell-agent review script-lint` produced no report',
       );
     }
     return { criticals, unreviewed, disclosed };
@@ -9156,7 +9157,7 @@ export function scriptLintGate(
   // not a shape to render.
   if (!structurallyValidReport(report)) {
     unreviewed.push(
-      'the executable-script lint — the report is malformed; re-run `qwen review script-lint`',
+      'the executable-script lint — the report is malformed; re-run `mariadb-shell-agent review script-lint`',
     );
     return { criticals, unreviewed, disclosed };
   }
@@ -9185,7 +9186,7 @@ export function scriptLintGate(
   const planDiffHash = diffHashOf(freshnessBasis);
   if (!planDiffHash || report.diffHash !== planDiffHash) {
     unreviewed.push(
-      'the executable-script lint — the report is stale or its diff could not be verified; re-run `qwen review script-lint`',
+      'the executable-script lint — the report is stale or its diff could not be verified; re-run `mariadb-shell-agent review script-lint`',
     );
     return { criticals, unreviewed, disclosed };
   }
@@ -9325,7 +9326,7 @@ export function blockerReCheckGate(
   } catch {
     return {
       unreviewed: [
-        'the blocker re-check — the blocker inventory is malformed; re-run `qwen review pr-context`',
+        'the blocker re-check — the blocker inventory is malformed; re-run `mariadb-shell-agent review pr-context`',
       ],
     };
   }
@@ -9340,7 +9341,7 @@ export function blockerReCheckGate(
   ) {
     return {
       unreviewed: [
-        'the blocker re-check — the blocker inventory is malformed; re-run `qwen review pr-context`',
+        'the blocker re-check — the blocker inventory is malformed; re-run `mariadb-shell-agent review pr-context`',
       ],
     };
   }

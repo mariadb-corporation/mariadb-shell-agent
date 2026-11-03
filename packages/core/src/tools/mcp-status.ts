@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,7 +27,7 @@ const serverStatuses: Map<string, MCPServerStatus> = new Map();
  * best-effort and swallows connect errors (logged only via `debugLogger`),
  * so the status enum alone cannot tell a consumer WHY a server is not
  * CONNECTED. Producers that fail a connect/discovery record the cause here;
- * consumers that observe a non-CONNECTED status (e.g. `qwen mcp reconnect`)
+ * consumers that observe a non-CONNECTED status (e.g. `mariadb-shell-agent mcp reconnect`)
  * can read it back. Entries are dropped automatically when the server
  * reaches CONNECTED or is removed from the registry.
  */

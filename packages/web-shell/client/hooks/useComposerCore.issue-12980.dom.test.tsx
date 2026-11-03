@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 // @vitest-environment jsdom
 //
-// Reproduction for https://github.com/QwenLM/qwen-code/issues/12980
+// Reproduction for https://github.invalid/QwenLM/qwen-code/issues/12980
 // "reference chip attaches to earlier matching plain text after submit".
 //
 // The composer knows each inline chip's real CodeMirror range, but the

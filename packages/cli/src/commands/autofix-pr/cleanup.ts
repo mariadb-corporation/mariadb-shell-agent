@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -102,7 +103,7 @@ export function unsavedWork(
     // changes inside it.
     // No optional locks: `status` asks while a round's agent may commit
     // there, and a refreshed index would take its index.lock.
-    // An in-place checkout holds the watch's own files under .qwen/tmp:
+    // An in-place checkout holds the watch's own files under .mariadb-shell-agent/tmp:
     // checkoutHoldsWork does not count them as the user's work.
     const holds = inPlace
       ? checkoutHoldsWork(paths.worktreePath)

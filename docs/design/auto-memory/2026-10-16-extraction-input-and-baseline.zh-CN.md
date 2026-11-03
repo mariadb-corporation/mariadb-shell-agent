@@ -5,8 +5,8 @@
 **状态：** 提案；本文不包含运行逻辑变更或性能验收结果。
 **日期：** 2026-10-16
 **源码基线：** `main` 上的 `38d58c63cf2f07835efe168929ceb4b5be813eef`。
-**跟踪：** [#13004](https://github.com/QwenLM/qwen-code/issues/13004)、[#13612](https://github.com/QwenLM/qwen-code/issues/13612)。
-**暂缓的实验：** [#13571](https://github.com/QwenLM/qwen-code/pull/13571)，已于 2026-10-16 转为草稿；不以该 PR 的代码作为基线。
+**跟踪：** [#13004](https://github.invalid/QwenLM/qwen-code/issues/13004)、[#13612](https://github.invalid/QwenLM/qwen-code/issues/13612)。
+**暂缓的实验：** [#13571](https://github.invalid/QwenLM/qwen-code/pull/13571)，已于 2026-10-16 转为草稿；不以该 PR 的代码作为基线。
 
 ## 1. 目标与决策
 
@@ -48,7 +48,7 @@ Claude Code 2.1.301 的静态分析发现直接写记忆、prose 门控和可配
 
 - 固定源码 SHA、CLI 入口、provider、解析后的主模型与提取模型、生成参数和记忆协议。
 - 使用合成题面，并隔离配置、项目/用户记忆、会话存储和工作目录。不读取或覆盖操作者的真实记忆和设置。
-- 单独核对已安装 CLI。本机 `qwen --version` 预检返回 `0.25.0`；不能把该发布版本与固定源码基线混用。本文设计阶段没有运行对话模型。
+- 单独核对已安装 CLI。本机 `mariadb-shell-agent --version` 预检返回 `0.25.0`；不能把该发布版本与固定源码基线混用。本文设计阶段没有运行对话模型。
 - Dream、recall、migration、权限分类器和前台请求分别归因。若隔离需要修改设置，只改测试配置，并在不同组使用相同配置。
 - harness 根据实际观测等待提取结束后评分。积压和超时明确记录，不能算成零成本或正常零产出。
 

@@ -1,6 +1,6 @@
 /**
  * Credential storage for WeChat account.
- * Stores account data in ~/.qwen/channels/weixin/
+ * Stores account data in ~/.mariadb-shell-agent/channels/weixin/
  */
 
 import {

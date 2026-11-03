@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -145,7 +146,7 @@ async function buildExistingMemoryContext(projectRoot: string): Promise<{
   // every doc is rendered into the extraction agent's task prompt below, so
   // an uncapped scan would grow that prompt without bound. Anything past the
   // cap stays reachable — the agent holds read_file/grep/glob/ls.
-  // User-level scan is best-effort: a read failure on `~/.qwen/memories/`
+  // User-level scan is best-effort: a read failure on `~/.mariadb-shell-agent/memories/`
   // must not deny the extraction agent its view of existing project-level
   // memories (which it uses to avoid creating duplicates).
   const [projectDocs, userDocs] = await Promise.all([

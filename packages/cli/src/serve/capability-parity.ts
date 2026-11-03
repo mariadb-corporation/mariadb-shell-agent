@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * The capability parity matrix (issue #15075): which `qwen serve` capability
+ * The capability parity matrix (issue #15075): which `mariadb-shell-agent serve` capability
  * tags the Managed Agent path stands behind.
  *
  * Every legacy tag carries exactly one row, so a new tag cannot land without

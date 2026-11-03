@@ -6,7 +6,7 @@
 
 ## 问题
 
-saved workflow 只能放在项目（`.qwen/workflows`）或用户目录（`~/.qwen/workflows`），没有办法把可复用的 workflow 分发给别人。Claude Code 插件已经通过 `workflows` 清单字段和默认的 `workflows/` 目录分发 workflow。扩展是 Qwen Code 的分发单元，但扩展文件是第三方代码，所以这个功能必须在扩大分发范围的同时，不扩大 workflow 运行时能读取的范围。
+saved workflow 只能放在项目（`.mariadb-shell-agent/workflows`）或用户目录（`~/.mariadb-shell-agent/workflows`），没有办法把可复用的 workflow 分发给别人。Claude Code 插件已经通过 `workflows` 清单字段和默认的 `workflows/` 目录分发 workflow。扩展是 MariaDB Shell Agent 的分发单元，但扩展文件是第三方代码，所以这个功能必须在扩大分发范围的同时，不扩大 workflow 运行时能读取的范围。
 
 ## 决策
 
@@ -30,7 +30,7 @@ workflow 的 `{ scriptPath }` 加载由 `readWorkflowFileSecurely` 检查，它�
 
 ### 入口与门禁
 
-扩展 workflow 复用现有门禁：斜杠命令受 Workflows 功能开关、bare mode 和 folder trust 约束，ACP 受 workflow 控制检查约束。斜杠命令以扩展的归属标签作为来源徽标，并且不能被模型调用。Workflow 工具的描述、参数描述、审批对话框和 resume 建议都会把扩展 workflow 标明为扩展 workflow。`/reload-plugins`、`qwen extensions list` 和扩展详情视图报告的是扩展提供了什么，与它们对命令、skill、agent 的做法一致。
+扩展 workflow 复用现有门禁：斜杠命令受 Workflows 功能开关、bare mode 和 folder trust 约束，ACP 受 workflow 控制检查约束。斜杠命令以扩展的归属标签作为来源徽标，并且不能被模型调用。Workflow 工具的描述、参数描述、审批对话框和 resume 建议都会把扩展 workflow 标明为扩展 workflow。`/reload-plugins`、`mariadb-shell-agent extensions list` 和扩展详情视图报告的是扩展提供了什么，与它们对命令、skill、agent 的做法一致。
 
 ### Claude Code 插件转换
 

@@ -36,7 +36,7 @@ completed 后刷新 summary，revision 达到 resultContextRevision 才清除意
 
 ## 交付与验收
 
-以一个 PR 一起交付前端 adapter/控件/恢复/事件与 BFF capability/OpenAPI/生成类型/测试。前端对缺能力的服务端不显示入口。整个前端与 BFF 合并而成的 PR 保持 draft，在 #13564 的 cwd 缓存失效修复通过联合验收前不能合入或部署：同一 Hosted attachment 中 A→B 后，下一轮的文件写入与 QWEN.md/AGENTS.md 规则必须同步变化。[能力设计](2026-10-09-managed-workspace-w2-capability.zh-CN.md)详细说明服务端授权和查询预算。本切片不修 rewind 或规则编辑。
+以一个 PR 一起交付前端 adapter/控件/恢复/事件与 BFF capability/OpenAPI/生成类型/测试。前端对缺能力的服务端不显示入口。整个前端与 BFF 合并而成的 PR 保持 draft，在 #13564 的 cwd 缓存失效修复通过联合验收前不能合入或部署：同一 Hosted attachment 中 A→B 后，下一轮的文件写入与 MARIADB-SHELL-AGENT.md/AGENTS.md 规则必须同步变化。[能力设计](2026-10-09-managed-workspace-w2-capability.zh-CN.md)详细说明服务端授权和查询预算。本切片不修 rewind 或规则编辑。
 
 Provider、hook、组件、事件以及 Java capability/查询预算测试覆盖丢 ACK、刷新、失败、权限、旧 revision、竞争、账号隔离、存储拒绝和旧服务端。浏览器验证 portal、焦点、草稿/历史保留。真实 Java/Hosted 验证根目录、空格/非 ASCII、非法/越界路径、忙时拒绝和切换后写入。完成 build/typecheck/bundle、聚焦测试和两次干净 self-audit。如联合门槛不可验证，明确记录，不提前启用。
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -53,7 +54,7 @@ function state(overrides: Partial<AutofixPrState> = {}): AutofixPrState {
     headRefName: 'feat',
     baseRefName: 'main',
     branch: 'qwen-autofix/pr-7',
-    worktreePath: '/repo/.qwen/tmp/autofix-pr-7',
+    worktreePath: '/repo/.mariadb-shell-agent/tmp/autofix-pr-7',
     viewer: 'me',
     prAuthor: 'me',
     lastKnownHeadSha: HEAD,

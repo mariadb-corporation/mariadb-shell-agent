@@ -189,7 +189,7 @@ is deleted and no lease timeout authorizes another writer.
 ## Deployment and rollout
 
 Worker backups live under `$QWEN_HOME/file-history/<Harness Session ID>/`
-(or the worker OS user's `~/.qwen/file-history/`). Set an absolute `QWEN_HOME`
+(or the worker OS user's `~/.mariadb-shell-agent/file-history/`). Set an absolute `QWEN_HOME`
 on the Broker's worker environment and mount durable storage writable by the
 worker user. Preserve it alongside the Workspace and SQL store; persisting only
 the Workspace or database does not retain backup bytes. Keep referenced backup
@@ -223,14 +223,14 @@ two Workspaces through the packaged Hosted CLI, real worker, Java Broker and
 HTTP Session Store. Verify existing file restoration and new file removal,
 plus default no-tool and Shell regressions. Build, typecheck, bundle, focused
 tests and two clean self-audit passes are required. E2E plans and measured
-results live in `.qwen/e2e-tests/hosted-file-history.md`.
+results live in `.mariadb-shell-agent/e2e-tests/hosted-file-history.md`.
 
 For #13124, add malformed-receipt and profile-disclosure assertions, and strengthen
 existing HTTP undo tests for mismatched replay keys, conflict replay and durable
 pending state. Reuse the existing later-undo, Write/Edit and reload replay tests.
 Verify fresh-turn pending-history guards and capacity refusal before dispatch.
 The focused plan and measured results are in
-`.qwen/e2e-tests/issue-13124.md`; the real Java/MySQL fault gates remain required
+`.mariadb-shell-agent/e2e-tests/issue-13124.md`; the real Java/MySQL fault gates remain required
 for changes to their execution behavior.
 
 Local validation passed: build, typecheck, bundle, focused tests, packaged worker

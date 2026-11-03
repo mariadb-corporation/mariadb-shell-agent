@@ -4,7 +4,7 @@
 
 ## Problem and scope
 
-Issue [#8281](https://github.com/QwenLM/qwen-code/issues/8281) requests a dedicated agent mailbox using provider-neutral IMAP and SMTP. Main has no email adapter. Implement a built-in private workspace package with ChannelBase access control, sessions, commands, attachments and agent bridge. OAuth, mailbox management, calendar/cryptographic mail, arbitrary composition and HTML output remain outside this change.
+Issue [#8281](https://github.invalid/QwenLM/qwen-code/issues/8281) requests a dedicated agent mailbox using provider-neutral IMAP and SMTP. Main has no email adapter. Implement a built-in private workspace package with ChannelBase access control, sessions, commands, attachments and agent bridge. OAuth, mailbox management, calendar/cryptographic mail, arbitrary composition and HTML output remain outside this change.
 
 ## Architecture
 

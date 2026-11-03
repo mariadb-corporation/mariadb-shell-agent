@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -451,8 +452,8 @@ function wrapProviderLoadError(error: unknown, authType: AuthType): unknown {
   }
 
   return new Error(
-    `Qwen Code was updated in the background and needs to be restarted.\n` +
-      `Please exit and restart Qwen Code to use the '${authType}' provider.`,
+    `MariaDB Shell Agent was updated in the background and needs to be restarted.\n` +
+      `Please exit and restart MariaDB Shell Agent to use the '${authType}' provider.`,
     { cause: moduleNotFoundError },
   );
 }

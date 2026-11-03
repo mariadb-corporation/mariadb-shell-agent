@@ -20,7 +20,7 @@ For list pages, one role grant read covers the workspaces of the union of cwd-sh
 
 #13545 landed first and moved cwd admission to the actor-role model (`atLeast(OPERATOR)`); this slice's capability predicate converges on exactly that predicate rather than the earlier creator-identity baseline. Frontend code uses the BFF capability and never infers creator/roles.
 
-Keep the entire combined frontend/BFF PR draft; do not merge or deploy it before #13564's cwd instruction-cache fix and joint acceptance pass. In one existing Hosted attachment, A→B must change the next Turn's physical write directory and its QWEN.md/AGENTS.md instructions without rebuilding the Session. A deterministic model proving tool writes does not prove instruction adoption. Rewind and in-session rule editing are outside this slice. There is no additional frontend release switch.
+Keep the entire combined frontend/BFF PR draft; do not merge or deploy it before #13564's cwd instruction-cache fix and joint acceptance pass. In one existing Hosted attachment, A→B must change the next Turn's physical write directory and its MARIADB-SHELL-AGENT.md/AGENTS.md instructions without rebuilding the Session. A deterministic model proving tool writes does not prove instruction adoption. Rewind and in-session rule editing are outside this slice. There is no additional frontend release switch.
 
 ## Verification and behavior E2E plan
 

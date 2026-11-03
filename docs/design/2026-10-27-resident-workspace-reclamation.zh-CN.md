@@ -4,11 +4,11 @@
 
 ## 状态
 
-这是 [#13395](https://github.com/QwenLM/qwen-code/issues/13395) 合并提交的 S2 设计与 S3 实现。实现基线为 main `0539160f35f983ba4a6d4d369c0ae18941b2fdb2`。本文描述已实现契约；完整平台验收仍待完成。
+这是 [#13395](https://github.invalid/QwenLM/qwen-code/issues/13395) 合并提交的 S2 设计与 S3 实现。实现基线为 main `0539160f35f983ba4a6d4d369c0ae18941b2fdb2`。本文描述已实现契约；完整平台验收仍待完成。
 
 2026-10-27，定向 Java/Checkstyle、真实 MySQL/进程检查以及隔离 ACK 健康交接在各自记录的范围内通过。原生运行使用实现基线加 31 文件源码清单，其 SHA-256 为 `9edfca3f939c5e19b4cebdacbc13460b9c4b4590c2de2c9113b30d59fa299ee2`，平台为 ACK `1.36.2-aliyun.1` 与 Disk CSI `1.37.3`。同一磁盘完成 A→B→C→D，reserved revision 为 `1/3/5/7`、released revision 为 `2/4/6`，22 次文件工具执行成功并保留前序字节。模型端点使用受控 fixture。该证据仅覆盖上述源码/制品快照与健康流程；rebase 不会自动验收新集成制品。完整 CI、要求的原生故障矩阵与生产最小权限验收仍待完成。
 
-2026-10-27，操作者选择保留文件，并由管理员显式将磁盘交接给同租户的另一个 Workspace。每一轮归属变化都必须遵守此决定。[现有交付边界](2026-10-23-csi-evidence-source.zh-CN.md) 及独立的 CSI LOST 恢复问题 [#12670](https://github.com/QwenLM/qwen-code/issues/12670) 继续有效。
+2026-10-27，操作者选择保留文件，并由管理员显式将磁盘交接给同租户的另一个 Workspace。每一轮归属变化都必须遵守此决定。[现有交付边界](2026-10-23-csi-evidence-source.zh-CN.md) 及独立的 CSI LOST 恢复问题 [#12670](https://github.invalid/QwenLM/qwen-code/issues/12670) 继续有效。
 
 ## 问题与基线状态
 
@@ -101,7 +101,7 @@ Kubernetes 文档说明了 [Pod 优雅终止](https://kubernetes.io/docs/concept
 
 ## 验证与验收
 
-详细忽略目录 E2E 计划位于 `.qwen/e2e-tests/13395-s2-s3-20261027/`。先以全局 CLI dry-run，若私有维护路径需要 Java/API fallback 则明确记录。环境准备、构建、定向单测及定向真实 MySQL/进程用例共同使用一个 600 秒本地 Java 验证预算；全量 profile 交由 CI，未覆盖检查单独列明。
+详细忽略目录 E2E 计划位于 `.mariadb-shell-agent/e2e-tests/13395-s2-s3-20261027/`。先以全局 CLI dry-run，若私有维护路径需要 Java/API fallback 则明确记录。环境准备、构建、定向单测及定向真实 MySQL/进程用例共同使用一个 600 秒本地 Java 验证预算；全量 profile 交由 CI，未覆盖检查单独列明。
 
 必须验收至少三轮 reserve/release，在同租户不同 Workspace 间保留文件内容；revision 大于 1 时执行与关闭；拒绝其他租户和旧 Workspace；两个并发申请者；平台身份替换；API 及节点/网络分区时保留归属；重复及丢失响应；回执持久化和 SQL 提交前后崩溃；各释放写入点回滚；映射替换与后续复用后的终态查询。独立复核任务资源清理。
 

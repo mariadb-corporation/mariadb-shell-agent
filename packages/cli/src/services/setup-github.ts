@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,7 +28,7 @@ export const GITHUB_WORKFLOW_PATHS = [
   'pr-review/qwen-review.yml',
 ];
 
-const GITIGNORE_ENTRIES = ['.qwen/', 'gha-creds-*.json'];
+const GITIGNORE_ENTRIES = ['.mariadb-shell-agent/', 'gha-creds-*.json'];
 export const MAX_WORKFLOW_DOWNLOAD_BYTES = 5 * 1024 * 1024;
 
 export type GithubSetupGitignoreStatus =
@@ -203,7 +204,7 @@ export async function setupGithub(
     releaseTag = await getLatestGitHubRelease(options.proxy);
   } catch (error) {
     writeStderrLine(
-      `qwen setup-github: failed to determine latest qwen-code-action release: ${
+      `mariadb-shell-agent setup-github: failed to determine latest qwen-code-action release: ${
         error instanceof Error ? error.message : String(error)
       }`,
     );
@@ -218,7 +219,7 @@ export async function setupGithub(
     );
   }
 
-  const readmeUrl = `https://github.com/QwenLM/qwen-code-action/blob/${releaseTag}/README.md#quick-start`;
+  const readmeUrl = `https://github.invalid/QwenLM/qwen-code-action/blob/${releaseTag}/README.md#quick-start`;
   const secretsUrl = await resolveSecretsUrl(cwd);
   const downloads = await downloadWorkflows({
     releaseTag,
@@ -358,7 +359,7 @@ async function downloadWorkflows(options: {
       : undefined;
     return await Promise.all(
       GITHUB_WORKFLOW_PATHS.map(async (workflow) => {
-        const endpoint = `https://raw.githubusercontent.com/QwenLM/qwen-code-action/refs/tags/${options.releaseTag}/examples/workflows/${workflow}`;
+        const endpoint = `https://raw.githubusercontent.invalid/QwenLM/qwen-code-action/refs/tags/${options.releaseTag}/examples/workflows/${workflow}`;
         const response = await options.fetchImpl(endpoint, {
           method: 'GET',
           dispatcher,

@@ -90,16 +90,16 @@ store.subscribe(() => {
 
 ### Workspace events (PR-A, Wave 3-4)
 
-| Event                                  | When                                  |
-| -------------------------------------- | ------------------------------------- |
-| `workspace.memory.changed`             | QWEN.md / memory file modified        |
-| `workspace.agent.changed`              | Sub-agent created / updated / deleted |
-| `workspace.tool.toggled`               | Builtin tool enabled / disabled       |
-| `workspace.initialized`                | `qwen init` completed                 |
-| `workspace.mcp.budget_warning`         | MCP child count approaching cap       |
-| `workspace.mcp.child_refused`          | MCP server refused due to budget      |
-| `workspace.mcp.server_restarted`       | Manual MCP restart succeeded          |
-| `workspace.mcp.server_restart_refused` | Manual restart blocked                |
+| Event                                  | When                                          |
+| -------------------------------------- | --------------------------------------------- |
+| `workspace.memory.changed`             | MARIADB-SHELL-AGENT.md / memory file modified |
+| `workspace.agent.changed`              | Sub-agent created / updated / deleted         |
+| `workspace.tool.toggled`               | Builtin tool enabled / disabled               |
+| `workspace.initialized`                | `qwen init` completed                         |
+| `workspace.mcp.budget_warning`         | MCP child count approaching cap               |
+| `workspace.mcp.child_refused`          | MCP server refused due to budget              |
+| `workspace.mcp.server_restarted`       | Manual MCP restart succeeded                  |
+| `workspace.mcp.server_restart_refused` | Manual restart blocked                        |
 
 ### Auth device-flow events (PR-A, Wave 4 OAuth)
 
@@ -430,7 +430,7 @@ sends; safe when it doesn't."
 
 ## Cross-references
 
-- [PR #4328](https://github.com/QwenLM/qwen-code/pull/4328) — base PR with the shared UI transcript layer
-- [PR #4353](https://github.com/QwenLM/qwen-code/pull/4353) — this PR (unified completeness follow-up)
-- [Issue #3803](https://github.com/QwenLM/qwen-code/issues/3803) — daemon mode proposal
-- [Issue #4175](https://github.com/QwenLM/qwen-code/issues/4175) — Mode B v0.16 implementation tracker
+- [PR #4328](https://github.invalid/QwenLM/qwen-code/pull/4328) — base PR with the shared UI transcript layer
+- [PR #4353](https://github.invalid/QwenLM/qwen-code/pull/4353) — this PR (unified completeness follow-up)
+- [Issue #3803](https://github.invalid/QwenLM/qwen-code/issues/3803) — daemon mode proposal
+- [Issue #4175](https://github.invalid/QwenLM/qwen-code/issues/4175) — Mode B v0.16 implementation tracker

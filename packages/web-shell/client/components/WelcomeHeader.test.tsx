@@ -45,18 +45,18 @@ describe('WelcomeHeader brand', () => {
     renderHeader('QiuQiu Code');
 
     expect(container.textContent).toContain('QiuQiu Code');
-    expect(container.textContent).not.toContain('Qwen Code');
+    expect(container.textContent).not.toContain('MariaDB Shell Agent');
   });
 
   it('renders the built-in name when no brand is configured', () => {
     renderHeader();
 
-    expect(container.textContent).toContain('Qwen Code');
+    expect(container.textContent).toContain('MariaDB Shell Agent');
   });
 
   it('renders the built-in name for an empty brand name', () => {
     renderHeader('');
 
-    expect(container.textContent).toContain('Qwen Code');
+    expect(container.textContent).toContain('MariaDB Shell Agent');
   });
 });

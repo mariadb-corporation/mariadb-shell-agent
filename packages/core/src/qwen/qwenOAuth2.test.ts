@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -143,8 +144,8 @@ const INVALID_REQUEST = {
 const deviceAuth = (expires_in = 1800) => ({
   device_code: 'test-device-code',
   user_code: 'TEST123',
-  verification_uri: 'https://chat.qwen.ai/device',
-  verification_uri_complete: 'https://chat.qwen.ai/device?code=TEST123',
+  verification_uri: 'https://chat.qwen.invalid/device',
+  verification_uri_complete: 'https://chat.qwen.invalid/device?code=TEST123',
   expires_in,
 });
 const deviceToken = () => ({
@@ -329,8 +330,8 @@ describe('Type Guards', () => {
   describe('isDeviceAuthorizationSuccess', () => {
     it('should return true for successful authorization response', () => {
       const expectedBaseUrl = process.env['DEBUG']
-        ? 'https://pre4-chat.qwen.ai'
-        : 'https://chat.qwen.ai';
+        ? 'https://pre4-chat.qwen.invalid'
+        : 'https://chat.qwen.invalid';
       const successResponse = {
         ...deviceAuth(),
         verification_uri: `${expectedBaseUrl}/device`,
@@ -660,7 +661,7 @@ describe('QwenOAuth2Client', () => {
       expect(error.cause).toBe(networkError);
       expect(error.message).toContain('Token refresh failed:');
       expect(error.message).toContain(
-        'https://chat.qwen.ai/api/v1/oauth2/token',
+        'https://chat.qwen.invalid/api/v1/oauth2/token',
       );
     });
 
@@ -948,14 +949,14 @@ describe('Browser Launch and Error Handling', () => {
 
     expect(await completeDeviceFlow(s.config)).toBeInstanceOf(Object);
     expect(mockOpenBrowserSecurely).toHaveBeenCalledWith(
-      'https://chat.qwen.ai/device?code=TEST123',
+      'https://chat.qwen.invalid/device?code=TEST123',
     );
   });
 
   it('should launch the device flow URL through the shared browser helper', async () => {
     expect(await completeDeviceFlow(s.config)).toBeInstanceOf(Object);
     expect(mockOpenBrowserSecurely).toHaveBeenCalledWith(
-      'https://chat.qwen.ai/device?code=TEST123',
+      'https://chat.qwen.invalid/device?code=TEST123',
     );
   });
 });
@@ -1018,7 +1019,11 @@ describe('Utility Functions', () => {
     it('should return correct path to cached credentials', async () => {
       const os = await import('os');
       const path = await import('path');
-      const expectedPath = path.join(os.homedir(), '.qwen', 'oauth_creds.json');
+      const expectedPath = path.join(
+        os.homedir(),
+        '.mariadb-shell-agent',
+        'oauth_creds.json',
+      );
 
       // The path helper is private, so it is tested through clearQwenCredentials.
       vi.mocked(fs.unlink).mockResolvedValue(undefined);
@@ -1296,7 +1301,7 @@ describe('Constants and Configuration', () => {
   it('should have correct OAuth endpoints', async () => {
     // The endpoint constants show up in the request.
     const [url] = await requestFromNewClient('test-scope');
-    expect(url).toBe('https://chat.qwen.ai/api/v1/oauth2/device/code');
+    expect(url).toBe('https://chat.qwen.invalid/api/v1/oauth2/device/code');
   });
 
   it('should use correct client ID in requests', async () => {
@@ -1317,7 +1322,7 @@ describe('Constants and Configuration', () => {
 
 describe('showFallbackMessage', () => {
   const savedEnv: Record<string, string | undefined> = {};
-  const url = 'https://chat.qwen.ai/authorize?user_code=WDJB-MJHT';
+  const url = 'https://chat.qwen.invalid/authorize?user_code=WDJB-MJHT';
 
   beforeEach(() => {
     for (const key of HYPERLINK_ENV_KEYS) {

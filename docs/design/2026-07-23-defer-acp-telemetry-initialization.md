@@ -28,7 +28,7 @@ The affected consumers are:
 - **ACP session creation and prompts**: retain the existing initialized gates; very early events may now be dropped for longer while SDK loading finishes.
 - **Ordinary interactive TUI**: retains post-first-render startup through `startPostRenderPrefetches`.
 - **Headless and stream-JSON CLI**: retain constructor startup.
-- **`qwen serve` parent/daemon runtime**: retains its explicit deferred core-runtime initialization and shutdown.
+- **`mariadb-shell-agent serve` parent/daemon runtime**: retains its explicit deferred core-runtime initialization and shutdown.
 - **Process exit cleanup**: retains `Config.shutdown()`. A child that disconnects before a successful protocol initialization never starts telemetry. If disconnect races a just-started import, the initializer's internal catch prevents an unhandled rejection and the ACP outer path still exits the process. Although `shutdownTelemetry()` can await an in-flight initializer, `Config.shutdown()` calls it only after the SDK reports initialized, so current config cleanup can skip an initialization that is still in flight.
 
 ## Failure and compatibility behavior

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +16,7 @@ export const helpCommand: SlashCommand = {
   supportedModes: ['interactive'] as const,
   canRunDuringStreaming: true,
   get description() {
-    return t('for help on Qwen Code');
+    return t('for help on MariaDB Shell Agent');
   },
   action: async () => ({
     type: 'dialog',

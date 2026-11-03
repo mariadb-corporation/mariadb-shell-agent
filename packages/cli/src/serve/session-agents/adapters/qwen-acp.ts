@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @fileoverview The `qwen` program adapter: one hidden ACP session per
+ * @fileoverview The `mariadb-shell-agent` program adapter: one hidden ACP session per
  * (chat session, agent) on this daemon's own bridge.
  *
  * Creates or resumes a hidden `sourceType: 'agent'` session under a
@@ -116,7 +117,7 @@ export interface QwenSessionSendBinding {
 
 /**
  * ACP `mcpServers[].name` of the `session_send` server (the tool prefix).
- * TODO(multi-agent): model-facing — offering `session_send` to qwen agents
+ * TODO(multi-agent): model-facing — offering `session_send` to mariadb-shell-agent agents
  * (tool name and description) needs eval before release.
  */
 export const SESSION_SEND_MCP_SERVER_NAME = 'qwen_session';

@@ -7,7 +7,7 @@
 产品：没有 banner、footer 对不上、各种 loading 状态缺失。这三块已另行恢复；
 本文覆盖的是在它们背后由系统化逐帧对比发现的问题，以及由此产出的修复。计划
 段落与滚动维护的缺口台账见
-[#8662](https://github.com/QwenLM/qwen-code/issues/8662)。
+[#8662](https://github.invalid/QwenLM/qwen-code/issues/8662)。
 
 ## 问题
 

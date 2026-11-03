@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +39,7 @@ function resolvePath(dir: string): string {
 let envBootstrapped = false;
 
 /**
- * Pre-resolves QWEN_HOME / QWEN_RUNTIME_DIR from `<homedir>/.qwen/.env` and
+ * Pre-resolves QWEN_HOME / QWEN_RUNTIME_DIR from `<homedir>/.mariadb-shell-agent/.env` and
  * `<homedir>/.env`. Mirrors the CLI's `preResolveHomeEnvOverrides` so the
  * companion's lock-file location agrees with the CLI even when these vars
  * are only configured via `.env`. Idempotent.
@@ -61,7 +62,7 @@ function bootstrapHomeEnvOverrides(): void {
   const initialQwenHome = process.env['QWEN_HOME'];
   const currentQwenDir = initialQwenHome
     ? resolvePath(initialQwenHome)
-    : path.join(homeDir, '.qwen');
+    : path.join(homeDir, '.mariadb-shell-agent');
 
   const KEYS = ['QWEN_HOME', 'QWEN_RUNTIME_DIR'] as const;
   const readInto = (file: string) => {
@@ -102,7 +103,7 @@ export function resetEnvBootstrapForTesting(): void {
 /**
  * Returns the global Qwen home directory (config, credentials, etc.).
  *
- * Priority: QWEN_HOME env var > ~/.qwen
+ * Priority: QWEN_HOME env var > ~/.mariadb-shell-agent
  */
 export function getGlobalQwenDir(): string {
   bootstrapHomeEnvOverrides();
@@ -112,15 +113,15 @@ export function getGlobalQwenDir(): string {
   }
   const homeDir = os.homedir();
   return homeDir
-    ? path.join(homeDir, '.qwen')
-    : path.join(os.tmpdir(), '.qwen');
+    ? path.join(homeDir, '.mariadb-shell-agent')
+    : path.join(os.tmpdir(), '.mariadb-shell-agent');
 }
 
 /**
  * Returns the runtime base directory for ephemeral data (tmp, debug, IDE
  * lock files, sessions, etc.).
  *
- * Priority: QWEN_RUNTIME_DIR env var > QWEN_HOME env var > ~/.qwen
+ * Priority: QWEN_RUNTIME_DIR env var > QWEN_HOME env var > ~/.mariadb-shell-agent
  *
  * This mirrors the fallback chain in packages/core Storage.getRuntimeBaseDir()
  * without importing from core to avoid cross-package dependencies.

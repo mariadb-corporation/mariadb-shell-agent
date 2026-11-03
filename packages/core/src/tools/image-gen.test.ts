@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -70,14 +71,14 @@ describe('ImageGenTool', () => {
     );
 
     const result = await tool.buildAndExecute(
-      { prompt: 'A Qwen Code poster', size: '1536*864' },
+      { prompt: 'A MariaDB Shell Agent poster', size: '1536*864' },
       new AbortController().signal,
     );
 
     expect(generateImage).toHaveBeenCalledWith(
       expect.objectContaining({
         model: 'qwen-image-2.0',
-        prompt: 'A Qwen Code poster',
+        prompt: 'A MariaDB Shell Agent poster',
         size: '1536*864',
         apiKey: 'secret',
       }),
@@ -91,7 +92,7 @@ describe('ImageGenTool', () => {
         kind: 'image',
         storage: 'workspace',
         workspacePath: expect.stringMatching(
-          /^\.qwen\/generated-images\/session-1\/.+\.png$/,
+          /^\.mariadb-shell-agent\/generated-images\/session-1\/.+\.png$/,
         ),
         mimeType: 'image/png',
         sizeBytes: PNG_BYTES.length,
@@ -188,7 +189,7 @@ describe('ImageGenTool', () => {
     process.env['TEST_IMAGE_API_KEY'] = 'secret';
     const generatedImagesDir = path.join(
       workspace,
-      '.qwen',
+      '.mariadb-shell-agent',
       'generated-images',
     );
     await mkdir(generatedImagesDir, { recursive: true });

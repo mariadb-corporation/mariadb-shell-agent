@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -98,7 +99,7 @@ function trustStatusV2(
 function sendTrustError(res: Response, route: string, err: unknown): void {
   if (sendGenerationClosedError(res, err)) return;
   writeStderrLine(
-    `qwen serve: ${route} error: ${
+    `mariadb-shell-agent serve: ${route} error: ${
       err instanceof Error ? err.message : String(err)
     }`,
   );

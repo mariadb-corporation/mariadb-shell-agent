@@ -46,7 +46,7 @@ and image-panel behavior.
 ## Storage and compatibility
 
 The default attachment root is
-`~/.qwen/tmp/<workspace-hash>/attachments/`, resolved through
+`~/.mariadb-shell-agent/tmp/<workspace-hash>/attachments/`, resolved through
 `Storage.getProjectTempDir()` so custom runtime directories continue to work.
 Each session owns `session-<encoded-session-id>/`. Files use their stored names
 as attachment IDs, with ` (1)` suffixes for duplicates. Daemon shutdown and

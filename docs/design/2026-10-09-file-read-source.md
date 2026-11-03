@@ -2,7 +2,7 @@
 
 [English](2026-10-09-file-read-source.md) | [简体中文](2026-10-09-file-read-source.zh-CN.md)
 
-Status: extracted for independent review from the ordinary-source component of [PR #13526](https://github.com/QwenLM/qwen-code/pull/13526), source commit `950950311f102a745556debc261009af677b125c`. This slice builds on current main and does not require the separate CSI mount lifecycle PR #13772.
+Status: extracted for independent review from the ordinary-source component of [PR #13526](https://github.invalid/QwenLM/qwen-code/pull/13526), source commit `950950311f102a745556debc261009af677b125c`. This slice builds on current main and does not require the separate CSI mount lifecycle PR #13772.
 
 ## 1. Problem and goal
 

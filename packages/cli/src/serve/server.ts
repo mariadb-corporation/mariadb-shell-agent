@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -571,7 +572,7 @@ export interface ServeAppDeps {
    */
   webShellDir?: string;
   /**
-   * Qwen Code version advertised to web/SDK clients. Production passes the
+   * MariaDB Shell Agent version advertised to web/SDK clients. Production passes the
    * resolved CLI package version; tests/direct embeds may omit it.
    */
   qwenCodeVersion?: string;
@@ -785,7 +786,7 @@ export interface ServeAppDeps {
 }
 
 /**
- * Build the Express app for `qwen serve`. Pure function — no side effects on
+ * Build the Express app for `mariadb-shell-agent serve`. Pure function — no side effects on
  * the network or process; `runQwenServe` does the listen/signal handling.
  *
  * `getPort` is invoked lazily by the host-allowlist middleware so callers
@@ -982,7 +983,7 @@ export function createServeApp(
     injectedWorkspaceRegistry?.primary.routeFileSystemFactory.sshWorkspace
   ) {
     throw new Error(
-      'Start qwen serve in a local workspace, then add the SSH workspace in the workspace picker.',
+      'Start mariadb-shell-agent serve in a local workspace, then add the SSH workspace in the workspace picker.',
     );
   }
   if (injectedWorkspaceRegistry) {
@@ -1047,7 +1048,7 @@ export function createServeApp(
   ) {
     warnedDefaultTrust = true;
     process.stderr.write(
-      'qwen serve: createServeApp default fsFactory uses trusted=false ' +
+      'mariadb-shell-agent serve: createServeApp default fsFactory uses trusted=false ' +
         '— agent ACP writeTextFile calls will reject with untrusted_workspace. ' +
         'Inject deps.fsFactory (with explicit trust) or deps.bridge to override.\n',
     );
@@ -1505,7 +1506,7 @@ export function createServeApp(
     createDaemonWorkspaceService({
       boundWorkspace,
       isWorkspaceTrusted: isPrimaryWorkspaceTrusted,
-      contextFilename: deps.contextFilename ?? 'QWEN.md',
+      contextFilename: deps.contextFilename ?? 'MARIADB-SHELL-AGENT.md',
       statusProvider,
       workspaceProvidersStatusProvider: createWorkspaceProvidersStatusProvider({
         ...(primaryEffectiveEnv ? { env: primaryEffectiveEnv } : {}),
@@ -1960,7 +1961,7 @@ export function createServeApp(
           // writeStderrLineSafe must not throw even on a dead stderr; the
           // latch stays set so a lost line cannot spin per retry either.
           writeStderrLineSafe(
-            `qwen serve: Conversations runtime boot failed: ${describeConversationBootError(error)}`,
+            `mariadb-shell-agent serve: Conversations runtime boot failed: ${describeConversationBootError(error)}`,
           );
         }
         throw error;
@@ -1989,7 +1990,7 @@ export function createServeApp(
       })
       .catch((error) => {
         process.stderr.write(
-          `qwen serve: failed to restore the Conversations runtime for scheduled tasks: ${
+          `mariadb-shell-agent serve: failed to restore the Conversations runtime for scheduled tasks: ${
             error instanceof Error ? error.message : String(error)
           }\n`,
         );
@@ -3334,7 +3335,7 @@ export function createServeApp(
         });
       } catch (err) {
         writeStderrLine(
-          `qwen serve: settings_changed broadcast to workspace ${workspace} failed: ${
+          `mariadb-shell-agent serve: settings_changed broadcast to workspace ${workspace} failed: ${
             err instanceof Error ? err.message : String(err)
           }`,
         );
@@ -3391,7 +3392,7 @@ export function createServeApp(
             // sessions converge on daemon restart (no production caller
             // re-triggers workspaceReload on sibling runtimes).
             writeStderrLine(
-              `qwen serve: Session Workflow push to sibling workspace ${runtime.workspaceCwd} failed: ${
+              `mariadb-shell-agent serve: Session Workflow push to sibling workspace ${runtime.workspaceCwd} failed: ${
                 err instanceof Error ? err.message : String(err)
               }`,
             );
@@ -3829,11 +3830,11 @@ export function createServeApp(
     () => mutate(),
   );
 
-  // Reconnect, in the background, every saved Host connection (`qwen agents
+  // Reconnect, in the background, every saved Host connection (`mariadb-shell-agent agents
   // join`, `hosts/connect`) of every trusted workspace, including ones
   // registered or trusted after boot. The real daemon only, like
   // scheduled-task residency below: tests and embeds that call
-  // createServeApp must not dial out on the strength of ~/.qwen.
+  // createServeApp must not dial out on the strength of ~/.mariadb-shell-agent.
   if (deps.manageScheduledTaskSessions) {
     const agentHostRestore = new AbortController();
     (app.locals as { stopAgentHostRestore?: () => void }).stopAgentHostRestore =
@@ -3856,7 +3857,7 @@ export function createServeApp(
       )
       .catch((error: unknown) =>
         writeStderrLine(
-          `qwen serve: could not restore Agent Host connections: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: could not restore Agent Host connections: ${error instanceof Error ? error.message : String(error)}`,
         ),
       );
   }
@@ -3956,7 +3957,7 @@ export function createServeApp(
             registerScheduledTaskAuthorizations(runtime.workspaceCwd, tasks),
           onError: (sessionId, err) => {
             process.stderr.write(
-              `qwen serve: failed to rehydrate scheduled-task session ${sessionId}: ${
+              `mariadb-shell-agent serve: failed to rehydrate scheduled-task session ${sessionId}: ${
                 err instanceof Error ? err.message : String(err)
               }\n`,
             );
@@ -3970,7 +3971,7 @@ export function createServeApp(
       )
         .catch((err) => {
           process.stderr.write(
-            `qwen serve: unexpected scheduled-task rehydration failure: ${
+            `mariadb-shell-agent serve: unexpected scheduled-task rehydration failure: ${
               err instanceof Error ? err.message : String(err)
             }\n`,
           );

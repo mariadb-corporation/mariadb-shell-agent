@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// File for 'qwen mcp remove' command
+// File for 'mariadb-shell-agent mcp remove' command
 import type { CommandModule } from 'yargs';
 import { loadSettings, SettingScope } from '../../config/settings.js';
 import { writeStdoutLine } from '../../utils/stdioHelpers.js';
@@ -49,7 +50,7 @@ export const removeCommand: CommandModule = {
   describe: 'Remove a server',
   builder: (yargs) =>
     yargs
-      .usage('Usage: qwen mcp remove [options] <name>')
+      .usage('Usage: mariadb-shell-agent mcp remove [options] <name>')
       .positional('name', {
         describe: 'Name of the server',
         type: 'string',

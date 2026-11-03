@@ -2,7 +2,7 @@
 
 [English](2026-09-15-task-session-startup-config.md) | [简体中文](2026-09-15-task-session-startup-config.zh-CN.md)
 
-Tracking: [#11944](https://github.com/QwenLM/qwen-code/issues/11944), independent PR 4.
+Tracking: [#11944](https://github.invalid/QwenLM/qwen-code/issues/11944), independent PR 4.
 Status: implemented on this branch; not yet merged. Baseline: `39b22efb6f` (2026-09-20).
 
 ## Goal

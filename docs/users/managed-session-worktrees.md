@@ -20,7 +20,7 @@ save tracked/untracked/ignored content first. Cleanup removes only a clean
 checkout and keeps all branches; it does not merge changes into the source.
 
 Deployments enable `qwen.managed-agent.runtime-broker.session-worktrees-enabled`.
-It defaults off; `qwen serve --managed` enables eligible local hosts. This version
+It defaults off; `mariadb-shell-agent serve --managed` enables eligible local hosts. This version
 supports LOCAL macOS/Linux storage, Session-isolated durable local-process
 workers and Git 2.40 or later. The repository and its Git common directory must
 be inside the registered storage root. For an existing linked checkout with Git

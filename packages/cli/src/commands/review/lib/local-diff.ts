@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -181,7 +182,7 @@ function describeUndiffable(abs: string, st: Stats): string | null {
  * Two things are wrong with passing it through untouched.
  *
  * It is relative to where the *user* typed it, and every git call below runs
- * with `-C <repoRoot>`. `qwen review capture-local --file src/foo.ts` from
+ * with `-C <repoRoot>`. `mariadb-shell-agent review capture-local --file src/foo.ts` from
  * `packages/cli` would therefore look for `<repo>/src/foo.ts` — a different
  * file, usually a nonexistent one — and report no changes.
  *
@@ -201,7 +202,7 @@ function toRepoPathspec(repoRoot: string, file: string): string {
   // be (a brand-new untracked file is exactly this feature's subject), so fall
   // back to the non-canonical form rather than failing the review.
   // Canonicalisation and the segment-aware escape check live in
-  // `repoRelativeOf` because `qwen review run` pins the artifact name it polls
+  // `repoRelativeOf` because `mariadb-shell-agent review run` pins the artifact name it polls
   // for from the same answer; a second derivation here is how the two spellings
   // drifted before.
   const { rel, abs, escapes } = repoRelativeOf(repoRoot, file);
@@ -254,7 +255,7 @@ function listUntracked(
     'ls-files',
     '--others',
     // Deliberately named plumbing wins over ignore rules — repos ordinarily
-    // ignore `.qwen/` (this repo's own `.gitignore` does), and exclusion
+    // ignore `.mariadb-shell-agent/` (this repo's own `.gitignore` does), and exclusion
     // applies to an explicitly pathspec-NAMED file too, so with the flag the
     // named file never reached the filter at all and the round reported
     // clean over the one file it was asked about.
@@ -307,8 +308,8 @@ function diffUntracked(repoRoot: string, path: string): Buffer {
  *
  * Segment-exact at ANY depth, not anchored to the cwd. The `paths.ts`
  * constants are cwd-relative for every invocation, so a round started from
- * `sub/` writes `sub/.qwen/…` — which a filter built from THIS invocation's
- * cwd does not match. A repo that does not ignore `.qwen` then lets the next
+ * `sub/` writes `sub/.mariadb-shell-agent/…` — which a filter built from THIS invocation's
+ * cwd does not match. A repo that does not ignore `.mariadb-shell-agent` then lets the next
  * root-invoked round capture the previous round's cache, reports, and args
  * record as the user's untracked work, and the cache changes every round by
  * construction, so an incremental round could never again report "no
@@ -319,7 +320,7 @@ function diffUntracked(repoRoot: string, path: string): Buffer {
  * directory named `.qwen-notes` or `tmpfiles` is the user's, not ours.
  *
  * Built from the constants rather than spelled out beside them: the lease
- * directory moved once already — out of `.qwen/tmp`, which the review sandbox
+ * directory moved once already — out of `.mariadb-shell-agent/tmp`, which the review sandbox
  * mounts read-write — and a hand-written alternation stayed behind, so a
  * checkout holding a lease captured that churned lease JSON as the user's
  * untracked change, and an incremental round could never again report "no
@@ -350,7 +351,7 @@ export function isReviewPlumbing(repoRelPath: string): boolean {
  * The tracked diff with the review's own plumbing sections removed.
  *
  * Ignore rules never apply to TRACKED files, so a repo that once committed
- * its `.qwen` plumbing gets the cache back in `git diff HEAD` every round —
+ * its `.mariadb-shell-agent` plumbing gets the cache back in `git diff HEAD` every round —
  * and Step 8 rewrites that cache after every clean round, so the section is
  * there by construction. The round then reviews its own ledger JSON, and
  * `changedSince` can never empty: the incremental loop can never report "no
@@ -358,7 +359,7 @@ export function isReviewPlumbing(repoRelPath: string): boolean {
  * prevent, on the half it could not reach.
  *
  * The exemption is a NAMED plumbing pathspec, file- or directory-shaped:
- * `/review .qwen/reviews/saved.md` is a deliberate request for exactly the
+ * `/review .mariadb-shell-agent/reviews/saved.md` is a deliberate request for exactly the
  * section this drop exists to remove, so whatever came back stays. A
  * NON-plumbing pathspec still drops: a directory target carries every
  * tracked section beneath it, and "whatever came back is what the user
@@ -419,7 +420,7 @@ export function captureLocalDiff(opts: {
   // runs with `-C <repoRoot>`. Re-base it, and strip it of pathspec magic.
   const pathspec = file ? toRepoPathspec(repoRoot, file) : undefined;
   // The user NAMED a plumbing path — a file or a directory under
-  // `.qwen/tmp|review-cache|reviews` — when reviewing it is the point. Both
+  // `.mariadb-shell-agent/tmp|review-cache|reviews` — when reviewing it is the point. Both
   // halves of the capture key on this one predicate so they cannot disagree:
   // the tracked drop keeps its sections, and the untracked filter lists its
   // files even when ignore rules cover them.
@@ -463,10 +464,10 @@ export function captureLocalDiff(opts: {
 
   if (includeUntracked) {
     // The review writes its own plumbing before and after this capture runs:
-    // scratch files under `.qwen/tmp` (the args record, the diff, the plan),
-    // the persistent incremental cache under `.qwen/review-cache` (rewritten
+    // scratch files under `.mariadb-shell-agent/tmp` (the args record, the diff, the plan),
+    // the persistent incremental cache under `.mariadb-shell-agent/review-cache` (rewritten
     // by Step 8 after every clean round), and per-round artifacts under
-    // `.qwen/reviews`. In a repo that does not ignore `.qwen`, `ls-files
+    // `.mariadb-shell-agent/reviews`. In a repo that does not ignore `.mariadb-shell-agent`, `ls-files
     // --others` lists all of them as the user's untracked work — and the
     // cache is worse than noise: hashed into its own next-round candidate it
     // changes every round by construction, so an incremental round could
@@ -474,7 +475,7 @@ export function captureLocalDiff(opts: {
     // review; drop it.
     //
     // …unless the user NAMED plumbing. An explicit `--file` under
-    // `.qwen/reviews` is a deliberate request to review it — round notes, a
+    // `.mariadb-shell-agent/reviews` is a deliberate request to review it — round notes, a
     // saved report — and dropping it here left the round claiming "the
     // working tree is clean, 0 chunks" over the one file it was asked about,
     // with no `Not reviewed` record: mute, which this module's `SkippedFile`

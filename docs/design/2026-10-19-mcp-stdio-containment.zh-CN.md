@@ -4,7 +4,7 @@
 
 ## 问题与范围
 
-Issue [#14503](https://github.com/QwenLM/qwen-code/issues/14503)（由 FG12 轮次 [#14447](https://github.com/QwenLM/qwen-code/issues/14447) 发现）记录了 Hosted stdio MCP server 由 Runtime worker 直接 spawn、没有任何东西约束其进程树。在 `main` `79362c2ecc`、macOS 26.5.1 上用真实 `ManagedMcpRuntime` 复现出四类泄漏（报告见 `.qwen/issues/issue-14503.md`）：
+Issue [#14503](https://github.invalid/QwenLM/qwen-code/issues/14503)（由 FG12 轮次 [#14447](https://github.invalid/QwenLM/qwen-code/issues/14447) 发现）记录了 Hosted stdio MCP server 由 Runtime worker 直接 spawn、没有任何东西约束其进程树。在 `main` `79362c2ecc`、macOS 26.5.1 上用真实 `ManagedMcpRuntime` 复现出四类泄漏（报告见 `.mariadb-shell-agent/issues/issue-14503.md`）：
 
 - worker 被 SIGKILL 后，忽略 EOF 的 server 仍存活，被 PID 1 收养，仍在 Workspace 内并持有 manifest token；
 - 优雅 release 在报告 `released: true` 的同时，留下 server 派生的后代进程；

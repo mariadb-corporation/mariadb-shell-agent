@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -37,7 +38,7 @@ import transcriptPage from '../../trajectory/__fixtures__/transcript-page.json' 
   globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-/** One page of a real `qwen serve` session; see the projection tests. */
+/** One page of a real `mariadb-shell-agent serve` session; see the projection tests. */
 const REAL_EVENTS = transcriptPage.events as unknown as DaemonEvent[];
 
 const mounted: Array<{ root: Root; container: HTMLElement }> = [];

@@ -3,7 +3,7 @@
 ## Problem
 
 An explicit `subagent_type: "fork"` request is currently honored only when
-`Config.isInteractive()` is true. Headless callers such as `qwen --prompt`,
+`Config.isInteractive()` is true. Headless callers such as `mariadb-shell-agent --prompt`,
 the TypeScript SDK, and CI runners silently execute a fresh
 `general-purpose` subagent instead. The requested and effective context modes
 therefore differ, and the child does not receive the parent conversation.
@@ -46,6 +46,6 @@ separately without blocking correct headless inheritance.
   verifies that it exposes `subagent_type: "fork"`.
 - The desktop SDK adapter test verifies that the runtime's background result
   takes precedence over a caller-provided `run_in_background: false`.
-- An end-to-end `qwen --prompt --output-format stream-json` check uses a parent
+- An end-to-end `mariadb-shell-agent --prompt --output-format stream-json` check uses a parent
   marker that is absent from the fork directive and verifies that the child
   can still recover it from inherited history.

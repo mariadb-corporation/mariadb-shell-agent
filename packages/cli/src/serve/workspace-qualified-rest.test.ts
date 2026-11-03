@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -145,7 +146,7 @@ function makeWorkspaceService(label: string): DaemonWorkspaceService {
         rules: { allow: [], ask: [], deny: [] },
       },
       workspace: {
-        path: `${ctx.workspaceCwd}/.qwen/settings.json`,
+        path: `${ctx.workspaceCwd}/.mariadb-shell-agent/settings.json`,
         rules: {
           allow: request.ruleType === 'allow' ? request.rules : [],
           ask: request.ruleType === 'ask' ? request.rules : [],
@@ -180,7 +181,7 @@ function makeWorkspaceService(label: string): DaemonWorkspaceService {
       }),
     ),
     initWorkspace: vi.fn(async (ctx) => ({
-      path: `${ctx.workspaceCwd}/QWEN.md`,
+      path: `${ctx.workspaceCwd}/MARIADB-SHELL-AGENT.md`,
       action: 'created' as const,
     })),
     restartMcpServer: vi.fn(async (_ctx, serverName) => ({
@@ -334,7 +335,7 @@ async function makeHarness(opts?: {
   const persistSetting = vi.fn(
     async (cwd: string, scope: SettingScope, key: string, value: unknown) => {
       if (scope !== SettingScope.Workspace) return;
-      const file = path.join(cwd, '.qwen', 'settings.json');
+      const file = path.join(cwd, '.mariadb-shell-agent', 'settings.json');
       let current: Record<string, unknown> = {};
       try {
         current = JSON.parse(await fsp.readFile(file, 'utf8'));
@@ -1520,7 +1521,7 @@ describe('workspace-qualified core REST', () => {
         .set('Host', host())
         .send({ force: true });
       expect(init.status).toBe(200);
-      expect(init.body.path).toBe(`${h.secondaryCwd}/QWEN.md`);
+      expect(init.body.path).toBe(`${h.secondaryCwd}/MARIADB-SHELL-AGENT.md`);
 
       const reload = await request(h.app)
         .post(`/workspaces/${encodeURIComponent(h.secondaryId)}/reload`)
@@ -1775,9 +1776,11 @@ describe('workspace-qualified core REST', () => {
   it('rejects enabling an MCP server blocked by a wildcard exclusion', async () => {
     const h = await makeHarness({ token: 'secret' });
     try {
-      await fsp.mkdir(path.join(h.secondaryCwd, '.qwen'), { recursive: true });
+      await fsp.mkdir(path.join(h.secondaryCwd, '.mariadb-shell-agent'), {
+        recursive: true,
+      });
       await fsp.writeFile(
-        path.join(h.secondaryCwd, '.qwen', 'settings.json'),
+        path.join(h.secondaryCwd, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({ mcp: { excluded: ['docs*'] } }),
       );
 
@@ -2261,7 +2264,9 @@ describe('workspace-qualified core REST', () => {
           content: '# Secondary memory\n',
         });
       expect(write.status).toBe(200);
-      expect(write.body.filePath).toBe(path.join(h.secondaryCwd, 'QWEN.md'));
+      expect(write.body.filePath).toBe(
+        path.join(h.secondaryCwd, 'MARIADB-SHELL-AGENT.md'),
+      );
       expect(write.body.changed).toBe(true);
 
       const read = await request(h.app)
@@ -2273,7 +2278,7 @@ describe('workspace-qualified core REST', () => {
       expect(read.body.files).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            path: path.join(h.secondaryCwd, 'QWEN.md'),
+            path: path.join(h.secondaryCwd, 'MARIADB-SHELL-AGENT.md'),
             scope: 'workspace',
           }),
         ]),
@@ -2666,7 +2671,7 @@ describe('workspace-qualified core REST', () => {
     const h = await makeHarness({ token: 'secret' });
     try {
       await fsp.writeFile(
-        path.join(h.secondaryCwd, 'QWEN.md'),
+        path.join(h.secondaryCwd, 'MARIADB-SHELL-AGENT.md'),
         'x'.repeat(17 * 1024 * 1024),
         'utf8',
       );

@@ -90,7 +90,7 @@ consumers keep that option. Native fixes cover unadvertised text-control
 presses and unverified text writes/confirmation, avoiding known no-op and
 duplicate-input paths.
 
-Validation is in `.qwen/e2e-tests/cua-native-alignment.md`: path collisions and
+Validation is in `.mariadb-shell-agent/e2e-tests/cua-native-alignment.md`: path collisions and
 termination, AX focus selection with reversed stacking order, menu/dialog
 context and stale IDs, full/diff/no-change, precise Unicode/punctuation input,
 and foreground ownership sampling during background actions. The final model
@@ -182,7 +182,7 @@ canonical Skill, package contents and 0.20.6 release metadata. Runtime topology,
 authorization ownership and exact-window platform support remain unchanged.
 
 Run SDK tests/types, targeted native and core Skill tests, build/typecheck/bundle,
-package verification and `.qwen/e2e-tests/cua-native-alignment.md`. GUI checks use
+package verification and `.mariadb-shell-agent/e2e-tests/cua-native-alignment.md`. GUI checks use
 owned fixtures with independent AX/file verification. The final smoke uses
 MRKey GPT-6; record actual request parameters and all inference usage. Character
 counts and a smoke do not establish aggregate 20-task benchmark savings.

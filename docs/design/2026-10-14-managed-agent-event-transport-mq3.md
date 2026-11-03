@@ -15,13 +15,13 @@
 > **Status:** Implemented as a gate. This is phase **MQ3** of the cross-node
 > EventTransport design
 > ([2026-10-04-managed-agent-event-transport](2026-10-04-managed-agent-event-transport.md),
-> §7), tracked under [#12380](https://github.com/QwenLM/qwen-code/issues/12380).
+> §7), tracked under [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380).
 > Its prerequisite, MQ2, landed in four slices
 > ([2026-10-12-managed-agent-event-transport-mq2](2026-10-12-managed-agent-event-transport-mq2.md)):
-> MQ2a [#13940](https://github.com/QwenLM/qwen-code/pull/13940), MQ2b
-> [#14029](https://github.com/QwenLM/qwen-code/pull/14029), MQ2c
-> [#14080](https://github.com/QwenLM/qwen-code/pull/14080) and MQ2d
-> [#14109](https://github.com/QwenLM/qwen-code/pull/14109). MQ3 changes no
+> MQ2a [#13940](https://github.invalid/QwenLM/qwen-code/pull/13940), MQ2b
+> [#14029](https://github.invalid/QwenLM/qwen-code/pull/14029), MQ2c
+> [#14080](https://github.invalid/QwenLM/qwen-code/pull/14080) and MQ2d
+> [#14109](https://github.invalid/QwenLM/qwen-code/pull/14109). MQ3 changes no
 > production code. Its rows assert the as-built behavior; where that differs
 > from §8's required behavior, the findings below record it.
 

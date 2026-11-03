@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,13 +15,13 @@ export function infrastructureTools(state: BridgeState): any[] {
   return [
     tool(
       'health',
-      'Check if the qwen serve daemon is alive.',
+      'Check if the mariadb-shell-agent serve daemon is alive.',
       {},
       handler(async () => formatJsonResult(await state.client.health())),
     ),
     tool(
       'capabilities',
-      'Get qwen serve daemon capabilities including protocol versions, mode, features, model services, and workspace CWD.',
+      'Get mariadb-shell-agent serve daemon capabilities including protocol versions, mode, features, model services, and workspace CWD.',
       {},
       handler(async () => formatJsonResult(await state.client.capabilities())),
     ),

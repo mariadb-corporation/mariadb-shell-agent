@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1836,8 +1837,8 @@ describe('BridgeClient — create-sub-session extMethod dispatch', () => {
 
     for (const params of [
       { model: 'm'.repeat(257) },
-      { model: 'model\nqwen serve: forged' },
-      { groupId: 'group\nqwen serve: forged' },
+      { model: 'model\nmariadb-shell-agent serve: forged' },
+      { groupId: 'group\nmariadb-shell-agent serve: forged' },
     ]) {
       await expect(
         client.extMethod(METHOD, {
@@ -3908,7 +3909,7 @@ describe('BridgeClient — pending interaction classification', () => {
 /**
  * `extMethod` is the daemon's answer to the ACP child's
  * `craft/drainMidTurnQueue` call (web-shell mid-turn drain). Desktop answers
- * the same method from its own in-memory queue; in `qwen serve` the BridgeClient
+ * the same method from its own in-memory queue; in `mariadb-shell-agent serve` the BridgeClient
  * answers it from `SessionEntry.midTurnMessageQueue`. Without this the SDK's
  * ClientSideConnection would reject the call with -32601 and the child would
  * latch the drain as unavailable for the whole session.

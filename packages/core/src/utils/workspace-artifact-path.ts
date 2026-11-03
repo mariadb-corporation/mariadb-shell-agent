@@ -1,15 +1,17 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import path from 'node:path';
 
-const WORKTREE_DIR_RE = /^(.*)[\\/]\.qwen[\\/]worktrees[\\/][^\\/]+$/;
+const WORKTREE_DIR_RE =
+  /^(.*)[\\/]\.mariadb-shell-agent[\\/]worktrees[\\/][^\\/]+$/;
 
 /**
- * Session cwd may be a worktree (`<root>/.qwen/worktrees/<slug>`). Artifact
+ * Session cwd may be a worktree (`<root>/.mariadb-shell-agent/worktrees/<slug>`). Artifact
  * consumers (`GET /file`, SessionArtifactStore) always resolve workspacePath
  * against the bound workspace root, so producers must strip that suffix.
  *
@@ -27,7 +29,7 @@ export function resolveBoundWorkspaceRoot(targetDir: string): string {
   if (!base) {
     return path.parse(resolved).root;
   }
-  // `C:\.qwen\worktrees\x` captures `C:`, which is drive-relative, not `C:\`.
+  // `C:\.mariadb-shell-agent\worktrees\x` captures `C:`, which is drive-relative, not `C:\`.
   if (/^[A-Za-z]:$/.test(base)) {
     return `${base}${path.sep}`;
   }

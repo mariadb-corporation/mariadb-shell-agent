@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -306,12 +307,12 @@ describe('refreshWorkspaceSessionPrStates', () => {
 
   describe('on an Aone workspace', () => {
     const AONE_URL =
-      'https://code.alibaba-inc.com/jspt/agentic_coding/codereview/26430560';
+      'https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/26430560';
 
     beforeEach(() => {
       execSync('git init', { cwd: workspaceCwd, stdio: 'pipe' });
       execSync(
-        'git remote add origin git@gitlab.alibaba-inc.com:jspt/agentic_coding.git',
+        'git remote add origin git@gitlab.alibaba-inc.invalid:jspt/agentic_coding.git',
         { cwd: workspaceCwd, stdio: 'pipe' },
       );
     });
@@ -487,13 +488,13 @@ describe('refreshWorkspaceSessionPrStates', () => {
         for (let i = 0; i < 9; i++, number++) {
           await upsertSessionPr(prPath, {
             number,
-            url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${number}`,
+            url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${number}`,
           });
         }
       }
       const view = vi.fn(async (_repoPath: string, id: number) => ({
         number: id,
-        url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${id}`,
+        url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${id}`,
         state: 'merged' as const,
       }));
       const backend = fakeAoneBackend({ view });
@@ -553,7 +554,7 @@ describe('refreshWorkspaceSessionPrStates', () => {
       );
       await upsertSessionPr(prPath, {
         number: 26430560,
-        url: 'https://gitlab.alibaba-inc.com/jspt/agentic_coding/codereview/26430560',
+        url: 'https://gitlab.alibaba-inc.invalid/jspt/agentic_coding/codereview/26430560',
       });
       const view = vi.fn(async (_repoPath: string, id: number) => ({
         number: id,
@@ -587,7 +588,7 @@ describe('refreshWorkspaceSessionPrStates', () => {
         for (let i = 0; i < 9; i++, number++) {
           await upsertSessionPr(prPath, {
             number,
-            url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${number}`,
+            url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${number}`,
           });
         }
       }
@@ -596,7 +597,7 @@ describe('refreshWorkspaceSessionPrStates', () => {
         seen.add(id);
         return {
           number: id,
-          url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${id}`,
+          url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${id}`,
           state: 'open' as const,
         };
       });
@@ -628,7 +629,7 @@ describe('refreshWorkspaceSessionPrStates', () => {
       for (let i = 1; i <= 5; i++) {
         await upsertSessionPr(prPath, {
           number: i,
-          url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${i}`,
+          url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${i}`,
         });
       }
       // Each view "hangs" for the full per-call timeout; the 60s budget
@@ -638,7 +639,7 @@ describe('refreshWorkspaceSessionPrStates', () => {
         clock += 20_000;
         return {
           number: id,
-          url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${id}`,
+          url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${id}`,
           state: 'merged' as const,
         };
       });
@@ -667,7 +668,7 @@ describe('refreshWorkspaceSessionPrStates', () => {
       for (let i = 1; i <= 5; i++) {
         await upsertSessionPr(prPath, {
           number: i,
-          url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${i}`,
+          url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${i}`,
         });
       }
       let clock = 0;
@@ -675,7 +676,7 @@ describe('refreshWorkspaceSessionPrStates', () => {
         clock += 20_000;
         return {
           number: id,
-          url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${id}`,
+          url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${id}`,
           state: 'merged' as const,
         };
       });
@@ -2155,7 +2156,7 @@ describe('startSessionPrRefreshTimer', () => {
   ): Promise<void> {
     execSync('git init', { cwd: runtime.workspaceCwd, stdio: 'pipe' });
     execSync(
-      'git remote add origin git@gitlab.alibaba-inc.com:jspt/agentic_coding.git',
+      'git remote add origin git@gitlab.alibaba-inc.invalid:jspt/agentic_coding.git',
       { cwd: runtime.workspaceCwd, stdio: 'pipe' },
     );
     const service = createWorkspaceRuntimeSessionService(runtime);
@@ -2189,7 +2190,7 @@ describe('startSessionPrRefreshTimer', () => {
       for (let i = 0; i < 10 && number <= total; i++, number++) {
         await upsertSessionPr(prPath, {
           number,
-          url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${number}`,
+          url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${number}`,
         });
       }
     }
@@ -2234,7 +2235,7 @@ describe('startSessionPrRefreshTimer', () => {
       current.push(id);
       return {
         number: id,
-        url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${id}`,
+        url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${id}`,
         // Non-terminal: nothing leaves the pending set between ticks.
         state: 'open' as const,
       };
@@ -2287,7 +2288,7 @@ describe('startSessionPrRefreshTimer', () => {
       current.push(id);
       return {
         number: id,
-        url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${id}`,
+        url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${id}`,
         state: 'open' as const,
       };
     });
@@ -2359,7 +2360,7 @@ describe('startSessionPrRefreshTimer', () => {
       clock += 20_000; // each view burns the per-call timeout
       return {
         number: id,
-        url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${id}`,
+        url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${id}`,
         state: 'open' as const,
       };
     });
@@ -2424,7 +2425,7 @@ describe('startSessionPrRefreshTimer', () => {
       current.push(id);
       return {
         number: id,
-        url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${id}`,
+        url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${id}`,
         state: 'open' as const,
       };
     });

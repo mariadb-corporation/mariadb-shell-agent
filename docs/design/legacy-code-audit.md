@@ -9,7 +9,7 @@ audit (pre-refactor assessment, taking over unfamiliar code, security review
 of a sensitive subsystem).
 
 Before designing, we measured whether the machinery actually transfers. An
-A/B experiment (working record at `.qwen/investigations/legacy-review-ab/`,
+A/B experiment (working record at `.mariadb-shell-agent/investigations/legacy-review-ab/`,
 untracked and undated; key results below) audited
 `packages/core/src/permissions/` (12 files, 7,638 production lines) two
 ways:
@@ -65,7 +65,7 @@ briefed threat-model-first, produced four single-source Criticals at the
 trust boundary (including frontmatter hooks bypassing folder trust, a
 workspace-writable HTTP-hook whitelist, env-resolution paths defeating a
 prior secrets-stripping fix). Full record:
-`.qwen/investigations/legacy-review-ab-2/REPORT.md` (untracked working file;
+`.mariadb-shell-agent/investigations/legacy-review-ab-2/REPORT.md` (untracked working file;
 key results summarized above).
 
 **Measurement inputs, consolidated.** The cost model below derives from
@@ -300,7 +300,7 @@ cross-round findings ledger does not lift into v1 — see Open questions.
   stays a subject; the build-output / dependency-install / tooling class
   — `dist/`, `build/`, `node_modules/`, and their same-shape peers `.git/`,
   `target/`, `.venv/`, `__pycache__/`, `coverage/`, `.next/`, `out/`,
-  `.gradle/`, `obj/`, `Pods/`, `.tox/`, `vendor/bundle/`, `.qwen/` — is
+  `.gradle/`, `obj/`, `Pods/`, `.tox/`, `vendor/bundle/`, `.mariadb-shell-agent/` — is
   excluded from enumeration outright, by directory name anywhere under the
   audited path (including the path root), and is never an audit subject —
   except `dist/` and `build/` under `vendor/`, where vendored packages ship
@@ -345,9 +345,9 @@ new subcommand, `qwen audit plan-files <path>`, which plays the role
   points at — and the same class runs past the JS tree: `.git/`,
   `target/`, `.venv/`, `__pycache__/`, `coverage/`, `.next/`, `out/`,
   `.gradle/`, `obj/`, `Pods/`, `.tox/`, `vendor/bundle/` (its Bundler
-  install subtree), and `.qwen/` — the tool's own artifact class: prior
-  audits under `.qwen/audits/`, saved reviews under `.qwen/reviews/`,
-  plan and prompt records under `.qwen/tmp/`. Every previously audited
+  install subtree), and `.mariadb-shell-agent/` — the tool's own artifact class: prior
+  audits under `.mariadb-shell-agent/audits/`, saved reviews under `.mariadb-shell-agent/reviews/`,
+  plan and prompt records under `.mariadb-shell-agent/tmp/`. Every previously audited
   or reviewed repository carries one, the walk deliberately ignores
   `.gitignore`, and without the exclusion prior review diffs and audit
   prose would count toward the gate and be handed to whole-file walkers
@@ -627,7 +627,7 @@ the product — so it ships with a stated bound, not an open tab:
   it into the range. The run starts only on user confirmation, the same
   confirmation that carries the execution consent above — and only on
   an interactive terminal: `/audit` refuses non-interactive starts
-  (`qwen -p`, a cron run, invocation from a sub-agent) rather than
+  (`mariadb-shell-agent -p`, a cron run, invocation from a sub-agent) rather than
   treating absence or silence as consent, because this confirmation is
   both the only budget enforcement this design has — with no runtime
   accounting, nothing enforces the ceiling mid-flight — and the
@@ -1003,7 +1003,7 @@ capped accordingly, the reason recorded in the header.
 **Decisions** (rationale in the bullets below):
 
 - The artifact is a markdown report at
-  `.qwen/audits/<YYYY-MM-DD>-<HHMMSS>-<path-slug>.md` — findings
+  `.mariadb-shell-agent/audits/<YYYY-MM-DD>-<HHMMSS>-<path-slug>.md` — findings
   clustered by theme, local-only, never in version control, no verdict.
 - The report opens with a run-metadata header — audited commit SHA,
   model id, dirty/clean state with a path-scoped sidecar captured
@@ -1020,9 +1020,9 @@ capped accordingly, the reason recorded in the header.
 - The terminal gets a short summary; the report is for acting on.
 
 - **The artifact:** a markdown report at
-  `.qwen/audits/<YYYY-MM-DD>-<HHMMSS>-<path-slug>.md` — the `/review` report
+  `.mariadb-shell-agent/audits/<YYYY-MM-DD>-<HHMMSS>-<path-slug>.md` — the `/review` report
   convention inherited, not adapted: `/review` already writes
-  `.qwen/reviews/<YYYY-MM-DD>-<HHMMSS>-<slug>.md`, so the plural
+  `.mariadb-shell-agent/reviews/<YYYY-MM-DD>-<HHMMSS>-<slug>.md`, so the plural
   directory, the date-first stamp, and the HHMMSS same-day-overwrite
   guard are carried over unchanged; only the directory name and the
   slug source change — findings clustered by
@@ -1040,7 +1040,7 @@ capped accordingly, the reason recorded in the header.
   lifting `safeTarget()` out of the review family's `lib/paths.ts` into
   the `packages/cli/src/utils/` home the findings schema lifts to above
   — the traversal-safe slug whose doc comment records the exact lesson
-  (a crafted `../../evil` escaped `.qwen/tmp` once) — so both skills
+  (a crafted `../../evil` escaped `.mariadb-shell-agent/tmp` once) — so both skills
   import one hardened slug from the CLI-level shared home instead of
   `/audit` re-deriving one or importing across command groups. It is
   not the codebase's only traversal-safe sanitizer:
@@ -1066,7 +1066,7 @@ capped accordingly, the reason recorded in the header.
   classifies the flagship target clean and vacates exactly the arm
   that covers it — after the opted-in baseline suite, when it runs —
   scoped to the audited path, next to the report wherever the report
-  lands (`.qwen/audits/` or the outside-repo fallback):
+  lands (`.mariadb-shell-agent/audits/` or the outside-repo fallback):
   `git diff HEAD -- <audited path>` for tracked and staged changes —
   path-scoped like the rest of this machinery, so the sidecar never
   carries unrelated dirty content from elsewhere in the repository — and,
@@ -1264,7 +1264,7 @@ capped accordingly, the reason recorded in the header.
   quote exploitable code. The property covers every path the run writes
   module-derived content to, not only the report: the plan file and the
   per-agent prompt records the reused plan machinery produces — `/review` lands
-  that class under `.qwen/tmp/` (`prompt-record.ts` derives the record
+  that class under `.mariadb-shell-agent/tmp/` (`prompt-record.ts` derives the record
   directory from the plan path), and agent returns quote the module verbatim,
   so the class carries the same exploitable content as the report; the
   run-start sidecar is the same class with a cross-run purpose — the
@@ -1273,9 +1273,9 @@ capped accordingly, the reason recorded in the header.
   time with the report. The probe scratch copies are the same class
   with a different shape: a sibling copy of the probed file lands in
   the probed file's own directory — inside the audited path, outside
-  the `.qwen/` directories the probes below examine — so the
+  the `.mariadb-shell-agent/` directories the probes below examine — so the
   committability reasoning covers the audited path too, not only
-  `.qwen/`. The sibling is transient by construction — created for the
+  `.mariadb-shell-agent/`. The sibling is transient by construction — created for the
   probe, deleted on both probe outcomes — and its exposure is the
   short-lived window the Dedup section names, where a concurrent
   `git add -A` in another terminal can pick it up and the reserved
@@ -1284,16 +1284,16 @@ capped accordingly, the reason recorded in the header.
   same path with a deletion confirmation — and a path that is never
   re-audited gets no later surfacing, so for this class the property
   rests on the bounded window plus that surfacing, not on a probe. The
-  agent-output cache (`.qwen/review-cache/`) is the same class where it exists;
+  agent-output cache (`.mariadb-shell-agent/review-cache/`) is the same class where it exists;
   v1 writes none, because the incremental cache keys on re-audit, an open
   question. The property holds only when the project ignores
-  `.qwen/*` and nothing re-includes or force-adds the audits path: this repo's
-  own `.gitignore` re-includes four `.qwen/` subtrees and tracks force-added
-  files under `.qwen/`, and `/audit` runs in arbitrary repositories where
-  `.qwen/` may not be ignored at all. So `plan-files` checks at plan time,
+  `.mariadb-shell-agent/*` and nothing re-includes or force-adds the audits path: this repo's
+  own `.gitignore` re-includes four `.mariadb-shell-agent/` subtrees and tracks force-added
+  files under `.mariadb-shell-agent/`, and `/audit` runs in arbitrary repositories where
+  `.mariadb-shell-agent/` may not be ignored at all. So `plan-files` checks at plan time,
   alongside the other plan-time refusals, with two probes, run for every
   directory the run writes durable module-derived content to —
-  `.qwen/audits/` (the report and its sidecar) and `.qwen/tmp/` (the
+  `.mariadb-shell-agent/audits/` (the report and its sidecar) and `.mariadb-shell-agent/tmp/` (the
   plan file and the per-agent prompt records), the transient scratch
   siblings inside the audited path being the named exception above:
   `git check-ignore` on
@@ -1346,15 +1346,15 @@ capped accordingly, the reason recorded in the header.
   applies that rule its own way — the representative report path for
   the ignore rules, paired with the index probe above for the
   force-add history. The refusal is not a dead end, and the remedy branches on
-  the reason — per module-derived directory, `.qwen/audits/` and
-  `.qwen/tmp/` alike — because `.git/info/exclude` is not
+  the reason — per module-derived directory, `.mariadb-shell-agent/audits/` and
+  `.mariadb-shell-agent/tmp/` alike — because `.git/info/exclude` is not
   equally effective everywhere — tracked `.gitignore` patterns outrank
   it where they match the representative report file, and whether they
   match is a shape question the probe decides, not a premise: a full
-  re-include (`.qwen/*`, `!.qwen/audits/`, `!.qwen/audits/**` — the
-  shape this repo itself uses for its re-included `.qwen/` subtrees)
+  re-include (`.mariadb-shell-agent/*`, `!.mariadb-shell-agent/audits/`, `!.mariadb-shell-agent/audits/**` — the
+  shape this repo itself uses for its re-included `.mariadb-shell-agent/` subtrees)
   matches the file, beats an exclude entry, and keeps the report
-  committable; a directory-only negation (`.qwen/*`, `!.qwen/audits/`)
+  committable; a directory-only negation (`.mariadb-shell-agent/*`, `!.mariadb-shell-agent/audits/`)
   re-includes only the directory, leaving the files beneath it exposed
   to an exclude entry — probe-verified both ways: (a) where nothing
   ignores a module-derived directory, the plan offers to add its ignore
@@ -1644,7 +1644,7 @@ capped, sold as triage — as above.)
   directory-clause split (the dependency-install / tooling class —
   `node_modules/`, `.git/`, `target/`, `.venv/`, `__pycache__/`,
   `coverage/`, `.next/`, `out/`, `.gradle/`, `obj/`, `Pods/`, `.tox/`,
-  `vendor/bundle/`, `.qwen/` — excluded from enumeration by name
+  `vendor/bundle/`, `.mariadb-shell-agent/` — excluded from enumeration by name
   anywhere under the path, including under `vendor/`; the build-output
   class — `dist/`, `build/` — excluded everywhere except under
   `vendor/`, where vendored packages' shipped code stays a subject;
@@ -1690,11 +1690,11 @@ capped, sold as triage — as above.)
   no artifacts; the accept path starts the run and records the two
   execution opt-ins, taken or declined, in the header); the local-only
   guard — asserted
-  for each module-derived directory, `.qwen/audits/` and `.qwen/tmp/`:
+  for each module-derived directory, `.mariadb-shell-agent/audits/` and `.mariadb-shell-agent/tmp/`:
   `plan-files`'s `git check-ignore` probe on a representative file
   path (not the directory) plus the index probe (a non-empty
   `git ls-files` under the directory → refuse), covering the
-  re-include case (`.qwen/` ignored but the audits path re-included
+  re-include case (`.mariadb-shell-agent/` ignored but the audits path re-included
   → refuse), the force-add case (a
   committed force-added audit file → refuse, where `check-ignore` alone
   passes on the fresh report path), the remedy branches — including both

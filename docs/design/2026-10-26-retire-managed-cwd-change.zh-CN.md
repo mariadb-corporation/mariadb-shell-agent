@@ -16,7 +16,7 @@ Managed 对话提供了普通 daemon WebShell 没有的 Change directory 操作�
 
 删除前端控件、hook、不再使用的 provider/client 提交代码及操作文案；保留独立布局的目录展示和创建引用。删除主页摘要行及其无用样式。删除两个 Java 提交控制器映射、请求 DTO 与新建准入方法。撤销 cwdChange 能力通告，更新 OpenAPI 和生成消费者，保留通用操作查询仍使用的历史响应 schema。同步 surface/capability 契约，将过时的新建准入测试改为被移除路由与历史清算的专项覆盖。
 
-专项计划位于 `.qwen/e2e-tests/remove-managed-directory-change/plan.md`。验证面对仍通告能力的旧服务端也不显示入口，已完成历史和创建行为保留，路由契约移除，历史操作仍能清算。完成 TypeScript 构建与类型检查，在模块预算内验证受影响 Java/契约测试，并审查完整 diff。独立构建，不影响实际预览。只刷新前端并代理原 Java 进程，只能证明 UI 行为；后端路由移除必须由匹配的新 Java 构建或隔离控制器检查验证，并单独报告。
+专项计划位于 `.mariadb-shell-agent/e2e-tests/remove-managed-directory-change/plan.md`。验证面对仍通告能力的旧服务端也不显示入口，已完成历史和创建行为保留，路由契约移除，历史操作仍能清算。完成 TypeScript 构建与类型检查，在模块预算内验证受影响 Java/契约测试，并审查完整 diff。独立构建，不影响实际预览。只刷新前端并代理原 Java 进程，只能证明 UI 行为；后端路由移除必须由匹配的新 Java 构建或隔离控制器检查验证，并单独报告。
 
 ## 范围
 

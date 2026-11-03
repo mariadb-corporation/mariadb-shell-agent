@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -199,8 +200,8 @@ describe('runBaseTree', () => {
     git(repo, 'commit', '-qam', 'head');
     headSha = git(repo, 'rev-parse', 'HEAD');
     // The review worktree the base tree is created beside.
-    worktree = join(repo, '.qwen', 'tmp', 'review-pr-1');
-    mkdirSync(join(repo, '.qwen', 'tmp'), { recursive: true });
+    worktree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
+    mkdirSync(join(repo, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     git(repo, 'worktree', 'add', '--detach', '-q', worktree, headSha);
     writeLease();
   };
@@ -841,7 +842,7 @@ describe('runBaseTree', () => {
       };
       expect(run({}, build).available).toBe(true);
       plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-base'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-base'),
         adminEntryOf(tree),
         tree,
         join(repo, '.git'),
@@ -897,7 +898,7 @@ describe('runBaseTree', () => {
   itWhereContainmentExists(
     'certifies nothing from inside the mount — a forged marker and an in-place rewrite both fail the record (production geometry)',
     () => {
-      // The plan lives at `.qwen/tmp/qwen-review-pr-<n>-fetch.json`, INSIDE
+      // The plan lives at `.mariadb-shell-agent/tmp/qwen-review-pr-<n>-fetch.json`, INSIDE
       // the directory the sandbox mounts read-write, and the base tree is
       // its sibling. The reviewed code's move: rewrite the executable the
       // A/B will run IN PLACE (no membership change, HEAD unmoved) and
@@ -905,7 +906,12 @@ describe('runBaseTree', () => {
       // fence passed both; under the record the marker is noise and the
       // rewrite moves the file's ctime, which no syscall can set back.
       const tree = baseWorktreePath(worktree);
-      planPath = join(repo, '.qwen', 'tmp', 'qwen-review-pr-1-fetch.json');
+      planPath = join(
+        repo,
+        '.mariadb-shell-agent',
+        'tmp',
+        'qwen-review-pr-1-fetch.json',
+      );
       writeFileSync(
         planPath,
         JSON.stringify({ mergeBaseSha: baseSha, files: [] }),
@@ -1170,7 +1176,7 @@ describe('runBaseTree', () => {
         {
           onReuseWindow: () => {
             plantAdminEntry(
-              join(repo, '.qwen', 'tmp', '.evil-git'),
+              join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
               adminEntryOf(tree),
               tree,
               join(repo, '.git'),
@@ -1340,7 +1346,7 @@ describe('runBaseTree', () => {
       // Force the rebuild: a rewritten pointer has no benign cause, so this
       // arm sweeps rather than declining.
       plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-git'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
         adminEntryOf(tree),
         tree,
         join(repo, '.git'),
@@ -1683,7 +1689,13 @@ describe('runBaseTree', () => {
       expect(run({}, build).available).toBe(true);
       expect(run({}, build).note).toContain('reusing it'); // the control
 
-      const planted = join(repo, '.qwen', 'tmp', 'node_modules', '.bin');
+      const planted = join(
+        repo,
+        '.mariadb-shell-agent',
+        'tmp',
+        'node_modules',
+        '.bin',
+      );
       mkdirSync(planted, { recursive: true });
       writeFileSync(join(planted, 'node'), '#!/bin/sh\necho PWNED\n');
 
@@ -1852,7 +1864,13 @@ describe('runBaseTree', () => {
       // the one that would otherwise write the record. Certifying there and
       // refusing only on reuse would hand the very first shard a tree whose
       // commands resolve from a directory the reviewed code holds.
-      const planted = join(repo, '.qwen', 'tmp', 'node_modules', '.bin');
+      const planted = join(
+        repo,
+        '.mariadb-shell-agent',
+        'tmp',
+        'node_modules',
+        '.bin',
+      );
       mkdirSync(planted, { recursive: true });
       writeFileSync(join(planted, 'node'), '#!/bin/sh\necho PWNED\n');
 
@@ -1981,10 +1999,17 @@ describe('runBaseTree', () => {
     'bounds the ancestor walk at the OUTERMOST review temp dir (R3-3)',
     () => {
       // Resolution walks EVERY ancestor, not the nearest one — so bounding
-      // at the innermost `.qwen/tmp` marker stopped one directory short of
+      // at the innermost `.mariadb-shell-agent/tmp` marker stopped one directory short of
       // the outer review's read-write temp dir in the nested geometry, which
       // is the directory the OUTER reviewed code holds.
-      const inner = join(repo, '.qwen', 'tmp', 'review-pr-9', '.qwen', 'tmp');
+      const inner = join(
+        repo,
+        '.mariadb-shell-agent',
+        'tmp',
+        'review-pr-9',
+        '.mariadb-shell-agent',
+        'tmp',
+      );
       mkdirSync(inner, { recursive: true });
       const innerWt = join(inner, 'review-pr-1');
       git(repo, 'worktree', 'add', '--detach', '-q', innerWt, headSha);
@@ -2000,7 +2025,13 @@ describe('runBaseTree', () => {
 
       // The plant is in the OUTER temp dir — two levels above the inner base
       // tree, and never touched by the inner review at all.
-      const planted = join(repo, '.qwen', 'tmp', 'node_modules', '.bin');
+      const planted = join(
+        repo,
+        '.mariadb-shell-agent',
+        'tmp',
+        'node_modules',
+        '.bin',
+      );
       mkdirSync(planted, { recursive: true });
       writeFileSync(join(planted, 'node'), '#!/bin/sh\necho PWNED\n');
 
@@ -2013,21 +2044,23 @@ describe('runBaseTree', () => {
       });
       expect(r.available).toBe(false);
       expect(r.note).toContain('module resolution state');
-      expect(r.note).toContain(join(repo, '.qwen', 'tmp', 'node_modules'));
+      expect(r.note).toContain(
+        join(repo, '.mariadb-shell-agent', 'tmp', 'node_modules'),
+      );
     },
   );
 
   itWhereContainmentExists(
     "does not count the ENCLOSING review worktree's own install as a plant (R5-3)",
     () => {
-      // The outermost bound walks THROUGH `<outer>/.qwen/tmp/review-pr-<n>` in
+      // The outermost bound walks THROUGH `<outer>/.mariadb-shell-agent/tmp/review-pr-<n>` in
       // the nested geometry, and that is the enclosing review's own checkout,
       // whose `node_modules` is the dependency farm every tree links into —
       // present on every honest nested review of a Node project. Refusing on
       // it killed the lane for all of them. The temp dirs around it are still
       // fenced.
-      const outerWt = join(repo, '.qwen', 'tmp', 'review-pr-9');
-      const inner = join(outerWt, '.qwen', 'tmp');
+      const outerWt = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-9');
+      const inner = join(outerWt, '.mariadb-shell-agent', 'tmp');
       mkdirSync(inner, { recursive: true });
       mkdirSync(join(outerWt, 'node_modules', '.bin'), { recursive: true });
       writeFileSync(
@@ -2057,7 +2090,13 @@ describe('runBaseTree', () => {
       expect(ask().available).toBe(true);
 
       // ...while a plant in the outer temp dir itself still refuses.
-      const planted = join(repo, '.qwen', 'tmp', 'node_modules', '.bin');
+      const planted = join(
+        repo,
+        '.mariadb-shell-agent',
+        'tmp',
+        'node_modules',
+        '.bin',
+      );
       mkdirSync(planted, { recursive: true });
       writeFileSync(join(planted, 'node'), '#!/bin/sh\necho PWNED\n');
       const refused = ask();
@@ -2780,7 +2819,7 @@ describe('runBaseTree', () => {
         {
           onCertifyWindow: () => {
             plantAdminEntry(
-              join(repo, '.qwen', 'tmp', '.evil-git'),
+              join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
               adminEntryOf(tree()),
               tree(),
               join(repo, '.git'),
@@ -2944,7 +2983,7 @@ describe('runBaseTree', () => {
         {
           onSettleWindow: () => {
             plantAdminEntry(
-              join(repo, '.qwen', 'tmp', '.evil-git'),
+              join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
               adminEntryOf(tree()),
               tree(),
               join(repo, '.git'),
@@ -3427,7 +3466,13 @@ describe('runBaseTree', () => {
         builds.push(w);
         return failing;
       };
-      const planted = join(repo, '.qwen', 'tmp', 'node_modules', '.bin');
+      const planted = join(
+        repo,
+        '.mariadb-shell-agent',
+        'tmp',
+        'node_modules',
+        '.bin',
+      );
       mkdirSync(planted, { recursive: true });
       writeFileSync(join(planted, 'node'), '#!/bin/sh\nexit 1\n');
 
@@ -3438,7 +3483,7 @@ describe('runBaseTree', () => {
       expect(run({}, build).note).not.toContain('already failed');
       expect(builds).toHaveLength(2); // repaid, not settled
 
-      rmSync(join(repo, '.qwen', 'tmp', 'node_modules'), {
+      rmSync(join(repo, '.mariadb-shell-agent', 'tmp', 'node_modules'), {
         recursive: true,
         force: true,
       });
@@ -3463,7 +3508,7 @@ describe('runBaseTree', () => {
         {
           onInventoryWindow: () => {
             plantAdminEntry(
-              join(repo, '.qwen', 'tmp', '.evil-git'),
+              join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
               adminEntryOf(tree()),
               tree(),
               join(repo, '.git'),
@@ -3667,7 +3712,7 @@ describe('runBaseTree', () => {
       // which the build/test phase already ran the PR's code against. It checks
       // files out, so it runs whatever that pointer leads to, on the host.
       plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-git'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
         adminEntryOf(worktree),
         worktree,
         join(repo, '.git'),

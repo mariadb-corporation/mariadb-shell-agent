@@ -11,7 +11,7 @@ Daemon HTTP file routes and ordinary delegated ACP `readTextFile` / `writeTextFi
 - **Audit** — every access / denial emits a structured event for `PermissionAuditRing` / monitoring.
 - **Typed errors** — closed `FsErrorKind` union mapped to HTTP statuses.
 
-The HTTP file routes (`GET /file`, `GET /file/bytes`, `POST /file/write`, `POST /file/edit`, `GET /list`, `GET /glob`, `GET /stat`) and the local directory routes (`POST /workspaces/:workspace/directory/create`, `POST /workspaces/:workspace/directory/delete`) use this boundary and never receive the same-host exception. In the production daemon, ACP calls that remain delegated reach the injected bridge adapter; generic bridge callers use WFS only when they inject such an adapter. Production same-host `qwen serve` runtimes advertise `readTextFile: false`, so all child `FileSystemService.readTextFile` consumers use the regular CLI filesystem service. Final ACP `writeTextFile` content writes remain delegated: workspace targets use WFS, while a strict built-in-tool marker may select an equivalent host writer for an external path only on daemon-created same-host adapters. See [the external write design](../../design/daemon-external-tool-text-writes.md).
+The HTTP file routes (`GET /file`, `GET /file/bytes`, `POST /file/write`, `POST /file/edit`, `GET /list`, `GET /glob`, `GET /stat`) and the local directory routes (`POST /workspaces/:workspace/directory/create`, `POST /workspaces/:workspace/directory/delete`) use this boundary and never receive the same-host exception. In the production daemon, ACP calls that remain delegated reach the injected bridge adapter; generic bridge callers use WFS only when they inject such an adapter. Production same-host `mariadb-shell-agent serve` runtimes advertise `readTextFile: false`, so all child `FileSystemService.readTextFile` consumers use the regular CLI filesystem service. Final ACP `writeTextFile` content writes remain delegated: workspace targets use WFS, while a strict built-in-tool marker may select an equivalent host writer for an external path only on daemon-created same-host adapters. See [the external write design](../../design/daemon-external-tool-text-writes.md).
 
 That text-read capability slice covers direct `read_file` plus the shared pre-reads used by write, edit, notebook, sed, and artifact operations:
 
@@ -20,7 +20,7 @@ That text-read capability slice covers direct `read_file` plus the shared pre-re
 - Direct external `read_file` keeps the normal CLI permission rules and core file-operation telemetry.
 - HTTP filesystem routes remain workspace-scoped, and agent discovery-tool behavior is unchanged by this capability.
 - Auxiliary actions such as parent-directory creation and arbitrary shell commands are separate existing paths, not covered by this boundary.
-- `qwen serve` assumes a same-machine, same-UID security principal and is not an OS sandbox.
+- `mariadb-shell-agent serve` assumes a same-machine, same-UID security principal and is not an OS sandbox.
 
 ## Responsibilities
 
@@ -28,7 +28,7 @@ That text-read capability slice covers direct `read_file` plus the shared pre-re
 - Refuse paths outside the bound workspace (`path_outside_workspace`) and paths whose target is a symlink (`symlink_escape`).
 - Refuse full-snapshot reads above `MAX_READ_BYTES`, while allowing explicit windows with output capped at `MAX_READ_BYTES` and scan cost capped at `MAX_TEXT_SCAN_BYTES`; refuse writes above `MAX_WRITE_BYTES` and binary files (`binary_file`).
 - Refuse writes/edits/deletes when the workspace is untrusted (`untrusted_workspace`) — gated by `assertTrustedForIntent(trusted, intent)`.
-- Honor `.gitignore` / `.qwenignore` patterns via `shouldIgnore`.
+- Honor `.gitignore` / `.mariadb-shell-agentignore` patterns via `shouldIgnore`.
 - Perform atomic write-then-rename with target mode preservation; new files default to `0o600` (umask-derived `0o666 & ~umask` under the `system` new-file mode policy).
 - Emit `fs.access` / `fs.denied` audit events on every operation.
 - Map every failure to a `FsError` with kind and HTTP status; route handlers serialize them uniformly.
@@ -75,7 +75,7 @@ interface BridgeFileSystem {
 }
 ```
 
-This is the injection point for ACP `readTextFile` / `writeTextFile`. Bridge tests and Mode A embedded callers can omit it on `BridgeOptions`; `BridgeClient` falls back to its inline `fs.readFile` / `fs.writeFile` proxy (preserves pre-F1 behavior). Production `qwen serve` wires `BridgeFileSystem` through `createBridgeFileSystemAdapter(fsFactory)` (`packages/cli/src/serve/bridge-file-system-adapter.ts`) and sets `delegateReadTextFileToClient: false`. Capability-compliant children therefore read text locally and delegate final ACP text writes. The adapter retains its read implementation so unexpected or capability-violating delegated reads still encounter WFS's workspace boundary. Its external host-writer path is disabled by default and selected only by exact versioned provenance on daemon-owned same-host adapters; injected bridges, workspace registries and factories, generic ACP, and HTTP retain the ordinary boundary.
+This is the injection point for ACP `readTextFile` / `writeTextFile`. Bridge tests and Mode A embedded callers can omit it on `BridgeOptions`; `BridgeClient` falls back to its inline `fs.readFile` / `fs.writeFile` proxy (preserves pre-F1 behavior). Production `mariadb-shell-agent serve` wires `BridgeFileSystem` through `createBridgeFileSystemAdapter(fsFactory)` (`packages/cli/src/serve/bridge-file-system-adapter.ts`) and sets `delegateReadTextFileToClient: false`. Capability-compliant children therefore read text locally and delegate final ACP text writes. The adapter retains its read implementation so unexpected or capability-violating delegated reads still encounter WFS's workspace boundary. Its external host-writer path is disabled by default and selected only by exact versioned provenance on daemon-owned same-host adapters; injected bridges, workspace registries and factories, generic ACP, and HTTP retain the ordinary boundary.
 
 Two defensive properties the adapter MUST preserve (because the inline proxy is fully bypassed when the adapter is injected):
 
@@ -271,7 +271,7 @@ workspace-qualified REST.
 | Constant                                          | `MAX_UPLOAD_BYTES = 50 MiB`                                                                                                                                                                                       | Binary upload cap for `POST /file/upload`; uploads never overwrite and auto-number occupied names.                                    |
 | Constant                                          | `BINARY_PROBE_BYTES = 4096`                                                                                                                                                                                       | Sample size for content-based binary detection.                                                                                       |
 | Capability tags                                   | `workspace_file_read`, `workspace_file_bytes`, `workspace_file_read_cursor`, `workspace_file_write`, `workspace_file_upload`, `workspace_file_delete`, `workspace_directory_create`, `workspace_directory_delete` | See [`11-capabilities-versioning.md`](./11-capabilities-versioning.md).                                                               |
-| Workspace files                                   | `.gitignore`, `.qwenignore`                                                                                                                                                                                       | Ignored paths surface as `ignored: true` from `shouldIgnore`.                                                                         |
+| Workspace files                                   | `.gitignore`, `.mariadb-shell-agentignore`                                                                                                                                                                        | Ignored paths surface as `ignored: true` from `shouldIgnore`.                                                                         |
 
 ## Caveats & Known Limits
 

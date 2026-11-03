@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -72,9 +73,10 @@ describe('readLoopTaskFile', () => {
     await fs.rm(tempDir, { recursive: true, force: true });
   });
 
-  const loopIn = (dir: string) => path.join(dir, '.qwen', 'loop.md');
+  const loopIn = (dir: string) =>
+    path.join(dir, '.mariadb-shell-agent', 'loop.md');
   const mkQwen = (dir: string) =>
-    fs.mkdir(path.join(dir, '.qwen'), { recursive: true });
+    fs.mkdir(path.join(dir, '.mariadb-shell-agent'), { recursive: true });
   const writeLoop = (dir: string, content: string | Buffer) =>
     mkQwen(dir).then(() => fs.writeFile(loopIn(dir), content));
   const writeProject = (content: string | Buffer) =>
@@ -164,13 +166,13 @@ describe('readLoopTaskFile', () => {
     expect(await read()).toEqual(found('home', 'user tasks'));
   });
 
-  it('refuses a project loop.md whose .qwen ancestor symlinks outside the workspace', async () => {
-    // `.qwen -> <outside>` makes a final-component lstat pass while the file
+  it('refuses a project loop.md whose .mariadb-shell-agent ancestor symlinks outside the workspace', async () => {
+    // `.mariadb-shell-agent -> <outside>` makes a final-component lstat pass while the file
     // resolves outside the project; realpath must catch the ancestor symlink.
     const outside = path.join(tempDir, 'outside');
     await fs.mkdir(outside, { recursive: true });
     await fs.writeFile(path.join(outside, 'loop.md'), 'escaped tasks');
-    await fs.symlink(outside, path.join(projectRoot, '.qwen'));
+    await fs.symlink(outside, path.join(projectRoot, '.mariadb-shell-agent'));
     await writeHome('user tasks');
 
     expect(await read()).toEqual(found('home', 'user tasks'));
@@ -178,16 +180,16 @@ describe('readLoopTaskFile', () => {
 
   it('refuses a project loop.md resolving to a SIBLING dir that shares a name prefix', async () => {
     // isWithin appends path.sep before startsWith, so root `<ws>/foo` must NOT
-    // accept a candidate under the sibling `<ws>/foobar`: symlink foo's `.qwen`
-    // to `<ws>/foobar/.qwen`, whose canonical path bare-startsWith `<ws>/foo`
+    // accept a candidate under the sibling `<ws>/foobar`: symlink foo's `.mariadb-shell-agent`
+    // to `<ws>/foobar/.mariadb-shell-agent`, whose canonical path bare-startsWith `<ws>/foo`
     // yet is NOT a descendant. A regression to a bare `real.startsWith(root)`
     // (no separator) would wave this cross-workspace read through.
     const fooRoot = path.join(tempDir, 'foo');
-    const siblingQwen = path.join(tempDir, 'foobar', '.qwen');
+    const siblingQwen = path.join(tempDir, 'foobar', '.mariadb-shell-agent');
     await fs.mkdir(fooRoot, { recursive: true });
     await fs.mkdir(siblingQwen, { recursive: true });
     await fs.writeFile(path.join(siblingQwen, 'loop.md'), 'sibling tasks');
-    await fs.symlink(siblingQwen, path.join(fooRoot, '.qwen'));
+    await fs.symlink(siblingQwen, path.join(fooRoot, '.mariadb-shell-agent'));
     await writeHome('user tasks');
 
     // Refused → falls through to home; the sibling content is never returned.
@@ -197,7 +199,7 @@ describe('readLoopTaskFile', () => {
   });
 
   it('does not read a project loop.md symlinked to an in-workspace file (exfiltration guard)', async () => {
-    // What confinement alone misses: a repo-committed `.qwen/loop.md -> ../.env`
+    // What confinement alone misses: a repo-committed `.mariadb-shell-agent/loop.md -> ../.env`
     // resolves INSIDE the workspace, so confinement passes — yet it must NOT be
     // read. A symlinked project loop.md is refused outright; only a real
     // regular file at the literal path is read.
@@ -213,7 +215,7 @@ describe('readLoopTaskFile', () => {
   });
 
   it('does not read a HARD-LINKED project loop.md (exfiltration guard)', async () => {
-    // What the symlink guard misses: `ln <secret> .qwen/loop.md` is an ordinary
+    // What the symlink guard misses: `ln <secret> .mariadb-shell-agent/loop.md` is an ordinary
     // regular file (no symlink, isFile() true) SHARING the secret's inode
     // (nlink 2) and resolving to itself in the workspace, so confinement passes
     // too — only the `nlink > 1` guard refuses it. Mutation check: drop that
@@ -303,7 +305,7 @@ describe('readLoopTaskFile', () => {
 
   it('skips a home loop.md whose symlink target escapes $HOME', async () => {
     // Home symlinks are allowed (dotfiles repos), but only if they resolve
-    // WITHIN $HOME. A `~/.qwen/loop.md -> /etc/passwd`-style escape (here a
+    // WITHIN $HOME. A `~/.mariadb-shell-agent/loop.md -> /etc/passwd`-style escape (here a
     // sibling outside homeDir) must be skipped, not read and fed to the model.
     await mkQwen(homeDir);
     const outside = path.join(tempDir, 'outside-secret');
@@ -315,7 +317,7 @@ describe('readLoopTaskFile', () => {
 
   it('reads the home loop.md from a relocated homeQwenDir (QWEN_HOME)', async () => {
     // The home candidate lives in the QWEN_HOME-aware global dir, not always
-    // <homeDir>/.qwen — loop.md in a relocated global dir is read as the `home`
+    // <homeDir>/.mariadb-shell-agent — loop.md in a relocated global dir is read as the `home`
     // source from <homeQwenDir>/loop.md.
     const relocated = path.join(tempDir, 'relocated-qwen');
     await fs.mkdir(relocated, { recursive: true });
@@ -402,10 +404,13 @@ describe('readLoopTaskFile', () => {
     );
   });
 
-  it('skips a non-directory component at .qwen (ENOTDIR) and falls through', async () => {
-    // A regular file where the `.qwen` dir should be → reading .qwen/loop.md
+  it('skips a non-directory component at .mariadb-shell-agent (ENOTDIR) and falls through', async () => {
+    // A regular file where the `.mariadb-shell-agent` dir should be → reading .mariadb-shell-agent/loop.md
     // raises ENOTDIR; skip to home rather than throwing.
-    await fs.writeFile(path.join(projectRoot, '.qwen'), 'not a dir');
+    await fs.writeFile(
+      path.join(projectRoot, '.mariadb-shell-agent'),
+      'not a dir',
+    );
     await writeHome('user tasks');
 
     expect(await read()).toEqual(found('home', 'user tasks'));

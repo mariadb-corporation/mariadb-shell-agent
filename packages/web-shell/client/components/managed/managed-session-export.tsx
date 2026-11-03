@@ -265,7 +265,7 @@ export function renderManagedReadingExport(
     content =
       '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
       "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'\">" +
-      '<title>Qwen Code conversation</title><style>body{font:16px/1.6 system-ui,sans-serif;color:#202124;background:#fff}main{max-width:900px;margin:32px auto;padding:0 20px}section{border-top:1px solid #ddd;padding:16px 0}h2{font-size:16px;color:#555}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f5f5;padding:12px}img{max-width:100%}table{border-collapse:collapse}td,th{border:1px solid #ddd;padding:6px}</style></head><body>' +
+      '<title>MariaDB Shell Agent conversation</title><style>body{font:16px/1.6 system-ui,sans-serif;color:#202124;background:#fff}main{max-width:900px;margin:32px auto;padding:0 20px}section{border-top:1px solid #ddd;padding:16px 0}h2{font-size:16px;color:#555}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f5f5;padding:12px}img{max-width:100%}table{border-collapse:collapse}td,th{border:1px solid #ddd;padding:6px}</style></head><body>' +
       body +
       '</body></html>';
   }

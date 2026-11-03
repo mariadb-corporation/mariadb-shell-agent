@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Code
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -70,7 +71,7 @@ export async function updateBeforeRelaunch(
       if (!installationInfo.updateCommand) {
         writeStderrLine(
           installationInfo.updateMessage ??
-            t('Manual update required. Please reinstall Qwen Code.'),
+            t('Manual update required. Please reinstall MariaDB Shell Agent.'),
         );
         return relaunchOnFailure;
       }

@@ -4,7 +4,7 @@
 
 - 状态：本次变更中实现
 - 日期：2026-10-21
-- Issue：[#14947](https://github.com/QwenLM/qwen-code/issues/14947)
+- Issue：[#14947](https://github.invalid/QwenLM/qwen-code/issues/14947)
 - 参考提交：`a8616497861fd779a0a90d3d2986b5327211f03d`
 
 ## 问题

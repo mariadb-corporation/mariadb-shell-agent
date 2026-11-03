@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -943,11 +944,11 @@ describe('MCPOAuthProvider', () => {
       expect(capturedUrl!).toContain('audience=https%3A%2F%2Fapi.example.com');
     });
 
-    // Regression test for https://github.com/QwenLM/qwen-code/issues/1749
-    // Scenario: user runs `qwen mcp add --transport http yuque https://mcp.alibaba-inc.com/yuque/mcp`
+    // Regression test for https://github.invalid/QwenLM/qwen-code/issues/1749
+    // Scenario: user runs `mariadb-shell-agent mcp add --transport http yuque https://mcp.alibaba-inc.invalid/yuque/mcp`
     // then authenticates the server from the `/mcp` dialog. Per MCP spec /
     // RFC 8707, the resource param should be the
-    // full canonical URI "https://mcp.alibaba-inc.com/yuque/mcp", not just the host.
+    // full canonical URI "https://mcp.alibaba-inc.invalid/yuque/mcp", not just the host.
     it('should use full canonical URI as resource parameter (issue #1749)', async () => {
       const browser = captureBrowserUrl();
       mockOAuthCallback();
@@ -967,9 +968,9 @@ describe('MCPOAuthProvider', () => {
 
       // Simulating what mcpCommand.ts does:
       // serverName = "yuque" (the name the user gave)
-      // mcpServerUrl = "https://mcp.alibaba-inc.com/yuque/mcp" (server.httpUrl || server.url)
+      // mcpServerUrl = "https://mcp.alibaba-inc.invalid/yuque/mcp" (server.httpUrl || server.url)
       const serverName = 'yuque';
-      const mcpServerUrl = 'https://mcp.alibaba-inc.com/yuque/mcp';
+      const mcpServerUrl = 'https://mcp.alibaba-inc.invalid/yuque/mcp';
 
       await authProvider.authenticate(serverName, mockConfig, mcpServerUrl);
 
@@ -977,14 +978,16 @@ describe('MCPOAuthProvider', () => {
       expect(browser.url).toBeDefined();
       const authUrl = new URL(browser.url!);
       const resourceInAuthUrl = authUrl.searchParams.get('resource');
-      expect(resourceInAuthUrl).toBe('https://mcp.alibaba-inc.com/yuque/mcp');
+      expect(resourceInAuthUrl).toBe(
+        'https://mcp.alibaba-inc.invalid/yuque/mcp',
+      );
 
       // Verify the token exchange request also uses the full canonical URI
       expect(capturedTokenBody).toBeDefined();
       const tokenParams = new URLSearchParams(capturedTokenBody!);
       const resourceInTokenExchange = tokenParams.get('resource');
       expect(resourceInTokenExchange).toBe(
-        'https://mcp.alibaba-inc.com/yuque/mcp',
+        'https://mcp.alibaba-inc.invalid/yuque/mcp',
       );
     });
 

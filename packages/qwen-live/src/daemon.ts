@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,10 +9,10 @@
  * LiveDaemon wires everything together: the Host WebSocket endpoint
  * (protocol v9, including optional visual input), the
  * discovery file that Host binaries poll, the realtime orchestrator, and
- * the qwen serve adaptor.
+ * the mariadb-shell-agent serve adaptor.
  *
- * Discovery mutual exclusion: writing `~/.qwen/live/daemon.json` fails fast
- * when a live owner (typically qwen serve's built-in Live integration)
+ * Discovery mutual exclusion: writing `~/.mariadb-shell-agent/live/daemon.json` fails fast
+ * when a live owner (typically mariadb-shell-agent serve's built-in Live integration)
  * already holds it — the two must not fight over the Host.
  */
 
@@ -227,7 +228,7 @@ export class LiveDaemon {
     });
     this.coordinator = coordinator;
     // The ported coordinator fails closed until the Appshot delivery channel
-    // is verified (in qwen serve that channel is a separate reverse-RPC hop
+    // is verified (in mariadb-shell-agent serve that channel is a separate reverse-RPC hop
     // booted lazily). Here the channel is the in-process visual capture call,
     // verified by construction.
     coordinator.setAppshotReadiness({ state: 'ready' });
@@ -275,7 +276,7 @@ export class LiveDaemon {
     await this.publishDiscovery(url);
 
     // The single machine-readable stdout line; harnesses parse the port
-    // from it (same pattern as `qwen serve`).
+    // from it (same pattern as `mariadb-shell-agent serve`).
     process.stdout.write(`qwen-live listening on ${url}\n`);
     this.logger.debug(
       `configuration ${JSON.stringify({
@@ -728,7 +729,7 @@ export class LiveDaemon {
         // handoff holds the directory lock (a nested write would deadlock)
         // and its confirm step expects the stale record to still be there.
         // Publish the new record after the reclaim completes — the same
-        // contract qwen serve's wiring follows.
+        // contract mariadb-shell-agent serve's wiring follows.
         await handoffLiveDiscoveryOwner(
           this.config.discoveryDir,
           { pid: process.pid, instanceNonce: this.instanceNonce },
@@ -741,7 +742,7 @@ export class LiveDaemon {
       }
       throw new Error(
         `Another Live daemon (pid ${error.ownerPid}) already owns the Host ` +
-          'discovery file — most likely qwen serve with its built-in Live ' +
+          'discovery file — most likely mariadb-shell-agent serve with its built-in Live ' +
           'Voice enabled. Stop it (or disable its Live integration) and ' +
           'start qwen-live again.',
       );

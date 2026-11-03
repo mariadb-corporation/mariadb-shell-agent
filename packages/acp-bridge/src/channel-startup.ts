@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -179,7 +180,7 @@ export function createChannelStartup({
             'late channel factory result',
           ).catch((teardownError) => {
             writeStderrLine(
-              `qwen serve: late ACP channel teardown failed: ${String(teardownError)}`,
+              `mariadb-shell-agent serve: late ACP channel teardown failed: ${String(teardownError)}`,
             );
           }),
         () => undefined,
@@ -247,7 +248,7 @@ export function createChannelStartup({
     ).length;
     if (engineChannelCount > 2) {
       writeStderrLine(
-        `qwen serve: WARNING engine=${engine ?? 'single'} channelCount=${engineChannelCount} ` +
+        `mariadb-shell-agent serve: WARNING engine=${engine ?? 'single'} channelCount=${engineChannelCount} ` +
           `(expected 1, max 2 per engine during killSession-then-spawnOrAttach ` +
           `overlap) — possible channel leak; check that prior channels' ` +
           `channel.exited fired and the handler ran cleanup.`,
@@ -423,7 +424,7 @@ export function createChannelStartup({
           'qwen-code.daemon.channel.transport_error_code': error.code,
         });
         writeStderrLine(
-          `qwen serve: channel liveness failed (${error.code}); killing channel`,
+          `mariadb-shell-agent serve: channel liveness failed (${error.code}); killing channel`,
         );
         if (info.channel.transportGuard) {
           info.channel.transportGuard.fail(error);

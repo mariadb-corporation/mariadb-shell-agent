@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2632,13 +2633,21 @@ describe('deleteDaemonSessions worktree cleanup', () => {
   it('keeps a checkout whose only work sits under a git-ignored path', async () => {
     const sessionId = '550e8400-e29b-41d4-a716-4466554400b2';
     const { service, worktreePath } = setupWorktreeSession(sessionId);
-    fs.writeFileSync(path.join(worktreePath, '.gitignore'), '.qwen/\n');
+    fs.writeFileSync(
+      path.join(worktreePath, '.gitignore'),
+      '.mariadb-shell-agent/\n',
+    );
     execFileSync('git', ['add', '.gitignore'], { cwd: worktreePath });
     execFileSync('git', ['commit', '-m', 'ignore agent artifacts'], {
       cwd: worktreePath,
       stdio: 'ignore',
     });
-    const draft = path.join(worktreePath, '.qwen', 'pr-drafts', 'draft.md');
+    const draft = path.join(
+      worktreePath,
+      '.mariadb-shell-agent',
+      'pr-drafts',
+      'draft.md',
+    );
     fs.mkdirSync(path.dirname(draft), { recursive: true });
     fs.writeFileSync(draft, '# draft\n');
 
@@ -2921,7 +2930,12 @@ function initGitRepo(dir: string): void {
 }
 
 function gitAddWorktree(repoDir: string, slug: string): string {
-  const worktreePath = path.join(repoDir, '.qwen', 'worktrees', slug);
+  const worktreePath = path.join(
+    repoDir,
+    '.mariadb-shell-agent',
+    'worktrees',
+    slug,
+  );
   fs.mkdirSync(path.dirname(worktreePath), { recursive: true });
   execFileSync(
     'git',
@@ -3016,7 +3030,7 @@ async function writeLifecycleSidecars(
   );
   const pr = {
     number: 10300,
-    url: 'https://github.com/QwenLM/qwen-code/pull/10300',
+    url: 'https://github.invalid/QwenLM/qwen-code/pull/10300',
     createdAt: '2026-08-28T00:00:00.000Z',
   };
   fs.mkdirSync(path.dirname(worktreePath), { recursive: true });

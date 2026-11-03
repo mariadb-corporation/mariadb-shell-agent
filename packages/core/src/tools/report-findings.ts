@@ -1,13 +1,14 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 // `report_findings`: the review findings as a typed contract to the client,
 // instead of a Markdown convention.
 //
-// A review's findings already exist as data once — the `qwen review findings`
+// A review's findings already exist as data once — the `mariadb-shell-agent review findings`
 // artifact — but that file lives on disk, registered after the fact via
 // `record_artifact`. Every client rendering the session live (the terminal UI,
 // the Web Shell transcript, ACP hosts) saw only the prose restatement, which

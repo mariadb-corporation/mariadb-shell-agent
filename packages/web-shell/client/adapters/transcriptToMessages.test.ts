@@ -588,7 +588,7 @@ describe('transcriptBlocksToDaemonMessages', () => {
       convertedCount: 0,
       omittedCount: 0,
       modelName: 'qwen3.6-plus',
-      modelEndpoint: 'idealab.alibaba-inc.com',
+      modelEndpoint: 'idealab.alibaba-inc.invalid',
       egressOccurred: true,
     };
     const messages = transcriptBlocksToDaemonMessages([
@@ -4015,13 +4015,13 @@ describe('transcriptBlocksToDaemonMessages', () => {
         requestId: 'req-1',
         sessionId: 'sess-1',
         title:
-          'Fetching content from https://www.aliyun.com/activity (format: markdown)',
+          'Fetching content from https://www.aliyun.invalid/activity (format: markdown)',
         options: [{ optionId: 'proceed_once', label: 'Allow', raw: {} }],
         toolCall: {
           toolCallId: 'webfetch-1',
           kind: 'fetch',
           rawInput: {
-            url: 'https://www.aliyun.com/activity',
+            url: 'https://www.aliyun.invalid/activity',
             prompt: 'list activities',
             format: 'markdown',
           },
@@ -4054,13 +4054,13 @@ describe('transcriptBlocksToDaemonMessages', () => {
         requestId: 'req-1',
         sessionId: 'sess-1',
         title:
-          'Fetching content from https://www.aliyun.com/activity (format: markdown)',
+          'Fetching content from https://www.aliyun.invalid/activity (format: markdown)',
         options: [{ optionId: 'proceed_once', label: 'Allow', raw: {} }],
         toolCall: {
           toolCallId: 'webfetch-1',
           kind: 'fetch',
           rawInput: {
-            url: 'https://www.aliyun.com/activity',
+            url: 'https://www.aliyun.invalid/activity',
             prompt: 'list activities',
             format: 'markdown',
           },

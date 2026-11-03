@@ -11,7 +11,7 @@
 
 ## 1. 问题
 
-有两类工作流需要 Qwen Code 会话在无人盯着的情况下对 GitHub 作出反应：
+有两类工作流需要 MariaDB Shell Agent 会话在无人盯着的情况下对 GitHub 作出反应：
 
 - 开发者维护一个 pull request：check 失败、评审者留下评论、基线分支前移导致 PR 冲突。
 - 评审者在 PR 创建或收到 push 时执行一次 review 或验证。
@@ -28,7 +28,7 @@
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 周期触发              | `cron_create` 与 `CronScheduler`（`packages/core/src/services/cronScheduler.ts`）。每个会话一个调度器，由 `Config.getCronScheduler()` 创建。tick 是同步的，所有触发类型（tick、catch-up、final、forced）最终都走同一个 `onFire(job)` 回调。                                                            |
 | 触发的消费方          | 交互式 TUI（`packages/cli/src/ui/hooks/use-llm-stream.ts`，后台通知队列里的 `kind: 'cron'` 条目）、ACP `Session`（自有 cron 队列；`per_run` 任务用 `buildScheduledTaskRunPrompt` 头部起一个新的子会话）和无头 CLI（`packages/cli/src/nonInteractiveCli.ts`）。三者都把 `job.prompt` 作为回合文本投递。 |
-| 持久任务              | `packages/core/src/services/cronTasksFile.ts`：`~/.qwen/tmp/<project-hash>/scheduled_tasks.json`，加锁原子写入，未知键被接受并在重写时保留，20 条运行记录环，以及对已移除 `condition` 字段的 fail-closed 处理（`taskHasLegacyCondition`）。                                                            |
+| 持久任务              | `packages/core/src/services/cronTasksFile.ts`：`~/.mariadb-shell-agent/tmp/<project-hash>/scheduled_tasks.json`，加锁原子写入，未知键被接受并在重写时保留，20 条运行记录环，以及对已移除 `condition` 字段的 fail-closed 处理（`taskHasLegacyCondition`）。                                             |
 | Daemon                | 没有 daemon 级的调度器。每个 ACP 会话各跑自己的调度器，`packages/cli/src/serve/scheduled-task-keepalive.ts` 让每个绑定会话常驻加载，所以触发从不恢复冷会话。`packages/cli/src/serve/routes/scheduled-tasks.ts` 和 Web Shell 对话框负责创建、编辑和"立即运行"任务。                                     |
 | 无人值守的 shell 执行 | `Monitor` 工具（`packages/core/src/tools/monitor.ts`）：命令校验、带 `Monitor(...)` 权限规则和只读 AST 快速放行的 `exec` 确认、使用净化环境的 `executeRuntimeShell`，以及会消解信封标签的输出净化。                                                                                                    |
 
@@ -82,7 +82,7 @@ prompt: "The gate output lists what changed on QwenLM/qwen-code#15057 since
 
 ```text
 cron: "*/2 * * * *"
-gate: "qwen review watch-repo --repo QwenLM/qwen-code --review-requested"
+gate: "mariadb-shell-agent review watch-repo --repo QwenLM/qwen-code --review-requested"
 prompt: "For each pull request event in the gate output, run /qreview <number>."
 ```
 
@@ -213,7 +213,7 @@ Tell the user, and suggest a fix if the cause is clear (for example expired
 
 - 去掉 idle 上限的 `Monitor` 加常驻轮询脚本：进程随会话消亡，不能持久化，而且每一行都是一条通知。
 - core 里带 GitHub 轮询器的 `pr_watch` 工具：往主干里放 GitHub 专用代码，并且重复实现 `snapshot` 已经做的事。
-- `qwen serve` 里的 GitHub webhook 路由：内网没有入站路径，况且本来就没有冲突事件。
+- `mariadb-shell-agent serve` 里的 GitHub webhook 路由：内网没有入站路径，况且本来就没有冲突事件。
 - 在 daemon 进程或 keepalive 里运行闸门：那里没有会话 `Config`，命令会用 daemon 的环境运行。
 
 ## 7. 上限
@@ -251,7 +251,7 @@ Tell the user, and suggest a fix if the cause is clear (for example expired
 
 集成测试：`integration-tests/cli/cron-tools.test.ts` 配合 `QWEN_CODE_TEST_CRON_FAST` 和一个第二次运行才打印内容的闸门脚本。
 
-E2E 计划：`.qwen/e2e-tests/2026-10-21-scheduled-task-gate.md`——在沙盒仓库上的交互式 TUI 监视（安静的轮询不产生回合；推上去一条评论恰好唤醒会话一次）以及 `qwen serve` daemon 监视，由 Web Shell 创建带闸门任务并跨越一次 daemon 重启。
+E2E 计划：`.mariadb-shell-agent/e2e-tests/2026-10-21-scheduled-task-gate.md`——在沙盒仓库上的交互式 TUI 监视（安静的轮询不产生回合；推上去一条评论恰好唤醒会话一次）以及 `mariadb-shell-agent serve` daemon 监视，由 Web Shell 创建带闸门任务并跨越一次 daemon 重启。
 
 ## 10. 验收标准
 

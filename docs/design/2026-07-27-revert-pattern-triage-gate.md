@@ -2,7 +2,7 @@
 
 Date: 2026-07-27
 Status: Proposed
-Area: CI triage — `.github/workflows/qwen-triage.yml`, `.qwen/skills/triage/`
+Area: CI triage — `.github/workflows/qwen-triage.yml`, `.mariadb-shell-agent/skills/triage/`
 
 ## Problem
 
@@ -43,8 +43,8 @@ Three-phase analysis of the repo's full revert history:
    and recall for each signal.
 
 Scripts and raw data (local analysis artifacts, not committed):
-`.qwen/scripts/revert-analysis-*.mjs`, `.qwen/scripts/revert-data-*.json`,
-`.qwen/scripts/revert-analysis-report-v2.json`.
+`.mariadb-shell-agent/scripts/revert-analysis-*.mjs`, `.mariadb-shell-agent/scripts/revert-data-*.json`,
+`.mariadb-shell-agent/scripts/revert-analysis-report-v2.json`.
 
 ### Signal precision and recall
 
@@ -172,7 +172,7 @@ not as a separate workflow step.
 
 ## Files changed
 
-- `.qwen/skills/triage/references/pr-workflow.md` — add the Stage 1e high-risk
+- `.mariadb-shell-agent/skills/triage/references/pr-workflow.md` — add the Stage 1e high-risk
   path checklist. The detection runs inside the triage skill (the model runs
   `gh api --paginate … | grep …` itself),
   so no workflow YAML change is needed.

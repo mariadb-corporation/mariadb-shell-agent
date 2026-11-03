@@ -4,7 +4,7 @@
 
 Status: D8b, D8c-1 and D8c-2 implemented in #13530; reviewer decisions in section 7 remain pending
 Date: 2026-10-07
-Issue: [#12867](https://github.com/QwenLM/qwen-code/issues/12867), part of [#12380](https://github.com/QwenLM/qwen-code/issues/12380)
+Issue: [#12867](https://github.invalid/QwenLM/qwen-code/issues/12867), part of [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380)
 Builds on: [AgentDefinition revisions (D8a)](2026-10-01-managed-agent-definitions.md)
 Baseline: `main` at `ac497aeed9`, OpenAPI 1.33.0
 
@@ -222,7 +222,7 @@ hosted_agent_definition_conflict` on a mismatch, as it does for
     `QWEN_MANAGED_AGENT_DEFINITION_MODELS`, which the deployment keeps
     consistent with the Harness.
   - **Instructions:** a separate section after the core system instruction
-    and before project context (QWEN.md and AGENTS.md from #13168). It never
+    and before project context (MARIADB-SHELL-AGENT.md and AGENTS.md from #13168). It never
     replaces the core instruction, which carries tool-use and safety rules.
 - **Not delivered:** credentials, sampling parameters and the round budget.
   They stay deployment settings until a field is added for them.

@@ -23,7 +23,7 @@ DAC 需要实例内统一产物专区，覆盖运行中、未加载及已归档�
 
 ## 验证与验收
 
-覆盖 live/cold/archived 读取、删除后重载不复现、归档与历史不变、不 attach/spawn、owner/client 边界、workspace 错配、损坏、并发 writer 拒绝和幂等性。执行受影响 package 测试、build、typecheck、bundle。临时 daemon HTTP 测试对比全局基线和本地 bundle，无模型调用、不使用真实用户会话。计划与结果位于 `.qwen/e2e-tests/session-artifact-library.md`。
+覆盖 live/cold/archived 读取、删除后重载不复现、归档与历史不变、不 attach/spawn、owner/client 边界、workspace 错配、损坏、并发 writer 拒绝和幂等性。执行受影响 package 测试、build、typecheck、bundle。临时 daemon HTTP 测试对比全局基线和本地 bundle，无模型调用、不使用真实用户会话。计划与结果位于 `.mariadb-shell-agent/e2e-tests/session-artifact-library.md`。
 
 ## 风险与待确认事项
 

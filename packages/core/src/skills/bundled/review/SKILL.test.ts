@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -52,7 +53,7 @@ function incidentHeadings(): string[] {
 
 describe('bundled review skill', () => {
   it('composes EVERY decided stop — a refused re-rule must not hide behind a clean-stop exit', () => {
-    // `qwen review run` completes a decided stop only when a composed
+    // `mariadb-shell-agent review run` completes a decided stop only when a composed
     // verdict exists: a nothing-open ledger composes a no-event Comment,
     // and a stop with no composed artifact is a re-rule the compose gate
     // refused — exit 1, never a silent exit 0 over standing blockers.
@@ -94,7 +95,7 @@ describe('bundled review skill', () => {
     expect(body).toContain('Refresh the deterministic lint at the new head');
     expect(body).toContain('lintDiffPath');
     expect(body).toContain(
-      '--diff .qwen/tmp/qwen-review-{target}-reanchor.diff',
+      '--diff .mariadb-shell-agent/tmp/qwen-review-{target}-reanchor.diff',
     );
     // Round 3: the config trust boundary is the merge base (trusted
     // exceptions survive, head suppressions never read), and an empty
@@ -222,7 +223,7 @@ describe('bundled review skill', () => {
   });
 
   it('keeps the file-review plan family outside every cleanup sweep prefix', () => {
-    // Step 9 sweeps `.qwen/tmp/qwen-review-<target>-*`, and ANY
+    // Step 9 sweeps `.mariadb-shell-agent/tmp/qwen-review-<target>-*`, and ANY
     // `qwen-review-…` family sits inside SOME target's sweep — the target
     // whose token prefixes it. A file literally named `file` (or
     // `file-<X>`) cleaning up while another file review ran swept that
@@ -233,7 +234,7 @@ describe('bundled review skill', () => {
     // never glob its family" structurally true.
     const body = skillBody();
     const templates = [
-      ...body.matchAll(/\.qwen\/tmp\/([^\n]+?-plan\.json)/g),
+      ...body.matchAll(/\.mariadb-shell-agent\/tmp\/([^\n]+?-plan\.json)/g),
     ].map((m) => m[1]);
     const perRun = templates.filter((t) => t.includes('<HHMMSS>'));
     expect(perRun.length).toBeGreaterThan(0);
@@ -389,7 +390,7 @@ describe('bundled review skill', () => {
     // pre-PR ordering — cache read beside the fetch report, after `fetch-pr` —
     // silently degrades every cached-anchor round to a full review.
     expect(body).toContain(
-      'read `.qwen/review-cache/pr-<n>.json` **before** `fetch-pr`',
+      'read `.mariadb-shell-agent/review-cache/pr-<n>.json` **before** `fetch-pr`',
     );
     expect(body).toContain(
       'pass BOTH fields to the fetch verbatim: `--since <lastCommitSha> ' +
@@ -1265,7 +1266,7 @@ describe('bundled review skill', () => {
     // failure class the meta pins above guard.
     const body = skillBody();
     expect(body).toContain(
-      '[--new-findings .qwen/tmp/qwen-review-{target}-new-findings.json] \\\n  [--host <host>]',
+      '[--new-findings .mariadb-shell-agent/tmp/qwen-review-{target}-new-findings.json] \\\n  [--host <host>]',
     );
   });
 
@@ -1308,7 +1309,7 @@ describe('bundled review skill', () => {
     // a hand-restored gh call silently routes at github.com.
     const body = skillBody();
     expect(body).toContain(
-      'review fetch-diff <number> --repo <owner>/<repo> --host <host> --out .qwen/tmp/qwen-review-pr-<number>-diff.txt',
+      'review fetch-diff <number> --repo <owner>/<repo> --host <host> --out .mariadb-shell-agent/tmp/qwen-review-pr-<number>-diff.txt',
     );
     expect(body).toContain(
       '# add --host <host> (every PR target, including github.com) — plan-diff',
@@ -1365,7 +1366,7 @@ describe('bundled review skill', () => {
     // link or re-querying the platform for the stable detailUrl.
     const body = skillBody();
     expect(body).toContain(
-      'add `--out .qwen/tmp/qwen-review-{target}-body-<id>.md` to the command the note names',
+      'add `--out .mariadb-shell-agent/tmp/qwen-review-{target}-body-<id>.md` to the command the note names',
     );
     expect(body).toContain('`submit` fills the gap itself');
     expect(body).toContain(
@@ -1405,7 +1406,9 @@ describe('bundled review skill', () => {
       at('Apply each finding to the working tree'),
     );
     expect(
-      at('--outcomes .qwen/tmp/qwen-review-{target}-outcomes.json'),
+      at(
+        '--outcomes .mariadb-shell-agent/tmp/qwen-review-{target}-outcomes.json',
+      ),
     ).toBeLessThan(at('review fix-delta \\\n  --since'));
     expect(at('review fix-delta \\\n  --since')).toBeLessThan(
       at('--role fix-audit'),
@@ -1416,9 +1419,12 @@ describe('bundled review skill', () => {
     // Producer and consumer sides derive from the SAME strings: a rename of
     // any producer `--out` path must touch the constant the consumer needle
     // reads, or the auditor reads a stale leftover at the old path.
-    const snapshotPath = '.qwen/tmp/qwen-review-{target}-fix-snapshot.json';
-    const hunksPath = '.qwen/tmp/qwen-review-{target}-fix-hunks.diff';
-    const artifactPath = '.qwen/tmp/qwen-review-{target}-findings.json';
+    const snapshotPath =
+      '.mariadb-shell-agent/tmp/qwen-review-{target}-fix-snapshot.json';
+    const hunksPath =
+      '.mariadb-shell-agent/tmp/qwen-review-{target}-fix-hunks.diff';
+    const artifactPath =
+      '.mariadb-shell-agent/tmp/qwen-review-{target}-findings.json';
     expect(step).toContain(`--out ${snapshotPath}`);
     expect(step).toContain(`--since ${snapshotPath}`);
     expect(step).toContain(`--out ${hunksPath}`);
@@ -2063,7 +2069,7 @@ describe('bundled review skill', () => {
     // does not wait for the gate file.
     const core = coreBody();
     expect(core).toContain(
-      '`qwen review submit` is the only write path in this skill',
+      '`mariadb-shell-agent review submit` is the only write path in this skill',
     );
     expect(core).toContain('Posting is a PR-only, high-only action');
     // The step headings stay in core so every "Step 7" / "Step 8" cross-
@@ -2169,7 +2175,7 @@ describe('bundled review skill', () => {
     );
   });
   it('names file-review reports from the capture-derived target token', () => {
-    // Step 8's report name and `qwen review run`'s report pin are one
+    // Step 8's report name and `mariadb-shell-agent review run`'s report pin are one
     // contract; the pre-PR `<filename>` convention agreed with the pin only
     // at the repo root, so every file review of a nested path lost its
     // Report: line — silently, since the verdict itself is unaffected.
@@ -2221,7 +2227,7 @@ describe('bundled review skill', () => {
     expect(body).not.toContain('coverage, the reverse-audit');
   });
   it('never asks the orchestrator to derive the file-review target', () => {
-    // Two derivations of one name is how `qwen review run` came to poll for
+    // Two derivations of one name is how `mariadb-shell-agent review run` came to poll for
     // an artifact no child ever wrote. The parent canonicalises through
     // `realpathSync`; a hand-applied recipe normalises characters and does
     // not, so a symlink BELOW the repo root made them disagree and a review
@@ -2278,16 +2284,18 @@ describe('bundled review skill', () => {
     );
   });
   it('has Step 0 WRITE its verdict, not pipe it past the guard', () => {
-    // The round's first write into `.qwen/tmp` is Step 0's. Through `tee` it
+    // The round's first write into `.mariadb-shell-agent/tmp` is Step 0's. Through `tee` it
     // was a shell redirection no command could guard, so a workspace that
-    // committed `.qwen/tmp` as a symlink took that write before anything
+    // committed `.mariadb-shell-agent/tmp` as a symlink took that write before anything
     // checked; `--out` routes it through `ensureReviewTmpDir`. A drift back
     // to `tee` re-opens it with every suite still green.
     const body = skillBody();
     expect(body).toContain(
-      'review parse-args --stdin --out .qwen/tmp/qwen-review-parse-args.json',
+      'review parse-args --stdin --out .mariadb-shell-agent/tmp/qwen-review-parse-args.json',
     );
-    expect(body).not.toContain('| tee .qwen/tmp/qwen-review-parse-args.json');
+    expect(body).not.toContain(
+      '| tee .mariadb-shell-agent/tmp/qwen-review-parse-args.json',
+    );
   });
 
   it('checks the candidate is this round\u2019s own before promoting', () => {
@@ -2309,7 +2317,7 @@ describe('bundled review skill', () => {
     // and by the report's clock, not the tree's hash, which two concurrent
     // rounds over an unchanged tree compute alike.
     expect(body).toContain(
-      '`.qwen/tmp/qwen-review-<target>-ledger-<timestamp>.json`',
+      '`.mariadb-shell-agent/tmp/qwen-review-<target>-ledger-<timestamp>.json`',
     );
     expect(body).toContain("Not the tree's `stateId`");
   });
@@ -2323,7 +2331,9 @@ describe('bundled review skill', () => {
     // local rounds, left open behind a reader that suggested coverage.
     const body = skillBody();
     expect(body).toContain('**Before the cleanup, write the stop sidecar**');
-    expect(body).toContain('.qwen/tmp/qwen-review-pr-<n>-stop.json');
+    expect(body).toContain(
+      '.mariadb-shell-agent/tmp/qwen-review-pr-<n>-stop.json',
+    );
     expect(body).toContain(
       'write the stop sidecar exactly as the up-to-date stop below does',
     );

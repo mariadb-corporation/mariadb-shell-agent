@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -93,8 +94,8 @@ export function parseJoinLink(
 }
 
 /**
- * The terminal equivalent of "Join a coordinator": `qwen agents join <link>`
- * asks the running local `qwen serve` to join with the same link (it calls
+ * The terminal equivalent of "Join a coordinator": `mariadb-shell-agent agents join <link>`
+ * asks the running local `mariadb-shell-agent serve` to join with the same link (it calls
  * that daemon's `/hosts/connect`, exactly as this dialog does). The token
  * rides in the environment, never in argv.
  */
@@ -103,7 +104,7 @@ export function joinCoordinatorCommand(
   token: string,
   allowHttp: boolean,
 ): string {
-  return `QWEN_AGENT_HOST_ENROLLMENT_TOKEN=${shellQuote(token || '<token>')} qwen agents join ${shellQuote(link.trim())}${allowHttp ? ' --allow-http' : ''}`;
+  return `QWEN_AGENT_HOST_ENROLLMENT_TOKEN=${shellQuote(token || '<token>')} mariadb-shell-agent agents join ${shellQuote(link.trim())}${allowHttp ? ' --allow-http' : ''}`;
 }
 
 export function findReplacementRuntime(

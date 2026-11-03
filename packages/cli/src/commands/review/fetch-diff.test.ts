@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -295,20 +296,22 @@ describe('fetchDiffCommand handler', () => {
 });
 
 describe('fetch-diff — the scratch directory guard', () => {
-  it('guards an --out under .qwen/tmp, and only there', () => {
-    // Lightweight mode's first writer into `.qwen/tmp`: the shared entry
+  it('guards an --out under .mariadb-shell-agent/tmp, and only there', () => {
+    // Lightweight mode's first writer into `.mariadb-shell-agent/tmp`: the shared entry
     // guard refuses a workspace-planted link before the diff lands.
     ghRawMock.mockReturnValue('d');
     ensureReviewTmpDirMock.mockClear();
     writeFileSyncMock.mockClear();
     ensureReviewTmpDirMock.mockImplementationOnce(() => {
-      throw new Error('fetch-diff: .qwen/tmp is a symbolic link');
+      throw new Error(
+        'fetch-diff: .mariadb-shell-agent/tmp is a symbolic link',
+      );
     });
     expect(() =>
       runFetchDiff({
         prNumber: 1,
         repo: 'QwenLM/qwen-code',
-        out: join('.qwen', 'tmp', 'qwen-review-pr-1-diff.txt'),
+        out: join('.mariadb-shell-agent', 'tmp', 'qwen-review-pr-1-diff.txt'),
       }),
     ).toThrow(/symbolic link/);
     expect(ensureReviewTmpDirMock).toHaveBeenCalledWith('fetch-diff');
@@ -322,7 +325,7 @@ describe('fetch-diff — the scratch directory guard', () => {
     runFetchDiff({
       prNumber: 1,
       repo: 'QwenLM/qwen-code',
-      out: join('.qwen', 'tmp'),
+      out: join('.mariadb-shell-agent', 'tmp'),
     });
     expect(ensureReviewTmpDirMock).toHaveBeenCalledWith('fetch-diff');
     ensureReviewTmpDirMock.mockClear();

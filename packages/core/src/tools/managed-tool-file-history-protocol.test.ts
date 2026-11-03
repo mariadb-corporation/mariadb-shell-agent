@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -154,7 +155,7 @@ describe('managed file history protocol', () => {
       ...context,
       fileFilteringOptions: {
         ...context.fileFilteringOptions,
-        customIgnoreFiles: ['.qwenignore'],
+        customIgnoreFiles: ['.mariadb-shell-agentignore'],
       },
     },
     {

@@ -41,7 +41,7 @@ The observer performs its enablement check before scanning or hashing values. Al
 
 A process-wide limiter emits at most 50 eligible events per 60-second window. Additional eligible events increment a suppressed counter. The first eligible event in a later window reports the accumulated count, then resets it.
 
-The existing `qwen serve` large-pipe-frame observer remains the only daemon attribution mechanism for frames at or above 256 KiB. These diagnostics correlate representations and exact writer sizes but do not emit production telemetry or replace large-frame attribution.
+The existing `mariadb-shell-agent serve` large-pipe-frame observer remains the only daemon attribution mechanism for frames at or above 256 KiB. These diagnostics correlate representations and exact writer sizes but do not emit production telemetry or replace large-frame attribution.
 
 ## Implementation Shape
 

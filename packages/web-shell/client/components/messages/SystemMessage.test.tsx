@@ -307,7 +307,7 @@ describe('SystemMessage — vision bridge notice', () => {
           convertedCount: 0,
           omittedCount: 0,
           modelName: 'qwen3.6-plus',
-          modelEndpoint: 'idealab.alibaba-inc.com',
+          modelEndpoint: 'idealab.alibaba-inc.invalid',
           egressOccurred: true,
         }}
       />,
@@ -315,7 +315,7 @@ describe('SystemMessage — vision bridge notice', () => {
     );
 
     expect(container.textContent).toContain(
-      '视觉桥接已取消。你的图片及提示词/上下文已发送至 qwen3.6-plus (idealab.alibaba-inc.com)。',
+      '视觉桥接已取消。你的图片及提示词/上下文已发送至 qwen3.6-plus (idealab.alibaba-inc.invalid)。',
     );
     expect(container.textContent).not.toContain('English fallback');
   });
@@ -1048,7 +1048,7 @@ describe('SystemMessage — context usage instruction files', () => {
     return {
       v: 1,
       sessionId: 's-1',
-      workspaceCwd: '/repo/.qwen/worktrees/task',
+      workspaceCwd: '/repo/.mariadb-shell-agent/worktrees/task',
       workspaceRoot: '/repo',
       formattedText: '',
       usage: {
@@ -1072,7 +1072,7 @@ describe('SystemMessage — context usage instruction files', () => {
           {
             path: 'AGENTS.md',
             tokens: 5,
-            absolutePath: '/repo/.qwen/worktrees/task/AGENTS.md',
+            absolutePath: '/repo/.mariadb-shell-agent/worktrees/task/AGENTS.md',
           },
         ],
         memoryFiles: [],

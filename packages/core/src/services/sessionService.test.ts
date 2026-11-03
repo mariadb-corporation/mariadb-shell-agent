@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Code
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -570,7 +571,7 @@ describe('SessionService', () => {
         typeof import('../utils/jsonl-utils.js')
       >('../utils/jsonl-utils.js');
       // Storage.resolveRuntimeBaseDir uses isAbsolute/resolve; automocked, they
-      // return undefined and fall back to `~/.qwen`, outside the tmp sandbox.
+      // return undefined and fall back to `~/.mariadb-shell-agent`, outside the tmp sandbox.
       const pathFns = ['join', 'dirname', 'isAbsolute', 'resolve'] as const;
       for (const name of mode === 'fork'
         ? [...pathFns, 'basename' as const]
@@ -4956,7 +4957,9 @@ describe('SessionService', () => {
     };
 
     it('includes a session whose transcript cwd is a worktree under this project', async () => {
-      listFromWorktree('/test/project/root/.qwen/worktrees/my-task');
+      listFromWorktree(
+        '/test/project/root/.mariadb-shell-agent/worktrees/my-task',
+      );
       // The worktree cwd hashes differently from the repo root, so the first
       // getProjectHash(recordCwd) check fails and marker inference runs.
       vi.mocked(getProjectHash).mockImplementation((p: string) =>
@@ -4970,7 +4973,7 @@ describe('SessionService', () => {
     });
 
     it('excludes a session whose worktree belongs to a different project', async () => {
-      listFromWorktree('/other/repo/.qwen/worktrees/my-task');
+      listFromWorktree('/other/repo/.mariadb-shell-agent/worktrees/my-task');
       vi.mocked(getProjectHash).mockImplementation((p: string) =>
         p.startsWith('/other/repo') ? 'other-hash' : 'test-project-hash',
       );

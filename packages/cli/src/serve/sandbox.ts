@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -433,7 +434,7 @@ export async function start_sandbox(
   if (process.env['BUILD_SANDBOX']) {
     if (!gcPath.includes('qwen-code/packages/')) {
       throw new FatalSandboxError(
-        'Cannot build sandbox using installed Qwen Code binary; ' +
+        'Cannot build sandbox using installed MariaDB Shell Agent binary; ' +
           'run `npm link ./packages/cli` under QwenCode-cli repo to switch to linked binary.',
       );
     } else {
@@ -467,7 +468,7 @@ export async function start_sandbox(
     const remedy =
       image === LOCAL_DEV_SANDBOX_IMAGE_NAME
         ? 'Try running `npm run build:all` or `npm run build:sandbox` under the qwen-code repo to build it locally, or check the image name and your network connection.'
-        : 'Please check the image name, your network connection, or notify qwen-code-dev@service.alibaba.com if the issue persists.';
+        : 'Please check the image name, your network connection, or notify qwen-code-dev@service.alibaba.invalid if the issue persists.';
     throw new FatalSandboxError(
       `Sandbox image '${image}' is missing or could not be pulled. ${remedy}`,
     );
@@ -496,7 +497,7 @@ export async function start_sandbox(
   // mount current directory as working directory in sandbox (set via --workdir)
   args.push('--volume', `${workdir}:${containerWorkdir}`);
 
-  // Mount user settings at /home/node/.qwen and at the canonical host path
+  // Mount user settings at /home/node/.mariadb-shell-agent and at the canonical host path
   // used by QWEN_HOME, unless that host path is already covered by a broader
   // runtime-dir mount below.
   const userSettingsDirOnHost = getUserSettingsDir();
@@ -539,7 +540,7 @@ export async function start_sandbox(
   }
 
   // Pass QWEN_HOME so the sandboxed CLI resolves the global qwen dir to the
-  // same path the host did, instead of relying on the /home/node/.qwen mount
+  // same path the host did, instead of relying on the /home/node/.mariadb-shell-agent mount
   // being the default fallback.
   args.push('--env', `QWEN_HOME=${userSettingsDirContainerPath}`);
 
@@ -855,13 +856,13 @@ export async function start_sandbox(
 
   // Check if we should use current user's UID/GID in sandbox
   // In integration test mode, we still respect SANDBOX_SET_UID_GID to allow
-  // tests that need to access host's ~/.qwen (e.g., --resume functionality)
+  // tests that need to access host's ~/.mariadb-shell-agent (e.g., --resume functionality)
   const useCurrentUser = await shouldUseCurrentUserInSandbox();
 
   if (useCurrentUser) {
     // SANDBOX_SET_UID_GID is enabled: create user with host's UID/GID
     // This includes integration test mode with SANDBOX_SET_UID_GID=true,
-    // allowing tests that need to access host's ~/.qwen (e.g., --resume) to work.
+    // allowing tests that need to access host's ~/.mariadb-shell-agent (e.g., --resume) to work.
     // For the user-creation logic to work, the container must start as root.
     // The entrypoint script then handles dropping privileges to the correct user.
     args.push('--user', 'root');

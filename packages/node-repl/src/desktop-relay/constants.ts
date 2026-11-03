@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -35,7 +36,7 @@ export const MAX_RELAYED_REPLY_BYTES = 9 * 1024 * 1024;
 export const MAX_RELAYED_TIMEOUT_MS = 20_000;
 
 export function defaultRelayHome(): string {
-  return path.join(os.homedir(), '.qwen', 'desktop-relay');
+  return path.join(os.homedir(), '.mariadb-shell-agent', 'desktop-relay');
 }
 
 export function launchAgentPlistPath(): string {

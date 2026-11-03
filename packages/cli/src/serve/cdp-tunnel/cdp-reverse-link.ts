@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Reverse link for the Plan C "CDP tunnel" (issue #5626).
@@ -196,7 +197,7 @@ export class CdpReverseLink {
       this.pending.set(id, { resolve, reject, timer, progressTimer });
       try {
         this.log?.(
-          `qwen serve: /cdp forwarded command id=${id} method=${method} to extension`,
+          `mariadb-shell-agent serve: /cdp forwarded command id=${id} method=${method} to extension`,
         );
         this.sendToExtension({
           type: CDP_FRAME_TYPES.command,
@@ -300,7 +301,9 @@ export class CdpReverseLink {
   private handleResult(frame: CdpResultFrame): void {
     const id = typeof frame.id === 'number' ? frame.id : undefined;
     if (id === undefined) {
-      this.log?.('qwen serve: /cdp dropped cdp_result with non-numeric id');
+      this.log?.(
+        'mariadb-shell-agent serve: /cdp dropped cdp_result with non-numeric id',
+      );
       return;
     }
     if (frame.error) {
@@ -315,7 +318,9 @@ export class CdpReverseLink {
     // malformed frame, so don't log it.
     if (!this.emulator) return;
     if (typeof frame.method !== 'string') {
-      this.log?.('qwen serve: /cdp dropped cdp_event with non-string method');
+      this.log?.(
+        'mariadb-shell-agent serve: /cdp dropped cdp_event with non-string method',
+      );
       return;
     }
     this.emulator.emitTabEvent(frame.method, frame.params);
@@ -325,7 +330,7 @@ export class CdpReverseLink {
     const attach = this.pendingAttach;
     if (!attach || attach.id !== frame.id) {
       this.log?.(
-        `qwen serve: /cdp dropped unexpected cdp_attached (id=${String(frame.id)})`,
+        `mariadb-shell-agent serve: /cdp dropped unexpected cdp_attached (id=${String(frame.id)})`,
       );
       return;
     }
@@ -379,7 +384,7 @@ export class CdpReverseLink {
     if (delay >= this.commandTimeoutMs) return undefined;
     const timer = setTimeout(() => {
       this.log?.(
-        `qwen serve: /cdp still waiting for command id=${id} method=${method} after ${delay}ms`,
+        `mariadb-shell-agent serve: /cdp still waiting for command id=${id} method=${method} after ${delay}ms`,
       );
     }, delay);
     timer.unref?.();

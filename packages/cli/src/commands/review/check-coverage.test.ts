@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -396,7 +397,7 @@ function planPr(): string {
       diffLines: 300,
       prNumber: '6766',
       ownerRepo: 'QwenLM/qwen-code',
-      worktreePath: '.qwen/tmp/review-pr-6766',
+      worktreePath: '.mariadb-shell-agent/tmp/review-pr-6766',
       files: [{ path: 'a.ts', kind: 'source', removedLines: 0, heavy: false }],
       chunks: [
         { id: 1, startLine: 1, endLine: 100 },
@@ -1170,7 +1171,7 @@ describe('the roster — who should have been here', () => {
       diffLines: 300,
       prNumber: '6766',
       ownerRepo: 'QwenLM/qwen-code',
-      worktreePath: '.qwen/tmp/review-pr-6766',
+      worktreePath: '.mariadb-shell-agent/tmp/review-pr-6766',
       files: [{ path: 'a.ts', kind: 'source', removedLines: 0, heavy: false }],
       chunks: [
         { id: 1, startLine: 1, endLine: 100 },

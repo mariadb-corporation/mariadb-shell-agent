@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -93,7 +94,7 @@ const readdir = vi.mocked(fs.promises.readdir) as Mock<
 const stat = vi.mocked(fs.promises.stat) as Mock<
   (path: fs.PathLike) => Promise<fs.Stats>
 >;
-const IDE_DIR = path.join('/home/test', '.qwen', 'ide');
+const IDE_DIR = path.join('/home/test', '.mariadb-shell-agent', 'ide');
 const lockFile = (port: string) => path.join(IDE_DIR, `${port}.lock`);
 const legacyFile = (id: string) =>
   path.join('/tmp', `qwen-code-ide-server-${id}.json`);
@@ -734,7 +735,7 @@ describe('IdeClient', () => {
       process.env['QWEN_CODE_IDE_SERVER_PORT'] = '2222';
       const config2 = { port: '2222', workspacePath: '/test/workspace' };
       readFile
-        .mockRejectedValueOnce(new Error('not found')) // ~/.qwen/ide/<port>.lock
+        .mockRejectedValueOnce(new Error('not found')) // ~/.mariadb-shell-agent/ide/<port>.lock
         .mockRejectedValueOnce(new Error('not found')) // legacy pid file
         .mockResolvedValueOnce(JSON.stringify(config2));
 

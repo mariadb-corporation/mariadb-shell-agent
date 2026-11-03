@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -57,7 +58,7 @@ describe('untrustedGitfile (real git)', () => {
       'one',
     );
     worktree = autofixPrPaths(root, 7).worktreePath;
-    mkdirSync(join(root, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(root, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     git(
       root,
       'worktree',
@@ -267,7 +268,7 @@ describe('untrustedGitfile (real git)', () => {
   });
 
   it('refuses a .git directory, and the entry of another worktree', () => {
-    const other = join(root, '.qwen', 'tmp', 'other');
+    const other = join(root, '.mariadb-shell-agent', 'tmp', 'other');
     git(root, 'worktree', 'add', '-q', '-b', 'other', other);
     writeFileSync(join(worktree, '.git'), readFileSync(join(other, '.git')));
     expect(untrustedGitfile(worktree, root)).toMatch(
@@ -282,7 +283,7 @@ describe('untrustedGitfile (real git)', () => {
 
   it('refuses a worktree without its gitfile: git would walk up to a git directory planted beside it', () => {
     rmSync(join(worktree, '.git'));
-    const planted = join(root, '.qwen', 'tmp', '.git');
+    const planted = join(root, '.mariadb-shell-agent', 'tmp', '.git');
     execFileSync('cp', ['-r', join(root, '.git'), planted]);
     execFileSync('git', [
       '--git-dir',
@@ -427,10 +428,15 @@ describe('untrustedGitfile (real git)', () => {
       // A tracked file inside the watch's own directory stops git
       // collapsing it to an ASCII entry; a non-ASCII sibling is C-quoted
       // in porcelain v1, and the quote must not read as the user's work.
-      const watchDir = join(root, '.qwen', 'tmp', 'autofix-pr-99');
+      const watchDir = join(
+        root,
+        '.mariadb-shell-agent',
+        'tmp',
+        'autofix-pr-99',
+      );
       mkdirSync(watchDir, { recursive: true });
       writeFileSync(join(watchDir, '.gitkeep'), '');
-      git(root, 'add', '.qwen/tmp/autofix-pr-99/.gitkeep');
+      git(root, 'add', '.mariadb-shell-agent/tmp/autofix-pr-99/.gitkeep');
       git(
         root,
         '-c',
@@ -444,7 +450,7 @@ describe('untrustedGitfile (real git)', () => {
       );
       writeFileSync(join(watchDir, '评审.md'), 'x');
       expect(checkoutHoldsWork(root)).toBe(false);
-      // A non-ASCII file of the user's own, outside .qwen, still counts.
+      // A non-ASCII file of the user's own, outside .mariadb-shell-agent, still counts.
       writeFileSync(join(root, '用户.md'), 'y');
       expect(checkoutHoldsWork(root)).toBe(true);
     });

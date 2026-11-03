@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -324,7 +325,7 @@ it('ends the runs a removed Host leaves stranded', async () => {
     token,
     name: 'gone',
     workspaceCwd: '/remote/gone',
-    providers: ['Qwen Code ACP'],
+    providers: ['MariaDB Shell Agent ACP'],
   });
   await updateWorkspaceAgents(workspaceCwd, () => [
     {
@@ -351,7 +352,7 @@ it('answers a committed host removal even when ending its runs fails', async () 
     token,
     name: 'gone',
     workspaceCwd: '/remote/gone',
-    providers: ['Qwen Code ACP'],
+    providers: ['MariaDB Shell Agent ACP'],
   });
   await updateWorkspaceAgents(workspaceCwd, () => [
     {
@@ -449,9 +450,9 @@ it('shows an online host offering the bound program when the first host is offli
   const workspaceCwd = path.join(runtimeDir, 'multi-host');
   const hosts: Array<{ id: string }> = [];
   for (const [name, providers] of [
-    ['offline', ['Qwen Code ACP']],
+    ['offline', ['MariaDB Shell Agent ACP']],
     ['wrong-program', ['Codex']],
-    ['available', ['Qwen Code ACP']],
+    ['available', ['MariaDB Shell Agent ACP']],
   ] as const) {
     const { token } = await issueAgentHostEnrollment(workspaceCwd);
     const enrolled = await enrollAgentHost(workspaceCwd, {
@@ -517,11 +518,11 @@ it.each([undefined, 1])(
       token,
       name: 'legacy',
       workspaceCwd: '/remote/legacy',
-      providers: ['Qwen Code ACP'],
+      providers: ['MariaDB Shell Agent ACP'],
     });
     await heartbeatAgentHost(workspaceCwd, enrolled.host.id, enrolled.secret, {
       workspaceCwd: '/remote/legacy',
-      providers: ['Qwen Code ACP'],
+      providers: ['MariaDB Shell Agent ACP'],
       ...(protocol !== undefined ? { protocol } : {}),
     });
     await updateWorkspaceAgents(workspaceCwd, () => [

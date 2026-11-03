@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,7 +26,7 @@ const MAX_RULES = 64;
 
 /**
  * Scope a backend's raw requestId. Request ids are adaptor-local strings
- * (qwen serve mints UUIDs; an ACP adaptor counts perm-1, perm-2), so the
+ * (mariadb-shell-agent serve mints UUIDs; an ACP adaptor counts perm-1, perm-2), so the
  * owning adaptor must scope the key or two live backends collide and one
  * backend's resolution retracts another backend's pending ask.
  */

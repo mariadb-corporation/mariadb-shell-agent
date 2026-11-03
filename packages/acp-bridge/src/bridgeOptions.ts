@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -171,7 +172,7 @@ export type ExternalToolGuardHandler = (
  * (Node version, CLI entry path, ripgrep, git, npm, workspace dir).
  *
  * The bridge is intentionally agnostic about how its host computes
- * these cells; production `qwen serve` provides
+ * these cells; production `mariadb-shell-agent serve` provides
  * `cli/src/serve/daemon-status-provider.ts` which wraps
  * `buildEnvStatusFromProcess` + `buildDaemonPreflightCells`. Future
  * Mode A / in-process consumers may omit the provider entirely; the
@@ -281,10 +282,10 @@ export interface BridgeOptions {
    * omits the field. See the `session_scope_override` capability on
    * `/capabilities.features` for negotiation.
    * Reference:
-   * https://github.com/QwenLM/qwen-code/pull/3889#issuecomment-4427875644
+   * https://github.invalid/QwenLM/qwen-code/pull/3889#issuecomment-4427875644
    */
   sessionScope?: 'single' | 'thread';
-  /** Channel factory; defaults to spawning `qwen --acp` as a child process. */
+  /** Channel factory; defaults to spawning `mariadb-shell-agent --acp` as a child process. */
   channelFactory?: ChannelFactory;
   /** Server-owned selection; restore must use verified durable ownership. */
   executionEngines?: {
@@ -344,7 +345,7 @@ export interface BridgeOptions {
    * `maxSessions`, where silently disabling a backpressure knob on a
    * config typo is worse than failing to start).
    *
-   * Operators tune via `qwen serve --event-ring-size <n>`. Cost
+   * Operators tune via `mariadb-shell-agent serve --event-ring-size <n>`. Cost
    * scales linearly with `ringSize`; each retained `BridgeEvent` is
    * an object reference plus its serialized payload (text chunks /
    * tool-call args / etc.), so the per-session memory ceiling is
@@ -515,7 +516,7 @@ export interface BridgeOptions {
   /**
    * #4175 Wave 5 PR 22b/2 — optional injection seam for daemon-host
    * status cells (env snapshot, daemon preflight). Production
-   * `qwen serve` provides
+   * `mariadb-shell-agent serve` provides
    * `createDaemonStatusProvider()` from
    * `cli/src/serve/daemon-status-provider.ts`.
    *
@@ -529,7 +530,7 @@ export interface BridgeOptions {
    * that don't need daemon-host cells can omit the provider
    * without crashing those routes.
    *
-   * Mode A in-process consumers (`qwen --serve`, future) typically
+   * Mode A in-process consumers (`mariadb-shell-agent --serve`, future) typically
    * omit this provider — they don't run a separate daemon process
    * so daemon-host environment cells are not meaningful. They can
    * still query the routes; they'll see empty/idle cells.
@@ -565,7 +566,7 @@ export interface BridgeOptions {
    * BridgeClient's inline `fs.realpath` / `fs.writeFile` / `fs.readFile`
    * proxy.
    *
-   * Production `qwen serve` injects a `WorkspaceFileSystem` adapter for final
+   * Production `mariadb-shell-agent serve` injects a `WorkspaceFileSystem` adapter for final
    * text writes and for defensive handling of unexpected delegated reads.
    *
    * When omitted (tests, Mode A in-process consumers, channels /
@@ -604,7 +605,7 @@ export interface BridgeOptions {
    * the bridge unit-test suite) can run the mediator without an
    * audit consumer.
    *
-   * **In production** (`qwen serve`), `run-qwen-serve.ts` allocates a
+   * **In production** (`mariadb-shell-agent serve`), `run-qwen-serve.ts` allocates a
    * `PermissionAuditRing` (default capacity 512), wraps it with
    * `createPermissionAuditPublisher`, and passes the result here.
    * The ring stays alive for the lifetime of the daemon so a future
@@ -661,7 +662,7 @@ export interface BridgeOptions {
    * `0` (the default) preserves the original behavior: close fires
    * immediately when the session is idle at prompt-settle time. Library
    * consumers embedding the bridge directly are unaffected unless they opt
-   * in by setting this value. For `qwen serve`, pass
+   * in by setting this value. For `mariadb-shell-agent serve`, pass
    * `--session-prompt-settled-close-grace-ms 60000` (or similar) to enable
    * protection for poll-based clients.
    *
@@ -677,7 +678,7 @@ export interface BridgeOptions {
    * advertised `server` name, returning `undefined` when no client currently
    * hosts it.
    *
-   * The `qwen --acp` child binds its session `McpClientManager`'s
+   * The `mariadb-shell-agent --acp` child binds its session `McpClientManager`'s
    * `sendSdkMcpMessage` to a `qwen/control/client_mcp/message` ext-method
    * (child → parent). `BridgeClient.extMethod` answers that method by calling
    * THIS lookup to reach the per-WS-connection `ClientMcpRegistrar` that

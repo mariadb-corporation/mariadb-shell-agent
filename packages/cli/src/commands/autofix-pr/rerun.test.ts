@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -103,7 +104,7 @@ describe('runRerun', () => {
     repo = realpathSync(mkdtempSync(join(tmpdir(), 'autofix-rerun-')));
     execFileSync('git', ['init', '-q', '-b', 'main', repo]);
     paths = autofixPrPaths(repo, 7);
-    mkdirSync(join(repo, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(repo, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     const initial: AutofixPrState = {
       version: 1,
       sessionId: 'session-a',

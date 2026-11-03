@@ -4,7 +4,7 @@
 
 状态：W0e-1/2/3 源码实现，2026-09-28。专用 Linux 物理重启验收仍待完成。基线：`e0b8bea9e0ba369a0661bc51cbbb9a27555aff48`。
 
-关联：[路线图 #12380](https://github.com/QwenLM/qwen-code/issues/12380)、[丢失执行 #12670](https://github.com/QwenLM/qwen-code/issues/12670)、[本地 worker #12766](https://github.com/QwenLM/qwen-code/issues/12766)、[W0c-3](2026-09-26-managed-workspace-execution.zh-CN.md) 和 [W0d](managed-workspace-w0d-web-shell-binding.zh-CN.md)。
+关联：[路线图 #12380](https://github.invalid/QwenLM/qwen-code/issues/12380)、[丢失执行 #12670](https://github.invalid/QwenLM/qwen-code/issues/12670)、[本地 worker #12766](https://github.invalid/QwenLM/qwen-code/issues/12766)、[W0c-3](2026-09-26-managed-workspace-execution.zh-CN.md) 和 [W0d](managed-workspace-w0d-web-shell-binding.zh-CN.md)。
 
 ## 1. 问题与已核验基线
 
@@ -136,7 +136,7 @@ Flyway V16 和独立 initializer 增加可空证据／放弃字段及 placement 
 
 这些是实施切片，不是三项已经完成的功能。启用 W0e-2 接管前先合入 W0e-1。W0e 只有完成 W0e-3 才算结束；测试辅助实现通过不能证明生产 provisioner 已达标。
 
-[Hosted 文件工具 PR #12831](https://github.com/QwenLM/qwen-code/pull/12831) 已覆盖私有受控 Read/Write/Edit 编排，并明确排除进程丢失恢复。集成前协调它保存的 execution identity 和未知结果消费路径。公开绑定消息执行、Stage G Turn 接管/历史结算、任意 Shell 隔离、Kubernetes 和产品身份传递仍属独立工作。`workspace_context` 保持 false；W0d 的窄能力 `workspace_binding` 保持不变。
+[Hosted 文件工具 PR #12831](https://github.invalid/QwenLM/qwen-code/pull/12831) 已覆盖私有受控 Read/Write/Edit 编排，并明确排除进程丢失恢复。集成前协调它保存的 execution identity 和未知结果消费路径。公开绑定消息执行、Stage G Turn 接管/历史结算、任意 Shell 隔离、Kubernetes 和产品身份传递仍属独立工作。`workspace_context` 保持 false；W0d 的窄能力 `workspace_binding` 保持不变。
 
 ## 8. 验收与证据
 
@@ -159,7 +159,7 @@ Flyway V16 和独立 initializer 增加可空证据／放弃字段及 placement 
 | 本地启动未认证            | 原 placement 保持封闭；该 Binding 未准入工具写入者，因此同 Workspace 的另一个 Session 可以启动                   |
 | legacy / schema / HTTP    | boot v1 使用相同复用门禁；迁移保留回执；释放后能读取终态且不泄露物理身份                                         |
 
-运行现有 Stage F 进程门禁、新仓库契约在 H2 和真实 MySQL/MariaDB 上的验证、Spring 到 worker 的 holder 恢复，以及受支持宿主重启或隔离域测试。反例使用真正逃逸的后代进程；仅 mock observation 不能证明物理安全。实现阶段运行仓库 build、typecheck、bundle、定向 TypeScript 测试、Java verification/Checkstyle，以及连续两轮干净的完整 diff 自审。详细本地测试计划保存在 `.qwen/e2e-tests/managed-workspace-w0e.md`。
+运行现有 Stage F 进程门禁、新仓库契约在 H2 和真实 MySQL/MariaDB 上的验证、Spring 到 worker 的 holder 恢复，以及受支持宿主重启或隔离域测试。反例使用真正逃逸的后代进程；仅 mock observation 不能证明物理安全。实现阶段运行仓库 build、typecheck、bundle、定向 TypeScript 测试、Java verification/Checkstyle，以及连续两轮干净的完整 diff 自审。详细本地测试计划保存在 `.mariadb-shell-agent/e2e-tests/managed-workspace-w0e.md`。
 
 ## 9. 评审决策与剩余前提
 

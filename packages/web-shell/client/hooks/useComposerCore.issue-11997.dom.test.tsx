@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 // @vitest-environment jsdom
 //
-// Reproduction for https://github.com/QwenLM/qwen-code/issues/11997
+// Reproduction for https://github.invalid/QwenLM/qwen-code/issues/11997
 // "label-only composer / user-message tags have zero padding-right".
 //
 // A tag whose `removable` is false gets no remove button, so nothing holds the

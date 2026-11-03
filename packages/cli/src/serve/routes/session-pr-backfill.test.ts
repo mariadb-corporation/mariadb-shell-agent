@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -296,7 +297,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       sidecarPath,
       JSON.stringify({
         slug,
-        worktreePath: `${workspaceCwd}/.qwen/worktrees/${slug}`,
+        worktreePath: `${workspaceCwd}/.mariadb-shell-agent/worktrees/${slug}`,
         worktreeBranch: branch,
         originalCwd: workspaceCwd,
         originalBranch: 'main',
@@ -409,7 +410,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       return {
         view: vi.fn(async (repoPath: string, id: number) => ({
           number: id,
-          url: `https://code.alibaba-inc.com/${repoPath}/codereview/${id}`,
+          url: `https://code.alibaba-inc.invalid/${repoPath}/codereview/${id}`,
           state: 'merged' as const,
         })),
         ...overrides,
@@ -420,11 +421,11 @@ describe('backfillWorkspaceSessionPrs', () => {
     // must agree so the legacy-shape detector sees the same web root.
     function aoneOrigin(repoPath = 'jspt/agentic_coding'): void {
       execSync(
-        `git remote add origin git@gitlab.alibaba-inc.com:${repoPath}.git`,
+        `git remote add origin git@gitlab.alibaba-inc.invalid:${repoPath}.git`,
         { cwd: workspaceCwd, stdio: 'pipe' },
       );
       fetchRemoteWebUrlMock.mockResolvedValue(
-        `https://gitlab.alibaba-inc.com/${repoPath}`,
+        `https://gitlab.alibaba-inc.invalid/${repoPath}`,
       );
     }
 
@@ -437,12 +438,12 @@ describe('backfillWorkspaceSessionPrs', () => {
       await seedSession(SESSION_A);
       await appendUserText(
         SESSION_A,
-        '/review https://gitlab.alibaba-inc.com/jspt/agentic_coding/pull/888',
+        '/review https://gitlab.alibaba-inc.invalid/jspt/agentic_coding/pull/888',
       );
       const backend = fakeAoneBackend({
         view: vi.fn(async (repoPath: string, id: number) => ({
           number: id,
-          url: `https://code.alibaba-inc.com/${repoPath}/codereview/${id}`,
+          url: `https://code.alibaba-inc.invalid/${repoPath}/codereview/${id}`,
           state: 'open' as const,
         })),
       });
@@ -462,7 +463,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       expect(prs).toEqual([
         {
           number: 888,
-          url: 'https://code.alibaba-inc.com/jspt/agentic_coding/codereview/888',
+          url: 'https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/888',
           createdAt: expect.any(String),
           state: 'open',
           source: 'review',
@@ -479,12 +480,12 @@ describe('backfillWorkspaceSessionPrs', () => {
       await seedSession(SESSION_A);
       await appendUserText(
         SESSION_A,
-        '/review https://gitlab.alibaba-inc.com/group/subgroup/other/pull/5',
+        '/review https://gitlab.alibaba-inc.invalid/group/subgroup/other/pull/5',
       );
       await seedSession(SESSION_B);
       await appendUserText(
         SESSION_B,
-        '/review https://gitlab.alibaba-inc.com/group/subgroup/project/pull/5',
+        '/review https://gitlab.alibaba-inc.invalid/group/subgroup/project/pull/5',
       );
       const backend = fakeAoneBackend();
 
@@ -513,7 +514,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       );
       expect(prsB?.[0]).toMatchObject({
         number: 5,
-        url: 'https://code.alibaba-inc.com/group/subgroup/project/codereview/5',
+        url: 'https://code.alibaba-inc.invalid/group/subgroup/project/codereview/5',
         source: 'review',
       });
     });
@@ -550,7 +551,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       expect(prs).toEqual([
         {
           number: 26430560,
-          url: 'https://code.alibaba-inc.com/jspt/agentic_coding/codereview/26430560',
+          url: 'https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/26430560',
           createdAt: expect.any(String),
           state: 'merged',
           source: 'worktree',
@@ -564,7 +565,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       const backend = fakeAoneBackend({
         view: vi.fn(async (repoPath: string, id: number) => ({
           number: id,
-          url: `https://code.alibaba-inc.com/${repoPath}/codereview/${id}`,
+          url: `https://code.alibaba-inc.invalid/${repoPath}/codereview/${id}`,
           state: 'open' as const,
         })),
       });
@@ -582,7 +583,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       );
       expect(prs?.[0]).toMatchObject({
         number: 26430560,
-        url: 'https://code.alibaba-inc.com/jspt/agentic_coding/codereview/26430560',
+        url: 'https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/26430560',
         state: 'open',
         source: 'review',
       });
@@ -623,7 +624,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       // the cap; the excess stays unresolved for the next run.
       const view = vi.fn(async (repoPath: string, id: number) => ({
         number: id,
-        url: `https://code.alibaba-inc.com/${repoPath}/codereview/${id}`,
+        url: `https://code.alibaba-inc.invalid/${repoPath}/codereview/${id}`,
         state: 'merged' as const,
       }));
       for (let i = 0; i < AONE_MAX_MR_VIEW_CALLS_PER_RUN + 2; i++) {
@@ -668,11 +669,11 @@ describe('backfillWorkspaceSessionPrs', () => {
     });
 
     it('keeps a GHE-shaped origin on the GitHub path', async () => {
-      // `*.alibaba-inc.com` also names GitHub Enterprise instances; such a
+      // `*.alibaba-inc.invalid` also names GitHub Enterprise instances; such a
       // workspace must stay on gh (which resolves the enterprise host from
       // the origin) instead of being displaced onto a1.
       execSync(
-        'git remote add origin git@ghe.alibaba-inc.com:team/project.git',
+        'git remote add origin git@ghe.alibaba-inc.invalid:team/project.git',
         { cwd: workspaceCwd, stdio: 'pipe' },
       );
       await seedSession(SESSION_A);
@@ -772,7 +773,7 @@ describe('backfillWorkspaceSessionPrs', () => {
         JSON.stringify({
           prs: Array.from({ length: SESSION_PR_LIST_LIMIT }, (_, i) => ({
             number: i + 1,
-            url: `https://code.alibaba-inc.com/jspt/agentic_coding/codereview/${i + 1}`,
+            url: `https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/${i + 1}`,
             createdAt: '2026-08-01T00:00:00.000Z',
             state: 'merged',
             source: 'review',
@@ -782,7 +783,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       );
       const view = vi.fn(async (repoPath: string, id: number) => ({
         number: id,
-        url: `https://code.alibaba-inc.com/${repoPath}/codereview/${id}`,
+        url: `https://code.alibaba-inc.invalid/${repoPath}/codereview/${id}`,
         state: 'merged' as const,
       }));
       const backend = fakeAoneBackend({ view });
@@ -825,7 +826,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       );
       const seeded = await upsertSessionPr(prPath, {
         number: 777,
-        url: 'https://gitlab.alibaba-inc.com/jspt/agentic_coding/pull/777',
+        url: 'https://gitlab.alibaba-inc.invalid/jspt/agentic_coding/pull/777',
         source: 'worktree',
       });
 
@@ -845,7 +846,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       expect(prs).toEqual([
         {
           number: 777,
-          url: 'https://code.alibaba-inc.com/jspt/agentic_coding/codereview/777',
+          url: 'https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/777',
           createdAt: seeded[0]?.createdAt,
           state: 'merged',
           source: 'worktree',
@@ -863,7 +864,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       );
       const seeded = await upsertSessionPr(prPath, {
         number: 888,
-        url: 'https://gitlab.alibaba-inc.com/jspt/agentic_coding/pull/888',
+        url: 'https://gitlab.alibaba-inc.invalid/jspt/agentic_coding/pull/888',
       });
       const backend = fakeAoneBackend({
         view: vi.fn(async () => {
@@ -883,7 +884,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       expect(prs).toEqual([
         {
           number: 888,
-          url: 'https://gitlab.alibaba-inc.com/jspt/agentic_coding/pull/888',
+          url: 'https://gitlab.alibaba-inc.invalid/jspt/agentic_coding/pull/888',
           createdAt: seeded[0]?.createdAt,
         },
       ]);
@@ -901,12 +902,12 @@ describe('backfillWorkspaceSessionPrs', () => {
       );
       const seeded = await upsertSessionPr(prPath, {
         number: 999,
-        url: 'https://gitlab.alibaba-inc.com/jspt/agentic_coding/pull/999',
+        url: 'https://gitlab.alibaba-inc.invalid/jspt/agentic_coding/pull/999',
       });
       const backend = fakeAoneBackend({
         view: vi.fn(async (repoPath: string, id: number) => ({
           number: id,
-          url: `https://code.alibaba-inc.com/${repoPath}/codereview/${id}`,
+          url: `https://code.alibaba-inc.invalid/${repoPath}/codereview/${id}`,
           state: id === 500 ? ('open' as const) : ('merged' as const),
         })),
       });
@@ -923,13 +924,13 @@ describe('backfillWorkspaceSessionPrs', () => {
       expect(prs).toEqual([
         {
           number: 999,
-          url: 'https://code.alibaba-inc.com/jspt/agentic_coding/codereview/999',
+          url: 'https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/999',
           createdAt: seeded[0]?.createdAt,
           state: 'merged',
         },
         {
           number: 500,
-          url: 'https://code.alibaba-inc.com/jspt/agentic_coding/codereview/500',
+          url: 'https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/500',
           createdAt: expect.any(String),
           state: 'open',
           source: 'review',
@@ -949,11 +950,11 @@ describe('backfillWorkspaceSessionPrs', () => {
       );
       const seeded = await upsertSessionPr(prPath, {
         number: 777,
-        url: 'https://gitlab.alibaba-inc.com/jspt/agentic_coding/pull/777',
+        url: 'https://gitlab.alibaba-inc.invalid/jspt/agentic_coding/pull/777',
       });
       const view = vi.fn(async (repoPath: string, id: number) => ({
         number: id,
-        url: `https://code.alibaba-inc.com/${repoPath}/codereview/${id}`,
+        url: `https://code.alibaba-inc.invalid/${repoPath}/codereview/${id}`,
         state: 'merged' as const,
       }));
 
@@ -975,7 +976,7 @@ describe('backfillWorkspaceSessionPrs', () => {
       expect(prs).toEqual([
         {
           number: 777,
-          url: 'https://code.alibaba-inc.com/jspt/agentic_coding/codereview/777',
+          url: 'https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/777',
           createdAt: seeded[0]?.createdAt,
           state: 'merged',
         },
@@ -3995,7 +3996,7 @@ describe('backfillWorkspaceSessionPrs', () => {
     await seedSession(SESSION_A);
     await appendUserText(
       SESSION_A,
-      'Save reports under .qwen/tmp/review-pr-<n> (#9205) and run /review 77 before merging',
+      'Save reports under .mariadb-shell-agent/tmp/review-pr-<n> (#9205) and run /review 77 before merging',
     );
     fetchGitHubPullRequestsMock.mockResolvedValue({
       kind: 'ok',
@@ -5892,7 +5893,7 @@ describe('registerSessionPrBackfillRoutes', () => {
       worktreePath,
       JSON.stringify({
         slug: 'pr-123',
-        worktreePath: `${trustedCwd}/.qwen/worktrees/pr-123`,
+        worktreePath: `${trustedCwd}/.mariadb-shell-agent/worktrees/pr-123`,
         worktreeBranch: 'worktree-pr-123',
         originalCwd: trustedCwd,
         originalBranch: 'main',
@@ -5992,7 +5993,7 @@ describe('registerSessionPrBackfillRoutes', () => {
       worktreePath,
       JSON.stringify({
         slug: 'pr-123',
-        worktreePath: `${cwd}/.qwen/worktrees/pr-123`,
+        worktreePath: `${cwd}/.mariadb-shell-agent/worktrees/pr-123`,
         worktreeBranch: 'worktree-pr-123',
         originalCwd: cwd,
         originalBranch: 'main',

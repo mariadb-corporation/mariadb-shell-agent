@@ -6,7 +6,7 @@ Implemented in issue #8589.
 
 ## Scope
 
-Qwen Code already records the application session ID as `session.id` and maps
+MariaDB Shell Agent already records the application session ID as `session.id` and maps
 it to `gen_ai.conversation.id` on GenAI LLM and agent spans. This design adds
 the OpenTelemetry General Session lifecycle events without removing the
 existing Qwen-specific telemetry fields or event names.
@@ -49,7 +49,7 @@ before shutting down the SDK.
 
 ## Session id reuse on `/resume`
 
-Qwen Code's session model predates this design: `/resume` restores a
+MariaDB Shell Agent's session model predates this design: `/resume` restores a
 persisted conversation under its original session id instead of minting a new
 one. Two consequences follow for the lifecycle stream:
 

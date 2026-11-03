@@ -4,19 +4,19 @@
 
 ## Status
 
-Implemented in this change. `qwen daemon start` is local process management; it
+Implemented in this change. `mariadb-shell-agent daemon start` is local process management; it
 does not change the serve protocol, authentication, or workspace isolation.
 
 ## Problem
 
 Starting a local daemon required a service manager, tmux, or `nohup`. The
-discovery record and `qwen daemon stop` already made a running daemon
+discovery record and `mariadb-shell-agent daemon stop` already made a running daemon
 inspectable, but there was no supported way to start one and return to the
 shell.
 
 ## Behavior
 
-`qwen daemon start` spawns `qwen serve` as a detached child, waits for the
+`mariadb-shell-agent daemon start` spawns `mariadb-shell-agent serve` as a detached child, waits for the
 child to publish its discovery record, then prints the bound URL, PID, log
 path, and stop command. The child keeps running after the parent exits.
 
@@ -67,13 +67,13 @@ startup log.
   non-loopback token fails before spawning.
 - If the child exits or does not publish a record within 30 seconds, the
   command exits non-zero, says the detached child may still start, points at
-  `qwen daemon status`, and prints the startup log path and tail.
+  `mariadb-shell-agent daemon status`, and prints the startup log path and tail.
 
 ## Non-goals
 
 - No supervision, crash restart, or service installation.
 - No Windows service wrapper.
-- No ephemeral-token mode on a non-loopback bind; use `qwen serve` directly.
+- No ephemeral-token mode on a non-loopback bind; use `mariadb-shell-agent serve` directly.
 
 ## Validation
 

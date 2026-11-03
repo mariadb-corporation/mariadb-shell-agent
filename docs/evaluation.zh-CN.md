@@ -1,13 +1,13 @@
-# Qwen Code 评测
+# MariaDB Shell Agent 评测
 
 [English](evaluation.md) | [简体中文](evaluation.zh-CN.md)
 
 本次评测使用相同的 Qwen 3.7 Max 模型和配置，在 SWE-bench Verified 上比较七个
-Qwen Code 版本。平均得分为 **76.40%–77.80%**，最大差值为 **1.40 个百分点**。
+MariaDB Shell Agent 版本。平均得分为 **76.40%–77.80%**，最大差值为 **1.40 个百分点**。
 
 ## 各版本得分
 
-![各 Qwen Code 版本的 SWE-bench Verified 平均得分，范围为 76.40%–77.80%。](../.github/assets/qwen-code-avg-score-trend.svg)
+![各 MariaDB Shell Agent 版本的 SWE-bench Verified 平均得分，范围为 76.40%–77.80%。](../.github/assets/qwen-code-avg-score-trend.svg)
 
 | 版本   | Avg Score | Pass Rate | pass@3 | pass^3 |
 | ------ | --------: | --------: | -----: | -----: |
@@ -27,7 +27,7 @@ pass@3 的数值相同。
 | 配置项        | 值                                                                                                  |
 | ------------- | --------------------------------------------------------------------------------------------------- |
 | 数据集        | `princeton-nlp/SWE-bench_Verified`，500 个任务                                                      |
-| 运行次数      | 每个版本 3 次，共 1,500 个作业；覆盖 7 个 Qwen Code 版本                                            |
+| 运行次数      | 每个版本 3 次，共 1,500 个作业；覆盖 7 个 MariaDB Shell Agent 版本                                  |
 | 模型          | `Qwen 3.7 Max`                                                                                      |
 | 采样          | `temperature=1`, `top_p=0.95`                                                                       |
 | 思考 / 推理   | `interleaved_thinking=true`, `thinking_type=adaptive`, `reasoning_effort=high`                      |

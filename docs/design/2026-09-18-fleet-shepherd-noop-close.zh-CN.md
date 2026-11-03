@@ -3,7 +3,7 @@
 [English](2026-09-18-fleet-shepherd-noop-close.md) | [简体中文](2026-09-18-fleet-shepherd-noop-close.zh-CN.md)
 
 日期：2026-09-18（2026-09-19 在第 1–2 轮评审后修订）
-状态：提议中 —— 由 [#12150](https://github.com/QwenLM/qwen-code/pull/12150) 实现；等待评审
+状态：提议中 —— 由 [#12150](https://github.invalid/QwenLM/qwen-code/pull/12150) 实现；等待评审
 
 ## 问题
 

@@ -19,11 +19,11 @@
 前瞻性的设计预留，不是对运行中代码的描述；涉及架构的各节标题均再次标注。
 本文件不改变任何生产行为，不随附任何生产代码。
 
-属于 [#12380](https://github.com/QwenLM/qwen-code/issues/12380)，认领其被推迟的
+属于 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380)，认领其被推迟的
 「optional MQ/Redis transport … later design scope」范围。跟随 H 阶段跟踪单
-[#12827](https://github.com/QwenLM/qwen-code/issues/12827)；实现阶段的门禁依赖
-[#13300](https://github.com/QwenLM/qwen-code/issues/13300)（H0c 评审跟进项）与
-[#13265](https://github.com/QwenLM/qwen-code/issues/13265)（H3 后台 Shell 与
+[#12827](https://github.invalid/QwenLM/qwen-code/issues/12827)；实现阶段的门禁依赖
+[#13300](https://github.invalid/QwenLM/qwen-code/issues/13300)（H0c 评审跟进项）与
+[#13265](https://github.invalid/QwenLM/qwen-code/issues/13265)（H3 后台 Shell 与
 Monitor 运行时，后者落定唤醒路径所承载的持久任务事件与取消语义）。
 上游权威设计：固定于 `6891216` 的扩展运行时文档
 [managed-agent-extension-runtime.md](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-extension-runtime.md)
@@ -237,8 +237,8 @@ wiki](https://github.com/apache/rocketmq/wiki/RIP%E2%80%9083-Lite-Topic:-A-New-M
 [LiteTopic 领域模型](https://rocketmq.apache.org/docs/domainModel/03litetopic/)、
 [5.5.0 发布说明](https://rocketmq.apache.org/zh/release-notes/2026/04/10/5.5.0/)、
 [multi-agent 最佳实践](https://rocketmq.apache.org/zh/docs/bestPractice/04multiagent/)、
-[阿里云 LiteTopic 参考](https://help.aliyun.com/zh/apsaramq-for-rocketmq/cloud-message-queue-rocketmq-5-x-series/developer-reference/litetopic)与
-[使用限制](https://help.aliyun.com/zh/apsaramq-for-rocketmq/cloud-message-queue-rocketmq-5-x-series/product-overview/usage-limits)、
+[阿里云 LiteTopic 参考](https://help.aliyun.invalid/zh/apsaramq-for-rocketmq/cloud-message-queue-rocketmq-5-x-series/developer-reference/litetopic)与
+[使用限制](https://help.aliyun.invalid/zh/apsaramq-for-rocketmq/cloud-message-queue-rocketmq-5-x-series/product-overview/usage-limits)、
 [5.5.0 LiteTopic 深度解读](https://www.cnblogs.com/alisystemsoftware/p/20189542);5.5.0 源码 tag:
 [LiteEventDispatcher](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.0/broker/src/main/java/org/apache/rocketmq/broker/lite/LiteEventDispatcher.java#L107-L162)、
 [PopLiteMessageProcessor](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.0/broker/src/main/java/org/apache/rocketmq/broker/processor/PopLiteMessageProcessor.java#L285-L328)、
@@ -397,7 +397,7 @@ bootstrap 通道停顿约两分钟；没有生产者重试缓冲，broker 离开
 - [x] broker 能力主张拆分为已核实与未核实，附抓取来源与日期（§5.1）。
 - [x] 双语版本保持结构对齐（README 规则）。
 - [ ] 双语设计合入；跟踪 issue（草稿位于
-      `.qwen/issues/managed-agent-event-transport-mq.md`）由其 owner 提交，
+      `.mariadb-shell-agent/issues/managed-agent-event-transport-mq.md`）由其 owner 提交，
       并在 #12380 快照上记录认领切片。
 
 ## 11. 提交给跟踪 issue 的开放问题

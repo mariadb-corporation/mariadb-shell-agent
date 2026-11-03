@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -436,7 +437,7 @@ describe('managed auto-memory lifecycle integration', () => {
 
   it('forgets a topic beyond the general 200-document scan cap', async () => {
     // Hermetic: forget deletes files, so the user-level scan must never reach
-    // the real `~/.qwen/memories`.
+    // the real `~/.mariadb-shell-agent/memories`.
     const originalMemoryBase = process.env['QWEN_CODE_MEMORY_BASE_DIR'];
     process.env['QWEN_CODE_MEMORY_BASE_DIR'] = path.join(tempDir, 'memory');
     clearAutoMemoryRootCache();

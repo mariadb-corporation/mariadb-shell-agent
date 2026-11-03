@@ -1,6 +1,6 @@
 # `@qwen-code/acp-bridge`
 
-Shared ACP bridge primitives consumed by `qwen serve`, channels, IDE, TUI,
+Shared ACP bridge primitives consumed by `mariadb-shell-agent serve`, channels, IDE, TUI,
 and remote-control adapters. Lives in the monorepo, not published to npm.
 
 Lift history (#4175 Mode B daemon roadmap):
@@ -20,7 +20,7 @@ Lift history (#4175 Mode B daemon roadmap):
   (`slow_client_warning` → `client_evicted`).
 - `inMemoryChannel` — paired NDJSON streams without spawning a child;
   used for in-process bridge tests and the parked Mode A
-  (`qwen --serve`) path.
+  (`mariadb-shell-agent --serve`) path.
 - `channel` — `AcpChannel` / `AcpChannelExitInfo` / `ChannelFactory`
   type contract that `createHttpAcpBridge` (now in this package) plus
   the channels / VSCode IDE companion's own-spawn paths consume via
@@ -68,7 +68,7 @@ Lift history (#4175 Mode B daemon roadmap):
   `SCRUBBED_CHILD_ENV_KEYS` denylist + `scrubChildEnv` pure env-policy
   helper (exported for adapter reuse + unit-test access; isolates the
   scrub + override + defense-in-depth ordering invariant the security
-  argument relies on). Production spawn of the `qwen --acp` child
+  argument relies on). Production spawn of the `mariadb-shell-agent --acp` child
   with stderr prefix-and-forward, kill cascade, and env passthrough.
   Channels (`packages/channels/base/AcpBridge.ts`) and the VSCode IDE
   companion consume this directly instead of each reimplementing the
@@ -92,7 +92,7 @@ Lift history (#4175 Mode B daemon roadmap):
   ACP fs proxy. When wired through `BridgeOptions.fileSystem`,
   `BridgeClient.readTextFile` / `BridgeClient.writeTextFile`
   delegate to it instead of the inline `fs.realpath` /
-  `fs.writeFile` / `fs.readFile` proxy. Production `qwen serve` injects
+  `fs.writeFile` / `fs.readFile` proxy. Production `mariadb-shell-agent serve` injects
   `WorkspaceFileSystem` for final ACP `writeTextFile` content writes and for
   defensive handling of unexpected or capability-violating delegated reads;
   normal same-host text reads stay in the child. The interface remains

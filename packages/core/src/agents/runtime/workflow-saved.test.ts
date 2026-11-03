@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -40,7 +41,7 @@ import {
 
 /**
  * A Config whose `.storage` points at `projectDir`. The user scope
- * (`~/.qwen`) is sandboxed via QWEN_HOME in beforeEach, so tests never touch
+ * (`~/.mariadb-shell-agent`) is sandboxed via QWEN_HOME in beforeEach, so tests never touch
  * the real home directory.
  */
 function fakeConfig(projectDir: string): Config {
@@ -106,9 +107,9 @@ describe('workflow-saved', () => {
     projectDir = await fs.mkdtemp(path.join(os.tmpdir(), 'wf-proj-'));
     userHome = await fs.mkdtemp(path.join(os.tmpdir(), 'wf-user-'));
     prevQwenHome = process.env['QWEN_HOME'];
-    // Storage.getGlobalQwenDir() reads QWEN_HOME, else ~/.qwen. Point it at
-    // `<userHome>/.qwen` so the user scope is sandboxed.
-    process.env['QWEN_HOME'] = path.join(userHome, '.qwen');
+    // Storage.getGlobalQwenDir() reads QWEN_HOME, else ~/.mariadb-shell-agent. Point it at
+    // `<userHome>/.mariadb-shell-agent` so the user scope is sandboxed.
+    process.env['QWEN_HOME'] = path.join(userHome, '.mariadb-shell-agent');
   });
 
   afterEach(async () => {
@@ -365,7 +366,9 @@ describe('workflow-saved', () => {
       const result = await save('user-flow', 'return 1;', { scope: 'user' });
       expect(result.status).toBe('saved');
       if (result.status !== 'saved') throw new Error('expected saved');
-      expect(result.path).toContain(path.join(userHome, '.qwen'));
+      expect(result.path).toContain(
+        path.join(userHome, '.mariadb-shell-agent'),
+      );
       expect(result.scope).toBe('user');
     });
 
@@ -413,7 +416,7 @@ describe('workflow-saved', () => {
 
     beforeEach(async () => {
       // Attacker-controlled external dir with a planted secret-bearing script,
-      // linked at `<projectDir>/.qwen/workflows`.
+      // linked at `<projectDir>/.mariadb-shell-agent/workflows`.
       external = await fs.mkdtemp(path.join(os.tmpdir(), 'wf-evil-'));
       await put(path.join(external, 'leak.js'), `return 'EXFILTRATED';`);
       projectWorkflowsDir = projectWorkflows();
@@ -556,7 +559,7 @@ describe('workflow-saved — extension tier', () => {
     await fs.mkdir(projectDir, { recursive: true });
     await fs.mkdir(extensionRoot, { recursive: true });
     prevQwenHome = process.env['QWEN_HOME'];
-    process.env['QWEN_HOME'] = path.join(base, 'home', '.qwen');
+    process.env['QWEN_HOME'] = path.join(base, 'home', '.mariadb-shell-agent');
   });
 
   afterEach(async () => {
@@ -835,7 +838,8 @@ describe('workflow-saved — local ancestor discovery', () => {
   let target: string;
   let previousHome: string | undefined;
   const trust = vi.fn(async (dirs: readonly string[]) => dirs.map(() => true));
-  const workflows = (dir: string) => path.join(dir, '.qwen', 'workflows');
+  const workflows = (dir: string) =>
+    path.join(dir, '.mariadb-shell-agent', 'workflows');
   const config = (storageTarget = target): Config =>
     ({
       storage: new Storage(storageTarget),
@@ -852,7 +856,7 @@ describe('workflow-saved — local ancestor discovery', () => {
     await fs.mkdir(target, { recursive: true });
     await fs.mkdir(path.join(repo, '.git'));
     previousHome = process.env['QWEN_HOME'];
-    process.env['QWEN_HOME'] = path.join(base, 'home', '.qwen');
+    process.env['QWEN_HOME'] = path.join(base, 'home', '.mariadb-shell-agent');
     trust.mockReset();
     trust.mockImplementation(async (dirs) => dirs.map(() => true));
   });
@@ -1036,15 +1040,19 @@ describe('workflow-saved — local ancestor discovery', () => {
     );
   });
 
-  it.each(['.qwen', 'workflows'])(
+  it.each(['.mariadb-shell-agent', 'workflows'])(
     'C06: ancestor %s symlink grants no discovery or explicit path access',
     async (segment) => {
       const external = path.join(base, 'external');
       const externalWorkflows =
-        segment === '.qwen' ? path.join(external, 'workflows') : external;
+        segment === '.mariadb-shell-agent'
+          ? path.join(external, 'workflows')
+          : external;
       await writeWorkflow(externalWorkflows, 'leak', "return 'SECRET';");
       const link =
-        segment === '.qwen' ? path.join(repo, '.qwen') : workflows(repo);
+        segment === '.mariadb-shell-agent'
+          ? path.join(repo, '.mariadb-shell-agent')
+          : workflows(repo);
       await symlinkDir(external, link);
       expect(await listSavedWorkflows(config())).toEqual([]);
       await expect(
@@ -1095,9 +1103,12 @@ describe('workflow-saved — local ancestor discovery', () => {
     ).toEqual(['shared']);
   });
 
-  it('C08: target .qwen cannot launder an untrusted ancestor for reads or saves', async () => {
+  it('C08: target .mariadb-shell-agent cannot launder an untrusted ancestor for reads or saves', async () => {
     await writeWorkflow(workflows(repo), 'hidden', "return 'SECRET';");
-    await symlinkDir(path.join(repo, '.qwen'), path.join(target, '.qwen'));
+    await symlinkDir(
+      path.join(repo, '.mariadb-shell-agent'),
+      path.join(target, '.mariadb-shell-agent'),
+    );
     trust.mockImplementation(async (dirs) => dirs.map(() => false));
     expect(await listSavedWorkflows(config())).toEqual([]);
     await expect(
@@ -1122,7 +1133,7 @@ describe('workflow-saved — local ancestor discovery', () => {
   it('C08: keeps project aliases inside target and user parent aliases usable', async () => {
     const local = path.join(target, 'config');
     await writeWorkflow(path.join(local, 'workflows'), 'local', 'return 1;');
-    await symlinkDir(local, path.join(target, '.qwen'));
+    await symlinkDir(local, path.join(target, '.mariadb-shell-agent'));
     const userAlias = path.join(base, 'user-config');
     await writeWorkflow(path.join(userAlias, 'workflows'), 'user', 'return 2;');
     await symlinkDir(userAlias, Storage.getGlobalQwenDir());
@@ -1517,7 +1528,7 @@ describe('workflow-saved — local ancestor discovery', () => {
     process.env['QWEN_HOME'] = path.join(
       workflows(repo),
       'user-config',
-      '.qwen',
+      '.mariadb-shell-agent',
     );
     const scriptPath = path.join(
       Storage.getUserWorkflowsDir(),
@@ -1587,13 +1598,16 @@ describe('workflow-saved — local ancestor discovery', () => {
     }
   });
 
-  it.each(['.qwen', 'workflows', 'file'])(
+  it.each(['.mariadb-shell-agent', 'workflows', 'file'])(
     'C06: an ancestor %s link into the independent user scope grants no ancestor path',
     async (segment) => {
       const userFile = path.join(Storage.getUserWorkflowsDir(), 'user-only.js');
       await put(userFile, "return 'USER_ONLY';");
-      if (segment === '.qwen') {
-        await symlinkDir(Storage.getGlobalQwenDir(), path.join(repo, '.qwen'));
+      if (segment === '.mariadb-shell-agent') {
+        await symlinkDir(
+          Storage.getGlobalQwenDir(),
+          path.join(repo, '.mariadb-shell-agent'),
+        );
       } else if (segment === 'workflows') {
         await symlinkDir(Storage.getUserWorkflowsDir(), workflows(repo));
       } else {
@@ -1765,7 +1779,7 @@ describe('workflow-saved — local ancestor discovery', () => {
     async (alias) => {
       const userRepo = alias ? path.join(base, 'repo-alias') : repo;
       if (alias) await symlinkDir(repo, userRepo);
-      process.env['QWEN_HOME'] = path.join(userRepo, '.qwen');
+      process.env['QWEN_HOME'] = path.join(userRepo, '.mariadb-shell-agent');
       const scriptPath = path.join(Storage.getUserWorkflowsDir(), 'global.js');
       await put(scriptPath, 'return 7;');
       const readdir = vi.spyOn(fs, 'readdir');
@@ -1814,9 +1828,9 @@ describe('workflow-saved — local ancestor discovery', () => {
   });
 
   it('R1-29: a refused project boundary is distinguished from considered and missing roots', async () => {
-    const outside = path.join(base, 'outside', '.qwen');
+    const outside = path.join(base, 'outside', '.mariadb-shell-agent');
     await writeWorkflow(path.join(outside, 'workflows'), 'hidden', 'return 9;');
-    await symlinkDir(outside, path.join(target, '.qwen'));
+    await symlinkDir(outside, path.join(target, '.mariadb-shell-agent'));
     await expect(
       resolveSavedWorkflowScript(
         { scriptPath: path.join(workflows(target), 'hidden.js') },
@@ -1895,7 +1909,7 @@ describe('workflow-saved — local ancestor discovery', () => {
   it('R1-28: an existing escaping project alias is rejected before mkdir creates external directories', async () => {
     const outside = path.join(base, 'outside');
     await fs.mkdir(outside);
-    await symlinkDir(outside, path.join(target, '.qwen'));
+    await symlinkDir(outside, path.join(target, '.mariadb-shell-agent'));
     const mkdir = vi.spyOn(fs, 'mkdir');
     await expect(
       saveWorkflowScript(config(), {
@@ -1908,8 +1922,8 @@ describe('workflow-saved — local ancestor discovery', () => {
     expect(await fs.readdir(outside)).toEqual([]);
   });
 
-  it('R1-32: a target .qwen ordinary file permits independent user discovery without widening read or write scope', async () => {
-    await put(path.join(target, '.qwen'), 'ordinary file');
+  it('R1-32: a target .mariadb-shell-agent ordinary file permits independent user discovery without widening read or write scope', async () => {
+    await put(path.join(target, '.mariadb-shell-agent'), 'ordinary file');
     const userPath = path.join(Storage.getUserWorkflowsDir(), 'user.js');
     await put(userPath, 'return 13;');
     expect(await listSavedWorkflows(config())).toEqual([

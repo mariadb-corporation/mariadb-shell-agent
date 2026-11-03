@@ -4,11 +4,11 @@
 
 ## 背景
 
-Qwen Code 配置的 MCP 会话目前使用 v1 TypeScript SDK。只实现 MCP `2026-07-28`
+MariaDB Shell Agent 配置的 MCP 会话目前使用 v1 TypeScript SDK。只实现 MCP `2026-07-28`
 无状态协议的服务器无法完成旧版 `initialize` 握手，但无条件切换到现代协议会破坏现有服务器。
 
 官方 TypeScript SDK v2 已负责线路层兼容逻辑：`server/discover` 协商、旧版回退、
-每次请求的元数据与 HTTP 请求头、分页以及缓存提示。Qwen Code 应配置这些行为，而非重复实现。
+每次请求的元数据与 HTTP 请求头、分页以及缓存提示。MariaDB Shell Agent 应配置这些行为，而非重复实现。
 
 ## 范围
 
@@ -26,7 +26,7 @@ SDK v2 在 HTTP `server/discover` 探测超时后会直接拒绝，不回退到 
 - 仅支持现代协议的远程（HTTP / SSE / TCP）协议协商；
 - 跨 TUI、WebShell、无头模式与 ACP 的交互式 MRTR 信息征询和审批；
 - MCP 链接、下载、消息、模型上下文更新和全屏展示；
-- Qwen Code 内部 IDE、Computer Use 和内嵌 MCP 服务器集成的迁移，
+- MariaDB Shell Agent 内部 IDE、Computer Use 和内嵌 MCP 服务器集成的迁移，
   它们不属于配置的外部 MCP 会话。
 
 ## 设计
@@ -46,7 +46,7 @@ SDK 会在启动会话进程前，使用一次性兄弟进程执行可选的 std
 不发送 `server/discover`。
 
 现代会话使用带类型的 v2 列表/读取方法，使 SDK 能汇总分页并遵守 `ttlMs` 和
-`cacheScope`。旧版会话继续使用 Qwen Code 原有的提示词和资源请求路径，
+`cacheScope`。旧版会话继续使用 MariaDB Shell Agent 原有的提示词和资源请求路径，
 因为该路径有意兼容未声明相应能力却提供方法的旧服务器。
 
 工具发现使用同一次支持缓存的 `tools/list` 结果注册 schema 和注解。
@@ -54,7 +54,7 @@ SDK 会在启动会话进程前，使用一次性兄弟进程执行可选的 std
 
 配置的客户端声明 `io.modelcontextprotocol/ui` 扩展和
 `text/html;profile=mcp-app` 资源类型。当服务器也声明该扩展时，工具发现会保留其
-`ui://` 资源 URI。调用成功后，Qwen Code 读取并校验对应 HTML，将其保存在结构化
+`ui://` 资源 URI。调用成功后，MariaDB Shell Agent 读取并校验对应 HTML，将其保存在结构化
 展示结果中，而不改变模型可见结果。缺失、超大、格式错误或不可读的资源仍产生
 `html` 为空的 `mcp_app` 展示，其 `fallbackText` 在普通工具文本之前添加
 `Warning: MCP App '<uri>' from '<server>' could not be displayed: <reason>`；
@@ -125,7 +125,7 @@ AppBridge 和 postMessage 向内层 iframe 传递 HTML、工具输入及结果�
 - 配置的 stdio 服务器默认使用单进程旧版流程，可通过 `versionNegotiation: "auto"`
   选择额外的协商进程。
 - 旧版回退保持 SDK 与 v1 字节兼容的序列。
-- 授权和 Qwen Code 的 MCP 权限边界不变。
+- 授权和 MariaDB Shell Agent 的 MCP 权限边界不变。
 - 现代缓存为每个客户端实例私有，不跨工作区或授权主体共享结果。
 - MCP App HTML 默认限制为 1 MiB，可按服务器调到最多 4 MiB，且从不进入模型上下文。
 - App HTML 在双层 iframe 沙箱中运行，两层均带 `allow-same-origin`。

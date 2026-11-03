@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,7 +26,7 @@ import type {
 import { createWorkspaceRuntimeSessionService } from '../workspace-runtime-storage.js';
 
 const STARTUP_CONTEXT_HEADER =
-  'Startup context from Qwen Code.\nThis is background context about recent work and machine/workspace layout. It may be incomplete or stale. Use it to inform responses, and do not repeat it back unless relevant.';
+  'Startup context from MariaDB Shell Agent.\nThis is background context about recent work and machine/workspace layout. It may be incomplete or stale. Use it to inform responses, and do not repeat it back unless relevant.';
 const CURRENT_THREAD_SECTION_TOKEN_BUDGET = 1_200;
 const RECENT_WORK_SECTION_TOKEN_BUDGET = 2_200;
 const WORKSPACE_SECTION_TOKEN_BUDGET = 1_600;

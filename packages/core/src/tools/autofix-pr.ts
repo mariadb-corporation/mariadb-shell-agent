@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -168,7 +169,7 @@ function isPlanPath(plan: string, pr: number | undefined): boolean {
     n >= 3 &&
     parts[n - 1] === `autofix-pr-${pr}-plan.json` &&
     parts[n - 2] === 'tmp' &&
-    parts[n - 3] === '.qwen' &&
+    parts[n - 3] === '.mariadb-shell-agent' &&
     // Case-folding file systems read AUTOFIX-PR-<n> as the worktree too.
     !parts.some((part) => part.toLowerCase() === `autofix-pr-${pr}`)
   );
@@ -214,7 +215,7 @@ export function validateAutofixPrParams(
         return `"${key}" is not a valid value: ${JSON.stringify(value)}.`;
       }
       if (option === 'plan' && !isPlanPath(value, params.pr)) {
-        return `"plan" must be the absolute path of the reply plan the skill writes, <clone>/.qwen/tmp/autofix-pr-${params.pr ?? '<pr>'}-plan.json beside the worktree.`;
+        return `"plan" must be the absolute path of the reply plan the skill writes, <clone>/.mariadb-shell-agent/tmp/autofix-pr-${params.pr ?? '<pr>'}-plan.json beside the worktree.`;
       }
     }
   }
@@ -347,7 +348,7 @@ export function resolveAutofixPrLaunch(
     return { executable: interpreter(), args: [script] };
   }
   throw new Error(
-    'cannot find the Qwen Code CLI to run: QWEN_CODE_CLI is not usable and this process was not started from a script',
+    'cannot find the MariaDB Shell Agent CLI to run: QWEN_CODE_CLI is not usable and this process was not started from a script',
   );
 }
 
@@ -1297,7 +1298,7 @@ class AutofixPrInvocation extends BaseToolInvocation<
 
   /**
    * For a watch this session prepared, the plan must sit in the watch's
-   * `.qwen/tmp`, as the skill writes it; null when it does. A worktree
+   * `.mariadb-shell-agent/tmp`, as the skill writes it; null when it does. A worktree
    * watch's tmp is the worktree's parent; an in-place watch's worktree IS
    * the user's checkout, so its tmp is inside it.
    */
@@ -1307,7 +1308,7 @@ class AutofixPrInvocation extends BaseToolInvocation<
     const watch = preparedWatch(this.config, pr);
     if (!watch) return null;
     const planDir = watch.inPlace
-      ? path.join(watch.worktree, '.qwen', 'tmp')
+      ? path.join(watch.worktree, '.mariadb-shell-agent', 'tmp')
       : path.dirname(watch.worktree);
     const expected = path.join(planDir, `autofix-pr-${pr}-plan.json`);
     const given = path.join(

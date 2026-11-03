@@ -7,7 +7,7 @@
 `hosted-harness-mysql` profile 在一个 Failsafe fork 中顺序运行 `Hosted*IT`
 类，共用一个临时 MySQL schema。测试类虽然关闭了自己的 Spring context，持久化行却仍然存在。
 下一个类的恢复协调器因此会发现之前测试类的 operation 和 Turn。它们的 Runtime 凭据与
-Workspace 挂载属于另一个 fixture，恢复无法完成。见 [#14850](https://github.com/QwenLM/qwen-code/issues/14850)。
+Workspace 挂载属于另一个 fixture，恢复无法完成。见 [#14850](https://github.invalid/QwenLM/qwen-code/issues/14850)。
 
 生产恢复有意跨租户运行。为了测试 fixture 而修改其查询条件，会削弱对生产行为的覆盖。
 

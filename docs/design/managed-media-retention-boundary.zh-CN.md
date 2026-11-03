@@ -4,7 +4,7 @@
 
 ## 当前生产者与问题
 
-P3 issue [#13884](https://github.com/QwenLM/qwen-code/issues/13884) 早于共享
+P3 issue [#13884](https://github.invalid/QwenLM/qwen-code/issues/13884) 早于共享
 schema 整合。在 `06efd789b1` 上，Session 回收器已经释放退役 journal owner，
 并且不限制 kind 地回收没有引用的不可变 SQL 资源。剩余工作必须区分实际生产者与
 尚待设计的共享对象生命周期。
@@ -57,8 +57,8 @@ Session 引用，在最后一次释放后重新遍历延迟候选，并防止 up
 删除远端对象。
 
 此变更不新增推测性的 Hosted omni adapter，也不启用新恢复布局。它不会关闭
-[#13884](https://github.com/QwenLM/qwen-code/issues/13884)，也不宣称生产物理回收验收通过。后续物理共享生命周期和
-[#13090](https://github.com/QwenLM/qwen-code/issues/13090) 的部署门禁仍然开放。
+[#13884](https://github.invalid/QwenLM/qwen-code/issues/13884)，也不宣称生产物理回收验收通过。后续物理共享生命周期和
+[#13090](https://github.invalid/QwenLM/qwen-code/issues/13090) 的部署门禁仍然开放。
 
 ## 验证与验收
 

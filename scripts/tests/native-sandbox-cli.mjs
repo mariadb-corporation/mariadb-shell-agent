@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,7 +31,7 @@ if (mode === '--linux') {
 const bundle = path.resolve(process.argv[3] ?? 'dist/cli.js');
 const reportPath = path.resolve(
   process.argv[4] ??
-    `.qwen/e2e-tests/issue-12417-native-cli-${mode.slice(2)}.json`,
+    `.mariadb-shell-agent/e2e-tests/issue-12417-native-cli-${mode.slice(2)}.json`,
 );
 const root = await fs.mkdtemp(
   path.join(os.tmpdir(), 'issue-12417-native-cli-'),
@@ -75,7 +76,7 @@ async function fixture(name, policy) {
   await Promise.all(
     Object.values(dirs).map((dir) => fs.mkdir(dir, { recursive: true })),
   );
-  const globalDir = path.join(dirs.home, '.qwen');
+  const globalDir = path.join(dirs.home, '.mariadb-shell-agent');
   await fs.mkdir(globalDir);
   await fs.writeFile(
     path.join(globalDir, 'settings.json'),

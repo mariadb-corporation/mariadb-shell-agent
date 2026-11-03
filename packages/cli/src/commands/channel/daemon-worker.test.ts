@@ -1919,7 +1919,7 @@ describe('runChannelDaemonWorker', () => {
   // The worker dials the bound address instead, and an own-interface address
   // keeps the daemon token on this host exactly as loopback does — the
   // property the rule protects. Without this widening the documented LAN
-  // flow (`qwen serve --hostname <lan-ip> --channel …`) passes every boot
+  // flow (`mariadb-shell-agent serve --hostname <lan-ip> --channel …`) passes every boot
   // check (`assertChannelWorkerDaemonUrlIsLocal` certifies the bind) and
   // then throws in every worker: the first one exits the daemon, later ones
   // restart-loop with /health green.
@@ -2861,7 +2861,7 @@ describe('daemonWorkerCommand', () => {
     ).rejects.toThrow('process.exit 1');
 
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      '[Channel] daemon worker failed: daemon-worker is an internal qwen serve command.',
+      '[Channel] daemon worker failed: daemon-worker is an internal mariadb-shell-agent serve command.',
     );
   });
 
@@ -2888,7 +2888,7 @@ describe('daemonWorkerCommand', () => {
     expect(process.env['QWEN_DAEMON_URL']).toBeUndefined();
     expect(process.env['QWEN_DAEMON_WORKSPACE']).toBeUndefined();
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      '[Channel] daemon worker failed: daemon-worker is an internal qwen serve command.',
+      '[Channel] daemon worker failed: daemon-worker is an internal mariadb-shell-agent serve command.',
     );
   });
 
@@ -2915,7 +2915,7 @@ describe('daemonWorkerCommand', () => {
     expect(process.env['QWEN_DAEMON_URL']).toBeUndefined();
     expect(process.env['QWEN_DAEMON_WORKSPACE']).toBeUndefined();
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      '[Channel] daemon worker failed: daemon-worker is an internal qwen serve command.',
+      '[Channel] daemon worker failed: daemon-worker is an internal mariadb-shell-agent serve command.',
     );
   });
 

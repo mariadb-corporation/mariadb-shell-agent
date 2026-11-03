@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -6974,7 +6975,7 @@ export const useLlmStream = (
       try {
         // Enable durable (file-backed) cron support (loads tasks from the
         // user's per-project runtime dir, acquires the lock). The tasks file
-        // lives under ~/.qwen, not the working tree, so it's user-owned
+        // lives under ~/.mariadb-shell-agent, not the working tree, so it's user-owned
         // rather than project-controlled — no folder-trust gate needed; the
         // user's own loops run regardless of how the folder is trusted.
         // Missed one-shots arrive as late fires through the start() callback.

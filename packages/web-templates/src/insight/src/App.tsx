@@ -180,7 +180,7 @@ function InsightApp({ data }: { data: InsightData }) {
   if (showInteractionStyle) {
     navSections.push({
       href: '#section-usage',
-      label: 'How You Use Qwen Code',
+      label: 'How You Use MariaDB Shell Agent',
     });
   }
   if (showImpressiveWorkflows) {
@@ -218,7 +218,7 @@ function InsightApp({ data }: { data: InsightData }) {
       <header className="insights-header">
         <div className="header-content">
           <div className="header-title-section">
-            <h1 className="header-title">Qwen Code Insights</h1>
+            <h1 className="header-title">MariaDB Shell Agent Insights</h1>
             <p className="header-subtitle">
               {data.totalMessages
                 ? `${data.totalMessages.toLocaleString()} messages across ${data.totalSessions?.toLocaleString()} sessions`

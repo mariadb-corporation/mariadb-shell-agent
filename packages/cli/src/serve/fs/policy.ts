@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -94,7 +95,7 @@ export interface IgnoreVerdict {
  * Check whether `absolute` is matched by the workspace's ignore
  * rules. The check is computed against the workspace-relative
  * form of the path, matching the convention of `.gitignore` /
- * `.qwenignore` patterns.
+ * `.mariadb-shell-agentignore` patterns.
  *
  * Returns `{ ignored: false }` when:
  *   - the path equals `boundWorkspace` (the workspace root itself

@@ -1,14 +1,15 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 // Post-review cleanup for /review Step 9.
-//   - Audit the PR for writes that bypassed `qwen review submit` (PR targets).
-//   - Remove the temporary worktree at .qwen/tmp/review-pr-<n>.
+//   - Audit the PR for writes that bypassed `mariadb-shell-agent review submit` (PR targets).
+//   - Remove the temporary worktree at .mariadb-shell-agent/tmp/review-pr-<n>.
 //   - Delete the local branch ref qwen-review/pr-<n>.
-//   - Remove any .qwen/tmp/qwen-review-<target>-* side files.
+//   - Remove any .mariadb-shell-agent/tmp/qwen-review-<target>-* side files.
 //
 // The command is idempotent — missing files / branches are silent OK.
 
@@ -122,7 +123,7 @@ export interface WindowWrites<T> {
 /**
  * Issue-comment writes by the reviewing account inside the review window.
  *
- * `qwen review submit` is the ONLY sanctioned write in `/review`, and it
+ * `mariadb-shell-agent review submit` is the ONLY sanctioned write in `/review`, and it
  * posts a *review* — never an issue comment. So an issue comment the
  * reviewing account created (or edited — the Step 7 ban covers edits too,
  * and `?since=` filters on `updated_at`, so edited rows are already in the
@@ -498,7 +499,7 @@ function auditPrWrites(target: string, prNumber: string): void {
     writeStdoutLine(
       `warning: ${total} write(s) by the reviewing account on ` +
         `${window.ownerRepo}#${window.prNumber} during this review window were not made by ` +
-        `\`qwen review submit\` — the only sanctioned write in /review:`,
+        `\`mariadb-shell-agent review submit\` — the only sanctioned write in /review:`,
     );
     for (const c of posted) {
       writeStdoutLine(
@@ -857,7 +858,7 @@ function bypassAuditFooter(me: string, target: 'PR' | 'MR'): string {
     `warning: The likely cause is benign — the user (from another terminal), ` +
     `another workflow, or a bot posting under the same account (${me}) produces ` +
     `exactly this shape. ` +
-    `\`/review\` writes to the ${target} only through \`qwen review submit\`; a write ` +
+    `\`/review\` writes to the ${target} only through \`mariadb-shell-agent review submit\`; a write ` +
     `here is a real bypass of that gate only if its content is this review's own ` +
     `output. Relay this warning verbatim in the terminal summary so a human can judge.`
   );
@@ -944,7 +945,7 @@ function auditAoneMrWrites(target: string, window: AuditWindow): void {
   writeStdoutLine(
     `warning: ${total} comment(s) by the reviewing account on ` +
       `${window.ownerRepo} MR ${window.prNumber} during this review window were not made by ` +
-      `\`qwen review submit\` — the only sanctioned write in /review:`,
+      `\`mariadb-shell-agent review submit\` — the only sanctioned write in /review:`,
   );
   // The path is an MR-author-controlled filename reaching a terminal —
   // flatten it the way every other reviewer-facing path rendering does
@@ -1008,7 +1009,7 @@ function scratchWorktreesOf(
     }
     return { paths: [], failed: false };
   }
-  // The LEAF checks below cannot see an ancestor: a symlink at `.qwen/tmp`
+  // The LEAF checks below cannot see an ancestor: a symlink at `.mariadb-shell-agent/tmp`
   // resolves for every path built under it, so the whole sweep — the `existsSync`
   // probes, `git worktree remove`, `releaseWorktree`'s recursive `rmSync` —
   // would run inside wherever that link points. Refusing the whole family is the
@@ -1173,7 +1174,7 @@ export function runCleanup(target: string): void {
     }
 
     // Before the sweep below deletes the fetch report (the audit window's
-    // carrier), check the PR for writes that bypassed `qwen review submit`.
+    // carrier), check the PR for writes that bypassed `mariadb-shell-agent review submit`.
     auditPrWrites(target, prNumber);
 
     // The audit is network-bound (seconds) — and the ancestor gate at the top
@@ -1400,7 +1401,7 @@ export function runCleanup(target: string): void {
     }
   }
 
-  // --- Per-target side files (under .qwen/tmp/) -------------------------
+  // --- Per-target side files (under .mariadb-shell-agent/tmp/) -------------------------
   const prefix = tmpPrefix(target);
   let tmpEntries: string[] = [];
   try {

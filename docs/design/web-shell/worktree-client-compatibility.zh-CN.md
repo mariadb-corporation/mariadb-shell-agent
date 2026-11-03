@@ -6,7 +6,7 @@
 ## 范围
 
 本补充设计处理
-[PR #11816 验证报告](https://github.com/QwenLM/qwen-code/pull/11816#issuecomment-5851912768)
+[PR #11816 验证报告](https://github.invalid/QwenLM/qwen-code/pull/11816#issuecomment-5851912768)
 中的 F1 和 F2，替代
 [可选 worktree 设计](web-shell-branch-session-optional-worktree.md)
 第 6.2、7.1 节关于缺失 session id 的规则。分支事务与 worktree 生命周期不在本次修复范围内。

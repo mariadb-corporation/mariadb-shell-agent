@@ -22,7 +22,7 @@ The field is optional: old JSONL remains valid, and unknown historical values ar
 
 Update the chat-record type and the two recording entry points in `packages/core/src/services/chatRecordingService.ts`. Extend collocated recorder tests and any existing recorder test Config fixtures that need the getters. Add focused compatibility coverage for transcript preservation and API-history isolation if not already exercised by recorder tests.
 
-Run the global CLI baseline, then local build, typecheck, bundle, focused unit tests, and an isolated daemon/API E2E run with a mock OpenAI provider. Verify the persisted user record, not just streaming response metadata. The provider is simulated; the daemon and recording backend must be real. Keep test scripts and results under `.qwen/e2e-tests/`.
+Run the global CLI baseline, then local build, typecheck, bundle, focused unit tests, and an isolated daemon/API E2E run with a mock OpenAI provider. Verify the persisted user record, not just streaming response metadata. The provider is simulated; the daemon and recording backend must be real. Keep test scripts and results under `.mariadb-shell-agent/e2e-tests/`.
 
 ## Acceptance criteria and risks
 

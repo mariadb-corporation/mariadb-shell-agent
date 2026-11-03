@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -86,7 +87,7 @@ export function mountWorkspaceGenerationRoutes(
     } catch (error) {
       if (!abort.signal.aborted && !res.destroyed) {
         writeStderrLine(
-          `qwen serve: POST /workspace/generate failed: ${
+          `mariadb-shell-agent serve: POST /workspace/generate failed: ${
             error instanceof Error
               ? (error.stack ?? error.message)
               : String(error)

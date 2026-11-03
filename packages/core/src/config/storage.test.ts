@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -94,9 +95,9 @@ const GLOBAL_CONFIG_PATHS = [
 ] as const;
 
 describe('Storage – getGlobalSettingsPath', () => {
-  it('returns path to ~/.qwen/settings.json', () => {
+  it('returns path to ~/.mariadb-shell-agent/settings.json', () => {
     expect(Storage.getGlobalSettingsPath()).toBe(
-      underHome('.qwen', 'settings.json'),
+      underHome('.mariadb-shell-agent', 'settings.json'),
     );
   });
 });
@@ -105,22 +106,28 @@ describe('Storage – additional helpers', () => {
   const projectRoot = '/tmp/project';
   const storage = new Storage(projectRoot);
 
-  it('getWorkspaceSettingsPath returns project/.qwen/settings.json', () => {
-    const expected = path.join(projectRoot, '.qwen', 'settings.json');
+  it('getWorkspaceSettingsPath returns project/.mariadb-shell-agent/settings.json', () => {
+    const expected = path.join(
+      projectRoot,
+      '.mariadb-shell-agent',
+      'settings.json',
+    );
     expect(storage.getWorkspaceSettingsPath()).toBe(expected);
   });
 
-  it('getUserCommandsDir returns ~/.qwen/commands', () => {
-    expect(Storage.getUserCommandsDir()).toBe(underHome('.qwen', 'commands'));
+  it('getUserCommandsDir returns ~/.mariadb-shell-agent/commands', () => {
+    expect(Storage.getUserCommandsDir()).toBe(
+      underHome('.mariadb-shell-agent', 'commands'),
+    );
   });
 
-  it('getProjectCommandsDir returns project/.qwen/commands', () => {
-    const expected = path.join(projectRoot, '.qwen', 'commands');
+  it('getProjectCommandsDir returns project/.mariadb-shell-agent/commands', () => {
+    const expected = path.join(projectRoot, '.mariadb-shell-agent', 'commands');
     expect(storage.getProjectCommandsDir()).toBe(expected);
   });
 
-  it('getMcpOAuthTokensPath returns ~/.qwen/mcp-oauth-tokens.json', () => {
-    const expected = underHome('.qwen', 'mcp-oauth-tokens.json');
+  it('getMcpOAuthTokensPath returns ~/.mariadb-shell-agent/mcp-oauth-tokens.json', () => {
+    const expected = underHome('.mariadb-shell-agent', 'mcp-oauth-tokens.json');
     expect(Storage.getMcpOAuthTokensPath()).toBe(expected);
   });
 });
@@ -167,8 +174,10 @@ describe('Storage – getRuntimeBaseDir / setRuntimeBaseDir', () => {
 
   it('resolves relative paths in setRuntimeBaseDir using explicit cwd', () => {
     const cwd = path.resolve('workspace', 'projectA');
-    Storage.setRuntimeBaseDir('.qwen', cwd);
-    expect(Storage.getRuntimeBaseDir()).toBe(path.join(cwd, '.qwen'));
+    Storage.setRuntimeBaseDir('.mariadb-shell-agent', cwd);
+    expect(Storage.getRuntimeBaseDir()).toBe(
+      path.join(cwd, '.mariadb-shell-agent'),
+    );
   });
 
   it('ignores cwd when path is absolute', () => {
@@ -235,7 +244,7 @@ describe('Storage – getPlansDir', () => {
     mockRealpathSync.mockReset();
   });
 
-  it('defaults to ~/.qwen/plans when plansDirectory is not configured', () => {
+  it('defaults to ~/.mariadb-shell-agent/plans when plansDirectory is not configured', () => {
     expect(Storage.getPlansDir(projectRoot)).toBe(
       path.join(Storage.getGlobalQwenDir(), 'plans'),
     );
@@ -423,7 +432,7 @@ describe('Storage – runtime path methods use getRuntimeBaseDir', () => {
   });
 });
 
-describe('Storage – config paths remain at ~/.qwen regardless of runtime dir', () => {
+describe('Storage – config paths remain at ~/.mariadb-shell-agent regardless of runtime dir', () => {
   const globalQwenDir = Storage.getGlobalQwenDir();
   isolateRuntimeDir(() => {
     Storage.setRuntimeBaseDir(path.resolve('custom-runtime'));
@@ -433,11 +442,11 @@ describe('Storage – config paths remain at ~/.qwen regardless of runtime dir',
   it.each([
     ...GLOBAL_CONFIG_PATHS,
     ['getGoogleAccountsPath', 'google_accounts.json'] as const,
-  ])('%s still uses ~/.qwen', (method, file) => {
+  ])('%s still uses ~/.mariadb-shell-agent', (method, file) => {
     expect(Storage[method]()).toBe(path.join(globalQwenDir, file));
   });
 
-  it('getUserSkillsDirs still includes ~/.qwen/skills', () => {
+  it('getUserSkillsDirs still includes ~/.mariadb-shell-agent/skills', () => {
     const skillsDirs = new Storage('/tmp/project').getUserSkillsDirs();
     expect(
       skillsDirs.some((dir) => dir === path.join(globalQwenDir, 'skills')),
@@ -453,9 +462,9 @@ describe('Storage – QWEN_HOME env var', () => {
     restoreEnv('QWEN_HOME', originalEnv);
   });
 
-  it('defaults to ~/.qwen when QWEN_HOME is not set', () => {
+  it('defaults to ~/.mariadb-shell-agent when QWEN_HOME is not set', () => {
     delete process.env['QWEN_HOME'];
-    expect(Storage.getGlobalQwenDir()).toBe(underHome('.qwen'));
+    expect(Storage.getGlobalQwenDir()).toBe(underHome('.mariadb-shell-agent'));
   });
 
   it('uses QWEN_HOME when set to absolute path', () => {
@@ -480,10 +489,10 @@ describe('Storage – QWEN_HOME env var', () => {
     process.env['QWEN_HOME'] = configDir;
     const storage = new Storage(projectDir);
     expect(storage.getWorkspaceSettingsPath()).toBe(
-      path.join(projectDir, '.qwen', 'settings.json'),
+      path.join(projectDir, '.mariadb-shell-agent', 'settings.json'),
     );
     expect(storage.getProjectCommandsDir()).toBe(
-      path.join(projectDir, '.qwen', 'commands'),
+      path.join(projectDir, '.mariadb-shell-agent', 'commands'),
     );
   });
 
@@ -525,9 +534,15 @@ describe('Storage – runtime base dir async context isolation', () => {
     Storage.setRuntimeBaseDir(path.resolve('global-runtime'));
     const cwd = path.resolve('workspace', 'project-a');
 
-    await Storage.runWithRuntimeBaseDir('.qwen', cwd, async () => {
-      expect(Storage.getRuntimeBaseDir()).toBe(path.join(cwd, '.qwen'));
-    });
+    await Storage.runWithRuntimeBaseDir(
+      '.mariadb-shell-agent',
+      cwd,
+      async () => {
+        expect(Storage.getRuntimeBaseDir()).toBe(
+          path.join(cwd, '.mariadb-shell-agent'),
+        );
+      },
+    );
   });
 
   it('keeps concurrent contexts isolated', async () => {
@@ -830,7 +845,7 @@ describe('Storage – ensureAuditFallbackDir', () => {
     () => {
       // mkdirSync(recursive) follows symlinks ABOVE the leaf and lstat skips
       // only the FINAL one, so a leaf-only check misses a redirected parent.
-      // Planting `audits` is one raceless `ln -s`: ~/.qwen predates it.
+      // Planting `audits` is one raceless `ln -s`: ~/.mariadb-shell-agent predates it.
       withTemp('audit-attacker-', (attacker) => {
         actualFs.symlinkSync(attacker, path.join(home, 'audits'));
         try {

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -46,7 +47,7 @@ function canonicalPath(candidate: string): string {
 }
 
 function logWarning(message: string): void {
-  writeStderrLine(`qwen serve: ${message}`);
+  writeStderrLine(`mariadb-shell-agent serve: ${message}`);
 }
 
 export function logWorktreeCleanupPreserve(
@@ -175,11 +176,11 @@ async function worktreeAllowedRoots(
     // cwd — never let it derive a root. preclassify already rejects
     // such sidecars; this is the defense in depth underneath it.
     if (!path.isAbsolute(base)) continue;
-    roots.add(path.join(base, '.qwen', 'worktrees'));
+    roots.add(path.join(base, '.mariadb-shell-agent', 'worktrees'));
     try {
       const repoTop = await new GitWorktreeService(base).getRepoTopLevel();
       if (repoTop) {
-        roots.add(path.join(repoTop, '.qwen', 'worktrees'));
+        roots.add(path.join(repoTop, '.mariadb-shell-agent', 'worktrees'));
       }
     } catch {
       // Not a git repo from this base — its own root still counts.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -106,7 +107,7 @@ function createUpdateController(deps: UpdateRouteDeps) {
       loadSettings(startupDirectory, {
         skipLoadEnvironment: true,
         skipWorkspaceSettings: true,
-      }).merged.general?.enableAutoUpdate !== false && !closed
+      }).merged.general?.enableAutoUpdate === true && !closed
     );
   };
   const unavailable = (): DaemonUpdateStatus => ({
@@ -330,7 +331,7 @@ function createUpdateController(deps: UpdateRouteDeps) {
               .catch(() => undefined);
             fail(error);
             writeStderrLine(
-              `qwen serve: update restart failed: ${status?.message}`,
+              `mariadb-shell-agent serve: update restart failed: ${status?.message}`,
             );
           }
         },

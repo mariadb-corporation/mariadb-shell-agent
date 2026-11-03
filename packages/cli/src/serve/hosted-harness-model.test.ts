@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1419,7 +1420,7 @@ describe('Hosted Harness model boundary', () => {
           value: {
             callId: 'call-1',
             name: 'read_file',
-            args: { file_path: 'QWEN.md' },
+            args: { file_path: 'MARIADB-SHELL-AGENT.md' },
             isClientInitiated: false,
             prompt_id: input.promptId,
           },

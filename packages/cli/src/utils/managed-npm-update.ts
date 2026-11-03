@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Code
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -42,7 +43,7 @@ function packageDir(prefix: string): string {
 
 function resolveBootstrapPath(bootstrapPath?: string): string {
   if (!bootstrapPath) {
-    throw new Error('Unable to identify the Qwen Code npm launcher');
+    throw new Error('Unable to identify the MariaDB Shell Agent npm launcher');
   }
   return fs.realpathSync(bootstrapPath);
 }
@@ -158,7 +159,9 @@ function readBaseInstallation(bootstrapPath: string): {
     ),
   ) as { name?: unknown; version?: unknown };
   if (manifest.name !== PACKAGE_NAME || typeof manifest.version !== 'string') {
-    throw new Error('Unable to identify the base Qwen Code npm installation');
+    throw new Error(
+      'Unable to identify the base MariaDB Shell Agent npm installation',
+    );
   }
   return {
     version: manifest.version,
@@ -391,7 +394,7 @@ export async function activateManagedNpmUpdate(
       base.ctimeMs !== update.bootstrapCtimeMs
     ) {
       throw new Error(
-        'The base Qwen Code npm installation changed during update',
+        'The base MariaDB Shell Agent npm installation changed during update',
       );
     }
 

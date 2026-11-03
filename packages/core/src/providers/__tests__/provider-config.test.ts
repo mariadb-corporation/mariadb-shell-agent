@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -121,7 +122,7 @@ describe('buildInstallPlan', () => {
   );
 
   it('keeps a hand-written realtimeOnly route on reconnect and never selects it', () => {
-    const baseUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+    const baseUrl = 'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
     const envKey = generateCustomEnvKey(AuthType.USE_OPENAI, baseUrl);
     // Listed first on purpose: position must not make it the conversation
     // model.
@@ -917,8 +918,8 @@ describe('findProviderByCredentials', () => {
   it('matches a multi-baseUrl preset against any of its registered URLs', () => {
     // coding-plan ships both China and Singapore endpoints under the same env key.
     for (const url of [
-      'https://coding.dashscope.aliyuncs.com/v1',
-      'https://coding-intl.dashscope.aliyuncs.com/v1',
+      'https://coding.dashscope.aliyuncs.invalid/v1',
+      'https://coding-intl.dashscope.aliyuncs.invalid/v1',
     ]) {
       expect(
         findProviderByCredentials(url, 'BAILIAN_CODING_PLAN_API_KEY')?.id,
@@ -946,8 +947,8 @@ describe('getAllProviderBaseUrls', () => {
   it('expands BaseUrlOption[] presets into each option URL', () => {
     const urls = getAllProviderBaseUrlsSrc();
     // coding-plan has China + Singapore options
-    expect(urls).toContain('https://coding.dashscope.aliyuncs.com/v1');
-    expect(urls).toContain('https://coding-intl.dashscope.aliyuncs.com/v1');
+    expect(urls).toContain('https://coding.dashscope.aliyuncs.invalid/v1');
+    expect(urls).toContain('https://coding-intl.dashscope.aliyuncs.invalid/v1');
     expect(urls).toContain(TOKEN_PLAN_CHINA_BASE_URL);
     expect(urls).toContain(TOKEN_PLAN_GLOBAL_BASE_URL);
   });
@@ -1061,14 +1062,14 @@ describe('customHeaders in ProviderConfig', () => {
 
   it('merges customHeaders into generationConfig for fixed models', () => {
     const customHeaders = {
-      'HTTP-Referer': 'https://github.com/QwenLM/qwen-code.git',
-      'X-Title': 'Qwen Code',
+      'HTTP-Referer': 'https://github.invalid/QwenLM/qwen-code.git',
+      'X-Title': 'MariaDB Shell Agent',
     };
     const gc = installModels(makeConfig({ customHeaders }), testInputs())[0]
       ?.generationConfig;
     expect(gc?.customHeaders).toEqual({
-      'HTTP-Referer': 'https://github.com/QwenLM/qwen-code.git',
-      'X-Title': 'Qwen Code',
+      'HTTP-Referer': 'https://github.invalid/QwenLM/qwen-code.git',
+      'X-Title': 'MariaDB Shell Agent',
     });
     // existing fields preserved
     expect(gc?.extra_body).toEqual({ enable_thinking: true });

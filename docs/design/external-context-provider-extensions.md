@@ -14,12 +14,12 @@
 
 ## Decision
 
-External context integrations owned by other teams use Qwen Code Extensions
+External context integrations owned by other teams use MariaDB Shell Agent Extensions
 and MCP rather than adding provider adapters to Qwen Core or dynamically
 loading third-party modules into the existing External Context process.
 
 Each provider owner develops, releases, operates, and versions its own
-extension. Qwen Code maintains a small `context_search` interoperability
+extension. MariaDB Shell Agent maintains a small `context_search` interoperability
 profile, contract schemas, test vectors, and reference examples. The existing
 Generic HTTP Search V1 adapter remains a private compatibility implementation
 and reference; it is not a central registry into which every provider is
@@ -27,7 +27,7 @@ added.
 
 ```mermaid
 flowchart LR
-    Q["Qwen Code"] --> M["External Context MCP Profile v1"]
+    Q["MariaDB Shell Agent"] --> M["External Context MCP Profile v1"]
     M --> R["Provider-owned Remote MCP extension"]
     R --> S["Provider-operated MCP service"]
     M --> L["Provider-owned local adapter extension"]
@@ -44,7 +44,7 @@ tool allowlists. Adding another provider API or module ABI would duplicate
 those lifecycle and distribution mechanisms.
 
 A one-off integration does not require an extension. An administrator can
-register an MCP server directly with `qwen mcp add`. An extension is useful
+register an MCP server directly with `mariadb-shell-agent mcp add`. An extension is useful
 only when the provider owner needs a reusable install, version, update, and
 enablement unit.
 
@@ -94,7 +94,7 @@ delivery until an installation-to-child-process E2E has verified that path.
 Qwen loads environment files from a trusted workspace before it resolves an
 Extension manifest. A managed launcher must therefore export the fixed endpoint
 and credential before starting Qwen; process environment values take precedence
-over repository `.env` and `.qwen/.env` files. If either value is absent, a
+over repository `.env` and `.mariadb-shell-agent/.env` files. If either value is absent, a
 trusted workspace file can supply it. The workspace, its environment files, and
 same-UID code remain inside the local-adapter trust boundary.
 

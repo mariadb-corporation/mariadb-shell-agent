@@ -18,7 +18,7 @@
 }
 ```
 
-原始实现将所有 Qwen Code 流量标识为 `qwen-code`。现在需要根据拥有请求的运行时入口，区分 CLI 和 Desktop 流量。
+原始实现将所有 MariaDB Shell Agent 流量标识为 `qwen-code`。现在需要根据拥有请求的运行时入口，区分 CLI 和 Desktop 流量。
 
 ## 请求头取值
 
@@ -29,20 +29,20 @@
 | `tags.t1` | Desktop 运行时为 `qwen-code-desktop`，其余为 `qwen-code-cli`         |
 | `tags.t2` | 按量付费端点为 `payg`；Token Plan 端点不填                           |
 
-站点根据请求的 host 判断。已批准的需求为两个站点选择 `inner-agents`，保留现有 channel。Qwen Code 的平台归类仍待平台确认；本次细化不改变这些 channel 取值。
+站点根据请求的 host 判断。已批准的需求为两个站点选择 `inner-agents`，保留现有 channel。MariaDB Shell Agent 的平台归类仍待平台确认；本次细化不改变这些 channel 取值。
 
 ## 范围
 
 只有当请求的 host 精确等于下面之一时，才发送这个头：
 
-| Host                               | `channel`                | `t2`   |
-| ---------------------------------- | ------------------------ | ------ |
-| `maas.qianwenaiapi.com`            | `qianwenai-inner-agents` | `payg` |
-| `token-plan.maas.qianwenaiapi.com` | `qianwenai-inner-agents` | 不填   |
-| `maas.qwencloudapi.com`            | `qwencloud-inner-agents` | `payg` |
-| `token-plan.maas.qwencloudapi.com` | `qwencloud-inner-agents` | 不填   |
+| Host                                   | `channel`                | `t2`   |
+| -------------------------------------- | ------------------------ | ------ |
+| `maas.qianwenaiapi.com`                | `qianwenai-inner-agents` | `payg` |
+| `token-plan.maas.qianwenaiapi.com`     | `qianwenai-inner-agents` | 不填   |
+| `maas.qwencloudapi.invalid`            | `qwencloud-inner-agents` | `payg` |
+| `token-plan.maas.qwencloudapi.invalid` | `qwencloud-inner-agents` | 不填   |
 
-其他所有端点都保持不变，包括百炼（`dashscope.aliyuncs.com`、`*.maas.aliyuncs.com`、Coding Plan）和 Qwen OAuth 端点。是否发送只看 host，不检查 API Key。
+其他所有端点都保持不变，包括百炼（`dashscope.aliyuncs.invalid`、`*.maas.aliyuncs.invalid`、Coding Plan）和 Qwen OAuth 端点。是否发送只看 host，不检查 API Key。
 
 默认配置下能打到这些 host 的请求链路有三条，三条都会发送这个头：
 
@@ -52,7 +52,7 @@
 
 ## 设计决策
 
-- **精确匹配 host。** 先解析 URL，再精确比较 hostname，所以仿冒域名（`maas.qwencloudapi.com.evil.example`）和把域名放在路径里的写法都不会命中。忽略大小写和端口。这里刻意比消费同一份列表的两个端点门禁更窄：`isDashScopeProvider` 和 WebSearch 的端点检查都按后缀匹配 `QWENCLOUD_MAAS_HOSTS`，所以不在上表里的 MaaS 子域会被当成 DashScope 服务、也能通过搜索门禁，但不带来源标识。准入只需要选对 API 方言；来源标识会把 `channel`/`t2` 写进平台面板，因此只覆盖上表列出的四个 host。
+- **精确匹配 host。** 先解析 URL，再精确比较 hostname，所以仿冒域名（`maas.qwencloudapi.invalid.evil.example`）和把域名放在路径里的写法都不会命中。忽略大小写和端口。这里刻意比消费同一份列表的两个端点门禁更窄：`isDashScopeProvider` 和 WebSearch 的端点检查都按后缀匹配 `QWENCLOUD_MAAS_HOSTS`，所以不在上表里的 MaaS 子域会被当成 DashScope 服务、也能通过搜索门禁，但不带来源标识。准入只需要选对 API 方言；来源标识会把 `channel`/`t2` 写进平台面板，因此只覆盖上表列出的四个 host。
 - **Token Plan 不填 `t2`（已接受的临时行为）。** Token Plan 的个人版和团队版 key 都以 `sk-sp-` 开头，客户端分不出来。接入指南说明平台可以按 API Key 反查付费方式，不填可以避免错报。
 - **第一方取值优先。** `customHeaders` 中同名的项（不区分大小写）会被移除，所以来源标识既不会被覆盖，也不会重复发送。移除时刻意不给提示：这是文档化的策略、没有开关，请求本身照常成功。
 - **运行时身份。** 三条调用链都传入已有的 `Config.getChannel()` 值。仅 `desktop` 映射为 `qwen-code-desktop`；CLI、daemon、ACP、其他集成及未设置的 channel 均映射为 `qwen-code-cli`。Desktop 启动器已有 channel 传递，包括由 ACP channel fallback 解析的 Tauri 标记。派生 agent Config 会继承该值，嵌套 agent 和模型覆盖也一样。无需新增环境检测或身份状态。
@@ -86,7 +86,7 @@
 
 ## 待确认问题
 
-- Qwen Code 应归为阿里系内部 Agent（`inner-agents`）还是外部生态 Agent（`outer-agents`）。接入指南要求各 Agent 团队在接入前确认归属，且没有列出 Qwen Code；它引用的上游埋点方案可能定义了规则，但无法访问。
+- MariaDB Shell Agent 应归为阿里系内部 Agent（`inner-agents`）还是外部生态 Agent（`outer-agents`）。接入指南要求各 Agent 团队在接入前确认归属，且没有列出 MariaDB Shell Agent；它引用的上游埋点方案可能定义了规则，但无法访问。
 - `qwen-code-cli` 和 `qwen-code-desktop` 是否需要先在平台的渠道清单中登记，才会被计入统计。
 - Token Plan 端点不填 `t2` 是否为平台所接受。
 - Batch 提交请求上的头能否传递到该批次的模型调用。

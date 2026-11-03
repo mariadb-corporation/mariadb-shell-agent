@@ -10,7 +10,7 @@ PR #12691 是从 #12358 提取的基础设施，不是可运行的 Hosted Harnes
 明确拒绝操作，不引入预览分支的完整架构。
 
 后续的集成拆分解除了本文档记录的 fail-closed 边界：提供 bearer token、
-`--no-web` 与 capability digest 后，`qwen serve --profile hosted-harness`
+`--no-web` 与 capability digest 后，`mariadb-shell-agent serve --profile hosted-harness`
 现在可在 loopback 启动并提供私有 no-tool Managed Session API；Broker 路由中
 仅 `executions/{id}:resolve` 仍返回不可重试的 501。下文描述的是该基础设施
 PR 交付时的状态，当前边界以
@@ -19,7 +19,7 @@ PR 交付时的状态，当前边界以
 
 ## 范围与决策
 
-`qwen serve --profile hosted-harness` 在监听端口之前失败，即使凭据完整也不例外。
+`mariadb-shell-agent serve --profile hosted-harness` 在监听端口之前失败，即使凭据完整也不例外。
 实验性 Managed Gateway、worker 和 auto-local 设置同样失败。默认 serve 保持可用；
 显式 Broker 参数要求当前不可用的 hosted profile。默认模式下仅设置 Broker 环境
 变量不会生效。帮助文本说明这一限制。

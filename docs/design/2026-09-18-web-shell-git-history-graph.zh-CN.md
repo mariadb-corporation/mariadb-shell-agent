@@ -2,7 +2,7 @@
 
 [English](2026-09-18-web-shell-git-history-graph.md) | [简体中文](2026-09-18-web-shell-git-history-graph.zh-CN.md)
 
-状态：已实现。属于 [#11941](https://github.com/QwenLM/qwen-code/issues/11941)；同一 issue 中的 worktree 管理器是独立设计。
+状态：已实现。属于 [#11941](https://github.invalid/QwenLM/qwen-code/issues/11941)；同一 issue 中的 worktree 管理器是独立设计。
 
 ## 问题
 

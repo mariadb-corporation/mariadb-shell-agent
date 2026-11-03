@@ -4,9 +4,9 @@
 
 ## 1. Status and delivery boundary
 
-Implemented locally with the verification below completed, 2026-09-15. Source baseline: `88347ccca394902262915dde880499976e596cd7`, the merged [PR1 #11911](https://github.com/QwenLM/qwen-code/pull/11911). Delivery tracker: [#11907](https://github.com/QwenLM/qwen-code/issues/11907). This change includes the PR2 implementation and collocated regression tests. Runtime evidence is recorded in the local E2E report.
+Implemented locally with the verification below completed, 2026-09-15. Source baseline: `88347ccca394902262915dde880499976e596cd7`, the merged [PR1 #11911](https://github.invalid/QwenLM/qwen-code/pull/11911). Delivery tracker: [#11907](https://github.invalid/QwenLM/qwen-code/issues/11907). This change includes the PR2 implementation and collocated regression tests. Runtime evidence is recorded in the local E2E report.
 
-PR1 delivered opt-in, daemon-wide ACP process-count admission and recognizable capacity errors. PR2 adds on-demand reclamation of eligible idle ACP children. PR3 remains the user-directed choice to close a workspace runtime or cancel when automatic reclamation cannot help. None of these stages applies the modeled per-child heap ceiling or completes [#8182](https://github.com/QwenLM/qwen-code/issues/8182).
+PR1 delivered opt-in, daemon-wide ACP process-count admission and recognizable capacity errors. PR2 adds on-demand reclamation of eligible idle ACP children. PR3 remains the user-directed choice to close a workspace runtime or cancel when automatic reclamation cannot help. None of these stages applies the modeled per-child heap ceiling or completes [#8182](https://github.invalid/QwenLM/qwen-code/issues/8182).
 
 **First version: automatically reclaim only an ACP channel with zero live sessions and no pending work.** Keep the existing session reaper responsible for expired abandoned sessions; do not advance its timeout or close a connected conversation just because it has not generated recently. Once that reaper has closed every session, a remaining warm channel can become a candidate.
 
@@ -105,7 +105,7 @@ There is no live session to migrate in the selected child. Saved conversations r
 
 ## 9. Validation and acceptance
 
-Use the `e2e-testing` workflow with an isolated daemon, deterministic local provider and test-owned child processes. Record the global CLI baseline before implementation; if it already includes later changes, record its exact version rather than inventing an expected failure. The local test plan is `.qwen/e2e-tests/daemon-acp-idle-reclamation-pr2.md`; baseline and implementation results are recorded alongside it.
+Use the `e2e-testing` workflow with an isolated daemon, deterministic local provider and test-owned child processes. Record the global CLI baseline before implementation; if it already includes later changes, record its exact version rather than inventing an expected failure. The local test plan is `.mariadb-shell-agent/e2e-tests/daemon-acp-idle-reclamation-pr2.md`; baseline and implementation results are recorded alongside it.
 
 1. At one slot, warm empty A blocks cold B on the PR1 baseline. With PR2, the same operation succeeds after A's tracked child is released; registration and saved history do not change.
 2. With several empty warm candidates, the least recently used one is reclaimed. MCP/control and preheat activity update ordering; repeated status polling does not. Ties are deterministic. Stop after one victim.
@@ -120,7 +120,7 @@ Use the `e2e-testing` workflow with an isolated daemon, deterministic local prov
 
 Full build, typecheck, bundle and focused lint passed. The ACP focused suite passed 80 tests, serve lifecycle/routes passed 696 tests, and standalone server wiring passed 4 tests. Coverage includes the single-victim policy, no spawn before release, cancellation/failure/competition outcomes, candidate identity and activity protection, soft retention, MCP completion recency and status polling without recency updates.
 
-Five real-daemon groups passed 52 assertions on macOS with Node 22: empty warm reclamation, old-PID exit, cold recovery of the original workspace with an increased epoch, history preservation and original session-ID loading, loaded idle session and ACP-connection protection, LRU ordering, dynamic requesters, preserved registration identity and unchanged heap arguments. All test-owned processes exited. The detailed report is `.qwen/e2e-tests/pr2-idle-reclamation/verification-report.md`.
+Five real-daemon groups passed 52 assertions on macOS with Node 22: empty warm reclamation, old-PID exit, cold recovery of the original workspace with an increased epoch, history preservation and original session-ID loading, loaded idle session and ACP-connection protection, LRU ordering, dynamic requesters, preserved registration identity and unchanged heap arguments. All test-owned processes exited. The detailed report is `.mariadb-shell-agent/e2e-tests/pr2-idle-reclamation/verification-report.md`.
 
 Linux/Windows, real delayed descendant exit and fault injection, real model conversations and all business-service combinations were not exercised. Cancellation and competition use focused unit-test evidence; those tests do not replace process-tree verification on the deployment target. These tests do not prove actual RAM safety or performance improvement.
 

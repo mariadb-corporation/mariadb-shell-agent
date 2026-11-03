@@ -6,7 +6,7 @@
 
 Restored on main baseline `2b5c4deadb9e9dd0d9d740a52ae42f28ad14bf92` as U1 of the [migration delivery plan](2026-10-20-opentui-migration-delivery.md). Candidate verification is tracked separately from implementation.
 
-Source attribution: [#14044](https://github.com/QwenLM/qwen-code/pull/14044), commits `10a98a72ee2c78323c902f7d01f2a05db371a5d0` and `7cb0a86fbf709da0da24f6acb0a14465e59b9c36`, authored by gary.gq with multica-agent. That PR merged into `fix/MYWO-7-short-dialog-budgets`, not main. Restore only its eight-file delta from `e16490eccc5aeffbb680da7c0935b5aebfe82f1b`, preserving subsequent main changes. Historical passing results do not certify this candidate.
+Source attribution: [#14044](https://github.invalid/QwenLM/qwen-code/pull/14044), commits `10a98a72ee2c78323c902f7d01f2a05db371a5d0` and `7cb0a86fbf709da0da24f6acb0a14465e59b9c36`, authored by gary.gq with multica-agent. That PR merged into `fix/MYWO-7-short-dialog-budgets`, not main. Restore only its eight-file delta from `e16490eccc5aeffbb680da7c0935b5aebfe82f1b`, preserving subsequent main changes. Historical passing results do not certify this candidate.
 
 ## Reproduction
 

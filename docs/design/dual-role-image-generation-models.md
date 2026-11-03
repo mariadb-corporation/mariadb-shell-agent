@@ -53,7 +53,7 @@ The two concerns must be independent:
 image-generation capability  !=  image-generation exclusivity
 ```
 
-The name `supportsImage` is intentionally not used. Qwen Code already uses
+The name `supportsImage` is intentionally not used. MariaDB Shell Agent already uses
 image capability terminology for image input and visual understanding through
 `capabilities.vision`, `generationConfig.modalities.image`, and
 `isImageCapable()`. Image input and image output are distinct capabilities.
@@ -360,12 +360,12 @@ No settings migration is required.
   generation and remain excluded from primary selection.
 - Existing persisted `imageModel` selectors continue to resolve.
 - The new field is additive and optional.
-- Older Qwen Code versions ignore the unknown field. A dual-role route relying
+- Older MariaDB Shell Agent versions ignore the unknown field. A dual-role route relying
   only on `supportsImageGeneration` will not expose `image_gen` on those
   versions, while legacy `imageOnly` routes continue to work.
 
 Because old runtimes ignore the new field, downstream platforms must gate use
-of dual-role configuration on a Qwen Code version that includes this change.
+of dual-role configuration on a MariaDB Shell Agent version that includes this change.
 
 ## Validation plan
 
@@ -457,7 +457,7 @@ Using a test endpoint that supports the existing image-generation protocol:
 3. Select the same route with `/model --image`.
 4. Request an image and approve `image_gen`.
 5. Confirm the PNG is saved under
-   `.qwen/generated-images/<session-id>/` and emitted as an image artifact.
+   `.mariadb-shell-agent/generated-images/<session-id>/` and emitted as an image artifact.
 6. Send a normal conversational turn and confirm the same route still works as
    the primary model.
 7. Repeat with a legacy `imageOnly: true` route and confirm it remains rejected

@@ -2,7 +2,7 @@
 
 ## 定位与结论
 
-关联 [#11386](https://github.com/QwenLM/qwen-code/issues/11386)。本稿为 2026-09-08 的方案调研，核查基线为 `1a73f5bff6201473f237c5106367e944ba2d092b`（调研开始时的远端 main）。没有实现业务代码。随后已完成 1/25/256 空 workspace 的容量基线测量，见 [实测报告](workspace-capacity-baseline-2026-09-08.md)；这不是 LRU 实现或真实模型负载验证。Issue 提及的同名草稿未在本 checkout 或当前已登记的本地 Git worktree 中找到；本文件是本次新稿。
+关联 [#11386](https://github.invalid/QwenLM/qwen-code/issues/11386)。本稿为 2026-09-08 的方案调研，核查基线为 `1a73f5bff6201473f237c5106367e944ba2d092b`（调研开始时的远端 main）。没有实现业务代码。随后已完成 1/25/256 空 workspace 的容量基线测量，见 [实测报告](workspace-capacity-baseline-2026-09-08.md)；这不是 LRU 实现或真实模型负载验证。Issue 提及的同名草稿未在本 checkout 或当前已登记的本地 Git worktree 中找到；本文件是本次新稿。
 
 后续 P0 实现见 [容量常量解耦设计](workspace-capacity-decoupling.md)。它保留默认上限 25，独立管理注册、child 观测模型和 channel 超时预算；下文的源码事实与实测数据仍保留上述调研基线，扩容和 LRU 仍属后续工作。
 
@@ -48,7 +48,7 @@
 
 Primary 和 internal runtime 只豁免自动驱逐，不能从资源统计中消失。它们物化时也应占 resident 配额；内置功能或后台责任导致全部名额不可回收时，返回明确容量错误，或要求运营者扩大配置。已知启动必须恢复的受保护集合超过配额时，应在启动阶段报出具体 workspace 和原因，避免随机丢失后台服务。
 
-Issue 的 `floor(childPoolMb / 512)` 可以是独立 child 固定分区模型的输入，不能证明“这些宿主对象安全常驻”。将来 enforcement 还须检查 fixed ceiling 不低于 floor、不超过 legacy ceiling，并允许计算结果为 0；它约束的是 old generation ceiling，不等于整个进程树的 RSS。代表性 old-generation 峰值和 GC 成本验证仍是 [#8182](https://github.com/QwenLM/qwen-code/issues/8182) 的前置条件。
+Issue 的 `floor(childPoolMb / 512)` 可以是独立 child 固定分区模型的输入，不能证明“这些宿主对象安全常驻”。将来 enforcement 还须检查 fixed ceiling 不低于 floor、不超过 legacy ceiling，并允许计算结果为 0；它约束的是 old generation ceiling，不等于整个进程树的 RSS。代表性 old-generation 峰值和 GC 成本验证仍是 [#8182](https://github.invalid/QwenLM/qwen-code/issues/8182) 的前置条件。
 
 `maxTotalSessions` 继续是独立准入值。自动推导时应以明确的运行容量为基数，保留已有单 workspace 和显式无限值语义；不能把 256 条元数据默认换成 8192 个运行 session 名额。具体默认变更须在扩容 PR 中作为可见行为单独说明。
 

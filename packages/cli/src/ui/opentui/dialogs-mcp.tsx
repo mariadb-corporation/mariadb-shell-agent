@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1034,7 +1035,7 @@ export function OpenTuiMcpDialog(props: OpenTuiMcpDialogProps) {
             <box flexDirection="row">
               <text fg={C.yellow}>
                 {clipToWidth(
-                  `${ICON.REFERENCE} ${t('Run qwen --debug to see error logs')}`,
+                  `${ICON.REFERENCE} ${t('Run mariadb-shell-agent --debug to see error logs')}`,
                   contentWidth,
                 )}
               </text>

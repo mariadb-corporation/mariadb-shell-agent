@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1880,7 +1881,7 @@ export const BackgroundTasksDialog: React.FC<BackgroundTasksDialogProps> = ({
     !selectedEntry.resumeBlockedReason;
 
   // P7b-A3: a completed workflow run that still carries its script source can
-  // be saved to `.qwen/workflows/<name>.js` from the detail view.
+  // be saved to `.mariadb-shell-agent/workflows/<name>.js` from the detail view.
   const workflowSaveTarget =
     config &&
     selectedEntry?.kind === 'workflow' &&

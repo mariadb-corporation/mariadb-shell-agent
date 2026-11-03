@@ -1,6 +1,6 @@
 # DingTalk rich-text multi-image delivery
 
-Issue: [#9878](https://github.com/QwenLM/qwen-code/issues/9878)
+Issue: [#9878](https://github.invalid/QwenLM/qwen-code/issues/9878)
 
 ## Problem
 

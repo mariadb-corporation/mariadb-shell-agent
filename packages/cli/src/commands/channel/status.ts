@@ -127,7 +127,7 @@ export const statusCommand: CommandModule<unknown, StatusArgs> = {
 
     if (info.owner === 'serve') {
       writeStdoutLine(
-        `Channel service: managed by qwen serve (PID ${info.pid})`,
+        `Channel service: managed by mariadb-shell-agent serve (PID ${info.pid})`,
       );
       if (info.workerPid !== undefined) {
         writeStdoutLine(`Worker PID:      ${info.workerPid}`);

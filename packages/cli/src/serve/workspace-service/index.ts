@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -289,7 +290,7 @@ export function createDaemonWorkspaceService(
       loggedPreheatFailures.add(err);
     }
     writeStderrLineSafe(
-      `qwen serve: ACP preheat failed: ${err instanceof Error ? err.message : String(err)}`,
+      `mariadb-shell-agent serve: ACP preheat failed: ${err instanceof Error ? err.message : String(err)}`,
     );
   };
 
@@ -330,7 +331,7 @@ export function createDaemonWorkspaceService(
         return await workspaceSkillsStatusProvider(boundWorkspace);
       } catch (err) {
         writeStderrLine(
-          `qwen serve: getWorkspaceSkillsConfigStatus local provider failed: ${err instanceof Error ? err.message : String(err)}`,
+          `mariadb-shell-agent serve: getWorkspaceSkillsConfigStatus local provider failed: ${err instanceof Error ? err.message : String(err)}`,
         );
       }
     }
@@ -379,7 +380,7 @@ export function createDaemonWorkspaceService(
       // enumeration below instead of failing the request — matching
       // getWorkspaceEnvStatus / getWorkspacePreflightStatus.
       writeStderrLine(
-        `qwen serve: getWorkspaceSkillsStatus query failed: ${err instanceof Error ? err.message : String(err)}`,
+        `mariadb-shell-agent serve: getWorkspaceSkillsStatus query failed: ${err instanceof Error ? err.message : String(err)}`,
       );
       status = createIdleWorkspaceSkillsStatus(boundWorkspace);
     }
@@ -389,7 +390,7 @@ export function createDaemonWorkspaceService(
     ) {
       if (status.errors?.length) {
         writeStderrLine(
-          `qwen serve: workspace skills observation reported errors, keeping the retained catalog: ${status.errors
+          `mariadb-shell-agent serve: workspace skills observation reported errors, keeping the retained catalog: ${status.errors
             .map((cell) => cell.error)
             .join('; ')}`,
         );
@@ -404,7 +405,7 @@ export function createDaemonWorkspaceService(
     // matching getWorkspaceEnvStatus / getWorkspacePreflightStatus.
     if (status.errors?.length) {
       writeStderrLine(
-        `qwen serve: workspace skills observation reported errors, falling back to daemon-local enumeration: ${status.errors
+        `mariadb-shell-agent serve: workspace skills observation reported errors, falling back to daemon-local enumeration: ${status.errors
           .map((cell) => cell.error)
           .join('; ')}`,
       );
@@ -417,7 +418,7 @@ export function createDaemonWorkspaceService(
         status = await workspaceSkillsStatusProvider(boundWorkspace);
       } catch (err) {
         writeStderrLine(
-          `qwen serve: getWorkspaceSkillsStatus local provider failed: ${err instanceof Error ? err.message : String(err)}`,
+          `mariadb-shell-agent serve: getWorkspaceSkillsStatus local provider failed: ${err instanceof Error ? err.message : String(err)}`,
         );
       }
     }
@@ -477,7 +478,7 @@ export function createDaemonWorkspaceService(
           .catch((error: unknown) => {
             assertActiveGeneration();
             writeStderrLineSafe(
-              `qwen serve: workspace skills revalidation failed: ${error instanceof Error ? error.message : String(error)}`,
+              `mariadb-shell-agent serve: workspace skills revalidation failed: ${error instanceof Error ? error.message : String(error)}`,
             );
             return unavailableWorkspaceSkillsStatus();
           })
@@ -510,7 +511,7 @@ export function createDaemonWorkspaceService(
     if (!inFlightWorkspaceSkillsStatus && canStart) {
       void revalidateWorkspaceSkillsStatus().catch((error: unknown) => {
         writeStderrLineSafe(
-          `qwen serve: workspace skills revalidation failed: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: workspace skills revalidation failed: ${error instanceof Error ? error.message : String(error)}`,
         );
       });
     }
@@ -531,7 +532,7 @@ export function createDaemonWorkspaceService(
       // still succeeded; surface the partial refresh rather than dropping it.
       if ((refreshed.configsFailed ?? 0) > 0) {
         writeStderrLine(
-          `qwen serve: ${refreshed.configsFailed} skill cache refresh(es) failed after mutation`,
+          `mariadb-shell-agent serve: ${refreshed.configsFailed} skill cache refresh(es) failed after mutation`,
         );
       }
     } catch (err) {
@@ -540,7 +541,7 @@ export function createDaemonWorkspaceService(
         !(err instanceof BridgeChannelClosedError)
       ) {
         writeStderrLine(
-          `qwen serve: workspace skill refresh after mutation failed: ${err instanceof Error ? err.message : String(err)}`,
+          `mariadb-shell-agent serve: workspace skill refresh after mutation failed: ${err instanceof Error ? err.message : String(err)}`,
         );
       }
     } finally {
@@ -645,7 +646,7 @@ export function createDaemonWorkspaceService(
       } catch (err) {
         if (err instanceof TimeoutError) {
           writeStderrLineSafe(
-            `qwen serve: ACP preheat timed out after ${opts?.timeoutMs ?? 5_000}ms`,
+            `mariadb-shell-agent serve: ACP preheat timed out after ${opts?.timeoutMs ?? 5_000}ms`,
           );
         }
         const live = channelLive();
@@ -668,7 +669,7 @@ export function createDaemonWorkspaceService(
       const live = channelLive();
       if (!live) {
         writeStderrLineSafe(
-          'qwen serve: ACP preheat resolved without a live channel',
+          'mariadb-shell-agent serve: ACP preheat resolved without a live channel',
         );
       }
       return live
@@ -702,7 +703,7 @@ export function createDaemonWorkspaceService(
         );
       } catch (err) {
         writeStderrLine(
-          `qwen serve: getEnvStatus failed: ${err instanceof Error ? err.message : String(err)}`,
+          `mariadb-shell-agent serve: getEnvStatus failed: ${err instanceof Error ? err.message : String(err)}`,
         );
         return createIdleEnvStatus(boundWorkspace, acpChannelLive);
       }
@@ -724,7 +725,7 @@ export function createDaemonWorkspaceService(
         } catch (err) {
           // Daemon cells failing is non-fatal; proceed with empty.
           writeStderrLine(
-            `qwen serve: getDaemonPreflightCells failed: ${err instanceof Error ? err.message : String(err)}`,
+            `mariadb-shell-agent serve: getDaemonPreflightCells failed: ${err instanceof Error ? err.message : String(err)}`,
           );
         }
       }
@@ -964,7 +965,7 @@ export function createDaemonWorkspaceService(
           } catch (err) {
             assertActiveGeneration();
             writeStderrLine(
-              `qwen serve: workspace voice partial persist error (workspace=${boundWorkspace}, committed=${committed.length}/${writes.length}, failedKey=${write.key}, failedScope=${voiceSettingsScopeToWire(write.scope)}): ${
+              `mariadb-shell-agent serve: workspace voice partial persist error (workspace=${boundWorkspace}, committed=${committed.length}/${writes.length}, failedKey=${write.key}, failedScope=${voiceSettingsScopeToWire(write.scope)}): ${
                 err instanceof Error ? err.message : String(err)
               }`,
             );
@@ -1064,7 +1065,7 @@ export function createDaemonWorkspaceService(
               activation = 'partial';
               sessionsFailed = 1;
               writeStderrLine(
-                `qwen serve: workspace skill refresh failed: ${err instanceof Error ? err.message : String(err)}`,
+                `mariadb-shell-agent serve: workspace skill refresh failed: ${err instanceof Error ? err.message : String(err)}`,
               );
             }
           }
@@ -1180,7 +1181,7 @@ export function createDaemonWorkspaceService(
               activation = 'partial';
               sessionsFailed = 1;
               writeStderrLine(
-                `qwen serve: workspace skill refresh failed: ${err instanceof Error ? err.message : String(err)}`,
+                `mariadb-shell-agent serve: workspace skill refresh failed: ${err instanceof Error ? err.message : String(err)}`,
               );
             }
           }
@@ -1518,7 +1519,7 @@ export function createDaemonWorkspaceService(
         const entries = Array.isArray(result.entries) ? result.entries : [];
         if (!Array.isArray(result.entries)) {
           writeStderrLine(
-            `qwen serve: pool restart response carried 'entries' field ` +
+            `mariadb-shell-agent serve: pool restart response carried 'entries' field ` +
               `but it is not an array (server=${serverName}); ` +
               `treating as empty.`,
           );
@@ -1530,7 +1531,7 @@ export function createDaemonWorkspaceService(
             typeof (entry as { entryIndex?: unknown }).entryIndex !== 'number'
           ) {
             writeStderrLine(
-              `qwen serve: skipping malformed pool restart entry ` +
+              `mariadb-shell-agent serve: skipping malformed pool restart entry ` +
                 `(server=${serverName}): ${JSON.stringify(entry)}`,
             );
             continue;
@@ -1594,7 +1595,7 @@ export function createDaemonWorkspaceService(
         } catch (err) {
           runtimeEnvironmentApplied = false;
           writeStderrLine(
-            `qwen serve: daemon reload failed: ${err instanceof Error ? err.message : String(err)}`,
+            `mariadb-shell-agent serve: daemon reload failed: ${err instanceof Error ? err.message : String(err)}`,
           );
         }
       }
@@ -1641,7 +1642,9 @@ export function createDaemonWorkspaceService(
           childError = 'ACP child not running';
         } else {
           childError = err instanceof Error ? err.message : String(err);
-          writeStderrLine(`qwen serve: reload failed: ${childError}`);
+          writeStderrLine(
+            `mariadb-shell-agent serve: reload failed: ${childError}`,
+          );
         }
       }
 
@@ -1691,7 +1694,7 @@ export function createDaemonWorkspaceService(
           assertActiveGeneration();
           failed = true;
           writeStderrLine(
-            'qwen serve: model-provider parent environment sync failed',
+            'mariadb-shell-agent serve: model-provider parent environment sync failed',
           );
         }
       }
@@ -1715,7 +1718,9 @@ export function createDaemonWorkspaceService(
         ) {
           return { status: failed ? 'failed' : 'deferred' };
         }
-        writeStderrLine('qwen serve: model-provider ACP child sync failed');
+        writeStderrLine(
+          'mariadb-shell-agent serve: model-provider ACP child sync failed',
+        );
         return { status: 'failed' };
       }
     },
@@ -1753,7 +1758,7 @@ export function createDaemonWorkspaceService(
       } catch (err) {
         if (err instanceof SessionNotFoundError) throw err;
         writeStderrLine(
-          `qwen serve: refreshExtensionsForAllSessions failed: ${err instanceof Error ? err.message : String(err)}`,
+          `mariadb-shell-agent serve: refreshExtensionsForAllSessions failed: ${err instanceof Error ? err.message : String(err)}`,
         );
         return { refreshed: 0, failed: 1 };
       } finally {

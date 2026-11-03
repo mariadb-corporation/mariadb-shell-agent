@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2038,7 +2039,7 @@ describe('managed-agent-server e2e runner', () => {
     const readme = read('packages/managed-agent-server/README.md');
     const fencedBlocks = fencedShellBlocks(readme);
     const command =
-      'qwen serve --profile hosted-harness --port 4171 --hostname 127.0.0.1 --no-web';
+      'mariadb-shell-agent serve --profile hosted-harness --port 4171 --hostname 127.0.0.1 --no-web';
     const launchBlocks = fencedBlocks.filter((block) =>
       block.includes(command),
     );
@@ -2119,7 +2120,7 @@ describe('managed-agent-server e2e runner', () => {
     // the launch pin above would otherwise leave this assertion green while
     // Spring keeps calling the old port and every Managed Turn fails.
     const launchBlocks = fencedShellBlocks(readme).filter((fenced) =>
-      fenced.includes('qwen serve --profile hosted-harness'),
+      fenced.includes('mariadb-shell-agent serve --profile hosted-harness'),
     );
     expect(
       launchBlocks,

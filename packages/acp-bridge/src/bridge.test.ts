@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -3947,7 +3948,12 @@ describe('createAcpSessionBridge', () => {
   });
 
   it('reports the live execution cwd and worktree ownership snapshot', async () => {
-    const target = path.join(WS_A, '.qwen', 'worktrees', 'branch-test');
+    const target = path.join(
+      WS_A,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'branch-test',
+    );
     const handle = makeChannel({
       extMethodImpl: async (method) =>
         method === SERVE_CONTROL_EXT_METHODS.sessionCd
@@ -3959,7 +3965,7 @@ describe('createAcpSessionBridge', () => {
 
     await bridge.changeSessionCwd(session.sessionId, {
       path: target,
-      allowedRoots: [path.join(WS_A, '.qwen', 'worktrees')],
+      allowedRoots: [path.join(WS_A, '.mariadb-shell-agent', 'worktrees')],
     });
     bridge.setSessionWorktree(session.sessionId, {
       slug: 'branch-test',
@@ -14770,7 +14776,7 @@ describe('createAcpSessionBridge', () => {
     expect(first.attached).toBe(false);
     expect(second.attached).toBe(false);
     // Stage 1.5 multi-session: the two thread-scope calls SHARE the
-    // workspace's `qwen --acp` child. Only one `channelFactory` call.
+    // workspace's `mariadb-shell-agent --acp` child. Only one `channelFactory` call.
     // Each `newSession()` call to the agent produces a distinct id.
     expect(handles).toHaveLength(1);
     expect(bridge.sessionCount).toBe(2);
@@ -27550,7 +27556,7 @@ describe('createAcpSessionBridge', () => {
           );
           expect(failures).toEqual([
             [
-              `qwen serve: source_persistence_failed sessionId=${session.sessionId} reason=${reason} sourcePersisted=false`,
+              `mariadb-shell-agent serve: source_persistence_failed sessionId=${session.sessionId} reason=${reason} sourcePersisted=false`,
               'warn',
             ],
           ]);
@@ -27640,7 +27646,7 @@ describe('createAcpSessionBridge', () => {
           );
           expect(failures).toEqual([
             [
-              `qwen serve: source_persistence_failed sessionId=${sessionId} reason=write_not_confirmed sourcePersisted=false`,
+              `mariadb-shell-agent serve: source_persistence_failed sessionId=${sessionId} reason=write_not_confirmed sourcePersisted=false`,
               'warn',
             ],
           ]);
@@ -32784,7 +32790,7 @@ describe('createAcpSessionBridge', () => {
 
     it('Stage 1.5 multi-session: N sessions on same workspace share ONE channel', async () => {
       // The headline of the Stage 1.5 refactor — multiple thread-scope
-      // sessions on one workspace pay for one `qwen --acp` child, not
+      // sessions on one workspace pay for one `mariadb-shell-agent --acp` child, not
       // N children. LaZzyMan + tanzhenxin pushed for this; the agent
       // already supports it via `acpAgent.ts:194 sessions:
       // Map<string, Session>`.
@@ -32904,7 +32910,7 @@ describe('createAcpSessionBridge', () => {
       expect(session.sessionId).toBeTruthy();
       expect(diagnostics).toEqual([
         {
-          line: 'qwen serve: fresh session admission release failed: release broken',
+          line: 'mariadb-shell-agent serve: fresh session admission release failed: release broken',
           level: 'warn',
         },
       ]);
@@ -35140,7 +35146,7 @@ describe('createAcpSessionBridge', () => {
         type: 'memory_changed',
         data: {
           scope: 'workspace',
-          filePath: '/work/QWEN.md',
+          filePath: '/work/MARIADB-SHELL-AGENT.md',
           mode: 'append',
           bytesWritten: 5,
         },
@@ -35311,9 +35317,11 @@ describe('onDiagnosticLine', () => {
     expect(accepted).toBe(false);
 
     // Verify the onDiagnosticLine callback received the debug line.
-    expect(captured.some((e) => e.line.includes('qwen serve debug: '))).toBe(
-      true,
-    );
+    expect(
+      captured.some((e) =>
+        e.line.includes('mariadb-shell-agent serve debug: '),
+      ),
+    ).toBe(true);
     expect(
       captured.some((e) => e.line.includes('rejected permission vote')),
     ).toBe(true);

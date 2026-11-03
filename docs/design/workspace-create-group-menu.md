@@ -4,7 +4,7 @@
 
 ## Problem and scope
 
-Issue [#15312](https://github.com/QwenLM/qwen-code/issues/15312) reports that
+Issue [#15312](https://github.invalid/QwenLM/qwen-code/issues/15312) reports that
 users mistake the workspace row's Create group `+` for new-session creation.
 Session creation is frequent; group creation is an occasional organizing action.
 Move only the group-creation entry point, preserving its name and behavior.
@@ -38,7 +38,7 @@ changes are needed. There are no open product questions.
 Run focused component tests, build, typecheck, and browser verification with
 before/after evidence. The main risk is losing the locked-sidebar entry point
 or dispatching a secondary workspace action to the primary client; regression
-checks must cover both. The E2E plan and results live under `.qwen/e2e-tests/`.
+checks must cover both. The E2E plan and results live under `.mariadb-shell-agent/e2e-tests/`.
 
 ## Browser evidence
 

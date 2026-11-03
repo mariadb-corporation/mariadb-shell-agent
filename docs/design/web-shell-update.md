@@ -85,7 +85,7 @@ protocol documentation. Existing interactive CLI update behavior remains intact.
 
 ## Validation and acceptance
 
-Establish the missing API/UI baseline with global `qwen serve` in an isolated
+Establish the missing API/UI baseline with global `mariadb-shell-agent serve` in an isolated
 runtime. Never update the user's installation during tests. Exercise real local
 archives/npm fixtures with fake activation boundaries; verify preparation does
 not change the active install, cached payload activation works, and cleanup and

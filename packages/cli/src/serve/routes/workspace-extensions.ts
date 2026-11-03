@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -828,7 +829,7 @@ export function registerWorkspaceExtensionRoutes(
             appliedGenerationByWorkspaceId.set(workspaceId, generation);
           } else {
             writeStderrLine(
-              `qwen serve: extension generation reconciliation failed for workspace ${runtimes[index]!.workspaceId}: ${redactUrlCredentials(
+              `mariadb-shell-agent serve: extension generation reconciliation failed for workspace ${runtimes[index]!.workspaceId}: ${redactUrlCredentials(
                 result.reason instanceof Error
                   ? result.reason.message
                   : String(result.reason),
@@ -844,7 +845,7 @@ export function registerWorkspaceExtensionRoutes(
         }
       } catch (error) {
         writeStderrLine(
-          `qwen serve: extension generation reconciliation failed: ${redactUrlCredentials(
+          `mariadb-shell-agent serve: extension generation reconciliation failed: ${redactUrlCredentials(
             error instanceof Error ? error.message : String(error),
           )}`,
         );

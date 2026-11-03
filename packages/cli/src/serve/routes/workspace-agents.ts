@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -547,7 +548,7 @@ export function registerWorkspaceAgentRoutes(
           )
           .catch((error) => {
             writeStderrLine(
-              `qwen serve: ending the runs of removed Host ${String(req.params['hostId'])} failed: ` +
+              `mariadb-shell-agent serve: ending the runs of removed Host ${String(req.params['hostId'])} failed: ` +
                 (error instanceof Error ? error.message : String(error)),
             );
           });

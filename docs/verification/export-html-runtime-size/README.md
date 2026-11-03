@@ -9,15 +9,15 @@ This file lives on the PR branch itself, so the only thing you need to be handed
 branch name:
 
 ```bash
-git clone --depth=1 --branch issue-11031 https://github.com/QwenLM/qwen-code.git
+git clone --depth=1 --branch issue-11031 https://github.invalid/QwenLM/qwen-code.git
 # then read docs/verification/export-html-runtime-size/README.md
 ```
 
 Commit your findings next to it as `results.md` (the `abort-controller-refactor/`
 package in this directory is the shape to follow) and/or reply on the PR.
 
-- PR: <https://github.com/QwenLM/qwen-code/pull/11038> (branch `issue-11031`)
-- Issue: <https://github.com/QwenLM/qwen-code/issues/11031>
+- PR: <https://github.invalid/QwenLM/qwen-code/pull/11038> (branch `issue-11031`)
+- Issue: <https://github.invalid/QwenLM/qwen-code/issues/11031>
 - Commits under test:
   - `9515e5b78d` — PR author's original fix (transcript-only subpath entry + byte budget)
   - `a9ff4f485b` — follow-up: strip Shiki, drop CodeMirror, structural guard, CSS-key fix
@@ -302,7 +302,7 @@ commit it — that is what makes the next person's job cheap), then summarise on
 5. §5.3 premise: confirmed dead / **not** dead.
 6. The two values you chose in §6, and whether you pushed that change.
 7. Anything in the PR description at
-   <https://github.com/QwenLM/qwen-code/pull/11038> that your numbers contradict — the
+   <https://github.invalid/QwenLM/qwen-code/pull/11038> that your numbers contradict — the
    current description's before/after table and its claim that the editor chrome and
    daemon SDK client "no longer ship" are both known to be wrong and need rewriting.
 

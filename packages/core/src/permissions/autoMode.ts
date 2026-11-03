@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  *
  * AUTO approval mode three-layer filter.
@@ -159,15 +160,15 @@ const PERSISTENCE_PATH_PATTERNS: readonly RegExp[] = Object.freeze([
 ]);
 
 const SELF_MODIFICATION_PATH_PATTERNS: readonly RegExp[] = Object.freeze([
-  /(^|\/)\.qwen\/settings(?:\.[^/]*)?\.json$/,
-  /(^|\/)(qwen|agents)\.md$/,
-  /(^|\/)\.qwen\/qwen\.local\.md$/,
-  /(^|\/)\.qwen\/rules(?:\/|$)/,
-  /(^|\/)\.qwen\/commands(?:\/|$)/,
-  /(^|\/)\.qwen\/agents(?:\/|$)/,
-  /(^|\/)\.qwen\/skills(?:\/|$)/,
-  /(^|\/)\.qwen\/hooks(?:\/|$)/,
-  /(^|\/)\.qwen\/fork-profiles(?:\/|$)/,
+  /(^|\/)\.mariadb-shell-agent\/settings(?:\.[^/]*)?\.json$/,
+  /(^|\/)(mariadb-shell-agent|agents)\.md$/,
+  /(^|\/)\.mariadb-shell-agent\/mariadb-shell-agent\.local\.md$/,
+  /(^|\/)\.mariadb-shell-agent\/rules(?:\/|$)/,
+  /(^|\/)\.mariadb-shell-agent\/commands(?:\/|$)/,
+  /(^|\/)\.mariadb-shell-agent\/agents(?:\/|$)/,
+  /(^|\/)\.mariadb-shell-agent\/skills(?:\/|$)/,
+  /(^|\/)\.mariadb-shell-agent\/hooks(?:\/|$)/,
+  /(^|\/)\.mariadb-shell-agent\/fork-profiles(?:\/|$)/,
   /(^|\/)\.mcp\.json$/,
 ]);
 
@@ -237,7 +238,7 @@ function matchesQwenHomeSurface(normalizedPath: string): boolean {
     const relativePath = normalizedPath.slice(qwenHomePrefix.length);
     if (
       /^settings(?:\.[^/]*)?\.json$/.test(relativePath) ||
-      /^qwen\.local\.md$/.test(relativePath) ||
+      /^mariadb-shell-agent\.local\.md$/.test(relativePath) ||
       /^\.mcp\.json$/.test(relativePath) ||
       /^(rules|commands|agents|skills|hooks|fork-profiles)(?:\/|$)/.test(
         relativePath,
@@ -479,8 +480,8 @@ export function passesAcceptEditsFastPath(
   if (!EDIT_TOOL_NAMES.has(ctx.toolName)) return false;
   if (!ctx.filePath) return false;
   // Persistence paths (hooks, package.json scripts, CI definitions) and
-  // Qwen self-modification surfaces (.qwen/settings*.json, configured context
-  // files, .qwen/rules|commands|agents|skills|hooks/, .mcp.json) must never
+  // Qwen self-modification surfaces (.mariadb-shell-agent/settings*.json, configured context
+  // files, .mariadb-shell-agent/rules|commands|agents|skills|hooks/, .mcp.json) must never
   // auto-approve via fast-path — the former execute code on subsequent tooling
   // operations, the latter let an agent rewrite its own permissions or
   // instructions.

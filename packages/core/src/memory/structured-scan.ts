@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -441,7 +442,7 @@ async function listMarkdownFiles(
     AUTO_MEMORY_INDEX_FILENAME,
     // Only the user-owned root may itself be a symlink (dotfiles layout).
     // Project and team roots can live INSIDE the repository
-    // (`<projectRoot>/.qwen/memory`, `<gitRoot>/.qwen/team-memory`), where a
+    // (`<projectRoot>/.mariadb-shell-agent/memory`, `<gitRoot>/.mariadb-shell-agent/team-memory`), where a
     // committed symlink would redirect the scan — and every injected
     // project/team document — anywhere the user can read. The write side
     // already rejects that shape (TeamMemoryRootSecurityError).
@@ -815,7 +816,7 @@ export async function scanAllAutoMemoryTopicDocuments(
   //
   // "Project scope" is the same root set scanAutoMemorySnapshot uses: the
   // configured runtime root plus, for a trusted project, the repo-local
-  // `<projectRoot>/.qwen/memory` root. Forget enumerates its candidate
+  // `<projectRoot>/.mariadb-shell-agent/memory` root. Forget enumerates its candidate
   // universe through this scan, so a narrower universe here leaves a
   // repo-local document injectable by recall yet impossible to forget.
   // Dedupe on the same scope:relativePath key the snapshot uses so two
@@ -829,7 +830,7 @@ export async function scanAllAutoMemoryTopicDocuments(
   if (roots.length === 0) return [];
   if (bestEffort) {
     // Recall-facing: per-root tolerant, like the structured snapshot path —
-    // one unlistable root (e.g. a repo-shipped symlinked .qwen/memory) must
+    // one unlistable root (e.g. a repo-shipped symlinked .mariadb-shell-agent/memory) must
     // not discard the healthy roots' documents.
     const perRoot = await Promise.all(
       roots.map((root) =>

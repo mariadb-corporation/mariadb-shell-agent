@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -73,7 +74,7 @@ export const COLLAB_MESSAGES_EN: Record<string, CollabMessage> = {
   // --- end session agents (chat) ---
   'collab.runtime.addTitle': 'Add a runtime',
   'collab.runtime.addDescription':
-    'Let another computer run Qwen Code agents for this workspace.',
+    'Let another computer run MariaDB Shell Agent agents for this workspace.',
   'collab.runtime.replaceTitle': (v) => `Replace ${v?.name}`,
   'collab.runtime.replaceDescription': (v) =>
     `Replace ${v?.name} with a new host using a one-time join command.`,
@@ -93,7 +94,8 @@ export const COLLAB_MESSAGES_EN: Record<string, CollabMessage> = {
   'collab.runtime.generate': 'Create join command',
   'collab.runtime.runThis':
     'On the other computer, run this in the project folder:',
-  'collab.runtime.noQwen': 'Qwen Code not installed there? This works too:',
+  'collab.runtime.noQwen':
+    'MariaDB Shell Agent not installed there? This works too:',
   'collab.runtime.copy': 'Copy',
   'collab.runtime.copied': 'Copied',
   'collab.runtime.expires': (v) =>
@@ -111,7 +113,7 @@ export const COLLAB_MESSAGES_EN: Record<string, CollabMessage> = {
   'collab.runtime.offers': (v) => `Offers ${v?.programs}`,
   'collab.runtime.done': 'Done',
   'collab.runtime.createAgentOn': (v) => `Create an agent on ${v?.name}`,
-  'collab.runtime.remoteUrl': 'Its Qwen Code address',
+  'collab.runtime.remoteUrl': 'Its MariaDB Shell Agent address',
   'collab.runtime.remoteToken': 'Its access token',
   'collab.runtime.remoteCwd': 'Project folder on that computer',
   'collab.runtime.program': 'Program',
@@ -162,7 +164,7 @@ export const COLLAB_MESSAGES_EN: Record<string, CollabMessage> = {
   'collab.agent.role': 'Start from a role',
   'collab.agent.roleNone': 'No role',
   'collab.agent.roleHint':
-    'A role from .qwen/agents supplies base instructions and tools; what you write below adds to it.',
+    'A role from .mariadb-shell-agent/agents supplies base instructions and tools; what you write below adds to it.',
   'collab.agent.instructions': 'Working instructions (optional)',
   'collab.agent.instructionsHint':
     'What it is responsible for and how it should hand back results.',
@@ -188,7 +190,7 @@ export const COLLAB_MESSAGES_EN: Record<string, CollabMessage> = {
   'collab.agent.empty':
     'No agents yet. Create one, then @ it in any conversation.',
   'collab.runtime.localNote':
-    'This computer. Its agents run in this workspace with Qwen Code.',
+    'This computer. Its agents run in this workspace with MariaDB Shell Agent.',
   'collab.runtime.remoteNote':
     'Another computer that joined this workspace. Agents assigned to it run there.',
   'collab.runtime.programs': 'Programs',
@@ -244,7 +246,7 @@ export const COLLAB_MESSAGES_EN: Record<string, CollabMessage> = {
   // --- runtime join (agents page) ---
   'collab.runtime.methodJoin': 'Join a coordinator',
   'collab.runtime.joinDescription':
-    'Make this computer a runtime of another Qwen Code: paste the join link and token shown there under Runtimes › Add runtime.',
+    'Make this computer a runtime of another MariaDB Shell Agent: paste the join link and token shown there under Runtimes › Add runtime.',
   'collab.runtime.joinLink': 'Join link',
   'collab.runtime.joinToken': 'Join token',
   'collab.runtime.joinBadLink':
@@ -310,7 +312,7 @@ export const COLLAB_MESSAGES_ZH: Record<string, CollabMessage> = {
   // --- end session agents (chat) ---
   'collab.runtime.addTitle': '添加 Runtime',
   'collab.runtime.addDescription':
-    '让另一台电脑为这个工作区运行 Qwen Code Agent。',
+    '让另一台电脑为这个工作区运行 MariaDB Shell Agent Agent。',
   'collab.runtime.replaceTitle': (v) => `替换 ${v?.name}`,
   'collab.runtime.replaceDescription': (v) =>
     `使用一次性加入命令，用新主机替换 ${v?.name}。`,
@@ -328,7 +330,7 @@ export const COLLAB_MESSAGES_ZH: Record<string, CollabMessage> = {
     'localhost 只在这台电脑上有效。请换成它的局域网地址（例如 http://192.168.1.8:4170），另一台电脑才能连上。',
   'collab.runtime.generate': '生成加入命令',
   'collab.runtime.runThis': '在那台电脑的项目目录里运行：',
-  'collab.runtime.noQwen': '那台电脑没装 Qwen Code？用这条也行：',
+  'collab.runtime.noQwen': '那台电脑没装 MariaDB Shell Agent？用这条也行：',
   'collab.runtime.copy': '复制',
   'collab.runtime.copied': '已复制',
   'collab.runtime.expires': (v) =>
@@ -345,7 +347,7 @@ export const COLLAB_MESSAGES_ZH: Record<string, CollabMessage> = {
   'collab.runtime.offers': (v) => `提供 ${v?.programs}`,
   'collab.runtime.done': '完成',
   'collab.runtime.createAgentOn': (v) => `在 ${v?.name} 上新建 Agent`,
-  'collab.runtime.remoteUrl': '它的 Qwen Code 地址',
+  'collab.runtime.remoteUrl': '它的 MariaDB Shell Agent 地址',
   'collab.runtime.remoteToken': '它的访问令牌',
   'collab.runtime.remoteCwd': '那台电脑上的项目目录',
   'collab.runtime.program': '执行程序',
@@ -394,7 +396,7 @@ export const COLLAB_MESSAGES_ZH: Record<string, CollabMessage> = {
   'collab.agent.role': '从角色开始',
   'collab.agent.roleNone': '不使用角色',
   'collab.agent.roleHint':
-    '.qwen/agents 里的角色提供基础指令和工具，下面写的内容在它之上补充。',
+    '.mariadb-shell-agent/agents 里的角色提供基础指令和工具，下面写的内容在它之上补充。',
   'collab.agent.instructions': '工作说明（可选）',
   'collab.agent.instructionsHint': '它负责什么，结果怎么交回来。',
   'collab.agent.description': '其他 Agent 什么时候该找它（可选）',
@@ -415,7 +417,7 @@ export const COLLAB_MESSAGES_ZH: Record<string, CollabMessage> = {
   'collab.noWorkspace': '先打开一个工作区，才能和 Agent 协作。',
   'collab.agent.empty': '还没有 Agent。新建一个，然后在任意对话里 @ 它。',
   'collab.runtime.localNote':
-    '这台电脑。它上面的 Agent 用 Qwen Code 在这个工作区里运行。',
+    '这台电脑。它上面的 Agent 用 MariaDB Shell Agent 在这个工作区里运行。',
   'collab.runtime.remoteNote':
     '加入了这个工作区的另一台电脑。分配给它的 Agent 在那边运行。',
   'collab.runtime.programs': '程序',
@@ -467,7 +469,7 @@ export const COLLAB_MESSAGES_ZH: Record<string, CollabMessage> = {
   // --- runtime join (agents page) ---
   'collab.runtime.methodJoin': '加入协调方',
   'collab.runtime.joinDescription':
-    '让这台电脑成为另一个 Qwen Code 的 Runtime：粘贴对方在「Runtime › 添加 Runtime」里给出的加入链接和令牌。',
+    '让这台电脑成为另一个 MariaDB Shell Agent 的 Runtime：粘贴对方在「Runtime › 添加 Runtime」里给出的加入链接和令牌。',
   'collab.runtime.joinLink': '加入链接',
   'collab.runtime.joinToken': '加入令牌',
   'collab.runtime.joinBadLink':

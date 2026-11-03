@@ -2,7 +2,7 @@
 
 ## Goal
 
-Represent one logical Qwen Code main-agent invocation with the existing `qwen-code.interaction` span. The span covers every LLM request, tool approval and execution, and model continuation that belongs to the same prompt. This avoids a second wrapper span while making the trace compliant with the OpenTelemetry GenAI Agent span convention.
+Represent one logical MariaDB Shell Agent main-agent invocation with the existing `qwen-code.interaction` span. The span covers every LLM request, tool approval and execution, and model continuation that belongs to the same prompt. This avoids a second wrapper span while making the trace compliant with the OpenTelemetry GenAI Agent span convention.
 
 ## Semantic contract
 
@@ -13,7 +13,7 @@ The interaction span keeps its framework-defined name, `SpanKind.INTERNAL`, and 
 - `gen_ai.conversation.id=<session id>`
 - `gen_ai.output.type=json` only when a JSON Schema constrains the model output
 
-`qwen-code.model` remains available for compatibility. `gen_ai.request.model` is omitted because the main agent can use model overrides, fallback, and dynamic selection. The main span also omits `gen_ai.provider.name` and `gen_ai.agent.id`, `gen_ai.agent.version`, and `gen_ai.agent.description`: Qwen Code has no hosted-agent identity or canonical runtime description for those fields.
+`qwen-code.model` remains available for compatibility. `gen_ai.request.model` is omitted because the main agent can use model overrides, fallback, and dynamic selection. The main span also omits `gen_ai.provider.name` and `gen_ai.agent.id`, `gen_ai.agent.version`, and `gen_ai.agent.description`: MariaDB Shell Agent has no hosted-agent identity or canonical runtime description for those fields.
 
 LLM spans do not receive `gen_ai.agent.name`. Execute-tool spans copy `gen_ai.agent.name` from their actual parent context, so main-agent tools use `qwen-code`, subagent tools use the subagent name, and standalone tools omit the field.
 

@@ -34,9 +34,9 @@ const directPrompt = 'java daemon e2e direct response';
 const token = 'java-daemon-e2e-token';
 const javaTestTimeoutMs = 5 * 60_000;
 mkdirSync(workspace, { recursive: true });
-mkdirSync(path.join(testHome, '.qwen'), { recursive: true });
+mkdirSync(path.join(testHome, '.mariadb-shell-agent'), { recursive: true });
 writeFileSync(
-  path.join(testHome, '.qwen', 'settings.json'),
+  path.join(testHome, '.mariadb-shell-agent', 'settings.json'),
   JSON.stringify({ ui: { enableFollowupSuggestions: false } }),
 );
 
@@ -115,7 +115,7 @@ const daemon = spawn(
     env: {
       ...cleanEnvironment,
       HOME: testHome,
-      QWEN_HOME: path.join(testHome, '.qwen'),
+      QWEN_HOME: path.join(testHome, '.mariadb-shell-agent'),
       NO_PROXY: '127.0.0.1,localhost',
       no_proxy: '127.0.0.1,localhost',
       OPENAI_API_KEY: 'fake-key',
@@ -276,7 +276,7 @@ try {
   if (result !== 0) {
     const logPath = path.join(
       testHome,
-      '.qwen',
+      '.mariadb-shell-agent',
       'debug',
       'daemon',
       'daemon.log',

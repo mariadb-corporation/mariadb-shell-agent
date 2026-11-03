@@ -4,9 +4,9 @@
 
 ## Problem and baseline
 
-This is the HTTP recovery slice of [#13184](https://github.com/QwenLM/qwen-code/issues/13184), following the [PR2 native snapshot contract](2026-10-26-managed-native-journal-snapshots.md). At the PR2-only baseline, named `committed-prefix-v1` snapshots were available, but HTTP restoration still read every transaction from revision zero and had no production snapshot selector. A client option without a producer would not connect recovery to these snapshots.
+This is the HTTP recovery slice of [#13184](https://github.invalid/QwenLM/qwen-code/issues/13184), following the [PR2 native snapshot contract](2026-10-26-managed-native-journal-snapshots.md). At the PR2-only baseline, named `committed-prefix-v1` snapshots were available, but HTTP restoration still read every transaction from revision zero and had no production snapshot selector. A client option without a producer would not connect recovery to these snapshots.
 
-The HTTP slice was developed against PR2 [#15569](https://github.com/QwenLM/qwen-code/pull/15569), initially at `c144d2fa65ff1f31e616fd73d205eabdff7dbf18`. PR3 [#15599](https://github.com/QwenLM/qwen-code/pull/15599) is now merged into that branch, and #15569 delivers the protocol/storage and HTTP recovery slices together to main. This document retains the HTTP slice's design; combined acceptance requires both designs' gates on the accepted integrated revision. This is a lossless prefix transport, not compact authority state: snapshot size, replay work and resident history remain proportional to history.
+The HTTP slice was developed against PR2 [#15569](https://github.invalid/QwenLM/qwen-code/pull/15569), initially at `c144d2fa65ff1f31e616fd73d205eabdff7dbf18`. PR3 [#15599](https://github.invalid/QwenLM/qwen-code/pull/15599) is now merged into that branch, and #15569 delivers the protocol/storage and HTTP recovery slices together to main. This document retains the HTTP slice's design; combined acceptance requires both designs' gates on the accepted integrated revision. This is a lossless prefix transport, not compact authority state: snapshot size, replay work and resident history remain proportional to history.
 
 ## Scope and decisions
 

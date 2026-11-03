@@ -1,4 +1,5 @@
 // Copyright 2026 Qwen Team
+// Copyright (c) 2026, MariaDB plc.
 // SPDX-License-Identifier: Apache-2.0
 
 import { execFileSync } from 'node:child_process';
@@ -187,7 +188,7 @@ afterEach(() => {
 function writeLegacyLease(lease: ReviewWorktreeLease, mtime?: Date): string {
   const path = join(
     lease.repositoryRoot,
-    '.qwen',
+    '.mariadb-shell-agent',
     'tmp',
     `qwen-review-lease-${lease.target}.json`,
   );
@@ -200,7 +201,7 @@ function writeLegacyLease(lease: ReviewWorktreeLease, mtime?: Date): string {
 describe('review worktree leases', () => {
   it('protects a worktree created after the lease is registered', () => {
     const root = createRepository();
-    const worktree = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktree = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     createReviewWorktreeLease({
       sessionId: 'session-a',
       promptId: 'prompt-parent',
@@ -239,7 +240,7 @@ describe('review worktree leases', () => {
 
   it('falls back to removing an unregistered worktree directory', () => {
     const root = createRepository();
-    const worktree = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktree = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     mkdirSync(worktree, { recursive: true });
     writeFileSync(join(worktree, 'marker'), 'remove');
     execFileSync('git', ['-C', root, 'branch', 'qwen-review/pr-1']);
@@ -271,7 +272,7 @@ describe('review worktree leases', () => {
 
   it('keeps the lease when fallback pruning fails', () => {
     const root = createRepository();
-    const worktree = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktree = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     mkdirSync(worktree, { recursive: true });
     execFileSync('git', ['-C', root, 'branch', 'qwen-review/pr-1']);
     createReviewWorktreeLease({
@@ -296,8 +297,8 @@ describe('review worktree leases', () => {
 
   it('removes only worktrees owned by the completed session', () => {
     const root = createRepository();
-    const owned = join(root, '.qwen', 'tmp', 'review-pr-1');
-    const other = join(root, '.qwen', 'tmp', 'review-pr-2');
+    const owned = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
+    const other = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-2');
     execFileSync('git', ['-C', root, 'branch', 'qwen-review/pr-1']);
     execFileSync('git', ['-C', root, 'branch', 'qwen-review/pr-2']);
     execFileSync('git', [
@@ -358,7 +359,7 @@ describe('review worktree leases', () => {
 
   it('does not let a child prompt clean up its parent review lease', () => {
     const root = createRepository();
-    const worktree = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktree = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     execFileSync('git', ['-C', root, 'branch', 'qwen-review/pr-1']);
     execFileSync('git', [
       '-C',
@@ -414,7 +415,7 @@ describe('review worktree leases', () => {
 
   it('ignores a lease whose branch does not match its PR target', () => {
     const root = createRepository();
-    const worktree = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktree = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     execFileSync('git', ['-C', root, 'branch', 'keep-me']);
     execFileSync('git', [
       '-C',
@@ -454,18 +455,18 @@ describe('review worktree leases', () => {
       promptId: 'prompt-parent',
       target: '../../../keep',
       repositoryRoot: root,
-      worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+      worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
       branch: 'qwen-review/pr-1',
     });
     clearReviewWorktreeLease(root, '../../../keep');
 
     expect(readFileSync(marker, 'utf8')).toBe('keep');
-    expect(existsSync(join(root, '.qwen', 'tmp'))).toBe(false);
+    expect(existsSync(join(root, '.mariadb-shell-agent', 'tmp'))).toBe(false);
   });
 
   it('lets explicit review cleanup disarm the finalizer', () => {
     const root = createRepository();
-    const worktree = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktree = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     execFileSync('git', ['-C', root, 'branch', 'qwen-review/pr-1']);
     execFileSync('git', [
       '-C',
@@ -509,7 +510,7 @@ describe('the move out of the mounted directory', () => {
     const root = createRepository();
     const planted = join(
       root,
-      '.qwen',
+      '.mariadb-shell-agent',
       'review-leases',
       'qwen-review-lease-pr-1.json',
     );
@@ -521,7 +522,7 @@ describe('the move out of the mounted directory', () => {
         promptId: 'foreign',
         target: 'pr-1',
         repositoryRoot: root,
-        worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+        worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
         branch: 'qwen-review/pr-1',
         identity: 1,
       }),
@@ -533,7 +534,7 @@ describe('the move out of the mounted directory', () => {
       promptId: 'current',
       target: 'pr-1',
       repositoryRoot: root,
-      worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+      worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
       branch: 'qwen-review/pr-1',
     });
 
@@ -544,8 +545,8 @@ describe('the move out of the mounted directory', () => {
   it('replaces the superseded legacy lease with the mirror, directory or not', () => {
     const root = createRepository();
     const legacy = (t: string) =>
-      join(root, '.qwen', 'tmp', `qwen-review-lease-${t}.json`);
-    mkdirSync(join(root, '.qwen', 'tmp'), { recursive: true });
+      join(root, '.mariadb-shell-agent', 'tmp', `qwen-review-lease-${t}.json`);
+    mkdirSync(join(root, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     writeFileSync(legacy('pr-2'), '{}');
     // The wedge shape: a DIRECTORY where the old lease file was. A
     // non-recursive remove throws EISDIR out of acquisition, and nothing
@@ -559,7 +560,7 @@ describe('the move out of the mounted directory', () => {
       promptId: 'p',
       target: 'pr-1',
       repositoryRoot: root,
-      worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+      worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
       branch: 'qwen-review/pr-1',
     });
 
@@ -584,7 +585,7 @@ describe('the move out of the mounted directory', () => {
     // its own tests as never throwing — reporting failure over a release
     // that succeeded, with every retry re-throwing.
     const root = createRepository();
-    const worktree = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktree = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     createReviewWorktreeLease({
       sessionId: 'session-a',
       promptId: 'prompt-a',
@@ -594,7 +595,12 @@ describe('the move out of the mounted directory', () => {
       branch: 'qwen-review/pr-1',
     });
     const trusted = reviewLeasePath(root, 'pr-1');
-    const legacy = join(root, '.qwen', 'tmp', 'qwen-review-lease-pr-1.json');
+    const legacy = join(
+      root,
+      '.mariadb-shell-agent',
+      'tmp',
+      'qwen-review-lease-pr-1.json',
+    );
     // The mirror the acquisition just wrote is what the wedge sits on. The
     // fs seam, not `chmod`: this suite runs as root in CI images, where mode
     // bits stop nothing.
@@ -630,7 +636,12 @@ describe('a pre-move lease file at the legacy path (R30-7)', () => {
     // the one honest way to produce that file is a crash-interrupted old
     // build whose state the next sweep now treats as stale.
     const root = createRepository();
-    const worktreePath = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktreePath = join(
+      root,
+      '.mariadb-shell-agent',
+      'tmp',
+      'review-pr-1',
+    );
     const legacy = writeLegacyLease(
       {
         sessionId: 'older-build-session',
@@ -679,7 +690,12 @@ describe('a pre-move lease file at the legacy path (R30-7)', () => {
     // own under Actions — and a raw ESC is an SGR sequence that repaints the
     // rest of the operator's terminal.
     const root = createRepository();
-    const worktreePath = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktreePath = join(
+      root,
+      '.mariadb-shell-agent',
+      'tmp',
+      'review-pr-1',
+    );
     const legacy = writeLegacyLease({
       sessionId: 'older-build-session\n::error::forged\u001b[31m\u202ereversed',
       promptId: 'older-prompt',
@@ -715,7 +731,12 @@ describe('a pre-move lease file at the legacy path (R30-7)', () => {
 
   it('bounds the displaced session id — a name, not a payload (R32-3)', () => {
     const root = createRepository();
-    const worktreePath = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktreePath = join(
+      root,
+      '.mariadb-shell-agent',
+      'tmp',
+      'review-pr-1',
+    );
     const legacy = writeLegacyLease({
       sessionId: 'x'.repeat(5_000),
       promptId: 'older-prompt',
@@ -753,7 +774,7 @@ describe('a pre-move lease file at the legacy path (R30-7)', () => {
         promptId: 'prompt-a',
         target: 'pr-1',
         repositoryRoot: root,
-        worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+        worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
         branch: 'qwen-review/pr-1',
       },
       new Date(0),
@@ -768,14 +789,14 @@ describe('the one-release rollout window', () => {
     promptId: 'prompt-a',
     target: 'pr-1',
     repositoryRoot: root,
-    worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+    worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
     branch: 'qwen-review/pr-1',
   });
   const legacyPathFor = (root: string) =>
-    join(root, '.qwen', 'tmp', 'qwen-review-lease-pr-1.json');
+    join(root, '.mariadb-shell-agent', 'tmp', 'qwen-review-lease-pr-1.json');
 
   it('mirrors the lease at the legacy path for pre-move builds', () => {
-    // A build from before the move reads ONLY `.qwen/tmp`; without the mirror
+    // A build from before the move reads ONLY `.mariadb-shell-agent/tmp`; without the mirror
     // it passes its own gate over this live lease for the whole rollout
     // window, and its cleanStale force-removes this session's worktree and
     // deletes its branch mid-run — #9205 in the mirrored direction, and
@@ -788,7 +809,9 @@ describe('the one-release rollout window', () => {
     ) as ReviewWorktreeLease;
     expect(mirror.sessionId).toBe('session-a');
     expect(mirror.promptId).toBe('prompt-a');
-    expect(mirror.worktreePath).toBe(join(root, '.qwen', 'tmp', 'review-pr-1'));
+    expect(mirror.worktreePath).toBe(
+      join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
+    );
   });
 
   it('the mirror is never fatal — not even when the rename AND the tmp cleanup both fail', () => {
@@ -831,7 +854,7 @@ describe('the one-release rollout window', () => {
         promptId: 'older-prompt',
         target: 'pr-1',
         repositoryRoot: root,
-        worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+        worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
         branch: 'qwen-review/pr-1',
       })}\n`,
       plantMtime: new Date(0),
@@ -923,7 +946,7 @@ describe('the one-release rollout window', () => {
         promptId: 'prompt-a',
         target: 'pr-1',
         repositoryRoot: root,
-        worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+        worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
         branch: 'qwen-review/pr-1',
       },
       new Date(0),
@@ -943,7 +966,7 @@ describe('the one-release rollout window', () => {
     // `removeLeaseWorktree` twice per lease, the second pass operating on
     // the world the first had already destroyed.
     const root = createRepository();
-    const worktree = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktree = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     execFileSync('git', ['-C', root, 'branch', 'qwen-review/pr-1']);
     execFileSync('git', [
       '-C',
@@ -993,7 +1016,7 @@ describe('the one-release rollout window', () => {
     // One pass, one verdict: a partway failure keeps both files so the next
     // sweep retries the same target whole.
     const root = createRepository();
-    const worktree = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktree = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     execFileSync('git', ['-C', root, 'branch', 'qwen-review/pr-1']);
     execFileSync('git', [
       '-C',
@@ -1047,13 +1070,13 @@ describe('the one-release rollout window', () => {
   });
 
   it('never even lists the mounted directory — the mirror is found by name, through the trusted lease', () => {
-    // `.qwen/tmp` is the directory reviewed code owns: a chmod 000 (or a
+    // `.mariadb-shell-agent/tmp` is the directory reviewed code owns: a chmod 000 (or a
     // stale handle) makes its readdirSync throw. The sweep reads only the
     // trusted directory and derives the twin by NAME, so the mounted side's
     // readability cannot decide what the finalizer reaches — an unreadable
-    // `.qwen/tmp` used to degrade the legacy leg into skipping the mirror.
+    // `.mariadb-shell-agent/tmp` used to degrade the legacy leg into skipping the mirror.
     const root = createRepository();
-    const worktree = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktree = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     execFileSync('git', ['-C', root, 'branch', 'qwen-review/pr-1']);
     execFileSync('git', [
       '-C',
@@ -1073,7 +1096,7 @@ describe('the one-release rollout window', () => {
       branch: 'qwen-review/pr-1',
     });
     const mirror = legacyPathFor(root);
-    fsMockState.readdirFailureDir = join(root, '.qwen', 'tmp');
+    fsMockState.readdirFailureDir = join(root, '.mariadb-shell-agent', 'tmp');
 
     cleanupReviewWorktreeLeases({
       sessionId: 'session-a',
@@ -1111,11 +1134,11 @@ describe('the one-release rollout window', () => {
       promptId: 'prompt-parent',
       target: 'pr-1',
       repositoryRoot: root,
-      worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+      worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
       branch: 'qwen-review/pr-1',
     });
     // The victim: another review tree under the same temp dir.
-    const victim = join(root, '.qwen', 'tmp', 'review-pr-2');
+    const victim = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-2');
     execFileSync('git', ['-C', root, 'branch', 'qwen-review/pr-2']);
     execFileSync('git', [
       '-C',
@@ -1165,11 +1188,11 @@ describe('the one-release rollout window', () => {
       promptId: 'prompt-parent',
       target: 'pr-1',
       repositoryRoot: root,
-      worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+      worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
       branch: 'qwen-review/pr-1',
     });
     // The victim the doctored mirror points at instead.
-    const victim = join(root, '.qwen', 'tmp', 'review-pr-2');
+    const victim = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-2');
     execFileSync('git', ['-C', root, 'branch', 'qwen-review/pr-2']);
     execFileSync('git', [
       '-C',
@@ -1214,11 +1237,11 @@ describe('the acquisition mirror at the mounted legacy path', () => {
     promptId: 'prompt-a',
     target: 'pr-1',
     repositoryRoot: root,
-    worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+    worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
     branch: 'qwen-review/pr-1',
   });
   const legacyPathFor = (root: string) =>
-    join(root, '.qwen', 'tmp', 'qwen-review-lease-pr-1.json');
+    join(root, '.mariadb-shell-agent', 'tmp', 'qwen-review-lease-pr-1.json');
 
   it.skipIf(process.platform === 'win32')(
     'never writes through a symlink planted at the legacy path (R27-7)',
@@ -1332,12 +1355,12 @@ describe('the nested review geometry (R27-6)', () => {
   it('re-roots the trusted lease directory outside an enclosing review temp dir', () => {
     // A review launched from inside another review's worktree has its
     // repositoryRoot INSIDE the outer mount: leases placed relative to it
-    // would sit in the writable surface the move out of `.qwen/tmp` exists
+    // would sit in the writable surface the move out of `.mariadb-shell-agent/tmp` exists
     // to escape. The trusted state lands beside the OUTERMOST review temp
     // dir instead — which is also the right lock scope, since every nested
     // layer shares the outermost repository's common git dir.
     const outer = createRepository();
-    const innerRoot = join(outer, '.qwen', 'tmp', 'review-pr-9');
+    const innerRoot = join(outer, '.mariadb-shell-agent', 'tmp', 'review-pr-9');
     mkdirSync(innerRoot, { recursive: true });
 
     createReviewWorktreeLease({
@@ -1345,7 +1368,12 @@ describe('the nested review geometry (R27-6)', () => {
       promptId: 'prompt-a',
       target: 'pr-1',
       repositoryRoot: innerRoot,
-      worktreePath: join(innerRoot, '.qwen', 'tmp', 'review-pr-1'),
+      worktreePath: join(
+        innerRoot,
+        '.mariadb-shell-agent',
+        'tmp',
+        'review-pr-1',
+      ),
       branch: 'qwen-review/pr-1',
     });
 
@@ -1354,7 +1382,7 @@ describe('the nested review geometry (R27-6)', () => {
       existsSync(
         join(
           innerRoot,
-          '.qwen',
+          '.mariadb-shell-agent',
           'review-leases',
           'qwen-review-lease-pr-1.json',
         ),
@@ -1365,10 +1393,15 @@ describe('the nested review geometry (R27-6)', () => {
       'session-a',
     );
     // ...while the pre-move mirror still lands where pre-move builds read:
-    // the inner root's own `.qwen/tmp` — advisory content, never authority.
+    // the inner root's own `.mariadb-shell-agent/tmp` — advisory content, never authority.
     expect(
       existsSync(
-        join(innerRoot, '.qwen', 'tmp', 'qwen-review-lease-pr-1.json'),
+        join(
+          innerRoot,
+          '.mariadb-shell-agent',
+          'tmp',
+          'qwen-review-lease-pr-1.json',
+        ),
       ),
     ).toBe(true);
   });
@@ -1380,7 +1413,7 @@ describe('readReviewWorktreeLeaseAt', () => {
     promptId: 'prompt-a',
     target: 'pr-1',
     repositoryRoot: root,
-    worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+    worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
     branch: 'qwen-review/pr-1',
   });
 
@@ -1410,14 +1443,16 @@ describe('readReviewWorktreeLease', () => {
       promptId: 'prompt-parent',
       target: 'pr-1',
       repositoryRoot: root,
-      worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+      worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
       branch: 'qwen-review/pr-1',
     });
 
     const lease = readReviewWorktreeLease(root, 'pr-1');
     expect(lease?.sessionId).toBe('session-a');
     expect(lease?.promptId).toBe('prompt-parent');
-    expect(lease?.worktreePath).toBe(join(root, '.qwen', 'tmp', 'review-pr-1'));
+    expect(lease?.worktreePath).toBe(
+      join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
+    );
     expect(reviewLeasePath(root, 'pr-1').startsWith(root + sep)).toBe(false);
     expect(
       reviewLeasePath(root, 'pr-1').startsWith(
@@ -1443,7 +1478,7 @@ describe('lease acquisition is atomic (#9205)', () => {
     promptId: 'prompt-a',
     target: 'pr-1',
     repositoryRoot: root,
-    worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+    worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
     branch: 'qwen-review/pr-1',
     ...over,
   });
@@ -1549,7 +1584,7 @@ describe('lease acquisition is atomic (#9205)', () => {
     // through `clearReviewWorktreeLease`, so the reclaim on that path alone
     // left a ~9 MB file per plan path behind forever.
     const root = createRepository();
-    const worktree = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktree = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     execFileSync('git', [
       '-C',
       root,
@@ -1956,7 +1991,7 @@ describe('lease acquisition is atomic (#9205)', () => {
     // Every reader treats a torn/unparseable lease as no lease, so the
     // writer rewriting it is self-heal, not clobber.
     const root = createRepository();
-    mkdirSync(join(root, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(root, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     mkdirSync(dirname(reviewLeasePath(root, 'pr-1')), { recursive: true });
     writeFileSync(reviewLeasePath(root, 'pr-1'), '{"truncated');
     createReviewWorktreeLease(leaseParams(root));
@@ -1974,7 +2009,7 @@ describe('clearReviewWorktreeLeaseIfOwned', () => {
       promptId: 'prompt-a',
       target: 'pr-1',
       repositoryRoot: root,
-      worktreePath: join(root, '.qwen', 'tmp', 'review-pr-1'),
+      worktreePath: join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
       branch: 'qwen-review/pr-1',
     });
 
@@ -2015,7 +2050,7 @@ describe('cleanupReviewWorktreeLeases scan', () => {
     // a hand-shaped file the writer could never produce is not swept, so the
     // finalizer's destructive path cannot ride a non-lease name.
     const root = createRepository();
-    const worktree = join(root, '.qwen', 'tmp', 'review-pr-1');
+    const worktree = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     execFileSync('git', ['-C', root, 'branch', 'qwen-review/pr-1']);
     execFileSync('git', [
       '-C',
@@ -2060,7 +2095,7 @@ describe('reviewLeaseHeldByAnotherSession', () => {
     promptId: 'prompt-parent',
     target: 'pr-1',
     repositoryRoot: '/repo',
-    worktreePath: '/repo/.qwen/tmp/review-pr-1',
+    worktreePath: '/repo/.mariadb-shell-agent/tmp/review-pr-1',
     branch: 'qwen-review/pr-1',
   };
   let savedSessionId: string | undefined;

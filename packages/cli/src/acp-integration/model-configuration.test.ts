@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -101,7 +102,7 @@ describe('model configuration manifest', () => {
       const generation = {
         model: 'deepseek-v4.1-flash-1017',
         authType: 'openai',
-        baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
         reasoning: { effort: 'low' },
         ...overrides,
       } as ContentGeneratorConfig;
@@ -133,7 +134,7 @@ describe('model configuration manifest', () => {
   );
 
   it('keeps the final model declaration ahead of the configured DeepSeek declaration', () => {
-    const baseUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+    const baseUrl = 'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
     const generation = {
       model: 'deepseek-v4.1-flash-1017',
       authType: 'openai',
@@ -209,12 +210,12 @@ describe('model configuration manifest', () => {
     ['deepseek-flash', 'https://api.deepseek.com/v1', ['low', 'high', 'max']],
     [
       'deepseek-v4.1-flash',
-      'https://model-proxy.alibaba-inc.com/v1',
+      'https://model-proxy.alibaba-inc.invalid/v1',
       ['low', 'high', 'max'],
     ],
     [
       'deepseek-v4.1-flash',
-      'https://model-proxy.aliyun-inc.com/v1',
+      'https://model-proxy.aliyun-inc.invalid/v1',
       ['low', 'high', 'max'],
     ],
     [
@@ -224,22 +225,22 @@ describe('model configuration manifest', () => {
     ],
     [
       'deepseek-v4.1-flash-1017',
-      'https://gateway.cn-shanghai.pai-eas.aliyuncs.com/api/predict/demo/v1',
+      'https://gateway.cn-shanghai.pai-eas.aliyuncs.invalid/api/predict/demo/v1',
       ['low', 'high', 'max'],
     ],
     [
       'DeepSeek-V4-Pro',
-      'https://gateway.cn-shanghai.pai-eas.aliyuncs.com/api/predict/demo/v1',
+      'https://gateway.cn-shanghai.pai-eas.aliyuncs.invalid/api/predict/demo/v1',
       ['high', 'max'],
     ],
     [
       'deepseek-v4.1-flash-1017',
-      'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       ['low', 'high', 'max'],
     ],
     [
       'deepseek-v4-pro',
-      'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       ['high', 'max'],
     ],
   ] as const)(
@@ -772,7 +773,7 @@ describe('model configuration manifest', () => {
     'projects tiered controls for %s on opaque duplicate-endpoint routes',
     (model) => {
       const baseUrl =
-        'https://llm-a.cn-beijing.maas.aliyuncs.com/compatible-mode/v1';
+        'https://llm-a.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1';
       const generation = {
         model,
         authType: 'openai',
@@ -783,7 +784,7 @@ describe('model configuration manifest', () => {
             id: model,
             authType: 'openai',
             baseUrl:
-              'https://llm-b.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+              'https://llm-b.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
             reasoning: undefined,
           },
         ],
@@ -812,7 +813,8 @@ describe('model configuration manifest', () => {
     const generation = {
       model: 'qwen3.7-plus',
       authType: 'openai',
-      baseUrl: 'https://llm-a.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+      baseUrl:
+        'https://llm-a.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
     } as ContentGeneratorConfig;
     expect(
       buildModelReasoningRoutePreview(generation, undefined, undefined, true),
@@ -824,7 +826,7 @@ describe('model configuration manifest', () => {
       model: 'deepseek-v4.1-flash-custom',
       authType: 'openai',
       baseUrl:
-        'https://workspace.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+        'https://workspace.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
       reasoning: { effort: 'xhigh' },
     } as ContentGeneratorConfig;
     const config = {

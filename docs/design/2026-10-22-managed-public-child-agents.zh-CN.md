@@ -36,6 +36,6 @@
 
 覆盖关闭开关、旧 host/Session、不支持的 profile、伪造调用、前后台执行、写入/Shell 的允许/拒绝/过期/丢回复、模式修改及重启后的策略固定、取消/启动/完成竞争、重复命令、租户与所有者边界、权限撤销、分页、隐藏面板、迟到响应和多标签页。在创建、前台等待且有待处理通知、结果投递期间重启 Java/Harness。验证资源精确释放及不确定副作用不重放。
 
-执行聚焦包测试、build/typecheck/bundle、Java Maven verify、独立 MySQL 8.4 和 Linux 真实进程 Hosted/WebShell 验收。分别验证契约准入、执行停止、UI 与资格验证。默认开启仅在既有 Runtime 与 Harness 资格检查通过后生效。同步维护共享增量 schema 和 inventory，不修改已发布迁移。设计保持完整双语，E2E 计划同步在 `.qwen/e2e-tests/`。没有未决产品选择。
+执行聚焦包测试、build/typecheck/bundle、Java Maven verify、独立 MySQL 8.4 和 Linux 真实进程 Hosted/WebShell 验收。分别验证契约准入、执行停止、UI 与资格验证。默认开启仅在既有 Runtime 与 Harness 资格检查通过后生效。同步维护共享增量 schema 和 inventory，不修改已发布迁移。设计保持完整双语，E2E 计划同步在 `.mariadb-shell-agent/e2e-tests/`。没有未决产品选择。
 
 资格验证使用本地确定性模型端点和独立数据库。E2E 报告分别记录通过场景和中断尝试；单元测试、HTTP 路由测试或通用进程恢复测试都不能证明完整的公开 child 故障矩阵。浏览器渲染和多标签页验收需要独立证据，部署公布这些场景已获资格前必须完成相应验证。

@@ -8,7 +8,7 @@ const mockIsSameProcess = vi.hoisted(() => vi.fn());
 const mockWriteStdoutLine = vi.hoisted(() => vi.fn());
 const mockWriteStderrLine = vi.hoisted(() => vi.fn());
 const mockPidFilePath = vi.hoisted(() =>
-  vi.fn(() => '/tmp/qwen-stop-test/.qwen/channels/service.pid'),
+  vi.fn(() => '/tmp/qwen-stop-test/.mariadb-shell-agent/channels/service.pid'),
 );
 const mockStopChannelWorker = vi.hoisted(() => vi.fn());
 const mockDaemonClient = vi.hoisted(() =>
@@ -102,7 +102,7 @@ describe('stopCommand', () => {
     expect(mockSignalService).not.toHaveBeenCalled();
     expect(mockRemoveServiceInfo).not.toHaveBeenCalled();
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      expect.stringContaining('managed by qwen serve'),
+      expect.stringContaining('managed by mariadb-shell-agent serve'),
     );
   });
 

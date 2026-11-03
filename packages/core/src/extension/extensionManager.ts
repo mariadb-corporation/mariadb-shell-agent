@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -453,7 +454,7 @@ function filterMcpConfig(original: MCPServerConfig): MCPServerConfig {
 
 function getContextFileNames(config: ExtensionConfig): string[] {
   if (!config.contextFileName || config.contextFileName.length === 0) {
-    return ['QWEN.md'];
+    return ['MARIADB-SHELL-AGENT.md'];
   } else if (!Array.isArray(config.contextFileName)) {
     return [config.contextFileName];
   }
@@ -599,7 +600,7 @@ export class ExtensionManager {
       // `config.getProxy()` at upload time, so the proxy must stay visible —
       // but installing the process-global undici dispatcher (which nothing
       // ever restores) would re-route the host process's plain `fetch` on
-      // every lifecycle event. In `qwen serve` that would leak one
+      // every lifecycle event. In `mariadb-shell-agent serve` that would leak one
       // workspace's proxy into every other workspace the daemon hosts.
       installProxyDispatcher: false,
       interactive: false,
@@ -1710,7 +1711,7 @@ export class ExtensionManager {
    *
    * Extension sources have no watcher (skills do — see
    * `SkillManager.startWatching`), so read-only consumers that must not scan on
-   * every call use this to stay eventually consistent with `qwen extensions
+   * every call use this to stay eventually consistent with `mariadb-shell-agent extensions
    * install` / `enable` / `disable` run outside the process.
    *
    * Concurrent callers share one refresh, so a caller can join a refresh that

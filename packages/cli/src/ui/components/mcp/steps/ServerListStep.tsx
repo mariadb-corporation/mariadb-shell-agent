@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -193,7 +194,8 @@ export const ServerListStep: React.FC<ServerListStepProps> = ({
       ) && (
         <Box marginTop={1}>
           <Text color={theme.status.warning}>
-            {ICON.REFERENCE} {t('Run qwen --debug to see error logs')}
+            {ICON.REFERENCE}{' '}
+            {t('Run mariadb-shell-agent --debug to see error logs')}
           </Text>
         </Box>
       )}

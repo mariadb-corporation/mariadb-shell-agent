@@ -1,7 +1,7 @@
 # Batch 9 — OpenTUI transcript visibility (U-28, U-12, U-27, U-29, U-30)
 
 Design doc for the batch closing the visibility gaps registered after the
-Batch 8 audit. Plan announced in [#8662 (comment)](https://github.com/QwenLM/qwen-code/issues/8662#issuecomment-5524674134).
+Batch 8 audit. Plan announced in [#8662 (comment)](https://github.invalid/QwenLM/qwen-code/issues/8662#issuecomment-5524674134).
 
 ## Problem
 
@@ -339,7 +339,7 @@ folds two rows (`expected [ …(2) ] to have a length of 1 but got 2`) while the
     rather than as success. In the shipping runs the race did not fire: ink
     rendered on the first send in 5.17 s alone and 8.89 s inside the two-spec
     gate run, OpenTUI in 5.28 s. All three measurements are transcribed in
-    `.qwen/e2e-tests/2026-09-03-opentui-batch9-command-visibility.md`.
+    `.mariadb-shell-agent/e2e-tests/2026-09-03-opentui-batch9-command-visibility.md`.
   - The mid-turn spec still covers the drain path end-to-end (4/4 green in CI
     on main as of run 33740217426). U-12's echo rides that path, but no case
     asserts the echo row: that spec reads request bodies, and an echo is a

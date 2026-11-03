@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -349,21 +350,21 @@ describe('HookEventHandler', () => {
     it('should include instruction load metadata in hook input', async () => {
       const input = await captureInput(() =>
         hookEventHandler.fireInstructionsLoadedEvent(
-          '/repo/.qwen/QWEN.local.md',
+          '/repo/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md',
           'local',
           'include',
-          { parentFilePath: '/repo/QWEN.md' },
+          { parentFilePath: '/repo/MARIADB-SHELL-AGENT.md' },
         ),
       );
 
       expectPlanned(HookEventName.InstructionsLoaded, {
-        filePath: '/repo/.qwen/QWEN.local.md',
+        filePath: '/repo/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md',
       });
       expectFields(input, {
-        file_path: '/repo/.qwen/QWEN.local.md',
+        file_path: '/repo/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md',
         memory_type: 'local',
         load_reason: 'include',
-        parent_file_path: '/repo/QWEN.md',
+        parent_file_path: '/repo/MARIADB-SHELL-AGENT.md',
       });
     });
   });
@@ -793,7 +794,7 @@ describe('HookEventHandler', () => {
 
   describe('project-skill trust gate at fire time', () => {
     // The second side of the gate `applySideEffects` enforces on the way
-    // in: a hook registered from a repository's `.qwen/skills/` frontmatter
+    // in: a hook registered from a repository's `.mariadb-shell-agent/skills/` frontmatter
     // fires only while the folder is STILL trusted. `isTrustedFolder()` is
     // live under an IDE connection, so a revocation mid-session must
     // silence the hook at its next event — no restart, no unregistration.
@@ -1611,12 +1612,12 @@ describe('HookEventHandler', () => {
     it('should include all parameters in the hook input', () =>
       expectInput(
         fire(
-          'Qwen Code needs your permission to use Bash',
+          'MariaDB Shell Agent needs your permission to use Bash',
           NotificationType.PermissionPrompt,
           'Permission needed',
         ),
         {
-          message: 'Qwen Code needs your permission to use Bash',
+          message: 'MariaDB Shell Agent needs your permission to use Bash',
           notification_type: 'permission_prompt',
           title: 'Permission needed',
         },
@@ -1625,7 +1626,7 @@ describe('HookEventHandler', () => {
     itPassesContext(
       'should pass notification_type as context for matcher filtering',
       fire(
-        'Qwen Code is waiting for your input',
+        'MariaDB Shell Agent is waiting for your input',
         NotificationType.IdlePrompt,
         'Waiting for input',
       ),

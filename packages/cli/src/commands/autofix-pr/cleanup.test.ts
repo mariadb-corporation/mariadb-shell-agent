@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -112,7 +113,7 @@ describe('runCleanup (real git)', () => {
     savedSession = process.env['QWEN_CODE_SESSION_ID'];
     process.env['QWEN_CODE_SESSION_ID'] = 'session-a';
     // `watchRoot` roots a daemon session's watch at its own worktree; a runner
-    // under `qwen serve` must not leak that into these clone-rooted tests.
+    // under `mariadb-shell-agent serve` must not leak that into these clone-rooted tests.
     savedServe = process.env['QWEN_CODE_SERVE'];
     delete process.env['QWEN_CODE_SERVE'];
     process.chdir(repo);
@@ -677,11 +678,14 @@ describe('runCleanup (real git)', () => {
     }
   });
 
-  it('ends the watch despite a sibling worktree with a malformed .qwen/tmp', () => {
+  it('ends the watch despite a sibling worktree with a malformed .mariadb-shell-agent/tmp', () => {
     const sibling = join(dirname(repo), `${basename(repo)}-sibling`);
     run(repo, 'worktree', 'add', '-q', '--detach', sibling);
-    mkdirSync(join(sibling, '.qwen'), { recursive: true });
-    writeFileSync(join(sibling, '.qwen', 'tmp'), 'not a directory');
+    mkdirSync(join(sibling, '.mariadb-shell-agent'), { recursive: true });
+    writeFileSync(
+      join(sibling, '.mariadb-shell-agent', 'tmp'),
+      'not a directory',
+    );
     try {
       // Discovery must isolate the sibling's ENOTDIR, not abort: the healthy
       // main-rooted watch is still found and ended.

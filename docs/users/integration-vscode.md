@@ -1,6 +1,6 @@
 # Visual Studio Code
 
-> The VS Code extension (Beta) lets you see Qwen's changes in real-time through a native graphical interface integrated directly into your IDE, making it easier to access and interact with Qwen Code.
+> The VS Code extension (Beta) lets you see Qwen's changes in real-time through a native graphical interface integrated directly into your IDE, making it easier to access and interact with MariaDB Shell Agent.
 
 <br/>
 
@@ -10,11 +10,11 @@
 
 ### Features
 
-- **Native IDE experience**: Dedicated Qwen Code sidebar panel accessed via the Qwen icon
+- **Native IDE experience**: Dedicated MariaDB Shell Agent sidebar panel accessed via the Qwen icon
 - **Auto-accept edits mode**: Automatically apply Qwen's changes as they're made
 - **File management**: @-mention files or attach files and images using the system file picker
 - **Conversation history**: Access to past conversations
-- **Multiple sessions**: Run multiple Qwen Code sessions simultaneously
+- **Multiple sessions**: Run multiple MariaDB Shell Agent sessions simultaneously
 
 ### Requirements
 
@@ -32,8 +32,8 @@ Download and install the extension from the [Visual Studio Code Extension Market
 - Check that VS Code has permission to install extensions
 - Try installing directly from the Marketplace website
 
-### Qwen Code not responding
+### MariaDB Shell Agent not responding
 
 - Check your internet connection
 - Start a new conversation to see if the issue persists
-- [File an issue on GitHub](https://github.com/qwenlm/qwen-code/issues) if the problem continues
+- [File an issue on GitHub](https://github.invalid/qwenlm/qwen-code/issues) if the problem continues

@@ -39,7 +39,7 @@ Close retains history and outputs. Archive follows a completed close; unarchive 
 
 Reproduce the default capability gap and delayed first-claim failure before changing production code. Then verify delayed claim renewal inside the handoff period, unchanged generation/revision, ordinary-write refusal, expired-before-admission and post-handoff refusal, idempotent replay, resubmission, stale claims, replacement writers and files v1 compatibility.
 
-Run selected H2 and real MySQL cases within the shared local Java budget. Reuse matching SDK and bundle evidence where applicable. Run focused CLI checks, build, typecheck and bundle for changed TypeScript. Keep the original failed attempts in `.qwen/issues/issue-15011.md`, `.qwen/issues/issue-15078.md` and the E2E report.
+Run selected H2 and real MySQL cases within the shared local Java budget. Reuse matching SDK and bundle evidence where applicable. Run focused CLI checks, build, typecheck and bundle for changed TypeScript. Keep the original failed attempts in `.mariadb-shell-agent/issues/issue-15011.md`, `.mariadb-shell-agent/issues/issue-15078.md` and the E2E report.
 
 Linux CI must exercise the source-matched public Shell lifecycle and `HostedShellLifecycleRecoveryIT` fault cases, including resource settlement, original Worker stop, retained output and deletion retirement. Historical green CI and fast-tier skipped jobs do not establish acceptance of this revision. No local macOS check replaces Linux cgroup and process-fault acceptance.
 

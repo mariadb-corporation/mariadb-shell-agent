@@ -12,13 +12,13 @@ A Mod's `$` offers `command.register`, `session.version` and `ui.log`. Any other
 - Claude Code's built-in telemetry Mod reads `$.session.id()`, `cwd()`, `model()` and `surfaces()`, and waits with `$.clock.sleep()`.
 - Mods label their own output with `$.plugin.name`.
 
-These calls fail in Qwen Code today, so such a Mod's hook fails and is skipped.
+These calls fail in MariaDB Shell Agent today, so such a Mod's hook fails and is skipped.
 
 ## Goals and non-goals
 
 Goals:
 
-- Answer the read-only session facts and the clock with Claude Code's shapes, from the figures Qwen Code already shows.
+- Answer the read-only session facts and the clock with Claude Code's shapes, from the figures MariaDB Shell Agent already shows.
 - Keep each method an API event that other plugins can observe, answer or deny, as `session.version` is.
 
 Non-goals:
@@ -38,7 +38,7 @@ Non-goals:
 
 Each method is an API event with no arguments, except `session.usage`:
 
-| Method                 | Answer                                               | Source in Qwen Code                                                                        |
+| Method                 | Answer                                               | Source in MariaDB Shell Agent                                                              |
 | ---------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | `session.id()`         | the session's id                                     | the current session; it changes on `/clear` and `/resume`                                  |
 | `session.cwd()`        | the directory the session runs in                    | the session's target directory                                                             |
@@ -53,8 +53,8 @@ Each method is an API event with no arguments, except `session.usage`:
 
 - `startedAt`: when the session began, in `$.clock.now()` milliseconds. For a resumed session it is the session's first record; `/clear` starts it over. A branch made with `/branch` copies its parent's records, so it keeps the parent's start, just as its `turns` include the parent's turns.
 - `context`: the main conversation's `tokens`, the model's context `window`, and `percent`, a whole number from 0 to 100. These are the figures the status line shows: the input tokens of the last response, including cached ones. Before the first response `tokens` and `percent` are 0. When the window size is unknown, `window` is 0 and `percent` is absent.
-- `rateLimits`: always empty. Qwen Code reads no rate-limit windows.
-- `cost` is absent, because Qwen Code keeps no cost ledger. `args.breakdown` and `args.columns` are validated but no breakdown is computed.
+- `rateLimits`: always empty. MariaDB Shell Agent reads no rate-limit windows.
+- `cost` is absent, because MariaDB Shell Agent keeps no cost ledger. `args.breakdown` and `args.columns` are validated but no breakdown is computed.
 
 The facts are read when each dispatch starts, on the main thread, and travel with the request to the worker. A hook that calls `$.session.usage()` while a tool runs reads the figures from the start of that tool call. They do not change during a tool call: the main conversation waits for its tools before it sends the next request, and subagents do not update the main conversation's figures.
 
@@ -66,7 +66,7 @@ The facts are read when each dispatch starts, on the main thread, and travel wit
 
 - `ms` must be a finite, non-negative number.
 - Unlike every other `$` call, the wait is charged to the calling hook's budget, as in Claude Code. A sleep that outlasts the remaining budget times the hook out.
-- `options.signal` rejects the sleep at once when it aborts. In Qwen Code the only signal a Mod has is `next.signal`, because the QuickJS environment provides no `AbortController`. As in Claude Code, the signal does not cross to the host.
+- `options.signal` rejects the sleep at once when it aborts. In MariaDB Shell Agent the only signal a Mod has is `next.signal`, because the QuickJS environment provides no `AbortController`. As in Claude Code, the signal does not cross to the host.
 - A sleep ends with the hook that started it. Work that outlives a dispatch is not supported yet, so a sleep the hook does not await cannot hold up the dispatch.
 
 ## Design decisions

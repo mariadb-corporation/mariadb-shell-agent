@@ -39,7 +39,7 @@ Issue #15011 暴露了相关交接失败：生命周期准入先围栏普通写�
 
 修改生产代码前，复现默认能力缺口及首个 claim 延迟失败。随后验证交接期内延迟续租、generation/revision 不变、普通写入拒绝、准入前过期与交接期后拒绝、幂等重放、重新提交、旧 claim、被替换写者及 files v1 兼容。
 
-在共享 Java 本地预算内执行定向 H2 和真实 MySQL 用例。适用时复用匹配的 SDK 与 bundle 证据。针对 TypeScript 变更执行定向 CLI 检查、构建、类型检查和 bundle。原始失败保留在 `.qwen/issues/issue-15011.md`、`.qwen/issues/issue-15078.md` 和 E2E 报告中。
+在共享 Java 本地预算内执行定向 H2 和真实 MySQL 用例。适用时复用匹配的 SDK 与 bundle 证据。针对 TypeScript 变更执行定向 CLI 检查、构建、类型检查和 bundle。原始失败保留在 `.mariadb-shell-agent/issues/issue-15011.md`、`.mariadb-shell-agent/issues/issue-15078.md` 和 E2E 报告中。
 
 Linux CI 必须对匹配源码的公开 Shell 生命周期及 `HostedShellLifecycleRecoveryIT` 故障用例进行验证，覆盖资源结算、原 Worker 停止、保留输出和删除退役。历史绿色 CI 和 fast tier 跳过的作业均不能证明本次版本验收。本机 macOS 检查不能替代 Linux cgroup 与进程故障验收。
 

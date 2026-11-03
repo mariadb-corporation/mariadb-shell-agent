@@ -6,7 +6,7 @@ Status: Implementation design
 
 Date: 2026-10-26
 
-Issue: [#15647](https://github.com/QwenLM/qwen-code/issues/15647)
+Issue: [#15647](https://github.invalid/QwenLM/qwen-code/issues/15647)
 
 ## Problem and current behavior
 

@@ -21,10 +21,10 @@ fourth is revised there.
 After a pull request is opened, the author still has to watch it: CI fails on a
 platform they did not test, a reviewer leaves comments, the base branch moves
 and the PR conflicts. Each round is small, but it needs someone to notice, sync
-the branch, fix, verify, push and reply. Today Qwen Code can do each step when
+the branch, fix, verify, push and reply. Today MariaDB Shell Agent can do each step when
 asked, but nothing watches the PR and starts the next round on its own.
 
-`/autofix-pr` closes that loop inside a local Qwen Code session. It watches one
+`/autofix-pr` closes that loop inside a local MariaDB Shell Agent session. It watches one
 PR, fixes CI failures, review feedback and merge conflicts in an isolated
 worktree, pushes the fix to the PR branch, replies to the feedback it handled,
 and stops when the PR is merged or closed.
@@ -39,11 +39,11 @@ exists on `main`:
 | Recurring trigger           | `cron_create` (`packages/core/src/tools/cron-create.ts`): session-only or durable, recurring jobs jittered by up to 10% of the period, auto-expiry. Fires enter the notification queue and never interrupt a running turn (`packages/cli/src/ui/hooks/use-llm-stream.ts`).             |
 | Model-free trigger          | A scheduled task's `gate` ([2026-10-21-scheduled-task-gate.md](2026-10-21-scheduled-task-gate.md)): a command runs at each fire outside the model; silence skips the fire with no turn, output wakes the session with the output attached as data. The probes below are such commands. |
 | Loop conventions            | Bundled `loop` skill (`packages/core/src/skills/bundled/loop/SKILL.md`), `cron_list` / `cron_delete`, the CronPill.                                                                                                                                                                    |
-| Isolated PR worktree        | `qwen review fetch-pr` (`packages/cli/src/commands/review/fetch-pr.ts`) and its git helpers (`releaseWorktree` in `packages/cli/src/commands/review/lib/git.ts`, `redirectedAncestor` in `lib/worktree.ts`).                                                                           |
+| Isolated PR worktree        | `mariadb-shell-agent review fetch-pr` (`packages/cli/src/commands/review/fetch-pr.ts`) and its git helpers (`releaseWorktree` in `packages/cli/src/commands/review/lib/git.ts`, `redirectedAncestor` in `lib/worktree.ts`).                                                            |
 | Delegation                  | The `agent` tool with `working_dir` and `run_in_background` (`packages/core/src/tools/agent/agent.ts`).                                                                                                                                                                                |
-| Deterministic skill helpers | The `qwen review <helper>` pattern: logic lives in tested CLI subcommands and the skill calls them through `"${QWEN_CODE_CLI:-qwen}"`.                                                                                                                                                 |
+| Deterministic skill helpers | The `mariadb-shell-agent review <helper>` pattern: logic lives in tested CLI subcommands and the skill calls them through `"${QWEN_CODE_CLI:-qwen}"`.                                                                                                                                  |
 | Conflict policy             | The `/resolve` design ([2026-06-23-fix-conflicts-command.md](2026-06-23-fix-conflicts-command.md)): merge the base branch and push with `--force-with-lease` against the expected head SHA.                                                                                            |
-| Untrusted-input rules       | The repository's `.qwen/skills/autofix` skill treats PR text, comments and logs as data, not instructions.                                                                                                                                                                             |
+| Untrusted-input rules       | The repository's `.mariadb-shell-agent/skills/autofix` skill treats PR text, comments and logs as data, not instructions.                                                                                                                                                              |
 
 What is missing is the deterministic part: reading a PR's state and computing
 what changed since the last check, enforcing push safety, and posting replies
@@ -68,7 +68,7 @@ Goals:
 
 Non-goals (first version):
 
-- Running when no Qwen Code session is open (no cloud runner, no webhooks).
+- Running when no MariaDB Shell Agent session is open (no cloud runner, no webhooks).
 - PRs in repositories without a matching local remote.
 - Resolving review threads. Reviewers keep that decision.
 - Opening new PRs or rewriting PR titles and descriptions.
@@ -141,31 +141,31 @@ with unit tests; judgment stays in the skill.
                                "qwen autofix-pr snapshot <n> --gate --repo <owner>/<repo> --host <host> --session <sessionId> --task <task>";
                                the prompt says how to handle the events the gate printed
 
-qwen review watch-repo         the reviewer's probe: PRs opened, pushed or marked
+mariadb-shell-agent review watch-repo         the reviewer's probe: PRs opened, pushed or marked
                                ready since the last run, behind a gate of its own
 ```
 
 Helpers live under `packages/cli/src/commands/autofix-pr.ts` and
 `packages/cli/src/commands/autofix-pr/`, and the skill runs them through the
 `autofix_pr` core tool (Section 6.12); the reviewer probe lives with the
-other `qwen review` helpers. Per-PR state lives next to the worktree, outside
+other `mariadb-shell-agent review` helpers. Per-PR state lives next to the worktree, outside
 it, under the worktree the watch was prepared from — the session's own
 worktree in a daemon session, else the clone's main worktree (see
 [2026-10-29-autofix-pr-worktree-rooted-storage.md](2026-10-29-autofix-pr-worktree-rooted-storage.md)).
 Branches are shared by every worktree of a clone; the watch listing scans them
 all, so a watch is found whichever of them holds it:
 
-- worktree: `.qwen/tmp/autofix-pr-<n>/`
-- state: `.qwen/tmp/autofix-pr-<n>-state.json`
-- gate cursor: `.qwen/tmp/autofix-pr-<n>-gate.json`
-- when the watch's own gate last checked: `.qwen/tmp/autofix-pr-<n>-gate.checked`
-- latest prepared snapshot: `.qwen/tmp/autofix-pr-<n>-snapshot.json`
-- what GitHub said of bot comments: `.qwen/tmp/autofix-pr-<n>-replies.json`
-- logs, briefs and reply plans: `.qwen/tmp/autofix-pr-<n>-*.{log,md,json}`
-- the user's instructions for every round: `.qwen/tmp/autofix-pr-<n>-instructions.txt`
-- reviewer cursor: `.qwen/tmp/review-watch/<host>/<owner>/<repo>.json` — this
+- worktree: `.mariadb-shell-agent/tmp/autofix-pr-<n>/`
+- state: `.mariadb-shell-agent/tmp/autofix-pr-<n>-state.json`
+- gate cursor: `.mariadb-shell-agent/tmp/autofix-pr-<n>-gate.json`
+- when the watch's own gate last checked: `.mariadb-shell-agent/tmp/autofix-pr-<n>-gate.checked`
+- latest prepared snapshot: `.mariadb-shell-agent/tmp/autofix-pr-<n>-snapshot.json`
+- what GitHub said of bot comments: `.mariadb-shell-agent/tmp/autofix-pr-<n>-replies.json`
+- logs, briefs and reply plans: `.mariadb-shell-agent/tmp/autofix-pr-<n>-*.{log,md,json}`
+- the user's instructions for every round: `.mariadb-shell-agent/tmp/autofix-pr-<n>-instructions.txt`
+- reviewer cursor: `.mariadb-shell-agent/tmp/review-watch/<host>/<owner>/<repo>.json` — this
   one stays under the clone's **main** worktree (`repoRoot()`), not the watch
-  root: `qwen review watch-repo` is a clone-level probe, not a per-session watch
+  root: `mariadb-shell-agent review watch-repo` is a clone-level probe, not a per-session watch
 
 ## 6. Helper contracts
 
@@ -191,7 +191,7 @@ all, so a watch is found whichever of them holds it:
    scheduled task goes on, so `prepare --take-over` moves the watch — its
    history and budgets kept — to the session that asks, when the user says
    so; the helpers of the session it was taken from refuse from then on,
-   and its scheduled task stops at its next fire: its gate names the session that made it (`--session`, the `sessionId` `prepare` reports), and until then moves no cursor — it asks again whose the watch is before it writes one — and only wakes it (`watched_elsewhere`, with the owner as `session`). Each task also names the id `schedule` minted for it (`--task`, Section 6.11): a gate whose id is not the one the state file records — a task a later start or resume replaced, or a copy in a second process of the same session (`qwen --continue`), where the helpers would accept its rounds — answers the same, and one whose watch `cleanup` removed answers `watch_ended`. Either event names the gate's own session and task (`gateSession`, `gateTask`), so the round deletes exactly that task. A round of the old owner that is already under way is stopped by its next helper call, which carries the task too (Section 6.8); its fix agent, which calls no helper, is not, and may go on committing into the worktree, where the new owner's round could push it. That is a known limit: the take-over and resume questions say so when `status` reports `checkedRecently`, and a take-over is best made once the other session has stopped.
+   and its scheduled task stops at its next fire: its gate names the session that made it (`--session`, the `sessionId` `prepare` reports), and until then moves no cursor — it asks again whose the watch is before it writes one — and only wakes it (`watched_elsewhere`, with the owner as `session`). Each task also names the id `schedule` minted for it (`--task`, Section 6.11): a gate whose id is not the one the state file records — a task a later start or resume replaced, or a copy in a second process of the same session (`mariadb-shell-agent --continue`), where the helpers would accept its rounds — answers the same, and one whose watch `cleanup` removed answers `watch_ended`. Either event names the gate's own session and task (`gateSession`, `gateTask`), so the round deletes exactly that task. A round of the old owner that is already under way is stopped by its next helper call, which carries the task too (Section 6.8); its fix agent, which calls no helper, is not, and may go on committing into the worktree, where the new owner's round could push it. That is a known limit: the take-over and resume questions say so when `status` reports `checkedRecently`, and a take-over is best made once the other session has stopped.
 6. Fetch `refs/pull/<n>/head` into local branch `qwen-autofix/pr-<n>` and
    create the worktree on it. `prepare` never discards earlier work: a
    leftover worktree, or a leftover branch that may hold commits beyond the
@@ -211,7 +211,7 @@ all, so a watch is found whichever of them holds it:
    cursor, history, reply cache, snapshot — is read only when it is a
    regular file, so a FIFO planted under its name cannot block a helper or
    the gate, and each is written replacing a link rather than following it,
-   so no helper writes outside `.qwen/tmp`. If the
+   so no helper writes outside `.mariadb-shell-agent/tmp`. If the
    worktree was removed (also with `rm -rf`, which `git worktree prune`
    clears), it is recreated and the recorded `pushedShas`,
    `handledCommentIds` and `postedCommentIds` are kept, with the budgets,
@@ -244,8 +244,8 @@ all, so a watch is found whichever of them holds it:
    this clone has that copy checked out and holds changes git reports. It is
    read with `--no-optional-locks`, `--untracked-files=normal` and
    `--ignore-submodules=none`, so a user's `status.showUntrackedFiles` or
-   submodule `ignore` setting cannot hide work; only `.qwen/tmp`, where the
-   helpers write, is left out, and anything else under `.qwen` is the user's.
+   submodule `ignore` setting cannot hide work; only `.mariadb-shell-agent/tmp`, where the
+   helpers write, is left out, and anything else under `.mariadb-shell-agent` is the user's.
    It is computed only when the copy exists and only for checkouts of that
    branch; work in a checkout of another branch is not work on that copy.
    `worktree list --porcelain -z` keeps a path git would quote, with the line
@@ -438,7 +438,7 @@ Event rules:
   as if it opened one, and is not known yet, is asked about over REST, one comment
   at a time (`in_reply_to_id` stays on it), only for an open thread of an
   open PR, and once: the answers are kept in
-  `.qwen/tmp/autofix-pr-<n>-replies.json`, which the gate, prepared
+  `.mariadb-shell-agent/tmp/autofix-pr-<n>-replies.json`, which the gate, prepared
   snapshots and `reply` share. A comment deleted meanwhile is no request.
   Each answer is kept as it comes. The gate asks about 20 at most a fire,
   within the gate's read budget, and stops at the first failure, leaving the rest — neither requests nor seen — for its next fire; a
@@ -467,7 +467,7 @@ Event rules:
 - Checks and suites belong to the commit, not to the PR: another PR of the
   same head commit shares them. That is a known limit.
 - Prepared mode writes the whole snapshot, indented, to
-  `.qwen/tmp/autofix-pr-<n>-snapshot.json` and prints one line: the snapshot
+  `.mariadb-shell-agent/tmp/autofix-pr-<n>-snapshot.json` and prints one line: the snapshot
   without its events, the number of events and their types, and the file's
   path (`snapshot`). On a PR with any history the comments' bodies run far
   past what one line of tool output shows; the round reads the file, and the
@@ -497,7 +497,7 @@ discards the attempt's work and redoes the fix though nothing else changed.
 `snapshot <n> --gate` is the command behind the scheduled task's gate. It
 needs no worktree and no state file: on the first run `--repo` names the
 PR's repository (or the prepared state supplies it), and its own cursor,
-`.qwen/tmp/autofix-pr-<n>-gate.json`, records what it has already reported.
+`.mariadb-shell-agent/tmp/autofix-pr-<n>-gate.json`, records what it has already reported.
 Without `--host` (or `GH_HOST`) it uses the host the PR is already watched
 on — its cursor's, or the prepared state's — before falling back to
 github.com; a blank `--host` is refused. A cursor for another repository's
@@ -613,7 +613,7 @@ Writes the log of each finished job of the run that failed or timed out,
 cut after the job's last `##[error]` line (what follows is post-job cleanup)
 and trimmed to the last `--lines` lines per job, with a note of how many were
 omitted, to
-`.qwen/tmp/autofix-pr-<n>-ci-<run-id>.log`, and prints the path and the job
+`.mariadb-shell-agent/tmp/autofix-pr-<n>-ci-<run-id>.log`, and prints the path and the job
 names. The fix agent reads that file instead of piping logs into a shell
 preview. `--lines` must be a positive integer. A job whose log cannot be
 read gets a `log unavailable: <reason>` line in place of its log, and the
@@ -827,7 +827,7 @@ and the replies announced but not yet settled (`pendingPosts`) and re-runs
 deferred (`deferredRuns`, `heldChecks`), which are the watch's own lists as they stand
 (they were started from the history, and what was settled since must not
 come back) — is added to the PR's history before the state file goes,
-`.qwen/tmp/autofix-pr-<n>-history-<host>+<owner>+<repo>.history.json` (one
+`.mariadb-shell-agent/tmp/autofix-pr-<n>-history-<host>+<owner>+<repo>.history.json` (one
 clone may watch PRs of one number in a fork and its upstream; `+` and `@`, in
 place of a port's `:`, occur in no name, and the suffix never matches a file
 the skill may write), and that file is kept
@@ -843,7 +843,7 @@ The reviewer's probe, behind a gate of its own. One GraphQL call reads the
 most recently updated open PRs (`--limit`, default 50, at most 100) with
 their head, draft flag, author, labels and review requests, and whether more
 open PRs exist past the limit. The cursor,
-`.qwen/tmp/review-watch/<host>/<owner>/<repo>.json` (lowercase, a port's
+`.mariadb-shell-agent/tmp/review-watch/<host>/<owner>/<repo>.json` (lowercase, a port's
 `:` written as `_`, so every spelling of a repository shares one file),
 records every open PR's head and draft flag. With filters the file is
 `<repo>@<key>.json`, `<key>` naming the filter set whatever its spelling or
@@ -1008,7 +1008,7 @@ after the deferral, the re-run is held by the first, and the second is
 treated as real once the run has ended. That is a known limit.
 
 `push`, `sync`, `reply` and `rerun` each hold the watch's lock
-(`.qwen/tmp/autofix-pr-<n>.lock`) while they read and write the state file:
+(`.mariadb-shell-agent/tmp/autofix-pr-<n>.lock`) while they read and write the state file:
 two helper calls the model issues at once would otherwise each write back
 what they read, undoing the other's record of a push, a reply or a re-run.
 `prepare` holds it while it creates the worktree and the state file, so two
@@ -1030,7 +1030,7 @@ into, and a fresh lock is never touched.
 ### 6.10 `status [<pr>]`
 
 Lists the watches of the clone, read from their files under each worktree's
-`.qwen/tmp` — every worktree of the clone is scanned, so a watch rooted in any
+`.mariadb-shell-agent/tmp` — every worktree of the clone is scanned, so a watch rooted in any
 of them is listed (`--no-work` leaves `worktreeWork` null, skipping its git
 scan): no lock is taken and GitHub is not asked, so it answers while a helper
 runs and whichever session owns a watch. An explicit root scans just that one
@@ -1047,7 +1047,7 @@ the reason for a state file that could not be read. Each watch carries:
 - `lastCheck`, the last run of the watch's own gate (one with a
   `--session`), whether it read the PR or, with a background fix in
   flight, skipped reading it (Section 6.14) — it touches
-  `.qwen/tmp/autofix-pr-<n>-gate.checked` on every such run, which
+  `.mariadb-shell-agent/tmp/autofix-pr-<n>-gate.checked` on every such run, which
   `cleanup` removes with the watch, while a gate with no session, which
   shares the cursor, leaves it — and `lastRound`, the time of the last
   prepared snapshot; both null before the first;
@@ -1107,7 +1107,7 @@ gate and the prompt are not composed in a prompt.
 - `--every` is one of `1, 2, 5, 10, 15, 30, 60` (default 2), and takes a
   value; 60 is `0 * * * *`.
 - `--instructions` reads the user's instructions from
-  `.qwen/tmp/autofix-pr-<n>-instructions.txt`, which the skill writes as the
+  `.mariadb-shell-agent/tmp/autofix-pr-<n>-instructions.txt`, which the skill writes as the
   user gave them. A prompt is one line, so whitespace is folded and format
   characters (bidi controls, zero-width ones) dropped; more than 2,000
   characters is refused.
@@ -1144,7 +1144,7 @@ parameters carry its options (`pr`, `repo`, `host`, `take_over`, `task`,
 `--name=value`, and starts the CLI without a shell, so nothing in a
 parameter is read as shell syntax or as an option; a parameter the command
 does not take is a refusal before anything runs. `reply`'s plan must be the
-one the skill writes, `.qwen/tmp/autofix-pr-<n>-plan.json` beside the
+one the skill writes, `.mariadb-shell-agent/tmp/autofix-pr-<n>-plan.json` beside the
 worktree — for a watch this session prepared, beside that very worktree —
 and not a file inside it: a file the PR's own tree carries must not speak on
 the PR.
@@ -1659,7 +1659,7 @@ feedback is acted on, but cannot widen what the tool may do.
 Verification runs the PR's code: its tests, and build scripts the PR may
 change. For a PR whose author has no write access, that is someone else's
 code running unattended with the user's `gh` and `git` credentials in reach.
-No sandbox Qwen Code offers keeps those credentials out of that code's
+No sandbox MariaDB Shell Agent offers keeps those credentials out of that code's
 reach: the default macOS profile restricts only writes, and inside a
 container the helpers themselves need `gh` and `git` credentials. The watch
 therefore does not watch such a PR at all; `--once` runs in the foreground
@@ -1882,7 +1882,7 @@ Delivery plan:
    a push or a rollback the GitHub API does not show yet is followed; it
    syncs once more before it pushes, which moves along the submodules a
    merge the fix agent made left behind. The skill's `allowedTools` grant
-   reading its `.qwen/tmp` files, writing its brief, plan and the user's
+   reading its `.mariadb-shell-agent/tmp` files, writing its brief, plan and the user's
    instructions (step 4 adds the last), and `cron_list` — no shell command. The permission matcher reads a leading
    `"${QWEN_CODE_CLI:-qwen}"` as an empty word, so no rule can name the
    helpers alone, and an allow rule for even a read-only command such as

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -139,7 +140,7 @@ function isDeepSeekAnthropicHostname(
  * anthropic-compatible endpoints (sglang/vllm). For decisions where a model-
  * name false positive is dangerous (e.g. `reasoning.effort: 'max'` clamping),
  * use `isDeepSeekAnthropicHostname` instead.
- * https://github.com/QwenLM/qwen-code/issues/3786
+ * https://github.invalid/QwenLM/qwen-code/issues/3786
  */
 function isDeepSeekAnthropicProvider(
   contentGeneratorConfig: ContentGeneratorConfig,
@@ -482,7 +483,7 @@ export class AnthropicContentGenerator implements ContentGenerator {
     // with the auth-mode decision so the bundle stays internally consistent.
     const userAgent = useProxyIdentity
       ? `claude-cli/${version} (external, cli)`
-      : `QwenCode/${version} (${process.platform}; ${process.arch})`;
+      : `MariaDBShellAgent/${version} (${process.platform}; ${process.arch})`;
     const { customHeaders } = this.contentGeneratorConfig;
 
     const headers: Record<string, string> = {
@@ -806,7 +807,7 @@ export class AnthropicContentGenerator implements ContentGenerator {
     // model ids parse as non-adaptive and keep the fill — that is exactly
     // what a custom SGLang model id needs. The native API's history is left
     // untouched.
-    // https://github.com/QwenLM/qwen-code/issues/11772
+    // https://github.invalid/QwenLM/qwen-code/issues/11772
     const fillUnsignedThinkingSignature =
       isProxyHostedClaude && !this.modelSupportsAdaptiveThinking(true);
     // Opus/Sonnet 4.6+ and every 5.x family reject a request whose final

@@ -1,6 +1,6 @@
 # Starter Extension Example
 
-A complete, end-to-end Qwen Code extension that demonstrates **every** building
+A complete, end-to-end MariaDB Shell Agent extension that demonstrates **every** building
 block in a single package, themed around a small "writing companion". Use it as
 a starting point when you want a relatively complete scaffold instead of an
 empty extension.
@@ -8,7 +8,7 @@ empty extension.
 ```
 starter/
 ├── qwen-extension.json        # Manifest: name, version, context file, MCP servers
-├── QWEN.md                    # Context: persistent instructions for the model
+├── MARIADB-SHELL-AGENT.md                    # Context: persistent instructions for the model
 ├── agents/
 │   └── diary.md               # Subagent: a focused diary-writing assistant
 ├── commands/
@@ -24,13 +24,13 @@ starter/
 
 ## What each piece does
 
-| Capability | Where               | How it shows up                                          |
-| ---------- | ------------------- | -------------------------------------------------------- |
-| Context    | `QWEN.md`           | Persistent instructions injected into every session.     |
-| Subagent   | `agents/diary.md`   | Available via `/agents manage`.                          |
-| Command    | `commands/writing/` | Invoked as `/writing:polish <text>`.                     |
-| Skill      | `skills/synonyms/`  | Auto-activated via `/skills` when relevant.              |
-| MCP server | `example.ts`        | Exposes a `count_words` tool and a `poem-writer` prompt. |
+| Capability | Where                    | How it shows up                                          |
+| ---------- | ------------------------ | -------------------------------------------------------- |
+| Context    | `MARIADB-SHELL-AGENT.md` | Persistent instructions injected into every session.     |
+| Subagent   | `agents/diary.md`        | Available via `/agents manage`.                          |
+| Command    | `commands/writing/`      | Invoked as `/writing:polish <text>`.                     |
+| Skill      | `skills/synonyms/`       | Auto-activated via `/skills` when relevant.              |
+| MCP server | `example.ts`             | Exposes a `count_words` tool and a `poem-writer` prompt. |
 
 ## Building the MCP server
 
@@ -48,12 +48,12 @@ build step.
 ## Trying it out
 
 ```bash
-qwen extensions link /path/to/starter   # link this directory for local testing
+mariadb-shell-agent extensions link /path/to/starter   # link this directory for local testing
 ```
 
-Then restart Qwen Code. The context loads automatically, `/writing:polish` and
+Then restart MariaDB Shell Agent. The context loads automatically, `/writing:polish` and
 `/skills` become available, the `diary-writer` subagent appears under
 `/agents manage`, and (once built) the MCP `count_words` tool is callable.
 
-See the [Getting Started with Extensions](https://github.com/QwenLM/qwen-code/blob/main/docs/users/extension/getting-started-extensions.md)
+See the [Getting Started with Extensions](https://github.invalid/QwenLM/qwen-code/blob/main/docs/users/extension/getting-started-extensions.md)
 guide for a deeper walkthrough.

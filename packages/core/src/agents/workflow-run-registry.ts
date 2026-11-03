@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -414,7 +415,7 @@ export interface WorkflowTask extends TaskBase<WorkflowStatus> {
    * P7b: the workflow script source (verbatim, as the tool received it).
    * Used by the run-snapshot writer (so a persisted run carries its
    * script) and the save-to-disk dialog (so a completed run can be saved
-   * to `.qwen/workflows/<name>.js`). Empty string for legacy callers that
+   * to `.mariadb-shell-agent/workflows/<name>.js`). Empty string for legacy callers that
    * don't supply it.
    */
   script: string;
@@ -2052,7 +2053,7 @@ function buildRecoveryLines(entry: WorkflowTask, nameOnly: boolean): string[] {
       ? parseExtensionWorkflowName(entry.workflowName)
       : null;
     const pathAdvice = extension
-      ? `This reads the /${entry.workflowName} workflow the ${extension.extensionName} extension ships; copy it into .qwen/workflows before making a run-specific change.`
+      ? `This reads the /${entry.workflowName} workflow the ${extension.extensionName} extension ships; copy it into .mariadb-shell-agent/workflows before making a run-specific change.`
       : entry.workflowName
         ? `This reads the saved /${entry.workflowName} workflow; copy it before making a run-specific change.`
         : 'Edit the generated script copy first if the script needs to change.';

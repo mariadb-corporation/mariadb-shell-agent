@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -40,7 +41,7 @@ function makeShellRoot({ withUpdater = true } = {}) {
   mkdirSync(join(root, 'src-tauri', 'icons'), { recursive: true });
   mkdirSync(join(root, 'bootstrap'), { recursive: true });
   const tauriConfig = {
-    productName: 'Qwen Code Desktop',
+    productName: 'MariaDB Shell Agent Desktop',
     identifier: 'com.qwen.code.desktop',
     bundle: { createUpdaterArtifacts: true, shortDescription: '' },
   };
@@ -200,25 +201,25 @@ describe('brand-create.mjs safety checks', () => {
   });
 
   // R3-4: Single-use guard bypass when appName === productName
-  it('rejects appName equal to the pristine default "Qwen Code Desktop"', () => {
+  it('rejects appName equal to the pristine default "MariaDB Shell Agent Desktop"', () => {
     const result = runBrand(shellRoot, {
       brandId: 'acme-ai',
       logo: logoPath,
-      appName: 'Qwen Code Desktop',
+      appName: 'MariaDB Shell Agent Desktop',
     });
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain('Qwen Code Desktop');
+    expect(result.stderr).toContain('MariaDB Shell Agent Desktop');
     expect(result.stderr).toContain('re-run guard');
   });
 
-  it('rejects brandId that derives appName "Qwen Code Desktop"', () => {
-    // brandId "qwen-code-desktop" → titleWords → "Qwen Code Desktop"
+  it('rejects brandId that derives appName "MariaDB Shell Agent Desktop"', () => {
+    // brandId "qwen-code-desktop" → titleWords → "MariaDB Shell Agent Desktop"
     const result = runBrand(shellRoot, {
       brandId: 'qwen-code-desktop',
       logo: logoPath,
     });
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain('Qwen Code Desktop');
+    expect(result.stderr).toContain('MariaDB Shell Agent Desktop');
   });
 
   // Hostile appName escaping: appName is a free-form override, and the
@@ -240,7 +241,7 @@ describe('brand-create.mjs safety checks', () => {
       const bootstrapPath = join(root, 'bootstrap', 'bootstrap.js');
       writeFileSync(
         bootstrapPath,
-        "const a = 'Starting Qwen Code';\nconst b = 'Restarting Qwen Code';\n",
+        "const a = 'Starting MariaDB Shell Agent';\nconst b = 'Restarting MariaDB Shell Agent';\n",
       );
       const result = runBrand(root, {
         brandId: 'acme-ai',
@@ -289,9 +290,9 @@ describe('brand-create.mjs safety checks', () => {
       const indexPath = join(root, 'bootstrap', 'index.html');
       writeFileSync(
         indexPath,
-        '<!doctype html>\n<html>\n<head>\n<title>Qwen Code</title>\n' +
-          '</head>\n<body>\n<img src="qwen-code-logo.svg" alt="Qwen Code">\n' +
-          '<h1>Qwen Code</h1>\n<h2 id="title">Starting Qwen Code</h2>\n' +
+        '<!doctype html>\n<html>\n<head>\n<title>MariaDB Shell Agent</title>\n' +
+          '</head>\n<body>\n<img src="qwen-code-logo.svg" alt="MariaDB Shell Agent">\n' +
+          '<h1>MariaDB Shell Agent</h1>\n<h2 id="title">Starting MariaDB Shell Agent</h2>\n' +
           '</body>\n</html>\n',
       );
       const result = runBrand(root, {

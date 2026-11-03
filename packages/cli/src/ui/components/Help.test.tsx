@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -138,7 +139,7 @@ describe('Help Component', () => {
     const { lastFrame } = render(<Help commands={mockCommands} width={100} />);
     const output = lastFrame();
 
-    expect(output).toContain('Qwen Code');
+    expect(output).toContain('MariaDB Shell Agent');
     expect(output).toContain('general');
     expect(output).toContain('commands');
     expect(output).toContain('custom-commands');

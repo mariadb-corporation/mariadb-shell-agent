@@ -122,17 +122,17 @@ daemon 组织修改路由不增加已读
 已读行为共享、刷新重置、不发送已读写入、过期异步结果、部分失败、归档范围和撤销。
 验证活动会替换工作区及搜索导航、保留已启用的顶部“新任务”操作，并通过各退出方式
 恢复普通区域；同时验证 `session_organization` 能力门槛。
-实现前对全局 `qwen` 和浏览器夹具记录基线；
+实现前对全局 `mariadb-shell-agent` 和浏览器夹具记录基线；
 实现后运行针对性测试、浏览器 E2E、build、typecheck 和 bundle。完整 diff 进行两轮
 连续干净自查，并独立审查。仅操作隔离测试会话，不归档用户真实参考聊天。目前没有
 等待用户批准的产品决策；实现和验证结果可以进一步修订本文。
 
 ## 相关工作与界面证据
 
-Issue [#16020](https://github.com/QwenLM/qwen-code/issues/16020) 跟踪本功能。
+Issue [#16020](https://github.invalid/QwenLM/qwen-code/issues/16020) 跟踪本功能。
 既有未读持久化工作
-[#11451](https://github.com/QwenLM/qwen-code/issues/11451) 和
-[#12672](https://github.com/QwenLM/qwen-code/pull/12672) 保持独立；本功能不解决
+[#11451](https://github.invalid/QwenLM/qwen-code/issues/11451) 和
+[#12672](https://github.invalid/QwenLM/qwen-code/pull/12672) 保持独立；本功能不解决
 离线或刷新后的连续性。后者提出浏览器 localStorage 方案，而非后端读回执；若其先合入，
 需要协调重叠的侧栏改动。
 

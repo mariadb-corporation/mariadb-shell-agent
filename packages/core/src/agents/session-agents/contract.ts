@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -537,7 +538,7 @@ export interface AgentAdapter {
 }
 
 /* ------------------------------------------------------------------------ */
-/* Host protocol v2 (coordinator <-> remote `qwen serve`).                   */
+/* Host protocol v2 (coordinator <-> remote `mariadb-shell-agent serve`).                   */
 /* ------------------------------------------------------------------------ */
 
 /**

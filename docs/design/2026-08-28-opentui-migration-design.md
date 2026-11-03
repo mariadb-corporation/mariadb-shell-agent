@@ -1,6 +1,6 @@
 # OpenTUI Migration — Design and Architecture
 
-Tracking: [#8662](https://github.com/QwenLM/qwen-code/issues/8662). Status
+Tracking: [#8662](https://github.invalid/QwenLM/qwen-code/issues/8662). Status
 2026-09-01: Phase 1 in progress; five of the seven batches are on main (infra,
 foundation modules, live-session & input, dialogs & commands, backend
 composition root). Renderer activation is the next batch.

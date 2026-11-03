@@ -16,7 +16,7 @@
 ## 目标
 
 - `harness` 行执行与第一个 Session 相同的协商，并检查每个已配置的 Workspace profile 所需的 lifecycle。
-- Harness 运行的 Qwen Code 版本与发行包 `manifest.json` 写明的不同，或者 Harness 没有说明自己的版本时，给出提示。
+- Harness 运行的 MariaDB Shell Agent 版本与发行包 `manifest.json` 写明的不同，或者 Harness 没有说明自己的版本时，给出提示。
 - 预检报告上次运行遗留、仍在运行的 Runtime worker。
 - `--check --online` 可以在服务运行时执行，且不会误报失败。
 - 离线端口行对 `TIME_WAIT` 中端口的判断与服务端一致。
@@ -39,7 +39,7 @@
 - digest 不同时报 FAIL："advertises another capability digest"，两边的值都不打印。使用凭据文件时，修复建议指向文件中的 `QWEN_HOSTED_HARNESS_CAPABILITY_DIGEST`，两端都读取它；不使用凭据文件时，修复建议同时给出两个变量：Harness 的 `QWEN_HOSTED_HARNESS_CAPABILITY_DIGEST` 和控制面的 `QWEN_MANAGED_AGENT_CAPABILITY_DIGEST`。
 - 协商自身的请求遇到传输失败、客户端饱和或 HTTP 错误时报 FAIL："did not answer the compatibility request"，或"answered the compatibility request with HTTP `<status>`"，修复建议为重试。401 或 403 与探测一样，指向 token 设置。只打印状态码，从不打印响应正文。
 - 客户端无法使用的 base URL（例如带凭据的 URL）报 FAIL，并指出 `QWEN_MANAGED_AGENT_HARNESS_BASE_URL`。
-- 其他协商失败属于协议不匹配，报 FAIL，信息为客户端给出的原因，修复建议给出应安装的 Qwen Code 版本。
+- 其他协商失败属于协议不匹配，报 FAIL，信息为客户端给出的原因，修复建议给出应安装的 MariaDB Shell Agent 版本。
 
 所有信息中的 URL 都去掉了用户信息。来自 Harness 的文本（例如客户端消息）会替换掉控制字符，并截断为 200 个字符。
 
@@ -51,7 +51,7 @@
   - 显式设置的值会替换整个列表，所以修复建议给出应设置的完整列表：先是 Harness 已提供的协议 2 profile，再是部署需要的。
 - 不属于这两个协议的 profile（例如 `hosted-workspace-files/3`）不检查。
 
-PASS 信息为"compatible: Hosted Harness protocol 1, capability digest matches, Qwen Code `<version>`"。以下三种情况报 WARN，修复建议给出应安装的版本：
+PASS 信息为"compatible: Hosted Harness protocol 1, capability digest matches, MariaDB Shell Agent `<version>`"。以下三种情况报 WARN，修复建议给出应安装的版本：
 
 - capabilities 响应中的 `qwenCodeVersion` 与 `manifest.json` 的 `compatibility.qwenCodeVersion` 不同；
 - manifest 写明了版本，而响应中没有 `qwenCodeVersion`，或者它不是普通的版本号（`[0-9A-Za-z.+-]{1,64}`）；
@@ -100,7 +100,7 @@ PASS 信息为"compatible: Hosted Harness protocol 1, capability digest matches,
   - 兼容性请求没有得到应答；
   - base URL 不可用；
   - 缺少 lifecycle。
-- Qwen Code 版本与 manifest 不同、Harness 没有可读的版本号，或开启 Shell 时缺少 `workspace-shell-mcp/1`：`harness` 行给出警告。
+- MariaDB Shell Agent 版本与 manifest 不同、Harness 没有可读的版本号，或开启 Shell 时缺少 `workspace-shell-mcp/1`：`harness` 行给出警告。
 - 离线时状态目录中有存活的 worker、非持久模式下在线检查发现孤儿 worker，或状态目录无法解析：`workers` 行给出警告。
 - `--online` 模式下某个端口无进程监听：对应的端口行失败。`--online=` 取 `true`、`false` 以外的值：`online` 行失败。
 

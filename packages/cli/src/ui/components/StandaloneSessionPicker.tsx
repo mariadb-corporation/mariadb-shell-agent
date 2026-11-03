@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Code
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -119,7 +120,9 @@ export async function showResumeSessionPicker(
     ],
   });
   if (!hasSession) {
-    writeStdoutLine('No sessions found. Start a new session with `qwen`.');
+    writeStdoutLine(
+      'No sessions found. Start a new session with `mariadb-shell-agent`.',
+    );
     return undefined;
   }
 

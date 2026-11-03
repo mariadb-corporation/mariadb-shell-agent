@@ -142,7 +142,7 @@ daemon 的 `continueManagedRuntime` 路由(coordinator 现在已对 `results_rea
   5. 二次死亡与孤儿形态:最后折叠之后崩溃分类到结转组;缺口填充回答从未到达的兄弟调用(按族措辞「未被 admitted」);已 admitted 的孤儿折叠其自身结局(完成、失败/取消、后台回执、超限带截断标记);被中断 Turn funnel 按与 takeover cancel 相同的方式结算。
 - **Java**:`HostedHarnessClientTest` 接受新相位——线路往返外加两条谓词级负向(空 executions 或任一 outcome 为 `unknown` 的 `await_agent` 均既非 continuation-ready 也非 cancellation-ready;线路解析器独立地把 executions 下限钉在 1–1024)。coordinator 的 recovery 准入机制本就相位无关,由其既有的 mock 驱动套件覆盖(`HarnessCoordinatorTest` mock 谓词);相位相关行为在谓词内,由线路测试钉死。
 - **变异见证**:每个新机制配一个见证,先对未变异代码证 RED(如去掉 `commitAwaitAgent` → 点 1 探针保持楔死;去掉 journaled 去重 → 点 2 探针双重折叠),再字节一致地还原后才提交。
-- **复现记录回填 `.qwen/issues/issue-13708.md`**:新套件对修复前代码的红色状态作为可执行的复现报告,绿色状态作为验证报告。
+- **复现记录回填 `.mariadb-shell-agent/issues/issue-13708.md`**:新套件对修复前代码的红色状态作为可执行的复现报告,绿色状态作为验证报告。
 
 ## 验收标准
 

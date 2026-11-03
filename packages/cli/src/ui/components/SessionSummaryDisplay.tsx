@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -41,7 +42,7 @@ export const SessionSummaryDisplay: React.FC<SessionSummaryDisplayProps> = ({
           <Text color={theme.text.secondary}>
             {t('To continue this session, run')}{' '}
             <Text color={theme.text.accent}>
-              qwen --resume {stats.sessionId}
+              mariadb-shell-agent --resume {stats.sessionId}
             </Text>
           </Text>
         </Box>

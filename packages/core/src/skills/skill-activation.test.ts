@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +22,8 @@ function makeSkill(overrides: Partial<SkillConfig>): SkillConfig {
     description: overrides.description ?? 'desc',
     body: overrides.body ?? '',
     level: overrides.level ?? 'project',
-    filePath: overrides.filePath ?? '/proj/.qwen/skills/test/SKILL.md',
+    filePath:
+      overrides.filePath ?? '/proj/.mariadb-shell-agent/skills/test/SKILL.md',
     ...overrides,
   };
 }

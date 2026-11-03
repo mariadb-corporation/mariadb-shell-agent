@@ -128,7 +128,7 @@ actor 和执行策略。命令使用稳定幂等键与预期配置版本。
 同 Workspace 会话隔离、基础 MCP/Hook 保留、commit/drain/enable/ACK 丢失、权限和旧记录/profile。
 使用真实 MySQL、进程和 SSH 证据，区分 Linux 清理与 macOS 范围。
 遵守受影响包检查和 Java 模块共享十分钟本地验证预算；CI 承担完整平台/故障矩阵。
-证据记录在 `.qwen/e2e-tests/managed-extension-packages.md`，缺失门禁保持明确。
+证据记录在 `.mariadb-shell-agent/e2e-tests/managed-extension-packages.md`，缺失门禁保持明确。
 
 ## 实现与验收
 

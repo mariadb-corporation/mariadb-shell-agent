@@ -571,4 +571,4 @@ D3（`StreamingState.Summarizing`）是感知层优化，与本方案完全正�
 | `packages/core/src/tools/tools.ts`                       | `Kind` + `CONCURRENCY_SAFE_KINDS`                             | L793, L818                        |
 | `packages/core/src/core/coreToolScheduler.ts`            | `partitionToolCalls` + `runConcurrently`（已有并发基础设施）  | 见 rt-optimization-design.md §5.7 |
 | `packages/core/src/core/prompts.ts`                      | `# Final Reminder` 段（Layer 3 加并发指导处）                 | L396                              |
-| `.qwen/skills/`                                          | 各 skill 定义目录（Layer 2 改造对象）                         | 目录                              |
+| `.mariadb-shell-agent/skills/`                           | 各 skill 定义目录（Layer 2 改造对象）                         | 目录                              |

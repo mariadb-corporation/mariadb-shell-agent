@@ -332,6 +332,6 @@ SDK's `daemonToolPreviewToMarkdown` for any unhandled kind.
 
 ## Cross-references
 
-- [PR #4353 SUMMARY](https://github.com/QwenLM/qwen-code/pull/4353)
+- [PR #4353 SUMMARY](https://github.invalid/QwenLM/qwen-code/pull/4353)
 - [Daemon UI README](./README.md) — full API reference
-- [PR #4328](https://github.com/QwenLM/qwen-code/pull/4328) — base PR with shared UI transcript layer
+- [PR #4328](https://github.invalid/QwenLM/qwen-code/pull/4328) — base PR with shared UI transcript layer

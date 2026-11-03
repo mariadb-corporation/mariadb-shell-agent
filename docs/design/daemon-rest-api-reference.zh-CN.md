@@ -8,7 +8,7 @@
 
 ## 问题
 
-`qwen serve` 已有详细的 HTTP 协议文档和较短的接入指南，但没有发布机器可读的
+`mariadb-shell-agent serve` 已有详细的 HTTP 协议文档和较短的接入指南，但没有发布机器可读的
 API 定义。集成方必须同时查阅说明文字、路由处理器、capability 文档和 TypeScript
 SDK 方法，才能确认基本接口信息。REST 接入指南筛选出的接口中还有 8 个缺少独立
 协议章节。

@@ -50,7 +50,7 @@ No daemon route or core module changes are required.
 - Resetting a worktree draft before sending creates a normal session.
 - Existing branch selection, default mode, and non-Git eligibility tests pass.
 - Run focused unit and browser tests, build, typecheck, and bundle. Record
-  baseline and verification results in `.qwen/e2e-tests/`.
+  baseline and verification results in `.mariadb-shell-agent/e2e-tests/`.
 
 ## Risks and Open Questions
 

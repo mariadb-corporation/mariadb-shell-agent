@@ -48,7 +48,7 @@ Presets affect new installations or provider reconfiguration. Existing settings 
 - [Kimi K2.7 Code](https://platform.kimi.ai/docs/guide/kimi-k2-7-code-quickstart): thinking defaults on and cannot be disabled.
 - [Kimi K2.6](https://platform.kimi.ai/docs/guide/kimi-k2-6-quickstart): thinking.type toggle.
 - [DeepSeek Thinking Mode](https://api-docs.deepseek.com/guides/thinking_mode/) and [model entry point](https://api-docs.deepseek.com/): native stable-ID versions, three tiers and disable shape.
-- [Alibaba Chat parameters](https://help.aliyun.com/zh/model-studio/qwen-api-via-openai-chat-completions): family-specific tiers/defaults, enable_thinking and Qwen 3.8 parameter exclusivity.
-- [Alibaba DeepSeek](https://help.aliyun.com/zh/model-studio/deepseek-api): stable-versus-snapshot tier differences.
-- [Alibaba Kimi](https://help.aliyun.com/zh/model-studio/kimi-api): models and routes; max-only kimi/kimi-k3 is not added.
-- [Token Plan model list](https://help.aliyun.com/zh/model-studio/token-plan-personal-overview): added Flash, Pro snapshot and Preview alias.
+- [Alibaba Chat parameters](https://help.aliyun.invalid/zh/model-studio/qwen-api-via-openai-chat-completions): family-specific tiers/defaults, enable_thinking and Qwen 3.8 parameter exclusivity.
+- [Alibaba DeepSeek](https://help.aliyun.invalid/zh/model-studio/deepseek-api): stable-versus-snapshot tier differences.
+- [Alibaba Kimi](https://help.aliyun.invalid/zh/model-studio/kimi-api): models and routes; max-only kimi/kimi-k3 is not added.
+- [Token Plan model list](https://help.aliyun.invalid/zh/model-studio/token-plan-personal-overview): added Flash, Pro snapshot and Preview alias.

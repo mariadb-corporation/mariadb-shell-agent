@@ -23,12 +23,12 @@ Every architecture statement below is a forward-looking design reserve, not a
 description of running code; each such section says so again in its heading.
 This document changes no production behavior and ships no production code.
 
-Part of [#12380](https://github.com/QwenLM/qwen-code/issues/12380), claiming
+Part of [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380), claiming
 its deferred "optional MQ/Redis transport … later design scope". Follows the
-Stage H tracker [#12827](https://github.com/QwenLM/qwen-code/issues/12827);
+Stage H tracker [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827);
 implementation phases are gated on
-[#13300](https://github.com/QwenLM/qwen-code/issues/13300) (H0c review
-follow-ups) and [#13265](https://github.com/QwenLM/qwen-code/issues/13265)
+[#13300](https://github.invalid/QwenLM/qwen-code/issues/13300) (H0c review
+follow-ups) and [#13265](https://github.invalid/QwenLM/qwen-code/issues/13265)
 (H3 background Shell and Monitor runtime, which settles the durable task-event
 and cancel semantics the wake path carries).
 Canonical upstream design: the pinned extension-runtime document at
@@ -310,9 +310,9 @@ notes](https://rocketmq.apache.org/zh/release-notes/2026/04/10/5.5.0/);
 [multi-agent best
 practice](https://rocketmq.apache.org/zh/docs/bestPractice/04multiagent/);
 [Aliyun LiteTopic
-reference](https://help.aliyun.com/zh/apsaramq-for-rocketmq/cloud-message-queue-rocketmq-5-x-series/developer-reference/litetopic)
+reference](https://help.aliyun.invalid/zh/apsaramq-for-rocketmq/cloud-message-queue-rocketmq-5-x-series/developer-reference/litetopic)
 and [usage
-limits](https://www.alibabacloud.com/help/en/apsaramq-for-rocketmq/cloud-message-queue-rocketmq-5-x-series/product-overview/usage-limits);
+limits](https://www.alibabacloud.invalid/help/en/apsaramq-for-rocketmq/cloud-message-queue-rocketmq-5-x-series/product-overview/usage-limits);
 [5.5.0 LiteTopic deep
 dive](https://www.cnblogs.com/alisystemsoftware/p/20189542); 5.5.0 source tag
 [LiteEventDispatcher](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.0/broker/src/main/java/org/apache/rocketmq/broker/lite/LiteEventDispatcher.java#L107-L162),
@@ -525,7 +525,7 @@ This slice's validation is documentation-only:
       sources and dates (§5.1).
 - [x] Bilingual pair kept structurally aligned (README rules).
 - [ ] Bilingual design merged; tracker issue (draft at
-      `.qwen/issues/managed-agent-event-transport-mq.md`) filed by its owner,
+      `.mariadb-shell-agent/issues/managed-agent-event-transport-mq.md`) filed by its owner,
       recording the claimed slice on #12380's snapshot.
 
 ## 11. Open questions for the tracker issue

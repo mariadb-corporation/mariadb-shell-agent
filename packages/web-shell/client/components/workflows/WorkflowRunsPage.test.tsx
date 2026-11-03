@@ -386,7 +386,7 @@ describe('WorkflowRunsPage', () => {
       sessionId: 'session-1',
       name: 'deep-review',
       source: 'project',
-      scriptPath: '/repo/.qwen/workflows/deep-review.js',
+      scriptPath: '/repo/.mariadb-shell-agent/workflows/deep-review.js',
       script,
       meta: {
         name: 'deep-review',
@@ -435,7 +435,7 @@ describe('WorkflowRunsPage', () => {
     expect(detail!.textContent).toContain('Phases (2)');
     expect(detail!.textContent).toContain('collect files');
     expect(detail!.textContent).toContain(
-      '/repo/.qwen/workflows/deep-review.js',
+      '/repo/.mariadb-shell-agent/workflows/deep-review.js',
     );
     // Only runs of this definition count, and the source stays folded.
     expect(detail!.textContent).toContain('View 1 run in History');

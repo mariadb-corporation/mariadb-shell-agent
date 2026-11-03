@@ -25,7 +25,7 @@
 
 ## 信号可见性边界
 
-- `qwen channel start` 使用 `AcpBridge`。标准初始 `tool_call` 携带 `kind`、`title` 和 `status`，现有链路会将其转成 `ToolCallEvent`，再由 `ChannelBase.dispatchToolCall` 投影为 `ChannelTaskLifecycleEvent`；因此本计划中的初始 kind 映射不需要修改 `ChannelBase.ts`。
+- `mariadb-shell-agent channel start` 使用 `AcpBridge`。标准初始 `tool_call` 携带 `kind`、`title` 和 `status`，现有链路会将其转成 `ToolCallEvent`，再由 `ChannelBase.dispatchToolCall` 投影为 `ChannelTaskLifecycleEvent`；因此本计划中的初始 kind 映射不需要修改 `ChannelBase.ts`。
 - 本地 `AcpBridge` 当前不消费 `tool_call_update`。工具完成或失败后的 `completed`、`failed` 状态不能保证及时到达 ChannelBase；本版本不修复这一点，也不以它作为验收条件。
 - `Kind.Agent` 在 ACP 层被标准化为 `other`，因此本版本不能将 Agent 映射为独立阶段。
 - `TodoWrite` 使用 `plan` 更新而不是 `tool_call`，因此不会触发 `think` 工具阶段。
@@ -286,7 +286,7 @@ git commit -m "feat(dingtalk): refine tool lifecycle phases"
 - 修改：`packages/channels/dingtalk/src/DingtalkAdapter.test.ts:2480-2550`
 - 修改：`packages/channels/dingtalk/src/status-card-controller.test.ts:175-205`
 - 修改：`docs/design/dingtalk-dynamic-lifecycle-tags.md:9-27`
-- 新增：`.qwen/e2e-tests/dingtalk-granular-kind-phases.md`（Git 忽略的验收材料）
+- 新增：`.mariadb-shell-agent/e2e-tests/dingtalk-granular-kind-phases.md`（Git 忽略的验收材料）
 
 **接口：**
 
@@ -337,7 +337,7 @@ cd packages/channels/dingtalk && npx vitest run src/presentation-phase.test.ts s
 
 - [ ] **步骤 5：编写并试运行 E2E 计划**
 
-创建 `.qwen/e2e-tests/dingtalk-granular-kind-phases.md`，覆盖：
+创建 `.mariadb-shell-agent/e2e-tests/dingtalk-granular-kind-phases.md`，覆盖：
 
 1. 发送会触发 `web_fetch` 的天气查询；该工具执行期间，入站消息 reaction 和活动卡片都应显示 `🌐 获取中`，不再显示通用的 `🛠️ 处理中`。
 2. 发送工作区检查请求并触发读取或搜索工具；根据实际 ACP kind 显示 `📖 读取中` 或 `🔎 搜索中`。
@@ -346,7 +346,7 @@ cd packages/channels/dingtalk && npx vitest run src/presentation-phase.test.ts s
 5. 任务完成后；活动阶段行从卡片中移除，终态状态行保留，reaction 切换为现有终态标签。
 6. 卡片稳定渲染后再记录客户端截图；首屏渲染延迟需要单独记录。
 
-先使用全局 `qwen` CLI 试运行相同请求，确认模型实际选择的工具；然后使用非 Gateway 钉钉机器人运行当前分支，模型凭据从 Gateway 环境注入。
+先使用全局 `mariadb-shell-agent` CLI 试运行相同请求，确认模型实际选择的工具；然后使用非 Gateway 钉钉机器人运行当前分支，模型凭据从 Gateway 环境注入。
 
 - [ ] **步骤 6：提交展示证据和设计契约**
 

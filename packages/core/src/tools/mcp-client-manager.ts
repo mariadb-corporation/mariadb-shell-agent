@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -271,8 +272,8 @@ export function mcpTransportOf(config: MCPServerConfig): McpTransportKind {
 
 /**
  * Resolve budget config from env vars when the constructor caller
- * doesn't pass one. Daemon-mode (`qwen serve`) sets these when
- * spawning the `qwen --acp` child; standalone `qwen` invocations
+ * doesn't pass one. Daemon-mode (`mariadb-shell-agent serve`) sets these when
+ * spawning the `mariadb-shell-agent --acp` child; standalone `mariadb-shell-agent` invocations
  * leave them unset and get `{ budgetMode: 'off' }` — the historical
  * behavior, no enforcement.
  *
@@ -304,7 +305,7 @@ function readBudgetFromEnv(): McpBudgetConfig {
       // boot breadcrumb so operators see the misconfiguration in
       // journald / docker logs.
       process.stderr.write(
-        `qwen serve: ignoring invalid QWEN_SERVE_MCP_CLIENT_BUDGET=` +
+        `mariadb-shell-agent serve: ignoring invalid QWEN_SERVE_MCP_CLIENT_BUDGET=` +
           `'${rawBudget}' (expected positive integer); ` +
           `MCP budget enforcement disabled for this child.\n`,
       );
@@ -320,7 +321,7 @@ function readBudgetFromEnv(): McpBudgetConfig {
       // budget-driven default; now it gets a stderr line so the
       // typo is visible.
       process.stderr.write(
-        `qwen serve: ignoring invalid QWEN_SERVE_MCP_BUDGET_MODE=` +
+        `mariadb-shell-agent serve: ignoring invalid QWEN_SERVE_MCP_BUDGET_MODE=` +
           `'${rawMode}' (expected enforce|warn|off); falling back to ` +
           `${clientBudget === undefined ? 'off' : 'warn'}.\n`,
       );
@@ -351,7 +352,7 @@ function readBudgetFromEnv(): McpBudgetConfig {
     clientBudget === undefined
   ) {
     process.stderr.write(
-      `qwen serve: QWEN_SERVE_MCP_BUDGET_MODE=${budgetMode} requires ` +
+      `mariadb-shell-agent serve: QWEN_SERVE_MCP_BUDGET_MODE=${budgetMode} requires ` +
         `QWEN_SERVE_MCP_CLIENT_BUDGET=N; downgrading to off. ` +
         `Set both env vars to enable MCP guardrail enforcement.\n`,
     );
@@ -576,8 +577,8 @@ export class McpClientManager {
     const budgetConfig = options.budgetConfig;
 
     // Tests inject `budgetConfig` directly; production reads env vars
-    // set by `qwen serve --mcp-client-budget=N --mcp-budget-mode=X`
-    // when spawning the ACP child. Standalone `qwen` invocations
+    // set by `mariadb-shell-agent serve --mcp-client-budget=N --mcp-budget-mode=X`
+    // when spawning the ACP child. Standalone `mariadb-shell-agent` invocations
     // leave both unset and get `mode: 'off'` — the pre-PR-14 default.
     const resolved = budgetConfig ?? readBudgetFromEnv();
     let resolvedMode = resolved.budgetMode;
@@ -603,7 +604,7 @@ export class McpClientManager {
       resolved.clientBudget === undefined
     ) {
       process.stderr.write(
-        `qwen serve: McpClientManager constructed with budgetMode=${resolvedMode} ` +
+        `mariadb-shell-agent serve: McpClientManager constructed with budgetMode=${resolvedMode} ` +
           `but no clientBudget; downgrading to off.\n`,
       );
       resolvedMode = 'off';
@@ -822,7 +823,7 @@ export class McpClientManager {
     // `lastRefusedServerNames.includes` guard above).
     this.pendingRefusalNames.add(serverName);
     process.stderr.write(
-      `qwen serve: MCP server '${serverName}' refused (budget exhausted, ` +
+      `mariadb-shell-agent serve: MCP server '${serverName}' refused (budget exhausted, ` +
         `budget=${this.clientBudget}, mode=enforce)\n`,
     );
   }
@@ -2036,7 +2037,7 @@ export class McpClientManager {
       await this.performHealthCheck(serverName);
     }, this.healthConfig.checkIntervalMs);
     // Health monitoring is background bookkeeping — it must never hold the
-    // event loop open. Short-lived consumers (`qwen mcp reconnect`, other
+    // event loop open. Short-lived consumers (`mariadb-shell-agent mcp reconnect`, other
     // one-shot Config users) call `config.shutdown()` while an incremental
     // discovery pass is still in flight; that pass's `finally` block then
     // re-arms health checks AFTER `stop()` already cleared them, and a

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -117,8 +118,8 @@ export const SERVE_CAPABILITY_REGISTRY = {
   workspace_acp_status: { since: 'v1' },
   auth_provider_install: { since: 'v1' },
   // Workspace memory CRUD (`GET/POST /workspace/memory`). Daemon exposes
-  // hierarchical QWEN.md state and accepts append/replace writes scoped
-  // to either the bound workspace or the global ~/.qwen directory.
+  // hierarchical MARIADB-SHELL-AGENT.md state and accepts append/replace writes scoped
+  // to either the bound workspace or the global ~/.mariadb-shell-agent directory.
   workspace_memory: { since: 'v1' },
   memory_import_v1: { since: 'v1' },
   workspace_memory_remember: {
@@ -292,7 +293,7 @@ export const SERVE_CAPABILITY_REGISTRY = {
   // Workspace trust policy changes rebuild the affected runtime generation
   // without restarting the daemon. V2 trust status exposes convergence.
   workspace_trust_hot_reload: { since: 'v1' },
-  // `POST /workspace/init` scaffolds an empty `QWEN.md` (or the
+  // `POST /workspace/init` scaffolds an empty `MARIADB-SHELL-AGENT.md` (or the
   // workspace `context.fileName` value injected as `contextFilename`)
   // at the bound workspace root. Body: `{force?: boolean}`. Default
   // refuses with 409 when the file already exists; `force: true`

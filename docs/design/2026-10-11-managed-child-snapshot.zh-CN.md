@@ -2,7 +2,7 @@
 
 [English](2026-10-11-managed-child-snapshot.md) | [简体中文](2026-10-11-managed-child-snapshot.zh-CN.md)
 
-状态：在本变更中实现。已落地：hosted child agent 可以作为其父 Workspace 的只读快照运行（`isolation: "snapshot"`）。child 读取一份冻结的副本，即一个总会被丢弃的 child Workspace，所用的工具 profile 不声明任何写入工具。串行化的裁定为最终结论：串行共享没有单独的取值。这是 [#13753](https://github.com/QwenLM/qwen-code/issues/13753) 的 I3，建立在 I1（[child Workspace 能力](2026-10-09-managed-child-workspace.zh-CN.md)，#13781）与 I2（[worktree 准入](2026-10-10-managed-child-worktree-admission.zh-CN.md)，#13841，及其跟进 #13872）之上。
+状态：在本变更中实现。已落地：hosted child agent 可以作为其父 Workspace 的只读快照运行（`isolation: "snapshot"`）。child 读取一份冻结的副本，即一个总会被丢弃的 child Workspace，所用的工具 profile 不声明任何写入工具。串行化的裁定为最终结论：串行共享没有单独的取值。这是 [#13753](https://github.invalid/QwenLM/qwen-code/issues/13753) 的 I3，建立在 I1（[child Workspace 能力](2026-10-09-managed-child-workspace.zh-CN.md)，#13781）与 I2（[worktree 准入](2026-10-10-managed-child-worktree-admission.zh-CN.md)，#13841，及其跟进 #13872）之上。
 
 ## 问题与范围
 
@@ -30,7 +30,7 @@ Issue #13753 对 I3 提出两点：
 **没有操作系统沙箱。** hosted 路径中没有任何工具运行在沙箱里。
 
 - local-process Broker 用普通的 `ProcessBuilder` 以控制面的用户启动 worker。
-- 按命令生效的 `tools.executionSandbox`（bwrap 或 Landlock，可以只读挂载）只支持 Linux，而且 `qwen serve` 配置了它就拒绝启动。
+- 按命令生效的 `tools.executionSandbox`（bwrap 或 Landlock，可以只读挂载）只支持 Linux，而且 `mariadb-shell-agent serve` 配置了它就拒绝启动。
 - 因此 shell 不受任何限制。
 - child Workspace 位于父的 storage 之内，所以 child 的 shell 能触及父的目录树。
 
@@ -63,7 +63,7 @@ Issue #13753 对 I3 提出两点：
      - 这个开关给运维一个开启快照的时机：所有控制面副本都运行本变更之后。
      - 本变更之前的副本在新副本迁移数据库后仍会继续运行，但一旦 #14316 及之后的服务端迁移过数据库，它就无法再启动：它的启动 schema 检查会拒绝这些迁移新增的列。因此开关防护的窗口，持续到升级前启动的最后一台副本被替换为止。
      - 之后关闭它只会停止新的准入。已提交的 snapshot run 仍按快照运行。
-     - 回滚同理：把任何副本退回到本变更之前的版本前，先关闭开关，等所有未结算的 snapshot run 结算完（或其父关闭），包括仍在创建 child、还没有 child Workspace 行的 run。开关关闭前已开始的 Turn 仍保有它开始时的能力，所以要等正在运行的 Turn 结束后再做这项检查。较旧的 relay 会把尚未创建的 snapshot run 创建为共享的写入者，并且直到父关闭才会丢弃它的副本。只有在 #14316 及之后的服务端从未迁移过的数据库上，控制面副本才能退回到本变更之前；在其他数据库上，较旧的服务端会拒绝启动。较旧的 `qwen serve` 会拒绝只读 profile，而 Workspace 恢复会检查 storage 中的每个 Session，包括已关闭的，所以对存有 snapshot child Session 的 storage，即使该 Session 已关闭，它的恢复也会中止。把 CLI 回滚到本变更之前，就放弃了对这些 storage 的 Workspace 恢复。
+     - 回滚同理：把任何副本退回到本变更之前的版本前，先关闭开关，等所有未结算的 snapshot run 结算完（或其父关闭），包括仍在创建 child、还没有 child Workspace 行的 run。开关关闭前已开始的 Turn 仍保有它开始时的能力，所以要等正在运行的 Turn 结束后再做这项检查。较旧的 relay 会把尚未创建的 snapshot run 创建为共享的写入者，并且直到父关闭才会丢弃它的副本。只有在 #14316 及之后的服务端从未迁移过的数据库上，控制面副本才能退回到本变更之前；在其他数据库上，较旧的服务端会拒绝启动。较旧的 `mariadb-shell-agent serve` 会拒绝只读 profile，而 Workspace 恢复会检查 storage 中的每个 Session，包括已关闭的，所以对存有 snapshot child Session 的 storage，即使该 Session 已关闭，它的恢复也会中止。把 CLI 回滚到本变更之前，就放弃了对这些 storage 的 Workspace 恢复。
 
 3. **冻结视图是一个 child Workspace。** relay 准备 snapshot run 的 child Workspace，方式与准备 worktree run 的完全相同（I2 决策 3）。
    - **包含什么。** 基线是 I1 对父工作树的快照提交：已跟踪与未跟踪的文件，不含被忽略的文件。
@@ -87,7 +87,7 @@ Issue #13753 对 I3 提出两点：
      - 声明集合中没有任何会写入的工具；
      - tool turn 在获取 Broker 之前拒绝任何其他名称，并结束该 Turn；
      - 文件路径相对于 child 在副本中的目录，拒绝绝对路径与 `..` 段。
-   - **不声称什么。** 它不是操作系统边界。操作系统层面的只读沙箱经过权衡没有采用：hosted 路径中没有沙箱，唯一的实现只支持 Linux，而且 `qwen serve` 拒绝它。若保留 shell，它还得限制一个位于父 storage 之内的进程。没有 shell，child 能用的工具里就没有任何会写入的。副本还位于父的 storage 之内，所以它只是相对控制面与 child 自身冻结，而不是相对父或兄弟不受限制的 shell：后者仍可能在 child 的两次 turn 之间改动它。
+   - **不声称什么。** 它不是操作系统边界。操作系统层面的只读沙箱经过权衡没有采用：hosted 路径中没有沙箱，唯一的实现只支持 Linux，而且 `mariadb-shell-agent serve` 拒绝它。若保留 shell，它还得限制一个位于父 storage 之内的进程。没有 shell，child 能用的工具里就没有任何会写入的。副本还位于父的 storage 之内，所以它只是相对控制面与 child 自身冻结，而不是相对父或兄弟不受限制的 shell：后者仍可能在 child 的两次 turn 之间改动它。
 
 5. **快照从不合并。** 快照的 child Workspace 把模式记录在其 child Workspace 操作的请求中（`ma_operation.request_json` 里的 `workspaceMode`），该请求在行被准入时写入一次，之后从不改写。没有指名模式的请求属于 worktree，所以 worktree 行（包括本变更之前准入的所有行）都读作 `worktree`，其请求保持原样。这不需要 schema 变更。`snapshot` 行的每次收尾都是丢弃。
    - **relay** 从不请求快照的合并，也从不为合并扣住结算。完成的 snapshot run 提交结果时回执不带 `workspace` 成员，也没有 workspace 行到达父的模型：child 什么也没改。

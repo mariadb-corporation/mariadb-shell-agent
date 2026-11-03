@@ -13,13 +13,13 @@
 
 #12737 的 B2d 切片设计，属于 #12380 的 Stage B 宿主接入，基于上游 `663d98eac5`。
 已由 #12828 在 `--experimental-paired-engines` 开关之后实现，未注册 Managed 引擎。它把 #12737 中已决定的选择与范围规则
-（[Q1/Q4](https://github.com/QwenLM/qwen-code/issues/12737#issuecomment-5846602143)）
+（[Q1/Q4](https://github.invalid/QwenLM/qwen-code/issues/12737#issuecomment-5846602143)）
 记录到本仓库，使 B2d 以本文而不是
 [外部引擎选择设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-session-execution-engine.md)
 为评审依据。本文承接[双引擎 owner 选择](./2026-09-26-paired-engine-owner-selection.zh-CN.md)
 （B2a）。#12737 要求在普通宿主配对之前完成的切片均已合入：工作区契约（B2b，#12776
 与 #12807）和按引擎的运维行为（B2c，#12795），它们落实了
-[Q2/Q3 决定](https://github.com/QwenLM/qwen-code/issues/12737#issuecomment-5846370487)。
+[Q2/Q3 决定](https://github.invalid/QwenLM/qwen-code/issues/12737#issuecomment-5846370487)。
 Managed 引擎本身的设计见[普通宿主的 Managed 引擎](./2026-09-27-ordinary-host-managed-engine.zh-CN.md)。
 其 M1 切片完成下文 Managed 引擎接口中的 Legacy 拒绝与用途标记两项，该设计也确定了
 该接口的待解问题。
@@ -76,7 +76,7 @@ Bridge；Java 承载的 Managed WebShell 产品链路；Managed 分支（仍保�
 
 ### 开关与构造点
 
-`qwen serve --experimental-paired-engines` 设置
+`mariadb-shell-agent serve --experimental-paired-engines` 设置
 `ServeOptions.experimentalPairedEngines`。不设置时，每个构造点保持现有的单 factory
 构造。设置后，每个构造点改为传入由该 runtime 自身输入构造的 `executionEngines`，
 而不是 `channelFactory`；Bridge 的其他选项全部不变。双引擎 Bridge 沿用 B2b 与 B2c
@@ -99,7 +99,7 @@ Bridge；Java 承载的 Managed WebShell 产品链路；Managed 分支（仍保�
   强制 writer lease 才被认证；双引擎 Bridge 会把这一要求扩展到一个它永远用不上的
   Managed factory。
 - 通过 `deps.bridge` 注入的 Bridge 或注入的工作区 registry 仍由调用方控制；开关既不
-  包装也不替换它们。`qwen serve` 自身会把工作区 registry 注入 serve app，因此在其中
+  包装也不替换它们。`mariadb-shell-agent serve` 自身会把工作区 registry 注入 serve app，因此在其中
   起作用的是 `runQwenServe` 的三处构造点；嵌入式默认 Bridge 由两者都不注入、并设置了
   该选项的嵌入方配对。
 - 嵌入式默认 Bridge 从嵌入进程的 runtime 目录读取 owner，与它读取 artifact 快照和
@@ -230,7 +230,7 @@ Bridge，需要单独的迁移设计，并证明 Store 权威与 transcript owne
 owner 固定、不跨引擎回退。
 
 外部设计中“WebShell 不经四处普通 daemon factory 选择 Managed”的表述，指的是 Java
-承载的 Managed WebShell 产品链路，并不取消普通本地 `qwen serve` 宿主的配对。
+承载的 Managed WebShell 产品链路，并不取消普通本地 `mariadb-shell-agent serve` 宿主的配对。
 
 ### 切换开关
 

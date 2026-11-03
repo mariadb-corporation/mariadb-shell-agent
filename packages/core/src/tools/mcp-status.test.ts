@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,7 +18,7 @@ describe('mcp-status last-error carrier (issue #9944)', () => {
   // Discovery is best-effort and swallows connect errors (debugLogger only),
   // so the status enum alone cannot tell a consumer WHY a server is not
   // CONNECTED. The registry therefore carries the most recent failure cause
-  // per server for consumers like `qwen mcp reconnect`.
+  // per server for consumers like `mariadb-shell-agent mcp reconnect`.
   const serverName = 'last-error-carrier-server';
 
   afterEach(() => {

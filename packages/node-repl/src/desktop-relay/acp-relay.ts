@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * The client side of `qwen serve`'s reverse tool channel: dial `/acp`, ACP
+ * The client side of `mariadb-shell-agent serve`'s reverse tool channel: dial `/acp`, ACP
  * `initialize`, `mcp_register { server, sessionId }`, then answer the daemon's
  * `mcp_message` frames.
  *

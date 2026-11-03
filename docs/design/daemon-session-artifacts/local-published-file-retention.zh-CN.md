@@ -12,7 +12,7 @@ journal。
 
 ## 问题
 
-Artifact 工具会同时发布 `~/.qwen/artifacts/<id>/index.html` 下的当前页，以及
+Artifact 工具会同时发布 `~/.mariadb-shell-agent/artifacts/<id>/index.html` 下的当前页，以及
 运行时快照目录里可恢复的历史页。当前页是 `published` `file://` 定位符。V2
 默认把所有 `published` artifact 标成 `restorable`，于是当前页被写入会话
 journal。恢复并不信任该定位符，加载时出现

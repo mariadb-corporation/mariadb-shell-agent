@@ -174,7 +174,7 @@ failure tests require real worker and SQL evidence; macOS substitutes or H2
 cannot certify Linux physical quiescence. Build, bundle, typecheck, focused
 package tests, Java packaging and Checkstyle, two clean self-audits and an
 independent review precede completion. Results live in
-`.qwen/e2e-tests/public-hosted-shell-admission.md`.
+`.mariadb-shell-agent/e2e-tests/public-hosted-shell-admission.md`.
 
 Historical validation at `9c5e2817`, after merging main bb66a52c, passed 181 focused Java tests, 30
 WebShell adapter tests, 341 CLI Harness/recovery tests and six real

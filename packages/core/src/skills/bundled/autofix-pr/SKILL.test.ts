@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -130,29 +131,29 @@ describe('bundled autofix-pr skill', () => {
     const pm = grantedManager();
     const write = (file: string) =>
       decide(pm, 'write_file', { file_path: `${PROJECT}/${file}` });
-    await expect(write('.qwen/tmp/autofix-pr-7-plan.json')).resolves.toBe(
-      'allow',
-    );
-    await expect(write('.qwen/tmp/autofix-pr-7-brief.md')).resolves.toBe(
-      'allow',
-    );
     await expect(
-      write('.qwen/tmp/autofix-pr-7-instructions.txt'),
+      write('.mariadb-shell-agent/tmp/autofix-pr-7-plan.json'),
+    ).resolves.toBe('allow');
+    await expect(
+      write('.mariadb-shell-agent/tmp/autofix-pr-7-brief.md'),
+    ).resolves.toBe('allow');
+    await expect(
+      write('.mariadb-shell-agent/tmp/autofix-pr-7-instructions.txt'),
     ).resolves.toBe('allow');
     // The helpers' own files decide where a push goes and what was handled.
     for (const file of [
-      '.qwen/tmp/autofix-pr-7-state.json',
-      '.qwen/tmp/autofix-pr-7-gate.json',
-      '.qwen/tmp/autofix-pr-7/src/a.ts',
-      '.qwen/tmp/autofix-pr-7/src/x-instructions.txt',
-      '.qwen/tmp/autofix-pr-7/../../settings.json',
+      '.mariadb-shell-agent/tmp/autofix-pr-7-state.json',
+      '.mariadb-shell-agent/tmp/autofix-pr-7-gate.json',
+      '.mariadb-shell-agent/tmp/autofix-pr-7/src/a.ts',
+      '.mariadb-shell-agent/tmp/autofix-pr-7/src/x-instructions.txt',
+      '.mariadb-shell-agent/tmp/autofix-pr-7/../../settings.json',
       'src/a.ts',
     ]) {
       await expect(write(file)).resolves.toBe('ask');
     }
     await expect(
       decide(pm, 'read_file', {
-        file_path: `${PROJECT}/.qwen/tmp/autofix-pr-7-state.json`,
+        file_path: `${PROJECT}/.mariadb-shell-agent/tmp/autofix-pr-7-state.json`,
       }),
     ).resolves.toBe('allow');
 
@@ -395,7 +396,7 @@ describe('bundled autofix-pr skill', () => {
     );
   });
 
-  it('runs a fix in the background only as step 5 says, and goes on from the follow-up Qwen Code writes', () => {
+  it('runs a fix in the background only as step 5 says, and goes on from the follow-up MariaDB Shell Agent writes', () => {
     const { body } = loadSkill();
     const step5 = /\n5\. \*\*Fix\*\*([\s\S]*?)\n6\. /.exec(body)?.[1] ?? '';
     for (const condition of [
@@ -421,11 +422,11 @@ describe('bundled autofix-pr skill', () => {
       'session-a',
       12,
       'o/r',
-      '/work/repo/.qwen/tmp/autofix-pr-12',
+      '/work/repo/.mariadb-shell-agent/tmp/autofix-pr-12',
       { task: 'feedc0ffee12', reply: false, instructions: 'keep the API' },
       {
         pr: 12,
-        worktree: '/work/repo/.qwen/tmp/autofix-pr-12',
+        worktree: '/work/repo/.mariadb-shell-agent/tmp/autofix-pr-12',
         check: async () => true,
         open: async () => ({ task: 'feedc0ffee12' }),
         close: async () => {},

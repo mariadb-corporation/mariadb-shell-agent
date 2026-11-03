@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -358,7 +359,7 @@ export interface PeerInboxOptions {
    *
    * A function rather than a list of tokens because the answer must be
    * current: grants live in a file the user edits with
-   * `qwen sessions controllers`, and reading it at authentication and at
+   * `mariadb-shell-agent sessions controllers`, and reading it at authentication and at
    * bounded intervals while a controller connection remains open is what
    * makes both adding and revoking one take effect without a restart. It
    * must be cheap on a token that is plainly not a grant. It should not

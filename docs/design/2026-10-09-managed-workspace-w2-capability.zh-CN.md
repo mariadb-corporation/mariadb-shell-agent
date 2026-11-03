@@ -20,7 +20,7 @@
 
 #13545 已先行合入，并将 cwd admission 迁移到 actor 角色模型（`atLeast(OPERATOR)`）；本切片的能力谓词与该谓词统一，而非沿用此前的 creator 身份基线。前端读取 BFF 能力，不推断 creator/角色。
 
-整个合并后的前端/BFF PR 保持 draft，在 #13564 cwd 项目规则缓存修复及联合验收通过前不合入或部署。在一个既有 Hosted attachment 内，A→B 必须同时改变下一轮的实际写入目录与 QWEN.md/AGENTS.md 规则，无需重建 Session。确定性模型验证工具写入，不能证明规则采用。rewind 与会话内规则编辑不属于此切片。不增加额外前端发布开关。
+整个合并后的前端/BFF PR 保持 draft，在 #13564 cwd 项目规则缓存修复及联合验收通过前不合入或部署。在一个既有 Hosted attachment 内，A→B 必须同时改变下一轮的实际写入目录与 MARIADB-SHELL-AGENT.md/AGENTS.md 规则，无需重建 Session。确定性模型验证工具写入，不能证明规则采用。rewind 与会话内规则编辑不属于此切片。不增加额外前端发布开关。
 
 ## 验证与行为 E2E 计划
 

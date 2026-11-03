@@ -4,7 +4,7 @@
 
 ## 状态与问题
 
-这是 [#14460](https://github.com/QwenLM/qwen-code/issues/14460) 的拟实现设计，基于 main `b3c5d3ed1e67`。Automation 运行已投影为任务，但不能声明或接受取消。现有运行结算已经能将已提交的 Turn 结果映射为 `cancelled`。
+这是 [#14460](https://github.invalid/QwenLM/qwen-code/issues/14460) 的拟实现设计，基于 main `b3c5d3ed1e67`。Automation 运行已投影为任务，但不能声明或接受取消。现有运行结算已经能将已提交的 Turn 结果映射为 `cancelled`。
 
 ## 目标与边界
 
@@ -34,9 +34,9 @@ Java 仅在已提交的 `automation_run` 为 `cancelled` 时完成此种取消�
 
 ## 验证与验收
 
-先以全局 `qwen` 尝试 E2E 基线，再验证本地 bundle 和 Java 服务。覆盖仅认领和排队取消、匹配活动运行的取消、同级和前台隔离、自然完成竞争、重复请求及重开、未知结果恢复、鉴权、公开与 WebShell 幂等和停放对账。执行受影响 TypeScript 测试、根目录 build/typecheck/bundle、Java 针对性测试和 `mvn verify`；使用一次性 MySQL 8.4 和匹配的 Hosted profile 获取集成证据。明确记录无法执行的平台或已部署环境验收。
+先以全局 `mariadb-shell-agent` 尝试 E2E 基线，再验证本地 bundle 和 Java 服务。覆盖仅认领和排队取消、匹配活动运行的取消、同级和前台隔离、自然完成竞争、重复请求及重开、未知结果恢复、鉴权、公开与 WebShell 幂等和停放对账。执行受影响 TypeScript 测试、根目录 build/typecheck/bundle、Java 针对性测试和 `mvn verify`；使用一次性 MySQL 8.4 和匹配的 Hosted profile 获取集成证据。明确记录无法执行的平台或已部署环境验收。
 
-[#14446](https://github.com/QwenLM/qwen-code/issues/14446) 的 FG11d 应改为验收单次任务取消和定时定义不变，不再期待 `task_action_unavailable`。提交 PR 时同步该 tracker，但不声称已经完成整轮故障验收。
+[#14446](https://github.invalid/QwenLM/qwen-code/issues/14446) 的 FG11d 应改为验收单次任务取消和定时定义不变，不再期待 `task_action_unavailable`。提交 PR 时同步该 tracker，但不声称已经完成整轮故障验收。
 
 ## 风险与待定问题
 

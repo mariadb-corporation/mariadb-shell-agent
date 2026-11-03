@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -199,7 +200,7 @@ function authenticateA2A(
       // Same boundary as the RPC methods: a damaged grant store is logged,
       // and the unauthenticated caller learns only that the request failed.
       writeStderrLine(
-        `qwen serve: A2A authentication failed: ${error instanceof Error ? error.message : String(error)}`,
+        `mariadb-shell-agent serve: A2A authentication failed: ${error instanceof Error ? error.message : String(error)}`,
       );
       res.status(500).json({ error: 'Internal error.' });
       return;
@@ -538,7 +539,7 @@ function withoutInternalDetail(handler: A2ARequestHandler): A2ARequestHandler {
       } catch (error) {
         if (error instanceof A2AError) throw error;
         writeStderrLine(
-          `qwen serve: A2A ${name} failed: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: A2A ${name} failed: ${error instanceof Error ? error.message : String(error)}`,
         );
         throw new Error('Internal error.');
       }

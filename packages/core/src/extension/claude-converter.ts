@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Converter for Claude Code plugins to Qwen Code format.
+ * Converter for Claude Code plugins to MariaDB Shell Agent format.
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -181,9 +182,9 @@ function parseStringOrArray(value: unknown): string[] | undefined {
 }
 
 /**
- * Converts a Claude agent config to Qwen Code subagent format.
+ * Converts a Claude agent config to MariaDB Shell Agent subagent format.
  * @param claudeAgent Claude agent configuration
- * @returns Converted agent config compatible with Qwen Code SubagentConfig
+ * @returns Converted agent config compatible with MariaDB Shell Agent SubagentConfig
  */
 export function convertClaudeAgentConfig(
   claudeAgent: ClaudeAgentConfig,
@@ -392,7 +393,7 @@ function normalizeClaudeMcpServers(
 }
 
 /**
- * Converts a Claude plugin config to Qwen Code format.
+ * Converts a Claude plugin config to MariaDB Shell Agent format.
  * @param claudeConfig Claude plugin configuration
  * @returns Qwen ExtensionConfig
  */
@@ -449,7 +450,7 @@ export function convertClaudeToQwenConfig(
 }
 
 /**
- * Converts a complete Claude plugin package to Qwen Code format.
+ * Converts a complete Claude plugin package to MariaDB Shell Agent format.
  * Creates a new temporary directory with:
  * 1. Converted qwen-extension.json
  * 2. Commands, skills, and agents collected to respective folders
@@ -623,15 +624,33 @@ export async function buildQwenExtensionFromPlugin(
     if (mcpServersPath && fs.existsSync(mcpServersPath)) {
       try {
         const mcpContent = fs.readFileSync(mcpServersPath, 'utf-8');
-        mergedConfig.mcpServers = JSON.parse(mcpContent) as Record<
-          string,
-          MCPServerConfig
-        >;
+        const parsed = JSON.parse(mcpContent) as Record<string, unknown>;
+        // A Claude `.mcp.json` wraps the servers in an `mcpServers` object;
+        // a plain map of servers is accepted as well.
+        const servers =
+          parsed?.['mcpServers'] &&
+          typeof parsed['mcpServers'] === 'object' &&
+          !Array.isArray(parsed['mcpServers'])
+            ? parsed['mcpServers']
+            : parsed;
+        mergedConfig.mcpServers = servers as Record<string, MCPServerConfig>;
       } catch (error) {
         debugLogger.warn(
           `Failed to parse MCP servers file ${mcpServersPath}: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
+    }
+  }
+
+  // Claude Code reads LSP servers from a root `.lsp.json` when plugin.json
+  // declares none; the installed copy is read through the same path.
+  if (!mergedConfig.lspServers) {
+    const lspJsonPath = path.join(pluginSource, '.lsp.json');
+    if (
+      fs.existsSync(lspJsonPath) &&
+      realPathWithin(lspJsonPath, pluginSource)
+    ) {
+      mergedConfig.lspServers = './.lsp.json';
     }
   }
 
@@ -754,7 +773,7 @@ export async function buildQwenExtensionFromPlugin(
 }
 
 /**
- * Converts a standalone Claude plugin to Qwen Code format. A standalone plugin
+ * Converts a standalone Claude plugin to MariaDB Shell Agent format. A standalone plugin
  * is a repo whose root holds `.claude-plugin/plugin.json` (no marketplace.json),
  * as produced by installing a Claude Code plugin directly from a git URL.
  *

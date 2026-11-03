@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -636,19 +637,19 @@ describe('fetch-pr report assembly', () => {
     expect(report.host).toBe('ghe.example.com');
   });
 
-  it('refuses a symlinked .qwen/tmp before the lease, the worktree or the diff', async () => {
+  it('refuses a symlinked .mariadb-shell-agent/tmp before the lease, the worktree or the diff', async () => {
     // The entry guard runs first: a redirected scratch directory must not
     // cost a lease write, a `cleanStale`, a worktree, or a diff — every one
     // of them lands under it. The suite's fs is a mock, so the link is what
     // `lstat` reports for the two in-repo components.
     producerMocks.lstatSync.mockImplementation((path?: unknown) => {
       const p = String(path);
-      if (p === join('.qwen', 'tmp')) {
+      if (p === join('.mariadb-shell-agent', 'tmp')) {
         return { isSymbolicLink: () => true } as unknown as ReturnType<
           typeof producerMocks.lstatSync
         >;
       }
-      if (p === '.qwen') {
+      if (p === '.mariadb-shell-agent') {
         return { isSymbolicLink: () => false } as unknown as ReturnType<
           typeof producerMocks.lstatSync
         >;
@@ -1251,7 +1252,7 @@ describe('fetch-pr report assembly', () => {
       promptId: 'prompt-other',
       target: 'pr-42',
       repositoryRoot: process.cwd(),
-      worktreePath: '.qwen/tmp/review-pr-42',
+      worktreePath: '.mariadb-shell-agent/tmp/review-pr-42',
       branch: 'qwen-review/pr-42',
     };
 
@@ -1423,7 +1424,7 @@ describe('fetch-pr report assembly', () => {
       expect(producerMocks.releaseWorktree).not.toHaveBeenCalled();
       expect(producerMocks.git).not.toHaveBeenCalled();
       // `gitRaw` is a git call too, and the scratch-directory guard makes one
-      // (`ls-files -s -z`) and then creates `.qwen/tmp`. It answers an empty
+      // (`ls-files -s -z`) and then creates `.mariadb-shell-agent/tmp`. It answers an empty
       // listing under this suite's mock, so a guard placed ahead of the gate
       // runs silently and the refusal below it still fires — the message
       // assertion alone cannot see the order.
@@ -1576,7 +1577,7 @@ describe('fetch-pr report assembly', () => {
       producerMocks.untrustedRepositoryFrom
         .mockReturnValueOnce(null) // the hoisted gate at the top of the run
         .mockReturnValueOnce(
-          '/repo/.qwen/tmp/review-pr-42 resolves to an admin entry inside the review temp dir',
+          '/repo/.mariadb-shell-agent/tmp/review-pr-42 resolves to an admin entry inside the review temp dir',
         );
 
       await expect(reportFor({})).rejects.toThrow(
@@ -1599,7 +1600,7 @@ describe('fetch-pr report assembly', () => {
       // out at the link's target: outside the review temp dir, where
       // `mountRootFor` answers null and the build/test phase runs
       // unsandboxed in a directory the planter chose.
-      const tmpParent = join(process.cwd(), '.qwen', 'tmp');
+      const tmpParent = join(process.cwd(), '.mariadb-shell-agent', 'tmp');
       const linkStat = {
         isSymbolicLink: () => true,
         isFile: () => false,
@@ -1616,7 +1617,7 @@ describe('fetch-pr report assembly', () => {
       // and the fetched ref survives the refusal for the next run's
       // cleanStale to sweep (the arm sits outside the rollback try).
       //
-      // ONE mkdir, not none: the entry guard creates `.qwen/tmp` before any
+      // ONE mkdir, not none: the entry guard creates `.mariadb-shell-agent/tmp` before any
       // of this, while the mock still answers ENOENT for the relative
       // spelling it asks about — the link this test plants is the one that
       // appears afterwards. Step 4's `mkdirSync(dirname(wt))` takes the very
@@ -1642,11 +1643,16 @@ describe('fetch-pr report assembly', () => {
       // planted at the destination — the cheaper plant of the two — walked
       // straight through it. `releaseWorktree` unlinks a leaf link it can
       // reach, but `cleanStale` only WARNS when the release reports
-      // `freed: false` (an EACCES on `.qwen/tmp` is enough) and runs on to
+      // `freed: false` (an EACCES on `.mariadb-shell-agent/tmp` is enough) and runs on to
       // here; `mkdirSync(dirname(wt))` is then a no-op on the real parent and
       // `git worktree add wt ref` creates and checks out THROUGH the link —
       // measured on git 2.43, exit 0 with the tree in the external directory.
-      const wt = join(process.cwd(), '.qwen', 'tmp', 'review-pr-42');
+      const wt = join(
+        process.cwd(),
+        '.mariadb-shell-agent',
+        'tmp',
+        'review-pr-42',
+      );
       const linkStat = {
         isSymbolicLink: () => true,
         isFile: () => false,
@@ -3671,7 +3677,7 @@ describe('fetch-pr report assembly', () => {
     it('ignores the marker when its value came from a file', async () => {
       // The beforeEach above sets the variable directly; the read must
       // distinguish provenance — a value the environment loader sourced
-      // from a FILE (a repository's `.env` / `.qwen/.env`) is not the
+      // from a FILE (a repository's `.env` / `.mariadb-shell-agent/.env`) is not the
       // operator's, and the reviewed checkout must not choose its own
       // review depth.
       const spy = vi
@@ -3773,7 +3779,7 @@ describe('fetch-pr report assembly', () => {
                 sourceBranch: 'f00df00df00d',
                 targetBranch: 'main',
                 detailUrl:
-                  'https://code.alibaba-inc.com/acme/widgets/codereview/42',
+                  'https://code.alibaba-inc.invalid/acme/widgets/codereview/42',
                 description: '',
               },
             });
@@ -3788,7 +3794,7 @@ describe('fetch-pr report assembly', () => {
       serveAone();
       const report = await reportFor({
         since: ANCHOR,
-        host: 'gitlab.alibaba-inc.com',
+        host: 'gitlab.alibaba-inc.invalid',
       });
       expect(report.incremental).toEqual({
         since: ANCHOR,
@@ -3811,7 +3817,7 @@ describe('fetch-pr report assembly', () => {
 
     it('never asks an ancestry question on the Aone platform', async () => {
       serveAone();
-      await reportFor({ since: ANCHOR, host: 'gitlab.alibaba-inc.com' });
+      await reportFor({ since: ANCHOR, host: 'gitlab.alibaba-inc.invalid' });
       const ancestryCalls = producerMocks.gitOpt.mock.calls.filter(
         (args) => args[0] === 'merge-base' && args[1] === '--is-ancestor',
       );
@@ -4791,7 +4797,7 @@ describe('fetch-pr --resume', () => {
       diffSha256: createHash('sha256')
         .update(Buffer.from(DIFF_BYTES))
         .digest('hex'),
-      worktreePath: '.qwen/tmp/review-pr-42',
+      worktreePath: '.mariadb-shell-agent/tmp/review-pr-42',
       diffPathAbsolute: resolve(tmpFile('pr-42', 'diff.txt')),
       mergeBaseSha: 'baseb45eb45e',
       baseRefName: 'main',
@@ -5654,7 +5660,7 @@ describe('fetch-pr --resume bookkeeping is counted, not merely called', () => {
       diffSha256: createHash('sha256')
         .update(Buffer.from(DIFF_BYTES))
         .digest('hex'),
-      worktreePath: '.qwen/tmp/review-pr-42',
+      worktreePath: '.mariadb-shell-agent/tmp/review-pr-42',
       diffPathAbsolute: resolve(tmpFile('pr-42', 'diff.txt')),
       mergeBaseSha: 'baseb45eb45e',
       baseRefName: 'main',

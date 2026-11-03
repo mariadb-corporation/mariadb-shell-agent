@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1046,6 +1047,9 @@ describe('Gemini Client (client.ts)', () => {
   });
 
   afterEach(() => {
+    // An interactive turn leaves the idle memory start pending; it must not
+    // fire into a later test's mocks.
+    client?.clearPendingManagedMemoryRun();
     vi.useRealTimers();
     vi.restoreAllMocks();
   });
@@ -4166,7 +4170,7 @@ describe('Gemini Client (client.ts)', () => {
       expect(getInitialChatHistory).toHaveBeenLastCalledWith(
         expect.anything(),
         undefined,
-        { gitStatus: 'Git snapshot A' },
+        expect.objectContaining({ gitStatus: 'Git snapshot A' }),
       );
 
       await client.addWorkingDirectoryChangedContext(
@@ -4208,7 +4212,7 @@ describe('Gemini Client (client.ts)', () => {
       expect(getInitialChatHistory).toHaveBeenLastCalledWith(
         expect.anything(),
         undefined,
-        { gitStatus: 'Git snapshot B' },
+        expect.objectContaining({ gitStatus: 'Git snapshot B' }),
       );
       expect(client['getCachedGitStatus']()).toBe('Git snapshot B');
       expect(getRecentGitStatus).toHaveBeenCalledTimes(2);
@@ -7505,7 +7509,7 @@ Other open files:
     });
     const userMemoryDoc = () =>
       fastDoc(
-        '/test/project/root/.qwen/memory/user.md',
+        '/test/project/root/.mariadb-shell-agent/memory/user.md',
         '- User prefers terse responses.',
       );
     const noRecall = () => ({ prompt: '', selectedDocs: [], strategy: 'none' });
@@ -7524,7 +7528,7 @@ Other open files:
           {
             scope: 'user',
             type: 'user',
-            filePath: '/test/project/root/.qwen/memory/user.md',
+            filePath: '/test/project/root/.mariadb-shell-agent/memory/user.md',
             relativePath: 'user.md',
             filename: 'user.md',
             title: 'User Memory',
@@ -7591,7 +7595,8 @@ Other open files:
             {
               scope: 'user',
               type: 'user',
-              filePath: '/test/project/root/.qwen/memory/user.md',
+              filePath:
+                '/test/project/root/.mariadb-shell-agent/memory/user.md',
               relativePath: 'user.md',
               filename: 'user.md',
               title: 'User Memory',
@@ -7627,7 +7632,8 @@ Other open files:
 
     it('excludes body-bearing memories after legacy delivery', async () => {
       vi.mocked(mockConfig.getMemoryRecallMode).mockReturnValue('legacy');
-      const memoryPath = '/test/project/root/.qwen/memory/user.md';
+      const memoryPath =
+        '/test/project/root/.mariadb-shell-agent/memory/user.md';
       const selectedDoc = {
         scope: 'user' as const,
         type: 'user' as const,
@@ -7768,7 +7774,8 @@ Other open files:
           selectedDocs: [
             {
               type: 'user',
-              filePath: '/test/project/root/.qwen/memory/user.md',
+              filePath:
+                '/test/project/root/.mariadb-shell-agent/memory/user.md',
               relativePath: 'user.md',
               filename: 'user.md',
               title: 'User Memory',
@@ -10903,7 +10910,7 @@ Other open files:
         [
           'should set skillsModifiedInSession=true when write_file targets a skill path',
           'write_file',
-          { file_path: '/project/.qwen/skills/my-skill.md' },
+          { file_path: '/project/.mariadb-shell-agent/skills/my-skill.md' },
           true,
         ],
         [
@@ -10915,13 +10922,13 @@ Other open files:
         [
           'should set skillsModifiedInSession=true when edit targets a skill path',
           'edit',
-          { path: '/project/.qwen/skills/my-skill.md' },
+          { path: '/project/.mariadb-shell-agent/skills/my-skill.md' },
           true,
         ],
         [
           'should not set skillsModifiedInSession=true for non-write tools',
           'read_file',
-          { file_path: '/project/.qwen/skills/my-skill.md' },
+          { file_path: '/project/.mariadb-shell-agent/skills/my-skill.md' },
           false,
         ],
       ])('%s', (_title, tool, args, modified) => {
@@ -13513,6 +13520,34 @@ Other open files:
         );
       });
 
+      it('records the user content as sent, with the reminders added after the user record', async () => {
+        const recordUserMessage = vi.fn();
+        const recordSentUserContent = vi.fn();
+        promptSubmitBus({ output: undefined });
+        vi.mocked(mockConfig.getChatRecordingService).mockReturnValue({
+          recordUserMessage,
+          recordSentUserContent,
+          recordAttributionSnapshot: vi.fn(),
+          recordFileHistorySnapshot: vi.fn(),
+        } as unknown as ReturnType<Config['getChatRecordingService']>);
+
+        await run([{ text: 'Hi' }], 'prompt-sent-content');
+
+        const recorded = recordUserMessage.mock.calls[0]![0];
+        expect(recordSentUserContent).toHaveBeenCalledTimes(1);
+        const [sent, request, promptId] = recordSentUserContent.mock.calls[0]!;
+        expect(request).toBe(recorded);
+        expect(promptId).toBe('prompt-sent-content');
+        expect(sent.at(-1)).toEqual({ text: 'Hi' });
+        const text = (part: unknown) =>
+          typeof part === 'string' ? part : (part as { text?: string }).text;
+        expect(
+          sent.some((part: unknown) =>
+            text(part)?.includes('The current date is:'),
+          ),
+        ).toBe(true);
+      });
+
       it('passes a non-empty submitted prompt for UserQuery hooks', async () => {
         const mockMessageBus = promptSubmitBus({ output: undefined });
 
@@ -15096,6 +15131,7 @@ Other open files:
           agentReachable: false,
           executionSandboxFilesystem: undefined,
           executionSandboxBackend: undefined,
+          interactionModeReminderInPrelude: true,
         },
       ] as const;
     /** generateContent args whose config carries `systemInstruction`. */
@@ -16049,6 +16085,107 @@ Other open files:
       expect(scheduleDreamSpy).not.toHaveBeenCalled();
     });
 
+    describe('idle wait before extraction and dream', () => {
+      const setup = (interactive: boolean, acp = false) => {
+        const scheduleExtract = vi.fn().mockResolvedValue({
+          touchedTopics: [],
+          cursor: { sessionId: 'sess', updatedAt: new Date().toISOString() },
+        });
+        const scheduleDream = vi
+          .fn()
+          .mockResolvedValue({ status: 'skipped', skippedReason: 'locked' });
+        const config = makeMockConfigForShutdown(
+          memoryManager({
+            scheduleMetadataMigration: vi.fn().mockResolvedValue({
+              status: 'skipped',
+              skippedReason: 'complete',
+            }),
+            scheduleExtract,
+            scheduleDream,
+          }),
+        );
+        vi.mocked(config.isInteractive).mockReturnValue(interactive);
+        vi.mocked(config.getExperimentalZedIntegration).mockReturnValue(acp);
+        const client = new LlmClient(config);
+        (
+          client as unknown as { getHistoryShallow: () => unknown[] }
+        ).getHistoryShallow = () => [];
+        const turnDone = () =>
+          (
+            client as unknown as {
+              runManagedAutoMemoryBackgroundTasks: (t: SendMessageType) => void;
+            }
+          ).runManagedAutoMemoryBackgroundTasks(SendMessageType.UserQuery);
+        const newQuestion = () => client.clearPendingManagedMemoryRun();
+        return {
+          config,
+          client,
+          scheduleExtract,
+          scheduleDream,
+          turnDone,
+          newQuestion,
+        };
+      };
+
+      beforeEach(() => vi.useFakeTimers());
+      afterEach(() => vi.useRealTimers());
+
+      it('starts right away in a headless run', () => {
+        const { scheduleExtract, scheduleDream, turnDone } = setup(false);
+        turnDone();
+        expect(scheduleExtract).toHaveBeenCalledTimes(1);
+        expect(scheduleDream).toHaveBeenCalledTimes(1);
+      });
+
+      it('waits for an idle session when a next question can come', () => {
+        const { scheduleExtract, scheduleDream, turnDone } = setup(true);
+        turnDone();
+        expect(scheduleExtract).not.toHaveBeenCalled();
+        vi.advanceTimersByTime(10_000);
+        expect(scheduleExtract).toHaveBeenCalledTimes(1);
+        expect(scheduleDream).toHaveBeenCalledTimes(1);
+      });
+
+      it('lets a new question restart the wait, then covers both turns once', () => {
+        const { scheduleExtract, turnDone, newQuestion } = setup(true);
+        turnDone();
+        vi.advanceTimersByTime(5_000);
+        newQuestion();
+        vi.advanceTimersByTime(10_000);
+        expect(scheduleExtract).not.toHaveBeenCalled();
+        turnDone();
+        vi.advanceTimersByTime(10_000);
+        expect(scheduleExtract).toHaveBeenCalledTimes(1);
+      });
+
+      it('also waits when an ACP session ends its turn through the client', () => {
+        const { client, scheduleExtract, scheduleDream } = setup(false, true);
+        client.scheduleManagedMemoryRun();
+        expect(scheduleExtract).not.toHaveBeenCalled();
+        vi.advanceTimersByTime(10_000);
+        expect(scheduleExtract).toHaveBeenCalledTimes(1);
+        expect(scheduleDream).toHaveBeenCalledTimes(1);
+      });
+
+      it("starts nothing for a session agent's hidden session", () => {
+        const { config, client, scheduleExtract } = setup(false, true);
+        (
+          config as unknown as { isSessionAgentSession: () => boolean }
+        ).isSessionAgentSession = () => true;
+        client.scheduleManagedMemoryRun();
+        vi.advanceTimersByTime(10_000);
+        expect(scheduleExtract).not.toHaveBeenCalled();
+      });
+
+      it('starts nothing once shutdown is requested during the wait', () => {
+        const { client, scheduleExtract, turnDone } = setup(true);
+        turnDone();
+        client.requestShutdown();
+        vi.advanceTimersByTime(10_000);
+        expect(scheduleExtract).not.toHaveBeenCalled();
+      });
+    });
+
     /**
      * C2: requestShutdown() is idempotent — calling it multiple times
      * should not throw or have side effects.
@@ -16224,6 +16361,7 @@ function makeMockConfigForShutdown(
     isBareMode: vi.fn().mockReturnValue(false),
     getLlmClient: vi.fn().mockReturnValue(undefined),
     getProjectRoot: vi.fn().mockReturnValue('/project'),
+    getExperimentalZedIntegration: vi.fn().mockReturnValue(false),
     getSessionId: vi.fn().mockReturnValue('session-1'),
     getMemoryManager: vi.fn().mockReturnValue(mgr),
     getManagedAutoMemoryEnabled: vi.fn().mockReturnValue(true),

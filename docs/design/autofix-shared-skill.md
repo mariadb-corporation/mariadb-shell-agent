@@ -2,7 +2,7 @@
 
 ## Context
 
-Qwen Code already has a repository-owned Autofix skill used by GitHub Actions.
+MariaDB Shell Agent already has a repository-owned Autofix skill used by GitHub Actions.
 It contains review-feedback triage and verification rules, while the workflow
 owns scheduling, trust filtering, credentials, GitHub writes, and round
 budgets.
@@ -22,7 +22,7 @@ the repository Autofix skill and does not change its rules.
 
 ## Design
 
-The existing `.qwen/skills/autofix/SKILL.md` remains the only Autofix skill. It
+The existing `.mariadb-shell-agent/skills/autofix/SKILL.md` remains the only Autofix skill. It
 has two entry paths:
 
 - A direct `/autofix` invocation synchronously reviews and fixes the current

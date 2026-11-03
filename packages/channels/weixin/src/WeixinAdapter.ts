@@ -1,5 +1,5 @@
 /**
- * WeChat channel adapter for Qwen Code.
+ * WeChat channel adapter for MariaDB Shell Agent.
  * Extends ChannelBase with WeChat iLink Bot API integration.
  */
 
@@ -118,7 +118,7 @@ export class WeixinChannel extends ChannelBase {
     const account = loadAccount();
     if (!account) {
       throw new Error(
-        'WeChat account not configured. Run "qwen channel configure-weixin" first.',
+        'WeChat account not configured. Run "mariadb-shell-agent channel configure-weixin" first.',
       );
     }
     this.token = account.token;

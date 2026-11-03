@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -154,7 +155,7 @@ export function normalizeMemoryBudgetMb(value: number): number {
 
 export function memoryBudgetRangeError(): string {
   return (
-    'qwen serve: --memory-budget-mb must be an integer in ' +
+    'mariadb-shell-agent serve: --memory-budget-mb must be an integer in ' +
     `[${MIN_MEMORY_BUDGET_MB}, ${MAX_MEMORY_BUDGET_MB}].`
   );
 }
@@ -278,7 +279,7 @@ export function resolveDaemonMemoryBudget(
 
 export function formatMemoryBudgetStderr(budget: DaemonMemoryBudget): string {
   let message =
-    `qwen serve: memory budget ${budget.effectiveBudgetMb} MB ` +
+    `mariadb-shell-agent serve: memory budget ${budget.effectiveBudgetMb} MB ` +
     `(${budget.budgetSource}, ${budget.availableMemoryMb} MB available ` +
     `via ${budget.availableMemorySource})`;
   if (budget.effectiveBudgetMb < budget.configuredBudgetMb) {

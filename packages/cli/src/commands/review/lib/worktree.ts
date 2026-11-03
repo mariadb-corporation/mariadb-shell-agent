@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -132,7 +133,7 @@ const GIT_ENV_EXEC = [
  * outside it.
  *
  * `lastIndexOf`, because a review run from inside another review's worktree —
- * this pipeline's own dogfood geometry — nests one `.qwen/tmp` inside another,
+ * this pipeline's own dogfood geometry — nests one `.mariadb-shell-agent/tmp` inside another,
  * and the FIRST occurrence would widen the mount to the outer temp dir,
  * pulling `<repo>/.git` and every sibling checkout in with it. Tree names
  * cannot contain a separator (scratch labels flatten to `[A-Za-z0-9._-]`), so
@@ -210,7 +211,7 @@ function mountRootVerdict(cwd: string): {
   if (at < 0) return { root: null, nullKind: 'outside' };
   const root = resolved.slice(0, at + marker.length - 1);
   // A LEXICAL root is not a safe mount target. `resolve` never touches the
-  // filesystem, so a symlink at or above `.qwen/tmp` — committable as mode
+  // filesystem, so a symlink at or above `.mariadb-shell-agent/tmp` — committable as mode
   // 120000 and materialised by a fresh clone — silently widens a read-write
   // bind mount to wherever it points. Every other creating or destroying path
   // in this pipeline refuses that (`runCleanup`, `releaseWorktree`,
@@ -219,7 +220,7 @@ function mountRootVerdict(cwd: string): {
   //
   // The walk's bound is geometry-aware. `outermostReviewTmpRoot(root) ===
   // root` is the flat case — one review temp dir on the path — and the bound
-  // is the `.qwen` directory: `.qwen/tmp` and `.qwen` stay inside the walk (a
+  // is the `.mariadb-shell-agent` directory: `.mariadb-shell-agent/tmp` and `.mariadb-shell-agent` stay inside the walk (a
   // link at either redirects the whole path), but the walk does not reach the
   // CHECKOUT itself. `redirectedAncestor` lstats the stop directory before
   // the stop test fires, so a bound at the repository root policed the
@@ -566,9 +567,9 @@ function untrustedPointer(
   //
   // The boundary is the OUTERMOST review temp root on `root`'s own path, the
   // same widening `adminEntryInsideReviewTmp` applies two questions above and
-  // for the same reason: `mountRootFor` cuts at the DEEPEST `.qwen/tmp`, but
+  // for the same reason: `mountRootFor` cuts at the DEEPEST `.mariadb-shell-agent/tmp`, but
   // in the nested geometry the OUTER review's containerized phase held the
-  // enclosing `.qwen/tmp` read-write. Bounded at the deepest root, an owner
+  // enclosing `.mariadb-shell-agent/tmp` read-write. Bounded at the deepest root, an owner
   // spelling one layer up — a sibling of the outer worktree, relinked at this
   // tree — sat outside the containment test, `redirectedAncestor` was never
   // called, and the realpath round trip then agreed with the link and
@@ -642,10 +643,10 @@ export function untrustedRepositoryFrom(
   // INSIDE-by-spelling and mount-null together need the null's KIND (see
   // `mountNullKind`): an UNMOUNTABLE spelling stays silent — where
   // containment cannot exist the mount is no trust boundary — while a
-  // REFUSAL (a symlinked `.qwen/tmp`, a root that vanished mid-check) names
+  // REFUSAL (a symlinked `.mariadb-shell-agent/tmp`, a root that vanished mid-check) names
   // precisely a directory no host-side command may resolve through. Reading
   // the refusal as "outside any temp dir" inverted the gate's fail
-  // direction, measured end-to-end with a symlinked `.qwen/tmp`.
+  // direction, measured end-to-end with a symlinked `.mariadb-shell-agent/tmp`.
   const root = mountRoot(cwd);
   if (root === null) {
     if (mountNullKind(cwd) !== 'refused') return null;
@@ -658,7 +659,7 @@ export function untrustedRepositoryFrom(
   }
   if (!existsSync(cwd)) {
     // Inside the same spelling, a launch directory that is not there is the
-    // rename attack, not "no objection": `mv .qwen .qwen-real` from inside
+    // rename attack, not "no objection": `mv .mariadb-shell-agent .qwen-real` from inside
     // the outer mount leaves the stale spelling matching lexically while
     // `mountRootFor` stops answering, and the next call at the re-stood-up
     // spelling must be judged fresh, never inherited. Outside the spelling
@@ -849,7 +850,7 @@ export function adminEntryInsideReviewTmp(
     // mocks `node:fs.realpathSync` as a bare `vi.fn` has no `.native` on it,
     // and reaching through it threw a TypeError straight into the fail-closed
     // catch — refusing every worktree creation in any checkout that happens to
-    // sit under `.qwen/tmp`.
+    // sit under `.mariadb-shell-agent/tmp`.
     const canonical = realpathSync.native ?? realpathSync;
     real = canonical(resolve(gitDir));
     realRoot = canonical(root);
@@ -868,13 +869,13 @@ export function adminEntryInsideReviewTmp(
   // belongs in one tested helper rather than in each caller's arithmetic.
   //
   // And judged against the OUTERMOST review temp root on that path, not the
-  // one the mount was cut at. `mountRootFor` takes the deepest `.qwen/tmp`
+  // one the mount was cut at. `mountRootFor` takes the deepest `.mariadb-shell-agent/tmp`
   // deliberately — the first occurrence would widen the MOUNT to the outer
   // temp dir and pull `<repo>/.git` and every sibling checkout into the
   // container — but "which directory may a container have been given
   // read-write" and "where may reviewed code already have written" are not the
   // same question. In the nested geometry `mountRootFor` documents, the OUTER
-  // review's containerized phase held the outer `.qwen/tmp` read-write, so an
+  // review's containerized phase held the outer `.mariadb-shell-agent/tmp` read-write, so an
   // admin entry planted one layer up sits outside the inner root and inside a
   // writable surface all the same — and judging only against the inner root
   // admitted it, after which the very `worktree add` this gate protects ran
@@ -884,7 +885,7 @@ export function adminEntryInsideReviewTmp(
   // linked worktree's admin entry beside its tree: `worktree add` run from
   // INSIDE a linked worktree still writes its entry under the MAIN
   // repository's `.git/worktrees/`, which is outside every layer's
-  // `.qwen/tmp` rather than merely outside the deepest. What it does refuse is
+  // `.mariadb-shell-agent/tmp` rather than merely outside the deepest. What it does refuse is
   // a repository whose own `.git` lives under a review temp dir — a checkout
   // cloned into one. Nothing this pipeline builds has that shape (every tree
   // it makes is a linked worktree), and a repository sitting inside the
@@ -896,7 +897,7 @@ export function adminEntryInsideReviewTmp(
 /**
  * The shallowest review temp root on a canonical review temp root's own path.
  *
- * `mountRootFor` already cut at the DEEPEST `.qwen/tmp`, so the string handed
+ * `mountRootFor` already cut at the DEEPEST `.mariadb-shell-agent/tmp`, so the string handed
  * in ends at one; any earlier occurrence in it is an enclosing review's temp
  * dir, and the shallowest is the widest writable surface this tree sits in.
  * Because the layers nest, the outermost alone answers for all of them — an
@@ -905,7 +906,7 @@ export function adminEntryInsideReviewTmp(
  * Lexical on purpose: the input is already canonical (`adminEntryInsideReviewTmp`
  * realpaths it before asking), so there is no link left to resolve, and a
  * separator-delimited marker cannot match half a path component. A root with
- * no `.qwen/tmp` inside it — an injected mount in a fixture — comes back
+ * no `.mariadb-shell-agent/tmp` inside it — an injected mount in a fixture — comes back
  * unchanged, so the judgement is never widened past what was handed in.
  */
 function outermostReviewTmpRoot(root: string): string {
@@ -952,7 +953,7 @@ export function redirectedAncestor(
         // A component that does not EXIST — an ancestor's link target lacks
         // the rest of the path — throws here, and swallowing that at the
         // outer catch used to end the walk with the link itself un-lstat'd:
-        // `.qwen` pointing at a directory with no `tmp` inside read as
+        // `.mariadb-shell-agent` pointing at a directory with no `tmp` inside read as
         // "nothing redirects this" while every path built under it lands in
         // the link's target. Keep walking: the link is what this looks for.
         isLink = false;

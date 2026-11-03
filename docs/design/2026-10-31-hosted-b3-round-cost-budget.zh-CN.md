@@ -177,4 +177,4 @@ token 账本」的澄清。
 - skill-only / 手动 continue 的轮次重置路径在打包臂中是否可达（延后；若确认将是独立
   缺口）。
 
-[issue]: https://github.com/QwenLM/qwen-code/issues/14481
+[issue]: https://github.invalid/QwenLM/qwen-code/issues/14481

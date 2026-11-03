@@ -2,12 +2,13 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Resume-mode adapter: replays a real qwen-code session JSONL
- * (~/.qwen/projects/<dir>/chats/<id>.jsonl) as neutral StreamEvents so the
+ * (~/.mariadb-shell-agent/projects/<dir>/chats/<id>.jsonl) as neutral StreamEvents so the
  * OpenTUI backend renders real conversations without API credentials.
  *
  * Session line shape: { type: 'user'|'assistant'|'system', message: { role, parts:

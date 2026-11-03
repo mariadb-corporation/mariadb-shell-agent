@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review capture-tui`: run a command in a throwaway terminal and hand
+// `mariadb-shell-agent review capture-tui`: run a command in a throwaway terminal and hand
 // back what it actually rendered — the evidence producer for rendering claims.
 //
 // A verifier ruling on "the panel clips at 80 columns" without this command

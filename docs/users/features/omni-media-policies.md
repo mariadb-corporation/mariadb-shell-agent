@@ -18,7 +18,7 @@
 
 ## 快速开始
 
-在项目 `.qwen/settings.json`(或用户级 `~/.qwen/settings.json`)中:
+在项目 `.mariadb-shell-agent/settings.json`(或用户级 `~/.mariadb-shell-agent/settings.json`)中:
 
 ```json
 {
@@ -52,7 +52,7 @@
     "enabled": true,
     "delivery": {
       "upload": {
-        "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "baseUrl": "https://dashscope.aliyuncs.invalid/compatible-mode/v1",
         "apiKeyEnv": "DASHSCOPE_API_KEY",
         "model": "qwen3.5-omni-plus"
       }
@@ -61,7 +61,7 @@
 }
 ```
 
-`apiKeyEnv` 填环境变量名,不填明文 key;启动 Qwen Code 前需确保该变量已有值。三个字段必须同时设置,否则启动失败。上传 endpoint/key/model 只用于 `getPolicy`、文件上传和上传缓存;自部署推理的 endpoint/key 仍按原有模型配置使用,两套凭据不会交叉发送。
+`apiKeyEnv` 填环境变量名,不填明文 key;启动 MariaDB Shell Agent 前需确保该变量已有值。三个字段必须同时设置,否则启动失败。上传 endpoint/key/model 只用于 `getPolicy`、文件上传和上传缓存;自部署推理的 endpoint/key 仍按原有模型配置使用,两套凭据不会交叉发送。
 
 如果三个字段都不设置,则保留旧行为:当前推理配置本身必须是带静态 API key 的 DashScope 兼容配置,并同时作为上传配置。
 
@@ -291,7 +291,7 @@ extract-audio (origins:[user],  reprocessMedia:true, source:keep)
 
 ## 缓存与存储
 
-- **内容寻址库** `.qwen/omni/objects/sha256/<xx>/<hash>.<ext>` —— 所有派生产物按内容哈希入库,同输入同策略永不重复派生(降质缓存键 = 源哈希 + 策略身份);
+- **内容寻址库** `.mariadb-shell-agent/omni/objects/sha256/<xx>/<hash>.<ext>` —— 所有派生产物按内容哈希入库,同输入同策略永不重复派生(降质缓存键 = 源哈希 + 策略身份);
 - **上传缓存** —— DashScope 临时上传的 `oss://` URL 按文件哈希、上传模型、上传 endpoint/key 隔离,并在 `urlTtlHours`(≤ 48h)内复用;只修改推理地址不会导致重复上传;
 - **隔离区** `quarantine/<invocationId>/` —— 失败派生的暂存残留连同 `reason.json` 移入隔离区,按保留天数和体积预算惰性清扫;崩溃留下的未提交 staging 超过 1 小时宽限窗后被回收。
 
@@ -299,7 +299,7 @@ extract-audio (origins:[user],  reprocessMedia:true, source:keep)
 
 ## 完整案例:81 分钟电影拉片
 
-目标:给 Qwen Code 一部 1080p 电影(《Breaking Surface》2020,81 分钟,986MB MKV)和一句"制作拉片网页"的 prompt,让模型在**从未看过全片**的情况下产出覆盖全片的交互式分析页面。
+目标:给 MariaDB Shell Agent 一部 1080p 电影(《Breaking Surface》2020,81 分钟,986MB MKV)和一句"制作拉片网页"的 prompt,让模型在**从未看过全片**的情况下产出覆盖全片的交互式分析页面。
 
 ### 策略设计
 
@@ -309,7 +309,7 @@ extract-audio (origins:[user],  reprocessMedia:true, source:keep)
 2. **视觉全覆盖(稀疏)** —— 16 张关键帧按全片分桶采样,每帧披露带绝对时间戳;
 3. **视觉细节(稠密,仅开头)** —— 截取前 10 分钟片段,给模型一段"高保真样本"感受影片质感。
 
-### 工作区 `.qwen/settings.json`
+### 工作区 `.mariadb-shell-agent/settings.json`
 
 ```json
 {

@@ -5,7 +5,7 @@
 - **状态：** 提案
 - **日期：** 2026-10-18
 - **基线：** `0fac9973df`
-- **Issue：** [#12937](https://github.com/QwenLM/qwen-code/issues/12937)（拆自 [#12868](https://github.com/QwenLM/qwen-code/pull/12868)）
+- **Issue：** [#12937](https://github.invalid/QwenLM/qwen-code/issues/12937)（拆自 [#12868](https://github.invalid/QwenLM/qwen-code/pull/12868)）
 - **模块：** `packages/managed-agent-server`、`packages/cli/src/serve`、`packages/core/src/tools`
 
 「现状」一节中的每项主张都在上述基线提交上重新读过。「提案」标记尚未实现的行为；§2.6 的状态表区分两者。

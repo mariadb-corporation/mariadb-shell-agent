@@ -66,7 +66,7 @@ All data remains within the existing owning session and persisted workspace.
 
 ## Validation and acceptance
 
-Attempt baseline with global `qwen`, then verify the local bundle. Cancel an
+Attempt baseline with global `mariadb-shell-agent`, then verify the local bundle. Cancel an
 active request, await settlement, reload from persisted history, and verify one
 marker with unchanged elapsed seconds. Cancel after thinking and text have both
 arrived and verify their contents and the processed summary survive reload.

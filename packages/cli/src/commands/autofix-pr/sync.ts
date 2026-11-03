@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -267,7 +268,7 @@ function syncLocked(
           `merge ${prHead} into the worktree (never rebase), then run sync again`,
       };
     }
-    // The checkout holds the watch's own files under .qwen/tmp: they are
+    // The checkout holds the watch's own files under .mariadb-shell-agent/tmp: they are
     // not the user's work.
     const dirty = inPlace
       ? (checkoutHoldsWork(worktree) ?? true)

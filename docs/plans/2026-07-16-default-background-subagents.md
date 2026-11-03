@@ -11,7 +11,7 @@ foreground, and forks plus named teammates keep their existing behavior.
 ## Steps
 
 1. Record the current global CLI behavior in
-   `.qwen/e2e-tests/default-background-subagents.md` by launching a normal
+   `.mariadb-shell-agent/e2e-tests/default-background-subagents.md` by launching a normal
    subagent without `run_in_background` and confirming that it returns inline.
 2. Add focused failing unit tests for the new core dispatch precedence:
    omitted flag defaults to background, explicit false stays foreground,

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,7 +25,7 @@ import type {
 const debugLogger = createDebugLogger('HTTP_HOOK_RUNNER');
 
 /**
- * Maximum output length (10,000 characters as per Qwen Code spec)
+ * Maximum output length (10,000 characters as per MariaDB Shell Agent spec)
  */
 const MAX_OUTPUT_LENGTH = 10000;
 
@@ -267,7 +268,7 @@ export class HttpHookRunner {
           // non-2xx branch below (non-blocking error).
           redirect: 'manual',
         });
-        // Per Qwen Code spec: Non-2xx status is a non-blocking error
+        // Per MariaDB Shell Agent spec: Non-2xx status is a non-blocking error
         // Execution continues, but we log a warning
         if (!response.ok) {
           onRequestState?.('response_received');
@@ -318,7 +319,7 @@ export class HttpHookRunner {
           fetchError instanceof Error &&
           (fetchError.name === 'AbortError' || combinedSignal.aborted)
         ) {
-          // Timeout or abort is a non-blocking error per Qwen Code spec.
+          // Timeout or abort is a non-blocking error per MariaDB Shell Agent spec.
           const cancelled =
             (requestSignal ?? signal)?.aborted === true ||
             (signal?.aborted === true && !combinedSignal.aborted);
@@ -338,7 +339,7 @@ export class HttpHookRunner {
           };
         }
 
-        // Connection failure is a non-blocking error per Qwen Code spec
+        // Connection failure is a non-blocking error per MariaDB Shell Agent spec
         debugLogger.warn(
           `HTTP hook ${hookId} connection failed (non-blocking): ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`,
         );
@@ -416,7 +417,7 @@ export class HttpHookRunner {
 
   /**
    * Truncate output to MAX_OUTPUT_LENGTH characters
-   * Per Qwen Code spec: output is capped at 10,000 characters
+   * Per MariaDB Shell Agent spec: output is capped at 10,000 characters
    */
   private truncateOutput(output: string): string {
     if (output.length <= MAX_OUTPUT_LENGTH) {
@@ -452,7 +453,7 @@ export class HttpHookRunner {
       output.suppressOutput = json['suppressOutput'];
     }
     if ('systemMessage' in json && typeof json['systemMessage'] === 'string') {
-      // Apply output length limit per Qwen Code spec
+      // Apply output length limit per MariaDB Shell Agent spec
       output.systemMessage = this.truncateOutput(json['systemMessage']);
     }
     if ('decision' in json && typeof json['decision'] === 'string') {

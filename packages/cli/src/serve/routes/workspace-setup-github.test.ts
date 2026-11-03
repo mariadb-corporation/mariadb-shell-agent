@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -190,7 +191,7 @@ function setupResult() {
     gitRepoRoot: '/work',
     releaseTag: 'v1.2.3',
     readmeUrl:
-      'https://github.com/QwenLM/qwen-code-action/blob/v1.2.3/README.md#quick-start',
+      'https://github.invalid/QwenLM/qwen-code-action/blob/v1.2.3/README.md#quick-start',
     secretsUrl: 'https://github.com/owner/repo/settings/secrets/actions',
     workflows: [
       {

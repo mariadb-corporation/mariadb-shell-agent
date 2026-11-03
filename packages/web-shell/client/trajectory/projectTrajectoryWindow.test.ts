@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,7 +14,7 @@ import transcriptPage from './__fixtures__/transcript-page.json' with { type: 'j
 
 /**
  * One page of a real session, fetched from `GET /session/:id/transcript` on a
- * `qwen serve` daemon: a prompt, two model rounds, two tool calls and the
+ * `mariadb-shell-agent serve` daemon: a prompt, two model rounds, two tool calls and the
  * managed memory extractor's delegated round.
  */
 const REAL_PAGE = transcriptPage.events as unknown as DaemonEvent[];

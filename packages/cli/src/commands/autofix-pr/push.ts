@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -244,7 +245,7 @@ function pushLocked(
     trustAnchor(state),
     state.inPlace === true,
   );
-  // An in-place checkout holds the watch's own files under .qwen/tmp:
+  // An in-place checkout holds the watch's own files under .mariadb-shell-agent/tmp:
   // they are not the user's work.
   const dirty =
     state.inPlace === true

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -82,12 +83,12 @@ describe('conflictingStateFiles', () => {
   // consumer would take the events this watch needs, stop included.
   it('detects an existing gate cursor', () => {
     const root = makeRoot();
-    mkdirSync(join(root, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(root, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     const [gate] = ownedStateFiles(123);
-    writeFileSync(join(root, '.qwen', 'tmp', gate), '{}');
+    writeFileSync(join(root, '.mariadb-shell-agent', 'tmp', gate), '{}');
 
     expect(conflictingStateFiles(root, 123)).toEqual([
-      join(root, '.qwen', 'tmp', gate),
+      join(root, '.mariadb-shell-agent', 'tmp', gate),
     ]);
   });
 
@@ -95,20 +96,23 @@ describe('conflictingStateFiles', () => {
   // the head-move a verification watch would otherwise receive.
   it('detects a prepared autofix watch', () => {
     const root = makeRoot();
-    mkdirSync(join(root, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(root, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     const [, state] = ownedStateFiles(123);
-    writeFileSync(join(root, '.qwen', 'tmp', state), '{}');
+    writeFileSync(join(root, '.mariadb-shell-agent', 'tmp', state), '{}');
 
     expect(conflictingStateFiles(root, 123)).toEqual([
-      join(root, '.qwen', 'tmp', state),
+      join(root, '.mariadb-shell-agent', 'tmp', state),
     ]);
   });
 
   // Another PR's state must not block this one.
   it('ignores state for a different PR', () => {
     const root = makeRoot();
-    mkdirSync(join(root, '.qwen', 'tmp'), { recursive: true });
-    writeFileSync(join(root, '.qwen', 'tmp', ownedStateFiles(124)[0]), '{}');
+    mkdirSync(join(root, '.mariadb-shell-agent', 'tmp'), { recursive: true });
+    writeFileSync(
+      join(root, '.mariadb-shell-agent', 'tmp', ownedStateFiles(124)[0]),
+      '{}',
+    );
 
     expect(conflictingStateFiles(root, 123)).toEqual([]);
   });
@@ -157,7 +161,7 @@ describe('ownership claim', () => {
   // let a second install take over while the first watch may still be live.
   it('refuses to steal a claim it cannot parse', () => {
     const root = makeRoot();
-    mkdirSync(join(root, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(root, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     writeFileSync(ownershipPath(root, 123), 'not json');
 
     expect(claimOwnership(root, 123, 1_000_000).ok).toBe(false);

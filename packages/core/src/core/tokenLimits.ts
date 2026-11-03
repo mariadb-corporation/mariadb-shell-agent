@@ -137,6 +137,7 @@ const LIMITS = {
   '384k': 384_000, // vendor-declared decimal, DeepSeek V4 max output
   '400k': 400_000, // vendor-declared decimal, used by OpenAI GPT-5.x
   '512k': 524_288,
+  '922k': 922_000, // vendor-declared decimal, GPT-6.x input (1.05M total - 128K output)
   '1m': 1_000_000,
   // Output token limits (typically much smaller than input limits)
   '4k': 4_096,
@@ -247,6 +248,7 @@ const PATTERNS: Array<[RegExp, TokenCount]> = [
   // -------------------
   // OpenAI
   // -------------------
+  [/^gpt-6/, LIMITS['922k']], // GPT-6.x (Astra, Sol, Terra, Luna): 922K input
   [/^gpt-5/, LIMITS['272k']], // GPT-5.x: 272K input (400K total - 128K output)
   [/^gpt-/, LIMITS['128k']], // GPT fallback (4o, 4.1, etc.): 128K
   [/^o\d/, LIMITS['200k']], // o-series (o3, o4-mini, etc.): 200K
@@ -336,6 +338,7 @@ const OUTPUT_PATTERNS: Array<[RegExp, TokenCount]> = [
   [/^gemini-/, LIMITS['8k']], // Gemini fallback: 8K
 
   // OpenAI
+  [/^gpt-6/, LIMITS['128k']], // GPT-6.x: 128K
   [/^gpt-5/, LIMITS['128k']], // GPT-5.x: 128K
   [/^gpt-/, LIMITS['16k']], // GPT fallback: 16K
   [/^o\d/, LIMITS['128k']], // o-series: 128K

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -107,7 +108,7 @@ describe('useDaemonSkills', () => {
     mocks.actions.installWorkspaceSkill.mockResolvedValue({
       skillName: 'review',
       scope: 'workspace',
-      installedPath: '/work/a/.qwen/skills/review/SKILL.md',
+      installedPath: '/work/a/.mariadb-shell-agent/skills/review/SKILL.md',
     });
     mocks.actions.deleteWorkspaceSkill.mockResolvedValue({
       skillName: 'review',

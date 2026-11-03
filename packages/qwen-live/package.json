@@ -1,10 +1,10 @@
 {
   "name": "@qwen-code/qwen-live",
   "version": "0.1.0",
-  "description": "Standalone Live voice daemon: a realtime voice control plane that orchestrates Qwen Code sessions.",
+  "description": "Standalone Live voice daemon: a realtime voice control plane that orchestrates MariaDB Shell Agent sessions.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/QwenLM/qwen-code.git",
+    "url": "git+https://github.invalid/QwenLM/qwen-code.git",
     "directory": "packages/qwen-live"
   },
   "type": "module",
@@ -64,7 +64,7 @@
     "@types/prompts": "^2.4.9"
   },
   "bugs": {
-    "url": "https://github.com/QwenLM/qwen-code/issues"
+    "url": "https://github.invalid/QwenLM/qwen-code/issues"
   },
-  "homepage": "https://github.com/QwenLM/qwen-code/tree/main/packages/qwen-live#readme"
+  "homepage": "https://github.invalid/QwenLM/qwen-code/tree/main/packages/qwen-live#readme"
 }

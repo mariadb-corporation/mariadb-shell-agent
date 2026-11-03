@@ -4,8 +4,8 @@
 
 Status: proposed design; nothing in this document is implemented, and no domain it
 names is enabled for submission. This is the design for slice H4 of
-[#12827](https://github.com/QwenLM/qwen-code/issues/12827), stage H of the
-Managed Agent proposal [#12380](https://github.com/QwenLM/qwen-code/issues/12380).
+[#12827](https://github.invalid/QwenLM/qwen-code/issues/12827), stage H of the
+Managed Agent proposal [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380).
 It builds on the task contract of H0a
 ([design](2026-09-27-managed-agent-task-contract.md)), the record contract of
 H0b ([design](2026-09-27-managed-extension-record-contract.md)) and the

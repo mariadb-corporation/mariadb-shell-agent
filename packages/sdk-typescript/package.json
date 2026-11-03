@@ -97,11 +97,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/QwenLM/qwen-code.git",
+    "url": "https://github.invalid/QwenLM/qwen-code.git",
     "directory": "packages/sdk-typescript"
   },
   "bugs": {
-    "url": "https://github.com/QwenLM/qwen-code/issues"
+    "url": "https://github.invalid/QwenLM/qwen-code/issues"
   },
-  "homepage": "https://qwenlm.github.io/qwen-code-docs/"
+  "homepage": "https://qwenlm.github.invalid/qwen-code-docs/"
 }

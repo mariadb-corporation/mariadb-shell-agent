@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -33,7 +34,7 @@ export interface OperatorReviewSettings {
    * unvalidated here for the same reason as the two above.
    *
    * Read through THIS loader on purpose: it skips the workspace scope, so a
-   * repository cannot ship a `.qwen/settings.json` that switches off the
+   * repository cannot ship a `.mariadb-shell-agent/settings.json` that switches off the
    * containment which exists to contain that repository's own code.
    */
   sandbox?: string;
@@ -66,7 +67,7 @@ export interface OperatorReviewSettings {
 /**
  * The `review.*` policy settings resolved from operator-controlled scopes
  * only (system defaults → user → system). The workspace scope is excluded
- * because `.qwen/settings.json` is repository-controlled content that the
+ * because `.mariadb-shell-agent/settings.json` is repository-controlled content that the
  * review reads: a repository must not decide, for every reviewer who opens
  * it, whether findings publish (`comment`), whether the posted review names
  * its model (`attribution`), or how deeply the pipeline verifies (`effort`).

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 import { beforeEach, expect, it, vi } from 'vitest';
@@ -34,7 +35,7 @@ it.each(['error', 'cancelled'] as const)(
       request: {
         callId: 'same',
         name: 'write_file',
-        args: { file_path: '/workspace/QWEN.md' },
+        args: { file_path: '/workspace/MARIADB-SHELL-AGENT.md' },
         isClientInitiated: false,
         prompt_id: 'turn',
       },

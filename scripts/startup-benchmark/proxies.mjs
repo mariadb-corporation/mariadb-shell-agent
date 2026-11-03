@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +16,7 @@
 //     [--credentials shell|settings|dotenv]
 //
 // `--credentials settings|dotenv` moves the model key and URL from the shell
-// into the settings file or `~/.qwen/.env`. Linux only: it needs strace. See
+// into the settings file or `~/.mariadb-shell-agent/.env`. Linux only: it needs strace. See
 // docs/design/2026-09-25-startup-benchmark-harness.md.
 
 import { execFileSync } from 'node:child_process';
@@ -106,7 +107,7 @@ try {
           runId: run.runId,
         });
         if (r.exitCode !== 0) {
-          throw new Error(`qwen -p exited with ${r.exitCode}`);
+          throw new Error(`mariadb-shell-agent -p exited with ${r.exitCode}`);
         }
       }
       results[mode].push(parseStrace(fs.readFileSync(trace, 'utf8'), cutoff));

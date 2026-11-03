@@ -11,7 +11,7 @@ Slice B2c of #12737, the Stage B host integration for #12380, based on upstream
 [paired engine workspace runtime identity](./2026-09-26-paired-engine-workspace-runtime-identity.md)
 (the first part of B2b), and applies the quarantine recovery decision recorded
 in the #12737
-[Q2/Q3 reply](https://github.com/QwenLM/qwen-code/issues/12737#issuecomment-5846370487).
+[Q2/Q3 reply](https://github.invalid/QwenLM/qwen-code/issues/12737#issuecomment-5846370487).
 Acknowledged workspace-change delivery (the second part of B2b) and host wiring
 (B2d) remain separate slices. No ordinary host constructs a paired Bridge yet.
 The two follow-ups the #12795 review required before B2d, background

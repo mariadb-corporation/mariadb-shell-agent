@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 // @vitest-environment jsdom
@@ -141,7 +142,7 @@ describe('useAttentionNotifications', () => {
 
     expect(mockedSendNotification).toHaveBeenCalledTimes(1);
     expect(mockedSendNotification).toHaveBeenCalledWith(
-      expect.objectContaining({ title: 'Qwen Code' }),
+      expect.objectContaining({ title: 'MariaDB Shell Agent' }),
       mockTerminal,
       true,
     );
@@ -263,7 +264,7 @@ describe('useAttentionNotifications', () => {
     expect(mockedSendNotification).toHaveBeenCalledTimes(1);
     expect(mockedSendNotification).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: 'Qwen Code needs your permission to use Bash',
+        message: 'MariaDB Shell Agent needs your permission to use Bash',
       }),
       mockTerminal,
       true,
@@ -286,7 +287,7 @@ describe('useAttentionNotifications', () => {
 
     expect(mockedSendNotification).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: 'Qwen Code is waiting for your input',
+        message: 'MariaDB Shell Agent is waiting for your input',
       }),
       mockTerminal,
       true,
@@ -318,7 +319,7 @@ describe('useAttentionNotifications', () => {
 
     expect(mockedSendNotification).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: 'Qwen Code is waiting for your input',
+        message: 'MariaDB Shell Agent is waiting for your input',
       }),
       mockTerminal,
       true,
@@ -392,8 +393,8 @@ describe('useAttentionNotifications', () => {
       expect(mockedSendNotification).toHaveBeenCalledTimes(1);
       expect(mockedSendNotification).toHaveBeenCalledWith(
         {
-          message: 'Qwen Code is waiting for your input',
-          title: 'Qwen Code',
+          message: 'MariaDB Shell Agent is waiting for your input',
+          title: 'MariaDB Shell Agent',
         },
         mockTerminal,
         true,

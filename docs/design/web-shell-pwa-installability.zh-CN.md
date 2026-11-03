@@ -2,7 +2,7 @@
 
 [English](web-shell-pwa-installability.md) | [简体中文](web-shell-pwa-installability.zh-CN.md)
 
-状态：实现正在评审。遵循 [issue #11704](https://github.com/QwenLM/qwen-code/issues/11704) 中可选 PWA 方案的方向。
+状态：实现正在评审。遵循 [issue #11704](https://github.invalid/QwenLM/qwen-code/issues/11704) 中可选 PWA 方案的方向。
 
 ## 问题
 

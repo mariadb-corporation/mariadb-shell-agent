@@ -5,7 +5,7 @@
 状态：W1a 已有实现候选；W1b/W1c 仍为设计提案。`7c54aa78` 已有 Linux/MySQL 验收证据；birth-time 身份修复及 O2 整合需要重新验证。
 调研基线：`be1ebc74d7f5b0bdce2b88a6565d4940d5a6b3c0`，2026-09-29。
 实现整合基线：main `78143fe33`，2026-09-30；已包含初始 Workspace 文件 Turn、可审计运维恢复及 O2 远端 Shell 结果持久交付（#12894）、私有 Hosted MCP（#12946）、Runtime JSON 序列化（#13108）及持久权限 Actions（#13101）。
-属于 [proposal #12380](https://github.com/QwenLM/qwen-code/issues/12380)。
+属于 [proposal #12380](https://github.invalid/QwenLM/qwen-code/issues/12380)。
 目标契约为 [Workspace v1.12 第 2、3.5、5 节](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-workspace-context.en.md)。
 
 ## 1. 建议范围
@@ -20,16 +20,16 @@ W0 已持久保存 binding，并提供 Runtime 接管与回收。W1 补充的是
 
 下列路径和行号均对应调研基线。实现整合基线已包含初始 Workspace 文件 Turn 与可审计运维恢复。描述更早基线的设计文档不作为当前行为的证据。
 
-| 领域          | 现有行为                                                                                                                                         | W1 缺口                                                                                               |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
-| Binding       | `ManagedAgentStore.java:335,2226` 保存并重建七字段 `ContextBinding`，校验冻结的 config/policy descriptor。V7 要求 binding 全部存在或全部为空。   | 已绑定 Session 不需要猜测身份回填。无绑定 Session 不能安全地继承今天的默认 Workspace。                |
-| 授权          | `WorkspaceExecutionStore.java:30` 检查 Session 状态、精确的 Registry generation/storage/state、原创建 actor 的权限和固定 profile。               | 没有独立 trust epoch。W1 应复用实际授权检查，不能增加没有赋值来源的 `trusted` 开关。                  |
-| 挂载          | `WorkspaceRuntimeResolver.java:38–81` 解析管理员配置的 tenant/storage root，拒绝别名和重叠，并比较规范路径与 `fileKey`。                         | `fileKey` 只在内存中。重启会建立新基线，当前没有持久挂载连续性回执。                                  |
-| 存储所有权    | `WorkspaceExecutionStore.java:92–135,166–228` 按 tenant/storage 串行执行；正常释放或 W0e 停止证据确认后，条件清理精确 holder。                   | 这不是文件清单，也不是跨新旧 placement 的迁移围栏。                                                   |
-| Runtime 身份  | `RuntimeScope.java:66–71`、`JdbcRepositorySupport.java:32–50` 和 `LocalRuntimeStore.java:365–379` 的身份或哈希包含物理 cwd。                     | root 迁移必须建立新 placement；原地修改旧 Runtime 行会使其证据失效。                                  |
-| Hosted 冷加载 | `hosted-harness-session.ts:302–305,353–356` 把 Harness cwd 写进 `managed-root`；存在未结算输入或恢复 bundle 非 OK 时拒绝加载。                   | Harness cwd 不是远程 Workspace 身份。执行中的 Turn 续跑仍属于 Stage G。                               |
-| 文件历史      | `hosted-workspace-tool-turn.ts:67,78` 明确不提供 undo 备份，worker 也关闭文件 checkpoint。其他 Managed 路径能够记录 `file_history`。             | `file_history` 记录只是元数据，不包含全部备份字节；备份可能在 Workspace 外的 Session 文件历史目录中。 |
-| 公开路径      | 调研基线的 main 仍对 Workspace 执行设门禁；[G0 #12955](https://github.com/QwenLM/qwen-code/pull/12955) 当时尚未合并，且仅开放初始文件工具 Turn。 | 可以先开发 W1 内部能力；公开恢复与后续 Turn 验收需要另行接通产品路由。                                |
+| 领域          | 现有行为                                                                                                                                             | W1 缺口                                                                                               |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Binding       | `ManagedAgentStore.java:335,2226` 保存并重建七字段 `ContextBinding`，校验冻结的 config/policy descriptor。V7 要求 binding 全部存在或全部为空。       | 已绑定 Session 不需要猜测身份回填。无绑定 Session 不能安全地继承今天的默认 Workspace。                |
+| 授权          | `WorkspaceExecutionStore.java:30` 检查 Session 状态、精确的 Registry generation/storage/state、原创建 actor 的权限和固定 profile。                   | 没有独立 trust epoch。W1 应复用实际授权检查，不能增加没有赋值来源的 `trusted` 开关。                  |
+| 挂载          | `WorkspaceRuntimeResolver.java:38–81` 解析管理员配置的 tenant/storage root，拒绝别名和重叠，并比较规范路径与 `fileKey`。                             | `fileKey` 只在内存中。重启会建立新基线，当前没有持久挂载连续性回执。                                  |
+| 存储所有权    | `WorkspaceExecutionStore.java:92–135,166–228` 按 tenant/storage 串行执行；正常释放或 W0e 停止证据确认后，条件清理精确 holder。                       | 这不是文件清单，也不是跨新旧 placement 的迁移围栏。                                                   |
+| Runtime 身份  | `RuntimeScope.java:66–71`、`JdbcRepositorySupport.java:32–50` 和 `LocalRuntimeStore.java:365–379` 的身份或哈希包含物理 cwd。                         | root 迁移必须建立新 placement；原地修改旧 Runtime 行会使其证据失效。                                  |
+| Hosted 冷加载 | `hosted-harness-session.ts:302–305,353–356` 把 Harness cwd 写进 `managed-root`；存在未结算输入或恢复 bundle 非 OK 时拒绝加载。                       | Harness cwd 不是远程 Workspace 身份。执行中的 Turn 续跑仍属于 Stage G。                               |
+| 文件历史      | `hosted-workspace-tool-turn.ts:67,78` 明确不提供 undo 备份，worker 也关闭文件 checkpoint。其他 Managed 路径能够记录 `file_history`。                 | `file_history` 记录只是元数据，不包含全部备份字节；备份可能在 Workspace 外的 Session 文件历史目录中。 |
+| 公开路径      | 调研基线的 main 仍对 Workspace 执行设门禁；[G0 #12955](https://github.invalid/QwenLM/qwen-code/pull/12955) 当时尚未合并，且仅开放初始文件工具 Turn。 | 可以先开发 W1 内部能力；公开恢复与后续 Turn 验收需要另行接通产品路由。                                |
 
 上述 Java 路径位于 `packages/managed-agent-server/src/main/java/com/alibaba/qwen/code/managedagent/` 或 `packages/managed-agent-server/src/main/java/com/alibaba/qwen/code/runtimebroker/`。TypeScript Hosted 路径位于 `packages/cli/src/serve/`。
 
@@ -52,7 +52,7 @@ W0 已持久保存 binding，并提供 Runtime 接管与回收。W1 补充的是
 | **W1b：回填与快照校验** | 从 authority 记录有界重建恢复元数据，版本化恢复 manifest，以及外部 snapshot/restore 回执校验。 | 依赖 W1a、可信快照来源及私有资源闭包。仅当所选 profile 的已接纳结果使用 O2 时依赖它。不构建通用备份引擎。                                                               |
 | **W1c：可验证迁移**     | 同一逻辑存储在同主机上的离线迁移、持久迁移回执与新 Runtime 安装。                              | 依赖 W1a/W1b、全部旧写入者已停止的证据，以及所有受影响 Session/profile 都支持迁移的清单。首版仅支持使用相对路径的 Hosted 文件工具 Session。                             |
 
-W1b/W1c 不代表 G1/G3 完成。调研时仍 open 的[运维恢复 #12977](https://github.com/QwenLM/qwen-code/pull/12977)在证明后释放旧 holder，但保留失败 Turn 的阻塞状态。W1 应复用该边界，不另造强制解锁路径。
+W1b/W1c 不代表 G1/G3 完成。调研时仍 open 的[运维恢复 #12977](https://github.invalid/QwenLM/qwen-code/pull/12977)在证明后释放旧 holder，但保留失败 Turn 的阻塞状态。W1 应复用该边界，不另造强制解锁路径。
 
 ## 5. W1a：持久存储登记
 
@@ -195,7 +195,7 @@ V25 接在 main 的 O2 migrations V20–V22、MCP V23 及 Actions V24 之后，�
 
 ## 10. 验证与验收
 
-详细工作计划位于 `.qwen/e2e-tests/managed-workspace-w1-recovery.md`（被忽略的开发产物）。随本设计提交的验收要求如下：
+详细工作计划位于 `.mariadb-shell-agent/e2e-tests/managed-workspace-w1-recovery.md`（被忽略的开发产物）。随本设计提交的验收要求如下：
 
 | 门禁               | 必须观察到的结果                                                                                                                                                                                                                                                                                                                                     |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -228,6 +228,6 @@ W1a 的可信 Linux/原位置、仅内部、进程重启、离线登记和严格
 
 此前本地验证已通过定向 Java、Hosted、projection/sink 测试，以及 build、typecheck、bundle、ESLint 和 Java Checkstyle，覆盖登记/重试/fence、缓存新工作授权、passive attachment、固定 cut 校验、重命名后的文件/Shell Session 历史及保留资源缺失。打包 macOS/H2 E2E 覆盖 stderr seal 修复、Harness 重启、下一 Turn、100 MiB Shell 输出和七个 Shell producer 退出；该环境关闭物理 guard，单独不构成 Linux 验收。
 
-[维护者针对 `7c54aa78` 的真实环境报告](https://github.com/QwenLM/qwen-code/pull/13088#issuecomment-5910509307)提供了 Linux/ext4 与 MySQL 8.4 证据，包括进程重启、专用主机重启/断电检查、两个真实 Broker JVM/worker、两种 claim/fence 顺序、派发前 fence 拒绝，以及旧 release/LOST cleanup 保持完整 storage 行不变。该精确 head 的选择集通过 209 个单元测试、15 个 Hosted 集成测试和 44 个故障门禁；只移除锁内 claim 校验的反向检查连续失败两次。这些结果证明该 head，不能代替更新候选的验证。
+[维护者针对 `7c54aa78` 的真实环境报告](https://github.invalid/QwenLM/qwen-code/pull/13088#issuecomment-5910509307)提供了 Linux/ext4 与 MySQL 8.4 证据，包括进程重启、专用主机重启/断电检查、两个真实 Broker JVM/worker、两种 claim/fence 顺序、派发前 fence 拒绝，以及旧 release/LOST cleanup 保持完整 storage 行不变。该精确 head 的选择集通过 209 个单元测试、15 个 Hosted 集成测试和 44 个故障门禁；只移除锁内 claim 校验的反向检查连续失败两次。这些结果证明该 head，不能代替更新候选的验证。
 
 同一报告复现了删除目录后从备份恢复并复用 inode，以及普通 Git 清理导致 marker 丢失，分别促成本轮 birth time 和 storage 布局要求。V25/marker v2 及 O2 整合后的 load 路径仍需新的定向测试、Linux/MySQL 门禁及精确 head 验证，尤其要重跑实际 inode 复用拒绝、远端输出闭包失败时零新模型/prepare/execute，以及原回执的成功恢复。公开 Workspace 恢复/后续 Turn 准入保持独立；被忽略的测试计划记录剩余门禁。

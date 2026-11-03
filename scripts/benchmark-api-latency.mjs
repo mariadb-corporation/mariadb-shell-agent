@@ -35,7 +35,7 @@ const DEFAULT_ENDPOINTS = [
   { url: 'https://api.openai.com', label: 'OpenAI' },
   { url: 'https://api.anthropic.com', label: 'Anthropic' },
   {
-    url: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    url: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
     label: 'DashScope (openai-compatible)',
   },
 ];
@@ -140,7 +140,7 @@ async function benchmarkEndpoint({ url, label }) {
 
 // ---------------------------------------------------------------------------
 
-console.log('=== Qwen Code API Preconnect Latency Benchmark ===');
+console.log('=== MariaDB Shell Agent API Preconnect Latency Benchmark ===');
 console.log(`Iterations per endpoint : ${ITERATIONS}`);
 console.log(`Request timeout         : ${REQUEST_TIMEOUT_MS}ms`);
 console.log('\nRunning...');

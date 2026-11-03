@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Reproduction for https://github.com/QwenLM/qwen-code/issues/13328
+// Reproduction for https://github.invalid/QwenLM/qwen-code/issues/13328
 // Two Workspace-bound Sessions share one mount (one Runtime execution lease).
 // The first Session's Turn acquires the lease; the second Session's Turn is
 // admitted (HTTP 202) but its acquisition is refused by the Runtime Broker

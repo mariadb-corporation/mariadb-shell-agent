@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -582,7 +583,7 @@ describe('verdict line shape', () => {
 // body a local round posts. All three PR #15984 rounds shipped without it.
 describe('comment.md footer', () => {
   const footer =
-    '_— test-model via Qwen Code /verify-pr (v0.1.2; skill 0123456789ab)_';
+    '_— test-model via MariaDB Shell Agent /verify-pr (v0.1.2; skill 0123456789ab)_';
   const body = `merge-ready · 4 passed · 0 failed · 4 total · ${HEAD}\n`;
 
   it('accepts a body ending in the resolved footer', () => {
@@ -626,9 +627,9 @@ describe('comment.md footer', () => {
 
   it('warns on a malformed footer', () => {
     for (const bad of [
-      '_— test-model via Qwen Code /verify-pr (v0.1.2; skill xyz)_',
-      '_— test-model via Qwen Code /verify-pr (0.1.2; skill 0123456789ab)_',
-      '— test-model via Qwen Code /verify-pr (v0.1.2; skill 0123456789ab)',
+      '_— test-model via MariaDB Shell Agent /verify-pr (v0.1.2; skill xyz)_',
+      '_— test-model via MariaDB Shell Agent /verify-pr (0.1.2; skill 0123456789ab)_',
+      '— test-model via MariaDB Shell Agent /verify-pr (v0.1.2; skill 0123456789ab)',
     ]) {
       const result = check({ comment: `${body}\n${bad}\n` });
       expect(result.warnings.join('\n')).toMatch(
@@ -697,7 +698,7 @@ describe.skipIf(process.platform === 'win32')('check (CLI)', () => {
   it('accepts a CRLF comment.md with a valid footer end to end', () => {
     const dir = makeArtifactDir(
       validFiles({
-        comment: `merge-ready · ${HEAD}\r\n\r\n_— test-model via Qwen Code /verify-pr (v0.26.4; skill 0123456789ab)_\r\n`,
+        comment: `merge-ready · ${HEAD}\r\n\r\n_— test-model via MariaDB Shell Agent /verify-pr (v0.26.4; skill 0123456789ab)_\r\n`,
       }),
       ['01-ab-cells.png'],
     );

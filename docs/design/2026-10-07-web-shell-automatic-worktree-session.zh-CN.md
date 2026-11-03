@@ -44,7 +44,7 @@
 - 发送前重置 Worktree 草稿后，创建普通会话。
 - 现有分支选择、默认模式和非 Git 工作区可用性测试通过。
 - 运行相关单元测试和浏览器测试，以及 build、typecheck、bundle。
-  在 `.qwen/e2e-tests/` 记录基线和验证结果。
+  在 `.mariadb-shell-agent/e2e-tests/` 记录基线和验证结果。
 
 ## 风险与开放问题
 

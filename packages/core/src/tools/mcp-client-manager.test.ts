@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1060,7 +1061,7 @@ describe('McpClientManager', () => {
   });
 
   it('unrefs health-check timers so they never hold the event loop open (issue #9944)', async () => {
-    // `qwen mcp reconnect` (and other short-lived Config consumers) call
+    // `mariadb-shell-agent mcp reconnect` (and other short-lived Config consumers) call
     // `config.shutdown()` mid incremental pass; that pass's `finally`
     // re-arms health checks AFTER `stop()` cleared them. Ref'd intervals
     // hung the process forever: health monitoring is background

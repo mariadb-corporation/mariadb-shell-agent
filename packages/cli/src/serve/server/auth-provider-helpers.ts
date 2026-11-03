@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -75,7 +76,33 @@ function buildAuthProviderDescriptor(
 export function buildAuthProviderCatalog(
   workspaceCwd: string,
 ): ServeAuthProviderCatalog {
-  const providers = ALL_PROVIDERS.map(buildAuthProviderDescriptor);
+  const providers = ALL_PROVIDERS.filter((p) =>
+    [
+      'openrouter',
+      'requesty',
+      'openai',
+      'grok',
+      'custom-openai-compatible',
+    ].includes(p.id),
+  )
+    .sort(
+      (a, b) =>
+        [
+          'openrouter',
+          'requesty',
+          'openai',
+          'grok',
+          'custom-openai-compatible',
+        ].indexOf(a.id) -
+        [
+          'openrouter',
+          'requesty',
+          'openai',
+          'grok',
+          'custom-openai-compatible',
+        ].indexOf(b.id),
+    )
+    .map(buildAuthProviderDescriptor);
   const providerIdsByGroup = (group: string) =>
     providers
       .filter((provider) => provider.uiGroup === group)
@@ -85,20 +112,6 @@ export function buildAuthProviderCatalog(
     workspaceCwd,
     providers,
     groups: [
-      {
-        id: 'qwencloud',
-        label: 'QwenCloud',
-        description:
-          'Official recommended setup: Token Plan or Standard API Key',
-        providerIds: providerIdsByGroup('qwencloud'),
-      },
-      {
-        id: 'alibaba',
-        label: 'Alibaba ModelStudio',
-        description:
-          'Official recommended setup: Coding Plan, Token Plan, or Standard API Key',
-        providerIds: providerIdsByGroup('alibaba'),
-      },
       {
         id: 'third-party',
         label: 'Third-party Providers',

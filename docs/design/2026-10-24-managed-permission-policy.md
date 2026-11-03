@@ -94,7 +94,7 @@ catalogs have no upgrade migration.
 
 ## Validation and acceptance
 
-The E2E plan is `.qwen/e2e-tests/managed-permission-policy.md`. First inspect the
+The E2E plan is `.mariadb-shell-agent/e2e-tests/managed-permission-policy.md`. First inspect the
 global CLI baseline in isolated state. Cover rule precedence, compound commands,
 MCP identity, malformed/oversized policies, classifier allow/block/unavailable,
 Plan and Hook asks, pending Action recovery, idempotency, authorization, stale

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2833,7 +2834,7 @@ export async function recoverHostedRuntimeTurn(input: {
         if (!input.leaseAlreadyHeld) {
           await broker.release().catch((releaseCause) => {
             writeStderrLineSafe(
-              `qwen serve: Hosted Harness recovery could not release the Runtime Session: ${String(releaseCause)}`,
+              `mariadb-shell-agent serve: Hosted Harness recovery could not release the Runtime Session: ${String(releaseCause)}`,
             );
           });
           acquiredRuntime = false;
@@ -2858,7 +2859,7 @@ export async function recoverHostedRuntimeTurn(input: {
       if (!input.leaseAlreadyHeld)
         await broker.release().catch((releaseCause) => {
           writeStderrLineSafe(
-            `qwen serve: Hosted Harness recovery could not release the Runtime Session: ${String(releaseCause)}`,
+            `mariadb-shell-agent serve: Hosted Harness recovery could not release the Runtime Session: ${String(releaseCause)}`,
           );
         });
       throw cause;
@@ -2876,7 +2877,7 @@ export async function recoverHostedRuntimeTurn(input: {
     if (acquiredRuntime && !passive && !input.leaseAlreadyHeld) {
       await broker.release().catch((releaseCause) => {
         writeStderrLineSafe(
-          `qwen serve: Hosted Harness recovery could not release the Runtime Session: ${String(releaseCause)}`,
+          `mariadb-shell-agent serve: Hosted Harness recovery could not release the Runtime Session: ${String(releaseCause)}`,
         );
       });
       acquiredRuntime = false;
@@ -2889,7 +2890,7 @@ export async function recoverHostedRuntimeTurn(input: {
     if (acquiredRuntime && !passive && !input.leaseAlreadyHeld) {
       await broker.release().catch((releaseCause) => {
         writeStderrLineSafe(
-          `qwen serve: Hosted Harness recovery could not release the Runtime Session: ${String(releaseCause)}`,
+          `mariadb-shell-agent serve: Hosted Harness recovery could not release the Runtime Session: ${String(releaseCause)}`,
         );
       });
     }

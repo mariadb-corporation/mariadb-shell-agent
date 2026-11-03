@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -234,7 +235,7 @@ describe('resolveBootstrapRoute', () => {
 
   it('keeps base help routing when -- sits in a base value slot', () => {
     // The pre-PR scan skipped the token after its hardcoded value flags
-    // unconditionally, even the `--` sentinel, so `qwen --model -- --help`
+    // unconditionally, even the `--` sentinel, so `mariadb-shell-agent --model -- --help`
     // printed top-level help (exit 0) instead of booting the agent with
     // the literal prompt `--help`. Derived-only flags keep the conditional
     // skip (pinned above: the --worktree sentinel shape demotes).
@@ -306,8 +307,8 @@ describe('resolveBootstrapRoute', () => {
   it("skips version tokens sitting in a value flag's value slot (base parity)", () => {
     // Base's hasFlag skipped the token after every value-taking flag
     // unconditionally, so a `-v`/`--version` in the value slot was never
-    // counted: `qwen -p -v -h` printed top-level help (exit 0) and
-    // `qwen --model -v` demoted to the full parser. An unconditional
+    // counted: `mariadb-shell-agent -p -v -h` printed top-level help (exit 0) and
+    // `mariadb-shell-agent --model -v` demoted to the full parser. An unconditional
     // version intercept flipped every VALUE_FLAGS x {-v,--version} x
     // {-h,--help} shape from help to version; the restored skip returns
     // them to parity.
@@ -952,20 +953,24 @@ describe('runCliEntry', () => {
     await runCliEntry(['--help']);
 
     const helpText = stdout.join('');
-    expect(helpText).toContain('Usage: qwen [options] [command]');
+    expect(helpText).toContain(
+      'Usage: mariadb-shell-agent [options] [command]',
+    );
     expect(helpText).toContain('\nCommands:');
     expect(helpText).toContain('\nOptions:');
     // The default command and its positional are part of the contract this
     // help output is supposed to state: `--prompt`'s own deprecation notice
     // points users at the positional prompt form, so it has to be listed.
     expect(helpText).toContain('\nPositionals:');
-    expect(helpText).toContain('qwen [query..]');
-    expect(helpText).toContain('Launch Qwen Code CLI');
+    expect(helpText).toContain('mariadb-shell-agent [query..]');
+    expect(helpText).toContain('Launch MariaDB Shell Agent CLI');
     expect(helpText).toContain('[default]');
     expect(helpText).toContain('Positional prompt.');
-    expect(helpText).toContain('Manage Qwen Code hooks');
+    expect(helpText).toContain('Manage MariaDB Shell Agent hooks');
     expect(helpText).toContain('Manage MCP servers');
-    expect(helpText).toContain('Run Qwen Code as a local HTTP daemon');
+    expect(helpText).toContain(
+      'Run MariaDB Shell Agent as a local HTTP daemon',
+    );
     expect(helpText).toContain('--model');
     expect(helpText).toContain('-p, --prompt');
     expect(helpText).toContain('--safe-mode');
@@ -1093,7 +1098,9 @@ describe('runCliEntry', () => {
   it('prints memory help to stdout and exits 0 when no subcommand is given', async () => {
     await runCliEntry(['memory']);
 
-    expect(stdout.join('')).toContain('Usage: qwen memory <command>');
+    expect(stdout.join('')).toContain(
+      'Usage: mariadb-shell-agent memory <command>',
+    );
     expect(stdout.join('')).toContain('qwen memory import codex');
     expect(stderr.join('')).toBe('');
     expect(process.exitCode).toBeUndefined();
@@ -1105,7 +1112,9 @@ describe('runCliEntry', () => {
   it('prints memory help for the -h alias without loading the full CLI', async () => {
     await runCliEntry(['memory', '-h']);
 
-    expect(stdout.join('')).toContain('Usage: qwen memory <command>');
+    expect(stdout.join('')).toContain(
+      'Usage: mariadb-shell-agent memory <command>',
+    );
     expect(stderr.join('')).toBe('');
     expect(process.exitCode).toBeUndefined();
     expect(mocks.memoryHandler).not.toHaveBeenCalled();
@@ -1125,7 +1134,9 @@ describe('runCliEntry', () => {
     await runCliEntry(['memory', '--json', 'import', 'codex']);
 
     expect(process.exitCode).toBe(1);
-    expect(stdout.join('')).not.toContain('Usage: qwen memory <command>');
+    expect(stdout.join('')).not.toContain(
+      'Usage: mariadb-shell-agent memory <command>',
+    );
     expect(stderr.join('')).toContain('Unknown command: codex');
     expect(mocks.memoryImportHandler).not.toHaveBeenCalled();
     expect(mocks.main).not.toHaveBeenCalled();
@@ -1249,7 +1260,7 @@ describe('runCliEntry', () => {
 
 describe('stampCliEntryEnv', () => {
   // Isolated because the CLI exports QWEN_CODE_CLI to every shell it spawns —
-  // a test run started from inside a qwen session inherits it.
+  // a test run started from inside a mariadb-shell-agent session inherits it.
   let originalCli: string | undefined;
   let tempDir: string;
 
@@ -1345,7 +1356,7 @@ describe('stampCliEntryEnv', () => {
   it('default derivation never throws and never stamps outside a built layout', () => {
     // Under vitest Vite rewrites new URL(…, import.meta.url) to a non-file
     // URL, and in dev runs the derived ../index.js is the unbuilt
-    // packages/cli/index.js. Both must keep the bare-`qwen` fallback — a
+    // packages/cli/index.js. Both must keep the bare-`mariadb-shell-agent` fallback — a
     // failed derivation taking the CLI down would be worse than the version
     // skew this stamp exists to fix.
     stampCliEntryEnv();
@@ -1369,7 +1380,7 @@ describe('bootstrap import boundaries', () => {
     // cli.ts evaluates top-level-options.js in-process on every fast path,
     // so any runtime import it emits joins the bootstrap entry's static
     // closure. A value import from @qwen-code/qwen-code-core there was
-    // measured at +10 MB and ~6x slower `qwen --help`/`qwen mcp`; only
+    // measured at +10 MB and ~6x slower `mariadb-shell-agent --help`/`mariadb-shell-agent mcp`; only
     // erased `import type` statements are allowed in this module.
     const source = readFileSync('src/config/top-level-options.ts', 'utf8');
     for (const line of source.match(/^import .*$/gm) ?? []) {
@@ -1681,9 +1692,11 @@ describe('bootstrap import boundaries', () => {
       mkdirSync(launcherRoot, { recursive: true });
       const bootstrapStat = statSync(entryPath);
 
-      mkdirSync(path.join(tempDir, '.qwen'), { recursive: true });
+      mkdirSync(path.join(tempDir, '.mariadb-shell-agent'), {
+        recursive: true,
+      });
       writeFileSync(
-        path.join(tempDir, '.qwen', '.env'),
+        path.join(tempDir, '.mariadb-shell-agent', '.env'),
         '\uFEFFQWEN_HOME: ~\\custom\\qwen\n',
       );
       const childEnv: NodeJS.ProcessEnv = {
@@ -1734,7 +1747,7 @@ describe('bootstrap import boundaries', () => {
       ).toMatchObject({ build: 'base' });
 
       writeFileSync(
-        path.join(tempDir, '.qwen', '.env'),
+        path.join(tempDir, '.mariadb-shell-agent', '.env'),
         `QWEN_HOME:${qwenHome}\n`,
       );
       expect(
@@ -1746,7 +1759,7 @@ describe('bootstrap import boundaries', () => {
         ),
       ).toMatchObject({ build: 'base' });
       writeFileSync(
-        path.join(tempDir, '.qwen', '.env'),
+        path.join(tempDir, '.mariadb-shell-agent', '.env'),
         `QWEN_HOME:   \nOTHER=${qwenHome}\n`,
       );
       expect(
@@ -1758,7 +1771,7 @@ describe('bootstrap import boundaries', () => {
         ),
       ).toMatchObject({ build: 'base' });
       writeFileSync(
-        path.join(tempDir, '.qwen', '.env'),
+        path.join(tempDir, '.mariadb-shell-agent', '.env'),
         '\uFEFFQWEN_HOME: ~\\custom\\qwen\n',
       );
       const output = execFileSync(
@@ -1815,7 +1828,7 @@ describe('bootstrap import boundaries', () => {
       );
 
       const emptyHomeRoot = path.join(tempDir, 'empty-home');
-      const emptyQwenHome = path.join(emptyHomeRoot, '.qwen');
+      const emptyQwenHome = path.join(emptyHomeRoot, '.mariadb-shell-agent');
       mkdirSync(emptyQwenHome, { recursive: true });
       renameSync(
         path.join(qwenHome, 'updates'),

@@ -18,7 +18,7 @@ Implemented. The original header was verified against the live 千问AI平台 To
 }
 ```
 
-The original implementation attributed all Qwen Code traffic as `qwen-code`. CLI and Desktop traffic must now be distinguished by the runtime entry that owns the request.
+The original implementation attributed all MariaDB Shell Agent traffic as `qwen-code`. CLI and Desktop traffic must now be distinguished by the runtime entry that owns the request.
 
 ## Header value
 
@@ -29,20 +29,20 @@ The original implementation attributed all Qwen Code traffic as `qwen-code`. CLI
 | `tags.t1` | `qwen-code-desktop` for the Desktop runtime; `qwen-code-cli` otherwise                           |
 | `tags.t2` | `payg` on pay-as-you-go endpoints; omitted on Token Plan endpoints                               |
 
-The site is derived from the request's host. The approved requirement selects `inner-agents` for both sites, preserving the existing channels. Platform confirmation of Qwen Code's classification remains an open question; this refinement does not change those channel values.
+The site is derived from the request's host. The approved requirement selects `inner-agents` for both sites, preserving the existing channels. Platform confirmation of MariaDB Shell Agent's classification remains an open question; this refinement does not change those channel values.
 
 ## Scope
 
 The header is sent only when the request's host is exactly one of:
 
-| Host                               | `channel`                | `t2`    |
-| ---------------------------------- | ------------------------ | ------- |
-| `maas.qianwenaiapi.com`            | `qianwenai-inner-agents` | `payg`  |
-| `token-plan.maas.qianwenaiapi.com` | `qianwenai-inner-agents` | omitted |
-| `maas.qwencloudapi.com`            | `qwencloud-inner-agents` | `payg`  |
-| `token-plan.maas.qwencloudapi.com` | `qwencloud-inner-agents` | omitted |
+| Host                                   | `channel`                | `t2`    |
+| -------------------------------------- | ------------------------ | ------- |
+| `maas.qianwenaiapi.com`                | `qianwenai-inner-agents` | `payg`  |
+| `token-plan.maas.qianwenaiapi.com`     | `qianwenai-inner-agents` | omitted |
+| `maas.qwencloudapi.invalid`            | `qwencloud-inner-agents` | `payg`  |
+| `token-plan.maas.qwencloudapi.invalid` | `qwencloud-inner-agents` | omitted |
 
-All other endpoints, including the Bailian (`dashscope.aliyuncs.com`, `*.maas.aliyuncs.com`, Coding Plan) and Qwen OAuth endpoints, are unchanged. The decision depends only on the host; the API key is not inspected.
+All other endpoints, including the Bailian (`dashscope.aliyuncs.invalid`, `*.maas.aliyuncs.invalid`, Coding Plan) and Qwen OAuth endpoints, are unchanged. The decision depends only on the host; the API key is not inspected.
 
 Three request paths can reach these hosts in a default setup, and all three send the header:
 
@@ -52,7 +52,7 @@ Three request paths can reach these hosts in a default setup, and all three send
 
 ## Design decisions
 
-- **Exact host match.** The URL is parsed and the hostname compared exactly, so lookalike hosts (`maas.qwencloudapi.com.evil.example`) and path-embedded hosts do not match. Case and port are ignored. This is deliberately narrower than the two endpoint gates that consume the same list: `isDashScopeProvider` and the WebSearch endpoint check suffix-match `QWENCLOUD_MAAS_HOSTS`, so a MaaS subdomain that is not in the table above is served as DashScope and passes the search gate, but is not attributed. Admission only has to pick the right API dialect; attribution writes a `channel`/`t2` pair onto the platform's dashboard, so it stays on the four hosts listed above.
+- **Exact host match.** The URL is parsed and the hostname compared exactly, so lookalike hosts (`maas.qwencloudapi.invalid.evil.example`) and path-embedded hosts do not match. Case and port are ignored. This is deliberately narrower than the two endpoint gates that consume the same list: `isDashScopeProvider` and the WebSearch endpoint check suffix-match `QWENCLOUD_MAAS_HOSTS`, so a MaaS subdomain that is not in the table above is served as DashScope and passes the search gate, but is not attributed. Admission only has to pick the right API dialect; attribution writes a `channel`/`t2` pair onto the platform's dashboard, so it stays on the four hosts listed above.
 - **No `t2` on Token Plan (accepted temporary behavior).** Token Plan keys share the `sk-sp-` prefix across the Personal and Team editions, so the client cannot tell them apart. The guide states the platform can resolve the plan from the API key; omitting the field avoids misreporting.
 - **First-party value wins.** A `customHeaders` entry with the same name, in any casing, is removed, so the attribution can neither be overridden nor sent twice. There is deliberately no diagnostic for the removal: it is a documented policy with no switch, and the request still succeeds.
 - **Runtime identity.** All three callers pass the existing `Config.getChannel()` value. Only `desktop` maps to `qwen-code-desktop`; CLI, daemon, ACP, other integrations and an unset channel map to `qwen-code-cli`. Desktop launchers already establish the channel, including the Tauri marker resolved by the ACP channel fallback. Derived agent Configs inherit it, including nested agents and model overrides. No new environment detection or identity state is needed.
@@ -86,7 +86,7 @@ Any of these can call `withDashScopeSourceConfig` once they reach QwenCloud.
 
 ## Open questions
 
-- Whether Qwen Code is classified as an Alibaba-affiliated internal Agent (`inner-agents`) or an external ecosystem Agent (`outer-agents`). The guide asks each Agent team to confirm ownership before integration and does not list Qwen Code; the upstream tracking plan it cites may define the rule but was not accessible.
+- Whether MariaDB Shell Agent is classified as an Alibaba-affiliated internal Agent (`inner-agents`) or an external ecosystem Agent (`outer-agents`). The guide asks each Agent team to confirm ownership before integration and does not list MariaDB Shell Agent; the upstream tracking plan it cites may define the rule but was not accessible.
 - Whether `qwen-code-cli` and `qwen-code-desktop` must be registered in the platform's channel list before it is counted.
 - Whether omitting `t2` on Token Plan endpoints is acceptable to the platform.
 - Whether Batch submission headers propagate to the batch's model calls.

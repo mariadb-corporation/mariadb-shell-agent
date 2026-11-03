@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -330,7 +331,7 @@ describe('AnthropicContentGenerator', () => {
   };
   // Native identity: QwenCode UA, no `x-app`, apiKey auth, authToken null.
   const expectNativeIdentity = ({ opts, headers }: Built, key = 'test-key') => {
-    expect(headers['User-Agent']).toContain('QwenCode/1.2.3');
+    expect(headers['User-Agent']).toContain('MariaDBShellAgent/1.2.3');
     expect(headers['x-app']).toBeUndefined();
     expect(opts['apiKey']).toBe(key);
     expect(opts['authToken']).toBeNull();
@@ -433,7 +434,8 @@ describe('AnthropicContentGenerator', () => {
     });
 
     try {
-      const route = 'https://routify-pub.alibaba-inc.com/protocol/anthropic';
+      const route =
+        'https://routify-pub.alibaba-inc.invalid/protocol/anthropic';
       const { opts } = await construct(cfg({ baseUrl: route }));
       await (opts['fetch'] as typeof fetch)(`${route}/v1`);
       const headers = new Headers(runtimeFetch.mock.calls[0][1]?.headers);
@@ -1074,7 +1076,7 @@ describe('AnthropicContentGenerator', () => {
 
       // `base` targets api.anthropic.com, hence the native QwenCode UA.
       const defaults = defaultHeaders();
-      expect(defaults['User-Agent']).toContain('QwenCode/1.2.3');
+      expect(defaults['User-Agent']).toContain('MariaDBShellAgent/1.2.3');
       expect(defaults['X-Custom']).toBe('v1');
       expect(defaults['anthropic-beta']).toBeUndefined();
 
@@ -1708,7 +1710,7 @@ describe('AnthropicContentGenerator', () => {
       // signature, so we fill `signature: ''` instead of shipping a
       // `thinking` block with no `signature` field (HTTP 400). Unlike 4.6+
       // the block is NOT dropped, and unlike the native API it IS rewritten.
-      // https://github.com/QwenLM/qwen-code/issues/11772
+      // https://github.invalid/QwenLM/qwen-code/issues/11772
       const request = (
         await send(
           nativeCfg('claude-opus-4-5', {
@@ -1734,7 +1736,7 @@ describe('AnthropicContentGenerator', () => {
       // request carries no `thinking` parameter at all — yet they replay
       // history whose thinking blocks never got a signature. The fill must
       // repair those blocks independent of the outgoing `thinking` config.
-      // https://github.com/QwenLM/qwen-code/issues/11772
+      // https://github.invalid/QwenLM/qwen-code/issues/11772
       const request = (
         await send(
           nativeCfg('claude-opus-4-5', {
@@ -1763,7 +1765,7 @@ describe('AnthropicContentGenerator', () => {
       // does not run either (it requires the outgoing `thinking`) — so the
       // block ships exactly as it did before this PR: unsigned. The two
       // passes stay disjoint, so the 4.6+ wire shape never changes.
-      // https://github.com/QwenLM/qwen-code/issues/11772
+      // https://github.invalid/QwenLM/qwen-code/issues/11772
       const request = (
         await send(
           nativeCfg('claude-opus-4-6', {
@@ -1886,7 +1888,7 @@ describe('AnthropicContentGenerator', () => {
     });
   });
 
-  // https://github.com/QwenLM/qwen-code/issues/3786: in thinking mode,
+  // https://github.invalid/QwenLM/qwen-code/issues/3786: in thinking mode,
   // DeepSeek's anthropic API rejects a prior tool_use assistant turn without
   // a thinking block (plain-text turns are accepted unchanged).
   describe('DeepSeek anthropic-compatible provider', () => {

@@ -1,15 +1,19 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
 
-export const PROJECT_SKILLS_RELATIVE_DIR = path.join('.qwen', 'skills');
+export const PROJECT_SKILLS_RELATIVE_DIR = path.join(
+  '.mariadb-shell-agent',
+  'skills',
+);
 export const ARCHIVED_SKILLS_RELATIVE_DIR = path.join(
-  '.qwen',
+  '.mariadb-shell-agent',
   'archived-skills',
 );
 export const SKILL_FILE_NAME = 'SKILL.md';
@@ -22,11 +26,14 @@ export function getArchivedSkillsRoot(projectRoot: string): string {
   return path.join(projectRoot, ARCHIVED_SKILLS_RELATIVE_DIR);
 }
 
-export const PENDING_SKILLS_RELATIVE_DIR = path.join('.qwen', 'pending-skills');
+export const PENDING_SKILLS_RELATIVE_DIR = path.join(
+  '.mariadb-shell-agent',
+  'pending-skills',
+);
 
 /**
  * Staging root for auto-skills awaiting user confirmation. Deliberately a
- * SIBLING of `.qwen/skills/` so `loadSkillsFromDir` never discovers
+ * SIBLING of `.mariadb-shell-agent/skills/` so `loadSkillsFromDir` never discovers
  * unconfirmed skills (it scans the skills root only).
  */
 export function getPendingSkillsRoot(projectRoot: string): string {

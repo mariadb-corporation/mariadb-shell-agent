@@ -79,7 +79,7 @@ windows to a surviving work area without altering unrelated orb preference.
 
 ## Verification
 
-Independent baseline recorded in `.qwen/e2e-tests/subagents-baseline-2026-09-07.md`:
+Independent baseline recorded in `.mariadb-shell-agent/e2e-tests/subagents-baseline-2026-09-07.md`:
 stopping voice aborts backend subscriptions; a later completion stays queued
 until a new call; Proactive dispose clears tasks; Host has no subagent surface.
 Use fake backends/realtime and real loopback Host protocol, no user config or

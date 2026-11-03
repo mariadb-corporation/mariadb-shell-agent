@@ -6,14 +6,14 @@
 
 ## 范围
 
-为 `qwen daemon start --save-token` 启动的 daemon 增加可选的、仅 owner 可读的 bearer token sidecar，并提供 `qwen daemon token` 读取或删除。discovery record 与 daemon log 永不包含 token。
+为 `mariadb-shell-agent daemon start --save-token` 启动的 daemon 增加可选的、仅 owner 可读的 bearer token sidecar，并提供 `mariadb-shell-agent daemon token` 读取或删除。discovery record 与 daemon log 永不包含 token。
 
 ## 命令
 
 ```bash
-qwen daemon start --token <token> --save-token
-qwen daemon token [--port <port>] [--json]
-qwen daemon token --remove [--port <port>]
+mariadb-shell-agent daemon start --token <token> --save-token
+mariadb-shell-agent daemon token [--port <port>] [--json]
+mariadb-shell-agent daemon token --remove [--port <port>]
 ```
 
 ## 存储

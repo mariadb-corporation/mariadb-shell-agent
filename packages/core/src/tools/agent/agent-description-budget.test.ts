@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -41,7 +42,7 @@ const SUBAGENT_A: SubagentConfig = {
   description: 'Specialized agent for searching and analyzing files',
   systemPrompt: 'You are a file search specialist.',
   level: 'project',
-  filePath: '/project/.qwen/agents/file-search.md',
+  filePath: '/project/.mariadb-shell-agent/agents/file-search.md',
 };
 
 const SUBAGENT_B: SubagentConfig = {
@@ -49,7 +50,7 @@ const SUBAGENT_B: SubagentConfig = {
   description: 'Agent for reviewing code quality and best practices',
   systemPrompt: 'You are a code review specialist.',
   level: 'user',
-  filePath: '/home/user/.qwen/agents/code-review.md',
+  filePath: '/home/user/.mariadb-shell-agent/agents/code-review.md',
 };
 
 interface Shape {

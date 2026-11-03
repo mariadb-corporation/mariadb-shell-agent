@@ -242,4 +242,4 @@ observation, not the generic audit string.
   assertions (deferred; Q2's scope is the stale-claim fence).
 - Projection-rebuild cursor/resync semantics as a separate slice (out of scope here).
 
-[issue]: https://github.com/QwenLM/qwen-code/issues/14481
+[issue]: https://github.invalid/QwenLM/qwen-code/issues/14481

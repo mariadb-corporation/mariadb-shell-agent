@@ -18,7 +18,7 @@
 
 ## Explicit exclusions
 
-Do not modify Qwen Code core, CLI, ACP, TUI, Node REPL, tool registration, scheduler, permission manager, prompts, or Skills in this stage. Do not add a Qwen host bridge or model-delivery tracking. Those belong to Stage 3 (#9335).
+Do not modify MariaDB Shell Agent core, CLI, ACP, TUI, Node REPL, tool registration, scheduler, permission manager, prompts, or Skills in this stage. Do not add a Qwen host bridge or model-delivery tracking. Those belong to Stage 3 (#9335).
 
 ## Current checkpoint
 

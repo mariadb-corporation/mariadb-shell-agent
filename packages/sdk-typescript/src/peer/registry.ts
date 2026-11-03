@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,7 +13,7 @@
  * believed only when the process it names is still the one that wrote it
  * (see `identity.ts`). This module writes and removes this process's own
  * record and reads everyone's — and never deletes anyone else's. Clearing
- * out the records of sessions that died is left to Qwen Code sessions
+ * out the records of sessions that died is left to MariaDB Shell Agent sessions
  * themselves: a program that joins the directory has no business removing
  * what other processes wrote.
  */
@@ -76,8 +77,8 @@ export function isValidSessionKind(kind: string): boolean {
 
 /**
  * The Qwen home this process should use: `explicit`, else `QWEN_HOME`, else
- * `~/.qwen`. A leading `~` is expanded and a relative path is resolved
- * against the working directory, the way Qwen Code itself reads the
+ * `~/.mariadb-shell-agent`. A leading `~` is expanded and a relative path is resolved
+ * against the working directory, the way MariaDB Shell Agent itself reads the
  * variable — two programs that disagree on this never see each other.
  */
 export function resolveQwenHome(explicit?: string): string {
@@ -100,7 +101,9 @@ export function resolveQwenHome(explicit?: string): string {
     return path.resolve(resolved);
   }
   const home = os.homedir();
-  return home ? path.join(home, '.qwen') : path.join(os.tmpdir(), '.qwen');
+  return home
+    ? path.join(home, '.mariadb-shell-agent')
+    : path.join(os.tmpdir(), '.mariadb-shell-agent');
 }
 
 export function sessionRegistryDir(qwenHome: string): string {

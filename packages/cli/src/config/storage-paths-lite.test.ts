@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -265,7 +266,7 @@ describe('settings locations in a given environment', () => {
     // A first spelling without a value is not passed on at all.
     expect(
       getGlobalQwenDirLite({ QWEN_HOME: undefined, qwen_home: other }),
-    ).toBe(path.join(os.homedir(), '.qwen'));
+    ).toBe(path.join(os.homedir(), '.mariadb-shell-agent'));
   });
 
   it.each([
@@ -290,7 +291,7 @@ describe('settings locations in a given environment', () => {
     runOn('linux');
 
     expect(getGlobalQwenDirLite({ qwen_home: home })).toBe(
-      path.join(os.homedir(), '.qwen'),
+      path.join(os.homedir(), '.mariadb-shell-agent'),
     );
   });
 });

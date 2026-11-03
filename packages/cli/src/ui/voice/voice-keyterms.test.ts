@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -37,7 +38,7 @@ function makeSettings(
   return {
     isTrusted,
     workspace: {
-      path: path.join(workspaceDir, '.qwen', 'settings.json'),
+      path: path.join(workspaceDir, '.mariadb-shell-agent', 'settings.json'),
       settings: { general: workspaceVoiceSettings },
     },
     system: { settings: { general: systemVoiceSettings } },
@@ -67,7 +68,7 @@ describe('buildVoiceKeyterms', () => {
 
     beforeEach(() => {
       workspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'voice-keyterms-'));
-      qwenDir = path.join(workspaceDir, '.qwen');
+      qwenDir = path.join(workspaceDir, '.mariadb-shell-agent');
       fs.mkdirSync(qwenDir, { recursive: true });
     });
 
@@ -76,7 +77,7 @@ describe('buildVoiceKeyterms', () => {
       fs.rmSync(workspaceDir, { recursive: true, force: true });
     });
 
-    it('auto-loads .qwen/voice-keyterms.txt and merges with the globals', () => {
+    it('auto-loads .mariadb-shell-agent/voice-keyterms.txt and merges with the globals', () => {
       fs.writeFileSync(
         path.join(qwenDir, 'voice-keyterms.txt'),
         'Kubernetes\nGraphQL\n',
@@ -351,7 +352,7 @@ describe('buildVoiceKeyterms', () => {
       expect(terms).toContain('TypeScript'); // globals only
     });
 
-    it('does not load the default file through a symlinked .qwen directory', () => {
+    it('does not load the default file through a symlinked .mariadb-shell-agent directory', () => {
       const outsideDir = fs.mkdtempSync(
         path.join(os.tmpdir(), 'voice-keyterms-outside-'),
       );

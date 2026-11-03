@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,7 +12,7 @@ const TOKEN_PLAN_HOST_PREFIX = 'token-plan.';
 
 const SITE_CHANNELS: ReadonlyArray<readonly [host: string, channel: string]> = [
   ['maas.qianwenaiapi.com', 'qianwenai-inner-agents'],
-  ['maas.qwencloudapi.com', 'qwencloud-inner-agents'],
+  ['maas.qwencloudapi.invalid', 'qwencloud-inner-agents'],
 ];
 
 const SITE_CHANNEL_BY_HOST: ReadonlyMap<string, string> = new Map(

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -308,7 +309,10 @@ describe('setupGithub service', () => {
 
   it('updates gitignore idempotently', async () => {
     const gitignorePath = path.join(scratchDir, '.gitignore');
-    await fsp.writeFile(gitignorePath, '.qwen/\nnode_modules/\n');
+    await fsp.writeFile(
+      gitignorePath,
+      '.mariadb-shell-agent/\nnode_modules/\n',
+    );
 
     const first = await updateGitignore(scratchDir);
     const second = await updateGitignore(scratchDir);
@@ -316,7 +320,7 @@ describe('setupGithub service', () => {
     expect(first.status).toBe('updated');
     expect(second.status).toBe('unchanged');
     await expect(fsp.readFile(gitignorePath, 'utf8')).resolves.toBe(
-      '.qwen/\nnode_modules/\n\ngha-creds-*.json\n',
+      '.mariadb-shell-agent/\nnode_modules/\n\ngha-creds-*.json\n',
     );
   });
 

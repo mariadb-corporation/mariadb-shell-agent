@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Run-level budget enforcement for headless / non-interactive Qwen Code
+ * Run-level budget enforcement for headless / non-interactive MariaDB Shell Agent
  * sessions. See issue QwenLM/qwen-code#4103.
  *
  * Two budgets are enforced today:

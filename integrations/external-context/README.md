@@ -2,7 +2,7 @@
 
 For normal Mem0 use, configure `memory.mem0` in the main CLI's user settings instead. This private direct integration is the advanced, separately managed profile; it is not required for the bundled path and does not require a separate npm package release.
 
-This private Qwen Code integration connects one interactive CLI process to one
+This private MariaDB Shell Agent integration connects one interactive CLI process to one
 administrator-bound external context corpus without changing Qwen Core. It has
 three managed deployment variants:
 
@@ -62,7 +62,7 @@ inside that pinned process.
 
 The launcher must also construct an administrator-approved environment rather
 than inherit caller-controlled values. Qwen can subsequently load values from
-the repository's `.env` and `.qwen/.env` files, so the Direct Profile requires
+the repository's `.env` and `.mariadb-shell-agent/.env` files, so the Direct Profile requires
 the repository, those files, and same-UID code to be trusted. The source pin
 prevents same-name MCP configuration collisions; it is not a process sandbox.
 Use the governed profile when those inputs may be hostile or when credentials
@@ -104,7 +104,7 @@ confirmation; use the governed profile when that is required.
    `timeoutMs` defaults to 5000 and may be between 1 and 30000 milliseconds.
 3. Have the managed launcher set `QWEN_EXTERNAL_CONTEXT_CONFIG` to the absolute
    configuration path.
-4. From the Qwen Code checkout, install dependencies and build this workspace:
+4. From the MariaDB Shell Agent checkout, install dependencies and build this workspace:
 
    ```bash
    npm install
@@ -124,7 +124,7 @@ confirmation; use the governed profile when that is required.
    credential, change to the intended repository, and invoke:
 
    ```bash
-   qwen --mcp-config /administrator/path/external-context-mcp.json
+   mariadb-shell-agent --mcp-config /administrator/path/external-context-mcp.json
    ```
 
    The MCP subprocess honors `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY`
@@ -142,7 +142,7 @@ confirmation; use the governed profile when that is required.
    to switch repositories.
 
 For a local trusted trial, the built directory may instead be linked with
-`qwen extensions link`. The extension manifest contribution and
+`mariadb-shell-agent extensions link`. The extension manifest contribution and
 workspace-scoped enablement are convenience mechanisms only; they do not
 provide the managed MCP source binding described above. Before starting Qwen,
 the trial environment must set `QWEN_EXTERNAL_CONTEXT_CONFIG` to the absolute

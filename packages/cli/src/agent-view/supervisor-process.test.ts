@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -118,7 +119,7 @@ describe('Agent View supervisor process helpers', () => {
   it('computes a Windows named pipe path', () => {
     expect(
       getAgentViewSupervisorSocketPath({
-        globalDir: 'C:\\Users\\test\\.qwen',
+        globalDir: 'C:\\Users\\test\\.mariadb-shell-agent',
         platform: 'win32',
       }),
     ).toMatch(/^\\\\\.\\pipe\\qwen-agent-view-[a-f0-9]{12}$/);
@@ -578,10 +579,20 @@ describe('Agent View supervisor process helpers', () => {
     await writeAgentViewSessionState(
       {
         ...state,
-        activeCwd: path.join(globalDir, '.qwen', 'worktrees', 'topic'),
+        activeCwd: path.join(
+          globalDir,
+          '.mariadb-shell-agent',
+          'worktrees',
+          'topic',
+        ),
         worktree: {
           mode: 'worktree',
-          path: path.join(globalDir, '.qwen', 'worktrees', 'topic'),
+          path: path.join(
+            globalDir,
+            '.mariadb-shell-agent',
+            'worktrees',
+            'topic',
+          ),
           owner: 'user',
         },
       },
@@ -4035,7 +4046,7 @@ describe('Agent View supervisor process helpers', () => {
         ...state,
         worktree: {
           mode: 'worktree',
-          path: '/workspace/project/.qwen/worktrees/agent-1234567',
+          path: '/workspace/project/.mariadb-shell-agent/worktrees/agent-1234567',
           owner: 'agent-view',
         },
       },

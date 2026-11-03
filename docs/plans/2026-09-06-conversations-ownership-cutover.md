@@ -4,7 +4,7 @@ Date: 2026-09-06
 
 Design: [Relaxed Standalone Daemon Ownership](../design/2026-09-02-relaxed-standalone-daemon-ownership.md)
 
-Tracking: [#10810](https://github.com/QwenLM/qwen-code/issues/10810)
+Tracking: [#10810](https://github.invalid/QwenLM/qwen-code/issues/10810)
 
 Inspected checkout: `a6549509c63a779e911fd5c846684f2140aed3bb`.
 The mandatory writer fences are already merged as
@@ -60,7 +60,7 @@ state. Avoid unrelated owner-code cleanup or a new ownership mode.
 | Conversations task rehydration and keepalive                             | Restore bound tasks and transactionally bind unbound tasks                                 | Keep #10924's fences; verify losing restores do not fire tasks or create task-run results                                                                                     |
 
 The journal's private `conversations/` leaf and subtree remain `0700` on POSIX.
-An existing same-owner, non-symlink stable root such as a `0755` home `.qwen`
+An existing same-owner, non-symlink stable root such as a `0755` home `.mariadb-shell-agent`
 directory stays valid. Moving bootstrap must not chmod ancestors or require
 Live publication to have happened. Parent validation must also cover the
 `pendingClears` fast paths in journal read and clear operations. The existing
@@ -154,7 +154,7 @@ local-build test. Use a deterministic local provider if prompting is needed.
 | Upgrade and rollback           | All old writers drain before new startup; rollback handles active, sealed, claim, and extended-schema records explicitly                                                               |
 
 The detailed baseline and release verification plan lives at
-`.qwen/e2e-tests/2026-09-06-conversations-ownership-cutover.md`.
+`.mariadb-shell-agent/e2e-tests/2026-09-06-conversations-ownership-cutover.md`.
 
 For implementation, run root `npm run build`, `npm run typecheck`, and
 `npm run bundle`, focused Vitest suites from each changed package, and
@@ -206,7 +206,7 @@ cutover fixtures, so these runs do not certify universally clean shutdown.
 No fixture daemon or ACP process was left running.
 
 Detailed backend/browser evidence and retained fixture paths are recorded in
-`.qwen/e2e-tests/2026-09-06-conversations-ownership-cutover.md`.
+`.mariadb-shell-agent/e2e-tests/2026-09-06-conversations-ownership-cutover.md`.
 This ignored report is a working artifact; this section preserves its
 scope and limitations for the implementation review.
 

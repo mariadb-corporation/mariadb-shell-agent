@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -100,8 +101,8 @@ export class DiffManager {
    * `onDidChange` carries `ide/diffClosed` to IDE-mode MCP transports, which no
    * web-shell host is; a chat surface that opened the diff itself would
    * otherwise never learn the user closed it, and would keep waiting for a
-   * decision on an edit the user can no longer see (#10557). `qwen.diff.accept`
-   * and `qwen.diff.cancel` do not reach here for a request-bound diff — they
+   * decision on an edit the user can no longer see (#10557). `mariadb-shell-agent.diff.accept`
+   * and `mariadb-shell-agent.diff.cancel` do not reach here for a request-bound diff — they
    * route the vote through `respondToPendingPermission` instead — and
    * `closeDiffEditor` drops the entry before the tab closes, so a close the
    * chat surface asked for does not echo back as a dismissal.
@@ -319,7 +320,7 @@ export class DiffManager {
       this.recentlyShown.set(key, now);
       return;
     }
-    // Left side: old content using qwen-diff scheme
+    // Left side: old content using mariadb-shell-agent-diff scheme
     // Use Uri.file() to properly handle Windows paths (e.g., C:\Users\...)
     // then change the scheme to our custom diff scheme
     const leftDocUri = vscode.Uri.file(resolvedPath).with({
@@ -328,7 +329,7 @@ export class DiffManager {
     });
     this.diffContentProvider.setContent(leftDocUri, oldContent);
 
-    // Right side: new content using qwen-diff scheme
+    // Right side: new content using mariadb-shell-agent-diff scheme
     const rightDocUri = vscode.Uri.file(resolvedPath).with({
       scheme: DIFF_SCHEME,
       query: `new&rand=${Math.random()}`,
@@ -349,7 +350,7 @@ export class DiffManager {
     const diffTitle = `${path.basename(resolvedPath)} (Before ↔ After)`;
     await vscode.commands.executeCommand(
       'setContext',
-      'qwen.diff.isVisible',
+      'mariadb-shell-agent.diff.isVisible',
       true,
     );
 
@@ -541,7 +542,7 @@ export class DiffManager {
     }
     await vscode.commands.executeCommand(
       'setContext',
-      'qwen.diff.isVisible',
+      'mariadb-shell-agent.diff.isVisible',
       isVisible,
     );
   }
@@ -554,7 +555,7 @@ export class DiffManager {
     const diffInfo = this.diffDocuments.get(rightDocUri.toString());
     await vscode.commands.executeCommand(
       'setContext',
-      'qwen.diff.isVisible',
+      'mariadb-shell-agent.diff.isVisible',
       false,
     );
 
@@ -578,7 +579,7 @@ export class DiffManager {
     }
   }
 
-  /** Close all open qwen-diff editors */
+  /** Close all open mariadb-shell-agent-diff editors */
   async closeAll(): Promise<void> {
     // Collect keys first to avoid iterator invalidation while closing
     const uris = Array.from(this.diffDocuments.keys()).map((k) =>

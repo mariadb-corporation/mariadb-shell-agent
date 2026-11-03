@@ -1,14 +1,14 @@
-# Qwen Code Evaluation
+# MariaDB Shell Agent Evaluation
 
 [English](evaluation.md) | [简体中文](evaluation.zh-CN.md)
 
-This evaluation compares seven Qwen Code versions on SWE-bench Verified using
+This evaluation compares seven MariaDB Shell Agent versions on SWE-bench Verified using
 the same Qwen 3.7 Max model and configuration. Average scores range from
 **76.40% to 77.80%**, a spread of **1.40 percentage points**.
 
-## Scores by Qwen Code Version
+## Scores by MariaDB Shell Agent Version
 
-![Average SWE-bench Verified scores by Qwen Code version, ranging from 76.40% to 77.80%.](../.github/assets/qwen-code-avg-score-trend.svg)
+![Average SWE-bench Verified scores by MariaDB Shell Agent version, ranging from 76.40% to 77.80%.](../.github/assets/qwen-code-avg-score-trend.svg)
 
 | Version | Avg Score | Pass Rate | pass@3 | pass^3 |
 | ------- | --------: | --------: | -----: | -----: |
@@ -29,7 +29,7 @@ Pass Rate and pass@3 have identical values in these results.
 | Configuration           | Value                                                                                               |
 | ----------------------- | --------------------------------------------------------------------------------------------------- |
 | Dataset                 | `princeton-nlp/SWE-bench_Verified`, 500 cases                                                       |
-| Runs                    | 3 trials per version, 1,500 jobs per version; 7 Qwen Code versions                                  |
+| Runs                    | 3 trials per version, 1,500 jobs per version; 7 MariaDB Shell Agent versions                        |
 | Model                   | `Qwen 3.7 Max`                                                                                      |
 | Sampling                | `temperature=1`, `top_p=0.95`                                                                       |
 | Thinking / Reasoning    | `interleaved_thinking=true`, `thinking_type=adaptive`, `reasoning_effort=high`                      |

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 // @vitest-environment jsdom
@@ -485,7 +486,10 @@ describe('useLlmStream', () => {
   const mockLoadedSettings: LoadedSettings = {
     merged: { preferredEditor: 'vscode' },
     user: { path: '/user/settings.json', settings: {} },
-    workspace: { path: '/workspace/.qwen/settings.json', settings: {} },
+    workspace: {
+      path: '/workspace/.mariadb-shell-agent/settings.json',
+      settings: {},
+    },
     errors: [],
     forScope: vi.fn(),
     setValue: vi.fn(),
@@ -17641,7 +17645,9 @@ describe('useLlmStream', () => {
         request: {
           callId: 'write-memory-call-1',
           name: 'write_file',
-          args: { file_path: '/workspace/.qwen/memory/project.md' },
+          args: {
+            file_path: '/workspace/.mariadb-shell-agent/memory/project.md',
+          },
           isClientInitiated: false,
           prompt_id: 'prompt-id-memory-write',
         },
@@ -17709,7 +17715,9 @@ describe('useLlmStream', () => {
         [
           {
             toolName: 'write_file',
-            args: { file_path: '/workspace/.qwen/memory/project.md' },
+            args: {
+              file_path: '/workspace/.mariadb-shell-agent/memory/project.md',
+            },
             status: 'success',
           },
         ],
@@ -17818,7 +17826,9 @@ describe('useLlmStream', () => {
         expect(mockSendMessageStream).toHaveBeenCalledTimes(2);
       });
       await completeToolWrite(
-        createCompletedFileWrite({ filePath: '/test/dir/QWEN.md' }),
+        createCompletedFileWrite({
+          filePath: '/test/dir/MARIADB-SHELL-AGENT.md',
+        }),
       );
 
       expect(mockRefreshMemoryInstruction).toHaveBeenCalledWith(mockConfig, {
@@ -17826,9 +17836,11 @@ describe('useLlmStream', () => {
       });
     }
 
-    it('refreshes context-file instructions after bare remember writes QWEN.md', async () => {
+    it('refreshes context-file instructions after bare remember writes MARIADB-SHELL-AGENT.md', async () => {
       await submitSlashCommandAndCompleteTool(
-        createCompletedFileWrite({ filePath: '/test/dir/QWEN.md' }),
+        createCompletedFileWrite({
+          filePath: '/test/dir/MARIADB-SHELL-AGENT.md',
+        }),
         true,
       );
 
@@ -17843,7 +17855,7 @@ describe('useLlmStream', () => {
       await completeToolWrite(
         createCompletedFileWrite({
           callId: 'write-context-call-1',
-          filePath: '/test/dir/QWEN.md',
+          filePath: '/test/dir/MARIADB-SHELL-AGENT.md',
         }),
       );
       await waitFor(() => {
@@ -17852,18 +17864,18 @@ describe('useLlmStream', () => {
       await completeToolWrite(
         createCompletedFileWrite({
           callId: 'write-context-call-2',
-          filePath: '/test/dir/QWEN.md',
+          filePath: '/test/dir/MARIADB-SHELL-AGENT.md',
         }),
       );
 
       expect(mockRefreshMemoryInstruction).toHaveBeenCalledTimes(2);
     });
 
-    it('refreshes context-file instructions after bare remember edits QWEN.md', async () => {
+    it('refreshes context-file instructions after bare remember edits MARIADB-SHELL-AGENT.md', async () => {
       await submitSlashCommandAndCompleteTool(
         createCompletedFileWrite({
           toolName: 'edit',
-          filePath: '/test/dir/QWEN.md',
+          filePath: '/test/dir/MARIADB-SHELL-AGENT.md',
         }),
         true,
       );
@@ -17873,10 +17885,10 @@ describe('useLlmStream', () => {
       });
     });
 
-    it('does not refresh context-file instructions for failed QWEN.md writes', async () => {
+    it('does not refresh context-file instructions for failed MARIADB-SHELL-AGENT.md writes', async () => {
       await submitSlashCommandAndCompleteTool(
         createCompletedFileWrite({
-          filePath: '/test/dir/QWEN.md',
+          filePath: '/test/dir/MARIADB-SHELL-AGENT.md',
           status: 'error',
         }),
         true,
@@ -17894,9 +17906,11 @@ describe('useLlmStream', () => {
       expect(mockRefreshMemoryInstruction).not.toHaveBeenCalled();
     });
 
-    it('does not refresh context-file instructions for ordinary QWEN.md writes', async () => {
+    it('does not refresh context-file instructions for ordinary MARIADB-SHELL-AGENT.md writes', async () => {
       await submitSlashCommandAndCompleteTool(
-        createCompletedFileWrite({ filePath: '/test/dir/QWEN.md' }),
+        createCompletedFileWrite({
+          filePath: '/test/dir/MARIADB-SHELL-AGENT.md',
+        }),
         false,
       );
 
@@ -17916,7 +17930,7 @@ describe('useLlmStream', () => {
       await completeToolWrite(
         createCompletedFileWrite({
           callId: 'ordinary-write-context-call',
-          filePath: '/test/dir/QWEN.md',
+          filePath: '/test/dir/MARIADB-SHELL-AGENT.md',
         }),
       );
 
@@ -17993,7 +18007,9 @@ describe('useLlmStream', () => {
         request: {
           callId: 'write-memory-call-1',
           name: 'write_file',
-          args: { file_path: '/workspace/.qwen/memory/project.md' },
+          args: {
+            file_path: '/workspace/.mariadb-shell-agent/memory/project.md',
+          },
           isClientInitiated: false,
           prompt_id: 'prompt-id-memory-write',
         },
@@ -18066,7 +18082,9 @@ describe('useLlmStream', () => {
           },
           {
             toolName: 'write_file',
-            args: { file_path: '/workspace/.qwen/memory/project.md' },
+            args: {
+              file_path: '/workspace/.mariadb-shell-agent/memory/project.md',
+            },
             status: 'success',
           },
         ],

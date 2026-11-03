@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -720,7 +721,7 @@ function parsePermissionResponse(
       // dropped — but log it, otherwise a client whose answers silently
       // vanished (agent sees none) has no server-side signal to chase.
       writeStderrLine(
-        'qwen serve: /acp session/permission dropping invalid `answers` (expected an object map of string values)',
+        'mariadb-shell-agent serve: /acp session/permission dropping invalid `answers` (expected an object map of string values)',
       );
     }
   }
@@ -1387,7 +1388,7 @@ export class AcpDispatcher {
       : runtime.bridge.killSession(sessionId, { requireZeroAttaches: true });
     return cleanup.catch((err) => {
       writeStderrLine(
-        `qwen serve: /acp orphan killSession(${logSafe(sessionId)}) failed: ${logSafe(errMsg(err))}`,
+        `mariadb-shell-agent serve: /acp orphan killSession(${logSafe(sessionId)}) failed: ${logSafe(errMsg(err))}`,
       );
       return undefined;
     });
@@ -1646,7 +1647,7 @@ export class AcpDispatcher {
       return this.filterConfigOptions(ctx?.state?.configOptions);
     } catch (err) {
       writeStderrLine(
-        `qwen serve: /acp configOptionsFor(${logSafe(sessionId)}) failed: ${logSafe(errMsg(err))}`,
+        `mariadb-shell-agent serve: /acp configOptionsFor(${logSafe(sessionId)}) failed: ${logSafe(errMsg(err))}`,
       );
       return undefined;
     }
@@ -1749,7 +1750,7 @@ export class AcpDispatcher {
       const msg = errMsg(err);
       if (/not found|unknown session/i.test(msg)) return true;
       writeStderrLine(
-        `qwen serve: /acp cancelAbandonedPermission(${logSafe(req.sessionId)}) failed: ${logSafe(msg)}`,
+        `mariadb-shell-agent serve: /acp cancelAbandonedPermission(${logSafe(req.sessionId)}) failed: ${logSafe(msg)}`,
       );
       return false;
     }
@@ -1822,7 +1823,7 @@ export class AcpDispatcher {
       // Notification (no id) for an unowned session: no wire response to
       // send, so log it — otherwise "my cancel did nothing" is undebuggable.
       writeStderrLine(
-        `qwen serve: /acp notification for unowned session ${logSafe(sessionId)} (dropped)`,
+        `mariadb-shell-agent serve: /acp notification for unowned session ${logSafe(sessionId)} (dropped)`,
       );
       return false;
     }
@@ -1923,7 +1924,7 @@ export class AcpDispatcher {
         this.resolveClientResponse(conn, msg, loopback);
       } catch (err) {
         writeStderrLine(
-          `qwen serve: /acp response handling error: ${logSafe(errMsg(err))}`,
+          `mariadb-shell-agent serve: /acp response handling error: ${logSafe(errMsg(err))}`,
         );
       }
       return;
@@ -2016,7 +2017,7 @@ export class AcpDispatcher {
         case 'session/new': {
           if (id === undefined) {
             writeStderrLine(
-              'qwen serve: /acp session/new notification rejected',
+              'mariadb-shell-agent serve: /acp session/new notification rejected',
             );
             return;
           }
@@ -2163,7 +2164,7 @@ export class AcpDispatcher {
                     // otherwise a permanently occupied id has no
                     // diagnostic at all.
                     writeStderrLine(
-                      `qwen serve: startup rejection recording rollback was inconclusive; the session id may stay occupied (${logSafe(rejectedSessionId)})`,
+                      `mariadb-shell-agent serve: startup rejection recording rollback was inconclusive; the session id may stay occupied (${logSafe(rejectedSessionId)})`,
                     );
                   }
                 }
@@ -2246,7 +2247,9 @@ export class AcpDispatcher {
         case 'session/load':
         case 'session/resume': {
           if (id === undefined) {
-            writeStderrLine(`qwen serve: /acp ${method} notification rejected`);
+            writeStderrLine(
+              `mariadb-shell-agent serve: /acp ${method} notification rejected`,
+            );
             return;
           }
           const sessionId = normalizeSessionIdForLookup(
@@ -2745,7 +2748,7 @@ export class AcpDispatcher {
               conn.closeSessionStream(sessionId);
             } catch (teardownErr) {
               writeStderrLine(
-                `qwen serve: /acp session/close local teardown failed (${logSafe(sessionId)}): ${logSafe(errMsg(teardownErr))}`,
+                `mariadb-shell-agent serve: /acp session/close local teardown failed (${logSafe(sessionId)}): ${logSafe(errMsg(teardownErr))}`,
               );
             }
           };
@@ -2804,7 +2807,7 @@ export class AcpDispatcher {
         case 'session/fork': {
           if (id === undefined) {
             writeStderrLine(
-              'qwen serve: /acp session/fork notification rejected',
+              'mariadb-shell-agent serve: /acp session/fork notification rejected',
             );
             return;
           }
@@ -2928,7 +2931,7 @@ export class AcpDispatcher {
             // legacy `resolveClientResponse` path logs its vote/cancel
             // failures the same way).
             writeStderrLine(
-              `qwen serve: /acp session/permission rejected: \`requestId\` is required`,
+              `mariadb-shell-agent serve: /acp session/permission rejected: \`requestId\` is required`,
             );
             if (id !== undefined) {
               conn.sendConn(
@@ -2950,7 +2953,7 @@ export class AcpDispatcher {
             // plain INVALID_PARAMS with no httpStatus for SDK callers.
             if (err instanceof AcpParamError) {
               writeStderrLine(
-                `qwen serve: /acp session/permission invalid params (requestId ${logSafe(requestId)}): ${logSafe(err.message)}`,
+                `mariadb-shell-agent serve: /acp session/permission invalid params (requestId ${logSafe(requestId)}): ${logSafe(err.message)}`,
               );
               if (id !== undefined) {
                 conn.sendConn(
@@ -2982,7 +2985,7 @@ export class AcpDispatcher {
             sessionIdParam !== pendingRef.req.sessionId
           ) {
             writeStderrLine(
-              `qwen serve: /acp session/permission vote rejected: requestId ${logSafe(requestId)} does not belong to session ${logSafe(sessionIdParam)}`,
+              `mariadb-shell-agent serve: /acp session/permission vote rejected: requestId ${logSafe(requestId)} does not belong to session ${logSafe(sessionIdParam)}`,
             );
             if (id !== undefined) {
               conn.sendConn(
@@ -3005,7 +3008,7 @@ export class AcpDispatcher {
           // exception). Reserve 409 for a present entry the bridge still rejects.
           if (this.registry && !pendingRef) {
             writeStderrLine(
-              `qwen serve: /acp session/permission vote dropped: no pending request for requestId ${logSafe(requestId)}`,
+              `mariadb-shell-agent serve: /acp session/permission vote dropped: no pending request for requestId ${logSafe(requestId)}`,
             );
             if (id !== undefined) {
               conn.sendConn(
@@ -3022,7 +3025,7 @@ export class AcpDispatcher {
           const sessionId = pendingRef?.req.sessionId ?? sessionIdParam;
           if (!sessionId) {
             writeStderrLine(
-              `qwen serve: /acp session/permission vote dropped: no pending request for requestId ${logSafe(requestId)}`,
+              `mariadb-shell-agent serve: /acp session/permission vote dropped: no pending request for requestId ${logSafe(requestId)}`,
             );
             if (id !== undefined) {
               conn.sendConn(
@@ -3042,7 +3045,7 @@ export class AcpDispatcher {
           // this connection).
           if (!conn.ownsSession(sessionId)) {
             writeStderrLine(
-              `qwen serve: /acp session/permission vote rejected: session ${logSafe(sessionId)} not owned by this connection (requestId ${logSafe(requestId)})`,
+              `mariadb-shell-agent serve: /acp session/permission vote rejected: session ${logSafe(sessionId)} not owned by this connection (requestId ${logSafe(requestId)})`,
             );
             if (id !== undefined) {
               conn.sendConn(
@@ -3072,7 +3075,7 @@ export class AcpDispatcher {
             // policy-denied vote is a 403 (well-formed, authenticated, refused).
             if (err instanceof InvalidPermissionOptionError) {
               writeStderrLine(
-                `qwen serve: /acp session/permission invalid option (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`,
+                `mariadb-shell-agent serve: /acp session/permission invalid option (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`,
               );
               if (id !== undefined) {
                 conn.sendConn(
@@ -3088,7 +3091,7 @@ export class AcpDispatcher {
             }
             if (err instanceof PermissionForbiddenError) {
               writeStderrLine(
-                `qwen serve: /acp session/permission forbidden (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`,
+                `mariadb-shell-agent serve: /acp session/permission forbidden (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`,
               );
               if (id !== undefined) {
                 conn.sendConn(
@@ -3108,7 +3111,7 @@ export class AcpDispatcher {
               // in this build. 501 (not 500) so the SDK can say "daemon older
               // than your settings expect; upgrade".
               writeStderrLine(
-                `qwen serve: /acp session/permission policy not implemented (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`,
+                `mariadb-shell-agent serve: /acp session/permission policy not implemented (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`,
               );
               if (id !== undefined) {
                 conn.sendConn(
@@ -3126,7 +3129,7 @@ export class AcpDispatcher {
               // the cancel sentinel), not a client mistake — 500 with a stable
               // code so the SDK can distinguish it from unrelated internals.
               writeStderrLine(
-                `qwen serve: /acp session/permission cancel-sentinel collision (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`,
+                `mariadb-shell-agent serve: /acp session/permission cancel-sentinel collision (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`,
               );
               if (id !== undefined) {
                 conn.sendConn(
@@ -3147,7 +3150,7 @@ export class AcpDispatcher {
             // retry) — then rethrow so the outer dispatcher catch maps the
             // error for the wire.
             writeStderrLine(
-              `qwen serve: /acp session/permission vote failed (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(errMsg(err))}`,
+              `mariadb-shell-agent serve: /acp session/permission vote failed (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(errMsg(err))}`,
             );
             const cancelled = this.cancelAbandonedPermission(
               { sessionId, bridgeRequestId: requestId },
@@ -3173,7 +3176,7 @@ export class AcpDispatcher {
             // present vote" and (b) make a legitimate retry on another
             // connection fail with a misleading "no pending" error.
             writeStderrLine(
-              `qwen serve: /acp session/permission vote not accepted by bridge (${logSafe(sessionId)}, requestId ${logSafe(requestId)})`,
+              `mariadb-shell-agent serve: /acp session/permission vote not accepted by bridge (${logSafe(sessionId)}, requestId ${logSafe(requestId)})`,
             );
             if (id !== undefined) {
               conn.sendConn(
@@ -3204,7 +3207,7 @@ export class AcpDispatcher {
           // grepping a stuck prompt can then tell "vote accepted here" apart
           // from "vote never arrived" or "vote landed on another connection".
           writeStderrLine(
-            `qwen serve: /acp session/permission vote accepted (${logSafe(sessionId)}, requestId ${logSafe(requestId)}, connection ${logSafe(conn.connectionId.slice(0, 8))})`,
+            `mariadb-shell-agent serve: /acp session/permission vote accepted (${logSafe(sessionId)}, requestId ${logSafe(requestId)}, connection ${logSafe(conn.connectionId.slice(0, 8))})`,
           );
           this.replyConn(conn, id, {});
           return;
@@ -4169,7 +4172,7 @@ export class AcpDispatcher {
             const logClientId = logSafe(String(conn.clientId?.slice(0, 8)));
             const logCommand = logSafe(rawCmd.slice(0, 120));
             writeStderrLine(
-              `qwen serve: /acp session/shell session=${logSessionId} client=${logClientId} cmd=${logCommand}`,
+              `mariadb-shell-agent serve: /acp session/shell session=${logSessionId} client=${logClientId} cmd=${logCommand}`,
             );
             const result = await this.bridge.executeShellCommand(
               sessionId,
@@ -4518,7 +4521,7 @@ export class AcpDispatcher {
           }
           const mode = (rawMode as 'append' | 'replace') ?? 'append';
           writeStderrLine(
-            `qwen serve: /acp workspace/memory/write scope=${scope} mode=${mode} client=${conn.clientId?.slice(0, 8)} bytes=${Buffer.byteLength(content, 'utf8')}`,
+            `mariadb-shell-agent serve: /acp workspace/memory/write scope=${scope} mode=${mode} client=${conn.clientId?.slice(0, 8)} bytes=${Buffer.byteLength(content, 'utf8')}`,
           );
           const wr = await writeWorkspaceContextFile({
             scope,
@@ -5475,7 +5478,7 @@ export class AcpDispatcher {
                   const safeSessionId = logSafe(sessionId.slice(0, 8));
                   const safeMessage = logSafe(error);
                   writeStderrLine(
-                    `qwen serve: /acp sessions/delete ${phase}Session(${safeSessionId}) failed: ${safeMessage}`,
+                    `mariadb-shell-agent serve: /acp sessions/delete ${phase}Session(${safeSessionId}) failed: ${safeMessage}`,
                   );
                 },
               }),
@@ -5863,7 +5866,7 @@ export class AcpDispatcher {
       // Full detail to stderr for the operator; a coded, client-safe shape
       // on the wire (raw bridge messages may carry internal paths/details).
       writeStderrLine(
-        `qwen serve: /acp dispatch error (${logSafe(method)}): ${logSafe(errMsg(err))}`,
+        `mariadb-shell-agent serve: /acp dispatch error (${logSafe(method)}): ${logSafe(errMsg(err))}`,
       );
       if (id !== undefined) {
         const { code, message, data } = toRpcError(err);
@@ -5947,7 +5950,7 @@ export class AcpDispatcher {
             // snapshot may lag behind live events. Same operator breadcrumb
             // the REST surface gets via the bus-level log (DAEMON-008).
             writeStderrLine(
-              `qwen serve: /acp initial replay used a DEGRADED snapshot (compaction failure) session=${logSafe(sessionId)}; replay may be incomplete`,
+              `mariadb-shell-agent serve: /acp initial replay used a DEGRADED snapshot (compaction failure) session=${logSafe(sessionId)}; replay may be incomplete`,
             );
           }
           const snapshotEvents = [
@@ -5974,7 +5977,7 @@ export class AcpDispatcher {
           );
         } else {
           writeStderrLine(
-            `qwen serve: /acp initial replay skipped (no snapshot) session=${logSafe(sessionId)}`,
+            `mariadb-shell-agent serve: /acp initial replay skipped (no snapshot) session=${logSafe(sessionId)}`,
           );
           conn.markInitialReplayComplete(sessionId);
           conn.endReplayDeferral(sessionId, lastDeliveredId, false);
@@ -6016,7 +6019,7 @@ export class AcpDispatcher {
           const replayedCount = (event.data as { replayedCount?: number })
             ?.replayedCount;
           writeStderrLine(
-            `qwen serve: /acp replay complete (${logSafe(sessionId)}) ` +
+            `mariadb-shell-agent serve: /acp replay complete (${logSafe(sessionId)}) ` +
               `from=${lastEventId ?? 'none'} delivered_through=${lastDeliveredId} ` +
               `count=${replayedCount ?? 'n/a'} evicted=${sawEviction}`,
           );
@@ -6130,7 +6133,7 @@ export class AcpDispatcher {
           // follow-up, not this content-stream PR.
           if (binding?.graceTimer) {
             writeStderrLine(
-              `qwen serve: /acp permission cancel during reconnect grace ` +
+              `mariadb-shell-agent serve: /acp permission cancel during reconnect grace ` +
                 `(${logSafe(sessionId)}); vote not deferred (see §1.7 follow-up)`,
             );
           }
@@ -6149,7 +6152,7 @@ export class AcpDispatcher {
           // recovery; manual intervention (restart the agent session) is needed.
           if (!cancelled) {
             writeStderrLine(
-              `qwen serve: /acp permission cancel FAILED for ${logSafe(sessionId)} (mediator stuck; no automatic recovery)`,
+              `mariadb-shell-agent serve: /acp permission cancel FAILED for ${logSafe(sessionId)} (mediator stuck; no automatic recovery)`,
             );
           }
           return;
@@ -6270,7 +6273,7 @@ export class AcpDispatcher {
       // operator has no grep-friendly signal to correlate against a permission
       // prompt that stays blocked until teardown's `abandonPendingForSession`.
       writeStderrLine(
-        `qwen serve: /acp permission vote dropped: responding connection ${logSafe(
+        `mariadb-shell-agent serve: /acp permission vote dropped: responding connection ${logSafe(
           conn.connectionId.slice(0, 8),
         )} does not own session ${logSafe(pending.sessionId)} (requestId ${logSafe(
           pending.bridgeRequestId,
@@ -6311,7 +6314,7 @@ export class AcpDispatcher {
       this.dropResolvedPermission(pendingConn, id);
     } catch (err) {
       writeStderrLine(
-        `qwen serve: /acp permission vote failed (${logSafe(pending.sessionId)}): ${logSafe(errMsg(err))}`,
+        `mariadb-shell-agent serve: /acp permission vote failed (${logSafe(pending.sessionId)}): ${logSafe(errMsg(err))}`,
       );
       // Cancel BEFORE deleting, and ONLY drop the entry if the cancel
       // landed. If it also failed, keep the entry so teardown's
@@ -6384,7 +6387,7 @@ export class AcpDispatcher {
         // Notification-form prompt (no id): no response frame to send, so a
         // failure would vanish silently — log it for the operator.
         writeStderrLine(
-          `qwen serve: /acp prompt error (${logSafe(sessionId)}, notification): ${logSafe(errMsg(err))}`,
+          `mariadb-shell-agent serve: /acp prompt error (${logSafe(sessionId)}, notification): ${logSafe(errMsg(err))}`,
         );
       }
     } finally {
@@ -6460,7 +6463,7 @@ export class AcpDispatcher {
         // starts exercising this fallback (which would otherwise be invisible).
         anchorId = undefined;
         writeStderrLine(
-          `qwen serve: /acp replySession(${logSafe(sessionId)}) ` +
+          `mariadb-shell-agent serve: /acp replySession(${logSafe(sessionId)}) ` +
             `anchor unavailable, deferring unanchored: ` +
             logSafe(err instanceof Error ? err.message : String(err)),
         );
@@ -6484,7 +6487,7 @@ export class AcpDispatcher {
       // the connection stream, not the session stream" with a mid-flight
       // session teardown.
       writeStderrLine(
-        `qwen serve: /acp replySession(${logSafe(sessionId)}) binding gone mid-flight, ` +
+        `mariadb-shell-agent serve: /acp replySession(${logSafe(sessionId)}) binding gone mid-flight, ` +
           `reply routed to connection stream ${conn.connectionId.slice(0, 8)}`,
       );
       conn.sendConn(frame);

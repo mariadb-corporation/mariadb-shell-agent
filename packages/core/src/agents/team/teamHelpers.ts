@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +9,7 @@
  * @fileoverview Team file CRUD, name sanitization, color management,
  * and cleanup utilities.
  *
- * All file operations target `~/.qwen/teams/{team-name}/config.json`.
+ * All file operations target `~/.mariadb-shell-agent/teams/{team-name}/config.json`.
  * Functions are pure where possible; side-effectful I/O functions are
  * clearly separated.
  */
@@ -33,7 +34,7 @@ import {
 
 /**
  * Absolute path to the teams root directory.
- * `~/.qwen/teams/`
+ * `~/.mariadb-shell-agent/teams/`
  */
 export function getTeamsRootDir(): string {
   return path.join(Storage.getGlobalQwenDir(), TEAMS_DIR);
@@ -41,7 +42,7 @@ export function getTeamsRootDir(): string {
 
 /**
  * Absolute path to a specific team's directory.
- * `~/.qwen/teams/{teamName}/`
+ * `~/.mariadb-shell-agent/teams/{teamName}/`
  */
 export function getTeamDir(teamName: string): string {
   return path.join(getTeamsRootDir(), teamName);
@@ -49,7 +50,7 @@ export function getTeamDir(teamName: string): string {
 
 /**
  * Absolute path to a team's config file.
- * `~/.qwen/teams/{teamName}/config.json`
+ * `~/.mariadb-shell-agent/teams/{teamName}/config.json`
  */
 export function getTeamFilePath(teamName: string): string {
   return path.join(getTeamDir(teamName), TEAM_CONFIG_FILENAME);
@@ -57,7 +58,7 @@ export function getTeamFilePath(teamName: string): string {
 
 /**
  * Absolute path to a team's inboxes directory.
- * `~/.qwen/teams/{teamName}/inboxes/`
+ * `~/.mariadb-shell-agent/teams/{teamName}/inboxes/`
  */
 export function getInboxesDir(teamName: string): string {
   return path.join(getTeamDir(teamName), INBOXES_DIR);
@@ -65,7 +66,7 @@ export function getInboxesDir(teamName: string): string {
 
 /**
  * Absolute path to the tasks directory for a team.
- * `~/.qwen/tasks/{teamName}/`
+ * `~/.mariadb-shell-agent/tasks/{teamName}/`
  */
 export function getTasksDir(teamName: string): string {
   return path.join(Storage.getGlobalQwenDir(), TASKS_DIR, teamName);
@@ -409,7 +410,7 @@ export async function deleteTeamDirs(teamName: string): Promise<void> {
 }
 
 /**
- * List all team names (directory names under ~/.qwen/teams/).
+ * List all team names (directory names under ~/.mariadb-shell-agent/teams/).
  * Returns an empty array if the teams directory doesn't exist.
  */
 export async function listTeamNames(): Promise<string[]> {

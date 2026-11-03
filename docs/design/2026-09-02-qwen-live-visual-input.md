@@ -159,7 +159,7 @@ connected while silently rejecting the new capture commands:
 - `host.capture_visual`
 - `host.visual_capture_result`
 
-The built-in `qwen serve` daemon can omit `visualInput`; the v9 Host then exposes
+The built-in `mariadb-shell-agent serve` daemon can omit `visualInput`; the v9 Host then exposes
 no Source/Mode controls and uses `host.capture_visual` with source `screen` for
 Appshot. The qwen-live and CLI protocol type files remain byte-identical.
 

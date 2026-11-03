@@ -3,13 +3,14 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Pins the session-registry wiring in startInteractiveUI: registration
  * arguments, cleanup armed only on success, and failures swallowed.
  * Deleting the import or the registration block keeps every other test
  * green — without this file, interactive sessions could silently stop
- * appearing in `qwen sessions ps` (or never disappear from it).
+ * appearing in `mariadb-shell-agent sessions ps` (or never disappear from it).
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';

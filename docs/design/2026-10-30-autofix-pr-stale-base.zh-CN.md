@@ -81,7 +81,7 @@ CI 侧的 fleet workflow（`.github/workflows/qwen-autofix.yml`，rationale `af-
 - mock `gh` 的单元测试覆盖 `baseIsBehind` 与 `runSnapshot` 的标志条件（见上文测试）。
 - `SKILL.test.ts` 为新 brief 与 round 文本加 pin。
 - 在真实落后 PR 上对 compare 端点做只读实测（E2E 测试计划中的 dry-run 基线）。
-- E2E 测试计划：`.qwen/e2e-tests/2026-10-30-autofix-pr-stale-base.md`。
+- E2E 测试计划：`.mariadb-shell-agent/e2e-tests/2026-10-30-autofix-pr-stale-base.md`。
 - `npm run build`、`npm run typecheck` 与改动文件的聚焦单元测试。
 
 ## 验收标准

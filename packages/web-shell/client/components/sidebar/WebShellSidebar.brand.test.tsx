@@ -166,7 +166,7 @@ function brandLogoImage(): HTMLImageElement | null {
 
 /** The built-in inline mark — the one every unconfigured deployment sees. */
 function builtInMark(): Element | null {
-  return container.querySelector('svg[viewBox="17.5 27.7 135.6 135.6"]');
+  return container.querySelector('img[src^="data:image/png;base64,"]');
 }
 
 beforeEach(() => {
@@ -236,7 +236,7 @@ describe('sidebar brand', () => {
   it('renders the built-in name and inline mark when no brand is configured', () => {
     renderSidebar();
 
-    expect(container.textContent).toContain('Qwen Code');
+    expect(container.textContent).toContain('MariaDB Shell Agent');
     expect(brandLogoImage()).toBeNull();
     // The positive half of "default unchanged": the built-in mark is actually
     // there, not merely that no img is present (an empty 28px box passes that).
@@ -247,7 +247,7 @@ describe('sidebar brand', () => {
     renderSidebar({ name: 'QiuQiu Code' });
 
     expect(container.textContent).toContain('QiuQiu Code');
-    expect(container.textContent).not.toContain('Qwen Code');
+    expect(container.textContent).not.toContain('MariaDB Shell Agent');
   });
 
   it('treats an empty name as unset rather than blanking the brand row', () => {
@@ -258,9 +258,9 @@ describe('sidebar brand', () => {
     // a version tooltip reading " v1.2.3".
     renderSidebar({ name: '' });
 
-    expect(container.textContent).toContain('Qwen Code');
+    expect(container.textContent).toContain('MariaDB Shell Agent');
     expect(
-      container.querySelector('[title="Qwen Code v1.2.3"]'),
+      container.querySelector('[title="MariaDB Shell Agent v1.2.3"]'),
     ).not.toBeNull();
   });
 

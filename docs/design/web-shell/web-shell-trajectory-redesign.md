@@ -830,7 +830,7 @@ and visual baselines, and attaches before/after screenshots.
   `cd packages/web-shell && npx vitest run` on the changed files.
 - `npx playwright test --config playwright.config.ts client/e2e/web-shell.trajectory.spec.ts`
   and the visuals config for the trajectory captures.
-- A real daemon pass: build the bundle, start `qwen serve` with an isolated
+- A real daemon pass: build the bundle, start `mariadb-shell-agent serve` with an isolated
   `HOME`, run a session with a subagent, a failing shell command and an
   approval, then check the panel docked and fullscreen in both themes and both
   languages.

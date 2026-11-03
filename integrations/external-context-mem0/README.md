@@ -12,10 +12,10 @@ timeout, result limit, or dialect in either profile.
 
 ## Installation
 
-Install the published Extension with Qwen Code:
+Install the published Extension with MariaDB Shell Agent:
 
 ```bash
-qwen extensions install @qwen-code/external-context-mem0
+mariadb-shell-agent extensions install @qwen-code/external-context-mem0
 ```
 
 This command becomes available after the package's first registry release.
@@ -23,10 +23,10 @@ This command becomes available after the package's first registry release.
 Use an explicit package version when the deployment must remain pinned:
 
 ```bash
-qwen extensions install @qwen-code/external-context-mem0@x.y.z
+mariadb-shell-agent extensions install @qwen-code/external-context-mem0@x.y.z
 ```
 
-The Extension version follows the Qwen Code release version. Installation does
+The Extension version follows the MariaDB Shell Agent release version. Installation does
 not configure a memory service or install provider data. An administrator must
 supply an instance file, a dialect file, and the credential environment
 variable described below.
@@ -180,12 +180,12 @@ launcher script, or a command-line argument. The configuration path is not an
 ordinary Qwen setting.
 
 Both files are limited to 64 KiB. The on-demand MCP process reads them once at
-startup. Restart Qwen Code after changing either file or environment value in
+startup. Restart MariaDB Shell Agent after changing either file or environment value in
 that profile.
 
 ### 5. Verify the deployment
 
-1. Start Qwen Code from the configured process environment.
+1. Start MariaDB Shell Agent from the configured process environment.
 2. Open `/mcp` and verify that `external-context-mem0` is connected.
 3. Verify that the server exposes only `context_search`.
 4. Search for a known, non-sensitive record in the fixed scope and confirm the
@@ -260,13 +260,13 @@ could send two searches for one turn. Use the v2 Extension profile for
 on-demand `context_search`, or the v3 Hook-only profile for Auto Recall, never
 both in one Qwen process.
 
-The Hook requires a non-empty `submitted_prompt` captured before prompt expansion. This includes supported interactive TUI submissions, first-turn headless CLI `UserQuery` sends (`qwen -p` and stream-json input, including SDK clients using that path), and explicitly declared fresh non-channel turns on the ACP session path used by ACP clients, `serve`, and daemon hosts. ACP/daemon clients must provide `_meta: { "qwen.submittedPrompt": "original submitted text" }` per eligible request; Web Shell does so at its submission boundary. Realtime voice handoffs omit declarations because their text comes from model-generated tool arguments. Existing ACP clients without a declaration continue to omit the field. Internal background dispatches and all channel messages, including human messages, are excluded. See [UserPromptSubmit](../../docs/users/features/hooks.md#userpromptsubmit).
+The Hook requires a non-empty `submitted_prompt` captured before prompt expansion. This includes supported interactive TUI submissions, first-turn headless CLI `UserQuery` sends (`mariadb-shell-agent -p` and stream-json input, including SDK clients using that path), and explicitly declared fresh non-channel turns on the ACP session path used by ACP clients, `serve`, and daemon hosts. ACP/daemon clients must provide `_meta: { "qwen.submittedPrompt": "original submitted text" }` per eligible request; Web Shell does so at its submission boundary. Realtime voice handoffs omit declarations because their text comes from model-generated tool arguments. Existing ACP clients without a declaration continue to omit the field. Internal background dispatches and all channel messages, including human messages, are excluded. See [UserPromptSubmit](../../docs/users/features/hooks.md#userpromptsubmit).
 
 The field establishes prompt provenance, not a TUI-only origin or proof of human authorship. The Hook never falls back to `prompt`; events without `submitted_prompt` do not trigger retrieval.
 
 Register this profile only in launchers where automatic retrieval is intended
 for all eligible inputs. To disable every Hook for an automation run, use
-`qwen --bare -p '…'`, `qwen --safe-mode -p '…'`, or set `disableAllHooks: true`
+`mariadb-shell-agent --bare -p '…'`, `mariadb-shell-agent --safe-mode -p '…'`, or set `disableAllHooks: true`
 in its managed settings before starting Qwen. These options disable all Hooks;
 `--bare` and `--safe-mode` also change which customizations are loaded. If
 automation needs other Hooks, give it a separate administrator-controlled
@@ -287,7 +287,7 @@ credential, and common secret shapes, then keeps at most 512 Unicode code
 points. This is best-effort reduction, not DLP. Each eligible invocation is a
 new process and reads the v3 instance and dialect once, so administrator file
 changes apply to the next eligible prompt. Environment and Hook registration
-changes require restarting Qwen Code.
+changes require restarting MariaDB Shell Agent.
 
 ## Runtime guarantees
 

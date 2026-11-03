@@ -71,7 +71,7 @@ function createHarness(trusted = true, runtimeLive = false) {
   const installWorkspaceSkill = vi.fn().mockResolvedValue({
     skillName: 'demo-skill',
     scope: 'workspace',
-    installedPath: '/workspace/.qwen/skills/demo-skill/SKILL.md',
+    installedPath: '/workspace/.mariadb-shell-agent/skills/demo-skill/SKILL.md',
   });
   const deleteWorkspaceSkill = vi.fn().mockResolvedValue({
     skillName: 'demo-skill',
@@ -763,7 +763,7 @@ describe('workspace Skill management routes', () => {
   it('serializes aliased workspace and global installs on one directory', async () => {
     const harness = createHarness();
     const previousQwenHome = process.env['QWEN_HOME'];
-    process.env['QWEN_HOME'] = '/workspace/.qwen';
+    process.env['QWEN_HOME'] = '/workspace/.mariadb-shell-agent';
     let release!: () => void;
     const pause = new Promise<void>((resolve) => {
       release = resolve;
@@ -787,7 +787,8 @@ describe('workspace Skill management routes', () => {
         return {
           skillName: install.name,
           scope: install.scope,
-          installedPath: '/workspace/.qwen/skills/demo-skill/SKILL.md',
+          installedPath:
+            '/workspace/.mariadb-shell-agent/skills/demo-skill/SKILL.md',
         };
       },
     );

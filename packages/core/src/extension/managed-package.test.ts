@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -105,7 +106,7 @@ describe('Managed raw package compiler', () => {
       'agents/reviewer.md',
       '---\nname: reviewer\ndescription: Reviews changes\ntools: Read, Glob\nmodel: inherit\n---\nReview precisely.',
     );
-    await file('QWEN.md', 'Use the fixed context.');
+    await file('MARIADB-SHELL-AGENT.md', 'Use the fixed context.');
     const before = { cwd: process.cwd(), token: process.env['TOKEN'] };
     const compiled = await compileManagedExtensionPackage(root, {
       target,

@@ -7,7 +7,7 @@ attributed to a CI run is unverified**. §2 has since been answered by this PR's
 own CI and the byte constants are ratcheted; the rest still needs a human.
 
 ```bash
-git clone --depth=1 --branch fix/export-renderer-delegation https://github.com/QwenLM/qwen-code.git
+git clone --depth=1 --branch fix/export-renderer-delegation https://github.invalid/QwenLM/qwen-code.git
 # then read docs/verification/export-renderer-delegation-mermaid/README.md
 ```
 

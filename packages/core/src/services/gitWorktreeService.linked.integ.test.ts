@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -44,9 +45,9 @@ function initRepoAt(repo: string): string {
 
 const initRepo = (prefix: string) => initRepoAt(mkTmp(prefix));
 
-/** `git worktree add -b review-pr-1 <repo>/.qwen/tmp/review-pr-1 HEAD`. */
+/** `git worktree add -b review-pr-1 <repo>/.mariadb-shell-agent/tmp/review-pr-1 HEAD`. */
 function addReviewWorktree(repo: string): string {
-  const wt = path.join(repo, '.qwen', 'tmp', 'review-pr-1');
+  const wt = path.join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
   fs.mkdirSync(path.dirname(wt), { recursive: true });
   execFileSync('git', ['worktree', 'add', '-b', 'review-pr-1', wt, 'HEAD'], {
     cwd: repo,

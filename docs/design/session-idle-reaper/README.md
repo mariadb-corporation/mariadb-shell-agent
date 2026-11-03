@@ -15,7 +15,7 @@ Once created, a bridge session lives in memory (`byId: Map<string, SessionEntry>
 indefinitely. It is only destroyed when:
 
 1. A client explicitly calls `DELETE /session/:id` (`closeSession`)
-2. The shared `qwen --acp` child process crashes (`channel.exited` handler)
+2. The shared `mariadb-shell-agent --acp` child process crashes (`channel.exited` handler)
 3. The daemon process receives `SIGTERM` / `SIGINT` (`shutdown`)
 
 There is **no automatic idle timeout** for sessions. The heartbeat timestamps
@@ -141,7 +141,7 @@ interface BridgeOptions {
 }
 ```
 
-**CLI surface** (`qwen serve` flags):
+**CLI surface** (`mariadb-shell-agent serve` flags):
 
 ```
 --session-reap-interval-ms <ms>   Reaper scan interval (default 60000, 0=disable)
@@ -276,7 +276,7 @@ function startSessionReaper(): void {
       const idle = now - lastActive;
       if (idle < resolvedIdleTimeoutMs) continue;
       writeStderrLine(
-        `qwen serve: reaping idle session ${JSON.stringify(id)} ` +
+        `mariadb-shell-agent serve: reaping idle session ${JSON.stringify(id)} ` +
           `(idle for ${Math.round(idle / 1000)}s, threshold ${Math.round(resolvedIdleTimeoutMs / 1000)}s)`,
       );
       // Pass `undefined` context (no client) and `{ reason }` opts.
@@ -284,7 +284,7 @@ function startSessionReaper(): void {
         .closeSession(id, undefined, { reason: 'idle_timeout' })
         .catch((err) => {
           writeStderrLine(
-            `qwen serve: session reaper failed to close ${JSON.stringify(id)}: ${String(err)}`,
+            `mariadb-shell-agent serve: session reaper failed to close ${JSON.stringify(id)}: ${String(err)}`,
           );
         });
     }
@@ -405,8 +405,8 @@ generic terminal-frame handler (`isTerminalLifecycleEvent`) already handles
 
 ## 7. Observability
 
-- **stderr log**: `qwen serve: reaping idle session "<id>" (idle for Nms)` on
-  each reap, matching existing `qwen serve:` prefix convention.
+- **stderr log**: `mariadb-shell-agent serve: reaping idle session "<id>" (idle for Nms)` on
+  each reap, matching existing `mariadb-shell-agent serve:` prefix convention.
 - **Telemetry event**: `session.close` with operation
   `qwen-code.daemon.bridge.operation: 'session.close'` (reuses existing
   `closeSession` telemetry path).

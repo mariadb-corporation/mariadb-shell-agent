@@ -6,14 +6,14 @@ coding sessions through voice.
 `qwen-live` connects three parties:
 
 - **Live Host** (the macOS overlay app) over the Live Host WebSocket
-  protocol v9 — writes `~/.qwen/live/daemon.json` for discovery, so an
+  protocol v9 — writes `~/.mariadb-shell-agent/live/daemon.json` for discovery, so an
   already-installed Host connects automatically.
 - **A DashScope realtime voice model** (`qwen-omni` realtime) that owns the
   conversation: VAD, direct answers, and a tool surface for dispatching work
   to coding sessions.
 - **Coding sessions** through a `BackendAdaptor`. Two adaptors are available:
-  one drives `qwen serve` over REST/SSE, and one spawns any ACP-compatible
-  agent (`qwen --acp`, `qodercli --acp`, `gemini --acp`, etc.) as a child
+  one drives `mariadb-shell-agent serve` over REST/SSE, and one spawns any ACP-compatible
+  agent (`mariadb-shell-agent --acp`, `qodercli --acp`, `gemini --acp`, etc.) as a child
   process over JSON-RPC stdio. Multiple backends can coexist with per-session
   routing.
 
@@ -100,7 +100,7 @@ Selecting Screen or quitting retains the existing camera shutdown behavior.
 daemon's actual configuration in the OS-associated JSON editor or IDE. This
 respects the daemon's `QWEN_LIVE_DATA_DIR`, even when Host starts separately.
 Save the file and restart Qwen Live to apply manual edits. Older daemons and
-built-in `qwen serve` do not advertise this action. Missing, non-regular (including
+built-in `mariadb-shell-agent serve` do not advertise this action. Missing, non-regular (including
 symlink) files or editor failures show an error; the action never creates or
 overwrites configuration.
 
@@ -127,7 +127,7 @@ external error details retain their original language.
 
 `Quit Host` gracefully shuts down the connected standalone Live daemon and
 Host, including owned ACP processes, Memory work and discovery. It does not
-terminate an independently running `qwen serve`. A legacy WebShell connection
+terminate an independently running `mariadb-shell-agent serve`. A legacy WebShell connection
 only ends its Live call and closes Host. If shutdown is not confirmed, the
 orb remains with an error and Quit can retry the same authenticated instance.
 It never redirects a retry to a different discovered daemon.
@@ -412,7 +412,7 @@ after diagnosis and do not share recordings without reviewing their contents.
 For `qwen3.5-omni-plus-realtime` and `qwen3.5-omni-flash-realtime`, the initial
 session explicitly requests mono PCM input at 16 kHz and output at 24 kHz via
 `audio.input.format` / `audio.output.format`, as documented in the
-[DashScope session API](https://help.aliyun.com/zh/model-studio/client-events#26a8302028sjm).
+[DashScope session API](https://help.aliyun.invalid/zh/model-studio/client-events#26a8302028sjm).
 Older/custom models retain the legacy PCM fields and 24 kHz playback contract.
 Host playback uses a default-device-rate AudioContext, not a forced 24 kHz
 hardware clock. With current output-end-marker negotiation, each response is
@@ -428,14 +428,14 @@ shows microphone/output mute states beneath the main call status.
 
 ### Supported backends
 
-| Backend     | Kind        | ACP entry                                   | Notes                               |
-| ----------- | ----------- | ------------------------------------------- | ----------------------------------- |
-| Qoder CLI   | `acp`       | `qodercli --acp`                            | Hidden flag; uses Qoder's own login |
-| Qwen Code   | `acp`       | `qwen --acp`                                | Native ACP mode                     |
-| Gemini CLI  | `acp`       | `gemini --experimental-acp`                 | Official ACP support                |
-| Claude Code | `acp`       | `npx @agentclientprotocol/claude-agent-acp` | Adapter-based                       |
-| Codex       | `acp`       | `npx @agentclientprotocol/codex-acp`        | Adapter-based                       |
-| qwen serve  | `qwen-code` | REST/SSE to `qwen serve` daemon             | Legacy; no ACP needed               |
+| Backend                   | Kind        | ACP entry                                      | Notes                               |
+| ------------------------- | ----------- | ---------------------------------------------- | ----------------------------------- |
+| Qoder CLI                 | `acp`       | `qodercli --acp`                               | Hidden flag; uses Qoder's own login |
+| MariaDB Shell Agent       | `acp`       | `mariadb-shell-agent --acp`                    | Native ACP mode                     |
+| Gemini CLI                | `acp`       | `gemini --experimental-acp`                    | Official ACP support                |
+| Claude Code               | `acp`       | `npx @agentclientprotocol/claude-agent-acp`    | Adapter-based                       |
+| Codex                     | `acp`       | `npx @agentclientprotocol/codex-acp`           | Adapter-based                       |
+| mariadb-shell-agent serve | `qwen-code` | REST/SSE to `mariadb-shell-agent serve` daemon | Legacy; no ACP needed               |
 
 Multiple backends can coexist — the voice model sees all sessions across
 all backends in `session_list` and can route `handoff` to a specific one by
@@ -483,9 +483,9 @@ Embeddings use the existing key and regional endpoint's `/compatible-mode/v1/emb
 
 Official references checked 2026-09-05:
 
-- [Chat Completions](https://help.aliyun.com/zh/model-studio/compatibility-of-openai-with-dashscope)
-- [Embeddings](https://help.aliyun.com/zh/model-studio/text-embedding-synchronous-api)
-- [Models](https://help.aliyun.com/zh/model-studio/models)
+- [Chat Completions](https://help.aliyun.invalid/zh/model-studio/compatibility-of-openai-with-dashscope)
+- [Embeddings](https://help.aliyun.invalid/zh/model-studio/text-embedding-synchronous-api)
+- [Models](https://help.aliyun.invalid/zh/model-studio/models)
 
 ### Configuration defaults
 
@@ -575,8 +575,8 @@ codesign + team identifier verification). The daemon also exposes HTTP
 endpoints behind its Bearer token:
 
 ```bash
-TOKEN=$(jq -r .token ~/.qwen/live/daemon.json)
-PORT=$(jq -r .url ~/.qwen/live/daemon.json | sed 's/.*://')
+TOKEN=$(jq -r .token ~/.mariadb-shell-agent/live/daemon.json)
+PORT=$(jq -r .url ~/.mariadb-shell-agent/live/daemon.json | sed 's/.*://')
 curl -H "authorization: Bearer $TOKEN" "http://127.0.0.1:$PORT/live/setup"
 ```
 
@@ -596,7 +596,7 @@ Standalone v9 daemons advertise an optional `visualInput` object during the
 welcome handshake. `host.visual_settings` changes Source/Mode for the current
 call, `host.visual_frame` carries bounded Live Feed JPEGs, and
 `host.capture_visual` / `host.visual_capture_result` implement correlated On
-Demand capture. The built-in `qwen serve` integration uses the same pair with
+Demand capture. The built-in `mariadb-shell-agent serve` integration uses the same pair with
 source `screen` while omitting the standalone Source/Mode controls.
 
 In Live Feed mode the selected source continuously supplies recent frames to

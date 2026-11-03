@@ -4,7 +4,7 @@
 
 状态：D8b、D8c-1 与 D8c-2 已在 #13530 实现；第 7 节决策仍待 reviewer 确认
 日期：2026-10-07
-Issue：[#12867](https://github.com/QwenLM/qwen-code/issues/12867)，属于 [#12380](https://github.com/QwenLM/qwen-code/issues/12380)
+Issue：[#12867](https://github.invalid/QwenLM/qwen-code/issues/12867)，属于 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380)
 基于：[AgentDefinition revision（D8a）](2026-10-01-managed-agent-definitions.zh-CN.md)
 基线：`main` @ `ac497aeed9`，OpenAPI 1.33.0
 
@@ -185,7 +185,7 @@ instructionsRef?}`。
     拒绝，Java 维护白名单 `QWEN_MANAGED_AGENT_DEFINITION_MODELS`，由部署保证与
     Harness 一致。
   - **instructions：** 作为单独一段，放在核心系统指令之后、项目上下文
-    （#13168 的 QWEN.md 与 AGENTS.md）之前。它不替换核心指令，因为工具使用与
+    （#13168 的 MARIADB-SHELL-AGENT.md 与 AGENTS.md）之前。它不替换核心指令，因为工具使用与
     安全规则都在核心指令里。
 - **不下发：** 凭据、sampling 参数和轮次预算。在增加对应字段之前，它们仍由部署
   决定。

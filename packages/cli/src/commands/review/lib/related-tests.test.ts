@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -202,7 +203,7 @@ describe('filesNaming', () => {
     write('node_modules/x/i.js', "'guide.md'");
     write('pkg/dist/i.js', "'guide.md'");
     write('pkg/coverage/i.js', "'guide.md'");
-    write('.qwen/tmp/other/i.ts', "'guide.md'");
+    write('.mariadb-shell-agent/tmp/other/i.ts', "'guide.md'");
     const outside = mkdtempSync(join(tmpdir(), 'related-outside-'));
     try {
       writeFileSync(join(outside, 'i.ts'), "'guide.md'");

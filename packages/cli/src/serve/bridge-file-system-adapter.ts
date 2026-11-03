@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +9,7 @@
  * Serve-side adapter that satisfies `@qwen-code/acp-bridge`'s
  * `BridgeFileSystem` interface by routing delegated ACP `writeTextFile` /
  * `readTextFile` requests through the `WorkspaceFileSystem`. Production
- * `qwen serve` keeps text reads in the same-host child and delegates final ACP
+ * `mariadb-shell-agent serve` keeps text reads in the same-host child and delegates final ACP
  * `writeTextFile` content writes through this adapter. A daemon-owned adapter
  * may opt into the narrow same-host built-in-tool write route; the default
  * remains workspace-scoped. The read path remains a fail-closed boundary for

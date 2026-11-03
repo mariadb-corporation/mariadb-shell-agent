@@ -278,7 +278,7 @@ Expected: all Feishu focused tests PASS, including existing Stop and streaming-c
 
 **Files:**
 
-- Create: `.qwen/e2e-tests/feishu-ask-user-question-cards.md` (git-ignored evidence)
+- Create: `.mariadb-shell-agent/e2e-tests/feishu-ask-user-question-cards.md` (git-ignored evidence)
 - Review: `docs/design/2026-08-05-feishu-ask-user-question-cards.md`
 - Review: all changed and untracked files in the isolated worktree
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -164,7 +165,7 @@ describe('QwenCodeAdaptor.preflight', () => {
     );
     expect(error.message).toContain(BASE_URL);
     expect(error.message).toContain('connect ECONNREFUSED');
-    expect(error.message).toContain('qwen serve');
+    expect(error.message).toContain('mariadb-shell-agent serve');
   });
 
   it('distinguishes an HTTP refusal from an unreachable daemon', async () => {
@@ -1534,7 +1535,7 @@ describe('QwenCodeAdaptor.respondPermission', () => {
   });
 
   it('votes the least-escalating allow option in production order', async () => {
-    // qwen serve offers always-allow options FIRST (toPermissionOptions);
+    // mariadb-shell-agent serve offers always-allow options FIRST (toPermissionOptions);
     // a bare voice "allow" must still take the one-shot grant, not persist
     // a project-scoped always-allow rule.
     const client = makeClient();

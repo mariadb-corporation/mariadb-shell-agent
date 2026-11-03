@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1800,7 +1801,7 @@ describe('daemon event schema', () => {
       type: 'memory_changed',
       data: {
         scope: 'workspace',
-        filePath: '/work/QWEN.md',
+        filePath: '/work/MARIADB-SHELL-AGENT.md',
         mode: 'append',
         bytesWritten: 42,
       },
@@ -1817,7 +1818,7 @@ describe('daemon event schema', () => {
       type: 'memory_changed',
       data: {
         scope: 'remote',
-        filePath: '/work/QWEN.md',
+        filePath: '/work/MARIADB-SHELL-AGENT.md',
         mode: 'append',
         bytesWritten: 1,
       },
@@ -1831,7 +1832,7 @@ describe('daemon event schema', () => {
       type: 'memory_changed',
       data: {
         scope: 'workspace',
-        filePath: '/work/QWEN.md',
+        filePath: '/work/MARIADB-SHELL-AGENT.md',
         mode: 'append',
       },
     };
@@ -1917,7 +1918,7 @@ describe('daemon event schema', () => {
         type: 'memory_changed',
         data: {
           scope: 'workspace',
-          filePath: '/work/QWEN.md',
+          filePath: '/work/MARIADB-SHELL-AGENT.md',
           mode: 'append',
           bytesWritten: 12,
         },
@@ -1949,7 +1950,7 @@ describe('daemon event schema', () => {
       type: 'memory_changed',
       data: {
         scope: 'global',
-        filePath: '/home/.qwen/QWEN.md',
+        filePath: '/home/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md',
         mode: 'replace',
         bytesWritten: 100,
       },
@@ -1957,7 +1958,7 @@ describe('daemon event schema', () => {
     expect(state.lastWorkspaceMutationType).toBe('memory_changed');
     expect(state.lastWorkspaceMutation).toEqual({
       scope: 'global',
-      filePath: '/home/.qwen/QWEN.md',
+      filePath: '/home/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md',
       mode: 'replace',
       bytesWritten: 100,
     });
@@ -2419,7 +2420,7 @@ describe('PR 21 — auth device-flow events', () => {
         id: 8,
         v: 1,
         type: 'workspace_initialized',
-        data: { path: '/work/QWEN.md', action: 'created' },
+        data: { path: '/work/MARIADB-SHELL-AGENT.md', action: 'created' },
       });
       expect(afterCreate.workspaceInitCount).toBe(1);
       expect(afterCreate.lastWorkspaceInit?.action).toBe('created');
@@ -2427,7 +2428,7 @@ describe('PR 21 — auth device-flow events', () => {
         id: 9,
         v: 1,
         type: 'workspace_initialized',
-        data: { path: '/work/QWEN.md', action: 'noop' },
+        data: { path: '/work/MARIADB-SHELL-AGENT.md', action: 'noop' },
       });
       expect(afterNoop.workspaceInitCount).toBe(2);
       expect(afterNoop.lastWorkspaceInit?.action).toBe('noop');
@@ -2436,7 +2437,7 @@ describe('PR 21 — auth device-flow events', () => {
         id: 10,
         v: 1,
         type: 'workspace_initialized',
-        data: { path: '/work/QWEN.md', action: 'replaced' },
+        data: { path: '/work/MARIADB-SHELL-AGENT.md', action: 'replaced' },
       };
       expect(asKnownDaemonEvent(malformed)).toBeUndefined();
     });
@@ -2449,7 +2450,7 @@ describe('PR 21 — auth device-flow events', () => {
         data: {
           releaseTag: 'v1.2.3',
           readmeUrl:
-            'https://github.com/QwenLM/qwen-code-action/blob/v1.2.3/README.md#quick-start',
+            'https://github.invalid/QwenLM/qwen-code-action/blob/v1.2.3/README.md#quick-start',
           workflows: [
             {
               path: '.github/workflows/qwen-dispatch.yml',

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,6 +11,7 @@ import type {
   ChatCompressionRecordPayload,
   ChatRecord,
   GoalTurnEndRecordPayload,
+  SentUserContentRecordPayload,
   SlashCommandRecordPayload,
   TurnResultRecordPayload,
   UserPromptRecordPayload,
@@ -425,6 +427,10 @@ export class SessionApiHistoryAccumulator {
         }
         return;
       }
+      if (record.subtype === 'sent_user_content') {
+        this.applySentUserContent(record);
+        return;
+      }
       if (!isApiHistoryCompressionCandidate(record)) return;
       const payload = record.systemPayload as ChatCompressionRecordPayload;
       this.compressionCandidate = payload.compressedHistory;
@@ -481,6 +487,41 @@ export class SessionApiHistoryAccumulator {
       this.systemNotificationFlags.push(isSystemNotificationRecord(record));
     }
     this.lastMaterialRecord = record;
+  }
+
+  /**
+   * Restores the user entry the model received: the reminders and context
+   * that were added to the recorded request before it was sent.
+   */
+  private applySentUserContent(record: ChatRecord): void {
+    const payload = record.systemPayload as
+      | SentUserContentRecordPayload
+      | undefined;
+    const previous = this.lastMaterialRecord;
+    const entry = this.history.at(-1);
+    const recordedParts = previous?.message?.parts ?? [];
+    if (
+      !Array.isArray(payload?.parts) ||
+      previous?.type !== 'user' ||
+      (previous.subtype !== undefined && previous.subtype !== 'cron') ||
+      (previous.promptId !== undefined &&
+        previous.promptId !== record.promptId) ||
+      entry?.role !== 'user' ||
+      entry.parts?.length !== recordedParts.length
+    ) {
+      return;
+    }
+    const parts: Part[] = [];
+    for (const part of payload.parts) {
+      if ('recordedPart' in part && typeof part.recordedPart === 'number') {
+        const recordedPart = recordedParts[part.recordedPart];
+        if (!recordedPart) return;
+        parts.push(recordedPart);
+      } else {
+        parts.push(part as Part);
+      }
+    }
+    entry.parts = copyContentForApiHistory({ role: 'user', parts }).parts;
   }
 
   getCompletedToolCallIds(): string[] {

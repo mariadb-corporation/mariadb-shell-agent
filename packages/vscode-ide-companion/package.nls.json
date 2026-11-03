@@ -1,5 +1,5 @@
 {
-  "qwen-code.copyMessage.title": "Copy Message",
-  "qwen-code.copyAllMessages.title": "Copy All Messages",
-  "qwen-code.copyLastReply.title": "Copy Last Reply"
+  "mariadb-shell-agent.copyMessage.title": "Copy Message",
+  "mariadb-shell-agent.copyAllMessages.title": "Copy All Messages",
+  "mariadb-shell-agent.copyLastReply.title": "Copy Last Reply"
 }

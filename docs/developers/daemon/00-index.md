@@ -1,6 +1,6 @@
 # Daemon Developer Documentation
 
-This is the developer-facing technical documentation for **qwen-code daemon mode**: the `qwen serve` HTTP daemon, the `@qwen-code/acp-bridge` package, the workspace-scoped MCP transport pool, multi-client permission mediation, typed daemon event schema v1, the TypeScript SDK daemon client, and the adapters that connect to the daemon.
+This is the developer-facing technical documentation for **qwen-code daemon mode**: the `mariadb-shell-agent serve` HTTP daemon, the `@qwen-code/acp-bridge` package, the workspace-scoped MCP transport pool, multi-client permission mediation, typed daemon event schema v1, the TypeScript SDK daemon client, and the adapters that connect to the daemon.
 
 It complements, rather than replaces, these existing docs:
 
@@ -58,19 +58,19 @@ Pick the path that matches your goal:
 - [`17-configuration.md`](./17-configuration.md) - env vars, CLI flags, `settings.json` keys that affect the daemon.
 - [`18-error-taxonomy.md`](./18-error-taxonomy.md) - typed errors per layer with remediation.
 - [`19-observability.md`](./19-observability.md) - `QWEN_SERVE_DEBUG`, debugging recipes, telemetry gaps.
-- [`20-quickstart-operations.md`](./20-quickstart-operations.md) - shortest startup path, curl checks, route map, and the embedding boundary (in-process hosting is internal; external integrations use `qwen serve --no-web` plus the HTTP/SSE protocol). The internal `createServeApp` lifecycle recipe lives in [`02-serve-runtime.md`](./02-serve-runtime.md).
+- [`20-quickstart-operations.md`](./20-quickstart-operations.md) - shortest startup path, curl checks, route map, and the embedding boundary (in-process hosting is internal; external integrations use `mariadb-shell-agent serve --no-web` plus the HTTP/SSE protocol). The internal `createServeApp` lifecycle recipe lives in [`02-serve-runtime.md`](./02-serve-runtime.md).
 
 ## Glossary
 
 - **ACP** - Agent Client Protocol. JSON-RPC over stdio spoken between the daemon bridge and the ACP child process. This is not the HTTP protocol that clients use against the daemon.
-- **ACP child** - the `qwen --acp` child that hosts one workspace's agent runtime. Production attempts to preheat the trusted primary child for compatibility; trusted secondaries start on their first runtime command or Session, and untrusted secondaries do not start ACP. Legacy primary routes retain their existing compatibility behavior. The owning bridge multiplexes sessions and clients onto that child.
+- **ACP child** - the `mariadb-shell-agent --acp` child that hosts one workspace's agent runtime. Production attempts to preheat the trusted primary child for compatibility; trusted secondaries start on their first runtime command or Session, and untrusted secondaries do not start ACP. Legacy primary routes retain their existing compatibility behavior. The owning bridge multiplexes sessions and clients onto that child.
 - **acp-bridge** - the `@qwen-code/acp-bridge` package (`packages/acp-bridge/`). Owns session multiplexing, the permission mediator, the event bus, and the channel factory.
 - **BridgeClient** - `packages/acp-bridge/src/bridgeClient.ts`. Wraps one ACP `ClientSideConnection`, and handles `requestPermission`, `sendPrompt`, and `cancelSession`.
-- **Channel factory** - pluggable strategy for spawning or attaching to an ACP child. The default `spawnChannel` runs `qwen --acp` as a subprocess; `inMemoryChannel` runs it in-process for tests.
+- **Channel factory** - pluggable strategy for spawning or attaching to an ACP child. The default `spawnChannel` runs `mariadb-shell-agent --acp` as a subprocess; `inMemoryChannel` runs it in-process for tests.
 - **DaemonClient** - `packages/sdk-typescript/src/daemon/DaemonClient.ts`. The TypeScript SDK HTTP-level facade over the daemon.
 - **DaemonSessionClient** - `packages/sdk-typescript/src/daemon/DaemonSessionClient.ts`. Session-scoped wrapper that tracks `lastSeenEventId` for SSE replay.
 - **EventBus** - `packages/acp-bridge/src/eventBus.ts`. Per-session in-memory pub/sub with monotonic IDs, a bounded ring, and per-subscriber backpressure.
-- **F1 / F2 / F3 / F4** - internal milestones tracked in [#4175](https://github.com/QwenLM/qwen-code/issues/4175). F1: bridge extraction and `BridgeFileSystem`. F2: workspace-scoped MCP transport pool. F3: multi-client permission mediation. F4: protocol completion and daemon client surfaces.
+- **F1 / F2 / F3 / F4** - internal milestones tracked in [#4175](https://github.invalid/QwenLM/qwen-code/issues/4175). F1: bridge extraction and `BridgeFileSystem`. F2: workspace-scoped MCP transport pool. F3: multi-client permission mediation. F4: protocol completion and daemon client surfaces.
 - **MCP** - Model Context Protocol. Servers expose tools, resources, and prompts; the daemon ACP child connects to them.
 - **McpTransportPool** - `packages/core/src/tools/mcp-transport-pool.ts`. F2 workspace-scoped pool sharing one MCP transport per server name and config fingerprint.
 - **Mediator policy** - one of `first-responder`, `designated`, `consensus`, or `local-only`. Decides how multi-client permission votes resolve.
@@ -104,7 +104,7 @@ Use these anchors when moving from the docs into the latest `main` code:
 
 - **Java / Python SDK daemon clients** - only the TypeScript SDK ships a daemon client today. Doc 13 is TypeScript-only.
 - **Web UI product details** - the shared transcript layer and web UI daemon entry points are covered here, but product UI layout is tracked in `docs/developers/daemon-ui/` and adapter design notes.
-- **Zed extension (`packages/zed-extension/`)** - it launches `qwen --acp` over stdio directly and bypasses the daemon.
+- **Zed extension (`packages/zed-extension/`)** - it launches `mariadb-shell-agent --acp` over stdio directly and bypasses the daemon.
 - **Experimental in-process hosting** - `--no-http-bridge` still falls back to http-bridge today; a stable in-process serve mode would need new docs when it lands.
 
 ## Current daemon mode coverage
@@ -113,7 +113,7 @@ Use these anchors when moving from the docs into the latest `main` code:
 
 | Area                      | Current state                                                                                                                                                                                                       | Primary docs                                                              |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Bootstrap / listen path   | `qwen serve` lazy-loads `runQwenServe`, validates auth/workspace/budget/settings, builds an Express app, then calls `app.listen` and blocks forever until signal.                                                   | [`02`](./02-serve-runtime.md), [`20`](./20-quickstart-operations.md)      |
+| Bootstrap / listen path   | `mariadb-shell-agent serve` lazy-loads `runQwenServe`, validates auth/workspace/budget/settings, builds an Express app, then calls `app.listen` and blocks forever until signal.                                    | [`02`](./02-serve-runtime.md), [`20`](./20-quickstart-operations.md)      |
 | Auth / network guardrails | Token-less loopback grants the primary listener local operator authority; non-loopback requires bearer; `--require-auth` extends bearer to loopback and `/health`; Host allowlist and default CORS deny are active. | [`12`](./12-auth-security.md), [`17`](./17-configuration.md)              |
 | Session lifecycle         | `POST /session`, `load`, `resume`, metadata patch, heartbeat, eviction, idle reaping, prompt pending limits, and graceful close are documented.                                                                     | [`08`](./08-session-lifecycle.md), [`10`](./10-event-bus.md)              |
 | ACP bridge                | Single ACP child multiplexed by default; `sessionScope` supports `single` and `thread`; `BridgeFileSystem`, context filename, env overrides, and channel idle timeout are wired.                                    | [`03`](./03-acp-bridge.md), [`07`](./07-workspace-filesystem.md)          |
@@ -143,7 +143,7 @@ Use these anchors when moving from the docs into the latest `main` code:
 
 | Area                    | Current state                                                                                                                                                                                                                               | Primary docs                          |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| Configuration           | Full `qwen serve` flags, env vars, `settings.json`, `ServeOptions`, `BridgeOptions`, and important constants are collected in one page.                                                                                                     | [`17`](./17-configuration.md)         |
+| Configuration           | Full `mariadb-shell-agent serve` flags, env vars, `settings.json`, `ServeOptions`, `BridgeOptions`, and important constants are collected in one page.                                                                                      | [`17`](./17-configuration.md)         |
 | Quickstart / operations | Shortest startup path, launch recipes, curl checks, Web Shell auth behavior, route split, shutdown behavior, and the embedding boundary are covered. The internal `createServeApp` lifecycle recipe lives in [`02`](./02-serve-runtime.md). | [`20`](./20-quickstart-operations.md) |
 | Errors                  | Boot-time explicit failures, route errors, bridge errors, EventBus errors, filesystem errors, and mediator errors are summarized with remediation.                                                                                          | [`18`](./18-error-taxonomy.md)        |
 | Observability           | `QWEN_SERVE_DEBUG`, curl recipes, useful events, telemetry gaps, and investigation checklists are documented.                                                                                                                               | [`19`](./19-observability.md)         |
@@ -165,4 +165,4 @@ Use these anchors when moving from the docs into the latest `main` code:
 
 ## Version provenance
 
-This doc set reflects the daemon mode surface currently merged into `main`, including the follow-up work from [#4412](https://github.com/QwenLM/qwen-code/pull/4412). It intentionally describes current behavior instead of earlier F-series planning snapshots.
+This doc set reflects the daemon mode surface currently merged into `main`, including the follow-up work from [#4412](https://github.invalid/QwenLM/qwen-code/pull/4412). It intentionally describes current behavior instead of earlier F-series planning snapshots.

@@ -138,6 +138,6 @@ cannot strand one. On top of that, an operator acting on the channel, or on the
 whole selection with a change that stops something, clears it.
 
 Legacy `runtime.channelWorker`, grouped `runtime.channelWorkers`, pidfile
-fields, standalone `qwen channel start`, and `qwen channel reload` remain
-compatible. New CLI control is exposed through `qwen channel set`, plus remote
+fields, standalone `mariadb-shell-agent channel start`, and `mariadb-shell-agent channel reload` remain
+compatible. New CLI control is exposed through `mariadb-shell-agent channel set`, plus remote
 variants of channel stop and status.

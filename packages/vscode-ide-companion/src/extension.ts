@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,11 +10,6 @@ import { IDEServer } from './ide-server.js';
 import semver from 'semver';
 import { DiffContentProvider, DiffManager } from './diff-manager.js';
 import { createLogger, logger, resetLoggerSink } from './utils/logger.js';
-import {
-  detectIdeFromEnv,
-  IDE_DEFINITIONS,
-  type IdeInfo,
-} from '@qwen-code/qwen-code-core';
 import { redactLogCredentials } from '@qwen-code/acp-bridge/logRedaction';
 import { WebViewProvider } from './webview/providers/WebViewProvider.js';
 import { ChatProviderRegistry } from './webview/providers/ChatProviderRegistry.js';
@@ -26,20 +22,9 @@ import { isWindows } from './utils/platform.js';
 // into the active extension flow yet.
 export { createSdkDaemonSessionFactory as __daemonIdeSessionFactoryForBundle } from './services/daemonIdeConnection.js';
 
-const CLI_IDE_COMPANION_IDENTIFIER = 'qwenlm.qwen-code-vscode-ide-companion';
-const INFO_MESSAGE_SHOWN_KEY = 'qwenCodeInfoMessageShown';
+const CLI_IDE_COMPANION_IDENTIFIER = 'MariaDB.mariadb-shell-agent';
 const IDE_WORKSPACE_PATH_ENV_VAR = 'QWEN_CODE_IDE_WORKSPACE_PATH';
-export const DIFF_SCHEME = 'qwen-diff';
-
-/**
- * IDE environments where the installation greeting is hidden.  In these
- * environments we either are pre-installed and the installation message is
- * confusing or we just want to be quiet.
- */
-const HIDE_INSTALLATION_GREETING_IDES: ReadonlySet<IdeInfo['name']> = new Set([
-  IDE_DEFINITIONS.firebasestudio.name,
-  IDE_DEFINITIONS.cloudshell.name,
-]);
+export const DIFF_SCHEME = 'mariadb-shell-agent-diff';
 
 let ideServer: IDEServer;
 let outputChannel: vscode.OutputChannel;
@@ -94,7 +79,7 @@ async function checkForUpdates(
 
     if (latestVersion && semver.gt(latestVersion, currentVersion)) {
       const selection = await vscode.window.showInformationMessage(
-        `A new version (${latestVersion}) of the Qwen Code Companion extension is available.`,
+        `A new version (${latestVersion}) of the MariaDB Shell Agent Companion extension is available.`,
         'Update to latest version',
       );
       if (selection === 'Update to latest version') {
@@ -112,7 +97,9 @@ async function checkForUpdates(
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-  outputChannel = vscode.window.createOutputChannel('Qwen Code Companion');
+  outputChannel = vscode.window.createOutputChannel(
+    'MariaDB Shell Agent Companion',
+  );
   createLogger(outputChannel, redactLogCredentials);
   logger.info('Extension activated');
 
@@ -227,13 +214,13 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   };
   context.subscriptions.push(
-    vscode.commands.registerCommand('qwen-code.copyMessage', () =>
+    vscode.commands.registerCommand('mariadb-shell-agent.copyMessage', () =>
       sendCopyToActive('copyMessage'),
     ),
-    vscode.commands.registerCommand('qwen-code.copyAllMessages', () =>
+    vscode.commands.registerCommand('mariadb-shell-agent.copyAllMessages', () =>
       sendCopyToActive('copyAllMessages'),
     ),
-    vscode.commands.registerCommand('qwen-code.copyLastReply', () =>
+    vscode.commands.registerCommand('mariadb-shell-agent.copyLastReply', () =>
       sendCopyToActive('copyLastReply'),
     ),
   );
@@ -276,7 +263,7 @@ export async function activate(context: vscode.ExtensionContext) {
       diffContentProvider,
     ),
     vscode.commands.registerCommand(
-      'qwen.diff.accept',
+      'mariadb-shell-agent.diff.accept',
       async (uri?: vscode.Uri) => {
         const docUri = uri ?? vscode.window.activeTextEditor?.document.uri;
         const isManagedDiff =
@@ -305,7 +292,7 @@ export async function activate(context: vscode.ExtensionContext) {
       },
     ),
     vscode.commands.registerCommand(
-      'qwen.diff.cancel',
+      'mariadb-shell-agent.diff.cancel',
       async (uri?: vscode.Uri) => {
         const docUri = uri ?? vscode.window.activeTextEditor?.document.uri;
         const isManagedDiff =
@@ -333,20 +320,32 @@ export async function activate(context: vscode.ExtensionContext) {
         logger.log('[Extension] Diff cancelled');
       },
     ),
-    vscode.commands.registerCommand('qwen.diff.closeAll', async () => {
-      try {
-        await diffManager.closeAll();
-      } catch (err) {
-        logger.warn('[Extension] qwen.diff.closeAll failed:', err);
-      }
-    }),
-    vscode.commands.registerCommand('qwen.diff.suppressBriefly', async () => {
-      try {
-        diffManager.suppressFor(1200);
-      } catch (err) {
-        logger.warn('[Extension] qwen.diff.suppressBriefly failed:', err);
-      }
-    }),
+    vscode.commands.registerCommand(
+      'mariadb-shell-agent.diff.closeAll',
+      async () => {
+        try {
+          await diffManager.closeAll();
+        } catch (err) {
+          logger.warn(
+            '[Extension] mariadb-shell-agent.diff.closeAll failed:',
+            err,
+          );
+        }
+      },
+    ),
+    vscode.commands.registerCommand(
+      'mariadb-shell-agent.diff.suppressBriefly',
+      async () => {
+        try {
+          diffManager.suppressFor(1200);
+        } catch (err) {
+          logger.warn(
+            '[Extension] mariadb-shell-agent.diff.suppressBriefly failed:',
+            err,
+          );
+        }
+      },
+    ),
   );
 
   ideServer = new IDEServer(logger.info, diffManager);
@@ -357,17 +356,6 @@ export async function activate(context: vscode.ExtensionContext) {
     logger.warn(`Failed to start IDE server: ${message}`);
   }
 
-  const infoMessageEnabled = !HIDE_INSTALLATION_GREETING_IDES.has(
-    detectIdeFromEnv().name,
-  );
-
-  if (!context.globalState.get(INFO_MESSAGE_SHOWN_KEY) && infoMessageEnabled) {
-    void vscode.window.showInformationMessage(
-      'Qwen Code Companion extension successfully installed.',
-    );
-    context.globalState.update(INFO_MESSAGE_SHOWN_KEY, true);
-  }
-
   context.subscriptions.push(
     vscode.workspace.onDidChangeWorkspaceFolders(() => {
       ideServer.syncEnvVars();
@@ -376,7 +364,7 @@ export async function activate(context: vscode.ExtensionContext) {
       ideServer.syncEnvVars();
     }),
     vscode.commands.registerCommand(
-      'qwen-code.runQwenCode',
+      'mariadb-shell-agent.runQwenCode',
       async (
         location?:
           | vscode.TerminalLocation
@@ -385,7 +373,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const workspaceFolders = vscode.workspace.workspaceFolders;
         if (!workspaceFolders || workspaceFolders.length === 0) {
           vscode.window.showInformationMessage(
-            'No folder open. Please open a folder to run Qwen Code.',
+            'No folder open. Please open a folder to run MariaDB Shell Agent.',
           );
           return;
         }
@@ -395,7 +383,7 @@ export async function activate(context: vscode.ExtensionContext) {
           selectedFolder = workspaceFolders[0];
         } else {
           selectedFolder = await vscode.window.showWorkspaceFolderPick({
-            placeHolder: 'Select a folder to run Qwen Code in',
+            placeHolder: 'Select a folder to run MariaDB Shell Agent in',
           });
         }
 
@@ -409,7 +397,7 @@ export async function activate(context: vscode.ExtensionContext) {
           const execPath = process.execPath;
 
           const terminalOptions: vscode.TerminalOptions = {
-            name: `Qwen Code (${selectedFolder.name})`,
+            name: `MariaDB Shell Agent (${selectedFolder.name})`,
             cwd: selectedFolder.uri.fsPath,
             env: {
               [IDE_WORKSPACE_PATH_ENV_VAR]: JSON.stringify(
@@ -446,13 +434,16 @@ export async function activate(context: vscode.ExtensionContext) {
         }
       },
     ),
-    vscode.commands.registerCommand('qwen-code.showNotices', async () => {
-      const noticePath = vscode.Uri.joinPath(
-        context.extensionUri,
-        'NOTICES.txt',
-      );
-      await vscode.window.showTextDocument(noticePath);
-    }),
+    vscode.commands.registerCommand(
+      'mariadb-shell-agent.showNotices',
+      async () => {
+        const noticePath = vscode.Uri.joinPath(
+          context.extensionUri,
+          'NOTICES.txt',
+        );
+        await vscode.window.showTextDocument(noticePath);
+      },
+    ),
   );
 }
 

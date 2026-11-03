@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 // @vitest-environment jsdom
@@ -708,7 +709,9 @@ describe('startOpenTuiUI fallback contract', () => {
           expect(summary.textContent).toContain('Interaction Summary');
           expect(summary.textContent).toContain('Wall Time: 2m 3s');
           expect(
-            summary.textContent?.includes('qwen --resume test-session-id'),
+            summary.textContent?.includes(
+              'mariadb-shell-agent --resume test-session-id',
+            ),
           ).toBe(resumeHint);
           expect(mocks.state.transcript).toEqual(history);
           expect(messages).toEqual([

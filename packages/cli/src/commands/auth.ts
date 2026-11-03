@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,21 +20,21 @@ const yellow = (value: string) => color(value, '33');
 export const buildRemovalNotice = (): string =>
   [
     '',
-    yellow(t('⚠  qwen auth has been removed.')),
+    yellow(t('⚠  mariadb-shell-agent auth has been removed.')),
     '',
     `  ${cyan(t('Interactive'))}   →  ${t('run qwen and use /auth to configure providers')}`,
     `  ${cyan(t('CI / Headless'))} →  ${t('set provider environment variables, for example OPENAI_API_KEY + OPENAI_BASE_URL + OPENAI_MODEL')}`,
     `                     ${t('or pass --openai-api-key, --openai-base-url, --model')}`,
     `  ${cyan(t('Coding Plan'))}   →  ${t('set BAILIAN_CODING_PLAN_API_KEY and use the Coding Plan base URL for your region')}`,
-    `                     ${t('China: https://coding.dashscope.aliyuncs.com/v1')}`,
-    `                     ${t('International: https://coding-intl.dashscope.aliyuncs.com/v1')}`,
+    `                     ${t('China: https://coding.dashscope.aliyuncs.invalid/v1')}`,
+    `                     ${t('International: https://coding-intl.dashscope.aliyuncs.invalid/v1')}`,
     `  ${cyan(t('Token Plan'))}    →  ${t('set BAILIAN_TOKEN_PLAN_API_KEY and use the Token Plan base URL for your region')}`,
-    `                     ${t('China: https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1')}`,
-    `                     ${t('International: https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1')}`,
+    `                     ${t('China: https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1')}`,
+    `                     ${t('International: https://token-plan.ap-southeast-1.maas.aliyuncs.invalid/compatible-mode/v1')}`,
     `  ${cyan(t('OpenRouter'))}    →  ${t('set OPENROUTER_API_KEY and OPENAI_BASE_URL=https://openrouter.ai/api/v1')}`,
     `  ${cyan(t('Requesty'))}      →  ${t('set REQUESTY_API_KEY and OPENAI_BASE_URL=https://router.requesty.ai/v1')}`,
     `  ${cyan(t('Qwen OAuth'))}    →  ${t('run qwen interactively and use /auth; OAuth cannot be configured with env vars alone')}`,
-    `  ${cyan(t('Scripted'))}      →  ${t('edit ~/.qwen/settings.json, or run qwen interactively once')}`,
+    `  ${cyan(t('Scripted'))}      →  ${t('edit ~/.mariadb-shell-agent/settings.json, or run qwen interactively once')}`,
     '',
     `  ${t('Check auth status')} → ${cyan('/doctor')}`,
     '',

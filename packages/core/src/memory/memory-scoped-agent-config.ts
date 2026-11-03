@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -220,7 +221,7 @@ function realpathOrResolved(filePath: string): string {
  * same symlinks in its trusted prefix (macOS `/var` -> `/private/var`, a
  * symlinked project dir or linked worktree) to avoid false denials. But it must
  * NOT follow a symlink that lives inside the managed suffix — e.g. a repo-
- * tracked `.qwen -> /outside` under `QWEN_CODE_MEMORY_LOCAL` — which would
+ * tracked `.mariadb-shell-agent -> /outside` under `QWEN_CODE_MEMORY_LOCAL` — which would
  * relocate the "allowed" root out of the project and let the first managed
  * write land outside it. So we canonicalize the trusted anchor and append the
  * managed suffix literally, with one narrow exception.

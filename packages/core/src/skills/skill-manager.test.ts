@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -55,8 +56,12 @@ vi.mock('../utils/yaml-parser.js', () => ({
 const TEST_HOME = path.resolve('/home/user');
 const TEST_PROJECT_ROOT = path.resolve('/test/project');
 // path.join so separators match on all platforms.
-const PROJECT_QWEN_DIR = path.join(TEST_PROJECT_ROOT, '.qwen', 'skills');
-const USER_QWEN_DIR = path.join(TEST_HOME, '.qwen', 'skills');
+const PROJECT_QWEN_DIR = path.join(
+  TEST_PROJECT_ROOT,
+  '.mariadb-shell-agent',
+  'skills',
+);
+const USER_QWEN_DIR = path.join(TEST_HOME, '.mariadb-shell-agent', 'skills');
 
 type Dirents = Awaited<ReturnType<typeof fs.readdir>>;
 const dirents = (...entries: unknown[]) => entries as unknown as Dirents;
@@ -238,7 +243,7 @@ describe('SkillManager', () => {
     name: 'test-skill',
     description: 'A test skill',
     level: 'project',
-    filePath: '/test/project/.qwen/skills/test-skill/SKILL.md',
+    filePath: '/test/project/.mariadb-shell-agent/skills/test-skill/SKILL.md',
     body: 'You are a helpful assistant with this skill.',
   };
 
@@ -343,11 +348,11 @@ describe('SkillManager', () => {
     it('should determine level from file path', () => {
       const projectConfig = parse(
         validMarkdown,
-        '/test/project/.qwen/skills/test-skill/SKILL.md',
+        '/test/project/.mariadb-shell-agent/skills/test-skill/SKILL.md',
       );
       const userConfig = parse(
         validMarkdown,
-        '/home/user/.qwen/skills/test-skill/SKILL.md',
+        '/home/user/.mariadb-shell-agent/skills/test-skill/SKILL.md',
         'user',
       );
 
@@ -711,7 +716,7 @@ describe('SkillManager', () => {
     });
 
     it('should deduplicate same-name skills across provider dirs within a level', async () => {
-      // The same skill name in both the .qwen and .agents project dirs.
+      // The same skill name in both the .mariadb-shell-agent and .agents project dirs.
       vi.mocked(fs.readdir).mockReset();
       mockReaddirByDir({
         [PROJECT_QWEN_DIR]: [dirent('shared-skill')],
@@ -720,7 +725,11 @@ describe('SkillManager', () => {
         ],
       });
       mockReadFileByPath({
-        '.qwen': skillFile('shared-skill', 'From qwen dir', 'Qwen content'),
+        '.mariadb-shell-agent': skillFile(
+          'shared-skill',
+          'From qwen dir',
+          'Qwen content',
+        ),
         '.agents': skillFile(
           'shared-skill',
           'From agents dir',
@@ -733,7 +742,7 @@ describe('SkillManager', () => {
         force: true,
       });
 
-      // Only one instance should remain, from .qwen (first in PROVIDER_CONFIG_DIRS)
+      // Only one instance should remain, from .mariadb-shell-agent (first in PROVIDER_CONFIG_DIRS)
       expect(skills).toHaveLength(1);
       expect(skills[0].name).toBe('shared-skill');
       expect(skills[0].description).toBe('From qwen dir');
@@ -886,7 +895,9 @@ describe('SkillManager', () => {
       const baseDirs = manager.getSkillsBaseDirs(level);
 
       expect(baseDirs).toHaveLength(2);
-      expect(baseDirs).toContain(path.join(root, '.qwen', 'skills'));
+      expect(baseDirs).toContain(
+        path.join(root, '.mariadb-shell-agent', 'skills'),
+      );
       expect(baseDirs).toContain(path.join(root, '.agents', 'skills'));
     });
 
@@ -947,7 +958,7 @@ describe('SkillManager', () => {
 
   describe('bundled skills', () => {
     const bundledDirSegment = path.join('skills', 'bundled');
-    const qwenDirSegment = path.join('.qwen', 'skills');
+    const qwenDirSegment = path.join('.mariadb-shell-agent', 'skills');
 
     /**
      * Bundled lists review and simplify; each project/user level in `levels`

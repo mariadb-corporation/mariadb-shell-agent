@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -666,11 +667,11 @@ describe('realtime-session', () => {
   it('derives a model-qualified WebSocket URL', () => {
     expect(
       deriveQwenOmniRealtimeUrl(
-        'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
         'qwen3.5-omni-plus-realtime',
       ),
     ).toBe(
-      'wss://dashscope.aliyuncs.com/api-ws/v1/realtime?model=qwen3.5-omni-plus-realtime',
+      'wss://dashscope.aliyuncs.invalid/api-ws/v1/realtime?model=qwen3.5-omni-plus-realtime',
     );
     expect(
       deriveQwenOmniRealtimeUrl(

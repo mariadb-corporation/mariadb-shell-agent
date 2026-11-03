@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -243,7 +244,7 @@ it('refuses a v1 Host heartbeat with an upgrade notice and never records it', as
 
   const response = await setup().beat({
     workspaceCwd: '/remote',
-    providers: ['Qwen Code ACP'],
+    providers: ['MariaDB Shell Agent ACP'],
   });
 
   // Not 401: a v1 Host deletes its credential on that.
@@ -295,7 +296,7 @@ it('never hands work to a v1 Host', async () => {
     ...V2_HOST,
     protocol: undefined,
     programs: undefined,
-    providers: ['Qwen Code ACP'],
+    providers: ['MariaDB Shell Agent ACP'],
   });
 
   const response = await setup().poll(0);

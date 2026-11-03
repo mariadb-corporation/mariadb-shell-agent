@@ -178,7 +178,7 @@ refresh reset, absence of read-state writes, stale async responses, partial
 failures, archive scope and undo. Verify that activity replaces workspace/search
 navigation, preserves the enabled top-level New session action, and restores the
 ordinary surface through each exit; also verify the `session_organization`
-capability gate. Run a baseline against global `qwen`
+capability gate. Run a baseline against global `mariadb-shell-agent`
 and browser fixtures before implementing, then focused tests, browser E2E,
 build, typecheck and bundle. Read the full diff in two clean audit passes and
 perform an independent review. Test only isolated conversations; never archive
@@ -187,10 +187,10 @@ approval; implementation and verification findings may refine this document.
 
 ## Related work and visual evidence
 
-Issue [#16020](https://github.com/QwenLM/qwen-code/issues/16020) tracks this
+Issue [#16020](https://github.invalid/QwenLM/qwen-code/issues/16020) tracks this
 feature. Existing unread persistence work in
-[#11451](https://github.com/QwenLM/qwen-code/issues/11451) and
-[#12672](https://github.com/QwenLM/qwen-code/pull/12672) remains separate; this
+[#11451](https://github.invalid/QwenLM/qwen-code/issues/11451) and
+[#12672](https://github.invalid/QwenLM/qwen-code/pull/12672) remains separate; this
 feature does not resolve offline or reload continuity. The latter proposes
 browser localStorage, not backend receipts, and overlapping sidebar changes
 will need reconciliation if it lands first.

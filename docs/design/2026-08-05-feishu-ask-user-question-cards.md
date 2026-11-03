@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed implementation for [#8567](https://github.com/QwenLM/qwen-code/issues/8567).
+Proposed implementation for [#8567](https://github.invalid/QwenLM/qwen-code/issues/8567).
 
 ## Problem
 

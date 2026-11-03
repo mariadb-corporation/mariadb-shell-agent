@@ -74,7 +74,7 @@ PermissionManager 的 Qwen AUTO 规则；普通 Qwen 子代理仍使用原有 AU
 
 ## 验证和验收
 
-测试计划位于 `.qwen/e2e-tests/codex-subagent-executor.md`。先使用全局 Qwen
+测试计划位于 `.mariadb-shell-agent/e2e-tests/codex-subagent-executor.md`。先使用全局 Qwen
 确认能力缺口，再用隔离模型和原生协议替身验证重新构建的 CLI。覆盖两个内置定义、
 实际 Codex 分发、前后台结果、完成通知、消息和恢复拒绝、Stop hook 行为、权限
 约束、缺失程序、错误协议、取消、超时及进程清理，并回归 Claude ACP 和普通

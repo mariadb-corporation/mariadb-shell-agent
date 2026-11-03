@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -43,7 +44,7 @@ describe('Managed extension contribution resource closure', () => {
       skills: [],
       commands: [],
       agents: [],
-      context: [{ path: 'QWEN.md', body: '文'.repeat(60_000) }],
+      context: [{ path: 'MARIADB-SHELL-AGENT.md', body: '文'.repeat(60_000) }],
       mcpServers: {},
       hooks: {},
       settings: [],

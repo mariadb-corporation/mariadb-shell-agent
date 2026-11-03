@@ -277,7 +277,9 @@ test('nightly versions and update remain readable in More with a narrow sidebar'
   await expect(button).toBeVisible();
   const buttonBox = (await button.boundingBox())!;
   expect(buttonBox.width).toBeGreaterThan(100);
-  const badge = page.getByTitle(`Qwen Code v${version}`, { exact: true });
+  const badge = page.getByTitle(`MariaDB Shell Agent v${version}`, {
+    exact: true,
+  });
   await expect(badge).toHaveCSS('text-overflow', 'ellipsis');
   await expect(badge).toBeVisible();
   const menu = page.locator('[data-web-shell-sidebar-more]');

@@ -5,13 +5,13 @@
 ## Problem and scope
 
 OpenAI Chat Completions and Responses share credential configuration, but today
-Qwen Code exposes them as separate authentication choices and provider buckets.
+MariaDB Shell Agent exposes them as separate authentication choices and provider buckets.
 Users must change `openai` to `openai-responses` to select the request format.
 
 Add `wireApi: "chat-completions" | "responses"` to each OpenAI-compatible model,
 beside `id`, `baseUrl`, and `envKey`. Present one OpenAI-compatible provider
 choice followed by API selection. Keep internal protocol identities and recorded
-session routes distinct. This is a Qwen Code feature, not a port from
+session routes distinct. This is a MariaDB Shell Agent feature, not a port from
 another codebase. Native computer-use behavior, reasoning defaults, transport
 implementations, automatic protocol detection, and automatic credential
 migration are out of scope.
@@ -183,7 +183,7 @@ documentation. No daemon route ownership or workspace-resolution rules change.
   implicit Chat, explicit Chat, canonical Responses, custom-provider Responses,
   released Responses declarations, invalid API rejection before any request, and
   tool continuation for both APIs.
-- Dry-run the plan against global `qwen`, then verify the built local CLI. Use
+- Dry-run the plan against global `mariadb-shell-agent`, then verify the built local CLI. Use
   temporary `QWEN_HOME` directories and mock keys; do not modify real settings
   or send test prompts to a remote model.
 - Run build, typecheck, focused unit tests, bundle, formatting/lint checks, two
@@ -191,5 +191,5 @@ documentation. No daemon route ownership or workspace-resolution rules change.
 
 Acceptance requires correct request formats and preserved route identity, not
 merely successful JSON parsing or a zero exit code. Detailed execution results
-live in the git-ignored `.qwen/e2e-tests/pr11538-canonical-wire-api/` directory;
+live in the git-ignored `.mariadb-shell-agent/e2e-tests/pr11538-canonical-wire-api/` directory;
 publish the verification report on the PR so reviewers have accessible evidence.

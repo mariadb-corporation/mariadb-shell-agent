@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -60,7 +61,7 @@ it('asks the local daemon to connect with the link and token', async () => {
   expect(out.join('\n')).toContain('qwen, claude');
 });
 
-it('points at `qwen serve --join` when no daemon is running', async () => {
+it('points at `mariadb-shell-agent serve --join` when no daemon is running', async () => {
   const { value, err } = deps({
     fetch: vi.fn(async () => {
       throw new TypeError('fetch failed');
@@ -74,7 +75,7 @@ it('points at `qwen serve --join` when no daemon is running', async () => {
 
   expect(code).toBe(1);
   expect(err.join('\n')).toContain(
-    'qwen serve --join http://10.0.0.2:4170/join/ws_1 --agent-host-allow-http',
+    'mariadb-shell-agent serve --join http://10.0.0.2:4170/join/ws_1 --agent-host-allow-http',
   );
 });
 

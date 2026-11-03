@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -88,7 +89,7 @@ afterEach(() => {
   vi.unstubAllEnvs();
   process.exitCode = undefined;
 });
-describe('qwen sandbox tool boundary', () => {
+describe('mariadb-shell-agent sandbox tool boundary', () => {
   it.each([
     [[], undefined],
     [['--sandbox'], true],

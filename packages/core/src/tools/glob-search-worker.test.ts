@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -213,7 +214,10 @@ describe('bounded Glob search (real worker)', () => {
   it('retains ignore filtering and prunes outward traversal in the worker', async () => {
     await fs.mkdir(path.join(root, '.git'));
     await fs.writeFile(path.join(root, '.gitignore'), 'git-hidden.ts\n');
-    await fs.writeFile(path.join(root, '.qwenignore'), 'qwen-hidden.ts\n');
+    await fs.writeFile(
+      path.join(root, '.mariadb-shell-agentignore'),
+      'qwen-hidden.ts\n',
+    );
     await fs.writeFile(path.join(root, 'git-hidden.ts'), 'hidden');
     await fs.writeFile(path.join(root, 'qwen-hidden.ts'), 'hidden');
     const sibling = path.join(temporary, 'sibling');

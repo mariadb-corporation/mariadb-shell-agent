@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -238,7 +239,12 @@ function makeFixture(
 ) {
   const workspaceDir = path.join(tmpRoot, randomUUID());
   const slug = 'task';
-  const worktreeDir = path.join(workspaceDir, '.qwen', 'worktrees', slug);
+  const worktreeDir = path.join(
+    workspaceDir,
+    '.mariadb-shell-agent',
+    'worktrees',
+    slug,
+  );
   mkdirSync(worktreeDir, { recursive: true });
   const runtimeBaseDir = path.join(tmpRoot, randomUUID());
   const sessionService = new SessionService(workspaceDir, { runtimeBaseDir });
@@ -278,7 +284,7 @@ function makeFixture(
   const worktreeBranch = `worktree-${slug}`;
   const realTarget = realpathSync(worktreeDir);
   const candidateRoots = [
-    path.join(realpathSync(workspaceDir), '.qwen', 'worktrees'),
+    path.join(realpathSync(workspaceDir), '.mariadb-shell-agent', 'worktrees'),
   ];
   return {
     workspaceDir,

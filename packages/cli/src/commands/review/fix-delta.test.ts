@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -101,7 +102,7 @@ describe('fix-delta', () => {
     writeFileSync(join(repo, '.gitignore'), 'node_modules\n');
     git('add', '-A');
     git('commit', '-qm', 'head');
-    mkdirSync(join(repo, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(repo, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     cwdBefore = process.cwd();
     process.chdir(repo);
     (writeStderrLine as unknown as Mock).mockClear();
@@ -182,21 +183,33 @@ describe('fix-delta', () => {
     expect(hunks()).toContain('+export const x = 3;');
   });
 
-  it("leaves the review's own side files out at any depth — directory contents included — and keeps every other .qwen path", () => {
-    mkdirSync(join(repo, 'pkg', '.qwen', 'tmp'), { recursive: true });
-    writeFileSync(join(repo, '.qwen', 'tmp', 'user-notes.md'), 'v1\n');
+  it("leaves the review's own side files out at any depth — directory contents included — and keeps every other .mariadb-shell-agent path", () => {
+    mkdirSync(join(repo, 'pkg', '.mariadb-shell-agent', 'tmp'), {
+      recursive: true,
+    });
+    writeFileSync(
+      join(repo, '.mariadb-shell-agent', 'tmp', 'user-notes.md'),
+      'v1\n',
+    );
     runSnapshot();
 
     // Everything the flow writes between the two moments.
     writeFileSync(
-      join(repo, '.qwen', 'tmp', 'qwen-review-local-plan.json'),
+      join(repo, '.mariadb-shell-agent', 'tmp', 'qwen-review-local-plan.json'),
       '{}\n',
     );
-    mkdirSync(join(repo, '.qwen', 'tmp', 'qwen-review-local-plan-prompts'));
+    mkdirSync(
+      join(
+        repo,
+        '.mariadb-shell-agent',
+        'tmp',
+        'qwen-review-local-plan-prompts',
+      ),
+    );
     writeFileSync(
       join(
         repo,
-        '.qwen',
+        '.mariadb-shell-agent',
         'tmp',
         'qwen-review-local-plan-prompts',
         'chunk-8.md',
@@ -204,18 +217,33 @@ describe('fix-delta', () => {
       'brief\n',
     );
     writeFileSync(
-      join(repo, '.qwen', 'tmp', 'file-review-a-plan.json'),
+      join(repo, '.mariadb-shell-agent', 'tmp', 'file-review-a-plan.json'),
       '{}\n',
     );
-    mkdirSync(join(repo, '.qwen', 'tmp', 'review-pr-12-wt'));
-    writeFileSync(join(repo, '.qwen', 'tmp', 'review-pr-12-wt', 'x'), 'x\n');
+    mkdirSync(join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-12-wt'));
     writeFileSync(
-      join(repo, 'pkg', '.qwen', 'tmp', 'qwen-review-pkg-findings.json'),
+      join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-12-wt', 'x'),
+      'x\n',
+    );
+    writeFileSync(
+      join(
+        repo,
+        'pkg',
+        '.mariadb-shell-agent',
+        'tmp',
+        'qwen-review-pkg-findings.json',
+      ),
       '[]\n',
     );
     // …and user content that only looks close to a family name.
-    writeFileSync(join(repo, '.qwen', 'tmp', 'user-notes.md'), 'v2\n');
-    writeFileSync(join(repo, '.qwen', 'tmp', 'qwen-reviewer.md'), 'mine\n');
+    writeFileSync(
+      join(repo, '.mariadb-shell-agent', 'tmp', 'user-notes.md'),
+      'v2\n',
+    );
+    writeFileSync(
+      join(repo, '.mariadb-shell-agent', 'tmp', 'qwen-reviewer.md'),
+      'mine\n',
+    );
     runSince();
 
     const diff = hunks();
@@ -224,9 +252,13 @@ describe('fix-delta', () => {
     expect(diff).not.toContain('file-review-');
     expect(diff).not.toContain('review-pr-12');
     expect(diff).not.toContain('qwen-review-pkg');
-    expect(diff).toContain('diff --git a/.qwen/tmp/user-notes.md');
+    expect(diff).toContain(
+      'diff --git a/.mariadb-shell-agent/tmp/user-notes.md',
+    );
     expect(diff).toContain('+v2');
-    expect(diff).toContain('diff --git a/.qwen/tmp/qwen-reviewer.md');
+    expect(diff).toContain(
+      'diff --git a/.mariadb-shell-agent/tmp/qwen-reviewer.md',
+    );
   });
 
   it('leaves its own --out and --since files out when they sit in the repository', () => {
@@ -242,13 +274,16 @@ describe('fix-delta', () => {
   });
 
   it.each([
-    ['`.qwen/`, the rule /setup-github writes', '.qwen/\n'],
     [
-      "`.qwen/*` with a re-include, qwen-code's own shape",
-      '.qwen/*\n!.qwen/settings.json\n',
+      '`.mariadb-shell-agent/`, the rule /setup-github writes',
+      '.mariadb-shell-agent/\n',
+    ],
+    [
+      "`.mariadb-shell-agent/*` with a re-include, qwen-code's own shape",
+      '.mariadb-shell-agent/*\n!.mariadb-shell-agent/settings.json\n',
     ],
     ['a bare `tmp/`', 'tmp/\n'],
-    ['`.qwen/tmp/` itself', '.qwen/tmp/\n'],
+    ['`.mariadb-shell-agent/tmp/` itself', '.mariadb-shell-agent/tmp/\n'],
   ])(
     "captures when an ignore rule hides the flow's own side files — %s",
     (_name, rule) => {
@@ -258,13 +293,13 @@ describe('fix-delta', () => {
       git('commit', '-qam', 'ignore rules');
       const snap = join(
         repo,
-        '.qwen',
+        '.mariadb-shell-agent',
         'tmp',
         'qwen-review-local-fix-snapshot.json',
       );
       const hunksAt = join(
         repo,
-        '.qwen',
+        '.mariadb-shell-agent',
         'tmp',
         'qwen-review-local-fix-hunks.diff',
       );
@@ -285,14 +320,17 @@ describe('fix-delta', () => {
     // The skill's paths are relative to wherever the review started, and
     // the scratch index must not be: a relative git dir resolved against
     // the cwd names a directory that does not exist there.
-    writeFileSync(join(repo, '.gitignore'), 'node_modules\n.qwen/\n');
+    writeFileSync(
+      join(repo, '.gitignore'),
+      'node_modules\n.mariadb-shell-agent/\n',
+    );
     mkdirSync(join(repo, 'pkg'));
     writeFileSync(join(repo, 'pkg', 'b.ts'), 'b1\n');
     git('add', '-A');
     git('commit', '-qm', 'pkg');
     process.chdir(join(repo, 'pkg'));
-    const snap = '.qwen/tmp/qwen-review-local-fix-snapshot.json';
-    const hunksAt = '.qwen/tmp/qwen-review-local-fix-hunks.diff';
+    const snap = '.mariadb-shell-agent/tmp/qwen-review-local-fix-snapshot.json';
+    const hunksAt = '.mariadb-shell-agent/tmp/qwen-review-local-fix-hunks.diff';
     runSnapshot(snap);
     writeFileSync(join(repo, 'pkg', 'b.ts'), 'b2\n');
     runFixDelta({ snapshot: false, since: snap, out: hunksAt });
@@ -478,14 +516,20 @@ describe('fix-delta', () => {
   });
 
   it('holds to the scope line: a tracked family path is not captured, and a binary-attributed file has no content hunk', () => {
-    mkdirSync(join(repo, '.qwen', 'tmp'), { recursive: true });
-    writeFileSync(join(repo, '.qwen', 'tmp', 'qwen-review-notes.md'), 'v1\n');
+    mkdirSync(join(repo, '.mariadb-shell-agent', 'tmp'), { recursive: true });
+    writeFileSync(
+      join(repo, '.mariadb-shell-agent', 'tmp', 'qwen-review-notes.md'),
+      'v1\n',
+    );
     writeFileSync(join(repo, '.gitattributes'), 'gen.txt -diff\n');
     writeFileSync(join(repo, 'gen.txt'), 'g1\n');
     git('add', '-f', '-A');
     git('commit', '-qm', 'tracked family path and a -diff file');
     runSnapshot();
-    writeFileSync(join(repo, '.qwen', 'tmp', 'qwen-review-notes.md'), 'v2\n');
+    writeFileSync(
+      join(repo, '.mariadb-shell-agent', 'tmp', 'qwen-review-notes.md'),
+      'v2\n',
+    );
     writeFileSync(join(repo, 'gen.txt'), 'g2\n');
     runSince();
     expect(hunks()).not.toContain('qwen-review-notes.md');

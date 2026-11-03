@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -685,7 +686,7 @@ class FakeBridge {
               sessionId,
               name,
               source: 'project' as const,
-              scriptPath: `${TEST_WORKSPACE}/.qwen/workflows/deep-review.js`,
+              scriptPath: `${TEST_WORKSPACE}/.mariadb-shell-agent/workflows/deep-review.js`,
               script:
                 "export const meta = { name: 'deep-review', description: 'd' }",
               meta: { name: 'deep-review', description: 'd' },
@@ -897,8 +898,14 @@ const fakeWorkspace = {
   async getWorkspacePermissionsStatus() {
     return {
       v: 1,
-      user: { path: '/home/.qwen/settings.json', rules: emptyRules() },
-      workspace: { path: '/ws/.qwen/settings.json', rules: emptyRules() },
+      user: {
+        path: '/home/.mariadb-shell-agent/settings.json',
+        rules: emptyRules(),
+      },
+      workspace: {
+        path: '/ws/.mariadb-shell-agent/settings.json',
+        rules: emptyRules(),
+      },
       merged: emptyRules(),
       isTrusted: true,
     };
@@ -911,9 +918,12 @@ const fakeWorkspace = {
     };
     return {
       v: 1,
-      user: { path: '/home/.qwen/settings.json', rules: emptyRules() },
+      user: {
+        path: '/home/.mariadb-shell-agent/settings.json',
+        rules: emptyRules(),
+      },
       workspace: {
-        path: '/ws/.qwen/settings.json',
+        path: '/ws/.mariadb-shell-agent/settings.json',
         rules: {
           ...emptyRules(),
           ...(scope === 'workspace' ? { [ruleType]: rules } : {}),
@@ -965,7 +975,7 @@ const fakeWorkspace = {
     return { toolName, enabled };
   },
   async initWorkspace() {
-    return { path: '/ws/QWEN.md', action: 'created' as const };
+    return { path: '/ws/MARIADB-SHELL-AGENT.md', action: 'created' as const };
   },
   async restartMcpServer() {
     return { ok: true };
@@ -1158,7 +1168,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       workspaceCwd: TEST_WORKSPACE,
       gitRepoRoot: TEST_WORKSPACE,
       releaseTag: 'v1.2.3',
-      readmeUrl: 'https://github.com/QwenLM/qwen-code-action',
+      readmeUrl: 'https://github.invalid/QwenLM/qwen-code-action',
       workflows: [],
       gitignore: { path: '.gitignore', status: 'unchanged' },
       warnings: [],
@@ -8389,7 +8399,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       result: {
         v: 1,
         isTrusted: true,
-        workspace: { path: '/ws/.qwen/settings.json' },
+        workspace: { path: '/ws/.mariadb-shell-agent/settings.json' },
       },
     });
   });
@@ -8846,7 +8856,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       workspaceCwd: TEST_WORKSPACE,
       gitRepoRoot: TEST_WORKSPACE,
       releaseTag: 'v1.2.3',
-      readmeUrl: 'https://github.com/QwenLM/qwen-code-action',
+      readmeUrl: 'https://github.invalid/QwenLM/qwen-code-action',
       workflows: [
         {
           sourcePath: 'qwen-invoke.yml',
@@ -13056,7 +13066,7 @@ describe('ACP WebSocket transport security', () => {
     expect(bridge.runtimeMcpAdds).toHaveLength(0);
     expect(bridge.runtimeMcpRemoves).toHaveLength(0);
     expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: set QWEN_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)',
+      'mariadb-shell-agent serve: set QWEN_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)',
     );
 
     ws.close();
@@ -13073,7 +13083,7 @@ describe('ACP WebSocket transport security', () => {
     await yieldImmediate();
     expect(bridge.runtimeMcpAdds).toHaveLength(0);
     expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: set QWEN_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)',
+      'mariadb-shell-agent serve: set QWEN_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)',
     );
 
     ws.close();
@@ -13164,7 +13174,7 @@ describe('ACP WebSocket transport security', () => {
       originatorClientId: bridge.runtimeMcpAdds[0]?.originatorClientId,
     });
     expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: chrome-devtools runtime MCP skipped because settings already define it',
+      'mariadb-shell-agent serve: chrome-devtools runtime MCP skipped because settings already define it',
     );
     ws.close();
     await new Promise<void>((resolve) => ws.once('close', () => resolve()));
@@ -13185,7 +13195,7 @@ describe('ACP WebSocket transport security', () => {
     await vi.waitFor(() => expect(bridge.runtimeMcpAdds).toHaveLength(1));
     expect(bridge.runtimeMcpRemoves).toHaveLength(0);
     expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: chrome-devtools runtime MCP skipped: budget_exceeded',
+      'mariadb-shell-agent serve: chrome-devtools runtime MCP skipped: budget_exceeded',
     );
 
     bridge.runtimeMcpAddResult = {};
@@ -13233,7 +13243,7 @@ describe('ACP WebSocket transport security', () => {
 
     await vi.waitFor(() => {
       expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-        'qwen serve: failed to add chrome-devtools runtime MCP: add failed',
+        'mariadb-shell-agent serve: failed to add chrome-devtools runtime MCP: add failed',
       );
     });
 
@@ -13291,7 +13301,7 @@ describe('ACP WebSocket transport security', () => {
     await vi.waitFor(
       () => {
         expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-          'qwen serve: failed to add chrome-devtools runtime MCP: no channel',
+          'mariadb-shell-agent serve: failed to add chrome-devtools runtime MCP: no channel',
         );
       },
       { timeout: 7_000 },
@@ -13316,7 +13326,7 @@ describe('ACP WebSocket transport security', () => {
 
     expect(bridge.runtimeMcpAdds).toHaveLength(0);
     expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: chrome-devtools runtime MCP skipped because /cdp requires bearer auth',
+      'mariadb-shell-agent serve: chrome-devtools runtime MCP skipped because /cdp requires bearer auth',
     );
     ws.close();
     await new Promise<void>((resolve) => ws.once('close', () => resolve()));

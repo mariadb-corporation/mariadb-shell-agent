@@ -6,7 +6,7 @@
 
 现有 `wecom` 渠道使用 Bot ID 和 Secret，通过 WebSocket 连接智能机器人。
 企业自建应用则向 HTTP 回调地址发送加密 XML，并使用企业和应用凭据发送回复。
-这类应用目前无法接入 Qwen Code。
+这类应用目前无法接入 MariaDB Shell Agent。
 
 新增 `wecom-callback` 渠道，支持文本私聊，每个命名渠道对应一个企业自建应用。
 多个应用分别配置渠道和监听端口。本次不包含媒体、群聊、应用事件、流式回复、
@@ -68,7 +68,7 @@ API 响应。验证握手、提前确认、每个消息 ID 仅产生一次 promp
 
 记录全局 CLI 基线，再验证本地构建 CLI 和协议测试脚本。执行 build、typecheck、
 bundle 和聚焦测试；完成两轮干净的自查及独立审查。准确命令和证据保存在
-`.qwen/e2e-tests/wecom-callback.md`。
+`.mariadb-shell-agent/e2e-tests/wecom-callback.md`。
 
 真实平台验收需要企业微信管理员配置公网回调地址、应用可见范围和出站可信 IP，
 然后验证 URL 校验、允许用户、拒绝用户及较长 Unicode 回复。离线测试无法证明

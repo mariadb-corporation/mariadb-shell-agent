@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -52,7 +53,7 @@ export const rememberCommand: SlashCommand = {
       };
     }
 
-    // --bare mode: ask the agent to save to QWEN.md using its native
+    // --bare mode: ask the agent to save to MARIADB-SHELL-AGENT.md using its native
     // file tools.
     return {
       type: 'submit_prompt',

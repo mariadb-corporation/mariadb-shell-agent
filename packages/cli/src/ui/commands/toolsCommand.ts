@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,7 +17,7 @@ import { t } from '../../i18n/index.js';
 export const toolsCommand: SlashCommand = {
   name: 'tools',
   get description() {
-    return t('List available Qwen Code tools. Usage: /tools [desc]');
+    return t('List available MariaDB Shell Agent tools. Usage: /tools [desc]');
   },
   kind: CommandKind.BUILT_IN,
   canRunDuringStreaming: true,

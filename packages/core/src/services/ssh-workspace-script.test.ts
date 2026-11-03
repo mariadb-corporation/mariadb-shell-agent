@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -199,7 +200,7 @@ describe.skipIf(process.platform === 'win32')('SSH filesystem script', () => {
     execFileSync('git', ['init', '-q', root]);
     mkdirSync(join(root, 'src'));
     writeFileSync(join(root, '.gitignore'), 'ignored.txt\n');
-    writeFileSync(join(root, '.qwenignore'), 'secret.txt\n');
+    writeFileSync(join(root, '.mariadb-shell-agentignore'), 'secret.txt\n');
     for (const name of [
       'ignored.txt',
       'secret.txt',
@@ -270,14 +271,14 @@ describe.skipIf(process.platform === 'win32')('SSH filesystem script', () => {
     (ignoreFile) => {
       execFileSync('git', ['init', '-q', root]);
       mkdirSync(join(root, '.config'));
-      writeFileSync(join(root, '.qwenignore'), 'first.txt\n');
+      writeFileSync(join(root, '.mariadb-shell-agentignore'), 'first.txt\n');
       writeFileSync(join(root, ignoreFile), '!first.txt\nsecond.txt\n');
       for (const name of ['first.txt', 'second.txt', 'visible.txt'])
         writeFileSync(join(root, name), 'needle\n');
       execFileSync('git', ['-C', root, 'add', '-f', 'first.txt']);
       const options = ['.agentignore', '.aiignore'].includes(ignoreFile)
         ? {}
-        : { ignoreFiles: ['.qwenignore', ignoreFile] };
+        : { ignoreFiles: ['.mariadb-shell-agentignore', ignoreFile] };
       expect(request('glob', { pattern: '**/*.txt', ...options })).toEqual(
         success({ paths: [join(root, 'visible.txt')], truncated: false }),
       );
@@ -290,7 +291,7 @@ describe.skipIf(process.platform === 'win32')('SSH filesystem script', () => {
       expect(listed.map((entry) => entry.name)).not.toContain('first.txt');
       expect(listed.map((entry) => entry.name)).not.toContain('second.txt');
       rmSync(join(root, '.git'), { recursive: true });
-      rmSync(join(root, '.qwenignore'));
+      rmSync(join(root, '.mariadb-shell-agentignore'));
       for (const operation of ['glob', 'grep'])
         expect(request(operation, { pattern: '*', ...options })).toMatchObject(
           failure('unsupported_ignore'),
@@ -565,8 +566,11 @@ describe.skipIf(process.platform === 'win32')('SSH filesystem script', () => {
   it('honors a nested Qwen ignore file even when Git ignores that rule file', () => {
     execFileSync('git', ['init', '-q', root]);
     mkdirSync(join(root, 'nested'));
-    writeFileSync(join(root, '.gitignore'), '.qwenignore\n');
-    writeFileSync(join(root, 'nested/.qwenignore'), 'secret.txt\n');
+    writeFileSync(join(root, '.gitignore'), '.mariadb-shell-agentignore\n');
+    writeFileSync(
+      join(root, 'nested/.mariadb-shell-agentignore'),
+      'secret.txt\n',
+    );
     writeFileSync(join(root, 'nested/secret.txt'), 'needle');
     writeFileSync(join(root, 'nested/visible.txt'), 'needle');
     expect(request('glob', { pattern: '**/*.txt' })).toMatchObject(
@@ -576,7 +580,7 @@ describe.skipIf(process.platform === 'win32')('SSH filesystem script', () => {
   it('filters and marks ignored directory entries without descending ignored trees', () => {
     execFileSync('git', ['init', '-q', root]);
     writeFileSync(join(root, '.gitignore'), 'node_modules/\n');
-    writeFileSync(join(root, '.qwenignore'), 'secret.txt\n');
+    writeFileSync(join(root, '.mariadb-shell-agentignore'), 'secret.txt\n');
     mkdirSync(join(root, 'node_modules'));
     writeFileSync(join(root, 'node_modules/ignored'), 'ignored');
     writeFileSync(join(root, 'secret.txt'), 'secret');
@@ -584,7 +588,7 @@ describe.skipIf(process.platform === 'win32')('SSH filesystem script', () => {
     const filtered = request('list').result as Array<{ name: string }>;
     expect(filtered.map((entry) => entry.name)).toEqual([
       '.gitignore',
-      '.qwenignore',
+      '.mariadb-shell-agentignore',
       'visible.txt',
     ]);
     const all = request('list', { includeIgnored: true }).result as Array<{

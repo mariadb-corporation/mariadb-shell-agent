@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -212,7 +213,7 @@ export function formatControllerList(
   if (controllers.length === 0) {
     return (
       'No trusted controllers. Without an explicit "accept" setting, a message that asserts no review class is held for your review, except one from a process this session started, which is always accepted. A sender\'s own review-class claim is not authenticated; set agents.crossSessionInbound to "hold" to review every inbound message.\n' +
-      'Add one with: qwen sessions controllers add --label <name>'
+      'Add one with: mariadb-shell-agent sessions controllers add --label <name>'
     );
   }
   const lines = controllers.map(
@@ -243,7 +244,7 @@ export const peersCommand: SlashCommand = {
   kind: CommandKind.BUILT_IN,
   get description() {
     return t(
-      'Review messages held from other Qwen Code sessions (accept | deny), and manage trusted controllers (controllers | revoke)',
+      'Review messages held from other MariaDB Shell Agent sessions (accept | deny), and manage trusted controllers (controllers | revoke)',
     );
   },
   action: async (context, args): Promise<SlashCommandActionReturn> => {
@@ -522,7 +523,7 @@ function describeMessagingOff(
 ): string {
   switch (scope) {
     case 'workspace':
-      return 'Cross-session messaging is off: this repository\'s .qwen/settings.json turns "agents.crossSessionMessaging" off. A workspace may only make that setting stricter, so your user settings cannot turn it back on here. Remove the entry from that file, then restart.';
+      return 'Cross-session messaging is off: this repository\'s .mariadb-shell-agent/settings.json turns "agents.crossSessionMessaging" off. A workspace may only make that setting stricter, so your user settings cannot turn it back on here. Remove the entry from that file, then restart.';
     case 'system':
       return 'Cross-session messaging is off: system settings set "agents.crossSessionMessaging", and system settings override every other scope. Whoever manages them can remove the entry.';
     case 'system-defaults':

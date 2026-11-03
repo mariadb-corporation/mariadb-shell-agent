@@ -32,7 +32,7 @@ This is an additive reader PR against current `main`, with #14700 as a required 
 
 ## Validation and acceptance
 
-The E2E plan is `.qwen/e2e-tests/managed-cancel-evidence.md`. The globally installed CLI is checked first, but it does not expose the Java operation reconciler. A deterministic Java/SQL test-script fallback exercises actual command admission, parked rows, journal bytes, evidence reads and durable settlement. The same tests run on H2 and a disposable MySQL 8.4 InnoDB database.
+The E2E plan is `.mariadb-shell-agent/e2e-tests/managed-cancel-evidence.md`. The globally installed CLI is checked first, but it does not expose the Java operation reconciler. A deterministic Java/SQL test-script fallback exercises actual command admission, parked rows, journal bytes, evidence reads and durable settlement. The same tests run on H2 and a disposable MySQL 8.4 InnoDB database.
 
 Acceptance requires a matching cancellation result to settle the original operation exactly once; a completed/error result to fail it honestly; unknown, corrupt, foreign and compacted-away evidence to stay parked; coalesced cancellations to resolve independently without a second effect; and late cancellations and other operation kinds to preserve their existing behavior. Java module verification, public contract gates, generated WebShell contract verification and relevant Hosted recovery checks must be reported separately from full deployment acceptance.
 

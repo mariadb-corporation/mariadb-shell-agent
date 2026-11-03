@@ -45,7 +45,7 @@ function fixture(sessionId = 's-1'): DaemonSessionContextUsageStatus {
       },
       builtinTools: [{ name: 'read_file', tokens: 10 }],
       mcpTools: [{ name: 'mcp_search', tokens: 5 }],
-      memoryFiles: [{ path: '/workspace/QWEN.md', tokens: 5 }],
+      memoryFiles: [{ path: '/workspace/MARIADB-SHELL-AGENT.md', tokens: 5 }],
       skills: [{ name: 'review', tokens: 5, loaded: true, bodyTokens: 5 }],
       showDetails: true,
       isEstimated: true,
@@ -556,7 +556,7 @@ describe('ContextUsagePanel', () => {
       'context-model',
       'read_file',
       'mcp_search',
-      '/workspace/QWEN.md',
+      '/workspace/MARIADB-SHELL-AGENT.md',
       'review',
       'Messages',
       'Token usage is estimated until provider usage is received.',
@@ -837,14 +837,14 @@ describe('ContextUsagePanel', () => {
   it('opens instruction files through the admission root, not a relocated live cwd', async () => {
     const status = fixture();
     // A worktree session: the live cwd moved under the registered root.
-    status.workspaceCwd = '/repo/.qwen/worktrees/task';
+    status.workspaceCwd = '/repo/.mariadb-shell-agent/worktrees/task';
     status.workspaceRoot = '/repo';
     status.usage.breakdown.instructionFiles = 5;
     status.usage.instructionFiles = [
       {
         path: 'AGENTS.md',
         tokens: 5,
-        absolutePath: '/repo/.qwen/worktrees/task/AGENTS.md',
+        absolutePath: '/repo/.mariadb-shell-agent/worktrees/task/AGENTS.md',
       },
     ];
     const onOpenMemoryFile = vi.fn();

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,34 +29,38 @@ describe('detectPlatformKind', () => {
   });
 
   it('detects Aone from a CANONICAL Aone --host (trimmed, port-bearing, cased)', () => {
-    expect(detectPlatformKind({ host: 'gitlab.alibaba-inc.com' })).toBe('aone');
-    expect(detectPlatformKind({ host: 'code.alibaba-inc.com' })).toBe('aone');
-    expect(detectPlatformKind({ host: 'GITLAB.Alibaba-Inc.com:443' })).toBe(
+    expect(detectPlatformKind({ host: 'gitlab.alibaba-inc.invalid' })).toBe(
+      'aone',
+    );
+    expect(detectPlatformKind({ host: 'code.alibaba-inc.invalid' })).toBe(
+      'aone',
+    );
+    expect(detectPlatformKind({ host: 'GITLAB.Alibaba-Inc.invalid:443' })).toBe(
       'aone',
     );
     // A NON-default port on the canonical pair still names Aone.
-    expect(detectPlatformKind({ host: 'code.alibaba-inc.com:8443' })).toBe(
+    expect(detectPlatformKind({ host: 'code.alibaba-inc.invalid:8443' })).toBe(
       'aone',
     );
-    expect(detectPlatformKind({ host: ' gitlab.alibaba-inc.com ' })).toBe(
+    expect(detectPlatformKind({ host: ' gitlab.alibaba-inc.invalid ' })).toBe(
       'aone',
     );
   });
 
   it('an EXPLICIT family-but-not-canonical host stays GitHub — it is a GHE instance', () => {
-    // The review skill always passes --host; a `*.alibaba-inc.com` host
-    // that is NOT the canonical pair (`ghe.alibaba-inc.com` is the live
+    // The review skill always passes --host; a `*.alibaba-inc.invalid` host
+    // that is NOT the canonical pair (`ghe.alibaba-inc.invalid` is the live
     // example) is a GitHub Enterprise instance — selecting Aone there
     // would authenticate against the wrong platform and read an unrelated
     // same-numbered Aone MR. The family predicate stands only for the
     // no-explicit-signal cwd fallback (pinned below).
-    expect(detectPlatformKind({ host: 'GHE.Alibaba-Inc.com:8443' })).toBe(
+    expect(detectPlatformKind({ host: 'GHE.Alibaba-Inc.invalid:8443' })).toBe(
       'github',
     );
     // The explicit-remote arm follows the same rule.
     expect(
       detectPlatformKind({
-        remoteUrl: 'git@ghe.alibaba-inc.com:group/repo.git',
+        remoteUrl: 'git@ghe.alibaba-inc.invalid:group/repo.git',
       }),
     ).toBe('github');
   });
@@ -63,10 +68,12 @@ describe('detectPlatformKind', () => {
   it('the cwd origin probe keeps the FAMILY predicate', () => {
     // An origin the caller did not name explicitly is the one place a
     // non-canonical Aone-family host still reads as Aone.
-    execFileSyncMock.mockReturnValue('git@ghe.alibaba-inc.com:group/repo.git');
+    execFileSyncMock.mockReturnValue(
+      'git@ghe.alibaba-inc.invalid:group/repo.git',
+    );
     expect(detectPlatformKind({})).toBe('aone');
     execFileSyncMock.mockReturnValue(
-      'git@gitlab.alibaba-inc.com:maxcompute/odps_src.git',
+      'git@gitlab.alibaba-inc.invalid:maxcompute/odps_src.git',
     );
     expect(detectPlatformKind({})).toBe('aone');
   });
@@ -74,12 +81,14 @@ describe('detectPlatformKind', () => {
   it('detects Aone from the trailing-dot FQDN spelling of the same host', () => {
     // DNS-identical to the plain host, admitted by the URL grammar — both
     // spellings must hit the same guards.
-    expect(detectPlatformKind({ host: 'code.alibaba-inc.com.' })).toBe('aone');
+    expect(detectPlatformKind({ host: 'code.alibaba-inc.invalid.' })).toBe(
+      'aone',
+    );
     // The remoteUrl arm too — a dotted-spelling clone must route to the
     // same platform its CR-URL twin names.
     expect(
       detectPlatformKind({
-        remoteUrl: 'https://code.alibaba-inc.com./maxcompute/odps_src.git',
+        remoteUrl: 'https://code.alibaba-inc.invalid./maxcompute/odps_src.git',
       }),
     ).toBe('aone');
   });
@@ -87,7 +96,7 @@ describe('detectPlatformKind', () => {
   it('detects Aone from an Aone remote URL', () => {
     expect(
       detectPlatformKind({
-        remoteUrl: 'git@gitlab.alibaba-inc.com:maxcompute/odps_src.git',
+        remoteUrl: 'git@gitlab.alibaba-inc.invalid:maxcompute/odps_src.git',
       }),
     ).toBe('aone');
   });
@@ -96,7 +105,7 @@ describe('detectPlatformKind', () => {
     // Regression guard: from an Aone-origin clone, an explicitly-GitHub
     // target must stay GitHub, not be hijacked to Aone by the cwd probe.
     execFileSyncMock.mockReturnValue(
-      'git@gitlab.alibaba-inc.com:maxcompute/odps_src.git',
+      'git@gitlab.alibaba-inc.invalid:maxcompute/odps_src.git',
     );
     expect(detectPlatformKind({ host: 'github.com' })).toBe('github');
     expect(
@@ -106,7 +115,7 @@ describe('detectPlatformKind', () => {
 
   it('falls back to the cwd origin when there is no explicit signal', () => {
     execFileSyncMock.mockReturnValue(
-      'git@gitlab.alibaba-inc.com:maxcompute/odps_src.git',
+      'git@gitlab.alibaba-inc.invalid:maxcompute/odps_src.git',
     );
     expect(detectPlatformKind({})).toBe('aone');
     execFileSyncMock.mockReturnValue('git@github.com:QwenLM/qwen-code.git');
@@ -130,19 +139,21 @@ describe('detectPlatformKind', () => {
     // disagree again (one parser, one source of truth).
     expect(
       detectPlatformKind({
-        remoteUrl: 'git:S1/xx@gitlab.alibaba-inc.com:maxcompute/odps_src.git',
+        remoteUrl:
+          'git:S1/xx@gitlab.alibaba-inc.invalid:maxcompute/odps_src.git',
       }),
     ).toBe('github');
     expect(
       detectPlatformKind({
-        remoteUrl: 'https://oauth2:abc/def@code.alibaba-inc.com/group/proj.git',
+        remoteUrl:
+          'https://oauth2:abc/def@code.alibaba-inc.invalid/group/proj.git',
       }),
     ).toBe('github');
     // The `?`-bearing userinfo corner stays consistent in the other
     // direction: the canonical parser accepts it, so detection says Aone.
     expect(
       detectPlatformKind({
-        remoteUrl: 'https://user:pa?ss@code.alibaba-inc.com/group/proj.git',
+        remoteUrl: 'https://user:pa?ss@code.alibaba-inc.invalid/group/proj.git',
       }),
     ).toBe('aone');
   });
@@ -154,13 +165,13 @@ describe('detectPlatformKind', () => {
     expect(
       detectPlatformKind({
         host: 'github.com',
-        remoteUrl: 'git@gitlab.alibaba-inc.com:maxcompute/odps_src.git',
+        remoteUrl: 'git@gitlab.alibaba-inc.invalid:maxcompute/odps_src.git',
       }),
     ).toBe('github');
     // The mirror arm: an explicit Aone host beats a non-Aone remote.
     expect(
       detectPlatformKind({
-        host: 'gitlab.alibaba-inc.com',
+        host: 'gitlab.alibaba-inc.invalid',
         remoteUrl: 'git@github.com:QwenLM/qwen-code.git',
       }),
     ).toBe('aone');
@@ -170,9 +181,9 @@ describe('detectPlatformKind', () => {
 describe('parseRemoteUrl', () => {
   it('parses the scp-like ssh form', () => {
     expect(
-      parseRemoteUrl('git@gitlab.alibaba-inc.com:maxcompute/odps_src.git'),
+      parseRemoteUrl('git@gitlab.alibaba-inc.invalid:maxcompute/odps_src.git'),
     ).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'maxcompute',
       repo: 'odps_src',
       groupPath: 'maxcompute/odps_src',
@@ -181,9 +192,9 @@ describe('parseRemoteUrl', () => {
 
   it('parses a USER-LESS scp-like remote (ssh-config / insteadOf)', () => {
     expect(
-      parseRemoteUrl('gitlab.alibaba-inc.com:maxcompute/odps_src.git'),
+      parseRemoteUrl('gitlab.alibaba-inc.invalid:maxcompute/odps_src.git'),
     ).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'maxcompute',
       repo: 'odps_src',
       groupPath: 'maxcompute/odps_src',
@@ -192,17 +203,19 @@ describe('parseRemoteUrl', () => {
 
   it('parses the https form (with and without .git)', () => {
     expect(
-      parseRemoteUrl('https://gitlab.alibaba-inc.com/maxcompute/odps_src.git'),
+      parseRemoteUrl(
+        'https://gitlab.alibaba-inc.invalid/maxcompute/odps_src.git',
+      ),
     ).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'maxcompute',
       repo: 'odps_src',
       groupPath: 'maxcompute/odps_src',
     });
     expect(
-      parseRemoteUrl('https://gitlab.alibaba-inc.com/maxcompute/odps_src'),
+      parseRemoteUrl('https://gitlab.alibaba-inc.invalid/maxcompute/odps_src'),
     ).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'maxcompute',
       repo: 'odps_src',
       groupPath: 'maxcompute/odps_src',
@@ -212,10 +225,10 @@ describe('parseRemoteUrl', () => {
   it('parses ssh:// with a user@ prefix', () => {
     expect(
       parseRemoteUrl(
-        'ssh://git@gitlab.alibaba-inc.com/maxcompute/odps_src.git',
+        'ssh://git@gitlab.alibaba-inc.invalid/maxcompute/odps_src.git',
       ),
     ).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'maxcompute',
       repo: 'odps_src',
       groupPath: 'maxcompute/odps_src',
@@ -224,9 +237,11 @@ describe('parseRemoteUrl', () => {
 
   it('scheme case is irrelevant (RFC 3986), matching hostOfRemoteUrl', () => {
     expect(
-      parseRemoteUrl('HTTPS://GitLab.Alibaba-Inc.com/maxcompute/odps_src.git'),
+      parseRemoteUrl(
+        'HTTPS://GitLab.Alibaba-Inc.invalid/maxcompute/odps_src.git',
+      ),
     ).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'maxcompute',
       repo: 'odps_src',
       groupPath: 'maxcompute/odps_src',
@@ -235,9 +250,11 @@ describe('parseRemoteUrl', () => {
 
   it('lowercases the host and keeps the last two path segments (nested groups)', () => {
     expect(
-      parseRemoteUrl('https://GitLab.Alibaba-Inc.com/sub/maxcompute/odps_src'),
+      parseRemoteUrl(
+        'https://GitLab.Alibaba-Inc.invalid/sub/maxcompute/odps_src',
+      ),
     ).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'maxcompute',
       repo: 'odps_src',
       groupPath: 'sub/maxcompute/odps_src',
@@ -246,17 +263,19 @@ describe('parseRemoteUrl', () => {
 
   it('strips a trailing slash and a .git/ suffix', () => {
     expect(
-      parseRemoteUrl('https://gitlab.alibaba-inc.com/maxcompute/odps_src.git/'),
+      parseRemoteUrl(
+        'https://gitlab.alibaba-inc.invalid/maxcompute/odps_src.git/',
+      ),
     ).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'maxcompute',
       repo: 'odps_src',
       groupPath: 'maxcompute/odps_src',
     });
     expect(
-      parseRemoteUrl('git@gitlab.alibaba-inc.com:maxcompute/odps_src/'),
+      parseRemoteUrl('git@gitlab.alibaba-inc.invalid:maxcompute/odps_src/'),
     ).toEqual({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'maxcompute',
       repo: 'odps_src',
       groupPath: 'maxcompute/odps_src',

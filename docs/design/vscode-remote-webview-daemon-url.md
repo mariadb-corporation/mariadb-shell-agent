@@ -4,7 +4,7 @@
 
 ## Problem
 
-In a remote window (Remote-SSH, Dev Containers, WSL) the companion spawns `qwen serve` as a child of the extension host, so the daemon binds a random port on the _remote_ machine's loopback (`packages/vscode-ide-companion/src/services/qwenDaemonProcess.ts`: `--hostname 127.0.0.1 --port 0`, URL scraped off stdout). The webview renderer lives in the local desktop client. `WebViewProvider` spread the scraped `runtime.baseUrl` into the `webShellBootstrap` payload unchanged, so the embedded Web Shell fetched `http://127.0.0.1:<port>/capabilities` against the client's own loopback. Every request failed with `ERR_CONNECTION_REFUSED`, surfaced as "Failed to load workspace". Forwarding the port by hand in VS Code's PORTS panel worked until the next extension host restart, which minted a new port (#11976).
+In a remote window (Remote-SSH, Dev Containers, WSL) the companion spawns `mariadb-shell-agent serve` as a child of the extension host, so the daemon binds a random port on the _remote_ machine's loopback (`packages/vscode-ide-companion/src/services/qwenDaemonProcess.ts`: `--hostname 127.0.0.1 --port 0`, URL scraped off stdout). The webview renderer lives in the local desktop client. `WebViewProvider` spread the scraped `runtime.baseUrl` into the `webShellBootstrap` payload unchanged, so the embedded Web Shell fetched `http://127.0.0.1:<port>/capabilities` against the client's own loopback. Every request failed with `ERR_CONNECTION_REFUSED`, surfaced as "Failed to load workspace". Forwarding the port by hand in VS Code's PORTS panel worked until the next extension host restart, which minted a new port (#11976).
 
 Two further gates made a bare `vscode.env.asExternalUri()` call insufficient:
 

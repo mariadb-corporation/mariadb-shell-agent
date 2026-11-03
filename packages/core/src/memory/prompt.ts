@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -131,7 +132,7 @@ export const WHAT_NOT_TO_SAVE_SECTION: readonly string[] = [
   '- Git history, recent changes, or who-changed-what — `git log` / `git blame` are authoritative.',
   '- Debugging solutions or fix recipes — the fix is in the code; the commit message has the context.',
   '- MCP tool names, parameter schemas, field mappings, guessed tool-call formats, or raw failed tool-call transcripts — live tool definitions are authoritative and may change. Save a tool-related note only when it captures a confirmed durable workaround, warning, owner, or escalation path.',
-  '- Anything already documented in QWEN.md or AGENTS.md files.',
+  '- Anything already documented in MARIADB-SHELL-AGENT.md or AGENTS.md files.',
   '- Ephemeral task details: in-progress work, temporary state, current conversation context.',
   '',
   'These exclusions apply even when the user explicitly asks you to save. If they ask you to save a PR list or activity summary, ask what was *surprising* or *non-obvious* about it — that is the part worth keeping.',

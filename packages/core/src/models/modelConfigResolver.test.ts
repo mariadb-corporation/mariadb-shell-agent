@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -626,7 +627,8 @@ describe('modelConfigResolver', () => {
         },
         env: {
           OPENAI_API_KEY: 'key',
-          OPENAI_BASE_URL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+          OPENAI_BASE_URL:
+            'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
           OPENAI_MODEL: model,
         },
       });

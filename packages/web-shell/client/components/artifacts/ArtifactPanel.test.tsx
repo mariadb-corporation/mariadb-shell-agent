@@ -275,7 +275,7 @@ function codeReviewArtifact(
     source: 'tool',
     status: 'available',
     title: 'Code review result',
-    workspacePath: '.qwen/reviews/review.json',
+    workspacePath: '.mariadb-shell-agent/reviews/review.json',
     metadata: { artifactType: 'code_review', schemaVersion: 1 },
     retention: 'ephemeral',
     clientRetained: false,
@@ -309,7 +309,7 @@ const validCodeReviewDocument = JSON.stringify({
     held: 0,
   },
   outcomesRecorded: false,
-  markdownReportPath: '.qwen/reviews/review.md',
+  markdownReportPath: '.mariadb-shell-agent/reviews/review.md',
 });
 
 function linkArtifact(): DaemonSessionArtifact {
@@ -320,7 +320,7 @@ function linkArtifact(): DaemonSessionArtifact {
     source: 'tool',
     status: 'available',
     title: 'Issue 9059',
-    url: 'https://github.com/QwenLM/qwen-code/issues/9059',
+    url: 'https://github.invalid/QwenLM/qwen-code/issues/9059',
     retention: 'ephemeral',
     clientRetained: false,
     createdAt: '2026-08-13T06:13:59.048Z',
@@ -1881,7 +1881,7 @@ describe('ArtifactPanel code review artifacts', () => {
     expect(container.querySelector('.cm-editor')).toBeNull();
     // The dedicated renderer reads the whole document, so it passes no window.
     expect(mockWorkspaceActions.readWorkspaceFile).toHaveBeenCalledWith(
-      '.qwen/reviews/review.json',
+      '.mariadb-shell-agent/reviews/review.json',
       undefined,
     );
   });
@@ -1968,7 +1968,7 @@ describe('ArtifactPanel code review artifacts', () => {
     );
     expect(button).toBeTruthy();
     expect(button!.getAttribute('href')).toBe(
-      'https://github.com/QwenLM/qwen-code/issues/9059',
+      'https://github.invalid/QwenLM/qwen-code/issues/9059',
     );
     expect(button!.getAttribute('target')).toBe('_blank');
     act(() => {
@@ -1977,7 +1977,7 @@ describe('ArtifactPanel code review artifacts', () => {
       );
     });
     expect(invoke).toHaveBeenCalledWith('plugin:opener|open_url', {
-      url: 'https://github.com/QwenLM/qwen-code/issues/9059',
+      url: 'https://github.invalid/QwenLM/qwen-code/issues/9059',
     });
   });
 
@@ -2007,7 +2007,7 @@ describe('ArtifactPanel code review artifacts', () => {
     });
     expect(event.defaultPrevented).toBe(true);
     expect(invoke).toHaveBeenCalledWith('plugin:opener|open_url', {
-      url: 'https://github.com/QwenLM/qwen-code/issues/9059',
+      url: 'https://github.invalid/QwenLM/qwen-code/issues/9059',
     });
   });
 
@@ -2077,7 +2077,7 @@ describe('ArtifactPanel code review artifacts', () => {
     // generic file preview, not the dedicated renderer.
     mockWorkspaceActions.stat.mockResolvedValue({
       kind: 'stat',
-      path: '.qwen/reviews/review.json',
+      path: '.mariadb-shell-agent/reviews/review.json',
       type: 'file',
       sizeBytes: 2,
       modifiedMs: 1,
@@ -2097,7 +2097,7 @@ describe('ArtifactPanel code review artifacts', () => {
     expect(container.querySelector('.cm-editor')).not.toBeNull();
     expect(container.textContent).not.toContain('Authoritative verdict');
     expect(mockWorkspaceActions.readWorkspaceFile).toHaveBeenCalledWith(
-      '.qwen/reviews/review.json',
+      '.mariadb-shell-agent/reviews/review.json',
       { maxBytes: 256 * 1024 },
     );
   });

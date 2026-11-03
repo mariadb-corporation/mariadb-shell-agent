@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * @fileoverview Saved-workflow resolution. Workflow scripts persisted at
- * `.qwen/workflows/<name>.js` (project) or `~/.qwen/workflows/<name>.js`
+ * `.mariadb-shell-agent/workflows/<name>.js` (project) or `~/.mariadb-shell-agent/workflows/<name>.js`
  * (user) are both surfaced as slash commands (CLI: `SavedWorkflowLoader`)
  * AND resolvable by name from inside a running workflow via the
  * `workflow('<name>')` global (core: `WorkflowOrchestrator`). This module
@@ -215,7 +216,7 @@ export async function findActiveExtensionWorkflowByPathCanonical(
 function getProjectWorkflowsDir(config: Config): string {
   const target = config.getTargetDir?.();
   return target
-    ? path.join(target, '.qwen', 'workflows')
+    ? path.join(target, '.mariadb-shell-agent', 'workflows')
     : config.storage.getProjectWorkflowsDir();
 }
 
@@ -289,7 +290,7 @@ async function workflowSnapshot(config: Config): Promise<WorkflowSnapshot> {
   const saved: WorkflowRoot[] = [
     { ...project, targetBoundary: canonicalTarget ?? null },
     ...ancestors
-      .map((dir) => path.join(dir, '.qwen', 'workflows'))
+      .map((dir) => path.join(dir, '.mariadb-shell-agent', 'workflows'))
       .filter(
         (dir) => dir !== project.dir && dir !== user.dir && dir !== userReal,
       )
@@ -320,7 +321,7 @@ async function checkRoot(root: WorkflowRoot): Promise<WorkflowRootCheck> {
     if (root.ancestor) {
       const qwen = await fs.lstat(path.dirname(root.dir));
       if (qwen.isSymbolicLink())
-        return refuse('symlinked .qwen directory', true);
+        return refuse('symlinked .mariadb-shell-agent directory', true);
       if (!qwen.isDirectory()) return {};
     }
     const stat = await fs.lstat(root.dir);
@@ -489,10 +490,10 @@ async function readWorkflowFile(
     };
     let spelling = lexical;
     if (snapshot.saved.some((candidate) => candidate.ancestor)) {
-      const marker = `${path.sep}.qwen${path.sep}workflows${path.sep}`;
+      const marker = `${path.sep}.mariadb-shell-agent${path.sep}workflows${path.sep}`;
       const match =
         process.platform === 'win32'
-          ? /[\\/]\.qwen[\\/]workflows[\\/]/i.exec(lexical)
+          ? /[\\/]\.mariadb-shell-agent[\\/]workflows[\\/]/i.exec(lexical)
           : undefined;
       const index =
         process.platform === 'win32'
@@ -503,7 +504,7 @@ async function readWorkflowFile(
         const owner = lexical.slice(0, index + 1);
         spelling = path.join(
           await fs.realpath(owner),
-          '.qwen',
+          '.mariadb-shell-agent',
           'workflows',
           lexical.slice(index + (match?.[0].length ?? marker.length)),
         );
@@ -743,8 +744,8 @@ export async function resolveSavedWorkflowScript(
 }
 
 /**
- * Save a workflow script to `.qwen/workflows/<name>.js` (project) or
- * `~/.qwen/workflows/<name>.js` (user). Powers the `/workflows` save dialog.
+ * Save a workflow script to `.mariadb-shell-agent/workflows/<name>.js` (project) or
+ * `~/.mariadb-shell-agent/workflows/<name>.js` (user). Powers the `/workflows` save dialog.
  *
  * Validates the name and refuses to clobber an existing file unless
  * `overwrite` is set (the dialog uses the `exists` result to prompt for

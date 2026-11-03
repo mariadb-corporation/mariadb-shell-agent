@@ -91,7 +91,7 @@ catalog, model loop, Plan policy, and focused tests. This extends the existing
    expose a previous Session's Skills.
 
 The executable plan and results live in
-`.qwen/e2e-tests/managed-session-skills.md`. Run focused Java and TypeScript
+`.mariadb-shell-agent/e2e-tests/managed-session-skills.md`. Run focused Java and TypeScript
 tests, API generation, Java verification, root build/typecheck/bundle, changed
 file lint/format checks, and two clean full-diff audits. Report environment and
 process-test limits separately from verified behavior.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -84,11 +85,11 @@ const A1_ERROR_MESSAGE_MAX = 512;
 
 /**
  * The host an a1 `detailUrl` ALWAYS carries — the Aone Code WEB host. The
- * git host (`gitlab.alibaba-inc.com`) spells the same platform's clone
+ * git host (`gitlab.alibaba-inc.invalid`) spells the same platform's clone
  * remotes, but a detailUrl is never spelled with it (and detection keys on
  * it separately via `isAoneCanonicalHost`).
  */
-export const AONE_DETAIL_URL_HOST = 'code.alibaba-inc.com';
+export const AONE_DETAIL_URL_HOST = 'code.alibaba-inc.invalid';
 
 /** `a1 repo mr list` page size is server-fixed; `--page` only picks one. */
 export const AONE_MR_LIST_PAGE_SIZE = 20;
@@ -159,7 +160,7 @@ export function mapAoneMrState(raw: string | undefined): SessionPrState {
  * process.cwd(). Detection is CANONICAL-only, matching the rule review
  * applies to explicit coordinates: the workspace's origin names the platform
  * of that workspace's own MRs, and a family-wildcard match would displace
- * GitHub Enterprise instances (`*.alibaba-inc.com` also names GHE hosts)
+ * GitHub Enterprise instances (`*.alibaba-inc.invalid` also names GHE hosts)
  * onto a1 — a1 then either fails every read (state frozen forever where gh
  * served before) or, if a same-path repo exists on real Aone, serves an
  * unrelated repo's same-numbered MR.
@@ -253,7 +254,7 @@ function assertA1Version(stdout: string): void {
   if (triple && floor && !a1VersionAtLeast(triple, floor)) {
     throw new AoneCliUnavailableError(
       `a1 ${A1_MIN_VERSION}+ is required (found ${stdout.trim().split('\n')[0]}); ` +
-        'upgrade from https://code.alibaba-inc.com/aone/a1',
+        'upgrade from https://code.alibaba-inc.invalid/aone/a1',
     );
   }
 }

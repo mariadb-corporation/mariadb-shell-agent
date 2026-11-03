@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -288,7 +289,7 @@ describe('managed-runtime-provider/1', () => {
     const parse = (files: unknown) =>
       parseManagedRuntimeProviderResult(operation, { files }, session);
     const files = [
-      { name: 'QWEN.md', text: 'rules' },
+      { name: 'MARIADB-SHELL-AGENT.md', text: 'rules' },
       { name: 'AGENTS.md', text: '' },
     ];
     expect(parse(files)).toEqual(files);
@@ -303,11 +304,11 @@ describe('managed-runtime-provider/1', () => {
       [{ name: '../etc/passwd', text: 'x' }],
       [files[1], files[0]],
       [files[0], files[0]],
-      [{ name: 'QWEN.md', text: 1 }],
-      [{ name: 'QWEN.md', text: 'x', path: '/etc' }],
+      [{ name: 'MARIADB-SHELL-AGENT.md', text: 1 }],
+      [{ name: 'MARIADB-SHELL-AGENT.md', text: 'x', path: '/etc' }],
       [
         {
-          name: 'QWEN.md',
+          name: 'MARIADB-SHELL-AGENT.md',
           text: 'x'.repeat(MANAGED_WORKSPACE_CONTEXT_FILE_CHARS + 1),
         },
       ],

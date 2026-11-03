@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,7 +17,7 @@ import { I18nProvider } from '../../i18n';
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 
-const GLOBAL_PATH = '/home/u/.qwen/QWEN.md';
+const GLOBAL_PATH = '/home/u/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md';
 
 const memory = vi.hoisted(() => ({
   files: [] as DaemonWorkspaceMemoryFile[],

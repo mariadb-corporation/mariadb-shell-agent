@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -35,7 +36,7 @@ export const DEFAULT_AUTO_SKILL_TIMEOUT_MS = 120_000;
 /**
  * Mandatory directory-name prefix for skills created by the review agent.
  * The project `.gitignore` re-ignores directories matching
- * `.qwen/skills/auto-skill-<glob>` so these transient, session-specific
+ * `.mariadb-shell-agent/skills/auto-skill-<glob>` so these transient, session-specific
  * skills stay out of version control while hand-authored project skills
  * remain tracked. This is a prompt-level convention only — skill discovery
  * (`SkillManager`) is prefix-agnostic, and the `source: auto-skill`
@@ -183,7 +184,7 @@ async function evaluateScopedDecision(
       }
       // Restrict to the canonical `<name>/SKILL.md` slot. Without this,
       // the agent could write auxiliary files (notes, README, attachments)
-      // anywhere under `.qwen/skills/**` — SkillManager would ignore them
+      // anywhere under `.mariadb-shell-agent/skills/**` — SkillManager would ignore them
       // but they still pollute the directory.
       if (path.basename(ctx.filePath) !== SKILL_FILE_NAME) {
         return 'deny';
@@ -304,7 +305,7 @@ export const SKILL_REVIEW_SYSTEM_PROMPT = [
   "- You may ONLY modify skill files that contain 'source: auto-skill' in their YAML frontmatter. Always read a skill file before editing it.",
   '- Do NOT touch skills that lack this marker — they were created by the user.',
   "- When creating a new skill, you MUST include 'source: auto-skill' in the frontmatter so future review agents can safely update it.",
-  `- When creating a new skill, its directory MUST use the \`${AUTO_SKILL_DIR_PREFIX}\` prefix (e.g. \`.qwen/skills/${AUTO_SKILL_DIR_PREFIX}<name>/SKILL.md\`) so the project's .gitignore keeps auto-generated skills out of version control. Keep the frontmatter \`name:\` as the natural \`<name>\` without the prefix.`,
+  `- When creating a new skill, its directory MUST use the \`${AUTO_SKILL_DIR_PREFIX}\` prefix (e.g. \`.mariadb-shell-agent/skills/${AUTO_SKILL_DIR_PREFIX}<name>/SKILL.md\`) so the project's .gitignore keeps auto-generated skills out of version control. Keep the frontmatter \`name:\` as the natural \`<name>\` without the prefix.`,
   '- Do NOT delete any skill. Only create or update.',
   '',
   "If nothing is worth saving, just say 'Nothing to save.' and stop.",
@@ -428,7 +429,7 @@ export async function buildTaskPrompt(projectRoot: string): Promise<string> {
     '',
     'Use `read_file` to inspect the existing skill files listed above before writing.',
     'Use `write_file` to create a new skill, `edit` to update an existing auto-skill.',
-    `New skills you create MUST live at \`.qwen/skills/${AUTO_SKILL_DIR_PREFIX}<name>/SKILL.md\` — the \`${AUTO_SKILL_DIR_PREFIX}\` directory prefix is mandatory so the project's .gitignore keeps auto-generated skills out of version control. Keep the frontmatter \`name:\` as the natural \`<name>\` (no prefix). The frontmatter MUST include 'source: auto-skill':`,
+    `New skills you create MUST live at \`.mariadb-shell-agent/skills/${AUTO_SKILL_DIR_PREFIX}<name>/SKILL.md\` — the \`${AUTO_SKILL_DIR_PREFIX}\` directory prefix is mandatory so the project's .gitignore keeps auto-generated skills out of version control. Keep the frontmatter \`name:\` as the natural \`<name>\` (no prefix). The frontmatter MUST include 'source: auto-skill':`,
     '',
     '---',
     'name: <skill-name>',

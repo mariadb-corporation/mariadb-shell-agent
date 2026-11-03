@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -189,7 +190,7 @@ export function HookConfigDetailStep({
       <Box marginTop={1}>
         <Text color={theme.text.secondary}>
           {t(
-            'To modify or remove this hook, edit settings.json directly or ask Qwen to help.',
+            'To modify or remove this hook, edit settings.json directly or ask MariaDB Shell Agent to help.',
           )}
         </Text>
       </Box>

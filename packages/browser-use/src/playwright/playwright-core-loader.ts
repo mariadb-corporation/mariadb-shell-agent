@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,7 +21,7 @@ function incompleteRuntime(detail: string): BrowserRuntimeError {
   return new BrowserRuntimeError(
     'OPERATION_FAILED',
     `The Browser Use runtime in ${runtimeDir} is incomplete: ${detail}. ` +
-      'Reinstall Qwen Code instead of installing packages into the workspace.',
+      'Reinstall MariaDB Shell Agent instead of installing packages into the workspace.',
     { runtimeDir },
   );
 }

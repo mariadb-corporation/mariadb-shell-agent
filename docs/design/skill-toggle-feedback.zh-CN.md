@@ -4,7 +4,7 @@
 
 ## 问题
 
-本次修改处理 [#10152](https://github.com/QwenLM/qwen-code/issues/10152)。
+本次修改处理 [#10152](https://github.invalid/QwenLM/qwen-code/issues/10152)。
 成功写入设置后，所选 Skill 可能从刷新的目录中消失。页面随后返回列表，
 但操作结果通知没有显示。受上层设置禁用的 Skill 也缺少一个入口，
 让用户在它仍被禁用时移除按注册名称保存的工作区启用声明。

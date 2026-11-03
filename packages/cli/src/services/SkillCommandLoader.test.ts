@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -113,7 +114,7 @@ describe('SkillCommandLoader', () => {
         messageType: 'error',
         content: expect.stringContaining('not yet supported'),
       });
-      expect(existsSync(join(dir, '.qwen'))).toBe(false);
+      expect(existsSync(join(dir, '.mariadb-shell-agent'))).toBe(false);
       writeSkillArgs('my-skill', 'prior authority');
       await invoke('');
       expect(readFileSync(skillArgsPath('my-skill'), 'utf8')).toBe(
@@ -272,14 +273,16 @@ describe('SkillCommandLoader', () => {
       skillDetail: {
         name: 'my-skill',
         level: 'project',
-        filePath: '/test/project/.qwen/skills/auto-skill-test/SKILL.md',
+        filePath:
+          '/test/project/.mariadb-shell-agent/skills/auto-skill-test/SKILL.md',
       },
     });
 
     expect(recordAutoSkillUsageMock).toHaveBeenCalledWith('/test/project', {
       name: 'my-skill',
       level: 'project',
-      filePath: '/test/project/.qwen/skills/auto-skill-test/SKILL.md',
+      filePath:
+        '/test/project/.mariadb-shell-agent/skills/auto-skill-test/SKILL.md',
     });
   });
 
@@ -289,7 +292,7 @@ describe('SkillCommandLoader', () => {
       skillDetail: {
         name: 'my-skill',
         level: 'user',
-        filePath: '/test/user/.qwen/skills/my-skill/SKILL.md',
+        filePath: '/test/user/.mariadb-shell-agent/skills/my-skill/SKILL.md',
       },
     },
     {
@@ -321,7 +324,8 @@ describe('SkillCommandLoader', () => {
         skillDetail: {
           name: 'my-skill',
           level: 'project',
-          filePath: '/test/project/.qwen/skills/auto-skill-test/SKILL.md',
+          filePath:
+            '/test/project/.mariadb-shell-agent/skills/auto-skill-test/SKILL.md',
         },
       }),
     ).resolves.toBeUndefined();
@@ -693,8 +697,8 @@ describe('SkillCommandLoader', () => {
       await runSkillCommand(
         makeSkill({
           level: 'project',
-          filePath: '/repo/.qwen/skills/my-skill/SKILL.md',
-          skillRoot: '/repo/.qwen/skills/my-skill',
+          filePath: '/repo/.mariadb-shell-agent/skills/my-skill/SKILL.md',
+          skillRoot: '/repo/.mariadb-shell-agent/skills/my-skill',
           hooks: gateHooks,
         }),
       );
@@ -716,8 +720,8 @@ describe('SkillCommandLoader', () => {
       await runSkillCommand(
         makeSkill({
           level: 'project',
-          filePath: '/repo/.qwen/skills/my-skill/SKILL.md',
-          skillRoot: '/repo/.qwen/skills/my-skill',
+          filePath: '/repo/.mariadb-shell-agent/skills/my-skill/SKILL.md',
+          skillRoot: '/repo/.mariadb-shell-agent/skills/my-skill',
           allowedTools: ['Edit'],
           hooks: gateHooks,
         }),

@@ -10,7 +10,7 @@ status: 'implemented'
 
 ## 问题
 
-长时间运行的 Qwen Code 会话会通过大型工具结果、重复的文件读取、聊天历史和原生／外部分配不断累积内存。在此改动之前，core 包已有诊断能力和会话重置清理，但在正常工具执行过程中内存压力升高时没有任何运行时响应。
+长时间运行的 MariaDB Shell Agent 会话会通过大型工具结果、重复的文件读取、聊天历史和原生／外部分配不断累积内存。在此改动之前，core 包已有诊断能力和会话重置清理，但在正常工具执行过程中内存压力升高时没有任何运行时响应。
 
 缓存层面价值最高的缺口是 `FileReadCache`：它已有有界的 FIFO 容量，但没有基于时间的淘汰路径。这意味着即使进程正处于内存压力之下，会话仍会保留已不再活跃的文件读取元数据，直到触达硬的条目上限。
 
@@ -50,7 +50,7 @@ status: 'implemented'
 - `cleanupCooldownMs = 5000`
 - `enableExplicitGC = true`
 
-`enableExplicitGC` 只有在 Node 暴露 `global.gc` 时才有效。生产入口 scripts/cli-entry.js 出于这一原因会以 `--expose-gc` 重新启动交互式 CLI（其启动快速路径不带该参数），scripts/start.js 和 scripts/dev.js 也会传入该参数，`qwen review` 则会把该参数继续传给它派生的子进程。
+`enableExplicitGC` 只有在 Node 暴露 `global.gc` 时才有效。生产入口 scripts/cli-entry.js 出于这一原因会以 `--expose-gc` 重新启动交互式 CLI（其启动快速路径不带该参数），scripts/start.js 和 scripts/dev.js 也会传入该参数，`mariadb-shell-agent review` 则会把该参数继续传给它派生的子进程。
 
 环境变量覆盖：
 

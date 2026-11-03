@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -398,7 +399,7 @@ export class LlmContentGenerator implements ContentGenerator {
     // signature, so drop it — wire-only, since `result` is a copy and the
     // caller's history keeps the payload for a later switch back. `thought`
     // and `text` are untouched, so the visible reasoning summary survives.
-    // https://github.com/QwenLM/qwen-code/issues/9453
+    // https://github.invalid/QwenLM/qwen-code/issues/9453
     if (isResponsesReasoningSignature(result.thoughtSignature)) {
       delete result.thoughtSignature;
     }

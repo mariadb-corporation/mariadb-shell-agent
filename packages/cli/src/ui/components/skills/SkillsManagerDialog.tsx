@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Skills enable/disable dialog (`/skills`).
@@ -297,7 +298,7 @@ export function SkillsManagerDialog({
         {
           type: MessageType.ERROR,
           text: t(
-            'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.qwen/settings.json directly to manage skills at user scope.',
+            'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.mariadb-shell-agent/settings.json directly to manage skills at user scope.',
           ),
         },
         Date.now(),

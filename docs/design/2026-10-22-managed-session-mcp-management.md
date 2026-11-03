@@ -2,7 +2,7 @@
 
 [English](2026-10-22-managed-session-mcp-management.md) | [简体中文](2026-10-22-managed-session-mcp-management.zh-CN.md)
 
-Status: design and implementation in progress. Completes the runtime-management scope of [#15079](https://github.com/QwenLM/qwen-code/issues/15079), together with [ordinary Workspace tools and MCP](2026-10-21-managed-mcp-management-reuse.md).
+Status: design and implementation in progress. Completes the runtime-management scope of [#15079](https://github.invalid/QwenLM/qwen-code/issues/15079), together with [ordinary Workspace tools and MCP](2026-10-21-managed-mcp-management-reuse.md).
 
 ## Problem
 
@@ -63,8 +63,8 @@ Advance OpenAPI, regenerate WebShell types, update mapped surfaces and contract 
 
 ## Verification
 
-Dry-run the baseline using global `qwen`; record the absence of management separately from existing composition evidence. Verify the built CLI, Java service and WebShell together using disposable MySQL, two real stdio servers and a deterministic model. Exercise all operations in one Session, stable conversation identity, unchanged original definition pins, no credentials in responses, model declaration changes, disabled-state persistence after a Harness restart and cold load, idempotent retries, stale-revision refusal, isolation between Sessions and final close.
+Dry-run the baseline using global `mariadb-shell-agent`; record the absence of management separately from existing composition evidence. Verify the built CLI, Java service and WebShell together using disposable MySQL, two real stdio servers and a deterministic model. Exercise all operations in one Session, stable conversation identity, unchanged original definition pins, no credentials in responses, model declaration changes, disabled-state persistence after a Harness restart and cold load, idempotent retries, stale-revision refusal, isolation between Sessions and final close.
 
 Verify failed and unknown releases cannot claim restart success or start a replacement; active Turns and unauthorized actors cannot mutate. Verify empty and read-only Sessions, unsupported profiles, old logs, provider/Session switches, responsive manager controls and the existing daemon manager. Run affected package tests, root build/typecheck/bundle, Java API/surface gates, Maven verify and applicable MySQL/Hosted profiles. Inspect the complete diff twice and obtain independent review. Local process and browser evidence does not establish Linux cgroup, SSH/CSI, Windows or real upstream-provider qualification.
 
-The Plugin-only entry adjustment has a focused UI plan at `.qwen/e2e-tests/managed-mcp-plugin-only/plan.md`: use the running main-based service for baseline, verify selected-Session queries through Plugin management and preserved conversation drafts, and publish the separately built static frontend without restarting the services. This UI adjustment does not change management commands, authorization, Runtime ownership or the broader acceptance matrix.
+The Plugin-only entry adjustment has a focused UI plan at `.mariadb-shell-agent/e2e-tests/managed-mcp-plugin-only/plan.md`: use the running main-based service for baseline, verify selected-Session queries through Plugin management and preserved conversation drafts, and publish the separately built static frontend without restarting the services. This UI adjustment does not change management commands, authorization, Runtime ownership or the broader acceptance matrix.

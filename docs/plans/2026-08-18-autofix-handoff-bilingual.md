@@ -21,11 +21,11 @@ rest of `qwen-autofix.yml` already follows.
 
 ## Files
 
-| File                                          | Change                                                                                                             |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `.github/workflows/qwen-autofix.yml`          | HEADLINE_ZH at ~9 template sites (+ clause variants); report-block details section; zh excerpt truncation/escaping |
-| `.qwen/skills/autofix/SKILL.md`               | bilingual rule: `failure.zh.md` companion requirement + constraints                                                |
-| `scripts/tests/qwen-autofix-workflow.test.js` | contract pins: details block present, HEADLINE/HEADLINE_ZH pairing, SKILL rule pin                                 |
+| File                                           | Change                                                                                                             |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `.github/workflows/qwen-autofix.yml`           | HEADLINE_ZH at ~9 template sites (+ clause variants); report-block details section; zh excerpt truncation/escaping |
+| `.mariadb-shell-agent/skills/autofix/SKILL.md` | bilingual rule: `failure.zh.md` companion requirement + constraints                                                |
+| `scripts/tests/qwen-autofix-workflow.test.js`  | contract pins: details block present, HEADLINE/HEADLINE_ZH pairing, SKILL rule pin                                 |
 
 ## Tasks
 

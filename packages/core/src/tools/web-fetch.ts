@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -284,7 +285,7 @@ class WebFetchToolInvocation extends BaseToolInvocation<
 
   private getUserAgent(): string {
     const version = this.config.getCliVersion?.() || 'unknown';
-    return `QwenCode/${version} ${USER_AGENT_SUFFIX}`;
+    return `MariaDBShellAgent/${version} ${USER_AGENT_SUFFIX}`;
   }
 
   private fetchPlan?: { url: string; upgradedFrom?: string };
@@ -661,7 +662,7 @@ Status: ${entry.status} ${entry.statusText || 'OK'} | Content-Type: ${entry.cont
       // AFTER the fetch was already permitted and completed, never a
       // permission/network grant. Evaluated against the FINAL URL (post
       // blob→raw rewrite and followed redirects) so a redirect out of a
-      // path-scoped entry (github.com/QwenLM → elsewhere) falls back to
+      // path-scoped entry (github.invalid/QwenLM → elsewhere) falls back to
       // summarization instead of passing through unrelated content.
       const preapproved = isPreapprovedUrl(entry.finalUrl);
       if (

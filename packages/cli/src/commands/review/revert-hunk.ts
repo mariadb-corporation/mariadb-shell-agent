@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review revert-hunk`: take ONE hunk of the diff back out of a tree, so
+// `mariadb-shell-agent review revert-hunk`: take ONE hunk of the diff back out of a tree, so
 // "is this change load-bearing?" can be measured instead of argued.
 //
 // The probe answers "does the PR's code exhibit the claimed behaviour", and
@@ -811,7 +812,7 @@ export function runRevertHunk(args: RevertHunkArgs): RevertHunkReport {
   // the walk `resetScratchTree` makes, with the bound this command can know.
   // `--tree` is whatever the caller passed, so there is no common dir to stop
   // at; but the tree this command exists to mutate is the scratch tree under
-  // `.qwen/tmp`, and everything between that root and the leaf is the
+  // `.mariadb-shell-agent/tmp`, and everything between that root and the leaf is the
   // directory the sandbox hands the reviewed code read-write — exactly where
   // a writer can swap a component for a link AFTER the create/sweep checks
   // (`mountRootFor`, `releaseWorktree`, `runCleanup`) ran, and a link there is
@@ -825,7 +826,7 @@ export function runRevertHunk(args: RevertHunkArgs): RevertHunkReport {
       if (lstatSync(tree).isSymbolicLink()) {
         return `--tree ${JSON.stringify(args.tree)} is a symlink`;
       }
-      // Outermost `.qwen/tmp` on the path, the bound
+      // Outermost `.mariadb-shell-agent/tmp` on the path, the bound
       // `outermostReviewTmpRoot` computes: the FIRST occurrence, so a nested
       // review temp root still walks the inner components. `redirectedAncestor`
       // lstats each component from the leaf's parent up to and including the
@@ -855,7 +856,7 @@ export function runRevertHunk(args: RevertHunkArgs): RevertHunkReport {
         swapped
           ? ' — no link was there when the gates above ran, and the write is what it would aim'
           : ''
-      }. Reset the scratch tree (\`qwen review scratch-tree\`) and retry; nothing was changed.`,
+      }. Reset the scratch tree (\`mariadb-shell-agent review scratch-tree\`) and retry; nothing was changed.`,
     };
   };
   const redirectedTree = redirectReport();
@@ -902,7 +903,7 @@ export function runRevertHunk(args: RevertHunkArgs): RevertHunkReport {
       applied: false,
       hunk: entry,
       harnessFailure: true,
-      note: `--tree ${JSON.stringify(args.tree)}: ${untrusted} — the attribute and index reads this needs would come from whichever repository that pointer names, so no revert is attempted. Reset the scratch tree (\`qwen review scratch-tree\`) and retry; nothing was changed.`,
+      note: `--tree ${JSON.stringify(args.tree)}: ${untrusted} — the attribute and index reads this needs would come from whichever repository that pointer names, so no revert is attempted. Reset the scratch tree (\`mariadb-shell-agent review scratch-tree\`) and retry; nothing was changed.`,
     };
   }
   const targetPath = treePath(tree, targetBytes);

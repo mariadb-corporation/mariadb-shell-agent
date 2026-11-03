@@ -2,7 +2,7 @@
 
 [English](2026-09-18-resident-tool-prompt-assembly.md) | [简体中文](2026-09-18-resident-tool-prompt-assembly.zh-CN.md)
 
-**Status:** proposal for [#12032](https://github.com/QwenLM/qwen-code/issues/12032), part of [#12028](https://github.com/QwenLM/qwen-code/issues/12028). Step 1 only (session-start assembly); step 2 is named as follow-up work and is not proposed here.
+**Status:** proposal for [#12032](https://github.invalid/QwenLM/qwen-code/issues/12032), part of [#12028](https://github.invalid/QwenLM/qwen-code/issues/12028). Step 1 only (session-start assembly); step 2 is named as follow-up work and is not proposed here.
 
 Every code reference below was read on `main` at `8bd2feabba`. Nothing was built, run, or measured for this document; the token figures attributed to #12032 are that issue's own measurements and were not re-measured.
 
@@ -46,7 +46,7 @@ Test surface that moves with any change here: 17 full-prompt snapshots (`core/__
 
 **Goals.** The base prompt describes only tools the session actually declares. `/context` and the real request agree on that set. The prompt-cache prefix is rewritten no more often than it is today. Safety, permission, and dangerous-action text stays unconditional.
 
-**Non-goals.** Regenerating the prompt on every mid-session reveal (step 2, and it overlaps [#11321](https://github.com/QwenLM/qwen-code/issues/11321)). Subagent prompts. A new user-facing setting. Editing safety text. Shortening individual tool descriptions ([#12054](https://github.com/QwenLM/qwen-code/issues/12054)). Gating the skill listing or memory files ([#12030](https://github.com/QwenLM/qwen-code/issues/12030)).
+**Non-goals.** Regenerating the prompt on every mid-session reveal (step 2, and it overlaps [#11321](https://github.invalid/QwenLM/qwen-code/issues/11321)). Subagent prompts. A new user-facing setting. Editing safety text. Shortening individual tool descriptions ([#12054](https://github.invalid/QwenLM/qwen-code/issues/12054)). Gating the skill listing or memory files ([#12030](https://github.invalid/QwenLM/qwen-code/issues/12030)).
 
 ## 4. Proposed design
 
@@ -91,11 +91,11 @@ getCoreSystemPrompt(
 
 ### 4.4 Prompt cache
 
-The prompt depends only on the session-start snapshot, so `setStaticSystemPrefix` (`client.ts:1672`) is rewritten exactly as often as today — once per instruction build — and a mid-session reveal keeps changing only the tools block. This is a stated design constraint, not a caveat: wiring `refreshSystemInstruction` into the reveal sites would rewrite the globally cached block on every ToolSearch load, and it pulls against [#12029](https://github.com/QwenLM/qwen-code/issues/12029), whose whole purpose is to make deferral (and therefore reveals) actually happen on large windows. #12029 should reference this constraint so the net cache behaviour is chosen rather than inherited.
+The prompt depends only on the session-start snapshot, so `setStaticSystemPrefix` (`client.ts:1672`) is rewritten exactly as often as today — once per instruction build — and a mid-session reveal keeps changing only the tools block. This is a stated design constraint, not a caveat: wiring `refreshSystemInstruction` into the reveal sites would rewrite the globally cached block on every ToolSearch load, and it pulls against [#12029](https://github.invalid/QwenLM/qwen-code/issues/12029), whose whole purpose is to make deferral (and therefore reveals) actually happen on large windows. #12029 should reference this constraint so the net cache behaviour is chosen rather than inherited.
 
 ### 4.5 `/context`
 
-`collectContextData` builds the prompt through `getMainSessionBaseSystemPrompt` and reads declarations separately, and it does not warm the registry. It therefore reads the same snapshot, which keeps its system-prompt row consistent with the request. This lands on top of the breakdown rework in [#12119](https://github.com/QwenLM/qwen-code/pull/12119) (#12033), whose numbers are the measurement instrument for §7.
+`collectContextData` builds the prompt through `getMainSessionBaseSystemPrompt` and reads declarations separately, and it does not warm the registry. It therefore reads the same snapshot, which keeps its system-prompt row consistent with the request. This lands on top of the breakdown rework in [#12119](https://github.invalid/QwenLM/qwen-code/pull/12119) (#12033), whose numbers are the measurement instrument for §7.
 
 ### 4.6 Agent bridge reachability (#13033)
 

@@ -2,7 +2,7 @@
 
 [English](runtime-broker-jdbc-retention.md) | [简体中文](runtime-broker-jdbc-retention.zh-CN.md)
 
-Status: Implemented for [#13203](https://github.com/QwenLM/qwen-code/issues/13203)
+Status: Implemented for [#13203](https://github.invalid/QwenLM/qwen-code/issues/13203)
 
 ## Problem and scope
 
@@ -36,7 +36,7 @@ Use `ma_runtime_binding`, `ma_runtime_session` and `ma_tool_execution` for the t
 
 Enabling retention allows eligible, unreferenced historical records to be deleted once they age past max-age; it does not guarantee deletion by that age. Publication and CSI worker ACK references retain executions and their parent sessions and bindings regardless of age, including COLLECTED publications. Unreferenced siblings may be removed. After deletion, existing missing-record behavior applies; callers must not reuse expired runtime-session IDs or idempotency keys. No permanent execution tombstones are added.
 
-Initialize a fresh database with the canonical 32-table V1 baseline and keep retention disabled. Validate exact Managed Server/Broker catalog parity and repeated initialization preserving existing terminal receipts. Legacy, partial or foreign catalogs are rejected before initialization writes; this change does not migrate old data or support an in-place upgrade. Preserve the old environment for historical reads, stop its new admissions and settle in-flight work before cutover; create new Sessions only in the new environment. Rollback after new data exists must preserve and serve the new database records. Keep retention disabled until the exact-identity Hosted cleanup release-proof contract in [#13992](https://github.com/QwenLM/qwen-code/issues/13992) is delivered and verified, and every publication writer uses the new locking protocol. An owed cleanup descriptor can outlive its RELEASED binding; collection then changes original release to a conflict and blocks the Hosted Session. This PR does not implement that release-proof contract. Observe scan/deletion/skip counts, duration and failures. Disable retention before reverting to older writers. Disabling stops future cleanup but cannot restore deleted records.
+Initialize a fresh database with the canonical 32-table V1 baseline and keep retention disabled. Validate exact Managed Server/Broker catalog parity and repeated initialization preserving existing terminal receipts. Legacy, partial or foreign catalogs are rejected before initialization writes; this change does not migrate old data or support an in-place upgrade. Preserve the old environment for historical reads, stop its new admissions and settle in-flight work before cutover; create new Sessions only in the new environment. Rollback after new data exists must preserve and serve the new database records. Keep retention disabled until the exact-identity Hosted cleanup release-proof contract in [#13992](https://github.invalid/QwenLM/qwen-code/issues/13992) is delivered and verified, and every publication writer uses the new locking protocol. An owed cleanup descriptor can outlive its RELEASED binding; collection then changes original release to a conflict and blocks the Hosted Session. This PR does not implement that release-proof contract. Observe scan/deletion/skip counts, duration and failures. Disable retention before reverting to older writers. Disabling stops future cleanup but cannot restore deleted records.
 
 ## Validation and acceptance
 

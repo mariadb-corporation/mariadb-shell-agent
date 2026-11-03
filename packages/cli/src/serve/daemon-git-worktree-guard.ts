@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -3295,7 +3296,7 @@ async function evaluateBuiltInGuard(
     const canonicalReported = await realpathNearestExistingAsync(reportedCwd);
     if (isWithinRoot(canonicalReported, sessionCwd)) {
       // `AgentTool` with `isolation: 'worktree'` provisions under
-      // `<projectRoot>/.qwen/worktrees/`, which is inside the session — so
+      // `<projectRoot>/.mariadb-shell-agent/worktrees/`, which is inside the session — so
       // "inside" is not enough to leave the boundary alone. A reported
       // directory that is a checkout root in its own right is the sub-agent's
       // worktree, and containing it there is what stops one sub-agent from

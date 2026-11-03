@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -157,7 +158,7 @@ describe('createWorkspaceProvidersStatusProvider', () => {
         openai: [
           {
             id: 'qwen3.8-max',
-            baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+            baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
             capabilities: { reasoning: { defaultEffort: 'medium' } },
           },
           {
@@ -210,7 +211,7 @@ describe('createWorkspaceProvidersStatusProvider', () => {
     'projects DeepSeek controls for the final %s.model in cold workspace status',
     async (source) => {
       const provider = createWorkspaceProvidersStatusProvider({ env: {} });
-      const baseUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+      const baseUrl = 'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
       await writeUserSettings({
         security: { auth: { selectedType: 'openai' } },
         model: { name: 'deepseek-v4.1-flash-1017', reasoningEffort: 'low' },
@@ -244,7 +245,7 @@ describe('createWorkspaceProvidersStatusProvider', () => {
 
   it('uses the final DeepSeek route declaration in cold workspace status', async () => {
     const provider = createWorkspaceProvidersStatusProvider({ env: {} });
-    const baseUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+    const baseUrl = 'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
     await writeUserSettings({
       security: { auth: { selectedType: 'openai' } },
       model: { name: 'deepseek-v4.1-flash-1017' },
@@ -331,7 +332,7 @@ describe('createWorkspaceProvidersStatusProvider', () => {
           {
             id: 'deepseek-v4-pro',
             name: 'MaaS',
-            baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+            baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
           },
           {
             id: 'deepseek-v4-pro',
@@ -388,9 +389,9 @@ describe('createWorkspaceProvidersStatusProvider', () => {
   it('projects tiered Qwen controls for duplicate model routes', async () => {
     const provider = createWorkspaceProvidersStatusProvider({ env: {} });
     const maasA =
-      'https://llm-a.cn-beijing.maas.aliyuncs.com/compatible-mode/v1';
+      'https://llm-a.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1';
     const maasB =
-      'https://llm-b.cn-beijing.maas.aliyuncs.com/compatible-mode/v1';
+      'https://llm-b.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1';
     await writeUserSettings({
       security: { auth: { selectedType: 'openai' } },
       model: {
@@ -458,7 +459,7 @@ describe('createWorkspaceProvidersStatusProvider', () => {
       'max',
     ],
     [
-      'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       { samplingParams: { reasoning: { effort: 'max' } } },
       undefined,
       'max',
@@ -470,7 +471,7 @@ describe('createWorkspaceProvidersStatusProvider', () => {
       'none',
     ],
     [
-      'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       { extra_body: { enable_thinking: false } },
       undefined,
       'none',

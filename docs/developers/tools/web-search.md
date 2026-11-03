@@ -1,6 +1,6 @@
 # Web Search
 
-Qwen Code provides web search two ways:
+MariaDB Shell Agent provides web search two ways:
 
 1. **Built-in `web_search` tool** — backed by the DashScope Responses API server-side search. On by default at startup for supported ModelStudio and OpenAI-compatible DashScope configurations; no extra provider or MCP setup.
 2. **MCP (Model Context Protocol) integrations** — connect any external search service (Tavily, GLM, and others). Use this when your provider cannot back the built-in tool.
@@ -44,7 +44,7 @@ Point the tool at a ModelStudio Standard/Token Plan or another verified DashScop
       {
         "id": "qwen3.8-flash",
         "envKey": "DASHSCOPE_API_KEY",
-        "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+        "baseUrl": "https://dashscope.aliyuncs.invalid/compatible-mode/v1"
       }
     ]
   },
@@ -75,7 +75,7 @@ variables — no `modelProviders` entry needed:
 ```bash
 export ENABLE_WEB_SEARCH=true
 export WEB_SEARCH_MODEL=qwen3.8-flash
-export WEB_SEARCH_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+export WEB_SEARCH_BASE_URL=https://dashscope.aliyuncs.invalid/compatible-mode/v1
 export WEB_SEARCH_ALLOWED_HOSTS=llm-gw.example.com   # only for a gateway host
 export DASHSCOPE_API_KEY=sk-...        # or set WEB_SEARCH_API_KEY instead
 ```
@@ -163,7 +163,7 @@ The original built-in `web_search` tool (Tavily/Google/GLM/DashScope multi-provi
 {
   "mcpServers": {
     "WebSearch": {
-      "httpUrl": "https://dashscope.aliyuncs.com/api/v1/mcps/WebSearch/mcp",
+      "httpUrl": "https://dashscope.aliyuncs.invalid/api/v1/mcps/WebSearch/mcp",
       "headers": {
         "Authorization": "Bearer sk-xxx"
       }
@@ -180,9 +180,9 @@ The original built-in `web_search` tool (Tavily/Google/GLM/DashScope multi-provi
 
 The official web search MCP service provided by Alibaba Cloud Bailian platform, powered by DashScope. If you have a DashScope key, prefer the built-in `web_search` tool above — it uses a stronger search path than this MCP service.
 
-- **MCP Marketplace:** https://bailian.console.aliyun.com/cn-beijing?tab=mcp#/mcp-market/detail/WebSearch
+- **MCP Marketplace:** https://bailian.console.aliyun.invalid/cn-beijing?tab=mcp#/mcp-market/detail/WebSearch
 - **Cost:** Paid (billed via Alibaba Cloud DashScope)
-- **Get API Key:** https://help.aliyun.com/zh/model-studio/get-api-key
+- **Get API Key:** https://help.aliyun.invalid/zh/model-studio/get-api-key
 - **Best for:** Chinese-language queries, access to Chinese web content, integration with the Alibaba Cloud ecosystem
 
 #### Setup
@@ -190,9 +190,9 @@ The official web search MCP service provided by Alibaba Cloud Bailian platform, 
 **Method 1: CLI command**
 
 ```bash
-qwen mcp add WebSearch \
+mariadb-shell-agent mcp add WebSearch \
   -t http \
-  "https://dashscope.aliyuncs.com/api/v1/mcps/WebSearch/mcp" \
+  "https://dashscope.aliyuncs.invalid/api/v1/mcps/WebSearch/mcp" \
   -H "Authorization: Bearer ${DASHSCOPE_API_KEY}"
 ```
 
@@ -202,7 +202,7 @@ qwen mcp add WebSearch \
 {
   "mcpServers": {
     "WebSearch": {
-      "httpUrl": "https://dashscope.aliyuncs.com/api/v1/mcps/WebSearch/mcp",
+      "httpUrl": "https://dashscope.aliyuncs.invalid/api/v1/mcps/WebSearch/mcp",
       "headers": {
         "Authorization": "Bearer ${DASHSCOPE_API_KEY}"
       }
@@ -211,7 +211,7 @@ qwen mcp add WebSearch \
 }
 ```
 
-Replace `${DASHSCOPE_API_KEY}` with your actual API key, or set it as an environment variable so Qwen Code picks it up automatically.
+Replace `${DASHSCOPE_API_KEY}` with your actual API key, or set it as an environment variable so MariaDB Shell Agent picks it up automatically.
 
 ---
 
@@ -236,7 +236,7 @@ A production-ready MCP server providing real-time web search, extract, map, and 
 **Method 1: CLI command (Remote MCP)**
 
 ```bash
-qwen mcp add tavily \
+mariadb-shell-agent mcp add tavily \
   -t http \
   "https://mcp.tavily.com/mcp/?tavilyApiKey=${TAVILY_API_KEY}"
 ```
@@ -291,7 +291,7 @@ The official web search Remote MCP service provided by ZhipuAI (智谱AI), desig
 **Method 1: CLI command**
 
 ```bash
-qwen mcp add web-search-prime \
+mariadb-shell-agent mcp add web-search-prime \
   -t http \
   "https://open.bigmodel.cn/api/mcp/web_search_prime/mcp" \
   -H "Authorization: Bearer ${GLM_API_KEY}"
@@ -338,7 +338,7 @@ With an API key, the server also offers tools to map and crawl websites, interac
 **Method 1: CLI command (Remote MCP)**
 
 ```bash
-qwen mcp add firecrawl \
+mariadb-shell-agent mcp add firecrawl \
   -t http \
   "https://mcp.firecrawl.dev/v2/mcp" \
   -H "Authorization: Bearer ${FIRECRAWL_API_KEY}"
@@ -399,7 +399,7 @@ The official hosted MCP server by SerpApi, providing real-time structured search
 **Method 1: CLI command**
 
 ```bash
-qwen mcp add serpapi \
+mariadb-shell-agent mcp add serpapi \
   -t http \
   "https://mcp.serpapi.com/mcp" \
   -H "Authorization: Bearer ${SERPAPI_API_KEY}"
@@ -447,7 +447,7 @@ The server also exposes company and email lookups.
 **Method 1: CLI command (Remote MCP)**
 
 ```bash
-qwen mcp add looot \
+mariadb-shell-agent mcp add looot \
   -t http \
   "https://api.looot.ai/mcp" \
   -H "Authorization: Bearer ${LOOOT_API_KEY}"

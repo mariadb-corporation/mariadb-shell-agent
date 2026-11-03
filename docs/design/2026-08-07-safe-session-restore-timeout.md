@@ -56,7 +56,7 @@ The abandoned notification fence has no TTL and remains until the channel exits 
 
 ## Channel safety
 
-At timeout, the bridge removes the id from `pendingRestoreIds`, clears its early events, and records the id in the channel's `unsettledAbandonedRestores`. If the channel has no live sessions, pending spawn, other restore, or workspace-control operation, it is synchronously marked dying and its child is killed asynchronously; the 504 response does not wait for TERM/KILL escalation. The outer `qwen serve` process continues running.
+At timeout, the bridge removes the id from `pendingRestoreIds`, clears its early events, and records the id in the channel's `unsettledAbandonedRestores`. If the channel has no live sessions, pending spawn, other restore, or workspace-control operation, it is synchronously marked dying and its child is killed asynchronously; the 504 response does not wait for TERM/KILL escalation. The outer `mariadb-shell-agent serve` process continues running.
 
 If any sibling work exists, the child remains alive. A late cleanup failure sets a distinct quarantine bit and does not set `isDying`, so sibling attach, prompt, close, and workspace control continue. Fresh work is rejected before capacity checks so the stable error is `acp_channel_unavailable` rather than a coincidental session-limit response. Once visible work drains, the child is recycled and a subsequent request can create a clean channel.
 

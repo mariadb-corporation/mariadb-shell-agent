@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -72,7 +73,7 @@ describe('sandboxPolicy', () => {
 });
 
 describe('values a repository must not be able to set', () => {
-  // `loadEnvironment` walks up from cwd and applies `<repo>/.qwen/.env` —
+  // `loadEnvironment` walks up from cwd and applies `<repo>/.mariadb-shell-agent/.env` —
   // repository content, from the checkout under review, admitted by default
   // because folder trust starts off. So `process.env` is NOT the operator's
   // alone, and every containment decision read from it needs to know which
@@ -106,8 +107,8 @@ describe('values a repository must not be able to set', () => {
         .mockImplementation((k) => k === 'SANDBOX_SET_UID_GID');
       try {
         const { args } = containerCommand('npm ci', {
-          cwd: join(sep, 'repo', '.qwen', 'tmp', 'review-pr-9'),
-          tmpDir: join(sep, 'repo', '.qwen', 'tmp'),
+          cwd: join(sep, 'repo', '.mariadb-shell-agent', 'tmp', 'review-pr-9'),
+          tmpDir: join(sep, 'repo', '.mariadb-shell-agent', 'tmp'),
           kind: 'install',
           runtime: 'docker',
           image: 'example/image:tag',
@@ -185,8 +186,8 @@ describe('the operator opt-out still works', () => {
       vi.stubEnv('SANDBOX_SET_UID_GID', 'false');
       try {
         const { args } = containerCommand('npm ci', {
-          cwd: join(sep, 'repo', '.qwen', 'tmp', 'review-pr-9'),
-          tmpDir: join(sep, 'repo', '.qwen', 'tmp'),
+          cwd: join(sep, 'repo', '.mariadb-shell-agent', 'tmp', 'review-pr-9'),
+          tmpDir: join(sep, 'repo', '.mariadb-shell-agent', 'tmp'),
           kind: 'install',
           runtime: 'docker',
           image: 'example/image:tag',
@@ -224,7 +225,13 @@ describe('sandboxVerdict', () => {
     // The refusal has to reach something that stops the phase. Left to "the
     // caller", no caller acted and `required` ran the reviewed code
     // unsandboxed with the full environment — the policy meant nothing.
-    const tree = join(sep, 'repo', '.qwen', 'tmp', 'review-pr-9');
+    const tree = join(
+      sep,
+      'repo',
+      '.mariadb-shell-agent',
+      'tmp',
+      'review-pr-9',
+    );
     const mounted = () => tree;
     const verdict = sandboxVerdict('required', {}, () => null);
     expect(
@@ -250,7 +257,7 @@ describe('sandboxVerdict', () => {
 
   it('refuses a phase a healthy runtime still cannot contain', () => {
     // "A runtime answered" is not containment. A `/review` of a local checkout
-    // has no `.qwen/tmp` layout to mount, so the command falls through to the
+    // has no `.mariadb-shell-agent/tmp` layout to mount, so the command falls through to the
     // direct spawn — with the full environment, and a report indistinguishable
     // from a contained run. The policy's question is whether THIS phase can be
     // contained, and the mount is the half that fails while the daemon is fine.
@@ -417,9 +424,9 @@ describe('the decisions this module exists to make', () => {
     const verdict = { kind: 'container', runtime: 'docker' } as const;
     expect(
       refuseUnsandboxedPhase(
-        join(sep, 'repo', '.qwen', 'tmp', 'review-pr-9'),
+        join(sep, 'repo', '.mariadb-shell-agent', 'tmp', 'review-pr-9'),
         verdict,
-        () => join(sep, 'repo', '.qwen', 'tmp'),
+        () => join(sep, 'repo', '.mariadb-shell-agent', 'tmp'),
         'required',
       ),
     ).toBeNull();
@@ -494,7 +501,7 @@ describe('the decisions this module exists to make', () => {
 });
 
 describe('containerCommand', () => {
-  const tmpDir = join(sep, 'repo', '.qwen', 'tmp');
+  const tmpDir = join(sep, 'repo', '.mariadb-shell-agent', 'tmp');
   const base = {
     tmpDir,
     runtime: 'docker' as const,
@@ -910,36 +917,48 @@ describe('mountRootFor', () => {
 
   itWhereRootsCanMount('refuses a root the -v grammar cannot spell', () => {
     // `-v src:dst` has exactly one separator. A checkout at `/…/my:repo` makes
-    // the spec `…/my:repo/.qwen/tmp:…/my:repo/.qwen/tmp`, which docker rejects
+    // the spec `…/my:repo/.mariadb-shell-agent/tmp:…/my:repo/.mariadb-shell-agent/tmp`, which docker rejects
     // as "too many colons" — measured, not assumed. Saying "mountable" about
     // that root sends every command in the phase into a raw mount error
     // instead of the fallback (`auto`) or the refusal (`required`) already
     // written for roots that cannot be mounted.
     const root = tmp();
-    const colon = join(root, 'my:repo', '.qwen', 'tmp', 'review-pr-9');
+    const colon = join(
+      root,
+      'my:repo',
+      '.mariadb-shell-agent',
+      'tmp',
+      'review-pr-9',
+    );
     mkdirSync(colon, { recursive: true });
     expect(mountRootFor(colon)).toBeNull();
     // The comparison case, so this is a statement about the colon and not
     // about a deep path: docker takes a comma in a `-v` spec without complaint.
-    const comma = join(root, 'my,repo', '.qwen', 'tmp', 'review-pr-9');
+    const comma = join(
+      root,
+      'my,repo',
+      '.mariadb-shell-agent',
+      'tmp',
+      'review-pr-9',
+    );
     mkdirSync(comma, { recursive: true });
     expect(mountRootFor(comma)).not.toBeNull();
   });
 
   itWhereRootsCanMount('takes the DEEPEST temp dir, not the first', () => {
     // A review run from inside another review's worktree — this pipeline's own
-    // dogfood geometry — nests one `.qwen/tmp` inside another. First-occurrence
+    // dogfood geometry — nests one `.mariadb-shell-agent/tmp` inside another. First-occurrence
     // search widens the mount to the OUTER temp dir, which pulls `<repo>/.git`
     // and every sibling checkout into the container and defeats the one
     // property the mount exists for.
     const root = tmp();
     const inner = join(
       root,
-      '.qwen',
+      '.mariadb-shell-agent',
       'tmp',
       'checkouts',
       'myrepo',
-      '.qwen',
+      '.mariadb-shell-agent',
       'tmp',
     );
     mkdirSync(join(inner, 'review-pr-1-probe'), { recursive: true });
@@ -953,28 +972,33 @@ describe('mountRootFor', () => {
     'refuses a root reached through a symlink instead of mounting it',
     () => {
       // `resolve` never touches the filesystem, so a link at or above
-      // `.qwen/tmp` — committable as mode 120000, materialised by a fresh clone
+      // `.mariadb-shell-agent/tmp` — committable as mode 120000, materialised by a fresh clone
       // — would silently widen a read-write bind mount to wherever it points.
       // Every other creating or destroying path in this pipeline refuses that.
       const root = tmp();
       const elsewhere = tmp();
       mkdirSync(join(elsewhere, 'tmp', 'review-pr-1'), { recursive: true });
-      mkdirSync(join(root, '.qwen'), { recursive: true });
-      symlinkSync(join(elsewhere, 'tmp'), join(root, '.qwen', 'tmp'));
-
-      expect(mountRootFor(join(root, '.qwen', 'tmp', 'review-pr-1'))).toBe(
-        null,
+      mkdirSync(join(root, '.mariadb-shell-agent'), { recursive: true });
+      symlinkSync(
+        join(elsewhere, 'tmp'),
+        join(root, '.mariadb-shell-agent', 'tmp'),
       );
+
+      expect(
+        mountRootFor(join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1')),
+      ).toBe(null);
 
       // ...and the same layout without the link is mounted normally, so the
       // refusal is about the redirect and not about the shape.
       const honest = tmp();
-      mkdirSync(join(honest, '.qwen', 'tmp', 'review-pr-1'), {
+      mkdirSync(join(honest, '.mariadb-shell-agent', 'tmp', 'review-pr-1'), {
         recursive: true,
       });
-      expect(mountRootFor(join(honest, '.qwen', 'tmp', 'review-pr-1'))).toBe(
-        realpathSync(join(honest, '.qwen', 'tmp')),
-      );
+      expect(
+        mountRootFor(
+          join(honest, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
+        ),
+      ).toBe(realpathSync(join(honest, '.mariadb-shell-agent', 'tmp')));
     },
   );
 
@@ -986,7 +1010,7 @@ describe('mountRootFor', () => {
       // this mount uses one path as both source and target, and the container
       // side has no `C:` — so refusing is the honest answer, not a casualty.
       const root = tmp();
-      const tree = join(root, '.qwen', 'tmp', 'review-pr-1');
+      const tree = join(root, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
       mkdirSync(tree, { recursive: true });
       // The layout has to EXIST first. Named at a path that does not, this
       // returns null out of the realpath catch and says nothing at all about
@@ -1000,13 +1024,13 @@ describe('mountRootFor', () => {
   itWhereRootsCanMount(
     'answers for the review temp dir ITSELF, not only for its children',
     () => {
-      // The marker ends in a separator, so a path ending AT `.qwen/tmp`
+      // The marker ends in a separator, so a path ending AT `.mariadb-shell-agent/tmp`
       // matched no temp dir at all: `untrustedRepositoryFrom` short-circuited
       // on its first line, the launch-directory question went unpolicied for a
       // process standing there, and `lib/git` memoized that negative as
       // trusted for the rest of the process.
       const root = tmp();
-      const tmpDir = join(root, '.qwen', 'tmp');
+      const tmpDir = join(root, '.mariadb-shell-agent', 'tmp');
       mkdirSync(tmpDir, { recursive: true });
       expect(mountRootFor(tmpDir)).toBe(realpathSync(tmpDir));
       // ...and a child of it answers the same root, as before.
@@ -1030,7 +1054,7 @@ describe('reviewSandboxImage', () => {
       'mine:1',
     );
     // The operator's own sandbox image, if they configured one for
-    // `qwen --sandbox`, rather than ignoring it and pulling a second one.
+    // `mariadb-shell-agent --sandbox`, rather than ignoring it and pulling a second one.
     expect(reviewSandboxImage({ QWEN_SANDBOX_IMAGE: 'theirs:2' })).toBe(
       'theirs:2',
     );
@@ -1073,7 +1097,7 @@ describe('reviewSandboxImage', () => {
     // This is the branch the defect this PR fixes lived in: with no coverage,
     // reverting it to an unpullable name ships green.
     const fallback = reviewSandboxImage({}, () => undefined);
-    expect(fallback).toBe(`ghcr.io/qwenlm/qwen-code:${CLI_VERSION}`);
+    expect(fallback).toBe(`ghcr.invalid/qwenlm/qwen-code:${CLI_VERSION}`);
     expect(fallback).not.toContain('/sandbox');
     expect(fallback).not.toContain(':latest');
   });
@@ -1081,7 +1105,7 @@ describe('reviewSandboxImage', () => {
   it('defaults to the image this CLI actually ships with', () => {
     // Pinned against the MANIFEST, not against a spelling. The assertion this
     // replaces was `toContain('sandbox')`, which is how a default of
-    // `ghcr.io/qwenlm/qwen-code/sandbox:latest` shipped: it contains the word,
+    // `ghcr.invalid/qwenlm/qwen-code/sandbox:latest` shipped: it contains the word,
     // it is not the CLI's image, and it does not resolve at all — an anonymous
     // manifest request answers 403 where the real one answers 200, so every
     // command of an opted-in review failed at image pull. Nineteen rounds of

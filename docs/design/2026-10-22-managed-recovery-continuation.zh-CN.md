@@ -92,4 +92,4 @@
 
 先实现执行证据、取消善后意图持久化和恢复接口，再完成 WebShell 操作、取消跟踪与交接。两种语言同步。永久 journal 修复与公开 Shell 生命周期扩展保持独立工作范围。
 
-本版没有未决产品选择。主要风险为误判 ready、崩溃丢失取消善后标记、旧 owner 清理，以及误入普通加载路径。测试必须断言可观察副作用和原身份。本地 macOS 结果不能证明 Linux cgroup 专属验收；应明确记录跳过，不算作已通过的进程故障覆盖。[E2E 计划](../plans/2026-10-22-managed-recovery-continuation-e2e.zh-CN.md)定义场景与命令，本次详细执行证据保存在 `.qwen/e2e-tests/managed-recovery-continuation.md`。
+本版没有未决产品选择。主要风险为误判 ready、崩溃丢失取消善后标记、旧 owner 清理，以及误入普通加载路径。测试必须断言可观察副作用和原身份。本地 macOS 结果不能证明 Linux cgroup 专属验收；应明确记录跳过，不算作已通过的进程故障覆盖。[E2E 计划](../plans/2026-10-22-managed-recovery-continuation-e2e.zh-CN.md)定义场景与命令，本次详细执行证据保存在 `.mariadb-shell-agent/e2e-tests/managed-recovery-continuation.md`。

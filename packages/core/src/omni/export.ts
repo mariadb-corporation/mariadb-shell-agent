@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -761,7 +762,7 @@ function filterToSession(
 // ─── Entry points ─────────────────────────────────────────────────────────
 
 export interface ExportOmniTrajectoryOptions {
-  /** `.qwen/omni` root holding memory.json. */
+  /** `.mariadb-shell-agent/omni` root holding memory.json. */
   omniRootDir: string;
   /** Path to the session's chat-record JSONL. */
   transcriptPath: string;

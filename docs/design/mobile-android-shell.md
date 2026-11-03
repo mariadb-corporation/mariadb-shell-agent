@@ -2,7 +2,7 @@
 
 [English](mobile-android-shell.md) | [简体中文](mobile-android-shell.zh-CN.md)
 
-Status: development-only spike under review, following [issue #11704](https://github.com/QwenLM/qwen-code/issues/11704). It is not a production mobile client.
+Status: development-only spike under review, following [issue #11704](https://github.invalid/QwenLM/qwen-code/issues/11704). It is not a production mobile client.
 
 This document records the Phase 1 baseline. The [Phase 2 connection-profile design](mobile-connection-profiles.md) supersedes the single-profile and plaintext native-storage sections below; other production prerequisites still apply.
 
@@ -24,7 +24,7 @@ Use the existing daemon-served Web Shell in an Android WebView, with no second n
 
 ## Design Decisions
 
-The WebView navigates to the daemon origin, so direct same-origin HTTP API behavior applies without `--allow-origin`. Reverse proxies and remote terminal/voice WebSocket upgrades still follow the origin requirements documented in [qwen serve](../users/qwen-serve.md). Chrome/WebView 111 is the Web Shell's CSS support floor, derived from Tailwind v4, independently of the ES2021 JavaScript target.
+The WebView navigates to the daemon origin, so direct same-origin HTTP API behavior applies without `--allow-origin`. Reverse proxies and remote terminal/voice WebSocket upgrades still follow the origin requirements documented in [mariadb-shell-agent serve](../users/qwen-serve.md). Chrome/WebView 111 is the Web Shell's CSS support floor, derived from Tailwind v4, independently of the ES2021 JavaScript target.
 
 A static daemon token (`--token` or `QWEN_SERVER_TOKEN`) avoids restart invalidation during development. SharedPreferences storage is a temporary development mechanism, not Keystore-backed production security. HTTPS is the intended remote connection path. Additional HTTP LAN hosts require explicit network-security entries.
 
@@ -32,7 +32,7 @@ A static daemon token (`--token` or `QWEN_SERVER_TOKEN`) avoids restart invalida
 port. It must never forward a token-less daemon to a physical device: any app
 on that device can reach the port and act as the daemon user. Physical-device
 testing requires `--require-auth` with a bearer token saved as `daemon_token`;
-for example, `QWEN_SERVER_TOKEN=$(openssl rand -hex 32) qwen serve --require-auth`.
+for example, `QWEN_SERVER_TOKEN=$(openssl rand -hex 32) mariadb-shell-agent serve --require-auth`.
 
 No foreground service starts in this spike. A service with no SSE connection would merely consume resources and show a misleading persistent notification, so its placeholder and permissions are deferred.
 

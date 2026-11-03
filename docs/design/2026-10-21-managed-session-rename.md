@@ -72,12 +72,12 @@ migration or new dependency is needed.
 
 ## Validation and acceptance criteria
 
-The E2E plan is `.qwen/e2e-tests/managed-session-rename.md`. Baseline checks use
+The E2E plan is `.mariadb-shell-agent/e2e-tests/managed-session-rename.md`. Baseline checks use
 the globally installed CLI and an isolated previous lightweight distribution.
 Post-change checks use a matching new CLI and Java runtime against isolated
 local storage, including the real browser UI.
 
-The sidebar placement adjustment uses `.qwen/e2e-tests/managed-sidebar-rename/plan.md`, with the user-requested running main artifact as its baseline and a separate worktree for the new frontend build.
+The sidebar placement adjustment uses `.mariadb-shell-agent/e2e-tests/managed-sidebar-rename/plan.md`, with the user-requested running main artifact as its baseline and a separate worktree for the new frontend build.
 
 - Rename a new empty Session and a Session with an active Turn; the confirmed
   name appears in the header, navigation, and subsequent API reads.

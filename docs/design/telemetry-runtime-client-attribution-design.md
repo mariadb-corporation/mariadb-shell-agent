@@ -1,20 +1,20 @@
 # Telemetry: Daemon 会话的 channel 归因
 
-> 配套 issue: [#8660](https://github.com/QwenLM/qwen-code/issues/8660)
+> 配套 issue: [#8660](https://github.invalid/QwenLM/qwen-code/issues/8660)
 > 基于 2026-08-07 对 qwen-code main 分支的代码复核
 
 ## 1. 背景
 
 默认 usage-statistics（qwen-logger RUM）载荷中只有一个入口维度 `properties.channel`，它来自 `--channel` 标志：
 
-- VS Code 伴生插件直接启动 `qwen --acp --channel=VSCode`
-- Electron 桌面端直接启动 `qwen --acp --channel=desktop`
+- VS Code 伴生插件直接启动 `mariadb-shell-agent --acp --channel=VSCode`
+- Electron 桌面端直接启动 `mariadb-shell-agent --acp --channel=desktop`
 - TS/Python/Java SDK 的主入口（`query()`）直接 spawn CLI（stream-json 模式），自带 `--channel=SDK`
 - `--acp` 未显式指定 channel 时回退为 `ACP`（`packages/cli/src/config/config.ts` 的 ACP fallback）
 
-但 `qwen serve`（daemon）的 spawn 工厂启动的是不带 channel 的 `qwen --acp` 子进程（`packages/acp-bridge/src/spawnChannel.ts`），因此**经 daemon 承载的会话——SDK 的 daemon 客户端入口（如 TS SDK 的 `DaemonClient`/`DaemonSessionClient`）、Web Shell、Tauri 桌面 shell——全部上报为 `ACP`**，无法区分。Tauri shell 启动 daemon 时设置了 `QWEN_CODE_DESKTOP=1`（`packages/desktop/src-tauri/src/runtime.rs`），但 telemetry 从未读取该变量。
+但 `mariadb-shell-agent serve`（daemon）的 spawn 工厂启动的是不带 channel 的 `mariadb-shell-agent --acp` 子进程（`packages/acp-bridge/src/spawnChannel.ts`），因此**经 daemon 承载的会话——SDK 的 daemon 客户端入口（如 TS SDK 的 `DaemonClient`/`DaemonSessionClient`）、Web Shell、Tauri 桌面 shell——全部上报为 `ACP`**，无法区分。Tauri shell 启动 daemon 时设置了 `QWEN_CODE_DESKTOP=1`（`packages/desktop/src-tauri/src/runtime.rs`），但 telemetry 从未读取该变量。
 
-`app.channel` 是来自 `~/.qwen/source.json` 的**安装来源**，与入口归因是不同概念，不应被重载。
+`app.channel` 是来自 `~/.mariadb-shell-agent/source.json` 的**安装来源**，与入口归因是不同概念，不应被重载。
 
 ## 2. 方案
 
@@ -52,7 +52,7 @@ CLI 的 ACP channel 回退（`packages/cli/src/config/acp-channel-fallback.ts`�
 
 VS Code 伴生插件**自己拥有 spawn**：一个客户端 = 一个专属子进程，所以能传 `--channel=VSCode`。
 
-daemon 的桥接模型不同（`packages/acp-bridge/src/bridge.ts`）：**一个 bridge（一个 workspace）至多一个 `qwen --acp` 子进程**，所有客户端的会话经 `connection.newSession()` 多路复用到同一个进程上，共享进程/OAuth/FileReadCache。因此：
+daemon 的桥接模型不同（`packages/acp-bridge/src/bridge.ts`）：**一个 bridge（一个 workspace）至多一个 `mariadb-shell-agent --acp` 子进程**，所有客户端的会话经 `connection.newSession()` 多路复用到同一个进程上，共享进程/OAuth/FileReadCache。因此：
 
 - spawn 时不知道哪个客户端会连进来（子进程可能预热）；
 - 同一进程内同时跑着不同客户端的会话，进程级参数无法表达会话级身份；

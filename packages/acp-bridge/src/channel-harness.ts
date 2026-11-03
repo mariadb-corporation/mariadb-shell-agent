@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -126,7 +127,7 @@ export function createChannelHarness(options: ChannelHarnessOptions) {
       context ?? 'channel kill',
     ).catch((err) => {
       writeStderrLine(
-        `qwen serve: channel kill failed${context ? ` (${context})` : ''}: ${String(err)}`,
+        `mariadb-shell-agent serve: channel kill failed${context ? ` (${context})` : ''}: ${String(err)}`,
       );
     });
   }
@@ -142,7 +143,7 @@ export function createChannelHarness(options: ChannelHarnessOptions) {
     }
     ci.retireWhenSessionsDrain = true;
     writeStderrLine(
-      `qwen serve: ${context}; deferring channel retirement until ${sessionCount(ci)} active session(s) drain`,
+      `mariadb-shell-agent serve: ${context}; deferring channel retirement until ${sessionCount(ci)} active session(s) drain`,
     );
   }
 
@@ -199,7 +200,7 @@ export function createChannelHarness(options: ChannelHarnessOptions) {
       idleTimers.delete(ci);
       if (hasNoChannelWork(ci)) {
         writeStderrLine(
-          `qwen serve: idle timeout (${timeoutMs}ms) expired, killing channel`,
+          `mariadb-shell-agent serve: idle timeout (${timeoutMs}ms) expired, killing channel`,
         );
         void killChannelWithLog(ci, 'idle timeout');
       } else {
@@ -500,7 +501,9 @@ export function createChannelHarness(options: ChannelHarnessOptions) {
     preheat,
     reclaimIdleChannel(info: HarnessChannel) {
       // Retire only this child; shutdown would permanently seal the bridge.
-      writeStderrLine(`qwen serve: reclaiming idle ACP channel ${info.id}`);
+      writeStderrLine(
+        `mariadb-shell-agent serve: reclaiming idle ACP channel ${info.id}`,
+      );
       return retireChannel(info, 'capacity reclamation');
     },
     stopChannel(info: HarnessChannel) {

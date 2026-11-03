@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// File for 'qwen mcp add' command
+// File for 'mariadb-shell-agent mcp add' command
 import type { CommandModule } from 'yargs';
 import { loadSettings, SettingScope } from '../../config/settings.js';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
@@ -214,7 +215,9 @@ export const addCommand: CommandModule = {
   describe: 'Add a server',
   builder: (yargs) =>
     yargs
-      .usage('Usage: qwen mcp add [options] <name> <commandOrUrl> [args...]')
+      .usage(
+        'Usage: mariadb-shell-agent mcp add [options] <name> <commandOrUrl> [args...]',
+      )
       .parserConfiguration({
         'unknown-options-as-args': true, // Pass unknown options as server args
         'populate--': true, // Populate server args after -- separator

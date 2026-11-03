@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -416,7 +417,10 @@ describe('runPush (real git, bare remote)', () => {
   it('refuses a plain directory in place of the worktree, whatever the enclosing clone has checked out', () => {
     run(repo, 'worktree', 'remove', '--force', paths.worktreePath);
     mkdirSync(paths.worktreePath);
-    writeFileSync(join(repo, '.git', 'info', 'exclude'), '.qwen/\n');
+    writeFileSync(
+      join(repo, '.git', 'info', 'exclude'),
+      '.mariadb-shell-agent/\n',
+    );
     // The user checked the watch's branch out in their own clone.
     run(repo, 'switch', '-q', paths.branch);
     commitIn(repo, 'user-work.txt');
@@ -430,7 +434,7 @@ describe('runPush (real git, bare remote)', () => {
     run(base, 'clone', '-q', remote, other);
     run(other, 'config', 'user.email', 't@example.com');
     run(other, 'config', 'user.name', 't');
-    const otherTmp = join(other, '.qwen', 'tmp');
+    const otherTmp = join(other, '.mariadb-shell-agent', 'tmp');
     mkdirSync(otherTmp, { recursive: true });
     const otherWorktree = join(otherTmp, 'autofix-pr-7');
     run(
@@ -444,7 +448,7 @@ describe('runPush (real git, bare remote)', () => {
       featSha,
     );
     const theirWork = commitIn(otherWorktree, 'their-work.txt');
-    // This clone's `.qwen/tmp` now leads there.
+    // This clone's `.mariadb-shell-agent/tmp` now leads there.
     writeState(join(otherTmp, 'autofix-pr-7-state.json'), state());
     run(repo, 'worktree', 'remove', '--force', paths.worktreePath);
     rmSync(dirname(paths.worktreePath), { recursive: true });
@@ -548,7 +552,7 @@ describe('runPush (real git, bare remote)', () => {
     });
 
     it("pushes the user's commits along, under the lease", () => {
-      // The watch's own files under .qwen/tmp are not uncommitted work.
+      // The watch's own files under .mariadb-shell-agent/tmp are not uncommitted work.
       const mine = commitIn(repo, 'mine.txt');
       expect(runPush(7)).toMatchObject({ pushed: true, sha: mine, pushes: 1 });
       expect(remoteFeat()).toBe(mine);

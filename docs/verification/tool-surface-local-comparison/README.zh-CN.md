@@ -2,7 +2,7 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-本文记录 [#12333](https://github.com/QwenLM/qwen-code/issues/12333) 的一次有限本地 CLI 对比。默认工具可见性下，这组任务的总 token 更少，但尚未证明质量不变。本文是实验记录和手动验证步骤，不是自动验收门禁。
+本文记录 [#12333](https://github.invalid/QwenLM/qwen-code/issues/12333) 的一次有限本地 CLI 对比。默认工具可见性下，这组任务的总 token 更少，但尚未证明质量不变。本文是实验记录和手动验证步骤，不是自动验收门禁。
 
 ## 已有实测
 
@@ -29,7 +29,7 @@
 
 首轮单独保留：原始结果 A 14/18、B 12/18，总 token 为 969,739 → 783,840。它包含路径和 schema 检查的误判，以及两次通过仍启用的 `monitor` 实际修改 fixture 的失败。第二轮对两组同时修正了该 fixture。不能将不同配置混合取平均，也不能丢弃失败请求。
 
-[已发布报告](https://github.com/QwenLM/qwen-code/pull/13767#issuecomment-6079794031) 保留分任务结果及来源。历史实验使用临时转发代理，将全部 128 次请求与原生日志核对。之后离线修正分类器，计入此前漏判的参数错误，未改变 token 或任务结果；该修正之后没有重新调用供应商。原始日志和失败运行保留在本地，不随本文提交。实验 runner 保留在 PR 历史提交 `82f1f057cfe17e573ae465958b95c14d0d95d196` 中，不再作为仓库命令维护。
+[已发布报告](https://github.invalid/QwenLM/qwen-code/pull/13767#issuecomment-6079794031) 保留分任务结果及来源。历史实验使用临时转发代理，将全部 128 次请求与原生日志核对。之后离线修正分类器，计入此前漏判的参数错误，未改变 token 或任务结果；该修正之后没有重新调用供应商。原始日志和失败运行保留在本地，不随本文提交。实验 runner 保留在 PR 历史提交 `82f1f057cfe17e573ae465958b95c14d0d95d196` 中，不再作为仓库命令维护。
 
 ## 使用现有能力做小规模复测
 
@@ -38,7 +38,7 @@
 3. 每个任务在两组中分别开启新会话，重复时交替 A/B 顺序。对于 OpenAI 兼容供应商，使用已有 headless CLI 和 API 日志选项，例如：
 
    ```bash
-   qwen --model <model> --output-format json --chat-recording=true \
+   mariadb-shell-agent --model <model> --output-format json --chat-recording=true \
      --openai-logging --openai-logging-dir <private-log-directory> \
      -p '<same task prompt>'
    ```
@@ -52,7 +52,7 @@
 
 在 `c2f5ce45b156` 的源码 CLI 上运行两个会话，使用历史 B 配置以及相同模型和提示词。原始请求确认首轮 11 个声明，包含 `tool_search`／`tool_call`，Agent 和 Goal 工具仍隐藏。Agent 精确返回 `TOTAL=63`，这一个样本未再次出现格式失败。Goal 再次提前执行 `tool_call(get_goal)`，被拒绝后才搜索 schema，随后运行校验并完成。启动提醒和 Goal 续轮提示都已明确要求先审阅 schema。这是可复现的模型调用顺序错误；现有观察没有定位到缺失指引或可据此修复的生产代码。即使任务恢复，拒绝调用仍保留为调用质量失败。
 
-此前四次隔离全局 `qwen` 运行使用的是基础安装 0.24.0，而非普通配置中的自动更新版本 0.25.0。它们完成了任务，但直接暴露 Agent／Goal，不能验证按需桥接，因此不纳入该结论。本轮未重新进行 A/B 成本对比，也未根据这些观察改动生产代码。
+此前四次隔离全局 `mariadb-shell-agent` 运行使用的是基础安装 0.24.0，而非普通配置中的自动更新版本 0.25.0。它们完成了任务，但直接暴露 Agent／Goal，不能验证按需桥接，因此不纳入该结论。本轮未重新进行 A/B 成本对比，也未根据这些观察改动生产代码。
 
 ## 剩余验收
 

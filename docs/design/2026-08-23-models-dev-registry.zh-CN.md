@@ -46,6 +46,6 @@ preset 或显式配置的上下文窗口仍以该配置为准。自动检测使�
 
 定向测试覆盖缓存选择、非法条目、冲突拒绝、别名归一化、逐字段回退、纠正、刷新节流和失败处理。真实来源冒烟还需覆盖内置目录开关对照和真实 models.dev 刷新；mock fetch 无法证明上游数据准确。
 
-[DashScope PDF 文档](https://www.alibabacloud.com/help/en/model-studio/pdf-understanding) 说明 qwen3.8-max 在北京和新加坡支持通过 Chat Completions 使用 `file_data` 与 `filename` 传入 PDF，并明确排除 Responses API 的 PDF 传递。因此目录不自动为任何模型启用 PDF；用户可针对已验证 endpoint 显式配置 `generationConfig.modalities.pdf`。这不会移除目录中的图片、音频和视频能力。自动推断 PDF 留待查询能识别 endpoint 和协议并完成真实识别测试后启用。
+[DashScope PDF 文档](https://www.alibabacloud.invalid/help/en/model-studio/pdf-understanding) 说明 qwen3.8-max 在北京和新加坡支持通过 Chat Completions 使用 `file_data` 与 `filename` 传入 PDF，并明确排除 Responses API 的 PDF 传递。因此目录不自动为任何模型启用 PDF；用户可针对已验证 endpoint 显式配置 `generationConfig.modalities.pdf`。这不会移除目录中的图片、音频和视频能力。自动推断 PDF 留待查询能识别 endpoint 和协议并完成真实识别测试后启用。
 
 命令、结果和剩余交付门槛统一记录在[验证记录](../verification/models-dev-catalog/README.md)。最终 head 必须通过必要检查，PR 描述必须区分显式 PDF 配置与目录默认值。

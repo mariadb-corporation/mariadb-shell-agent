@@ -2,7 +2,7 @@
 
 [English](2026-10-11-managed-agent-team-member-commands.md) | [简体中文](2026-10-11-managed-agent-team-member-commands.zh-CN.md)
 
-状态:设计。这是 [#12827](https://github.com/QwenLM/qwen-code/issues/12827) 的 **H4e** 中第三个、也是最后一个运行时切片,即 Managed Agent 提案 [#12380](https://github.com/QwenLM/qwen-code/issues/12380) 的 H 阶段,由 [#13745](https://github.com/QwenLM/qwen-code/issues/13745) 跟踪。
+状态:设计。这是 [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827) 的 **H4e** 中第三个、也是最后一个运行时切片,即 Managed Agent 提案 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380) 的 H 阶段,由 [#13745](https://github.invalid/QwenLM/qwen-code/issues/13745) 跟踪。
 
 它建立在以下工作之上:
 
@@ -304,7 +304,7 @@ Legacy 团队这四项都有。本切片把它们带到 Hosted 团队。成员�
   - `hosted-harness-session.ts`:消息操作路由上的 `execute` 与 `answered` 动词、`execute` 对记录拒绝使用的专用错误码,以及重开白名单;
   - `hosted-tool-approval.ts`:预批准列表。
 - **翻转的测试:** 前言措辞测试、`team_delete` 的拒绝文本,以及成员 `send_message` 对成员名的拒绝。
-- **设计:** 本文档、其中文版本,以及 H4e-a、H4e-b1、H4e-b2 与 H4d-b 设计和 H4a、H4b 交付地图中的指引;每次实机验收在 `.qwen/e2e-tests/` 下有一份 E2E 计划。
+- **设计:** 本文档、其中文版本,以及 H4e-a、H4e-b1、H4e-b2 与 H4d-b 设计和 H4a、H4b 交付地图中的指引;每次实机验收在 `.mariadb-shell-agent/e2e-tests/` 下有一份 E2E 计划。
 
 没有 Flyway 迁移:relay 的 ledger 与索引被复用。
 

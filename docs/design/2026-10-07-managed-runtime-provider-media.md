@@ -4,7 +4,7 @@
 
 Status: provider/1 implemented; production deployment acceptance tracked separately.
 Date: 2026-10-07
-Issue: [#13039](https://github.com/QwenLM/qwen-code/issues/13039), including the [root-cause comment](https://github.com/QwenLM/qwen-code/issues/13039#issuecomment-5895577269).
+Issue: [#13039](https://github.invalid/QwenLM/qwen-code/issues/13039), including the [root-cause comment](https://github.invalid/QwenLM/qwen-code/issues/13039#issuecomment-5895577269).
 Code baseline: `a764fb9698e6e1152e0a8bc5808c30a765744152` for both upstream and local.
 
 ## 1. Decision and scope

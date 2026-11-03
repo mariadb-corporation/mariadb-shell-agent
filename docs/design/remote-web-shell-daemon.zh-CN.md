@@ -2,7 +2,7 @@
 
 [English](remote-web-shell-daemon.md) | [简体中文](remote-web-shell-daemon.zh-CN.md)
 
-状态：[#11475](https://github.com/QwenLM/qwen-code/issues/11475) 的 Web Shell 阶段实现。2026-10-09 修订：随 [#13727](https://github.com/QwenLM/qwen-code/issues/13727) 落地“所有已保存主机同时实时、页内聚焦切换与 `?fanout=` CSP 契约”，取代此前“仅一台实时主机、选择时导航”的表述。2026-10-08 修订：恢复侧边栏聚合视图，取代 2026-09-12 的收窄（`e879557a`）——那次变更删除了多主机项目目录并把聚合声明为非目标。
+状态：[#11475](https://github.invalid/QwenLM/qwen-code/issues/11475) 的 Web Shell 阶段实现。2026-10-09 修订：随 [#13727](https://github.invalid/QwenLM/qwen-code/issues/13727) 落地“所有已保存主机同时实时、页内聚焦切换与 `?fanout=` CSP 契约”，取代此前“仅一台实时主机、选择时导航”的表述。2026-10-08 修订：恢复侧边栏聚合视图，取代 2026-09-12 的收窄（`e879557a`）——那次变更删除了多主机项目目录并把聚合声明为非目标。
 
 ## 问题
 
@@ -47,7 +47,7 @@ Web Shell 已经通过同一个 daemon `baseUrl` 发送 workspace、session、�
 
 Bearer token 仍保存在当前标签页的 `sessionStorage` 中，但存储键按 daemon origin 区分。旧的无限定存储键只用于同源连接。选择远程 daemon 时绝不会复用页面自身 daemon 或另一个远程 daemon 的 token。
 
-当 HTML shell 由 `qwen serve` 提供时，CSP 的 `connect-src` 增加经过校验的目标 daemon origin、每个经过校验的 `?fanout=<origin>` 参数，以及对应的 `ws:` 或 `wss:` origin。fanout origin 走与 `?daemon=` 相同的严格校验（拒绝凭据、路径、查询参数和 fragment），可重复出现，等于页面 origin 时被丢弃。shell 通过 `history.replaceState` 让 `fanout` 参数与已保存主机集合保持同步，这不会放宽当前文档的策略；覆盖集合之外新保存的主机在可以页内聚焦之前仍需一次导航。远程 daemon 仍必须通过 `--allow-origin` 独立允许 Web Shell 页面 origin；现有 Origin、Host 和 bearer 校验继续作为最终边界。为刷新已保存项目而探测页面自身 daemon 属于同源请求，不需要改动 CSP。
+当 HTML shell 由 `mariadb-shell-agent serve` 提供时，CSP 的 `connect-src` 增加经过校验的目标 daemon origin、每个经过校验的 `?fanout=<origin>` 参数，以及对应的 `ws:` 或 `wss:` origin。fanout origin 走与 `?daemon=` 相同的严格校验（拒绝凭据、路径、查询参数和 fragment），可重复出现，等于页面 origin 时被丢弃。shell 通过 `history.replaceState` 让 `fanout` 参数与已保存主机集合保持同步，这不会放宽当前文档的策略；覆盖集合之外新保存的主机在可以页内聚焦之前仍需一次导航。远程 daemon 仍必须通过 `--allow-origin` 独立允许 Web Shell 页面 origin；现有 Origin、Host 和 bearer 校验继续作为最终边界。为刷新已保存项目而探测页面自身 daemon 属于同源请求，不需要改动 CSP。
 
 断开连接或关闭浏览器只会释放客户端连接，不会停止由外部管理的 daemon；现有 daemon 侧的客户端 detach 和 session 保留策略保持不变。
 
@@ -61,7 +61,7 @@ Bearer token 仍保存在当前标签页的 `sessionStorage` 中，但存储键�
 - 认证、Origin、Host 和网络失败继续在现有连接页中明确展示；一个有效的远程目标失败时，不会回退到本地 runtime。
 - 即使 URL 指向攻击者控制的 daemon，也不会把其他 daemon 的 token 发送给它。
 - 通过 `?daemon=` 选择的 loopback URL 可能是 SSH 隧道，不能据此认为 daemon host 与浏览器 host 是同一台机器。
-- 接受 HTTP 和 HTTPS 目标；可信网络之外推荐 HTTPS。如需 SSH 传输，由用户在 Qwen Code 之外建立 loopback 隧道。
+- 接受 HTTP 和 HTTPS 目标；可信网络之外推荐 HTTPS。如需 SSH 传输，由用户在 MariaDB Shell Agent 之外建立 loopback 隧道。
 
 ## 验证
 

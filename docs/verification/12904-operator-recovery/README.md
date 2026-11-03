@@ -1,6 +1,6 @@
 # Hosted Shell operator recovery acceptance
 
-This acceptance for [#12904](https://github.com/QwenLM/qwen-code/issues/12904) exercises the recovery already shipped by [#12977](https://github.com/QwenLM/qwen-code/pull/12977). It does not add another recovery mechanism.
+This acceptance for [#12904](https://github.invalid/QwenLM/qwen-code/issues/12904) exercises the recovery already shipped by [#12977](https://github.invalid/QwenLM/qwen-code/pull/12977). It does not add another recovery mechanism.
 
 Run the packaged CLI, real worker, Runtime Broker, Spring store and maintenance command on Linux with Java 21, Node 22+, and an isolated MySQL or MariaDB database. Only the model endpoint is deterministic. Build the CLI and bundle first, then install the Java SDK and Broker artifacts as in the SDK Java workflow.
 
@@ -43,7 +43,7 @@ In both runs, the detached case recorded `escapedWriterLive=true` after the orig
 <details>
 <summary>中文</summary>
 
-本验收对应 [#12904](https://github.com/QwenLM/qwen-code/issues/12904)，测试 [#12977](https://github.com/QwenLM/qwen-code/pull/12977) 已交付的恢复机制，不新增另一套恢复逻辑。
+本验收对应 [#12904](https://github.invalid/QwenLM/qwen-code/issues/12904)，测试 [#12977](https://github.invalid/QwenLM/qwen-code/pull/12977) 已交付的恢复机制，不新增另一套恢复逻辑。
 
 使用 Linux、Java 21、Node 22+ 和独立 MySQL 或 MariaDB 数据库，运行打包后的 CLI、真实 worker、Runtime Broker、Spring 存储服务及运维命令。仅模型端点返回确定性响应。先构建 CLI 和 bundle，再按 SDK Java 工作流安装 Java SDK 和 Broker 构件。上方命令只运行新增的验收方法；示例凭据仅用于可丢弃的验收数据库。将端口和数据库名换成独立的 MariaDB 配置后再次运行。缺少 Linux、SQL 或打包产物时，测试会失败。
 

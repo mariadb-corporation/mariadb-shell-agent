@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -948,7 +949,7 @@ describe('tool response finalization', () => {
   });
 
   it('keeps a real preview when the persisted pointer cannot fit the allocation', async () => {
-    const artifact = `/home/runner/.qwen/tmp/${'a'.repeat(64)}/tool-results/send-boundary-${'b'.repeat(36)}.txt`;
+    const artifact = `/home/runner/.mariadb-shell-agent/tmp/${'a'.repeat(64)}/tool-results/send-boundary-${'b'.repeat(36)}.txt`;
     persist.mockImplementation(async (_callId, _toolName, content) => ({
       content,
       outputFile: artifact,

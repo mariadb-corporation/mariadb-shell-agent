@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review agent-prompt`: build a review agent's launch prompt in code.
+// `mariadb-shell-agent review agent-prompt`: build a review agent's launch prompt in code.
 //
 // The prompt used to be composed by the orchestrator, from a paragraph of the
 // skill's instructions telling it what to include. Measured against the harness's
@@ -2110,7 +2111,7 @@ export function buildRoleBrief(
     const ctx = dir ? join(dir, `qwen-review-pr-${pr}-context.md`) : null;
     const evidence = dir
       ? join(dir, `qwen-review-pr-${pr}-issue-context.md`)
-      : `.qwen/tmp/qwen-review-pr-${pr}-issue-context.md`;
+      : `.mariadb-shell-agent/tmp/qwen-review-pr-${pr}-issue-context.md`;
     parts.push(
       '',
       `**This PR:** #${pr} of \`${repo}\`. Fetch its linked-issue evidence with ` +
@@ -2275,7 +2276,7 @@ export function buildRoleBrief(
         // Prefixed like every other executable review command: this block is run
         // by a SUBAGENT — the one call site neither the SKILL.md sweep nor the
         // stderr hints could reach — and its shell gets QWEN_CODE_CLI exactly as
-        // the orchestrator's does. A bare `qwen` here re-creates the PATH skew on
+        // the orchestrator's does. A bare `mariadb-shell-agent` here re-creates the PATH skew on
         // the machines this exists for, and worse: `build-test` is recent enough
         // that an old global lacks it entirely, wedging Agent 7 between its
         // mandate (no hand-run `npm run build`) and a command that does not exist.
@@ -2316,8 +2317,8 @@ export function buildRoleBrief(
     if (typeof base === 'string' && base && pr !== undefined && opts.planPath) {
       // Absolute, both of them. `worktreePath` and the plan path are repo-relative
       // in the report, and this agent's working directory IS the worktree — so a
-      // relative `.qwen/tmp/review-pr-6457` resolves to
-      // `<worktree>/.qwen/tmp/review-pr-6457`, which does not exist. Watched live:
+      // relative `.mariadb-shell-agent/tmp/review-pr-6457` resolves to
+      // `<worktree>/.mariadb-shell-agent/tmp/review-pr-6457`, which does not exist. Watched live:
       // Agent 7 of a real 29-agent run spent its time running
       // `find … -name "*6457*fetch*"`, hunting for a plan it had been handed a path
       // to that could not resolve from where it was standing.

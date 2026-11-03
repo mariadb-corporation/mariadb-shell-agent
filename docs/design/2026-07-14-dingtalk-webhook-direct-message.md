@@ -3,7 +3,7 @@
 ## 状态
 
 已实现并完成单聊真实链路验证。对应 Issue：
-[QwenLM/qwen-code#6883](https://github.com/QwenLM/qwen-code/issues/6883)。
+[QwenLM/qwen-code#6883](https://github.invalid/QwenLM/qwen-code/issues/6883)。
 
 ## 背景
 
@@ -129,10 +129,10 @@ POST /channels/:channelName/webhooks/:source
 
 ### 本地端到端验证
 
-在 `.qwen/e2e-tests/` 下编写测试计划，并先使用全局安装的 `qwen` CLI，记录当前单聊 Webhook 目标被拒绝的基线行为。实现完成后：
+在 `.mariadb-shell-agent/e2e-tests/` 下编写测试计划，并先使用全局安装的 `mariadb-shell-agent` CLI，记录当前单聊 Webhook 目标被拒绝的基线行为。实现完成后：
 
 1. 分别配置一个单聊目标和一个群聊目标。
-2. 启用钉钉 channel 并启动 `qwen serve`。
+2. 启用钉钉 channel 并启动 `mariadb-shell-agent serve`。
 3. 使用 `curl` 分别向两个 `targetRef` 提交一条事件。
 4. 确认两个请求均返回 `202`。
 5. 确认 channel worker 完成两个任务。

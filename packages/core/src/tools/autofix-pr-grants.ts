@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -43,7 +44,7 @@ export interface ConfirmedWatch {
   /** The worktree's canonical path. */
   worktree: string;
   /** `prepare --in-place`: `worktree` is the user's own checkout, so the
-   * watch's files sit in its `.qwen/tmp`, not beside the worktree. */
+   * watch's files sit in its `.mariadb-shell-agent/tmp`, not beside the worktree. */
   inPlace?: boolean;
   /** What GitHub said when `prepare` asked, just now. */
   authorCanPush: boolean;
@@ -452,7 +453,7 @@ export class BackgroundFix {
     // The arguments last, on a line of their own: the instructions are the
     // user's, as the scheduled task's prompt carries them.
     return (
-      `Written by Qwen Code, not by the agent: this agent was the background ` +
+      `Written by MariaDB Shell Agent, not by the agent: this agent was the background ` +
       `fix of /autofix-pr for ${this.repo}#${this.pr}. Go on with its round ` +
       `now: invoke the autofix-pr skill with these arguments:\n${args}`
     );

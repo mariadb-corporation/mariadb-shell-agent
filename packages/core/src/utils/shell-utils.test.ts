@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -557,7 +558,7 @@ describe('getCommandRoots', () => {
   it('should skip leading env var assignments', async () => {
     expect(
       getCommandRoots(
-        'PYTHONPATH=/Users/jinjing/.qwen/skills/scripts python3 -c "print(1)"',
+        'PYTHONPATH=/Users/jinjing/.mariadb-shell-agent/skills/scripts python3 -c "print(1)"',
       ),
     ).toEqual(['python3']);
   });

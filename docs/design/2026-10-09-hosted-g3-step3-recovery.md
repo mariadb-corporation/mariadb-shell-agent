@@ -508,7 +508,7 @@ Focused verification passed 841 core tests and 111 shared-contract tests. The ex
 
 Integration regressions proved that model request preparation failures preserve admitted, unsettled inputs through both the ordinary prompt route and the wake driver, and that interrupted channel settlement confirms the original cleanup owner only after its terminal and file-history retirement. A first release failure retained the cleanup fence; passive resident attachment then released the same binding/generation and added one confirmation without a second terminal. A separate Spring/H2 probe passed the bounded-retraction/replay-floor combination: readers remained usable while the snapshot was rebuilding, and old cursors expired again after snapshot coverage caught up. This probe is not MySQL or process-takeover acceptance.
 
-The machine-readable reports, manifests and retained failed diagnostics are under `.qwen/investigations/g3-step3-implementation/`; the current consolidated report is `packaged-verification.md`. These five packaged gates do not prove the whole matrix above. Since [replaceable-Harness D11](2026-10-02-hosted-replaceable-harness.md#d11--residual-gates-step-3-in-ci-the-model-round-arm-and-q2s-binding-half), they are CI steps of the `hosted-failover-e2e` job, which runs apart from the Hosted MySQL verify (see D11), next to a model-round arm that packages the main observations of B1 for a no-tool Session and of B2 — including, since [B2 stream identities](2026-10-31-hosted-b2-stream-identities.md), the attempt and stream identities and the live SSE view; the same audit also pins the admission count.
+The machine-readable reports, manifests and retained failed diagnostics are under `.mariadb-shell-agent/investigations/g3-step3-implementation/`; the current consolidated report is `packaged-verification.md`. These five packaged gates do not prove the whole matrix above. Since [replaceable-Harness D11](2026-10-02-hosted-replaceable-harness.md#d11--residual-gates-step-3-in-ci-the-model-round-arm-and-q2s-binding-half), they are CI steps of the `hosted-failover-e2e` job, which runs apart from the Hosted MySQL verify (see D11), next to a model-round arm that packages the main observations of B1 for a no-tool Session and of B2 — including, since [B2 stream identities](2026-10-31-hosted-b2-stream-identities.md), the attempt and stream identities and the live SSE view; the same audit also pins the admission count.
 
 #14481's packaged gates add fourteen fault arms to the same job. Seven landed with
 the second step. Five layer one fault on the Allow path: three crash the
@@ -618,11 +618,11 @@ cross-host stop/ownership proof and production event pruning remain separate.
 - [Delivery ledger](managed-agent-delivery-ledger.md).
 - [G1 post-merge fixes #13188][g1fix].
 
-[g]: https://github.com/QwenLM/qwen-code/issues/12952
-[proposal]: https://github.com/QwenLM/qwen-code/issues/12380
-[g3]: https://github.com/QwenLM/qwen-code/pull/13174
-[b2]: https://github.com/QwenLM/qwen-code/pull/13174#issuecomment-6030365600
-[g1fix]: https://github.com/QwenLM/qwen-code/pull/13188
+[g]: https://github.invalid/QwenLM/qwen-code/issues/12952
+[proposal]: https://github.invalid/QwenLM/qwen-code/issues/12380
+[g3]: https://github.invalid/QwenLM/qwen-code/pull/13174
+[b2]: https://github.invalid/QwenLM/qwen-code/pull/13174#issuecomment-6030365600
+[g1fix]: https://github.invalid/QwenLM/qwen-code/pull/13188
 
 ### Review corrections
 

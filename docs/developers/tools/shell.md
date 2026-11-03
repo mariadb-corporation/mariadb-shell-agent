@@ -1,6 +1,6 @@
 # Shell Tool (`run_shell_command`)
 
-This document describes the `run_shell_command` tool for Qwen Code.
+This document describes the `run_shell_command` tool for MariaDB Shell Agent.
 
 ## Description
 
@@ -17,7 +17,7 @@ On Windows, commands are executed with `cmd.exe /c`. On other platforms, they ar
 - `directory` (string, optional): The directory (relative to the project root) in which to execute the command. If not provided, the command runs in the project root.
 - `is_background` (boolean, optional): Whether to run the command in background. If not specified, defaults to `false` (foreground execution). Set to true for long-running processes like development servers, watchers, or daemons that should continue running without blocking further commands.
 
-## How to use `run_shell_command` with Qwen Code
+## How to use `run_shell_command` with MariaDB Shell Agent
 
 When using `run_shell_command`, the command is executed as a subprocess. Whether it runs in the background or in the foreground is controlled by the `is_background` parameter. Do not add a trailing `&` when `is_background: true`: the managed background path is itself the backgrounding mechanism, and the tool rejects the call rather than running it. The tool returns detailed information about the execution, including:
 
@@ -98,7 +98,7 @@ run_shell_command(command="docker-compose up", description="Start all services",
 
 ## Configuration
 
-You can configure the behavior of the `run_shell_command` tool by modifying your `settings.json` file or by using the `/settings` command in the Qwen Code.
+You can configure the behavior of the `run_shell_command` tool by modifying your `settings.json` file or by using the `/settings` command in the MariaDB Shell Agent.
 
 ### Enabling Interactive Commands
 
@@ -156,7 +156,7 @@ You can set a custom pager for the shell output by setting the `tools.shell.page
 
 The `run_shell_command` tool now supports interactive commands by integrating a pseudo-terminal (pty). This allows you to run commands that require real-time user input, such as text editors (`vim`, `nano`), terminal-based UIs (`htop`), and interactive version control operations (`git rebase -i`).
 
-When an interactive command is running, you can send input to it from the Qwen Code. To focus on the interactive shell, press `ctrl+f`. The terminal output, including complex TUIs, will be rendered correctly.
+When an interactive command is running, you can send input to it from the MariaDB Shell Agent. To focus on the interactive shell, press `ctrl+f`. The terminal output, including complex TUIs, will be rendered correctly.
 
 ## Important notes
 

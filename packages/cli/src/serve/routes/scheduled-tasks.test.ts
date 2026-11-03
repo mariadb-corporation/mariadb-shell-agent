@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -249,7 +250,7 @@ async function makeHarness(
   const workspace = path.join(scratch, 'workspace');
   await fsp.mkdir(workspace, { recursive: true });
   // The durable tasks file lands under the runtime base dir, not the real
-  // ~/.qwen — redirect it into the scratch dir for the duration of the test.
+  // ~/.mariadb-shell-agent — redirect it into the scratch dir for the duration of the test.
   Storage.setRuntimeBaseDir(scratch);
 
   const bridge = makeStubBridge();
@@ -880,7 +881,7 @@ describe('scheduled-tasks routes', () => {
       cron: '0 * * * *',
       prompt: 'review the next PR',
       sessionMode: 'per_run',
-      modelServiceId: 'model\nqwen serve: forged',
+      modelServiceId: 'model\nmariadb-shell-agent serve: forged',
     });
 
     expect(persistent.status).toBe(400);
@@ -921,7 +922,7 @@ describe('scheduled-tasks routes', () => {
 
     const unsafeGroup = await request(h.app)
       .patch(`/scheduled-tasks/${created.body.id}`)
-      .send({ groupId: 'group\nqwen serve: forged' });
+      .send({ groupId: 'group\nmariadb-shell-agent serve: forged' });
     expect(unsafeGroup.status).toBe(400);
     expect(unsafeGroup.body.code).toBe('invalid_group_id');
 

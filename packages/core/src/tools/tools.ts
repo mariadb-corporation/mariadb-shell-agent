@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1064,7 +1065,7 @@ export interface DiffStat {
 /**
  * One review finding as the `report_findings` tool hands it to clients.
  *
- * Field names and enum spellings deliberately match the `qwen review
+ * Field names and enum spellings deliberately match the `mariadb-shell-agent review
  * findings` artifact (`packages/cli/src/commands/review/findings.ts`) so the model
  * copies values straight out of the artifact instead of translating them —
  * a translation layer between two spellings of the same list is where

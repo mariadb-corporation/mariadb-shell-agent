@@ -6,9 +6,9 @@
 
 ## Current State
 
-- `qwen review findings` writes the canonical findings report under `.qwen/tmp/`.
-- `qwen review compose-review` writes the authoritative composed verdict under `.qwen/tmp/`.
-- Step 8 saves a durable Markdown report under `.qwen/reviews/`.
+- `mariadb-shell-agent review findings` writes the canonical findings report under `.mariadb-shell-agent/tmp/`.
+- `mariadb-shell-agent review compose-review` writes the authoritative composed verdict under `.mariadb-shell-agent/tmp/`.
+- Step 8 saves a durable Markdown report under `.mariadb-shell-agent/reviews/`.
 - Step 9 removes the temporary findings and composed verdict files.
 - Session artifacts already support workspace files with primitive metadata.
 - Web Shell already supports artifact-specific rendering selected by metadata.
@@ -17,14 +17,14 @@
 
 ### Durable review-result document
 
-Add `qwen review save-artifact`, which reads:
+Add `mariadb-shell-agent review save-artifact`, which reads:
 
 - the canonical findings report;
 - the composed verdict;
 - the saved Markdown report path;
 - the target and effort supplied by the review skill.
 
-It writes a versioned JSON document under `.qwen/reviews/` containing:
+It writes a versioned JSON document under `.mariadb-shell-agent/reviews/` containing:
 
 - schema version;
 - target and effort;
@@ -32,7 +32,7 @@ It writes a versioned JSON document under `.qwen/reviews/` containing:
 - canonical findings and counts;
 - the workspace-relative Markdown report path.
 
-The command copies structured inputs without recalculating the verdict or rewriting findings. It fails closed on unreadable or malformed inputs and refuses output inside `.qwen/tmp/`.
+The command copies structured inputs without recalculating the verdict or rewriting findings. It fails closed on unreadable or malformed inputs and refuses output inside `.mariadb-shell-agent/tmp/`.
 
 ### Session artifact registration
 
@@ -98,6 +98,6 @@ Excluded:
 
 - The canonical findings report remains the only finding authority.
 - The composed verdict remains the only verdict authority.
-- The durable JSON is created before cleanup and stored outside `.qwen/tmp/`.
+- The durable JSON is created before cleanup and stored outside `.mariadb-shell-agent/tmp/`.
 - `metadata.artifactType` is sufficient for renderer dispatch; no new artifact kind is introduced.
 - Review-result schema changes require a version bump and backward-compatible renderer handling.

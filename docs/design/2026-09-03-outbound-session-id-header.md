@@ -2,19 +2,19 @@
 
 ## Summary
 
-Qwen Code attaches its current session ID as the `session_id` HTTP header only when the outbound LLM request hostname is one of the three Routify endpoints documented by ModelRouter: `routify.alibaba-inc.com`, `routify-online.alibaba-inc.com`, or `routify-pub.alibaba-inc.com`.
+MariaDB Shell Agent attaches its current session ID as the `session_id` HTTP header only when the outbound LLM request hostname is one of the three Routify endpoints documented by ModelRouter: `routify.alibaba-inc.invalid`, `routify-online.alibaba-inc.invalid`, or `routify-pub.alibaba-inc.invalid`.
 
-The behavior is intentionally not configurable. Qwen Code does not attach the header to subdomains, other `alibaba-inc.com` hosts, or non-Routify providers. Standard fetch redirect behavior applies after the initial destination check, so a Routify response can forward the header by redirecting the request.
+The behavior is intentionally not configurable. MariaDB Shell Agent does not attach the header to subdomains, other `alibaba-inc.invalid` hosts, or non-Routify providers. Standard fetch redirect behavior applies after the initial destination check, so a Routify response can forward the header by redirecting the request.
 
 ## Motivation
 
-Routify's ModelRouter accepts `session_id` as a session-affinity and traffic-marking value. Qwen Code already maintains a session ID, but it is currently local metadata and never reaches the ModelRouter request. Reusing it gives Routify one stable affinity value per CLI session without creating another identifier.
+Routify's ModelRouter accepts `session_id` as a session-affinity and traffic-marking value. MariaDB Shell Agent already maintains a session ID, but it is currently local metadata and never reaches the ModelRouter request. Reusing it gives Routify one stable affinity value per CLI session without creating another identifier.
 
 ## Security boundary
 
 A session ID is a stable cross-request identifier. The implementation therefore requires HTTPS and compares the parsed request hostname to a fixed set of three ModelRouter hostnames. It does not use suffix matching, wildcards, path matching, or a user-configurable allowlist. Invalid URLs fail closed.
 
-The Qwen Code session ID replaces any custom `session_id` value on an eligible request so the affinity marker cannot disagree with the active session. All other existing headers, including authorization, are preserved.
+The MariaDB Shell Agent session ID replaces any custom `session_id` value on an eligible request so the affinity marker cannot disagree with the active session. All other existing headers, including authorization, are preserved.
 
 ## Request lifecycle
 

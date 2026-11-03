@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -79,7 +80,7 @@ describe('PR #11369 round 2 daemon runtime reproduction', () => {
   });
 
   it.each([
-    'dashscope.aliyuncs.com',
+    'dashscope.aliyuncs.invalid',
     'wss://user:pass@proxy.example.invalid/realtime',
   ])(
     'R2-8 keeps disabled-memory startup available for realtime endpoint %s',

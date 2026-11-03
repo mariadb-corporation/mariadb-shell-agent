@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -164,7 +165,7 @@ export interface PlanReport {
  * three review entry points is worse than one that applies to none. Passing
  * `{}` is how a caller says "neither applies" — visibly, at the call site.
  * Resolving them here instead would make this builder's tests depend on the
- * machine's own `~/.qwen` and on its environment.
+ * machine's own `~/.mariadb-shell-agent` and on its environment.
  */
 export function buildPlanReport(
   plan: DiffPlan,

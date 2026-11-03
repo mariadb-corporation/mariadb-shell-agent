@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -573,7 +574,7 @@ describe('FileCommandLoader', () => {
       ).getProjectCommandsDir();
       const extensionDir = path.join(
         process.cwd(),
-        '.qwen/extensions/test-ext',
+        '.mariadb-shell-agent/extensions/test-ext',
       );
 
       mock({
@@ -622,7 +623,7 @@ describe('FileCommandLoader', () => {
     it('ignores commands bundled in manually discovered Agent Plugins', async () => {
       const extensionDir = path.join(
         process.cwd(),
-        '.qwen/extensions/agent-plugin',
+        '.mariadb-shell-agent/extensions/agent-plugin',
       );
       mock({
         [extensionDir]: {
@@ -660,7 +661,7 @@ describe('FileCommandLoader', () => {
       ).getProjectCommandsDir();
       const extensionDir = path.join(
         process.cwd(),
-        '.qwen/extensions/test-ext',
+        '.mariadb-shell-agent/extensions/test-ext',
       );
 
       mock({
@@ -756,11 +757,11 @@ describe('FileCommandLoader', () => {
     it('only loads commands from active extensions', async () => {
       const extensionDir1 = path.join(
         process.cwd(),
-        '.qwen/extensions/active-ext',
+        '.mariadb-shell-agent/extensions/active-ext',
       );
       const extensionDir2 = path.join(
         process.cwd(),
-        '.qwen/extensions/inactive-ext',
+        '.mariadb-shell-agent/extensions/inactive-ext',
       );
 
       mock({
@@ -815,7 +816,7 @@ describe('FileCommandLoader', () => {
     it('handles missing extension commands directory gracefully', async () => {
       const extensionDir = path.join(
         process.cwd(),
-        '.qwen/extensions/no-commands',
+        '.mariadb-shell-agent/extensions/no-commands',
       );
 
       mock({
@@ -847,7 +848,10 @@ describe('FileCommandLoader', () => {
     });
 
     it('handles nested command structure in extensions', async () => {
-      const extensionDir = path.join(process.cwd(), '.qwen/extensions/a');
+      const extensionDir = path.join(
+        process.cwd(),
+        '.mariadb-shell-agent/extensions/a',
+      );
 
       mock({
         [extensionDir]: {

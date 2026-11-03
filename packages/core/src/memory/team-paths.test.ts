@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -33,9 +34,9 @@ describe('team auto-memory paths', () => {
     clearAutoMemoryRootCache();
   });
 
-  it('anchors the team root inside the repo .qwen directory', () => {
+  it('anchors the team root inside the repo .mariadb-shell-agent directory', () => {
     expect(getTeamAutoMemoryRoot(projectRoot)).toBe(
-      path.join(projectRoot, '.qwen', TEAM_AUTO_MEMORY_DIRNAME),
+      path.join(projectRoot, '.mariadb-shell-agent', TEAM_AUTO_MEMORY_DIRNAME),
     );
   });
 
@@ -56,7 +57,7 @@ describe('team auto-memory paths', () => {
       );
 
       expect(getTeamAutoMemoryRoot(worktree)).toBe(
-        path.join(worktree, '.qwen', TEAM_AUTO_MEMORY_DIRNAME),
+        path.join(worktree, '.mariadb-shell-agent', TEAM_AUTO_MEMORY_DIRNAME),
       );
     } finally {
       fs.rmSync(main, { recursive: true, force: true });
@@ -66,7 +67,12 @@ describe('team auto-memory paths', () => {
 
   it('places MEMORY.md at the team root', () => {
     expect(getTeamAutoMemoryIndexPath(projectRoot)).toBe(
-      path.join(projectRoot, '.qwen', TEAM_AUTO_MEMORY_DIRNAME, 'MEMORY.md'),
+      path.join(
+        projectRoot,
+        '.mariadb-shell-agent',
+        TEAM_AUTO_MEMORY_DIRNAME,
+        'MEMORY.md',
+      ),
     );
   });
 
@@ -147,7 +153,7 @@ describe('team auto-memory paths', () => {
   it('canonicalizes case variants on case-insensitive filesystems', () => {
     const memoryFile = path.join(
       projectRoot,
-      '.qwen',
+      '.mariadb-shell-agent',
       'memory',
       'user',
       'preference.md',
@@ -156,7 +162,7 @@ describe('team auto-memory paths', () => {
     fs.writeFileSync(memoryFile, 'preference');
     const caseVariant = path.join(
       projectRoot,
-      '.QWEN',
+      '.MARIADB-SHELL-AGENT',
       'Memory',
       'user',
       'preference.md',
@@ -178,7 +184,7 @@ describe('team auto-memory paths', () => {
       try {
         const memoryFile = path.join(
           tmpProjectRoot,
-          '.qwen',
+          '.mariadb-shell-agent',
           'memory',
           'user',
           'preference.md',
@@ -205,7 +211,7 @@ describe('team auto-memory paths', () => {
 
   it('recognizes a first-ever write before the team-memory dir exists', () => {
     const root = getTeamAutoMemoryRoot(projectRoot);
-    // Normal first-write state: nothing under .qwen has been created yet, so
+    // Normal first-write state: nothing under .mariadb-shell-agent has been created yet, so
     // realpathNearestExisting must walk up to an existing ancestor (the repo
     // root) and still classify the not-yet-created file as a team path.
     expect(fs.existsSync(root)).toBe(false);
@@ -249,13 +255,13 @@ describe('team auto-memory paths', () => {
     try {
       // Primes the cache with the no-git fallback (nested itself).
       expect(getTeamAutoMemoryRoot(nested)).toBe(
-        path.join(nested, '.qwen', TEAM_AUTO_MEMORY_DIRNAME),
+        path.join(nested, '.mariadb-shell-agent', TEAM_AUTO_MEMORY_DIRNAME),
       );
       fs.mkdirSync(path.join(fresh, '.git'));
       clearAutoMemoryRootCache();
       // After clearing, it must re-resolve to the new git root.
       expect(getTeamAutoMemoryRoot(nested)).toBe(
-        path.join(fresh, '.qwen', TEAM_AUTO_MEMORY_DIRNAME),
+        path.join(fresh, '.mariadb-shell-agent', TEAM_AUTO_MEMORY_DIRNAME),
       );
     } finally {
       fs.rmSync(fresh, { recursive: true, force: true });

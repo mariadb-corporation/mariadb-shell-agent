@@ -22,7 +22,7 @@ Ink 和 OpenTUI 的终端输入、IDE 编辑器输入框、Web Shell 输入框�
 边缘带标点的独立词，例如 `(workflow)`，但不接受 `workflows` 或
 `my-workflow-runner`。两个关键词同时出现时只添加一次提醒。
 
-普通 `qwen -p`、普通 stdin、定时输入和 SDK 字符串 prompt 不会自动触发。
+普通 `mariadb-shell-agent -p`、普通 stdin、定时输入和 SDK 字符串 prompt 不会自动触发。
 TypeScript SDK 的流式输入可以对每条原始人类消息分别声明来源：
 
 ```ts

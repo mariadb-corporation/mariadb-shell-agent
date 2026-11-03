@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2184,7 +2185,7 @@ export class MemoryManager {
           ),
         ).catch((error: unknown) => {
           // A root that cannot be scanned (a symlinked or unreadable
-          // .qwen/memory, for instance) cannot be migrated either, so fail
+          // .mariadb-shell-agent/memory, for instance) cannot be migrated either, so fail
           // open. Rejecting here would propagate before the task record and
           // telemetry exist, and because the stall counter only advances on a
           // completed run the gate would re-fire — and re-reject — on every

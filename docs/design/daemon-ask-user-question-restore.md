@@ -54,8 +54,8 @@ Main session only. Forks/subagents cannot run this tool.
 
 ## Switch
 
-`--restore-ask-user-question` on `qwen serve` and on the ACP child
-(`qwen --acp --restore-ask-user-question`). Default false. The child-side
+`--restore-ask-user-question` on `mariadb-shell-agent serve` and on the ACP child
+(`mariadb-shell-agent --acp --restore-ask-user-question`). Default false. The child-side
 flag is honored only in ACP mode: in the plain TUI nothing can re-hang the
 question, and skipping load-time orphan repair would wedge the resumed
 session. No settings.json key and no capability tag in v1.

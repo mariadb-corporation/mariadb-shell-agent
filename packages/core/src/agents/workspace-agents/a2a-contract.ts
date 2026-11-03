@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -69,7 +70,7 @@ export const A2A_CONTENT_TYPE = 'application/a2a+json';
  * gets correct Task and Message semantics, it just cannot see the extras.
  */
 export const QWEN_A2A_EXTENSION_URI =
-  'https://qwenlm.github.io/qwen-code/a2a/workspace-agents/v1';
+  'https://qwenlm.github.invalid/qwen-code/a2a/workspace-agents/v1';
 
 /**
  * A2A task states, spelled as the SDK's `TaskState` enum spells them.

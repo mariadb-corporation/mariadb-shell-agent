@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -99,7 +100,7 @@ describe('BundledSkillLoader', () => {
         messageType: 'error',
         content: expect.stringContaining('not yet supported'),
       });
-      expect(existsSync(join(dir, '.qwen'))).toBe(false);
+      expect(existsSync(join(dir, '.mariadb-shell-agent'))).toBe(false);
       writeSkillArgs('review', 'prior authority');
       await invoke('');
       expect(readFileSync(skillArgsPath('review'), 'utf8')).toBe(
@@ -404,7 +405,7 @@ describe('BundledSkillLoader', () => {
 
   it('should resolve {{model}} template variable in skill body', async () => {
     const skill = makeSkill({
-      body: 'Review by {{model}} via Qwen Code',
+      body: 'Review by {{model}} via MariaDB Shell Agent',
     });
     mockSkillManager.listSkills.mockResolvedValue([skill]);
     (mockConfig.getModel as ReturnType<typeof vi.fn>).mockReturnValue(
@@ -423,7 +424,7 @@ describe('BundledSkillLoader', () => {
       content: [
         {
           text: makeSkillPrompt(
-            'YOUR_MODEL_ID="qwen3-coder"\n\nReview by qwen3-coder via Qwen Code',
+            'YOUR_MODEL_ID="qwen3-coder"\n\nReview by qwen3-coder via MariaDB Shell Agent',
           ),
         },
       ],
@@ -432,7 +433,7 @@ describe('BundledSkillLoader', () => {
 
   it('should resolve the CLI version template variable in skill body', async () => {
     const skill = makeSkill({
-      body: 'via Qwen Code /review (v{{cliVersion}})',
+      body: 'via MariaDB Shell Agent /review (v{{cliVersion}})',
     });
     mockSkillManager.listSkills.mockResolvedValue([skill]);
 
@@ -445,7 +446,9 @@ describe('BundledSkillLoader', () => {
 
     expect(result).toEqual({
       type: 'submit_prompt',
-      content: [{ text: makeSkillPrompt('via Qwen Code /review (v0.21.2)') }],
+      content: [
+        { text: makeSkillPrompt('via MariaDB Shell Agent /review (v0.21.2)') },
+      ],
     });
   });
 
@@ -479,7 +482,7 @@ describe('BundledSkillLoader', () => {
     );
 
     // An argument-bearing invoke writes the args file; keep it in a throwaway
-    // cwd so the suite does not leave `.qwen/tmp/qwen-skill-args-review.txt` in
+    // cwd so the suite does not leave `.mariadb-shell-agent/tmp/qwen-skill-args-review.txt` in
     // the real repository.
     const argDir = mkdtempSync(join(tmpdir(), 'bundled-model-args-'));
     const argCwd = process.cwd();

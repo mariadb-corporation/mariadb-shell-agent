@@ -81,7 +81,9 @@ async function openModels(page: Page) {
   );
 }
 async function evidence(page: Page, name: string) {
-  const directory = resolve('../../.qwen/e2e-tests/model-management-evidence');
+  const directory = resolve(
+    '../../.mariadb-shell-agent/e2e-tests/model-management-evidence',
+  );
   await mkdir(directory, { recursive: true });
   await page.screenshot({
     path: resolve(directory, `${name}.png`),

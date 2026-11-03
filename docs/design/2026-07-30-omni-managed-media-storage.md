@@ -3,7 +3,7 @@
 ## 状态
 
 - 状态：Draft
-- 范围：Qwen Code 实验分支中 Omni 多模态资源与中间产物的物理存储管理
+- 范围：MariaDB Shell Agent 实验分支中 Omni 多模态资源与中间产物的物理存储管理
 - 关联设计：
   [多模态文件识别与元数据提取架构设计](./2026-07-29-multimodal-file-recognition-and-metadata.md)、
   [Omni 多模态数据处理 Policy 编排架构设计](./2026-07-29-omni-multimodal-policy-orchestration.md)、
@@ -50,12 +50,12 @@
 存储根目录固定为 project 作用域：
 
 ```text
-<projectRoot>/.qwen/omni/
+<projectRoot>/.mariadb-shell-agent/omni/
 ```
 
 - 与 Memory 设计 §13 的"以 project/workspace 为隔离边界"一致：不同 project 的
   对象、staging 与 quarantine 互不可见，GC 也只在本 project 内运行；
-- 目录创建时写入自忽略文件（`.qwen/omni/.gitignore` 内容为 `*`），保证媒体
+- 目录创建时写入自忽略文件（`.mariadb-shell-agent/omni/.gitignore` 内容为 `*`），保证媒体
   对象不会进入版本控制；
 - Omni 写入链路只在 trusted workspace 激活；未信任 workspace 中不创建该目录，
   也不执行任何 fixed policy（与 Policy 设计 §12.1 的 trust 合并语义一致）；
@@ -64,7 +64,7 @@
 ## 4. 目录布局
 
 ```text
-.qwen/omni/
+.mariadb-shell-agent/omni/
 ├── .gitignore                 # 内容为 *，自忽略
 ├── objects/                   # 内容寻址对象库（不可变，已提交内容的唯一存放地）
 │   └── sha256/
@@ -133,7 +133,7 @@
 | GC                  | 删除 `objects/`、`downloads/`、`staging/`、`quarantine/` | 见 §6                           |
 
 用户原始输入的本地文件**不复制进对象库**：它们留在原位置，Memory 以
-`localPath + sha256` 记录身份（识别设计 §6.5）。只有"Qwen Code 自己生成或
+`localPath + sha256` 记录身份（识别设计 §6.5）。只有"MariaDB Shell Agent 自己生成或
 下载的字节"才进入 `objects/`。这避免大视频在磁盘上双份存放；代价是用户文件
 被移动/删除后 Recall 返回 `artifact_unavailable` gap，这是 Memory 设计 §12 已
 定义的正常路径。
@@ -268,7 +268,7 @@ uploads: (sha256, model) → {
 - GC 只清扫无引用且超保留期的对象；把 Memory 记录删除后对应对象在保留期后
   被回收；
 - 超容量预算时告警并停止新衍生物，有引用对象仍在；
-- `.qwen/omni/` 不进入 git status；未信任 workspace 不创建该目录；
+- `.mariadb-shell-agent/omni/` 不进入 git status；未信任 workspace 不创建该目录；
 - 模型与协议层可见的只有 `sha256:<hash>` 形式的 managedId，任何返回中不出现
   真实路径。
 
@@ -276,6 +276,6 @@ uploads: (sha256, model) → {
 
 - 抽样完整性校验的比例与频率；
 - `downloads/` 续传元数据（ETag/offset）的存放形式；
-- GC 与多进程并发（同一 project 开多个 Qwen Code 实例）的锁策略——初版可用
+- GC 与多进程并发（同一 project 开多个 MariaDB Shell Agent 实例）的锁策略——初版可用
   目录锁 + "GC 只在持锁进程执行"；
 - 对象库是否需要按媒体类型分区统计（实验报表用途）。

@@ -1,6 +1,6 @@
 # Authentication
 
-Qwen Code's first-run `/auth` menu has four top-level options. Pick the one that matches how you want to run the CLI:
+MariaDB Shell Agent's first-run `/auth` menu has four top-level options. Pick the one that matches how you want to run the CLI:
 
 - **QwenCloud**: official recommended setup. Opens a sub-menu with **Token Plan** (subscription with a monthly Credit quota · dedicated endpoint, Personal and Team editions) or **Standard API Key** (pay-as-you-go). You then pick the platform explicitly — **China — 千问AI平台** or **International — QwenCloud** — so the UI language never decides your endpoint. Both access methods also enable the built-in [`web_search` tool](../../developers/tools/web-search.md) with no extra setup.
 - **Alibaba ModelStudio**: opens a sub-menu with **Coding Plan** (for individual developers · weekly quota included), **Token Plan** (for teams and companies · usage-based billing with a dedicated endpoint), or **Standard API Key** (connect with an existing ModelStudio API key). Token Plan and Standard API Key also enable the built-in [`web_search` tool](../../developers/tools/web-search.md) with no extra setup. Saved ModelStudio credentials, endpoints and models keep working unchanged.
@@ -15,23 +15,23 @@ Qwen Code's first-run `/auth` menu has four top-level options. Pick the one that
 
 The official platform entry. Choose it when your API key comes from 千问AI平台 (China) or QwenCloud (International).
 
-- **How it works**: pick an access method, then pick the platform explicitly — the UI language never decides your endpoint. Enter the key issued by that platform and Qwen Code configures the matching endpoint.
+- **How it works**: pick an access method, then pick the platform explicitly — the UI language never decides your endpoint. Enter the key issued by that platform and MariaDB Shell Agent configures the matching endpoint.
 - **Access methods**: **Token Plan** (a subscription with a monthly Credit quota on a dedicated endpoint; Personal and Team editions) or **Standard API Key** (pay-as-you-go). Coding Plan is _not_ offered here — it is an Alibaba ModelStudio product, see Option 3.
 - **Requirements**: a Token Plan key (prefixed `sk-sp-`) generated from the Token Plan console, or a pay-as-you-go key (prefixed `sk-` or `sk-ws-`) from the platform's API key page.
 - **Benefits**: both access methods enable the built-in [`web_search` tool](../../developers/tools/web-search.md) with no extra setup.
 
-| Platform                  | Access method    | Endpoint                                                      | API key                                                                                  |
-| ------------------------- | ---------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| China — 千问AI平台        | Standard API Key | `https://maas.qianwenaiapi.com/compatible-mode/v1`            | [API keys](https://platform.qianwenai.com/docs/developer-guides/administration/api-keys) |
-| China — 千问AI平台        | Token Plan       | `https://token-plan.maas.qianwenaiapi.com/compatible-mode/v1` | [Token Plan](https://platform.qianwenai.com/docs/token-plan/overview)                    |
-| International — QwenCloud | Standard API Key | `https://maas.qwencloudapi.com/compatible-mode/v1`            | [API keys](https://docs.qwencloud.com/developer-guides/administration/api-keys)          |
-| International — QwenCloud | Token Plan       | `https://token-plan.maas.qwencloudapi.com/compatible-mode/v1` | [Token Plan](https://docs.qwencloud.com/token-plan/overview)                             |
+| Platform                  | Access method    | Endpoint                                                          | API key                                                                                  |
+| ------------------------- | ---------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| China — 千问AI平台        | Standard API Key | `https://maas.qianwenaiapi.com/compatible-mode/v1`                | [API keys](https://platform.qianwenai.com/docs/developer-guides/administration/api-keys) |
+| China — 千问AI平台        | Token Plan       | `https://token-plan.maas.qianwenaiapi.com/compatible-mode/v1`     | [Token Plan](https://platform.qianwenai.com/docs/token-plan/overview)                    |
+| International — QwenCloud | Standard API Key | `https://maas.qwencloudapi.invalid/compatible-mode/v1`            | [API keys](https://docs.qwencloud.invalid/developer-guides/administration/api-keys)      |
+| International — QwenCloud | Token Plan       | `https://token-plan.maas.qwencloudapi.invalid/compatible-mode/v1` | [Token Plan](https://docs.qwencloud.invalid/token-plan/overview)                         |
 
 ### Interactive setup
 
-Enter `qwen` in the terminal to launch Qwen Code, then run the `/auth` command, select **QwenCloud**, and choose **Token Plan** or **Standard API Key** from the sub-menu. Choose the platform (**China — 千问AI平台** or **International — QwenCloud**), then enter your API key.
+Enter `mariadb-shell-agent` in the terminal to launch MariaDB Shell Agent, then run the `/auth` command, select **QwenCloud**, and choose **Token Plan** or **Standard API Key** from the sub-menu. Choose the platform (**China — 千问AI平台** or **International — QwenCloud**), then enter your API key.
 
-Qwen Code checks the endpoint's model list at startup with your stored key; see [Built-in provider updates](#built-in-provider-updates).
+MariaDB Shell Agent checks the endpoint's model list at startup with your stored key; see [Built-in provider updates](#built-in-provider-updates).
 
 ### Headless or scripted setup
 
@@ -40,7 +40,7 @@ For CI, containers, or scripts, configure the platform with environment variable
 ```bash
 # Pay-as-you-go (Standard API Key), International
 export QWENCLOUD_API_KEY="sk-your-api-key"
-export OPENAI_BASE_URL="https://maas.qwencloudapi.com/compatible-mode/v1"
+export OPENAI_BASE_URL="https://maas.qwencloudapi.invalid/compatible-mode/v1"
 export OPENAI_MODEL="qwen3.8-max"
 ```
 
@@ -53,7 +53,7 @@ export OPENAI_MODEL="qwen3.8-max"
 
 ### Alternative: configure via `settings.json`
 
-If you prefer to skip the interactive `/auth` flow, add the following to `~/.qwen/settings.json`:
+If you prefer to skip the interactive `/auth` flow, add the following to `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -62,7 +62,7 @@ If you prefer to skip the interactive `/auth` flow, add the following to `~/.qwe
       {
         "id": "qwen3.8-max",
         "name": "qwen3.8-max (QwenCloud)",
-        "baseUrl": "https://maas.qwencloudapi.com/compatible-mode/v1",
+        "baseUrl": "https://maas.qwencloudapi.invalid/compatible-mode/v1",
         "description": "qwen3.8-max from QwenCloud Standard API Key",
         "envKey": "QWENCLOUD_API_KEY"
       }
@@ -96,10 +96,10 @@ As with the other provider-specific keys, `QWENCLOUD_API_KEY` and `QWENCLOUD_TOK
 
 > [!warning]
 >
-> The Qwen OAuth free tier was discontinued on 2026-04-15. Existing cached tokens may continue working briefly, but new requests will be rejected. Please switch to Alibaba Cloud Coding Plan, [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or another provider. Run `qwen` and use `/auth` to configure.
+> The Qwen OAuth free tier was discontinued on 2026-04-15. Existing cached tokens may continue working briefly, but new requests will be rejected. Please switch to Alibaba Cloud Coding Plan, [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or another provider. Run `mariadb-shell-agent` and use `/auth` to configure.
 
-- **How it works**: on first start, Qwen Code opens a browser login page. After you finish, credentials are cached locally so you usually won't need to log in again.
-- **Requirements**: a `qwen.ai` account + internet access (at least for the first login).
+- **How it works**: on first start, MariaDB Shell Agent opens a browser login page. After you finish, credentials are cached locally so you usually won't need to log in again.
+- **Requirements**: a `qwen.invalid` account + internet access (at least for the first login).
 - **Benefits**: no API key management, automatic credential refresh.
 - **Cost & quota**: the free tier has been discontinued as of 2026-04-15.
 
@@ -120,41 +120,41 @@ Qwen OAuth is no longer offered as a selectable entry in the `/auth` dialog; run
 
 Use this if you want predictable costs with diverse model options and higher usage quotas.
 
-- **How it works**: Subscribe to the Coding Plan with a fixed monthly fee, then configure Qwen Code to use the dedicated endpoint and your subscription API key.
-- **Requirements**: Obtain an active Coding Plan subscription from [Alibaba Cloud ModelStudio(Beijing)](https://bailian.console.aliyun.com/cn-beijing?tab=coding-plan#/efm/coding-plan-index) or [Alibaba Cloud ModelStudio(intl)](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index), depending on the region of your account.
+- **How it works**: Subscribe to the Coding Plan with a fixed monthly fee, then configure MariaDB Shell Agent to use the dedicated endpoint and your subscription API key.
+- **Requirements**: Obtain an active Coding Plan subscription from [Alibaba Cloud ModelStudio(Beijing)](https://bailian.console.aliyun.invalid/cn-beijing?tab=coding-plan#/efm/coding-plan-index) or [Alibaba Cloud ModelStudio(intl)](https://modelstudio.console.alibabacloud.invalid/?tab=coding-plan#/efm/coding-plan-index), depending on the region of your account.
 - **Benefits**: Diverse model options, higher usage quotas, predictable monthly costs, access to a wide range of models (Qwen, GLM, Kimi, Minimax and more).
-- **Cost & quota**: View Aliyun ModelStudio Coding Plan documentation[Beijing](https://bailian.console.aliyun.com/cn-beijing/?tab=doc#/doc/?type=model&url=3005961)[intl](https://modelstudio.console.alibabacloud.com/?tab=doc#/doc/?type=model&url=2840914).
+- **Cost & quota**: View Aliyun ModelStudio Coding Plan documentation[Beijing](https://bailian.console.aliyun.invalid/cn-beijing/?tab=doc#/doc/?type=model&url=3005961)[intl](https://modelstudio.console.alibabacloud.invalid/?tab=doc#/doc/?type=model&url=2840914).
 
 Alibaba Cloud Coding Plan is available in two regions:
 
-| Region                       | Console URL                                                                  |
-| ---------------------------- | ---------------------------------------------------------------------------- |
-| Aliyun ModelStudio (Beijing) | [bailian.console.aliyun.com](https://bailian.console.aliyun.com)             |
-| Alibaba Cloud (intl)         | [bailian.console.alibabacloud.com](https://bailian.console.alibabacloud.com) |
+| Region                       | Console URL                                                                          |
+| ---------------------------- | ------------------------------------------------------------------------------------ |
+| Aliyun ModelStudio (Beijing) | [bailian.console.aliyun.invalid](https://bailian.console.aliyun.invalid)             |
+| Alibaba Cloud (intl)         | [bailian.console.alibabacloud.invalid](https://bailian.console.alibabacloud.invalid) |
 
 ### Interactive setup
 
-Enter `qwen` in the terminal to launch Qwen Code, then run the `/auth` command, select **Alibaba ModelStudio**, and choose **Coding Plan** from the sub-menu. Choose your region, then enter your `sk-sp-xxxxxxxxx` key.
+Enter `mariadb-shell-agent` in the terminal to launch MariaDB Shell Agent, then run the `/auth` command, select **Alibaba ModelStudio**, and choose **Coding Plan** from the sub-menu. Choose your region, then enter your `sk-sp-xxxxxxxxx` key.
 
-Qwen Code checks the endpoint's model list at startup with your stored key; see [Built-in provider updates](#built-in-provider-updates).
+MariaDB Shell Agent checks the endpoint's model list at startup with your stored key; see [Built-in provider updates](#built-in-provider-updates).
 
 After authentication, use the `/model` command to switch between all Alibaba Cloud Coding Plan supported models (including qwen3.5-plus, qwen3.6-plus, qwen3.7-plus, qwen3-coder-plus, qwen3-coder-next, qwen3-max-2026-01-23, glm-5, glm-4.7, kimi-k2.5, and MiniMax-M2.5).
 
 ### Headless or scripted setup
 
-For CI, containers, or scripts, configure Coding Plan with environment variables or `settings.json` instead of the removed `qwen auth coding-plan` command.
+For CI, containers, or scripts, configure Coding Plan with environment variables or `settings.json` instead of the removed `mariadb-shell-agent auth coding-plan` command.
 
 ```bash
 export BAILIAN_CODING_PLAN_API_KEY="sk-sp-xxxxxxxxx"
-export OPENAI_BASE_URL="https://coding.dashscope.aliyuncs.com/v1"
+export OPENAI_BASE_URL="https://coding.dashscope.aliyuncs.invalid/v1"
 export OPENAI_MODEL="qwen3-coder-plus"
 ```
 
-Use `https://coding.dashscope.aliyuncs.com/v1` for the China (Beijing) endpoint, or `https://coding-intl.dashscope.aliyuncs.com/v1` for the international endpoint.
+Use `https://coding.dashscope.aliyuncs.invalid/v1` for the China (Beijing) endpoint, or `https://coding-intl.dashscope.aliyuncs.invalid/v1` for the international endpoint.
 
 ### Alternative: configure via `settings.json`
 
-If you prefer to skip the interactive `/auth` flow, add the following to `~/.qwen/settings.json`:
+If you prefer to skip the interactive `/auth` flow, add the following to `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -163,7 +163,7 @@ If you prefer to skip the interactive `/auth` flow, add the following to `~/.qwe
       {
         "id": "qwen3-coder-plus",
         "name": "qwen3-coder-plus (Coding Plan)",
-        "baseUrl": "https://coding.dashscope.aliyuncs.com/v1",
+        "baseUrl": "https://coding.dashscope.aliyuncs.invalid/v1",
         "description": "qwen3-coder-plus from Alibaba Cloud Coding Plan",
         "envKey": "BAILIAN_CODING_PLAN_API_KEY"
       }
@@ -185,31 +185,31 @@ If you prefer to skip the interactive `/auth` flow, add the following to `~/.qwe
 
 > [!note]
 >
-> The Coding Plan uses a dedicated endpoint (`https://coding.dashscope.aliyuncs.com/v1`) that is different from the standard Dashscope endpoint. Make sure to use the correct `baseUrl`.
+> The Coding Plan uses a dedicated endpoint (`https://coding.dashscope.aliyuncs.invalid/v1`) that is different from the standard Dashscope endpoint. Make sure to use the correct `baseUrl`.
 
 ## 🪙 Option 4: Alibaba Cloud Token Plan
 
 Use this if your team or company prefers usage-based billing on a dedicated ModelStudio endpoint.
 
-- **How it works**: Subscribe to the Token Plan in Alibaba Cloud ModelStudio, then configure Qwen Code to use the region-specific Token Plan endpoint and your API key. You are billed for actual token usage instead of a fixed monthly fee.
-- **Requirements**: Obtain a Token Plan API key from [Alibaba Cloud ModelStudio(Beijing)](https://bailian.console.aliyun.com/cn-beijing?tab=doc#/doc/?type=model&url=3028856) or [Alibaba Cloud ModelStudio(intl)](https://modelstudio.console.alibabacloud.com/ap-southeast-1?tab=doc#/doc/?type=model), depending on the region of your account.
+- **How it works**: Subscribe to the Token Plan in Alibaba Cloud ModelStudio, then configure MariaDB Shell Agent to use the region-specific Token Plan endpoint and your API key. You are billed for actual token usage instead of a fixed monthly fee.
+- **Requirements**: Obtain a Token Plan API key from [Alibaba Cloud ModelStudio(Beijing)](https://bailian.console.aliyun.invalid/cn-beijing?tab=doc#/doc/?type=model&url=3028856) or [Alibaba Cloud ModelStudio(intl)](https://modelstudio.console.alibabacloud.invalid/ap-southeast-1?tab=doc#/doc/?type=model), depending on the region of your account.
 - **Benefits**: Usage-based billing for teams and companies, dedicated region-specific endpoints, access to a wide range of models (Qwen, DeepSeek, GLM, Kimi, Minimax and more).
-- **Cost & quota**: View Alibaba Cloud ModelStudio Token Plan documentation [Beijing](https://bailian.console.aliyun.com/cn-beijing?tab=doc#/doc/?type=model&url=3028856) [intl](https://modelstudio.console.alibabacloud.com/ap-southeast-1?tab=doc#/doc/?type=model).
+- **Cost & quota**: View Alibaba Cloud ModelStudio Token Plan documentation [Beijing](https://bailian.console.aliyun.invalid/cn-beijing?tab=doc#/doc/?type=model&url=3028856) [intl](https://modelstudio.console.alibabacloud.invalid/ap-southeast-1?tab=doc#/doc/?type=model).
 
 Token Plan is available in two regions, each with its own dedicated endpoint:
 
-| Region                    | Endpoint                                                                 | Console URL                                                                                         |
-| ------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| China (Beijing)           | `https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1`     | [bailian.console.aliyun.com](https://bailian.console.aliyun.com/cn-beijing)                         |
-| Singapore (International) | `https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1` | [modelstudio.console.alibabacloud.com](https://modelstudio.console.alibabacloud.com/ap-southeast-1) |
+| Region                    | Endpoint                                                                     | Console URL                                                                                                 |
+| ------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| China (Beijing)           | `https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1`     | [bailian.console.aliyun.invalid](https://bailian.console.aliyun.invalid/cn-beijing)                         |
+| Singapore (International) | `https://token-plan.ap-southeast-1.maas.aliyuncs.invalid/compatible-mode/v1` | [modelstudio.console.alibabacloud.invalid](https://modelstudio.console.alibabacloud.invalid/ap-southeast-1) |
 
 ### Interactive setup
 
-Enter `qwen` in the terminal to launch Qwen Code, then run the `/auth` command, select **Alibaba ModelStudio**, and choose **Token Plan** from the sub-menu. Choose your region (**China (Beijing)** or **Singapore (International)**), then enter your API key. The wizard then shows its final step (Step 3/3 · Model IDs), where you pick the model IDs to configure: the models served by your endpoint are offered there and are applied only when you explicitly select them. ModelStudio Token Plan API keys have no prefix requirement, unlike Coding Plan keys, which start with `sk-sp-`, and unlike the separate QwenCloud Token Plan keys in Option 1, which also start with `sk-sp-`.
+Enter `mariadb-shell-agent` in the terminal to launch MariaDB Shell Agent, then run the `/auth` command, select **Alibaba ModelStudio**, and choose **Token Plan** from the sub-menu. Choose your region (**China (Beijing)** or **Singapore (International)**), then enter your API key. The wizard then shows its final step (Step 3/3 · Model IDs), where you pick the model IDs to configure: the models served by your endpoint are offered there and are applied only when you explicitly select them. ModelStudio Token Plan API keys have no prefix requirement, unlike Coding Plan keys, which start with `sk-sp-`, and unlike the separate QwenCloud Token Plan keys in Option 1, which also start with `sk-sp-`.
 
 After authentication, use the `/model` command to browse and switch between the models configured for your Token Plan. The model lineup evolves over time, so it is intentionally not listed here; model discovery from the endpoint happens during the `/auth` setup step above (the endpoint's own list is offered there and must be selected explicitly), and `/model` then shows the models configured for your plan.
 
-Qwen Code also checks the endpoint's model list at startup with your stored API key, as described in [Built-in provider updates](#built-in-provider-updates).
+MariaDB Shell Agent also checks the endpoint's model list at startup with your stored API key, as described in [Built-in provider updates](#built-in-provider-updates).
 
 ### Headless or scripted setup
 
@@ -217,17 +217,17 @@ For CI, containers, or scripts, configure Token Plan with environment variables 
 
 ```bash
 export BAILIAN_TOKEN_PLAN_API_KEY="your-api-key"
-export OPENAI_BASE_URL="https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+export OPENAI_BASE_URL="https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1"
 export OPENAI_MODEL="qwen3.7-plus"
 ```
 
-Use `https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1` for the China (Beijing) endpoint, or `https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1` for the international (Singapore) endpoint. Replace `qwen3.7-plus` with any model included in your plan.
+Use `https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1` for the China (Beijing) endpoint, or `https://token-plan.ap-southeast-1.maas.aliyuncs.invalid/compatible-mode/v1` for the international (Singapore) endpoint. Replace `qwen3.7-plus` with any model included in your plan.
 
 Note that `BAILIAN_TOKEN_PLAN_API_KEY` is a provider-specific key: it takes effect once the `settings.json` provider entry in the next section exists, because that entry declares it as the `envKey`. To select OpenAI-compatible auth with environment variables alone, export `OPENAI_API_KEY` instead — provider-specific keys do not select the auth type by themselves.
 
 ### Alternative: configure via `settings.json`
 
-If you prefer to skip the interactive `/auth` flow, add the following to `~/.qwen/settings.json`:
+If you prefer to skip the interactive `/auth` flow, add the following to `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -236,7 +236,7 @@ If you prefer to skip the interactive `/auth` flow, add the following to `~/.qwe
       {
         "id": "qwen3.7-plus",
         "name": "qwen3.7-plus (Token Plan)",
-        "baseUrl": "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+        "baseUrl": "https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1",
         "description": "qwen3.7-plus from Alibaba Cloud Token Plan",
         "envKey": "BAILIAN_TOKEN_PLAN_API_KEY"
       }
@@ -258,7 +258,7 @@ If you prefer to skip the interactive `/auth` flow, add the following to `~/.qwe
 
 > [!note]
 >
-> The Token Plan uses dedicated, region-specific endpoints (`*.maas.aliyuncs.com`) that are different from the standard DashScope endpoint. Make sure the `baseUrl` matches the region of your subscription.
+> The Token Plan uses dedicated, region-specific endpoints (`*.maas.aliyuncs.invalid`) that are different from the standard DashScope endpoint. Make sure the `baseUrl` matches the region of your subscription.
 
 ## 🚀 Option 5: API Key (flexible)
 
@@ -266,7 +266,7 @@ Use this if you want to connect to third-party providers such as OpenAI, Anthrop
 
 ### Recommended: One-file setup via `settings.json`
 
-The simplest way to get started with API Key authentication is to put everything in a single `~/.qwen/settings.json` file. Here's a complete, ready-to-use example:
+The simplest way to get started with API Key authentication is to put everything in a single `~/.mariadb-shell-agent/settings.json` file. Here's a complete, ready-to-use example:
 
 ```json
 {
@@ -275,7 +275,7 @@ The simplest way to get started with API Key authentication is to put everything
       {
         "id": "qwen3-coder-plus",
         "name": "qwen3-coder-plus",
-        "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "baseUrl": "https://dashscope.aliyuncs.invalid/compatible-mode/v1",
         "description": "Qwen3-Coder via Dashscope",
         "envKey": "DASHSCOPE_API_KEY"
       }
@@ -297,20 +297,20 @@ The simplest way to get started with API Key authentication is to put everything
 
 What each field does:
 
-| Field                        | Description                                                                                                                                     |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `modelProviders`             | Declares which models are available and how to connect to them. Keys (`openai`, `anthropic`, `gemini`) represent the API protocol.              |
-| `env`                        | Stores API keys directly in `settings.json` as a fallback (lowest priority — shell `export` and `.env` files take precedence).                  |
-| `security.auth.selectedType` | Tells Qwen Code which protocol to use on startup (e.g. `openai`, `anthropic`, `gemini`). Without this, you'd need to run `/auth` interactively. |
-| `model.name`                 | The default model to activate when Qwen Code starts. Must match one of the `id` values in your `modelProviders`.                                |
+| Field                        | Description                                                                                                                                               |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `modelProviders`             | Declares which models are available and how to connect to them. Keys (`openai`, `anthropic`, `gemini`) represent the API protocol.                        |
+| `env`                        | Stores API keys directly in `settings.json` as a fallback (lowest priority — shell `export` and `.env` files take precedence).                            |
+| `security.auth.selectedType` | Tells MariaDB Shell Agent which protocol to use on startup (e.g. `openai`, `anthropic`, `gemini`). Without this, you'd need to run `/auth` interactively. |
+| `model.name`                 | The default model to activate when MariaDB Shell Agent starts. Must match one of the `id` values in your `modelProviders`.                                |
 
-After saving the file, just run `qwen` — no interactive `/auth` setup needed.
+After saving the file, just run `mariadb-shell-agent` — no interactive `/auth` setup needed.
 
 > [!tip]
 >
 > The sections below explain each part in more detail. If the quick example above works for you, feel free to skip ahead to [Security notes](#security-notes).
 
-The key concept is **Model Providers** (`modelProviders`): Qwen Code supports multiple API protocols, not just OpenAI. You configure which providers and models are available by editing `~/.qwen/settings.json`, then switch between them at runtime with the `/model` command.
+The key concept is **Model Providers** (`modelProviders`): MariaDB Shell Agent supports multiple API protocols, not just OpenAI. You configure which providers and models are available by editing `~/.mariadb-shell-agent/settings.json`, then switch between them at runtime with the `/model` command.
 
 #### Supported protocols
 
@@ -321,15 +321,15 @@ The key concept is **Model Providers** (`modelProviders`): Qwen Code supports mu
 | Google GenAI      | `gemini`             | `GEMINI_API_KEY`, `GEMINI_MODEL`                                                                                                                               | Google Gemini                                                                                         |
 | Vertex AI         | `vertex-ai`          | `GOOGLE_API_KEY` + `GOOGLE_MODEL` (sets `GOOGLE_GENAI_USE_VERTEXAI=true`) or `GOOGLE_CLOUD_PROJECT` + `GOOGLE_MODEL` (keyless ADC); uses the `gemini` protocol | Google Vertex AI                                                                                      |
 
-#### Step 1: Configure models and providers in `~/.qwen/settings.json`
+#### Step 1: Configure models and providers in `~/.mariadb-shell-agent/settings.json`
 
 Define which models are available for each protocol. Each model entry requires at minimum an `id`; `envKey` (the environment variable name that holds your API key) is optional and recommended — when omitted, it falls back to the auth type's default env key (e.g. `OPENAI_API_KEY` for `openai`).
 
 > [!important]
 >
-> It is recommended to define `modelProviders` in the user-scope `~/.qwen/settings.json` to avoid merge conflicts between project and user settings.
+> It is recommended to define `modelProviders` in the user-scope `~/.mariadb-shell-agent/settings.json` to avoid merge conflicts between project and user settings.
 
-Edit `~/.qwen/settings.json` (create it if it doesn't exist). You can mix multiple protocols in a single file — here is a multi-provider example showing just the `modelProviders` section:
+Edit `~/.mariadb-shell-agent/settings.json` (create it if it doesn't exist). You can mix multiple protocols in a single file — here is a multi-provider example showing just the `modelProviders` section:
 
 ```json
 {
@@ -383,7 +383,7 @@ For the full `modelProviders` schema and advanced options like `generationConfig
 
 #### Step 2: Set environment variables
 
-Qwen Code reads API keys from environment variables (specified by `envKey` in your model config). There are multiple ways to provide them, listed below from **highest to lowest priority**:
+MariaDB Shell Agent reads API keys from environment variables (specified by `envKey` in your model config). There are multiple ways to provide them, listed below from **highest to lowest priority**:
 
 **1. Shell environment / `export` (highest priority)**
 
@@ -406,25 +406,25 @@ export GEMINI_API_KEY="AIza..."
 
 **2. `.env` files**
 
-Qwen Code auto-loads the **first** `.env` file it finds (variables are **not merged** across multiple files). Only variables not already present in `process.env` are loaded.
+MariaDB Shell Agent auto-loads the **first** `.env` file it finds (variables are **not merged** across multiple files). Only variables not already present in `process.env` are loaded.
 
 Search order (from the current directory, walking upward toward `/`):
 
-1. `.qwen/.env` (preferred — keeps Qwen Code variables isolated from other tools)
+1. `.mariadb-shell-agent/.env` (preferred — keeps MariaDB Shell Agent variables isolated from other tools)
 2. `.env`
 
 If nothing is found, it falls back to your **home directory**:
 
-3. `~/.qwen/.env`
+3. `~/.mariadb-shell-agent/.env`
 4. `~/.env`
 
 > [!tip]
 >
-> `.qwen/.env` is recommended over `.env` to avoid conflicts with other tools. Some variables (like `DEBUG` and `DEBUG_MODE`) are excluded from project-level `.env` files to avoid interfering with Qwen Code behavior.
+> `.mariadb-shell-agent/.env` is recommended over `.env` to avoid conflicts with other tools. Some variables (like `DEBUG` and `DEBUG_MODE`) are excluded from project-level `.env` files to avoid interfering with MariaDB Shell Agent behavior.
 
 **3. `settings.json` → `env` field (lowest priority)**
 
-You can also define API keys directly in `~/.qwen/settings.json` under the `env` key. These are loaded as the **lowest-priority fallback** — only applied when a variable is not already set by the system environment or `.env` files.
+You can also define API keys directly in `~/.mariadb-shell-agent/settings.json` under the `env` key. These are loaded as the **lowest-priority fallback** — only applied when a variable is not already set by the system environment or `.env` files.
 
 ```json
 {
@@ -449,7 +449,7 @@ This is the approach used in the [one-file setup example](#recommended-one-file-
 
 #### Step 3: Switch models with `/model`
 
-After launching Qwen Code, use the `/model` command to switch between all configured models. Models are grouped by protocol:
+After launching MariaDB Shell Agent, use the `/model` command to switch between all configured models. Models are grouped by protocol:
 
 ```
 /model
@@ -462,11 +462,11 @@ You can also switch models directly with a command-line argument, which is conve
 ```bash
 # In one terminal
 
-qwen --model "qwen3-coder-plus"
+mariadb-shell-agent --model "qwen3-coder-plus"
 
 # In another terminal
 
-qwen --model "qwen3.5-plus"
+mariadb-shell-agent --model "qwen3.5-plus"
 ```
 
 ## Built-in provider updates
@@ -481,25 +481,25 @@ If discovery is unavailable, fails, or matches no built-in model, a preset updat
 
 **Later** waits 24 hours before asking again about the same version or served set; a different change can still prompt. Updating, skipping, or silently recording a newer decision clears the earlier postponement. **Skip** keeps your configuration, including retained models: a skipped preset version is not offered again until a newer one ships, and a skipped served set is not offered again until it changes.
 
-## Removed `qwen auth` CLI command
+## Removed `mariadb-shell-agent auth` CLI command
 
-The standalone `qwen auth` CLI command has been removed. Use these replacements instead:
+The standalone `mariadb-shell-agent auth` CLI command has been removed. Use these replacements instead:
 
-| Previous use case                | Replacement                                                                                   |
-| -------------------------------- | --------------------------------------------------------------------------------------------- |
-| Interactive authentication setup | Run `qwen`, then use `/auth`                                                                  |
-| Coding Plan setup                | Use `/auth`, or set `BAILIAN_CODING_PLAN_API_KEY` with the Coding Plan base URL               |
-| Token Plan setup                 | Use `/auth`, or set `BAILIAN_TOKEN_PLAN_API_KEY` with the Token Plan base URL for your region |
-| OpenRouter setup                 | Use `/auth`, or set `OPENROUTER_API_KEY` and `OPENAI_BASE_URL=https://openrouter.ai/api/v1`   |
-| Requesty setup                   | Use `/auth`, or set `REQUESTY_API_KEY` and `OPENAI_BASE_URL=https://router.requesty.ai/v1`    |
-| API-key or custom provider setup | Configure `~/.qwen/settings.json`, `.env`, or provider-specific environment variables         |
-| Check current authentication     | Run `/doctor` inside Qwen Code                                                                |
-| OAuth browser flow               | Run `qwen` interactively and use `/auth`; OAuth cannot be configured with env vars alone      |
+| Previous use case                | Replacement                                                                                             |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Interactive authentication setup | Run `mariadb-shell-agent`, then use `/auth`                                                             |
+| Coding Plan setup                | Use `/auth`, or set `BAILIAN_CODING_PLAN_API_KEY` with the Coding Plan base URL                         |
+| Token Plan setup                 | Use `/auth`, or set `BAILIAN_TOKEN_PLAN_API_KEY` with the Token Plan base URL for your region           |
+| OpenRouter setup                 | Use `/auth`, or set `OPENROUTER_API_KEY` and `OPENAI_BASE_URL=https://openrouter.ai/api/v1`             |
+| Requesty setup                   | Use `/auth`, or set `REQUESTY_API_KEY` and `OPENAI_BASE_URL=https://router.requesty.ai/v1`              |
+| API-key or custom provider setup | Configure `~/.mariadb-shell-agent/settings.json`, `.env`, or provider-specific environment variables    |
+| Check current authentication     | Run `/doctor` inside MariaDB Shell Agent                                                                |
+| OAuth browser flow               | Run `mariadb-shell-agent` interactively and use `/auth`; OAuth cannot be configured with env vars alone |
 
-Legacy invocations such as `qwen auth status` print a removal notice that summarizes these migration paths, including a Token Plan entry with the base URLs for both regions.
+Legacy invocations such as `mariadb-shell-agent auth status` print a removal notice that summarizes these migration paths, including a Token Plan entry with the base URLs for both regions.
 
 ## Security notes
 
 - Don't commit API keys to version control.
-- Prefer `.qwen/.env` for project-local secrets (and keep it out of git).
+- Prefer `.mariadb-shell-agent/.env` for project-local secrets (and keep it out of git).
 - Treat your terminal output as sensitive if it prints credentials for verification.

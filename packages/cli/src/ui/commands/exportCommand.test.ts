@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -188,7 +189,7 @@ describe('exportCommand', () => {
       mockContext.executionMode = 'acp';
       const worktree = path.join(
         mockProjectRoot,
-        '.qwen/worktrees/export-check',
+        '.mariadb-shell-agent/worktrees/export-check',
       );
       vi.mocked(mockContext.services.config!.getWorkingDir).mockReturnValue(
         worktree,
@@ -203,7 +204,7 @@ describe('exportCommand', () => {
         artifacts: [
           expect.objectContaining({
             workspacePath:
-              '.qwen/worktrees/export-check/export-2025-01-01T00-00-00-000Z.md',
+              '.mariadb-shell-agent/worktrees/export-check/export-2025-01-01T00-00-00-000Z.md',
           }),
         ],
       });

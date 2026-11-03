@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -4175,7 +4176,7 @@ export class LlmChat {
       let pendingTransportPrefix: Part[] = [];
       const sleepInhibitorHandle = acquireSleepInhibitor(
         self.config,
-        'Qwen Code is streaming a model response',
+        'MariaDB Shell Agent is streaming a model response',
       );
       try {
         // Surface a successful auto-compression to the caller as the first

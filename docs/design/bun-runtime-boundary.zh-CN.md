@@ -55,9 +55,9 @@
 | `packages/cli/src/serve/run-qwen-serve.ts`                             | channel worker 的 TLS 信任探针                                                                                                                       | 有意不接入；与 worker 保持同一 process.execPath |
 | `packages/cli/src/commands/review/test-efficacy.ts`                    | 经 `process.execPath` 启动 vitest（开发工具路径）                                                                                                    | 有意不接入；保持宿主工具身份                    |
 
-R3 整合 [#14134 的 c807de17](https://github.com/QwenLM/qwen-code/pull/14134)
+R3 整合 [#14134 的 c807de17](https://github.invalid/QwenLM/qwen-code/pull/14134)
 中剩余解释器工作，以及
-[#14187 的 d14b2ad1](https://github.com/QwenLM/qwen-code/pull/14187) 中对应回归覆盖。
+[#14187 的 d14b2ad1](https://github.invalid/QwenLM/qwen-code/pull/14187) 中对应回归覆盖。
 沙箱诊断、Mem0 spawn/身份、cgroup launcher、bwrap/landlock relay/protected root
 成对接入现有 helper。cgroup 保留 hook 与 managed-child-run 两类消费者及
 `reapOnParentExit`。源码检查点 `0d353777` 纳入已接受的 main `19d3289f`，包含 #14046 与 #15067，同时保留本解释器边界与依赖输入。macOS arm64 fresh build 和 typecheck 已通过。历史 e819/b734/7368/61f 结果保留各自原始源码、运行时与产物范围，不能代替最终组合验收。[分发设计](2026-10-21-opentui-npm-distribution.zh-CN.md) 分别记录这些结果、当前候选门禁与安装产物证明。Linux 原生 cgroup/bwrap/landlock、其他平台及正式发布版本升级验收仍未完成。
@@ -204,11 +204,11 @@ Windows 跳过可捕获 SIGTERM 用例；缺少 Bun 二进制时跳过 Bun 腿�
 ## Standalone 更新集成（R1）
 
 本批整合 chiga0 的更新工作：
-[#14134](https://github.com/QwenLM/qwen-code/pull/14134)、
-[#14139](https://github.com/QwenLM/qwen-code/pull/14139)、
-[#14142](https://github.com/QwenLM/qwen-code/pull/14142)、
-[#14187](https://github.com/QwenLM/qwen-code/pull/14187) 与
-[#14210](https://github.com/QwenLM/qwen-code/pull/14210)，来源截止
+[#14134](https://github.invalid/QwenLM/qwen-code/pull/14134)、
+[#14139](https://github.invalid/QwenLM/qwen-code/pull/14139)、
+[#14142](https://github.invalid/QwenLM/qwen-code/pull/14142)、
+[#14187](https://github.invalid/QwenLM/qwen-code/pull/14187) 与
+[#14210](https://github.invalid/QwenLM/qwen-code/pull/14210)，来源截止
 `ce67edaba5631e9deaee418296346370dba4c116`。无关的解释器调用点修改
 留在独立迁移中，上述完整调用点清单保持不变。
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +16,7 @@ const SKIP_DIRECTORY_ARTIFACT_NAMES = new Set([
   '.git',
   '__pycache__',
   'dist',
-  '.qwen',
+  '.mariadb-shell-agent',
 ]);
 
 export const OFFICE_DOCUMENT_EXTENSIONS: ReadonlySet<string> = new Set([
@@ -55,11 +56,12 @@ export function shouldSkipDirectoryArtifactName(name: string): boolean {
   );
 }
 
-const WORKTREE_ARTIFACT_PREFIX_RE = /^\.qwen\/worktrees\/[^/]+\//;
+const WORKTREE_ARTIFACT_PREFIX_RE =
+  /^\.mariadb-shell-agent\/worktrees\/[^/]+\//;
 
 /**
  * Bound-root-canonical paths from a worktree session always start with
- * `.qwen/worktrees/<slug>/`. That leading `.qwen` must not itself trip the
+ * `.mariadb-shell-agent/worktrees/<slug>/`. That leading `.mariadb-shell-agent` must not itself trip the
  * skip-directory gate for ordinary subdirectories inside the worktree.
  */
 export function stripWorktreeArtifactPrefix(workspacePath: string): string {

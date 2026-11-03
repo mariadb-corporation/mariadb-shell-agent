@@ -148,10 +148,10 @@ default list, unanchored children under search, group-membership splits, and
 row-count effects on truncation. Component tests cover the rendered chevron,
 indentation, the accessible label, and that the parent's own actions still fire.
 
-Browser verification against a local `qwen serve` uses the measured workspace:
+Browser verification against a local `mariadb-shell-agent serve` uses the measured workspace:
 before, eight `🧵 ...` rows sit beside their parent; after, the parent shows one
 chevron with eight children collapsed, and expanding reveals the eight indented
-rows. The E2E plan and results live under `.qwen/e2e-tests/`.
+rows. The E2E plan and results live under `.mariadb-shell-agent/e2e-tests/`.
 
 ## Acceptance criteria
 

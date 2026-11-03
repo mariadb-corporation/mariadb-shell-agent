@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -344,7 +345,7 @@ function useTempQwenHome(prefix: string) {
   beforeEach(() => {
     tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
     originalQwenHome = process.env['QWEN_HOME'];
-    process.env['QWEN_HOME'] = path.join(tmpHome, '.qwen');
+    process.env['QWEN_HOME'] = path.join(tmpHome, '.mariadb-shell-agent');
     fs.mkdirSync(process.env['QWEN_HOME'], { recursive: true });
   });
 
@@ -527,7 +528,7 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
     plantChatJsonl(sessionId, 1600);
 
     // The daemon dashboard loads read-only: it rebuilds + returns data but must
-    // not write to ~/.qwen on a GET.
+    // not write to ~/.mariadb-shell-agent on a GET.
     const records = await loadUsageHistory(undefined, {
       persistRebuild: false,
     });

@@ -1,6 +1,6 @@
-# MCP servers with Qwen Code
+# MCP servers with MariaDB Shell Agent
 
-This document provides a guide to configuring and using Model Context Protocol (MCP) servers with Qwen Code.
+This document provides a guide to configuring and using Model Context Protocol (MCP) servers with MariaDB Shell Agent.
 
 ## What is an MCP server?
 
@@ -16,7 +16,7 @@ With an MCP server, you can extend the CLI's capabilities to perform actions bey
 
 ## Core Integration Architecture
 
-Qwen Code integrates with MCP servers through a sophisticated discovery and execution system built into the core package (`packages/core/src/tools/`):
+MariaDB Shell Agent integrates with MCP servers through a sophisticated discovery and execution system built into the core package (`packages/core/src/tools/`):
 
 ### Discovery Layer (`mcp-client.ts`)
 
@@ -49,7 +49,7 @@ The CLI supports three MCP transport types:
 
 ## How to set up your MCP server
 
-Qwen Code uses the `mcpServers` configuration in your `settings.json` file to locate and connect to MCP servers. This configuration supports multiple servers with different transport mechanisms.
+MariaDB Shell Agent uses the `mcpServers` configuration in your `settings.json` file to locate and connect to MCP servers. This configuration supports multiple servers with different transport mechanisms.
 
 ### Configure the MCP server in settings.json
 
@@ -125,7 +125,7 @@ Each server configuration supports the following properties:
 
 ### OAuth Support for Remote MCP Servers
 
-Qwen Code supports OAuth 2.0 authentication for remote MCP servers using SSE or HTTP transports. This enables secure access to MCP servers that require authentication.
+MariaDB Shell Agent supports OAuth 2.0 authentication for remote MCP servers using SSE or HTTP transports. This enables secure access to MCP servers that require authentication.
 
 #### Automatic OAuth Discovery
 
@@ -164,7 +164,7 @@ When connecting to an OAuth-enabled server:
 **Important:** OAuth authentication requires that the redirect URI is accessible:
 
 - **Default behavior**: Redirects to `http://localhost:7777/oauth/callback` (works for local setups)
-- **Custom redirect URI**: Use `--oauth-redirect-uri` or configure `redirectUri` in settings.json to specify a public URL ending in `/oauth/callback`. Reverse-proxy that path to `http://127.0.0.1:7777/oauth/callback` on the machine running Qwen Code.
+- **Custom redirect URI**: Use `--oauth-redirect-uri` or configure `redirectUri` in settings.json to specify a public URL ending in `/oauth/callback`. Reverse-proxy that path to `http://127.0.0.1:7777/oauth/callback` on the machine running MariaDB Shell Agent.
 
 For **remote/cloud server deployments** (e.g., web terminals, SSH sessions, cloud IDEs):
 
@@ -175,7 +175,7 @@ For **remote/cloud server deployments** (e.g., web terminals, SSH sessions, clou
 Example for remote servers:
 
 ```bash
-qwen mcp add --transport sse remote-server https://api.example.com/sse/ \
+mariadb-shell-agent mcp add --transport sse remote-server https://api.example.com/sse/ \
   --oauth-redirect-uri https://your-remote-server.example.com/oauth/callback
 ```
 
@@ -186,7 +186,7 @@ OAuth will not work in:
 
 #### Managing OAuth Authentication
 
-Use the `/mcp` dialog inside an interactive Qwen Code session to inspect MCP
+Use the `/mcp` dialog inside an interactive MariaDB Shell Agent session to inspect MCP
 servers and manage OAuth authentication.
 
 #### OAuth Configuration Properties
@@ -197,7 +197,7 @@ servers and manage OAuth authentication.
 - **`authorizationUrl`** (string): OAuth authorization endpoint (auto-discovered if omitted)
 - **`tokenUrl`** (string): OAuth token endpoint (auto-discovered if omitted)
 - **`scopes`** (string[]): Required OAuth scopes
-- **`redirectUri`** (string): Custom redirect URI. **Critical for remote deployments**: Defaults to `http://localhost:7777/oauth/callback`. For remote use, set a public URL ending in `/oauth/callback` and reverse-proxy it to the local callback listener. Can be configured via `qwen mcp add --oauth-redirect-uri` or directly in settings.json.
+- **`redirectUri`** (string): Custom redirect URI. **Critical for remote deployments**: Defaults to `http://localhost:7777/oauth/callback`. For remote use, set a public URL ending in `/oauth/callback` and reverse-proxy it to the local callback listener. Can be configured via `mariadb-shell-agent mcp add --oauth-redirect-uri` or directly in settings.json.
 - **`tokenParamName`** (string): Query parameter name for tokens in SSE URLs
 - **`audiences`** (string[]): Audiences the token is valid for
 
@@ -205,7 +205,7 @@ servers and manage OAuth authentication.
 
 OAuth tokens are automatically:
 
-- **Stored** in `~/.qwen/mcp-oauth-tokens.json` (plaintext, mode 0600) by default. If `QWEN_CODE_FORCE_ENCRYPTED_FILE_STORAGE=true` is set, Qwen Code uses keychain-backed storage where available, or `~/.qwen/mcp-oauth-tokens-v2.json` with AES-256-GCM encryption.
+- **Stored** in `~/.mariadb-shell-agent/mcp-oauth-tokens.json` (plaintext, mode 0600) by default. If `QWEN_CODE_FORCE_ENCRYPTED_FILE_STORAGE=true` is set, MariaDB Shell Agent uses keychain-backed storage where available, or `~/.mariadb-shell-agent/mcp-oauth-tokens-v2.json` with AES-256-GCM encryption.
 - **Refreshed** when expired (if refresh tokens are available)
 - **Validated** before each connection attempt
 - **Cleaned up** when invalid or expired
@@ -381,7 +381,7 @@ The CLI will use your local Application Default Credentials (ADC) to generate an
 
 ## Discovery Process Deep Dive
 
-When Qwen Code starts, it performs MCP server discovery through the following detailed process:
+When MariaDB Shell Agent starts, it performs MCP server discovery through the following detailed process:
 
 ### 1. Server Iteration and Connection
 
@@ -689,7 +689,7 @@ Here is an example of a valid JSON response from an MCP tool that returns both a
 }
 ```
 
-When Qwen Code receives this response, it will:
+When MariaDB Shell Agent receives this response, it will:
 
 1.  Extract all the text and combine it into a single `functionResponse` part for the model.
 2.  Present the image data as a separate `inlineData` part.
@@ -699,7 +699,7 @@ This enables you to build sophisticated tools that can provide rich, multi-modal
 
 ## MCP Prompts as Slash Commands
 
-In addition to tools, MCP servers can expose predefined prompts that can be executed as slash commands within Qwen Code. This allows you to create shortcuts for common or complex queries that can be easily invoked by name.
+In addition to tools, MCP servers can expose predefined prompts that can be executed as slash commands within MariaDB Shell Agent. This allows you to create shortcuts for common or complex queries that can be easily invoked by name.
 
 ### Defining Prompts on the Server
 
@@ -757,29 +757,29 @@ This can be included in `settings.json` under `mcpServers` with:
 Once a prompt is discovered, you can invoke it using its name as a slash command. The CLI will automatically handle parsing arguments.
 
 ```bash
-/poem-writer --title="Qwen Code" --mood="reverent"
+/poem-writer --title="MariaDB Shell Agent" --mood="reverent"
 ```
 
 or, using positional arguments:
 
 ```bash
-/poem-writer "Qwen Code" reverent
+/poem-writer "MariaDB Shell Agent" reverent
 ```
 
 When you run this command, the CLI executes the `prompts/get` method on the MCP server with the provided arguments. The server is responsible for substituting the arguments into the prompt template and returning the final prompt text. The CLI then sends this prompt to the model for execution. This provides a convenient way to automate and share common workflows.
 
-## Managing MCP Servers with `qwen mcp`
+## Managing MCP Servers with `mariadb-shell-agent mcp`
 
 While you can always configure MCP servers by manually editing your `settings.json` file, the CLI provides a convenient set of commands to manage your server configurations programmatically. These commands streamline the process of adding, listing, and removing MCP servers without needing to directly edit JSON files.
 
-### Adding a Server (`qwen mcp add`)
+### Adding a Server (`mariadb-shell-agent mcp add`)
 
-The `add` command configures a new MCP server in your `settings.json`. Based on the scope (`-s, --scope`), it will be added to either the user config `~/.qwen/settings.json` or the project config `.qwen/settings.json` file.
+The `add` command configures a new MCP server in your `settings.json`. Based on the scope (`-s, --scope`), it will be added to either the user config `~/.mariadb-shell-agent/settings.json` or the project config `.mariadb-shell-agent/settings.json` file.
 
 **Command:**
 
 ```bash
-qwen mcp add [options] <name> <commandOrUrl> [args...]
+mariadb-shell-agent mcp add [options] <name> <commandOrUrl> [args...]
 ```
 
 - `<name>`: A unique name for the server.
@@ -810,13 +810,13 @@ This is the default transport for running local servers.
 
 ```bash
 # Basic syntax
-qwen mcp add <name> <command> [args...]
+mariadb-shell-agent mcp add <name> <command> [args...]
 
 # Example: Adding a local server
-qwen mcp add my-stdio-server -e API_KEY=123 /path/to/server arg1 arg2 arg3
+mariadb-shell-agent mcp add my-stdio-server -e API_KEY=123 /path/to/server arg1 arg2 arg3
 
 # Example: Adding a local python server
-qwen mcp add python-server python server.py --port 8080
+mariadb-shell-agent mcp add python-server python server.py --port 8080
 ```
 
 #### Adding an HTTP server
@@ -825,13 +825,13 @@ This transport is for servers that use the streamable HTTP transport.
 
 ```bash
 # Basic syntax
-qwen mcp add --transport http <name> <url>
+mariadb-shell-agent mcp add --transport http <name> <url>
 
 # Example: Adding an HTTP server
-qwen mcp add --transport http http-server https://api.example.com/mcp/
+mariadb-shell-agent mcp add --transport http http-server https://api.example.com/mcp/
 
 # Example: Adding an HTTP server with an authentication header
-qwen mcp add --transport http secure-http https://api.example.com/mcp/ --header "Authorization: Bearer abc123"
+mariadb-shell-agent mcp add --transport http secure-http https://api.example.com/mcp/ --header "Authorization: Bearer abc123"
 ```
 
 #### Adding an SSE server
@@ -840,16 +840,16 @@ This transport is for servers that use Server-Sent Events (SSE).
 
 ```bash
 # Basic syntax
-qwen mcp add --transport sse <name> <url>
+mariadb-shell-agent mcp add --transport sse <name> <url>
 
 # Example: Adding an SSE server
-qwen mcp add --transport sse sse-server https://api.example.com/sse/
+mariadb-shell-agent mcp add --transport sse sse-server https://api.example.com/sse/
 
 # Example: Adding an SSE server with an authentication header
-qwen mcp add --transport sse secure-sse https://api.example.com/sse/ --header "Authorization: Bearer abc123"
+mariadb-shell-agent mcp add --transport sse secure-sse https://api.example.com/sse/ --header "Authorization: Bearer abc123"
 
 # Example: Adding an OAuth-enabled SSE server
-qwen mcp add --transport sse oauth-server https://api.example.com/sse/ \
+mariadb-shell-agent mcp add --transport sse oauth-server https://api.example.com/sse/ \
   --oauth-client-id your-client-id \
   --oauth-redirect-uri https://your-server.com/oauth/callback \
   --oauth-authorization-url https://provider.example.com/authorize \
@@ -859,7 +859,7 @@ qwen mcp add --transport sse oauth-server https://api.example.com/sse/ \
 ### Managing Servers (`/mcp`)
 
 To view and manage all MCP servers currently configured, open the `/mcp`
-dialog inside an interactive Qwen Code session. This dialog lets you:
+dialog inside an interactive MariaDB Shell Agent session. This dialog lets you:
 
 - View all MCP servers with their connection status
 - Enable/disable servers
@@ -881,20 +881,20 @@ Then enter:
 
 The management dialog provides a visual interface showing each server's name, configuration details, connection status, and available tools/prompts.
 
-### Removing a Server (`qwen mcp remove`)
+### Removing a Server (`mariadb-shell-agent mcp remove`)
 
 To delete a server from your configuration, use the `remove` command with the server's name.
 
 **Command:**
 
 ```bash
-qwen mcp remove <name>
+mariadb-shell-agent mcp remove <name>
 ```
 
 **Example:**
 
 ```bash
-qwen mcp remove my-server
+mariadb-shell-agent mcp remove my-server
 ```
 
 This will find and delete the "my-server" entry from the `mcpServers` object in the appropriate `settings.json` file based on the scope (`-s, --scope`).

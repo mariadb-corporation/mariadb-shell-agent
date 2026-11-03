@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -133,7 +134,7 @@ describe('memoryDiagnostics', () => {
     expect(report).toContain('Status: warn');
     expect(report).toContain('Heap pressure: 85.4%');
     expect(report).toContain('V8 heap usage is high');
-    expect(report).toContain('restart Qwen Code to recover memory');
+    expect(report).toContain('restart MariaDB Shell Agent to recover memory');
     expect(report).toContain('capture a heap snapshot');
   });
 

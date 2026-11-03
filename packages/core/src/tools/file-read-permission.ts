@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -39,7 +40,7 @@ export function getFileReadDefaultPermission(
     Storage.getGlobalTempDir(),
     ...config.storage.getUserSkillsDirs(),
     Storage.getUserExtensionsDir(),
-    // Approved plans are persisted here (default ~/.qwen/plans, outside
+    // Approved plans are persisted here (default ~/.mariadb-shell-agent/plans, outside
     // the workspace) and after approval nothing re-injects the plan text,
     // so the saved file is the model's only recovery route — reading it
     // back must not stall on a confirmation prompt. The dir holds only
@@ -58,14 +59,14 @@ export function getFileReadDefaultPermission(
     workspaceContext.isPathWithinWorkspace(filePath) ||
     isSubpaths(allowedRoots, filePath) ||
     // isAnyAutoMemPath narrows to the managed auto-memory roots
-    // (per-project + user-level under ~/.qwen/memories/) — never the
-    // broad getMemoryBaseDir() — to avoid exposing sensitive ~/.qwen
+    // (per-project + user-level under ~/.mariadb-shell-agent/memories/) — never the
+    // broad getMemoryBaseDir() — to avoid exposing sensitive ~/.mariadb-shell-agent
     // files such as settings.json or OAuth credentials.
     //
     // Asymmetric with allowedRoots on purpose: the candidate is canonicalized
     // but the memory roots stay lexical. In local-memory mode that root sits
-    // under a repo-tracked `.qwen/`, so canonicalizing it would let a checked-in
-    // `.qwen -> /outside` relocate the allowed root — see
+    // under a repo-tracked `.mariadb-shell-agent/`, so canonicalizing it would let a checked-in
+    // `.mariadb-shell-agent -> /outside` relocate the allowed root — see
     // getAutoMemoryTrustedAnchor. Candidate-only is fail-closed and still
     // refuses a link planted inside the root.
     isAnyAutoMemPath(filePath, config.getTargetDir())

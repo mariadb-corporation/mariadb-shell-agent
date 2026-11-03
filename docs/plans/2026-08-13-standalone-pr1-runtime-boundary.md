@@ -49,7 +49,7 @@ PR1 不增加 standalone source、公开 standalone routes、SDK/standalone UI �
 新增 `packages/cli/src/serve/conversations/conversation-runtime-ownership.ts`，默认 record 为：
 
 ```text
-~/.qwen/conversations/runtime-owner.json
+~/.mariadb-shell-agent/conversations/runtime-owner.json
 ```
 
 最小且exact（unknown key也拒绝）schema：
@@ -62,11 +62,11 @@ interface ConversationRuntimeOwnerRecord {
 }
 ```
 
-不写 URL、token、workspace path 或可由 project 配置覆盖的值。PID必须是正safe integer，nonce沿用Live的UUID/pattern约束。POSIX敏感叶目录（owner record目录与Live locator目录）为 owner-only `0700`，record 为 link count 1的regular non-symlink owner-only `0600`；Windows只承诺regular non-reparse、single-link、canonical identity与既有平台可观测的path安全，不虚构uid/mode/ACL保证。读取有固定 byte 上限。首次创建目录时，先 canonicalize并记录nearest existing ancestor，再逐级使用non-recursive `mkdir`创建缺失组件；每一级在`mkdir`/`EEXIST`后都重验parent和child identity，拒绝symlink、非目录或竞态替换。既有祖先只要求稳定的canonical identity及POSIX same-owner，不把`0700`追溯强加给历史`~/.qwen`；敏感叶目录必须满足上述严格权限。只有本次成功创建的组件可依创建mode设置权限；既有unsafe敏感叶目录不得靠recursive `mkdir`或`chmod`静默修复。`proper-lockfile` 必须显式把 `lockfilePath` 放在已验证目录内（例如 `.runtime-owner.lock`），不能使用默认的 sibling `~/.qwen/conversations.lock`。进入 lock 前记录目录的 canonical/device/inode identity，lock 后及每次 read/rename/unlink 前重验，目录替换或 symlink一律 compromised。record读取采用 `lstat -> open(no-follow where supported) -> fstat`，并要求 path/handle device+inode一致；不得在 `lstat(path)` 后直接 `readFile(path)`。写入采用 same-directory `wx` temp file、`sync`与最终安全校验；POSIX可rename-over exact validated target，Windows在lock内重验后采用平台支持的commit顺序，不声称目标已存在时仍有不可实现的atomic overwrite。Windows删除validated dead target前必须已sync current temp；若删除后current commit失败，活进程保持owner lock并完成一次不可取消grace后才release/throw，进程崩溃则由大于grace加最大临界区的stale阈值保证后继恢复锁时已跨过grace。该异常gap路径不启动runtime。只best-effort清理当前operation持有的随机temp；crash遗留和其他未知文件均忽略且不删除。
+不写 URL、token、workspace path 或可由 project 配置覆盖的值。PID必须是正safe integer，nonce沿用Live的UUID/pattern约束。POSIX敏感叶目录（owner record目录与Live locator目录）为 owner-only `0700`，record 为 link count 1的regular non-symlink owner-only `0600`；Windows只承诺regular non-reparse、single-link、canonical identity与既有平台可观测的path安全，不虚构uid/mode/ACL保证。读取有固定 byte 上限。首次创建目录时，先 canonicalize并记录nearest existing ancestor，再逐级使用non-recursive `mkdir`创建缺失组件；每一级在`mkdir`/`EEXIST`后都重验parent和child identity，拒绝symlink、非目录或竞态替换。既有祖先只要求稳定的canonical identity及POSIX same-owner，不把`0700`追溯强加给历史`~/.mariadb-shell-agent`；敏感叶目录必须满足上述严格权限。只有本次成功创建的组件可依创建mode设置权限；既有unsafe敏感叶目录不得靠recursive `mkdir`或`chmod`静默修复。`proper-lockfile` 必须显式把 `lockfilePath` 放在已验证目录内（例如 `.runtime-owner.lock`），不能使用默认的 sibling `~/.mariadb-shell-agent/conversations.lock`。进入 lock 前记录目录的 canonical/device/inode identity，lock 后及每次 read/rename/unlink 前重验，目录替换或 symlink一律 compromised。record读取采用 `lstat -> open(no-follow where supported) -> fstat`，并要求 path/handle device+inode一致；不得在 `lstat(path)` 后直接 `readFile(path)`。写入采用 same-directory `wx` temp file、`sync`与最终安全校验；POSIX可rename-over exact validated target，Windows在lock内重验后采用平台支持的commit顺序，不声称目标已存在时仍有不可实现的atomic overwrite。Windows删除validated dead target前必须已sync current temp；若删除后current commit失败，活进程保持owner lock并完成一次不可取消grace后才release/throw，进程崩溃则由大于grace加最大临界区的stale阈值保证后继恢复锁时已跨过grace。该异常gap路径不启动runtime。只best-effort清理当前operation持有的随机temp；crash遗留和其他未知文件均忽略且不删除。
 
 lock使用显式、可测试的bounded retry window覆盖正常I/O临界区；一个仍有效的foreign lock只是暂时busy，耗尽重试映射为`conversation_runtime_unavailable`，不能误报篡改。unsafe lock shape、stale-lock recovery失败、`ECOMPROMISED`或release ownership丢失才映射为`conversation_runtime_ownership_compromised`。显式`onCompromised`只记录并唤醒当前operation；每次commit/release前检查该状态，不使用library默认的异步throw handler把进程直接crash。stale阈值必须大于handoff grace加最大正常文件临界区，update间隔满足library约束，两者均可测试注入。
 
-Ownership constructor必须是无 I/O、无 timer、无 process handler的纯构造。其 `stableBaseDir` 与 Live discovery 使用同一个已解析值：production沿用`getStableLiveDiscoveryBaseDir()`语义固定为真实home下的`~/.qwen`，不得改用会跟随`QWEN_HOME`的`Storage.getGlobalQwenDir()`；`runQwenServe` 的 `liveDiscoveryStableBaseDir` test/embed override必须同时传给 ownership和locator，不能出现两套“stable”目录。`proper-lockfile` 与 legacy `live/discovery` inspection在首次 `acquire()` 内动态加载；manager只 type-import ownership contract。这样不会破坏现有 serve startup import boundary，也不会因为 Live关闭而提前加载或创建稳定目录。
+Ownership constructor必须是无 I/O、无 timer、无 process handler的纯构造。其 `stableBaseDir` 与 Live discovery 使用同一个已解析值：production沿用`getStableLiveDiscoveryBaseDir()`语义固定为真实home下的`~/.mariadb-shell-agent`，不得改用会跟随`QWEN_HOME`的`Storage.getGlobalQwenDir()`；`runQwenServe` 的 `liveDiscoveryStableBaseDir` test/embed override必须同时传给 ownership和locator，不能出现两套“stable”目录。`proper-lockfile` 与 legacy `live/discovery` inspection在首次 `acquire()` 内动态加载；manager只 type-import ownership contract。这样不会破坏现有 serve startup import boundary，也不会因为 Live关闭而提前加载或创建稳定目录。
 
 `runQwenServe`只解析一次stable base并传给app与locator。`createServeApp`在`LiveHostCoordinator`产生nonce后，通过窄factory seam `(pid, instanceNonce, stableBaseDir) => ConversationRuntimeOwnership`构造side-effect-free实例，保证默认production ownership与tests注入的fake都拿到同一identity；再把同一实例装配到manager、Live discovery gate与`app.locals`。默认factory的构造仍无I/O，真实home下的目录/record只有在下述listener binding已经成立且internal boot实际开始后才会访问。
 
@@ -439,15 +439,15 @@ Ownership只记录上述四态与terminal compromise：若foreign/compromised的
 
 **Files:**
 
-- Create: `.qwen/e2e-tests/standalone-pr1-runtime-boundary.md`（实现工作产物，不提交）
+- Create: `.mariadb-shell-agent/e2e-tests/standalone-pr1-runtime-boundary.md`（实现工作产物，不提交）
 - Modify: `docs/developers/daemon/02-serve-runtime.md`
 - Modify: `docs/developers/daemon/20-quickstart-operations.md`
 - Update design doc仅当实现发现 contract必须修订；不为重复计划内容做无意义改写。
 
 - [ ] 先跑所有 changed-file focused tests；从 `packages/cli` 目录执行 Vitest。
-- [ ] 按仓库要求先用global`qwen` dry-run记录baseline：在隔离temp HOME/USERPROFILE中观察现有Live catalog/load请求形状、internal普通route当前可达性与正常shutdown行为，先断言所有root都落在temp tree；若global版本不含PR0 seam，明确标为不可比而不是伪造before。
+- [ ] 按仓库要求先用global`mariadb-shell-agent` dry-run记录baseline：在隔离temp HOME/USERPROFILE中观察现有Live catalog/load请求形状、internal普通route当前可达性与正常shutdown行为，先断言所有root都落在temp tree；若global版本不含PR0 seam，明确标为不可比而不是伪造before。
 - [ ] 运行 `npm run format`并重新审diff，再执行`npm run build && npm run typecheck`，随后`npm run lint`。
-- [ ] build/bundle后执行two-daemon E2E：两个真实child daemon共享同一个隔离的temp HOME/USERPROFILE与stable base、各用不同primary workspace/port；覆盖owner contention时loser的ordinary workspace仍可用但无internal entry/locator且Live操作返回503、kill -9 stale reclaim（平台支持时）、Live locator compatibility、generic REST/ACP WS/Voice WS拒绝、正常shutdown handoff、无primary fallback。先断言record解析到temp tree，绝不触碰操作者真实`~/.qwen`。
+- [ ] build/bundle后执行two-daemon E2E：两个真实child daemon共享同一个隔离的temp HOME/USERPROFILE与stable base、各用不同primary workspace/port；覆盖owner contention时loser的ordinary workspace仍可用但无internal entry/locator且Live操作返回503、kill -9 stale reclaim（平台支持时）、Live locator compatibility、generic REST/ACP WS/Voice WS拒绝、正常shutdown handoff、无primary fallback。先断言record解析到temp tree，绝不触碰操作者真实`~/.mariadb-shell-agent`。
 - [ ] WebShell行为验证记录Before/After evidence：Before的`kind: "live"`会出现在Composer/voice或scheduled-task ordinary selector，After这些selector不再展示/生成其目标，同时Live sidebar section、source-filtered list与精确session load仍可用。
 - [ ] 更新公开embed文档：`createServeApp`返回值保持不变；需要Live/Conversations的direct embed用`http.createServer(app)`绑定实际listener，调用`getServeAppLifecycle(app).bindServer(server)`，并以`await lifecycle.close()`完成shutdown。说明未绑定时internal能力fail closed、raw `server.close()`只触发event-driven best-effort cleanup且仍应await lifecycle，以及ordinary-only embed不受影响；给出从现有`app.listen()`示例迁移后的完整代码。
 - [ ] 在macOS/Linux可用环境验证mode/uid/PID与rename-over replacement；Windows把POSIX mode/uid标为N/A，验证regular non-reparse/single-link、平台commit顺序，以及delete→commit失败由held-lock grace、crash gap由stale阈值覆盖后继handoff，再验证PID、nonce和path semantics；不写“atomic overwrite”伪保证。

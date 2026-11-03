@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -962,7 +963,7 @@ export function createExtensionsController(
               ...(warnings.length > 0 ? { warnings } : {}),
             });
             writeStderrLine(
-              `qwen serve: [${boundWorkspace}] extensions ${operation}: refreshed ${result.refreshed} session(s), ${result.failed} failed`,
+              `mariadb-shell-agent serve: [${boundWorkspace}] extensions ${operation}: refreshed ${result.refreshed} session(s), ${result.failed} failed`,
             );
           } catch (refreshErr) {
             const message = sanitizeDaemonMessage(
@@ -996,7 +997,7 @@ export function createExtensionsController(
               });
             } catch (broadcastErr) {
               writeStderrLine(
-                `qwen serve: [${boundWorkspace}] extensions ${operation}: failed to broadcast refresh failure: ${sanitizeDaemonMessage(
+                `mariadb-shell-agent serve: [${boundWorkspace}] extensions ${operation}: failed to broadcast refresh failure: ${sanitizeDaemonMessage(
                   broadcastErr instanceof Error
                     ? broadcastErr.message
                     : String(broadcastErr),
@@ -1004,7 +1005,7 @@ export function createExtensionsController(
               );
             }
             writeStderrLine(
-              `qwen serve: [${boundWorkspace}] extensions ${operation}: mutation succeeded but refresh failed: ${message}`,
+              `mariadb-shell-agent serve: [${boundWorkspace}] extensions ${operation}: mutation succeeded but refresh failed: ${message}`,
             );
           }
         }
@@ -1079,7 +1080,7 @@ export function createExtensionsController(
           }
           try {
             writeStderrLine(
-              `qwen serve: [${boundWorkspace}] extensions ${operation}: ${error}`,
+              `mariadb-shell-agent serve: [${boundWorkspace}] extensions ${operation}: ${error}`,
             );
           } catch {
             // Keep queued background work from surfacing as unhandledRejection.
@@ -1106,7 +1107,7 @@ export function createExtensionsController(
           });
         } catch (broadcastErr) {
           writeStderrLine(
-            `qwen serve: [${boundWorkspace}] extensions ${operation}: failed to broadcast failure: ${sanitizeDaemonMessage(
+            `mariadb-shell-agent serve: [${boundWorkspace}] extensions ${operation}: failed to broadcast failure: ${sanitizeDaemonMessage(
               broadcastErr instanceof Error
                 ? broadcastErr.message
                 : String(broadcastErr),
@@ -1115,7 +1116,7 @@ export function createExtensionsController(
         }
         try {
           writeStderrLine(
-            `qwen serve: [${boundWorkspace}] extensions ${operation}: background task failed: ${message}`,
+            `mariadb-shell-agent serve: [${boundWorkspace}] extensions ${operation}: background task failed: ${message}`,
           );
         } catch {
           // Keep queued background work from surfacing as unhandledRejection.
@@ -1161,7 +1162,7 @@ export function createExtensionsController(
       // The probe stays ungated only where it is actually read. An
       // authoritative `false` from `isWorkspaceTrusted` short-circuits
       // `trusted`, so probing there would parse an untrusted workspace's own
-      // `.qwen/settings.json` and then throw the result away — and parsing
+      // `.mariadb-shell-agent/settings.json` and then throw the result away — and parsing
       // runs the migration / corruption-recovery path, which REWRITES that
       // file (injecting `$version`, or resetting invalid JSON to `{}` beside
       // a `.corrupted` sibling). A trust-free, read-only-by-contract status

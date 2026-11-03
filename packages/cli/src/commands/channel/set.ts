@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -60,7 +61,8 @@ interface SetArgs {
 
 export const setCommand: CommandModule<unknown, SetArgs> = {
   command: 'set <names..>',
-  describe: 'Set the channel selection for a running qwen serve daemon',
+  describe:
+    'Set the channel selection for a running mariadb-shell-agent serve daemon',
   builder: (yargs) =>
     yargs
       .positional('names', {

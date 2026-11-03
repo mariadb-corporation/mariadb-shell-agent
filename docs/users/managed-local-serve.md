@@ -23,7 +23,7 @@ CLI upgrade; installing the runtime alone cannot add the launcher. Install Java 
 and set `JAVA_HOME` to its home, or put its executable on PATH, then run:
 
 ```sh
-qwen serve --managed --open
+mariadb-shell-agent serve --managed --open
 ```
 
 Before creating application data or starting services, Qwen checks Java 21 and
@@ -42,9 +42,9 @@ your distribution builder. Verify and extract it before starting:
 
 ```sh
 shasum -a 256 -c qwen-code-managed-runtime-darwin-arm64.tar.gz.sha256
-mkdir -p "${QWEN_HOME:-$HOME/.qwen}"
-tar -xzf qwen-code-managed-runtime-darwin-arm64.tar.gz -C "${QWEN_HOME:-$HOME/.qwen}"
-qwen serve --managed --open
+mkdir -p "${QWEN_HOME:-$HOME/.mariadb-shell-agent}"
+tar -xzf qwen-code-managed-runtime-darwin-arm64.tar.gz -C "${QWEN_HOME:-$HOME/.mariadb-shell-agent}"
+mariadb-shell-agent serve --managed --open
 ```
 
 The archive installs under
@@ -62,7 +62,7 @@ before creating application state. An incorrect JAVA_HOME is an error even if
 PATH contains another working Java. For example:
 
 ```sh
-JAVA_HOME=/absolute/java-21-home qwen serve --managed --open
+JAVA_HOME=/absolute/java-21-home mariadb-shell-agent serve --managed --open
 ```
 
 On macOS, JAVA_HOME typically ends in `Contents/Home`. Missing or incompatible
@@ -117,10 +117,10 @@ and retry after that interval; restarting processes does not clear ownership.
 ## Workspaces and persistent data
 
 The default private data directory is `<Qwen home>/managed-local`, normally
-`~/.qwen/managed-local`. Override it with:
+`~/.mariadb-shell-agent/managed-local`. Override it with:
 
 ```sh
-qwen serve --managed --managed-data-dir /absolute/private/data --open
+mariadb-shell-agent serve --managed --managed-data-dir /absolute/private/data --open
 ```
 
 The directory must be outside every Git worktree. One launcher may use it at

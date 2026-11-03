@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1207,8 +1208,14 @@ describe('createChannelManagementService', () => {
     const home = await fs.mkdtemp(
       path.join(os.tmpdir(), 'channel-management-home-'),
     );
-    await fs.mkdir(path.join(home, '.qwen'), { recursive: true });
-    const userSettingsPath = path.join(home, '.qwen', 'settings.json');
+    await fs.mkdir(path.join(home, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
+    const userSettingsPath = path.join(
+      home,
+      '.mariadb-shell-agent',
+      'settings.json',
+    );
     await fs.writeFile(
       userSettingsPath,
       JSON.stringify({

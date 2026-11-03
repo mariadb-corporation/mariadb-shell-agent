@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -82,7 +83,8 @@ const autofixContractsScript = readFileSync(autofixContractsScriptPath, 'utf8');
 // here, not in production.
 const loopOwnedLanesJson =
   workflow.match(/^ {2}LOOP_OWNED_LANES: '(.+)'$/m)?.[1] ?? '[]';
-const autofixRunnerScriptPath = '.qwen/skills/autofix/scripts/run-agent.mjs';
+const autofixRunnerScriptPath =
+  '.mariadb-shell-agent/skills/autofix/scripts/run-agent.mjs';
 const checkBotCredentialsStep =
   workflow.match(
     /- name: 'Check bot credentials'[\s\S]*?(?=\n[ ]{6}- name: 'Set up Node.js')/,
@@ -169,7 +171,7 @@ const showRunArtifactsStep =
   )?.[0] ?? '';
 const prepareQwenCliSteps =
   workflow.match(
-    /- name: 'Prepare Qwen Code CLI'[\s\S]*?(?=\n[ ]{6}- name: ')/g,
+    /- name: 'Prepare MariaDB Shell Agent CLI'[\s\S]*?(?=\n[ ]{6}- name: ')/g,
   ) ?? [];
 const assessCandidatesStep =
   workflow.match(
@@ -278,7 +280,7 @@ const hasSha256sum =
   }).status === 0;
 
 function readAutofixSkill() {
-  return readFileSync('.qwen/skills/autofix/SKILL.md', 'utf8');
+  return readFileSync('.mariadb-shell-agent/skills/autofix/SKILL.md', 'utf8');
 }
 
 // A step's timeout-minutes, per self-review arm (af-156): a plain number
@@ -5877,7 +5879,7 @@ describe('qwen-autofix workflow', () => {
       cmd: 'remove',
       labels: ['autofix/takeover'],
       deleteFails:
-        'gh: Delete "https://api.github.com/repos/QwenLM/qwen-code/issues/4041/labels/autofix%2Ftakeover": dial tcp 140.82.121.4:443: connect: connection refused',
+        'gh: Delete "https://api.github.invalid/repos/QwenLM/qwen-code/issues/4041/labels/autofix%2Ftakeover": dial tcp 140.82.121.4:443: connect: connection refused',
     });
     expect(releaseUrlFourOhFour.writes).toContain(
       'takeover-ack release-failed',
@@ -6470,7 +6472,7 @@ exit 1
       expect(calls).toContain(
         'https://ghes.example.com/QwenLM/qwen-code/actions/runs/30778039590',
       );
-      expect(calls).not.toContain('https://github.com/QwenLM');
+      expect(calls).not.toContain('https://github.invalid/QwenLM');
 
       writeFileSync(callsFile, '');
       const transientActorReporter = runReporter({ FAIL_ACTOR_ONCE: 'true' });
@@ -11113,7 +11115,7 @@ exit 1
           ...after,
           ...bot,
           in_reply_to_id: 1,
-          body: `R1-2 fixed by the guard rewrite ${marker}\n\n_— m via Qwen Code /review (v1)_`,
+          body: `R1-2 fixed by the guard rewrite ${marker}\n\n_— m via MariaDB Shell Agent /review (v1)_`,
         },
         { ...after, ...bot, in_reply_to_id: 1, body: `R1-3 fixed ${marker}` },
         // A `by` clause with an `n` in it — the double-backslash class let
@@ -11213,7 +11215,7 @@ exit 1
           {
             ...after,
             ...bot,
-            body: `R1-2 fixed by x ${marker}\n${tail}_— m via Qwen Code /review (v1)_`,
+            body: `R1-2 fixed by x ${marker}\n${tail}_— m via MariaDB Shell Agent /review (v1)_`,
           },
         ]),
       ).toBe('1');
@@ -11602,7 +11604,7 @@ exit 1
   it('surfaces the running model in every autofix report for diagnosis and attribution', () => {
     // The model is a repo variable (already the agent's OPENAI_MODEL), not a
     // secret, so it is safe to echo into a public comment. Each reporting
-    // step must plumb it in and render a footer that names Qwen Code and the
+    // step must plumb it in and render a footer that names MariaDB Shell Agent and the
     // model, with an empty-variable fallback so the footer never renders a
     // bare backtick pair. The footer prefers the model the session ACTUALLY
     // ran: run-agent.mjs writes the stream-json init event's resolved model
@@ -11616,7 +11618,7 @@ exit 1
     // executed replay below gates the ordering and the shell semantics;
     // these pins gate that all THREE copies carry them.
     const footer =
-      'echo "🧠 Handled by **Qwen Code** · model/模型 \\`${MODEL_DISPLAY}\\`${CLI_DISPLAY}"';
+      'echo "🧠 Handled by **MariaDB Shell Agent** · model/模型 \\`${MODEL_DISPLAY}\\`${CLI_DISPLAY}"';
     for (const step of [
       pushAndReportStep,
       reviewAddressReportStep,
@@ -11957,9 +11959,11 @@ exit 1
       expect(step).toContain('qwen-bin');
       expect(step).toContain('chmod +x "${qwen_bin}/qwen"');
       expect(step).toContain('echo "${qwen_bin}" >> "${GITHUB_PATH}"');
-      expect(step).toContain('qwen --version');
-      expect(step).not.toContain('current_version="$(qwen --version');
-      expect(step).not.toContain('Using pre-installed Qwen Code');
+      expect(step).toContain('mariadb-shell-agent --version');
+      expect(step).not.toContain(
+        'current_version="$(mariadb-shell-agent --version',
+      );
+      expect(step).not.toContain('Using pre-installed MariaDB Shell Agent');
       expect(step).not.toContain('npm install -g');
     }
     expect(workflow).not.toContain('run_shell_command(node dist/cli.js)');
@@ -13320,14 +13324,16 @@ exit 1
       // repo copy; the review address step runs AFTER the PR branch is
       // checked out and must invoke the TRUSTED STAGED copy instead.
       expect(step).toMatch(
-        /node (?:"\$\{RUNNER_TEMP\}\/autofix-skill\/scripts\/run-agent\.mjs"|\.qwen\/skills\/autofix\/scripts\/run-agent\.mjs)/,
+        /node (?:"\$\{RUNNER_TEMP\}\/autofix-skill\/scripts\/run-agent\.mjs"|\.mariadb-shell-agent\/skills\/autofix\/scripts\/run-agent\.mjs)/,
       );
-      expect(step).not.toContain('qwen --yolo --prompt "${PROMPT}"');
+      expect(step).not.toContain(
+        'mariadb-shell-agent --yolo --prompt "${PROMPT}"',
+      );
       expect(step).not.toContain('AUTOFIX_INVOCATION:');
       expect(step).not.toContain('qwen_status=$?');
       expect(step).not.toMatch(/PROMPT: \|-\n\s+\/autofix /);
       expect(step).not.toContain('for attempt in 1 2; do');
-      expect(step).not.toContain('Qwen Code failed on attempt');
+      expect(step).not.toContain('MariaDB Shell Agent failed on attempt');
     }
     // Full-line pins: the zh sibling must sit in the SAME rm -f. Substring
     // pins that stop at failure.md stay green when the zh argument is
@@ -13365,9 +13371,9 @@ exit 1
       'temporarily remove or negate the new guard or branch',
       'and confirm they FAIL; then restore it',
       'write a test that pins it (or drop the guard)',
-      '.qwen/skills/prepare-pr/SKILL.md',
-      '.qwen/skills/bugfix/SKILL.md',
-      '.qwen/skills/e2e-testing/SKILL.md',
+      '.mariadb-shell-agent/skills/prepare-pr/SKILL.md',
+      '.mariadb-shell-agent/skills/bugfix/SKILL.md',
+      '.mariadb-shell-agent/skills/e2e-testing/SKILL.md',
       'decision.json',
       'pr-title.txt',
       'pr-body.md',
@@ -13408,10 +13414,10 @@ exit 1
       .replace(/\/scripts\/run-agent\.mjs$/, '')
       .trim();
     expect(workflow).toContain(
-      `cp .qwen/skills/autofix/scripts/run-agent.mjs "${stagedRunner}"`,
+      `cp .mariadb-shell-agent/skills/autofix/scripts/run-agent.mjs "${stagedRunner}"`,
     );
     expect(workflow).toContain(
-      `cp .qwen/skills/autofix/SKILL.md "${stagedSkillDir}/SKILL.md"`,
+      `cp .mariadb-shell-agent/skills/autofix/SKILL.md "${stagedSkillDir}/SKILL.md"`,
     );
     expect(workflow).toContain(`mkdir -p "${stagedSkillDir}/scripts"`);
     expect(workflow).not.toContain('.github/scripts/build-autofix-prompt.mjs');
@@ -15020,7 +15026,8 @@ exit 1
       run({
         base: ({ write }) => write('src/a.ts', 'a\n'),
         pr: ({ write }) => write('src/a.ts', 'b\n'),
-        round: ({ write }) => write('.qwen/skills/autofix/SKILL.md', 'x\n'),
+        round: ({ write }) =>
+          write('.mariadb-shell-agent/skills/autofix/SKILL.md', 'x\n'),
       }),
     ).toContain('REJECT:round expands into CI/verification machinery');
     // The root manifest's workspaces array steers the gate's dispatch.
@@ -17443,7 +17450,10 @@ exit 1
       expect(reviewAddressJob).toContain(
         'gate-advisories.md growth-audit.json agent-api-error',
       );
-      const skill = readFileSync('.qwen/skills/autofix/SKILL.md', 'utf8');
+      const skill = readFileSync(
+        '.mariadb-shell-agent/skills/autofix/SKILL.md',
+        'utf8',
+      );
       expect(skill).toContain('Verification is SOURCE-BLIND');
       expect(skill).toContain('changed tests against the pre-round branch');
       expect(skill).toContain("outside the PR's own");
@@ -17504,10 +17514,10 @@ exit 1
       '"sandbox": "docker"',
     );
     expect(repairDeterministicRejectionStep).toContain(
-      'mkdir -p .qwen "${QWEN_HOME}"',
+      'mkdir -p .mariadb-shell-agent "${QWEN_HOME}"',
     );
     expect(repairDeterministicRejectionStep).toContain(
-      'printf \'%s\\n\' "${SETTINGS_JSON}" > .qwen/settings.json',
+      'printf \'%s\\n\' "${SETTINGS_JSON}" > .mariadb-shell-agent/settings.json',
     );
     expect(repairDeterministicRejectionStep).toContain(
       'echo "attempted=true" >> "${GITHUB_OUTPUT}"',
@@ -18685,23 +18695,40 @@ exit 1
           readFileSync(join('.github', 'scripts', name)),
         );
       }
-      mkdirSync(join(stageProbeDir, '.qwen', 'skills', 'autofix', 'scripts'), {
-        recursive: true,
-      });
-      writeFileSync(
-        join(stageProbeDir, '.qwen', 'skills', 'autofix', 'SKILL.md'),
-        readFileSync('.qwen/skills/autofix/SKILL.md'),
+      mkdirSync(
+        join(
+          stageProbeDir,
+          '.mariadb-shell-agent',
+          'skills',
+          'autofix',
+          'scripts',
+        ),
+        {
+          recursive: true,
+        },
       );
       writeFileSync(
         join(
           stageProbeDir,
-          '.qwen',
+          '.mariadb-shell-agent',
+          'skills',
+          'autofix',
+          'SKILL.md',
+        ),
+        readFileSync('.mariadb-shell-agent/skills/autofix/SKILL.md'),
+      );
+      writeFileSync(
+        join(
+          stageProbeDir,
+          '.mariadb-shell-agent',
           'skills',
           'autofix',
           'scripts',
           'run-agent.mjs',
         ),
-        readFileSync('.qwen/skills/autofix/scripts/run-agent.mjs'),
+        readFileSync(
+          '.mariadb-shell-agent/skills/autofix/scripts/run-agent.mjs',
+        ),
       );
       // The planted leftover: attacker content a same-UID run left at
       // the staged path on this persistent host. Both leftover shapes
@@ -24466,7 +24493,7 @@ describe('growth-audit hardening: park wake set and verdict pipeline (round 3)',
         checks: [
           {
             name: 'build',
-            workflowName: 'Qwen Code CI',
+            workflowName: 'MariaDB Shell Agent CI',
             conclusion: 'FAILURE',
             completedAt: '2026-01-02T00:00:00Z',
           },
@@ -25111,8 +25138,8 @@ describe('growth-audit hardening: park wake set and verdict pipeline (round 3)',
               `CONVERGENCE_BREAK_ROUNDS='3'\n` +
               `CONVERGENCE_SIGNAL_CODES='["root-cause-triage","successor-chain","batch-fixes","stem-surface"]'\n` +
               `CONFLICT_PARKED='false'\nMAIN_HEAD='mainsha'\nPR_HEAD_OID='prheadsha'\n` +
-              `CHECKS_JSON='[{"name":"Qwen Code CI","workflowName":"Qwen Code CI","conclusion":"FAILURE"}]'\n` +
-              `MAIN_GREEN_CHECKS='["Qwen Code CI"]'\n` +
+              `CHECKS_JSON='[{"name":"MariaDB Shell Agent CI","workflowName":"MariaDB Shell Agent CI","conclusion":"FAILURE"}]'\n` +
+              `MAIN_GREEN_CHECKS='["MariaDB Shell Agent CI"]'\n` +
               `BASE_UPDATE_CUTOFF='2025-12-31T00:00:00Z'\n` +
               `fleet_row() { :; }\n` +
               `gh() {\n` +
@@ -31238,7 +31265,7 @@ describe('review-address: regression accounting (af-157)', () => {
       name: 'Test',
       status: 'COMPLETED',
       conclusion: 'FAILURE',
-      workflowName: 'Qwen Code CI',
+      workflowName: 'MariaDB Shell Agent CI',
     },
   ];
   const GREEN = [
@@ -31246,7 +31273,7 @@ describe('review-address: regression accounting (af-157)', () => {
       name: 'Test',
       status: 'COMPLETED',
       conclusion: 'SUCCESS',
-      workflowName: 'Qwen Code CI',
+      workflowName: 'MariaDB Shell Agent CI',
     },
   ];
 
@@ -31736,7 +31763,7 @@ describe('run-agent idle watchdog', () => {
       const res = spawnSync(
         process.execPath,
         [
-          resolve('.qwen/skills/autofix/scripts/run-agent.mjs'),
+          resolve('.mariadb-shell-agent/skills/autofix/scripts/run-agent.mjs'),
           '--mode',
           'address-review',
           '--pr',

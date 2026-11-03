@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -63,8 +64,8 @@ export function isDeepSeekOfficialBaseUrl(
 
 function isDeepSeekMaasHostname(hostname: string): boolean {
   return (
-    hostname.endsWith('.maas.aliyuncs.com') ||
-    /^(?:dashscope(?:-intl|-us)?|cn-hongkong\.dashscope)\.aliyuncs\.com$/.test(
+    hostname.endsWith('.maas.aliyuncs.invalid') ||
+    /^(?:dashscope(?:-intl|-us)?|cn-hongkong\.dashscope)\.aliyuncs\.invalid$/.test(
       hostname,
     )
   );
@@ -92,8 +93,8 @@ export function isDeepSeekEstablishedHost(
   if (isDeepSeekMaasHostname(hostname)) return known;
   return (
     /^deepseek-v4\.1-flash(?:-1017)?$/.test(normalized) &&
-    (hostname.endsWith('.alibaba-inc.com') ||
-      hostname.endsWith('.aliyun-inc.com') ||
+    (hostname.endsWith('.alibaba-inc.invalid') ||
+      hostname.endsWith('.aliyun-inc.invalid') ||
       hostname.endsWith('.alicloudapi.com'))
   );
 }

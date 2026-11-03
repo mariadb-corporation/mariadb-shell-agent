@@ -42,4 +42,4 @@ The workspace-scoped channel worker group supplies activity and teardown through
 
 ## Verification
 
-Unit coverage targets registry state transitions and owner cleanup, admission drain rollback, alias batch deletion, busy/force/store-failure route behavior, bridge shutdown reason idempotence, memory-lane cancellation, SDK request encoding, and Web Shell feature and force guards. The E2E plan lives at `.qwen/e2e-tests/workspace-runtime-removal.md`.
+Unit coverage targets registry state transitions and owner cleanup, admission drain rollback, alias batch deletion, busy/force/store-failure route behavior, bridge shutdown reason idempotence, memory-lane cancellation, SDK request encoding, and Web Shell feature and force guards. The E2E plan lives at `.mariadb-shell-agent/e2e-tests/workspace-runtime-removal.md`.

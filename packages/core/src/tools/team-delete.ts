@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -79,7 +80,7 @@ class TeamDeleteInvocation extends BaseToolInvocation<
     // Belt-and-suspenders: a teammate's tool call that didn't
     // settle inside `manager.cleanup()`'s wait window can still
     // call `writeMessage`, which `mkdir(recursive)`s the inboxes
-    // directory and recreates `~/.qwen/teams/{name}/...` *after*
+    // directory and recreates `~/.mariadb-shell-agent/teams/{name}/...` *after*
     // we delete it — leaving an orphan dir that wedges the team
     // name on the next `team_create`. Sweep once more after a
     // short delay to catch the race.

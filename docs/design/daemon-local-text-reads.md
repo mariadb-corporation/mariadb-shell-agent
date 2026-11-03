@@ -60,13 +60,13 @@ not imply that every agent write or helper operation goes through WFS.
 
 A child-local text read does not emit WFS `fs.access`; direct external
 `read_file` retains its permission audit and core file-operation telemetry.
-Same-host reads run under the daemon user's OS identity. `qwen serve` assumes
+Same-host reads run under the daemon user's OS identity. `mariadb-shell-agent serve` assumes
 one machine, one UID, and one security principal; it is not an OS sandbox.
 
 ## Compatibility
 
 Only the default embedded daemon bridge and primary, static-secondary, and
-dynamic `qwen serve` workspace runtimes disable read delegation. The WFS
+dynamic `mariadb-shell-agent serve` workspace runtimes disable read delegation. The WFS
 adapter keeps its read implementation so an unexpected or
 capability-violating delegated read still reaches the workspace boundary and
 fails closed for external paths.

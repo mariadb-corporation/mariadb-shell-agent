@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -85,7 +86,7 @@ export interface FsStat {
 export interface FsEntry {
   name: string;
   kind: 'file' | 'directory' | 'symlink' | 'other';
-  /** True iff the entry matched a `.gitignore`/`.qwenignore` rule. */
+  /** True iff the entry matched a `.gitignore`/`.mariadb-shell-agentignore` rule. */
   ignored: boolean;
 }
 

@@ -8,7 +8,7 @@ Status: proposed and implemented in the same change.
 
 The Hosted Harness and the Java control plane must share one bearer token and one capability digest. The Harness reads them as `QWEN_SERVER_TOKEN` and `QWEN_HOSTED_HARNESS_CAPABILITY_DIGEST`; the control plane reads them as `QWEN_MANAGED_AGENT_HARNESS_TOKEN` and `QWEN_MANAGED_AGENT_CAPABILITY_DIGEST`. The reference distribution therefore stores each value twice, in `harness.env` and in `server.env`, and every rotation or hand edit must change both files identically. A mismatch surfaces only as a `401` from the Harness or a digest refusal at the first Session.
 
-Making the control plane read the Harness's variable names from its own environment, for example by loading `harness.env` into the control-plane unit, would remove the duplication but put `QWEN_SERVER_TOKEN` into the Java process environment. Every process that environment reaches would then receive a variable that `qwen serve` treats as its own bearer token.
+Making the control plane read the Harness's variable names from its own environment, for example by loading `harness.env` into the control-plane unit, would remove the duplication but put `QWEN_SERVER_TOKEN` into the Java process environment. Every process that environment reaches would then receive a variable that `mariadb-shell-agent serve` treats as its own bearer token.
 
 ## Goals
 

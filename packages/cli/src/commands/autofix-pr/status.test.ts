@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -520,7 +521,7 @@ describe('runStatus', () => {
     }
   });
 
-  it('keeps listing healthy watches when a sibling worktree has a malformed .qwen/tmp', () => {
+  it('keeps listing healthy watches when a sibling worktree has a malformed .mariadb-shell-agent/tmp', () => {
     execFileSync(
       'git',
       [
@@ -542,10 +543,13 @@ describe('runStatus', () => {
       cwd: repo,
     });
     try {
-      // The sibling's `.qwen/tmp` is a regular file, so reading it throws
+      // The sibling's `.mariadb-shell-agent/tmp` is a regular file, so reading it throws
       // ENOTDIR. One bad root must not abort the whole clone's listing.
-      mkdirSync(join(sibling, '.qwen'), { recursive: true });
-      writeFileSync(join(sibling, '.qwen', 'tmp'), 'not a directory');
+      mkdirSync(join(sibling, '.mariadb-shell-agent'), { recursive: true });
+      writeFileSync(
+        join(sibling, '.mariadb-shell-agent', 'tmp'),
+        'not a directory',
+      );
       const { watches } = runStatus({ work: false });
       expect(watches.map(({ pr }) => pr)).toEqual([7]);
     } finally {
@@ -718,8 +722,8 @@ describe('runStatus', () => {
   };
 
   it('surfaces a read failure of the primary worktree, not an empty listing', () => {
-    mkdirSync(join(repo, '.qwen'), { recursive: true });
-    writeFileSync(join(repo, '.qwen', 'tmp'), 'not a directory');
+    mkdirSync(join(repo, '.mariadb-shell-agent'), { recursive: true });
+    writeFileSync(join(repo, '.mariadb-shell-agent', 'tmp'), 'not a directory');
     expect(() => runStatus({})).toThrow();
   });
 
@@ -785,7 +789,7 @@ describe('runStatus', () => {
     }
   });
 
-  it('does not list a watch forged inside a watch worktree own .qwen/tmp', () => {
+  it('does not list a watch forged inside a watch worktree own .mariadb-shell-agent/tmp', () => {
     commitBase();
     const host = autofixPrPaths(repo, 3);
     addWatchWorktree(host);
@@ -836,7 +840,7 @@ describe('runStatus', () => {
       encoding: 'utf8',
     }).trim();
     // The checkout is the clone's main worktree: a .git directory, which
-    // the in-place trust check accepts and the watch's own .qwen/tmp files
+    // the in-place trust check accepts and the watch's own .mariadb-shell-agent/tmp files
     // are not the user's work.
     write(7, {
       inPlace: true,

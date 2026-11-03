@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,7 +20,9 @@ describe('extensions command', () => {
   });
 
   it('should have a description', () => {
-    expect(extensionsCommand.describe).toBe('Manage Qwen Code extensions.');
+    expect(extensionsCommand.describe).toBe(
+      'Manage MariaDB Shell Agent extensions.',
+    );
   });
 
   it('should require a subcommand', () => {

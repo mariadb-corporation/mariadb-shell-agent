@@ -1,12 +1,12 @@
 {
   "name": "@qwen-code/browser-use",
   "version": "0.27.0",
-  "description": "Browser Use SDK for the Qwen Code Node REPL",
+  "description": "Browser Use SDK for the MariaDB Shell Agent Node REPL",
   "type": "module",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/QwenLM/qwen-code.git",
+    "url": "git+https://github.invalid/QwenLM/qwen-code.git",
     "directory": "packages/browser-use"
   },
   "main": "dist/index.js",

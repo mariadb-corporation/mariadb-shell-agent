@@ -36,7 +36,7 @@ When Java projects a valid allowed public Plan Action, verify its input/Turn ass
 
 ## Attachment contract and model input
 
-Extend the closed public input union with `input_file` carrying `name`, `mime_type`, UTF-8 `text`, and `input_image` carrying `mime_type`, base64 `data`. Existing `input_text` and legacy `text` retain their behavior. Reject mixed or unknown fields, empty attachments, arbitrary URLs, host paths, binary files, malformed base64 and mismatched image signatures. Text attachments use a conservative text MIME/extension allowlist and reject NUL. Images support PNG, JPEG (including the `image/jpg` alias), GIF and WebP, matching ordinary Qwen Code's `PIPELINE_IMAGE_MIME_TYPES`. PDF, Office documents, audio and video are outside this change.
+Extend the closed public input union with `input_file` carrying `name`, `mime_type`, UTF-8 `text`, and `input_image` carrying `mime_type`, base64 `data`. Existing `input_text` and legacy `text` retain their behavior. Reject mixed or unknown fields, empty attachments, arbitrary URLs, host paths, binary files, malformed base64 and mismatched image signatures. Text attachments use a conservative text MIME/extension allowlist and reject NUL. Images support PNG, JPEG (including the `image/jpg` alias), GIF and WebP, matching ordinary MariaDB Shell Agent's `PIPELINE_IMAGE_MIME_TYPES`. PDF, Office documents, audio and video are outside this change.
 
 Apply the same image formats in the Managed composer and restored drafts, public OpenAPI contract, Java admission and Hosted parsing. Accept both `GIF87a` and `GIF89a` signatures, and validate `image/jpg` with the JPEG signature. Canonicalize the JPEG alias to `image/jpeg` before creating durable input or model parts and when restoring composer thumbnails, matching ordinary image ingestion and downstream provider/display requirements. Preserve original image bytes and canonical MIME types through digests, replay and projection. Align with the ordinary model-input pipeline rather than its broader file-recognition list; BMP, TIFF, HEIC and SVG image blocks remain unsupported. No transcoding or new storage is required. Deploy the UI, Java service and Harness together before relying on GIF or `image/jpg`; older validators reject them.
 
@@ -68,7 +68,7 @@ Capabilities are pinned when the Java Harness client is constructed. If an unsup
 
 ## Validation and acceptance criteria
 
-Use an isolated worktree, disposable MySQL 8.4 databases, separate ports and Workspaces, and deterministic local model responses. Never run tool-effect tests in the user's actual Session or reset its database. Dry-run the E2E plan against global `qwen`, recording unsupported baseline paths honestly. Verify the built artifact with the test-engineer agent.
+Use an isolated worktree, disposable MySQL 8.4 databases, separate ports and Workspaces, and deterministic local model responses. Never run tool-effect tests in the user's actual Session or reset its database. Dry-run the E2E plan against global `mariadb-shell-agent`, recording unsupported baseline paths honestly. Verify the built artifact with the test-engineer agent.
 
 Exercise new/existing built-in/custom Sessions, all three execution modes, Plan reads and zero-effect refusals, approve/deny/cancel/expiry, stale CAS and receipt replay, owner/grant isolation, Plan Action refresh, and crash recovery before/after its decision/result. Verify approved execution still uses the frozen permission and old Actions do not release a new Plan. Regress team-member planning and native approvals.
 

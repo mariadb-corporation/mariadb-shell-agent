@@ -17,7 +17,7 @@ The gap is deliberate on the daemon side: `general.outputLanguage` is listed in
 `TUI_ONLY_SETTINGS` (`packages/cli/src/serve/routes/workspace-settings.ts`), so
 `GET /workspace/settings` does not serve its descriptor. The reason is that
 persisting the key through `POST /workspace/settings` would only rewrite
-`settings.json`; it would not rewrite `~/.qwen/output-language.md` and would not
+`settings.json`; it would not rewrite `~/.mariadb-shell-agent/output-language.md` and would not
 refresh running sessions. That is the "persistence is not synchronization"
 rule documented in
 [User-Level Language Sync for the Daemon](2026-08-29-user-level-language-sync.md).
@@ -69,7 +69,7 @@ suggestion, means `auto` (follow the user's input language).
 Committing a value sends `/language output <value>` (an empty value sends
 `auto`) through the same session command channel used by `/language ui`. The
 daemon command writes the `output-language.md` the session actually reads (the
-project file when one exists, otherwise `~/.qwen/output-language.md`), persists
+project file when one exists, otherwise `~/.mariadb-shell-agent/output-language.md`), persists
 `general.outputLanguage` at user scope, refreshes hierarchical memory, and
 rebuilds the live system instruction. The panel then reloads
 `/workspace/settings` so the row reflects the persisted value.
@@ -83,7 +83,7 @@ without a restart.
 Output language is user-level. The row is only rendered on the User scope tab:
 the command has no workspace target, and showing the row under Workspace would
 imply an override that the write path cannot honor. A workspace
-`.qwen/output-language.md` continues to override the global file per project,
+`.mariadb-shell-agent/output-language.md` continues to override the global file per project,
 independently of this row.
 
 ## Failure matrix

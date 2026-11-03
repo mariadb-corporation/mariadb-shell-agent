@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -136,7 +137,7 @@ export interface CollectMemoryPressureSamplesOptions {
 }
 
 function defaultHeapSnapshotDir(): string {
-  return path.join(os.homedir(), '.qwen', 'memory-snapshots');
+  return path.join(os.homedir(), '.mariadb-shell-agent', 'memory-snapshots');
 }
 
 function formatSnapshotTimestamp(now: Date): string {
@@ -424,7 +425,7 @@ function buildMemoryInsights(diagnostics: MemoryDiagnostics): MemoryInsights {
       'V8 heap statistics are unavailable; heap pressure assessment may be incomplete.',
     );
     recommendations.push(
-      'Re-run /doctor memory after restarting Qwen Code; if V8 diagnostics remain unavailable, include this report when filing an issue.',
+      'Re-run /doctor memory after restarting MariaDB Shell Agent; if V8 diagnostics remain unavailable, include this report when filing an issue.',
     );
   }
 
@@ -433,7 +434,7 @@ function buildMemoryInsights(diagnostics: MemoryDiagnostics): MemoryInsights {
       'V8 heap usage is high; the process is close to its configured heap limit.',
     );
     recommendations.push(
-      'If the CLI is sluggish or near OOM, restart Qwen Code to recover memory, then capture a heap snapshot before the next restart to identify retained objects.',
+      'If the CLI is sluggish or near OOM, restart MariaDB Shell Agent to recover memory, then capture a heap snapshot before the next restart to identify retained objects.',
     );
   }
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1032,7 +1033,7 @@ describe('MemoryPressureMonitor', () => {
       for (let i = 0; i < 7; i++) {
         const filePath =
           i === 0
-            ? '/mock/project/.qwen/team-memory/feedback/testing.md'
+            ? '/mock/project/.mariadb-shell-agent/team-memory/feedback/testing.md'
             : `/f${i}.ts`;
         toolHistory.push(
           content(

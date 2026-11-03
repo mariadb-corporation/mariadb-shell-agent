@@ -1,11 +1,11 @@
 # 客户端文件系统桥（Client Filesystem Bridge）设计
 
-> 状态：设计草案（片2）。前置实证：片1 spike `.qwen/scripts/client-fs-spike/spike.mjs`（PASS，可重复运行）、片0 探针 `.qwen/scripts/fsa-probe/`。
+> 状态：设计草案（片2）。前置实证：片1 spike `.mariadb-shell-agent/scripts/client-fs-spike/spike.mjs`（PASS，可重复运行）、片0 探针 `.mariadb-shell-agent/scripts/fsa-probe/`。
 > 关联：`packages/chrome-extension/docs/05-daemon-direct-architecture.md`、`packages/chrome-extension/docs/06-plan-c-cdp-tunnel.md`（issue #5626）。
 
 ## 0. 目标与非目标
 
-**目标**：当 `qwen serve` daemon 跑在远端（云上）、Web Shell 跑在用户本地 Chrome 里时，让**指定会话**的 agent 能读写用户本机上一个**用户显式授权**的目录。
+**目标**：当 `mariadb-shell-agent serve` daemon 跑在远端（云上）、Web Shell 跑在用户本地 Chrome 里时，让**指定会话**的 agent 能读写用户本机上一个**用户显式授权**的目录。
 
 **非目标（v1 明确不做）**：
 
@@ -88,7 +88,7 @@ ACP 子进程
 | `queryPermission` = `prompt`                                               | 需要一次真实点击                          | 显示「重新连接本地目录」按钮（事实 17：无法自动触发）                                                                          |
 | `queryPermission` = `denied`                                               | 用户已拒绝                                | 引导去站点设置手动恢复，不提供静默重试                                                                                         |
 
-frame 与 secure-context 检测逻辑可直接搬 `.qwen/scripts/fsa-probe/probe.html` 的「环境」段（`isTopLevel` / `parentOriginRelation` / `isSecureContext` / `typeof showDirectoryPicker`）。
+frame 与 secure-context 检测逻辑可直接搬 `.mariadb-shell-agent/scripts/fsa-probe/probe.html` 的「环境」段（`isTopLevel` / `parentOriginRelation` / `isSecureContext` / `typeof showDirectoryPicker`）。
 
 ### 4.1 Desktop Shell 宿主（Tauri 2）
 
@@ -147,7 +147,7 @@ server 名要短（会进每个工具名，事实 5）：`local-files` → `mcp_
 - 会话路径在 `skipped` 时也会调 `removeSessionRuntimeMcpServer`（owner-scoped catch 统一兜底，桥侧幂等）；workspace 路径在 `skipped` 时不调 remove。前者照的是 channels 的生产代码，后者是既有行为，两边各有测试钉住。
 - `alwaysLoadTools: true` **只加在会话路径**。workspace 路径今天没有生产客户端，顺手改它属于未被请求的行为变更。
 
-验证：`npm run build --workspace=packages/cli` 干净；`client-mcp-sender-registry.test.ts`（16）+ `client-mcp-ws.test.ts`（8）全绿，新增 9 条覆盖会话作用域（只加到该会话、跨会话与无 session context 硬拒绝、按 scope 拆除、peer 抢占不误删、skipped/shadowed 回滚、非法 sessionId、scope 透传）；`.qwen/scripts/client-fs-spike/spike.mjs` 对真实 daemon 重跑仍 `SPIKE: PASS`，证明无 `sessionId` 的 workspace 路径无回归。
+验证：`npm run build --workspace=packages/cli` 干净；`client-mcp-sender-registry.test.ts`（16）+ `client-mcp-ws.test.ts`（8）全绿，新增 9 条覆盖会话作用域（只加到该会话、跨会话与无 session context 硬拒绝、按 scope 拆除、peer 抢占不误删、skipped/shadowed 回滚、非法 sessionId、scope 透传）；`.mariadb-shell-agent/scripts/client-fs-spike/spike.mjs` 对真实 daemon 重跑仍 `SPIKE: PASS`，证明无 `sessionId` 的 workspace 路径无回归。
 
 **尚未做**：`docs/developers/qwen-serve-protocol.md` 里没有 `mcp_register` 的帧级规范（只有 capability tag 行），所以本次没有文档同步义务；若后续要把反向通道作为公开协议，需要补帧契约一节。
 
@@ -196,7 +196,7 @@ server 名要短（会进每个工具名，事实 5）：`local-files` → `mcp_
 - `client.ts:1117-1119` 在工具刷新时调 `queueMcpServerInstructionsReminder(toolRegistry.getMcpServerInstructions())`；该方法按 `serverName + 文本` 做增量 diff（`client.ts:1824-1841`），server 消失时撤掉已公告记录，所以断开再连会重新公告；`drainPendingMcpServerInstructionsReminder()`（`client.ts:1843-1860`）把它作为 `role:'user'` 消息注入历史。
 - 另外 `alwaysLoadTools: true` 让这 4 个工具**不进 deferred/tool_search 桶**，直接出现在 `toolRegistry.getFunctionDeclarations()` → `setTools()` 的工具 schema 里，每个描述都写明文件在用户本机并带上授权目录名。（注意 `queueAddedMcpToolsReminder` 的入参是 `deferredTools`，所以"MCP 工具新增"那条 reminder 不覆盖本桥——但工具本来就在 schema 里，这比 reminder 更强。）
 
-**组合验收已跑通（`.qwen/scripts/client-fs-spike/accept-local-files.mjs`，`ACCEPTANCE: PASS`）**：真 HOME + 真模型凭证 + 真 Chrome + 真 FSA 授权，无任何文件系统桩。判据是一个只存在于 canary 文件里的随机 token（不在 prompt 中、不可猜测）出现在会话 SSE 流里——它只可能经"模型调桥工具 → 浏览器用 FSA 读盘 → 字节回传"这条路到达。实测流从 ~37k 心跳基线涨到 61,369 字符。
+**组合验收已跑通（`.mariadb-shell-agent/scripts/client-fs-spike/accept-local-files.mjs`，`ACCEPTANCE: PASS`）**：真 HOME + 真模型凭证 + 真 Chrome + 真 FSA 授权，无任何文件系统桩。判据是一个只存在于 canary 文件里的随机 token（不在 prompt 中、不可猜测）出现在会话 SSE 流里——它只可能经"模型调桥工具 → 浏览器用 FSA 读盘 → 字节回传"这条路到达。实测流从 ~37k 心跳基线涨到 61,369 字符。
 
 daemon 日志给出独立佐证的时间线：`16:42:50` 浏览器 attach 会话（`SSE stream opened`）→ `16:44:48` `bridge sendPrompt` + `POST /session/:id/prompt 202` → `16:44:54` `prompt turn completed`（约 6 秒一轮）→ `16:44:54` `DELETE /session/:id 204`（清理成功）。
 
@@ -211,7 +211,7 @@ daemon 日志给出独立佐证的时间线：`16:42:50` 浏览器 attach 会话
 1. **`/acp` 不在 Vite dev 代理表里**（`/voice/stream`、`/terminal` 都在且都带 `ws: true`）。生产环境页面源就是 daemon，`/acp` 同源所以没事；但 dev 模式下桥会连到 Vite 而不是 daemon，永久停在 `connecting`。已按既有模式补上 `'^/acp/?$': { ...daemonProxy, ws: true }`（精确路径正则，避免前缀遮蔽客户端源模块，理由同 `/voice/stream` 的注释）。
 2. **StatusBar 是错误的插入点。** `<StatusBar>` 全仓只有一个渲染点（`App.tsx:15953`），且是 `CustomFooter = renderFooter` 这个**宿主 render prop 缺席时的 fallback**；那里 `compact={true}` 是硬编码的。于是 StatusBar 里所有 `!compact` 的内容——设置齿轮、mode 指示器、快捷键——在真实应用里都不渲染。入口已改到**侧边栏底部**（daemon 状态按钮旁），并按既有约定加了可被宿主裁剪的 `footerItems` 项 `'localFiles'`（类型联合 + `DEFAULT_FOOTER_ITEMS`）。触发器改成朴素 `<button>` 且 `triggerClassName` **必填**，由侧边栏传自己的 `styles.collapseButton`，避免发明第二套按钮样式。
 
-**端到端已贯通（`.qwen/scripts/client-fs-spike/e2e-browser.mjs`，`E2E: PASS`）**：真 daemon + Vite dev（直接服务 TS 源码，无需构建 web-shell）+ 真 Chromium。从侧边栏点进去 → popover → 「Connect a directory…」→ 页面开真实 `/acp` WebSocket（穿过 dev 代理）→ ACP initialize → `mcp_register {server:'local-files', sessionId}` → **真实 ACP 子进程**对页面托管的 server 跑完 MCP 发现 → UI 显示 `Connected` + `4 tools` → Disconnect 回到 `Not connected`。IndexedDB 用的是 Chromium 真实的实现，不是假件。
+**端到端已贯通（`.mariadb-shell-agent/scripts/client-fs-spike/e2e-browser.mjs`，`E2E: PASS`）**：真 daemon + Vite dev（直接服务 TS 源码，无需构建 web-shell）+ 真 Chromium。从侧边栏点进去 → popover → 「Connect a directory…」→ 页面开真实 `/acp` WebSocket（穿过 dev 代理）→ ACP initialize → `mcp_register {server:'local-files', sessionId}` → **真实 ACP 子进程**对页面托管的 server 跑完 MCP 发现 → UI 显示 `Connected` + `4 tools` → Disconnect 回到 `Not connected`。IndexedDB 用的是 Chromium 真实的实现，不是假件。
 
 只有一处是假的：`window.showDirectoryPicker` 被替换成最小假句柄——原生目录对话框无法自动化。因此**已证明**的是"浏览器 bundle → 真实反向通道 → 会话级注册 → 子进程发现"这条链；**仍未证明**的是"一次真实 `tools/call` 打到真实 FSA 句柄上"。那一环由两侧分别覆盖：daemon 侧 `client-mcp-ws.test.ts:235`（register → tools/list → tools/call over WS），浏览器侧 `local-directory.test.ts` + `mcp-server.test.ts`（真实 FSA 行为另由片0 探针在真 Chrome 里验过）。**组合起来没跑过**，需要一次带模型的验收（见 §10）。
 
@@ -224,8 +224,8 @@ daemon 日志给出独立佐证的时间线：`16:42:50` 浏览器 attach 会话
 
 ## 10. 验证
 
-- `.qwen/scripts/client-fs-spike/spike.mjs` 保留为回归（对真实 daemon，零源码改动，`SPIKE: PASS` 为门槛）。
-- E2E 测试计划写入 `.qwen/e2e-tests/`：顶层标签页连接 → agent 读写本地文件 → 刷新静默恢复 → 关 tab 自动摘除 → 跨会话调用被拒 → 侧边栏 iframe 降级为「新标签页打开」。
+- `.mariadb-shell-agent/scripts/client-fs-spike/spike.mjs` 保留为回归（对真实 daemon，零源码改动，`SPIKE: PASS` 为门槛）。
+- E2E 测试计划写入 `.mariadb-shell-agent/e2e-tests/`：顶层标签页连接 → agent 读写本地文件 → 刷新静默恢复 → 关 tab 自动摘除 → 跨会话调用被拒 → 侧边栏 iframe 降级为「新标签页打开」。
 
 ## 11. 未决
 

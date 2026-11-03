@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -56,12 +57,12 @@ describe('POST /live/setup', () => {
   it('forwards an endpoint to the controller', async () => {
     const { app, update } = createApp();
     const response = await request(app).post('/live/setup').send({
-      endpoint: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+      endpoint: 'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
     });
 
     expect(response.status).toBe(200);
     expect(update).toHaveBeenCalledWith({
-      endpoint: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+      endpoint: 'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
     });
   });
 

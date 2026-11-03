@@ -36,13 +36,13 @@ Core Config 仅调整受限工具注册表/允许列表，并拒绝自定义文�
 
 单测覆盖默认委托、无宿主 mkdir/write 的策略路由、版本变化与目标新出现/消失、普通文件限制、worker 结构化失败和自定义 adapter 拒绝。保留已有 Write/Edit/Read 测试。在真实 Linux 驱动生产 Read/Write/Edit 回合，验证受限注册表、Unicode 与非 UTF-8 字节、BOM/CRLF、已有 mode、嵌套创建、允许和拒绝的链接遍历、只读拒绝、两个 runtime 上限，以及取消不重放。增加确定性的 worker 版本冲突测试和超过旧 1 MiB 上限的内容测试。证明 PDF 在辅助进程启动前被拒绝。重跑既有 Shell 生命周期与 adapter 测试。
 
-验收要求 build、typecheck、bundle、定向测试、最终源码/artifact hash 一致、两轮干净自审及独立审查。精确结果与限制记录在 .qwen/e2e-tests/runtime-file-sandbox.md。本内部阶段没有未解决的设计选择。
+验收要求 build、typecheck、bundle、定向测试、最终源码/artifact hash 一致、两轮干净自审及独立审查。精确结果与限制记录在 .mariadb-shell-agent/e2e-tests/runtime-file-sandbox.md。本内部阶段没有未解决的设计选择。
 
 ## 验证结果
 
 2026-09-16，实施前的全局 qwen 0.23.4 基线完成了七次真实 Read/Edit 调用。在记录的 revision `661f5416f2b0e9c73a47582fac742ef78d777a3d` 上，候选产物在 Lima qwen-sbx、ARM64 Linux 7.0.0-31-generic、Node 22.22.1、bubblewrap 0.11.1 上通过 31 组生产 headless runtime 检查和 34 组 adapter/worker 检查。这些冻结的测量只描述该 revision 及其记录的 artifact；后续审查修复需要在准确 head 上重新验证。测量覆盖原有 Shell 生命周期、私有 PID namespace 清理、文件语义、越界写拒绝和启动失败不在宿主重放。worker 套件通过了超过 1 MiB 的原始二进制内容、空内容、权限/符号链接保留、目标变化/替换/删除/新出现冲突和 FIFO 拒绝。
 
-Build、typecheck 和 bundle 通过。定向 core 与 CLI 单测通过 3,328 项，另有一项原有跳过。runtime 产物的 4,791 个源码输入匹配，launcher SHA-256 为 `18a7a557bf41e8ecc3baa3de1a6826fccc21a7fb93cbac3f49584d83a362b8e1`。adapter 产物的 278 个输入匹配，其 worker SHA-256 `439e880137e0ef7ab383fb54f8d4f42804a406e363c6513468a102c7f90e3a18` 与生产 bundle worker 一致。精确证据与清理记录在 `.qwen/e2e-tests/runtime-file-sandbox.md`。
+Build、typecheck 和 bundle 通过。定向 core 与 CLI 单测通过 3,328 项，另有一项原有跳过。runtime 产物的 4,791 个源码输入匹配，launcher SHA-256 为 `18a7a557bf41e8ecc3baa3de1a6826fccc21a7fb93cbac3f49584d83a362b8e1`。adapter 产物的 278 个输入匹配，其 worker SHA-256 `439e880137e0ef7ab383fb54f8d4f42804a406e363c6513468a102c7f90e3a18` 与生产 bundle worker 一致。精确证据与清理记录在 `.mariadb-shell-agent/e2e-tests/runtime-file-sandbox.md`。
 
 Linux 证据覆盖上述 ARM64 环境。Linux x64、其他内核、公开前端启用和 Landlock 尚未验证或实现。取消与不确定回执处理由现有真实 Linux adapter 生命周期检查和文件 client 单测拒绝路径共同覆盖；runtime 文件用例没有中断正在执行的文件提交。不承诺原子 compare-and-swap 或通用回滚。
 

@@ -1238,7 +1238,7 @@ describe('purgeSingleScopeOrphans', () => {
     const removeSessionId = vi.fn(() => true);
     // In daemon mode the shared router persists to its own routes.json, not
     // this channel's sessions.json, which may still hold a stale cwd from an
-    // earlier standalone `qwen channel start`. The record must carry the
+    // earlier standalone `mariadb-shell-agent channel start`. The record must carry the
     // router's value, not the stale file's.
     const persistPath = '/tmp/daemon-workspace/routes.json';
     const router = {

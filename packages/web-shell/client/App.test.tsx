@@ -15757,7 +15757,7 @@ describe('App read-only local commands mid-turn', () => {
           },
           builtinTools: [{ name: 'read_file', tokens: 120 }],
           mcpTools: [],
-          memoryFiles: [{ path: 'QWEN.md', tokens: 50 }],
+          memoryFiles: [{ path: 'MARIADB-SHELL-AGENT.md', tokens: 50 }],
           skills: [],
         },
         formattedText: 'Context usage: 1.2k / 131k tokens',
@@ -23361,7 +23361,7 @@ describe('App session callbacks', () => {
         },
         {
           id: 'live',
-          cwd: '/Users/test/Documents/Qwen Code/Conversations',
+          cwd: '/Users/test/Documents/MariaDB Shell Agent/Conversations',
           displayName: 'Conversations',
           primary: false,
           trusted: true,
@@ -27087,7 +27087,7 @@ describe('App session callbacks', () => {
         { id: 'primary', cwd: '/workspace', primary: true, trusted: true },
         {
           id: 'live',
-          cwd: '/Users/test/Documents/Qwen Code/Conversations',
+          cwd: '/Users/test/Documents/MariaDB Shell Agent/Conversations',
           primary: false,
           trusted: true,
           kind: 'live',
@@ -27102,7 +27102,8 @@ describe('App session callbacks', () => {
         new CustomEvent('qwen:open-session', {
           detail: {
             sessionId: 'live-coordinator',
-            workspaceCwd: '/Users/test/Documents/Qwen Code/Conversations',
+            workspaceCwd:
+              '/Users/test/Documents/MariaDB Shell Agent/Conversations',
           },
         }),
       );
@@ -43775,7 +43776,7 @@ describe('App session callbacks', () => {
     expect(mockStore.dispatch).not.toHaveBeenCalledWith([
       expect.objectContaining({
         type: 'status',
-        text: 'The change was saved, but running sessions could not be refreshed. Restart qwen serve before using the updated model list.',
+        text: 'The change was saved, but running sessions could not be refreshed. Restart mariadb-shell-agent serve before using the updated model list.',
       }),
     ]);
 
@@ -43809,7 +43810,7 @@ describe('App session callbacks', () => {
       {
         type: 'status',
         promptId: expect.stringMatching(/^local-command:/),
-        text: 'The change was saved, but running sessions could not be refreshed. Restart qwen serve before using the updated model list.',
+        text: 'The change was saved, but running sessions could not be refreshed. Restart mariadb-shell-agent serve before using the updated model list.',
       },
     ]);
   });
@@ -43851,7 +43852,7 @@ describe('App session callbacks', () => {
     expect(mockStore.dispatch).not.toHaveBeenCalledWith([
       expect.objectContaining({
         type: 'status',
-        text: 'The change was saved, but running sessions could not be refreshed. Restart qwen serve before using the updated model list.',
+        text: 'The change was saved, but running sessions could not be refreshed. Restart mariadb-shell-agent serve before using the updated model list.',
       }),
     ]);
     expect(mockStore.dispatch).not.toHaveBeenCalledWith([

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +22,7 @@ import {
  * which reports BARE, lowercase addresses and carries the scope separately in
  * `scopeid` — was exercised by nothing, and deleting it shipped green.
  *
- * What a lost normalisation step costs: `qwen serve --hostname <own address>
+ * What a lost normalisation step costs: `mariadb-shell-agent serve --hostname <own address>
  * --tls-cert … --channel telegram` binds fine and then refuses its own bind
  * with "does not name an address on this host … Bind to … a literal address of
  * one of this machine's interfaces" — at boot, and again in

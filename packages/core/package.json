@@ -2,10 +2,10 @@
   "name": "@qwen-code/qwen-code-core",
   "private": true,
   "version": "0.26.5",
-  "description": "Qwen Code Core",
+  "description": "MariaDB Shell Agent Core",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/QwenLM/qwen-code.git"
+    "url": "git+https://github.invalid/QwenLM/qwen-code.git"
   },
   "type": "module",
   "main": "dist/index.js",

@@ -28,12 +28,13 @@ function run(overrides = {}) {
   return {
     databaseId: 11,
     name: 'E2E Tests',
-    workflowName: 'Qwen Code CI',
+    workflowName: 'MariaDB Shell Agent CI',
     status: 'COMPLETED',
     conclusion: 'FAILURE',
     startedAt: '2026-07-12T07:10:00.000Z',
     completedAt: '2026-07-12T07:20:00.000Z',
-    detailsUrl: 'https://github.com/QwenLM/qwen-code/actions/runs/123/job/1',
+    detailsUrl:
+      'https://github.invalid/QwenLM/qwen-code/actions/runs/123/job/1',
     ...overrides,
   };
 }
@@ -121,7 +122,7 @@ function client(overrides = {}) {
 }
 
 describe('ci flaky rerun patrol', () => {
-  it('selects only recent stale current Qwen Code CI failures', () => {
+  it('selects only recent stale current MariaDB Shell Agent CI failures', () => {
     const selected = selectCandidateTargets(
       [
         pr({
@@ -134,7 +135,7 @@ describe('ci flaky rerun patrol', () => {
               completedAt: null,
               startedAt: '2026-07-12T07:40:00.000Z',
               detailsUrl:
-                'https://github.com/QwenLM/qwen-code/actions/runs/124/job/2',
+                'https://github.invalid/QwenLM/qwen-code/actions/runs/124/job/2',
             }),
           ],
         }),
@@ -146,7 +147,7 @@ describe('ci flaky rerun patrol', () => {
               databaseId: 13,
               conclusion: 'TIMED_OUT',
               detailsUrl:
-                'https://github.com/QwenLM/qwen-code/actions/runs/125/job/3',
+                'https://github.invalid/QwenLM/qwen-code/actions/runs/125/job/3',
             }),
           ],
         }),
@@ -178,7 +179,7 @@ describe('ci flaky rerun patrol', () => {
             run({
               completedAt: '2026-07-12T06:00:00.000Z',
               detailsUrl:
-                'https://github.com/QwenLM/qwen-code/actions/runs/121/job/1',
+                'https://github.invalid/QwenLM/qwen-code/actions/runs/121/job/1',
             }),
           ],
         }),
@@ -200,7 +201,7 @@ describe('ci flaky rerun patrol', () => {
               name: 'Unit Tests',
               completedAt: '2026-07-12T07:25:00.000Z',
               detailsUrl:
-                'https://github.com/QwenLM/qwen-code/actions/runs/124/job/2',
+                'https://github.invalid/QwenLM/qwen-code/actions/runs/124/job/2',
             }),
           ],
         }),
@@ -377,7 +378,7 @@ describe('ci flaky rerun patrol', () => {
               conclusion: 'SUCCESS',
               completedAt: '2026-07-12T07:30:00.000Z',
               detailsUrl:
-                'https://github.com/QwenLM/qwen-code/actions/runs/124/job/2',
+                'https://github.invalid/QwenLM/qwen-code/actions/runs/124/job/2',
             }),
           ],
         }),
@@ -418,7 +419,7 @@ describe('ci flaky rerun patrol', () => {
       { prNumber: 42, runId: 99, repo: 'QwenLM/qwen-code' },
     );
     expect(body).toContain(deflakeMarker(flaky()));
-    expect(body).toContain('.qwen/skills/deflake/SKILL.md');
+    expect(body).toContain('.mariadb-shell-agent/skills/deflake/SKILL.md');
     expect(body).toContain(flaky().file);
     expect(body).toContain('<summary>中文说明</summary>');
     expect(body).toContain('/actions/runs/99');
@@ -443,7 +444,9 @@ describe('ci flaky rerun patrol', () => {
       'autofix/approved',
     ]);
     expect(created.body).toContain(deflakeMarker(flaky()));
-    expect(created.body).toContain('.qwen/skills/deflake/SKILL.md');
+    expect(created.body).toContain(
+      '.mariadb-shell-agent/skills/deflake/SKILL.md',
+    );
     expect(created.body).toContain('<details>');
     expect(created.body).toContain('中文说明');
     // Idempotent: an already-open deflake issue for this test → no second issue.
@@ -516,7 +519,7 @@ describe('ci flaky rerun patrol', () => {
     expect(body).not.toContain('`@owner`');
     // The whole marker + SKILL pointer survive intact.
     expect(body).toContain(deflakeMarker(evil));
-    expect(body).toContain('.qwen/skills/deflake/SKILL.md');
+    expect(body).toContain('.mariadb-shell-agent/skills/deflake/SKILL.md');
   });
 
   it('points the run link at the patrol repo, not a hardcoded upstream', async () => {
@@ -655,7 +658,7 @@ describe('ci flaky rerun patrol', () => {
         statusCheckRollup: [
           run({
             detailsUrl:
-              'https://github.com/QwenLM/qwen-code/actions/runs/123/job/2',
+              'https://github.invalid/QwenLM/qwen-code/actions/runs/123/job/2',
           }),
         ],
       }),
@@ -689,7 +692,7 @@ describe('ci flaky rerun patrol', () => {
             headRefOid: prNumber === 42 ? 'abc123' : 'def456',
             statusCheckRollup: [
               run({
-                detailsUrl: `https://github.com/QwenLM/qwen-code/actions/runs/${prNumber === 42 ? 123 : 124}/job/1`,
+                detailsUrl: `https://github.invalid/QwenLM/qwen-code/actions/runs/${prNumber === 42 ? 123 : 124}/job/1`,
               }),
             ],
           }),

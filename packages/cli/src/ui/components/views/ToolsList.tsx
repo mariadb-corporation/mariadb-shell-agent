@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,7 +25,7 @@ export const ToolsList: React.FC<ToolsListProps> = ({
 }) => (
   <Box flexDirection="column">
     <Text bold color={theme.text.primary}>
-      {t('Available Qwen Code CLI tools:')}
+      {t('Available MariaDB Shell Agent CLI tools:')}
     </Text>
     <Box height={1} />
     {tools.length > 0 ? (

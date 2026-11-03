@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Configuration for ACP message rewriting.
- * Loaded from .qwen/settings.json under "messageRewrite" key.
+ * Loaded from .mariadb-shell-agent/settings.json under "messageRewrite" key.
  */
 export interface MessageRewriteConfig {
   /** Whether message rewriting is enabled */

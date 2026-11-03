@@ -8,7 +8,7 @@
 
 Hosted Harness 和 Java 控制面必须共享同一个 bearer token 和同一个 capability digest。Harness 以 `QWEN_SERVER_TOKEN` 和 `QWEN_HOSTED_HARNESS_CAPABILITY_DIGEST` 读取它们，控制面则以 `QWEN_MANAGED_AGENT_HARNESS_TOKEN` 和 `QWEN_MANAGED_AGENT_CAPABILITY_DIGEST` 读取。因此参考发行包把每个值存了两份，分别在 `harness.env` 和 `server.env` 里，每次轮换或手工修改都必须同样地改两个文件。不一致只会在 Harness 返回 `401`、或第一个 Session 时 digest 被拒绝时才暴露。
 
-如果让控制面从自身环境读取 Harness 的变量名（例如把 `harness.env` 也加载进控制面的 unit），确实能消除重复，但会把 `QWEN_SERVER_TOKEN` 放进 Java 进程环境。这个环境所到之处的每个进程，都会收到一个被 `qwen serve` 当作自身 bearer token 的变量。
+如果让控制面从自身环境读取 Harness 的变量名（例如把 `harness.env` 也加载进控制面的 unit），确实能消除重复，但会把 `QWEN_SERVER_TOKEN` 放进 Java 进程环境。这个环境所到之处的每个进程，都会收到一个被 `mariadb-shell-agent serve` 当作自身 bearer token 的变量。
 
 ## 目标
 

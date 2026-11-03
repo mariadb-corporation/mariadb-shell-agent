@@ -2,11 +2,11 @@
 
 [English](2026-09-29-managed-tool-result-public-projection.md) | [简体中文](2026-09-29-managed-tool-result-public-projection.zh-CN.md)
 
-状态：本次改动包含实现，默认关闭，开放前须完成部署验证。调研日期：2026-09-29；实现日期：2026-09-30。属于 [#12380](https://github.com/QwenLM/qwen-code/issues/12380)。
+状态：本次改动包含实现，默认关闭，开放前须完成部署验证。调研日期：2026-09-29；实现日期：2026-09-30。属于 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380)。
 
 ## 1. 基线与目标
 
-调研使用 main 的 `be1ebc74d7f5b0bdce2b88a6565d4940d5a6b3c0`、O2 [#12894](https://github.com/QwenLM/qwen-code/pull/12894) 的 `0172d5ecae7a3a11824665800211241d24472cd6`，以及[原工具结果设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-tool-result-artifacts.zh-CN.md)。此基线中 O2 尚未合入。本实现已在 O2 合入后变基到 main 的 `3b18cfe5e4ab7ea72f1a92736186dacf753bf727`，包含其最新的重试和取消修复；本地测试不能证明真实 OSS 或跨宿主已经可用。
+调研使用 main 的 `be1ebc74d7f5b0bdce2b88a6565d4940d5a6b3c0`、O2 [#12894](https://github.invalid/QwenLM/qwen-code/pull/12894) 的 `0172d5ecae7a3a11824665800211241d24472cd6`，以及[原工具结果设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-tool-result-artifacts.zh-CN.md)。此基线中 O2 尚未合入。本实现已在 O2 合入后变基到 main 的 `3b18cfe5e4ab7ea72f1a92736186dacf753bf727`，包含其最新的重试和取消修复；本地测试不能证明真实 OSS 或跨宿主已经可用。
 
 O3 让持久记录的工具结果可以通过 Java 公共 API 和 Managed WebShell 被发现和读取。Runtime 与 Harness 退出后，用户仍能查看有界预览、下载获授权的不可变输出；实时事件和恢复后的历史指向同一份结果。命令成功、捕获完整、交付提交和内容当前可读是四个独立事实。
 
@@ -132,7 +132,7 @@ materializer 用数据库租约和 fencing token 领取有界工作。首片验�
 
 ## 5. 公开契约与事件恢复
 
-canonical OpenAPI 继续作为 Java 契约测试和 WebShell 类型生成的来源。本改动变基到 main 后，以 OpenAPI v1.27.0 和 Flyway V26 实现下列七条路由及其 handler/一致性测试。版本编号已对齐合入的 O2 migration 和并行契约工作，包括 [#12998](https://github.com/QwenLM/qwen-code/pull/12998) 。
+canonical OpenAPI 继续作为 Java 契约测试和 WebShell 类型生成的来源。本改动变基到 main 后，以 OpenAPI v1.27.0 和 Flyway V26 实现下列七条路由及其 handler/一致性测试。版本编号已对齐合入的 O2 migration 和并行契约工作，包括 [#12998](https://github.invalid/QwenLM/qwen-code/pull/12998) 。
 
 | 入口           | 操作                                                                                  |
 | -------------- | ------------------------------------------------------------------------------------- |
@@ -220,16 +220,16 @@ Managed provider 暴露明确的 `downloadArtifact` 操作，由宿主 streaming
 
 O3 增加公开引用映射和读取准入，O4 负责物理垃圾回收。只要 pending/ready result 仍依赖它，就保留源回执、binding 身份、outcome、manifest、page 和 segment。O2 当前保留已用/结果不确定的内容，不自动 GC；O3 不能新增破坏该保证的 TTL 清理。未来 O4 启用删除前，必须覆盖公开引用、投影回填窗口及进行中的读取 hold。
 
-| 失败                                                                      | 必须得到的结果                                                                                                                                 |
-| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| 回执提交后、投影前进程退出                                                | 待投影行持久存在，替代 materializer 发布原源。                                                                                                 |
-| 对象 I/O 成功、公开投影事务失败                                           | 重试同一源；失败事务不能泄露公开事件或部分 Artifact 成员。                                                                                     |
-| 投影提交、响应/SSE 丢失                                                   | 结果/列表/Snapshot 恢复返回相同 ID 和 revision。                                                                                               |
-| Turn 先完成                                                               | 迟到结果更新已结算 Item，不产生新 Turn 或模型续跑。                                                                                            |
-| Session 删除与投影竞争                                                    | Session 行门禁阻止删除开始后的公开写入；源按恢复策略保留或 suppressed。                                                                        |
-| range/下载过程中撤权                                                      | 按约定 chunk 边界停止后续交付，不触发 Runtime 操作。（自 2026-10-02 起，issue #13181：在复检窗口到期后的第一个 chunk 边界停止，默认 5 秒。）   |
-| 已接受 bytes 损坏或丢失                                                   | 可用性变为 unavailable，诊断有界；原执行/捕获事实保留。                                                                                        |
-| 未确认的 publication candidate 操作 deadline 在持久 finish/receipt 前到期 | 不公开已接受 Artifact；该 liveness 策略由 [#13019](https://github.com/QwenLM/qwen-code/issues/13019) 负责，不表示保留的 publication 数据过期。 |
+| 失败                                                                      | 必须得到的结果                                                                                                                                     |
+| ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 回执提交后、投影前进程退出                                                | 待投影行持久存在，替代 materializer 发布原源。                                                                                                     |
+| 对象 I/O 成功、公开投影事务失败                                           | 重试同一源；失败事务不能泄露公开事件或部分 Artifact 成员。                                                                                         |
+| 投影提交、响应/SSE 丢失                                                   | 结果/列表/Snapshot 恢复返回相同 ID 和 revision。                                                                                                   |
+| Turn 先完成                                                               | 迟到结果更新已结算 Item，不产生新 Turn 或模型续跑。                                                                                                |
+| Session 删除与投影竞争                                                    | Session 行门禁阻止删除开始后的公开写入；源按恢复策略保留或 suppressed。                                                                            |
+| range/下载过程中撤权                                                      | 按约定 chunk 边界停止后续交付，不触发 Runtime 操作。（自 2026-10-02 起，issue #13181：在复检窗口到期后的第一个 chunk 边界停止，默认 5 秒。）       |
+| 已接受 bytes 损坏或丢失                                                   | 可用性变为 unavailable，诊断有界；原执行/捕获事实保留。                                                                                            |
+| 未确认的 publication candidate 操作 deadline 在持久 finish/receipt 前到期 | 不公开已接受 Artifact；该 liveness 策略由 [#13019](https://github.invalid/QwenLM/qwen-code/issues/13019) 负责，不表示保留的 publication 数据过期。 |
 
 O3 不替 O2 证明持久性，不解决孤儿 Runtime 清理，也不让部分输出自动变成可供模型继续的结果；读取与这些执行恢复操作独立。
 
@@ -262,7 +262,7 @@ O3a 可以基于固定契约推进。O3b–O3e 的合并/运行验证依赖 O2 �
 
 ## 11. 验证计划与验收
 
-配套工作计划位于 `.qwen/e2e-tests/2026-09-29-o3-public-projection.md`。行为测试必须经过真实 producer 或事务边界，单独伪造 UI 数据不能证明链路已连通。
+配套工作计划位于 `.mariadb-shell-agent/e2e-tests/2026-09-29-o3-public-projection.md`。行为测试必须经过真实 producer 或事务边界，单独伪造 UI 数据不能证明链路已连通。
 
 | 分组       | 必须提供的证据                                                                                                                                                              |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

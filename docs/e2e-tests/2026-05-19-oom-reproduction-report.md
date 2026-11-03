@@ -151,10 +151,10 @@ Mark-Compact 只能回收 1-2 MB（几乎所有对象都是 reachable），证�
 - 使用临时 `QWEN_HOME`，禁用 MCP 和 hooks，避免本地全局配置污染
 - 只用进程外采样统计 process-tree RSS
 
-| CLI                  | 结果 |   时长 | Tree RSS 峰值 | Root RSS 峰值 | Worker RSS 峰值 | 备注                                                        |
-| -------------------- | ---- | -----: | ------------: | ------------: | --------------: | ----------------------------------------------------------- |
-| installed `qwen`     | 成功 | 167.3s |     838.0 MiB |     230.2 MiB |       566.3 MiB | 第一次 fresh run 遇到模型服务端错误，未纳入结论；retry 成功 |
-| local rebuilt bundle | 成功 | 106.3s |     527.5 MiB |     182.1 MiB |       345.4 MiB | 包含本地 clone 热路径修复                                   |
+| CLI                             | 结果 |   时长 | Tree RSS 峰值 | Root RSS 峰值 | Worker RSS 峰值 | 备注                                                        |
+| ------------------------------- | ---- | -----: | ------------: | ------------: | --------------: | ----------------------------------------------------------- |
+| installed `mariadb-shell-agent` | 成功 | 167.3s |     838.0 MiB |     230.2 MiB |       566.3 MiB | 第一次 fresh run 遇到模型服务端错误，未纳入结论；retry 成功 |
+| local rebuilt bundle            | 成功 | 106.3s |     527.5 MiB |     182.1 MiB |       345.4 MiB | 包含本地 clone 热路径修复                                   |
 
 默认 heap replay 的结论：
 

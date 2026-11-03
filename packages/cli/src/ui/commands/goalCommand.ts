@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -108,7 +109,7 @@ export const goalCommand: SlashCommand = {
     if (operation.kind === 'error') return errorMessage(operation.message);
 
     // Starting or re-driving an autonomous Goal ingests workspace context
-    // (QWEN.md, files) without per-tool confirmation, so it requires a trusted
+    // (MARIADB-SHELL-AGENT.md, files) without per-tool confirmation, so it requires a trusted
     // workspace. `status`, `clear`, and `pause` only read or reduce work, so
     // they stay available.
     const requiresTrustedFolder =

@@ -2,7 +2,7 @@
 
 ## 1. 文档定位
 
-本文是 `qwen serve` 从 Session-centric 迁移到
+本文是 `mariadb-shell-agent serve` 从 Session-centric 迁移到
 Workspace-runtime-centric 的目标设计与堆叠交付契约。该设计由四个可独立合并的
 PR 渐进落地；本文描述最终形态，不表示 foundation PR 已实现所有 capability。
 
@@ -126,7 +126,7 @@ Workspace-runtime-centric 架构通过一个工作区级运行时解决这些问
 ## 5. 进程与对象模型
 
 ```text
-qwen serve daemon
+mariadb-shell-agent serve daemon
 ├── 持久化控制面
 │   ├── Global config owner
 │   │   ├── User scope 配置与 Secret
@@ -145,7 +145,7 @@ qwen serve daemon
         └── ...                           与 A 完全隔离
 ```
 
-物理上仍复用现有 `qwen --acp` 子进程和 ACP Channel。迁移改变的是所有权：
+物理上仍复用现有 `mariadb-shell-agent --acp` 子进程和 ACP Channel。迁移改变的是所有权：
 它们是 Workspace ACP Runtime 的实现细节，不是 Session 级进程。
 
 ## 6. 唯一所有权

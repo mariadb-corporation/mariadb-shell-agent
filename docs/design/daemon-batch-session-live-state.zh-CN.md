@@ -2,7 +2,7 @@
 
 [English](daemon-batch-session-live-state.md) | [简体中文](daemon-batch-session-live-state.zh-CN.md)
 
-状态：与本文档一同为 [#12511](https://github.com/QwenLM/qwen-code/issues/12511) 实现。
+状态：与本文档一同为 [#12511](https://github.invalid/QwenLM/qwen-code/issues/12511) 实现。
 
 ## 问题与范围
 

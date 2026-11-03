@@ -104,5 +104,5 @@ worker 启动失败；启动期归属解析丢掉的名字（按每个列了它�
 确实停掉了东西的动作，也会清除记录。
 
 既有 `runtime.channelWorker`、分组后的 `runtime.channelWorkers`、pidfile
-字段、独立的 `qwen channel start` 和 `qwen channel reload` 保持兼容。新的 CLI
-控制通过 `qwen channel set` 以及远程 `stop` 和 `status` 变体提供。
+字段、独立的 `mariadb-shell-agent channel start` 和 `mariadb-shell-agent channel reload` 保持兼容。新的 CLI
+控制通过 `mariadb-shell-agent channel set` 以及远程 `stop` 和 `status` 变体提供。

@@ -20,7 +20,7 @@ standalone archive 则包含所有组件。
 PATH 上，然后运行：
 
 ```sh
-qwen serve --managed --open
+mariadb-shell-agent serve --managed --open
 ```
 
 创建应用数据或启动服务前，Qwen 检查 Java 21，再从官方阿里云 OSS 发行镜像下载
@@ -37,9 +37,9 @@ Release。校验后将完整 runtime 原子安装到
 
 ```sh
 shasum -a 256 -c qwen-code-managed-runtime-darwin-arm64.tar.gz.sha256
-mkdir -p "${QWEN_HOME:-$HOME/.qwen}"
-tar -xzf qwen-code-managed-runtime-darwin-arm64.tar.gz -C "${QWEN_HOME:-$HOME/.qwen}"
-qwen serve --managed --open
+mkdir -p "${QWEN_HOME:-$HOME/.mariadb-shell-agent}"
+tar -xzf qwen-code-managed-runtime-darwin-arm64.tar.gz -C "${QWEN_HOME:-$HOME/.mariadb-shell-agent}"
+mariadb-shell-agent serve --managed --open
 ```
 
 archive 安装在 `<Qwen home>/managed-runtime/<cli-version>/<platform>-<arch>/`。
@@ -54,7 +54,7 @@ Harness、worker 或 WebShell 安装。
 直接报错，即使 PATH 中有另一份可用 Java。例如：
 
 ```sh
-JAVA_HOME=/absolute/java-21-home qwen serve --managed --open
+JAVA_HOME=/absolute/java-21-home mariadb-shell-agent serve --managed --open
 ```
 
 macOS 的 JAVA_HOME 通常以 `Contents/Home` 结尾。Java 缺失或版本不兼容时，在下载
@@ -98,10 +98,10 @@ Harness 使用正常的 Qwen 模型配置与 provider 凭据。第一次发送 p
 ## Workspace 与持久数据
 
 私有数据目录默认是 `<Qwen home>/managed-local`，通常为
-`~/.qwen/managed-local`。可以覆盖：
+`~/.mariadb-shell-agent/managed-local`。可以覆盖：
 
 ```sh
-qwen serve --managed --managed-data-dir /absolute/private/data --open
+mariadb-shell-agent serve --managed --managed-data-dir /absolute/private/data --open
 ```
 
 目录必须位于所有 Git 工作树外，每次只允许一个启动器使用，Java 还会持有独占

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -32,10 +33,6 @@ export const requestyProvider: ProviderConfig = {
     } catch {
       return false;
     }
-  },
-  customHeaders: {
-    'HTTP-Referer': 'https://github.com/QwenLM/qwen-code.git',
-    'X-Title': 'Qwen Code',
   },
   documentationUrl: 'https://docs.requesty.ai',
   uiGroup: 'third-party',

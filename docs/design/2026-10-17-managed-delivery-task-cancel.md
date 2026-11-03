@@ -4,7 +4,7 @@
 
 Status: implemented in this change. A channel delivery projects as a task of its route Session (kind `channel_delivery`), and the public task cancel serves it while no adapter has claimed it. The contract names the kind in `1.57.0`. There are no new routes, operation types or failure codes. The change builds on [H4f-c](2026-10-17-managed-h3-task-cancel.md) (merged), whose cancellable-kind rule and delivery switch it shares.
 
-This is F3 of [#13746](https://github.com/QwenLM/qwen-code/issues/13746), "the H5 half": one cancellation path serves both a child task and a channel delivery, and neither grows its own vocabulary. It belongs to stage H of [#12380](https://github.com/QwenLM/qwen-code/issues/12380) under [#12827](https://github.com/QwenLM/qwen-code/issues/12827). It replaces decision 10 of the [H4f note](2026-10-10-managed-task-cancel.md), which kept deliveries out of the task model and left their cancel to H5's public mutation routes. The issue's own framing settles that question: channel deliveries are tasks with a delivery line.
+This is F3 of [#13746](https://github.invalid/QwenLM/qwen-code/issues/13746), "the H5 half": one cancellation path serves both a child task and a channel delivery, and neither grows its own vocabulary. It belongs to stage H of [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380) under [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827). It replaces decision 10 of the [H4f note](2026-10-10-managed-task-cancel.md), which kept deliveries out of the task model and left their cancel to H5's public mutation routes. The issue's own framing settles that question: channel deliveries are tasks with a delivery line.
 
 ## Problem
 

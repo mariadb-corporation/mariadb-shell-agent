@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -144,7 +145,7 @@ async function validateCredential(
 }
 
 const INVALID_ENDPOINT =
-  'The endpoint must be a DashScope or Model Studio (*.maas.aliyuncs.com) base URL, such as https://dashscope.aliyuncs.com/compatible-mode/v1.';
+  'The endpoint must be a DashScope or Model Studio (*.maas.aliyuncs.invalid) base URL, such as https://dashscope.aliyuncs.invalid/compatible-mode/v1.';
 
 function configuredEndpoint(settings: Settings): string {
   const value = settings.experimental?.liveVoice?.endpoint;

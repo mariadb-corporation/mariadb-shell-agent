@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Bundles/copies the Qwen Code CLI into the SDK package dist/ so consumers
+ * Bundles/copies the MariaDB Shell Agent CLI into the SDK package dist/ so consumers
  * don't need a separate CLI install.
  *
  * This is intentionally NOT part of the SDK "build" step; it is a packaging

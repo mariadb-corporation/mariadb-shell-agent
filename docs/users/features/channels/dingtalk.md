@@ -1,6 +1,6 @@
 # DingTalk (Dingtalk)
 
-This guide covers setting up a Qwen Code channel on DingTalk (钉钉).
+This guide covers setting up a MariaDB Shell Agent channel on DingTalk (钉钉).
 
 ## Prerequisites
 
@@ -21,7 +21,7 @@ DingTalk Stream mode uses an outbound WebSocket connection — no public URL or 
 
 ## Configuration
 
-Add the channel to `~/.qwen/settings.json`:
+Add the channel to `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -93,7 +93,7 @@ question cards time out after 270,000 milliseconds (270 seconds).
 Set `interactiveCards.enabled` to `false` to disable all interactive cards.
 Use `statusCard.enabled` or `questionCard.enabled` to disable one card type,
 and set `questionCard.timeoutMs` to a finite positive number to change how long
-Qwen Code waits for a question-card response. Values above 2,147,483,647
+MariaDB Shell Agent waits for a question-card response. Values above 2,147,483,647
 milliseconds (about 24.8 days) are capped at that maximum. Interactive cards
 are configured through `settings.json` or the management API; the Web Shell
 channel editor does not render them, and it preserves the stored object when
@@ -103,7 +103,7 @@ you edit other fields.
 
 `useConnectionManager` defaults to `true`. The connection manager monitors the Stream WebSocket and replaces the DingTalk SDK client when the connection stops responding. You should normally leave it enabled.
 
-Set `"useConnectionManager": false` to disable Qwen Code's connection manager and fall back to the SDK's keepalive and automatic reconnect behavior.
+Set `"useConnectionManager": false` to disable MariaDB Shell Agent's connection manager and fall back to the SDK's keepalive and automatic reconnect behavior.
 
 ### Turn Output Mode
 
@@ -150,17 +150,17 @@ Only `per_task`, `per_response`, and `per_turn` are accepted. The unpublished `f
 
 ```bash
 # Start only the DingTalk channel
-qwen channel start my-dingtalk
+mariadb-shell-agent channel start my-dingtalk
 
 # Or start all configured channels together
-qwen channel start
+mariadb-shell-agent channel start
 ```
 
 Open DingTalk and send a message to the bot. You should see a 👀 emoji reaction appear while the agent processes, followed by the response.
 
 ## Daemon Webhook Delivery
 
-When the channel runs under `qwen serve`, authenticated external Webhook events can trigger unattended agent tasks and deliver the final Markdown response to either a DingTalk user or group. Use the existing Webhook target fields; no separate channel type is required:
+When the channel runs under `mariadb-shell-agent serve`, authenticated external Webhook events can trigger unattended agent tasks and deliver the final Markdown response to either a DingTalk user or group. Use the existing Webhook target fields; no separate channel type is required:
 
 ```json
 {
@@ -201,7 +201,7 @@ By default, the bot requires an @mention in group chats (`requireMention: true`)
 
 Set `"atSender": true` to have the bot @mention the member whose group message triggered its response. It is off by default and only applies to agent replies with a DingTalk staff ID. Replies are sent as DingTalk markdown whether or not they carry a mention; the mention prefix is included in the first message chunk.
 
-Qwen Code preserves the text content supplied by DingTalk when constructing the canonical message; it does not remove a leading mention itself. When DingTalk omits the bot mention from a plain-text callback, a body such as `/clear` or `!command` still begins with that command marker and follows the normal local-command rules. When the callback retains a leading bot mention, as rich-text callbacks can, `@Bot /clear` and `@Bot !command` remain ordinary agent input because the canonical text does not begin with `/` or `!`. `isInAtList` continues to determine whether the group message addressed the bot.
+MariaDB Shell Agent preserves the text content supplied by DingTalk when constructing the canonical message; it does not remove a leading mention itself. When DingTalk omits the bot mention from a plain-text callback, a body such as `/clear` or `!command` still begins with that command marker and follows the normal local-command rules. When the callback retains a leading bot mention, as rich-text callbacks can, `@Bot /clear` and `@Bot !command` remain ordinary agent input because the canonical text does not begin with `/` or `!`. `isInAtList` continues to determine whether the group message addressed the bot.
 
 ### Finding a Group's Conversation ID
 
@@ -249,7 +249,7 @@ The multi-line layout above is what the agent sees in a 1:1 chat. In a group the
 ### Bot doesn't connect
 
 - Verify your AppKey and AppSecret are correct
-- Check that the environment variables are set before running `qwen channel start`
+- Check that the environment variables are set before running `mariadb-shell-agent channel start`
 - Make sure **Stream Mode** is enabled in the bot's settings on the DingTalk Developer Portal
 - Check the terminal output for connection errors
 

@@ -50,7 +50,7 @@ Hosted remote mode does not upload the sibling prompt ledger as another file. It
 
 Kubernetes documents that ordinary volume access modes primarily describe mounting capabilities and do not themselves enforce write protection after mount. `ReadWriteOncePod` is stricter but still binds recovery to a volume and CSI behavior. [Kubernetes Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
 
-OSS object operations are atomic and strongly consistent after a successful write, which is suitable for immutable resources. OSS AppendObject, however, has a 5 GiB limit, appends only to the current appendable version, does not create a historical version for every append, cannot be combined with WORM, and has other storage/encryption constraints. [OSS consistency](https://help.aliyun.com/en/oss/user-guide/what-is-oss), [OSS AppendObject](https://help.aliyun.com/en/oss/developer-reference/appendobject)
+OSS object operations are atomic and strongly consistent after a successful write, which is suitable for immutable resources. OSS AppendObject, however, has a 5 GiB limit, appends only to the current appendable version, does not create a historical version for every append, cannot be combined with WORM, and has other storage/encryption constraints. [OSS consistency](https://help.aliyun.invalid/en/oss/user-guide/what-is-oss), [OSS AppendObject](https://help.aliyun.invalid/en/oss/developer-reference/appendobject)
 
 ## 4. Target Topology and Ownership
 
@@ -291,7 +291,7 @@ If MySQL is unavailable, stop accepting new private commits and apply bounded ba
 - Public SSE replay retention and private Session retention are separate. Expiring public deltas must not delete private model context or checkpoints.
 - The first release performs no automatic deletion of referenced private resources. A safe leak is preferable to an unsafe recovery gap.
 - Session deletion first closes admission, reconciles executions, writes a tombstone/cleanup plan, and removes database references. Object deletion is idempotent and occurs after the configured grace or legal-retention window.
-- Enable OSS versioning and server-side encryption. Use an overwrite-prevention request header for immutable writes. Versioning protects against accidental replacement but does not replace the database commit point. [OSS overwrite protection and limits](https://help.aliyun.com/en/oss/user-guide/limits), [OSS versioning](https://help.aliyun.com/en/oss/user-guide/manage-objects-in-a-versioning-enabled-bucket)
+- Enable OSS versioning and server-side encryption. Use an overwrite-prevention request header for immutable writes. Versioning protects against accidental replacement but does not replace the database commit point. [OSS overwrite protection and limits](https://help.aliyun.invalid/en/oss/user-guide/limits), [OSS versioning](https://help.aliyun.invalid/en/oss/user-guide/manage-objects-in-a-versioning-enabled-bucket)
 - Private journal/resource tables use a separate database role from public readers. All reads require trusted tenant and Session scope. Raw records, signed URLs, credentials, tool arguments, and model context are excluded from public events and ordinary application logs.
 - Backups and disaster recovery must cover MySQL and OSS consistently enough to restore a journal head and every referenced object. A database point newer than the available object replica is not a valid recovery point.
 

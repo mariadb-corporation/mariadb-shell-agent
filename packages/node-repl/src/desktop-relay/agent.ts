@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -183,7 +184,7 @@ export function consentMessage(
 ): string {
   const daemon = new URL(request.daemonUrl);
   const lines = [
-    `${origin} asks to let a Qwen Code session on ${daemon.host} use this computer.`,
+    `${origin} asks to let a MariaDB Shell Agent session on ${daemon.host} use this computer.`,
     '',
     'If you allow it, that session can run code on this computer with your permissions and see and control its screen, until you disconnect it or the session ends.',
   ];

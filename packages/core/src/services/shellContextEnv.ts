@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -65,7 +66,7 @@ import {
  * the answer for a given entry does not change in-process.
  *
  * Exported because a producer of the stamp has to apply the same test the
- * consumer here does: `qwen review run` stamps the entry it re-enters, and a
+ * consumer here does: `mariadb-shell-agent review run` stamps the entry it re-enters, and a
  * stamp this function would blank is worse than no stamp — it names a path the
  * skill's `"${QWEN_CODE_CLI:-qwen}"` cannot exec, instead of falling back.
  */
@@ -92,7 +93,7 @@ export function isUnusableScriptEntry(path: string): boolean {
     }
   } catch {
     // Missing, unreadable or non-executable is unusable either way; fall back
-    // to `qwen`.
+    // to `mariadb-shell-agent`.
     unusable = true;
   }
   unusableCache.set(path, unusable);
@@ -141,18 +142,18 @@ export function getShellContextEnvVars(): Record<string, string> {
 
   // The CLI a subprocess should call to reach *this* build.
   //
-  // A skill that shells out to `qwen …` gets whatever `qwen` PATH resolves to,
+  // A skill that shells out to `qwen …` gets whatever `mariadb-shell-agent` PATH resolves to,
   // which is not necessarily the code that launched it: run `npm run dev:daemon`
-  // on a machine with an older global install and every `qwen review …` the
+  // on a machine with an older global install and every `mariadb-shell-agent review …` the
   // /review skill issues lands in the old binary. Measured: a current-source
-  // daemon told its shell to run `qwen review agent-prompt --role 0`, PATH
+  // daemon told its shell to run `mariadb-shell-agent review agent-prompt --role 0`, PATH
   // resolved to a v0.19.10 global whose `agent-prompt` predates `--role`, and the
   // run died on `Missing required argument: chunk` — the skill and the CLI running
   // it were different programs.
   //
   // So the entry is passed down instead of rediscovered. The bin wrapper sets it
   // (it is the executable entry, and knows its own path); a subprocess prefers it
-  // and falls back to `qwen` when it is absent, which is exactly the old behaviour.
+  // and falls back to `mariadb-shell-agent` when it is absent, which is exactly the old behaviour.
   //
   // Passed down only when a shell could actually exec it. The variable predates
   // this mechanism with a SECOND meaning: the desktop app's tooling sets it to a
@@ -168,7 +169,7 @@ export function getShellContextEnvVars(): Record<string, string> {
   // a key omitted here arrives anyway, inherited through the spread. The first
   // cut omitted, and on exactly the hosts the filter was written for the value
   // leaked through and every `"${QWEN_CODE_CLI:-qwen}"` died on exit 126.
-  // Empty is safe for the consumer: the `:-` expansion falls back to `qwen` on
+  // Empty is safe for the consumer: the `:-` expansion falls back to `mariadb-shell-agent` on
   // unset AND on empty.
   const cliEntry = process.env['QWEN_CODE_CLI'];
   if (cliEntry) {

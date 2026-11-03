@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -68,7 +69,12 @@ describe('auto-skill curator archive re-read guard', () => {
     directoryName: string,
     modifiedAt: Date,
   ): Promise<string> {
-    const directory = path.join(projectRoot, '.qwen', 'skills', directoryName);
+    const directory = path.join(
+      projectRoot,
+      '.mariadb-shell-agent',
+      'skills',
+      directoryName,
+    );
     const manifest = path.join(directory, 'SKILL.md');
     await fs.mkdir(directory, { recursive: true });
     await fs.writeFile(
@@ -114,7 +120,7 @@ describe('auto-skill curator archive re-read guard', () => {
       fs.access(
         path.join(
           projectRoot,
-          '.qwen',
+          '.mariadb-shell-agent',
           'archived-skills',
           'auto-skill-reread',
           'SKILL.md',

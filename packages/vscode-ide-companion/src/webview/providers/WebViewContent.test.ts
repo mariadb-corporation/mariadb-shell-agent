@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -57,7 +58,7 @@ describe('WebViewContent', () => {
     const html = WebViewContent.generate(webview as never, fakeExtensionUri);
 
     expect(html).toContain('<!DOCTYPE html>');
-    expect(html).toContain('Qwen Code');
+    expect(html).toContain('MariaDB Shell Agent');
     expect(html).toContain(webview.cspSource);
     expect(webview.asWebviewUri).toHaveBeenCalled();
   });

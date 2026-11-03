@@ -1,6 +1,6 @@
 # Feishu (Lark)
 
-This guide covers setting up a Qwen Code channel on Feishu (飞书) / Lark.
+This guide covers setting up a MariaDB Shell Agent channel on Feishu (飞书) / Lark.
 
 ## Prerequisites
 
@@ -12,23 +12,23 @@ This guide covers setting up a Qwen Code channel on Feishu (飞书) / Lark.
 1. Go to the [Feishu Open Platform](https://open.feishu.cn)
 2. Create a new application (or use an existing one)
 
-![](https://gw.alicdn.com/imgextra/i4/O1CN01ORb10i1JM0MQfhnsV_!!6000000001013-2-tps-2219-931.png)
+![](https://gw.alicdn.invalid/imgextra/i4/O1CN01ORb10i1JM0MQfhnsV_!!6000000001013-2-tps-2219-931.png)
 
 3. Under the application, enable the **Bot** capability (添加应用能力 → 机器人)
 
-![](https://gw.alicdn.com/imgextra/i4/O1CN01bClpxu1FZxyH4kNjJ_!!6000000000502-2-tps-2219-931.png)
+![](https://gw.alicdn.invalid/imgextra/i4/O1CN01bClpxu1FZxyH4kNjJ_!!6000000000502-2-tps-2219-931.png)
 
 4. In **Event Subscriptions** (事件与回调), select **Long Connection** (使用长连接接收事件)
 
-![](https://gw.alicdn.com/imgextra/i1/O1CN01uIwzbl1ph8Kwq7hTI_!!6000000005391-2-tps-2219-1166.png)
+![](https://gw.alicdn.invalid/imgextra/i1/O1CN01uIwzbl1ph8Kwq7hTI_!!6000000005391-2-tps-2219-1166.png)
 
 5. Add the event `im.message.receive_v1` (接收消息)
 
-![](https://gw.alicdn.com/imgextra/i2/O1CN01n7sZmV28s6WX0aDhw_!!6000000007987-2-tps-2219-1090.png)
+![](https://gw.alicdn.invalid/imgextra/i2/O1CN01n7sZmV28s6WX0aDhw_!!6000000007987-2-tps-2219-1090.png)
 
 6. Note the **App ID** (Client ID) and **App Secret** (Client Secret) from the application credentials page
 
-![](https://gw.alicdn.com/imgextra/i2/O1CN01ag1yBh1DxfEUb4xmE_!!6000000000283-2-tps-2219-1166.png)
+![](https://gw.alicdn.invalid/imgextra/i2/O1CN01ag1yBh1DxfEUb4xmE_!!6000000000283-2-tps-2219-1166.png)
 
 ### Required Permissions
 
@@ -51,11 +51,11 @@ keep their Feishu user and chat IDs as labels.
 
 After configuring permissions and events, create a version and publish it. The bot won't work until the application is published and approved.
 
-![](https://gw.alicdn.com/imgextra/i1/O1CN01GbNRcj1lVuACnkV6M_!!6000000004825-2-tps-2219-1090.png)
+![](https://gw.alicdn.invalid/imgextra/i1/O1CN01GbNRcj1lVuACnkV6M_!!6000000004825-2-tps-2219-1090.png)
 
 ## Configuration
 
-Add the channel to `~/.qwen/settings.json`:
+Add the channel to `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -93,10 +93,10 @@ Add the channel to `~/.qwen/settings.json`:
 
 ```bash
 # Start only the Feishu channel
-qwen channel start my-feishu
+mariadb-shell-agent channel start my-feishu
 
 # Or start all configured channels together
-qwen channel start
+mariadb-shell-agent channel start
 ```
 
 Open Feishu and send a message to the bot. You should see a streaming interactive card with the response.
@@ -158,7 +158,7 @@ You can send photos and documents to the bot:
 - **Files:** Downloaded and saved locally for the agent to read
 
 On systems with POSIX permissions, downloaded files and their temporary folders
-are accessible only to the account running Qwen Code. If a downloaded file
+are accessible only to the account running MariaDB Shell Agent. If a downloaded file
 cannot be saved locally, the message still reaches the agent with an indication
 that the media is unavailable. Any quoted message is preserved.
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1506,10 +1507,10 @@ describe('createWorkflowSandbox security', () => {
 
   it('agent({workingDir}) is passed through to dispatch', async () => {
     const { result, opts } = await agentWith(
-      'workingDir: ".qwen/tmp/review-pr-7"',
+      'workingDir: ".mariadb-shell-agent/tmp/review-pr-7"',
     );
     expect(result).toBe('done');
-    expect(opts.workingDir).toBe('.qwen/tmp/review-pr-7');
+    expect(opts.workingDir).toBe('.mariadb-shell-agent/tmp/review-pr-7');
   });
 
   it('agent({workingDir}) rejects invalid values', async () => {

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -241,7 +242,7 @@ export function handleToolError(
       process.stderr.write(
         `Warning: Tool "${displayName}" requires user approval but cannot execute in non-interactive mode.\n` +
           `To enable automatic tool execution, use the -y flag (YOLO mode):\n` +
-          `Example: qwen -p 'your prompt' -y\n\n`,
+          `Example: mariadb-shell-agent -p 'your prompt' -y\n\n`,
       );
     } else {
       const reason = sanitizeForStderr(

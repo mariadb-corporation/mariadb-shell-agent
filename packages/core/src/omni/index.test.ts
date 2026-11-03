@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +39,7 @@ function stubConfig(overrides: {
 const DASHSCOPE_CGC = {
   authType: AuthType.USE_OPENAI,
   apiKey: 'sk-real-key',
-  baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
 };
 
 afterEach(() => {
@@ -188,7 +189,8 @@ describe('sanitizeErrorMessage', () => {
   it('scrubs known paths exactly, including segments with spaces', () => {
     // A space inside a segment defeats the pattern pass ('/Users/john doe/…'
     // would surface 'john doe'); exact known-path replacement is immune to it.
-    const spaced = '/Users/john doe/.qwen/omni/objects/ab/abcd1234deadbeef.png';
+    const spaced =
+      '/Users/john doe/.mariadb-shell-agent/omni/objects/ab/abcd1234deadbeef.png';
     const err = new Error(`EACCES: permission denied, open '${spaced}'`);
     const out = sanitizeErrorMessage(err, [spaced]);
     expect(out).not.toContain('john doe');
@@ -198,7 +200,7 @@ describe('sanitizeErrorMessage', () => {
   it('scrubs a known store ROOT even when the full object path is unknown', () => {
     // putFile can throw before objectPath is assigned; passing the store
     // root as a known path still removes the user-identifying prefix.
-    const root = '/Users/john doe/.qwen/omni';
+    const root = '/Users/john doe/.mariadb-shell-agent/omni';
     const err = new Error(
       `ENOSPC: no space left on device, write '${root}/objects/cd/ef99.webm'`,
     );
@@ -327,7 +329,7 @@ describe('isOmniDeliveryActive', () => {
     const cgc = {
       authType: AuthType.QWEN_OAUTH,
       apiKey: 'QWEN_OAUTH_DYNAMIC_TOKEN',
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
     };
     expect(active({ trusted: true, cgc })).toBe(false);
   });
@@ -359,7 +361,7 @@ describe('isOmniDeliveryActive', () => {
     };
     const upload = {
       apiKey: 'upload-key',
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       model: 'qwen3.5-omni-plus',
     };
     expect(active({ trusted: true, cgc, upload })).toBe(true);
@@ -701,7 +703,7 @@ describe('processMediaForOmniDelivery upload cache integration', () => {
   }
 
   const UPLOAD: OmniUploadConfig = {
-    baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
     apiKey: 'upload-key',
     model: 'dashscope-upload-model',
   };

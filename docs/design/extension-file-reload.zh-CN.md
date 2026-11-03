@@ -22,7 +22,7 @@
 - Skill 和 subagent 管理器都有缓存刷新 API，但这些缓存与斜杠命令补全彼此分开。
 - Hook 由 `HookSystem` 和 `HookRegistry` 管理。重建整个 hook 系统会丢失 agent 作用域的临时 hook，因此重载只能针对已配置的 hook。
 - `SettingsWatcher` 以及已有的 MCP/LSP 监听器不会覆盖已安装扩展的包内容。扩展文件需要自己的监听器。
-- 链接扩展可以位于用户扩展目录之外，只监听 `~/.qwen/extensions` 无法覆盖这些扩展的日常开发流程。
+- 链接扩展可以位于用户扩展目录之外，只监听 `~/.mariadb-shell-agent/extensions` 无法覆盖这些扩展的日常开发流程。
 
 ## 目标
 

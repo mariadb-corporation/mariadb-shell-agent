@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -159,9 +160,9 @@ export async function setupStartupWorktree(
   }
 
   // Refuse nested creation: launching with --worktree from inside an existing
-  // worktree creates `<otherRepo>/.qwen/worktrees/<slug>/`, which is rarely
+  // worktree creates `<otherRepo>/.mariadb-shell-agent/worktrees/<slug>/`, which is rarely
   // what the user wants and corrupts ownership tracking.
-  if (/[\\/]\.qwen[\\/]worktrees[\\/]/.test(launchCwd)) {
+  if (/[\\/]\.mariadb-shell-agent[\\/]worktrees[\\/]/.test(launchCwd)) {
     return {
       ok: false,
       error: `--worktree: cannot start a new worktree from inside another worktree (cwd: ${launchCwd}). Run from the main checkout.`,
@@ -235,8 +236,8 @@ export async function setupStartupWorktree(
       : undefined;
 
   // Re-attach to an existing worktree instead of erroring out. Common
-  // case: user did `qwen --worktree foo` previously, exited with Keep,
-  // and now runs `qwen --resume <sid> --worktree foo` to continue. The
+  // case: user did `mariadb-shell-agent --worktree foo` previously, exited with Keep,
+  // and now runs `mariadb-shell-agent --resume <sid> --worktree foo` to continue. The
   // directory + branch are already on disk; we just chdir into them.
   //
   // `getRegisteredWorktreeBranch` returns the worktree's HEAD commit
@@ -576,7 +577,7 @@ export function buildStartupWorktreeNotice(
     return (
       `${base}\n` +
       `Note: --worktree overrode the resumed session's previous worktree "${override.overriddenSlug}". ` +
-      `That worktree directory was left intact; re-attach with \`qwen --worktree ${override.overriddenSlug}\` if needed.`
+      `That worktree directory was left intact; re-attach with \`mariadb-shell-agent --worktree ${override.overriddenSlug}\` if needed.`
     );
   }
   return base;

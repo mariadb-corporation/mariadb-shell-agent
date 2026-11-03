@@ -546,11 +546,8 @@ function SendIcon() {
       aria-hidden="true"
     >
       <path
-        d="M10 15.5v-11M5.5 9 10 4.5 14.5 9"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d="M8.74 2L3.69 10.42H7.9L3.69 18L15.47 7.89L10.42 7.05L16.31 2Z"
+        fill="currentColor"
       />
     </svg>
   );

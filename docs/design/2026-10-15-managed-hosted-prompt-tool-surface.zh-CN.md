@@ -41,7 +41,7 @@ Java 继续固定 Agent 定义版本并发布其指令。Runtime 和 Broker 继�
 
 ## 验证计划
 
-先使用全局 `qwen` 尝试基线复现；Hosted 路由可用时，通过本地模拟 OpenAI 服务检查实际请求。若全局路由依赖不可用的 SQL/Broker 基础设施，则使用真实 Hosted Harness 模型集成边界。
+先使用全局 `mariadb-shell-agent` 尝试基线复现；Hosted 路由可用时，通过本地模拟 OpenAI 服务检查实际请求。若全局路由依赖不可用的 SQL/Broker 基础设施，则使用真实 Hosted Harness 模型集成边界。
 
 覆盖无工具、五工具配置（`read_file`、`write_file`、`edit`、`run_shell_command`、`monitor`）、搜索/Agent 的增加与移除、名称不变仅顺序变化，以及记录的模型请求重放后进入新轮次。同时断言请求工具 schema 与生成的工具指导/示例，并验证核心策略以及 Agent 指令与 Workspace 上下文的顺序。
 

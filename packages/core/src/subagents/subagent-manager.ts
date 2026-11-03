@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1011,7 +1012,7 @@ export class SubagentManager {
         // that no repo-supplied execution surface runs. Discovery filtering is
         // not enough: `loadSubagent` resolves a `subagent_type` from disk
         // (project/user/extension) regardless of safe mode, and a cloned repo
-        // can ship `.qwen/agents/<builtin-name>.md` carrying an `executor` that
+        // can ship `.mariadb-shell-agent/agents/<builtin-name>.md` carrying an `executor` that
         // resolves before the built-in of the same name. Refuse at the dispatch
         // gate so safe mode never spawns a definition-supplied binary.
         if (runtimeContext.isSafeMode()) {
@@ -1558,7 +1559,7 @@ export class SubagentManager {
    * concrete model — `inherit`, an unset `fast` selector, or no selector.
    *
    * Every spawn path must resolve routes through this single helper so the
-   * same `.qwen/agents/<name>.md` definition always maps to the same
+   * same `.mariadb-shell-agent/agents/<name>.md` definition always maps to the same
    * provider route, whether it runs as an ordinary subagent
    * ({@link buildRuntimeContentGeneratorView}) or as a named teammate
    * ({@link resolveSubagentModelRoute}).

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -29,7 +30,7 @@ export {
 export type { LoopMode } from './autonomous-loop.js';
 
 /**
- * Fire-time resolver for `.qwen/loop.md`-driven loops.
+ * Fire-time resolver for `.mariadb-shell-agent/loop.md`-driven loops.
  *
  * A `/loop` whose scheduled prompt is one of these sentinels re-reads loop.md
  * on every fire and gets either the FULL task block (first delivery, or whenever
@@ -53,7 +54,7 @@ export interface LoopTickResolverDeps {
   homeDir: string;
   /**
    * QWEN_HOME-aware global dir holding the home `loop.md` (`Storage.getGlobalQwenDir()`).
-   * Omitted → defaults to `<homeDir>/.qwen` inside readLoopTaskFile.
+   * Omitted → defaults to `<homeDir>/.mariadb-shell-agent` inside readLoopTaskFile.
    */
   homeQwenDir?: string;
   /**
@@ -61,7 +62,7 @@ export interface LoopTickResolverDeps {
    * never captured once: `isTrustedFolder()` is not process-stable in IDE
    * sessions (a workspace-trust update can flip it), and a trusted→untrusted
    * flip must immediately stop reading the repo-controlled project
-   * `.qwen/loop.md` (the user-owned `~/.qwen/loop.md` still is read).
+   * `.mariadb-shell-agent/loop.md` (the user-owned `~/.mariadb-shell-agent/loop.md` still is read).
    */
   allowProjectFile: () => boolean;
 }
@@ -263,7 +264,7 @@ export class LoopTickResolver {
    * reminder — and the caller's sanitized resolve-error — names the location
    * actually checked (QWEN_HOME-aware), but must NEVER surface a raw absolute
    * path: it flows into model/API text, leaking the host's filesystem layout.
-   *   - under $HOME             → tilde-abbreviated `~/.qwen/loop.md`;
+   *   - under $HOME             → tilde-abbreviated `~/.mariadb-shell-agent/loop.md`;
    *   - relocated via $QWEN_HOME → the literal `$QWEN_HOME/loop.md`, not the
    *     resolved dir (`tildeifyPath` only abbreviates $HOME, so it's a no-op for
    *     a $QWEN_HOME outside $HOME and would otherwise pass the path through);
@@ -271,7 +272,8 @@ export class LoopTickResolver {
    * The real absolute path stays in LOCAL debug logs only. */
   homeLoopLabel(): string {
     const homeQwenDir =
-      this.deps.homeQwenDir ?? path.join(this.deps.homeDir, '.qwen');
+      this.deps.homeQwenDir ??
+      path.join(this.deps.homeDir, '.mariadb-shell-agent');
     const homeLoopPath = path.join(homeQwenDir, 'loop.md');
 
     const tildeified = tildeifyPath(homeLoopPath);
@@ -284,7 +286,7 @@ export class LoopTickResolver {
     // `<homeQwenDir>/loop.md`, so swap the whole resolved dir for `$QWEN_HOME` and
     // re-attach the user-facing POSIX slash + basename directly. Deriving the tail from the
     // resolved path's length instead mishandles edge dirs: a trailing slash
-    // (`$QWEN_HOME=/x/.qwen/`) over-counts the separator, and a filesystem-root
+    // (`$QWEN_HOME=/x/.mariadb-shell-agent/`) over-counts the separator, and a filesystem-root
     // homeQwenDir (`$QWEN_HOME=/` → homeLoopPath `/loop.md`, dirname `/`) drops the
     // leading separator — both garbling the tail into `$QWEN_HOMEloop.md`.
     if (process.env['QWEN_HOME']) {
@@ -296,13 +298,13 @@ export class LoopTickResolver {
   /** The checked-candidate "where" string shared by the absent reminder and the
    * caller's sanitized resolve-error. Names the project candidate ONLY when it
    * was actually read (`projectChecked` — a trusted folder), so neither path can
-   * claim `.qwen/loop.md (project)` for an untrusted folder where the project
+   * claim `.mariadb-shell-agent/loop.md (project)` for an untrusted folder where the project
    * file is skipped. The home label is the QWEN_HOME-aware, never-absolute
    * homeLoopLabel(). Single source of truth so the two messages can't drift. */
   absentLocations(projectChecked: boolean): string {
     const homeLabel = this.homeLoopLabel();
     return projectChecked
-      ? `.qwen/loop.md (project) or ${homeLabel} (home)`
+      ? `.mariadb-shell-agent/loop.md (project) or ${homeLabel} (home)`
       : `${homeLabel} (home)`;
   }
 

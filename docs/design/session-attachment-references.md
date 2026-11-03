@@ -34,7 +34,7 @@ their original bytes are not decoded or altered in the browser.
 
 ## Ownership and lifecycle
 
-- Storage lives at `~/.qwen/tmp/<workspace-hash>/attachments/session-<id>/`
+- Storage lives at `~/.mariadb-shell-agent/tmp/<workspace-hash>/attachments/session-<id>/`
   (or the equivalent custom runtime directory).
 - The resolved live-session owner and client authorization protect every
   upload, read, and removal operation.

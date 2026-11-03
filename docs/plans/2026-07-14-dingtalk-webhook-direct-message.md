@@ -140,7 +140,7 @@ Expected: 全部测试通过，群聊原有断言与新增单聊断言同时为�
 
 - Modify: `docs/users/features/channels/overview.md`
 - Modify: `docs/users/features/channels/dingtalk.md`
-- Create: `.qwen/e2e-tests/2026-07-14-dingtalk-webhook-direct-message.md`
+- Create: `.mariadb-shell-agent/e2e-tests/2026-07-14-dingtalk-webhook-direct-message.md`
 
 **Interfaces:**
 
@@ -211,7 +211,7 @@ Expected: 两个受影响 package 的测试和构建退出码为 0。根目录 b
 
 - [ ] **Step 2: 使用真实凭据执行 curl 验证**
 
-从隔离配置启动 `qwen serve --channel dingtalk-main`，对单聊和群聊 `targetRef` 各执行一次 curl。记录 HTTP 状态、daemon/worker 日志和钉钉实际收件结果；若缺少某个目标 ID，明确标记对应在线步骤未验证。
+从隔离配置启动 `mariadb-shell-agent serve --channel dingtalk-main`，对单聊和群聊 `targetRef` 各执行一次 curl。记录 HTTP 状态、daemon/worker 日志和钉钉实际收件结果；若缺少某个目标 ID，明确标记对应在线步骤未验证。
 
 - [ ] **Step 3: 自审完整 diff**
 

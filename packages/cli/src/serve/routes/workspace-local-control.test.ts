@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -228,7 +229,7 @@ describe('Local Control routes', () => {
         expect(writeStderrLineSafe).not.toHaveBeenCalled();
       } else {
         expect(writeStderrLineSafe).toHaveBeenCalledWith(
-          `qwen serve: ${diagnostic}`,
+          `mariadb-shell-agent serve: ${diagnostic}`,
         );
       }
     },

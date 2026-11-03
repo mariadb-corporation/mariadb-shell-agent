@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -78,7 +79,7 @@ function pruneMalformedRecords(snapshot: MediaMemorySnapshot): void {
 
 /**
  * v1 JSON persistence for the media-memory graph: ONE document
- * (`.qwen/omni/memory.json`) holding every file/version/execution/entry
+ * (`.mariadb-shell-agent/omni/memory.json`) holding every file/version/execution/entry
  * record. Deliberately the same discipline as omni's JSON entry caches
  * (S4 decision D2 — the backend is an internal detail; the collector and
  * recall service only ever see {@link MediaMemorySnapshot}):

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -246,7 +247,7 @@ async function runRelay(
       update(phase);
       if (phase === 'connected') {
         void notify(
-          `A Qwen Code session on ${host} is now using this computer. Disconnect it from the Web Shell to stop.`,
+          `A MariaDB Shell Agent session on ${host} is now using this computer. Disconnect it from the Web Shell to stop.`,
         );
       }
     },
@@ -268,7 +269,9 @@ async function runRelay(
   mcp.close();
   const { phase, message } = endMessage(end, childExit);
   update(phase, message);
-  await notify(`The Qwen Code session on ${host} stopped using this computer.`);
+  await notify(
+    `The MariaDB Shell Agent session on ${host} stopped using this computer.`,
+  );
 }
 
 /** Serves the connection launchd accepted and handed over as stdin/stdout. */

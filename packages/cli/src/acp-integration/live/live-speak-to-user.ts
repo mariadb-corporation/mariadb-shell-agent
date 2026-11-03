@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -68,7 +69,7 @@ export class SpeakToUserTool extends BaseDeclarativeTool<
       SPEAK_TO_USER_TOOL_NAME,
       'SpeakToUser',
       'Speak an important voice chat update to the user. Use this sparingly ' +
-        'and only during an active voice chat. Automatic backend Qwen Code ' +
+        'and only during an active voice chat. Automatic backend MariaDB Shell Agent ' +
         'text is silent context and is not automatically spoken. The message ' +
         'is spoken verbatim by the voice model, so write it for speech. Final ' +
         'assistant text is not automatically spoken; call this tool if the ' +

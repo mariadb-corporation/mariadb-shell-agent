@@ -33,7 +33,7 @@ that the `/acp` transport is not wired to it.
 - Monotonic per-session `id`, starting at 1 (`nextId`, assigned in
   `publish()`).
 - Bounded ring buffer per session (`DEFAULT_RING_SIZE = 8000`, operator
-  override `qwen serve --event-ring-size`).
+  override `mariadb-shell-agent serve --event-ring-size`).
 - `subscribeEvents(sessionId, { lastEventId, signal })` replays ring frames
   with `id > lastEventId` before live events flow, and emits the synthetic
   control frames `replay_complete`, `state_resync_required` (ring-evicted /

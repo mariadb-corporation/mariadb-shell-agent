@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review drive`: start something, wait until it is actually up, drive it,
+// `mariadb-shell-agent review drive`: start something, wait until it is actually up, drive it,
 // and capture what it did — as facts, not as a guess about how long to sleep.
 //
 // The maintainer verification this borrows from is the highest-yield review
@@ -106,7 +107,7 @@ export interface DriveReport {
    * is the one the service printed. The verify brief carries the recipe.
    *
    * The address a service actually bound is the motivating one, and it is not
-   * the address it was asked for: `qwen serve` handed a taken port prints
+   * the address it was asked for: `mariadb-shell-agent serve` handed a taken port prints
    * `port 8931 is in use, trying 8932...` and listens on the next one. A caller
    * that goes on addressing its requested port then reads a DIFFERENT, stale
    * process for the rest of the run — and every number it reports is about that

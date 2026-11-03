@@ -1,6 +1,6 @@
-# Installation Guide for Qwen Code with Source Tracking
+# Installation Guide for MariaDB Shell Agent with Source Tracking
 
-This guide describes the source-tracking installation scripts for Qwen Code.
+This guide describes the source-tracking installation scripts for MariaDB Shell Agent.
 The scripts prefer standalone release archives and can fall back to npm when a
 standalone archive is not available.
 
@@ -11,10 +11,10 @@ The installers are intentionally lightweight:
 - They try a standalone archive first by default.
 - They do not install Node.js, NVM, or any other Node version manager.
 - They do not edit npm config. Standalone installs may update the shell profile
-  or user/machine PATH so the generated `qwen` shim is discoverable.
-- They do not start `qwen` automatically after installation.
-- They store source information in `~/.qwen/source.json` or
-  `%USERPROFILE%\.qwen\source.json` when `--source` is provided.
+  or user/machine PATH so the generated `mariadb-shell-agent` shim is discoverable.
+- They do not start `mariadb-shell-agent` automatically after installation.
+- They store source information in `~/.mariadb-shell-agent/source.json` or
+  `%USERPROFILE%\.mariadb-shell-agent\source.json` when `--source` is provided.
 
 Standalone archives include a private Node.js runtime, so users do not need a
 local Node.js installation on the standalone path. Node.js 22 or newer and npm
@@ -94,9 +94,9 @@ these GitHub Actions variables only when the bucket, endpoint, or public base
 URL changes:
 
 - `ALIYUN_OSS_BUCKET` (default: `qwen-code-assets`)
-- `ALIYUN_OSS_ENDPOINT` (default: `https://oss-cn-hangzhou.aliyuncs.com`)
+- `ALIYUN_OSS_ENDPOINT` (default: `https://oss-cn-hangzhou.aliyuncs.invalid`)
 - `ALIYUN_OSS_PUBLIC_BASE_URL` (default:
-  `https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com`)
+  `https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid`)
 
 Archive layout:
 
@@ -134,7 +134,7 @@ install-qwen-standalone.bat --method npm
 ```
 
 Repair PATH for an existing standalone Windows install without downloading or
-reinstalling Qwen Code:
+reinstalling MariaDB Shell Agent:
 
 ```bat
 install-qwen-standalone.bat --repair-path
@@ -143,7 +143,7 @@ install-qwen-standalone.bat --repair-path --path-scope machine
 
 ## Optional Native Modules
 
-The standalone archives bundle Qwen Code, a private Node.js runtime, and the
+The standalone archives bundle MariaDB Shell Agent, a private Node.js runtime, and the
 matching `@teddyzhu/clipboard` native package for clipboard image paste. They
 also ship `@lydell/node-pty` plus the matching platform prebuild for
 `darwin-arm64`, `darwin-x64`, `linux-arm64`, `linux-x64` and `win-x64`, which
@@ -185,12 +185,12 @@ Override with `QWEN_INSTALL_ROOT`, `QWEN_INSTALL_LIB_PARENT`,
 Uninstall a standalone Linux/macOS install:
 
 ```bash
-curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.sh | bash
+curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/installation/uninstall-qwen-standalone.sh | bash
 ```
 
-The uninstaller removes only the standalone runtime, generated `qwen` wrapper,
-and installer-managed shell PATH block. It preserves `~/.qwen` by default. Set
-`QWEN_UNINSTALL_PURGE=1` to remove `~/.qwen/source.json`; other config and auth
+The uninstaller removes only the standalone runtime, generated `mariadb-shell-agent` wrapper,
+and installer-managed shell PATH block. It preserves `~/.mariadb-shell-agent` by default. Set
+`QWEN_UNINSTALL_PURGE=1` to remove `~/.mariadb-shell-agent/source.json`; other config and auth
 files are still preserved.
 
 ## Windows Usage
@@ -227,25 +227,25 @@ repair machine-level PATH without reinstalling:
 ```powershell
 $env:QWEN_INSTALL_REPAIR_PATH = '1'
 $env:QWEN_INSTALL_PATH_SCOPE = 'machine'
-irm https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.ps1 | iex
+irm https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/installation/install-qwen-standalone.ps1 | iex
 ```
 
 Restart the runner service or machine after updating machine-level PATH so jobs
 inherit the refreshed environment.
 
-Restart the terminal if `qwen` is not immediately available on PATH.
+Restart the terminal if `mariadb-shell-agent` is not immediately available on PATH.
 
 Uninstall a standalone Windows install:
 
 ```bat
-powershell -ExecutionPolicy Bypass -c "irm https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.ps1 | iex"
+powershell -ExecutionPolicy Bypass -c "irm https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/installation/uninstall-qwen-standalone.ps1 | iex"
 ```
 
 The uninstaller removes only the standalone runtime, generated `qwen.cmd`
 wrapper, user or machine PATH entry, and the current-session `cmd.exe` shim
-created by the hosted PowerShell installer. It preserves `%USERPROFILE%\.qwen`
+created by the hosted PowerShell installer. It preserves `%USERPROFILE%\.mariadb-shell-agent`
 by default. Set `QWEN_UNINSTALL_PURGE=1` to remove
-`%USERPROFILE%\.qwen\source.json`; other config and auth files are still
+`%USERPROFILE%\.mariadb-shell-agent\source.json`; other config and auth files are still
 preserved.
 
 ## Mirrors and Overrides
@@ -306,8 +306,8 @@ When `--source` or `-s` is provided, the installer writes:
 
 Locations:
 
-- Linux/macOS: `~/.qwen/source.json`
-- Windows: `%USERPROFILE%\.qwen\source.json`
+- Linux/macOS: `~/.mariadb-shell-agent/source.json`
+- Windows: `%USERPROFILE%\.mariadb-shell-agent\source.json`
 
 The telemetry logger reads this file when available. Missing, invalid, or
 unreadable source files are ignored.
@@ -320,7 +320,7 @@ If source tracking is not needed and Node.js 22 or newer is already available:
 npm install -g @qwen-code/qwen-code@latest
 ```
 
-Homebrew users can also install Qwen Code with:
+Homebrew users can also install MariaDB Shell Agent with:
 
 ```bash
 brew install qwen-code

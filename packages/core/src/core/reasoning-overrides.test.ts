@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 import { describe, expect, it, vi } from 'vitest';
@@ -81,7 +82,7 @@ describe('reasoning declarations', () => {
       const generation: ContentGeneratorConfig = {
         model: 'deepseek-v4.1-flash-1017',
         authType: AuthType.USE_OPENAI,
-        baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
         thinkingMandatory: true,
         reasoning: { effort: 'xhigh' },
         [source]: { model: 'deepseek-v4-pro' },
@@ -172,7 +173,7 @@ describe('reasoning declarations', () => {
       ...route,
       model: 'deepseek-v4.1-flash-1017',
       baseUrl:
-        'https://workspace.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+        'https://workspace.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
     };
     expect(resolveReasoningCapabilities(target, undefined)).toMatchObject({
       profile: 'deepseek-openai',
@@ -200,19 +201,19 @@ describe('reasoning declarations', () => {
     ['https://api.deepseek.com/v1', 'deepseek-flash', 'low', 'low'],
     ['https://api.deepseek.com/v1', 'deepseek-flash', 'xhigh', 'high'],
     [
-      'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       'deepseek-v4.1-flash-1017',
       'xhigh',
       'high',
     ],
     [
-      'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       'deepseek-v4-flash',
       'low',
       'high',
     ],
     [
-      'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       'deepseek-v4-pro',
       'xhigh',
       'max',
@@ -266,7 +267,7 @@ describe('reasoning declarations', () => {
       {
         ...route,
         model: 'qwen3.8-max',
-        baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       },
       { defaultEffort: 'medium' },
     );
@@ -371,17 +372,17 @@ describe('reasoning declarations', () => {
   });
 
   it.each([
-    ['qwen3.5-plus', 'https://coding.dashscope.aliyuncs.com/v1'],
-    ['qwen3-max-2026-01-23', 'https://coding.dashscope.aliyuncs.com/v1'],
-    ['kimi-k2.5', 'https://coding.dashscope.aliyuncs.com/v1'],
+    ['qwen3.5-plus', 'https://coding.dashscope.aliyuncs.invalid/v1'],
+    ['qwen3-max-2026-01-23', 'https://coding.dashscope.aliyuncs.invalid/v1'],
+    ['kimi-k2.5', 'https://coding.dashscope.aliyuncs.invalid/v1'],
     ['kimi-k2.6', 'https://api.moonshot.ai/v1'],
     [
       'qwen3.6-flash',
-      'https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+      'https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
     ],
     [
       'glm-5.2',
-      'https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+      'https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
     ],
   ])('inherits %s toggle capabilities from its provider', (model, baseUrl) => {
     const target = { ...route, model, baseUrl };
@@ -409,7 +410,7 @@ describe('reasoning declarations', () => {
         {
           ...target,
           baseUrl:
-            'https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+            'https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
         },
         input,
       ),
@@ -418,7 +419,7 @@ describe('reasoning declarations', () => {
       resolveReasoningCapabilities(
         {
           ...target,
-          baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+          baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
         },
         input,
       ),
@@ -447,7 +448,7 @@ describe('reasoning declarations', () => {
         {
           ...route,
           model: 'qwen3.8-max',
-          baseUrl: 'https://evil.example/dashscope.aliyuncs.com',
+          baseUrl: 'https://evil.example/dashscope.aliyuncs.invalid',
         },
         { defaultEffort: 'medium' },
       ),
@@ -460,16 +461,16 @@ describe('reasoning declarations', () => {
       'https://maas.qianwenaiapi.com/compatible-mode/v1',
     ],
     [
-      'maas.qwencloudapi.com',
-      'https://maas.qwencloudapi.com/compatible-mode/v1',
+      'maas.qwencloudapi.invalid',
+      'https://maas.qwencloudapi.invalid/compatible-mode/v1',
     ],
     [
       'token-plan.maas.qianwenaiapi.com',
       'https://token-plan.maas.qianwenaiapi.com/compatible-mode/v1',
     ],
     [
-      'token-plan.maas.qwencloudapi.com',
-      'https://token-plan.maas.qwencloudapi.com/compatible-mode/v1',
+      'token-plan.maas.qwencloudapi.invalid',
+      'https://token-plan.maas.qwencloudapi.invalid/compatible-mode/v1',
     ],
   ])(
     'inherits DashScope capabilities for QwenCloud host %s',
@@ -516,16 +517,16 @@ describe('reasoning declarations', () => {
       'https://maas.qianwenaiapi.com.evil.com/compatible-mode/v1',
     ],
     [
-      'maas.qwencloudapi.com.evil.com',
-      'https://maas.qwencloudapi.com.evil.com/compatible-mode/v1',
+      'maas.qwencloudapi.invalid.evil.com',
+      'https://maas.qwencloudapi.invalid.evil.com/compatible-mode/v1',
     ],
     [
       'notmaas.qianwenaiapi.com',
       'https://notmaas.qianwenaiapi.com/compatible-mode/v1',
     ],
     [
-      'notmaas.qwencloudapi.com',
-      'https://notmaas.qwencloudapi.com/compatible-mode/v1',
+      'notmaas.qwencloudapi.invalid',
+      'https://notmaas.qwencloudapi.invalid/compatible-mode/v1',
     ],
   ])('rejects lookalike QwenCloud host %s', (_host, baseUrl) => {
     expect(
@@ -662,7 +663,7 @@ describe('prompt reasoning snapshots', () => {
     const generation = {
       ...route,
       model: 'qwen3.8-max',
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       reasoningRouteBaseUrl: route.baseUrl,
       extra_body: { reasoning_effort: 'high' },
       reasoningSnapshot: captureReasoningSnapshot([model('qwen3.8-max')]),

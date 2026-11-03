@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -149,7 +150,7 @@ function sendDirectoriesError(
     return;
   }
   writeStderrLine(
-    `qwen serve: ${route} error: ${
+    `mariadb-shell-agent serve: ${route} error: ${
       error instanceof Error ? error.message : String(error)
     }`,
   );
@@ -234,7 +235,7 @@ export function registerWorkspaceDirectoriesRoutes(
       });
     } catch (error) {
       writeStderrLine(
-        `qwen serve: GET /workspaces/:workspace/directories error: ${
+        `mariadb-shell-agent serve: GET /workspaces/:workspace/directories error: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );

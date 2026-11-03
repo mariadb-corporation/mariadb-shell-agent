@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,11 +23,11 @@ const repoRoot = resolve(
   '..',
 );
 
-const MANIFEST_RELATIVE_PATH = '.qwen/review-context.json';
+const MANIFEST_RELATIVE_PATH = '.mariadb-shell-agent/review-context.json';
 
 const expectedManifest = {
   version: 1,
-  label: 'Qwen Code',
+  label: 'MariaDB Shell Agent',
   rules: [
     {
       paths: ['packages/cli/src/commands/review/**'],
@@ -191,7 +192,7 @@ describe('committed review context manifest', () => {
   });
 
   it.skipIf(!inGitWorktree())(
-    'keeps the manifest un-ignored and tracked despite the .qwen/* ignore',
+    'keeps the manifest un-ignored and tracked despite the .mariadb-shell-agent/* ignore',
     () => {
       expect(
         exitsZero(['check-ignore', '--no-index', '--', MANIFEST_RELATIVE_PATH]),

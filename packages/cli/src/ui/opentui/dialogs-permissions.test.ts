@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -42,7 +43,7 @@ describe('getPermissionsTabs', () => {
     expect(tabs[0]).toEqual({
       id: 'allow',
       label: 'Allow',
-      description: "Qwen Code won't ask before using allowed tools.",
+      description: "MariaDB Shell Agent won't ask before using allowed tools.",
     });
     expect(tabs[3]).toEqual({
       id: 'workspace',
@@ -83,13 +84,13 @@ describe('getPermissionScopeItems', () => {
     expect(items).toHaveLength(2);
     expect(items[0]).toEqual({
       label: 'Project settings',
-      description: 'Checked in at .qwen/settings.json',
+      description: 'Checked in at .mariadb-shell-agent/settings.json',
       value: SettingScope.Workspace,
       key: 'project',
     });
     expect(items[1]).toEqual({
       label: 'User settings',
-      description: 'Saved in at ~/.qwen/settings.json',
+      description: 'Saved in at ~/.mariadb-shell-agent/settings.json',
       value: SettingScope.User,
       key: 'user',
     });

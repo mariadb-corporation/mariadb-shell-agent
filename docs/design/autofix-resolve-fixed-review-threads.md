@@ -16,7 +16,7 @@ These gaps can mark a conversation resolved without evidence that the current PR
 
 The responsibilities are already separated correctly:
 
-- `.qwen/skills/autofix/SKILL.md` tells the agent how to classify findings and write `resolved-comments.txt` or `comment-replies.json`.
+- `.mariadb-shell-agent/skills/autofix/SKILL.md` tells the agent how to classify findings and write `resolved-comments.txt` or `comment-replies.json`.
 - `.github/scripts/run-autofix-review-verification.sh` independently runs deterministic build, typecheck, lint, and affected-package tests.
 - `.github/workflows/qwen-autofix.yml` owns the GitHub PAT, pushes the branch, fetches review threads, and performs mutations.
 - `scripts/tests/qwen-autofix-workflow.test.js` extracts and executes workflow shell blocks with stubbed GitHub responses.
@@ -69,14 +69,14 @@ Fail closed must not mean fail silent (issue #10106: 0 of 90 threads resolved on
 - **Query live PR state immediately before mutation:** workflow concurrency cannot prevent direct contributor pushes.
 - **Bounded wait for the initial live-head equality:** the PR read model is eventually consistent, and a `headRefOid` read seconds after this round's own push routinely still returns the previous head — on PR #9729 every pushed round declared drift on that single stale read and silently skipped (issue #10106). The initial equality check retries briefly before declaring drift, and names the refusal `live-head unreadable` rather than `live-head drift` when no attempt returned any head, so an expired PAT or an API outage reads differently from a contributor push. The per-mutation guards stay single-shot: once the head has been observed equal, a later mismatch means it actually moved. The proof runs only when the round selected at least one thread: its premise is THIS round's own push propagating, so a pushed round waits out the window while a round that pushed nothing decides on a single read — a mismatched head there moves only further away, never back — and a round that selected nothing to resolve has no head proof to run at all.
 - **Keep the existing model disposition contract:** semantic judgment remains with the agent, while exact commit identity is enforced deterministically by the host.
-- **Do not add general CLI/core code:** this is Autofix workflow orchestration, not a reusable Qwen Code runtime feature.
+- **Do not add general CLI/core code:** this is Autofix workflow orchestration, not a reusable MariaDB Shell Agent runtime feature.
 
 ## Files affected
 
 - `.github/scripts/run-autofix-review-verification.sh`
 - `.github/workflows/qwen-autofix.yml`
 - `scripts/tests/qwen-autofix-workflow.test.js`
-- `.qwen/skills/autofix/SKILL.md` for contract clarification
+- `.mariadb-shell-agent/skills/autofix/SKILL.md` for contract clarification
 
 ## Scope boundaries
 

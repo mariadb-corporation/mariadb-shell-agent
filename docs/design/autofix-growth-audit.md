@@ -78,7 +78,7 @@ The audit fires only when growth is measurable
 needs numbers to judge. The unmeasured advisory path (growth not
 reported, no brake) is unchanged.
 
-### B. Audit mode in the autofix skill (.qwen/skills/autofix/SKILL.md)
+### B. Audit mode in the autofix skill (.mariadb-shell-agent/skills/autofix/SKILL.md)
 
 feedback.md gains a `Growth audit required` section (replacing the
 `Needs a maintainer's decision — this PR is not converging` section)

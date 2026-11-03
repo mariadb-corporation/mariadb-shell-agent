@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -69,7 +70,7 @@ export function registerWorkspacePermissionsRoutes(
     } catch (err) {
       if (sendGenerationClosedError(res, err)) return;
       writeStderrLine(
-        `qwen serve: GET /workspace/permissions error: ${
+        `mariadb-shell-agent serve: GET /workspace/permissions error: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );
@@ -174,7 +175,7 @@ export function registerWorkspacePermissionsRoutes(
         }
 
         writeStderrLine(
-          `qwen serve: POST /workspace/permissions ACP error (key=${key}, scope=${permissionScope}, workspace=${boundWorkspace}): ${
+          `mariadb-shell-agent serve: POST /workspace/permissions ACP error (key=${key}, scope=${permissionScope}, workspace=${boundWorkspace}): ${
             err instanceof Error ? err.message : String(err)
           }`,
         );
@@ -213,7 +214,7 @@ export function registerWorkspaceQualifiedPermissionsRoutes(
         );
     } catch (err) {
       writeStderrLine(
-        `qwen serve: GET /workspaces/:workspace/permissions error: ${
+        `mariadb-shell-agent serve: GET /workspaces/:workspace/permissions error: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );
@@ -305,7 +306,7 @@ export function registerWorkspaceQualifiedPermissionsRoutes(
           return;
         }
         writeStderrLine(
-          `qwen serve: POST /workspaces/:workspace/permissions ACP error (ruleType=${ruleType}, workspace=${runtime.workspaceCwd}): ${
+          `mariadb-shell-agent serve: POST /workspaces/:workspace/permissions ACP error (ruleType=${ruleType}, workspace=${runtime.workspaceCwd}): ${
             err instanceof Error ? err.message : String(err)
           }`,
         );

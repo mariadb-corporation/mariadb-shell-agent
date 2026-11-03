@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2595,7 +2596,10 @@ describe('readWorkspaceContext', () => {
       await mkdir(session1);
       await mkdir(session2);
       await writeFile(path.join(session2, 'AGENTS.md'), 'sibling text');
-      await writeFile(path.join(session1, 'QWEN.md'), 'own text');
+      await writeFile(
+        path.join(session1, 'MARIADB-SHELL-AGENT.md'),
+        'own text',
+      );
       await symlink(
         path.join(session2, 'AGENTS.md'),
         path.join(session1, 'AGENTS.md'),
@@ -2611,7 +2615,9 @@ describe('readWorkspaceContext', () => {
       const executor = new ManagedToolExecutor(async () => toolSet);
       const { files } = await executor.readWorkspaceContext('session-1');
 
-      expect(files.map((file) => file.name)).toEqual(['QWEN.md']);
+      expect(files.map((file) => file.name)).toEqual([
+        'MARIADB-SHELL-AGENT.md',
+      ]);
       expect(files[0]?.text).toBe('own text');
       expect(files.some((file) => file.text.includes('sibling text'))).toBe(
         false,
@@ -2632,7 +2638,7 @@ describe('readWorkspaceContext', () => {
       const sibling = path.join(mount, 'b');
       await mkdir(sibling);
       await writeFile(path.join(sibling, 'AGENTS.md'), 'sibling private rules');
-      await writeFile(path.join(mount, 'QWEN.md'), 'own text');
+      await writeFile(path.join(mount, 'MARIADB-SHELL-AGENT.md'), 'own text');
       await symlink(
         path.join(sibling, 'AGENTS.md'),
         path.join(mount, 'AGENTS.md'),
@@ -2689,7 +2695,9 @@ describe('readWorkspaceContext', () => {
 
       const { files } = await executor.readWorkspaceContext('session-root');
 
-      expect(files.map((file) => file.name)).toEqual(['QWEN.md']);
+      expect(files.map((file) => file.name)).toEqual([
+        'MARIADB-SHELL-AGENT.md',
+      ]);
       expect(files.some((file) => file.text.includes('sibling private'))).toBe(
         false,
       );
@@ -2707,7 +2715,10 @@ describe('readWorkspaceContext', () => {
       const fifo = path.join(directory, 'AGENTS.md');
       let unblock: number | undefined;
       try {
-        await writeFile(path.join(directory, 'QWEN.md'), 'own text');
+        await writeFile(
+          path.join(directory, 'MARIADB-SHELL-AGENT.md'),
+          'own text',
+        );
         execFileSync('mkfifo', [fifo]);
 
         const toolSet: ManagedToolSet = {
@@ -2737,7 +2748,9 @@ describe('readWorkspaceContext', () => {
           );
         }
 
-        expect(outcome.files.map((file) => file.name)).toEqual(['QWEN.md']);
+        expect(outcome.files.map((file) => file.name)).toEqual([
+          'MARIADB-SHELL-AGENT.md',
+        ]);
       } finally {
         if (unblock !== undefined) fs.closeSync(unblock);
         await rm(directory, { recursive: true, force: true });
@@ -2755,7 +2768,10 @@ describe('readWorkspaceContext', () => {
     const readFileSpy = vi.spyOn(fs.promises, 'readFile');
     const openSpy = vi.spyOn(fs.promises, 'open');
     try {
-      await writeFile(path.join(directory, 'QWEN.md'), 'own text');
+      await writeFile(
+        path.join(directory, 'MARIADB-SHELL-AGENT.md'),
+        'own text',
+      );
       await writeFile(overBudget, 'a'.repeat(budget + 4096));
 
       const toolSet: ManagedToolSet = {
@@ -2769,7 +2785,10 @@ describe('readWorkspaceContext', () => {
       const { files } = await executor.readWorkspaceContext('session-1');
 
       // The reply is unchanged: same names, same capped length, same note.
-      expect(files.map((file) => file.name)).toEqual(['QWEN.md', 'AGENTS.md']);
+      expect(files.map((file) => file.name)).toEqual([
+        'MARIADB-SHELL-AGENT.md',
+        'AGENTS.md',
+      ]);
       expect(files[1]?.text).toHaveLength(MANAGED_WORKSPACE_CONTEXT_FILE_CHARS);
       expect(files[1]?.text).toContain('[Truncated');
       expect(files[0]?.text).toBe('own text');
@@ -2779,7 +2798,7 @@ describe('readWorkspaceContext', () => {
       // (macOS tmpdir is a symlink layer).
       const overBudgetReal = await fs.promises.realpath(overBudget);
       const smallReal = await fs.promises.realpath(
-        path.join(directory, 'QWEN.md'),
+        path.join(directory, 'MARIADB-SHELL-AGENT.md'),
       );
       expect(
         readFileSpy.mock.calls.filter(([target]) => target === overBudgetReal),
@@ -2807,7 +2826,10 @@ describe('readWorkspaceContext', () => {
     const directory = path.join(mount, 'session-1');
     try {
       await mkdir(directory);
-      await writeFile(path.join(directory, 'QWEN.md'), 'own text');
+      await writeFile(
+        path.join(directory, 'MARIADB-SHELL-AGENT.md'),
+        'own text',
+      );
       await rm(directory, { recursive: true, force: true });
 
       const toolSet: ManagedToolSet = {
@@ -2834,7 +2856,10 @@ describe('readWorkspaceContext', () => {
     // sibling control op refuses in the same state.
     const directory = await mkdtemp(path.join(os.tmpdir(), 'ctx-sealed-'));
     try {
-      await writeFile(path.join(directory, 'QWEN.md'), 'own text');
+      await writeFile(
+        path.join(directory, 'MARIADB-SHELL-AGENT.md'),
+        'own text',
+      );
 
       const toolSet: ManagedToolSet = {
         sessionId: 'session-1',
@@ -2857,7 +2882,10 @@ describe('readWorkspaceContext', () => {
   it('refuses a tool set that has retired', async () => {
     const directory = await mkdtemp(path.join(os.tmpdir(), 'ctx-retired-'));
     try {
-      await writeFile(path.join(directory, 'QWEN.md'), 'own text');
+      await writeFile(
+        path.join(directory, 'MARIADB-SHELL-AGENT.md'),
+        'own text',
+      );
 
       const toolSet: ManagedToolSet = {
         sessionId: 'session-1',
@@ -2885,7 +2913,10 @@ describe('readWorkspaceContext', () => {
       release = resolve;
     });
     try {
-      await writeFile(path.join(directory, 'QWEN.md'), 'own text');
+      await writeFile(
+        path.join(directory, 'MARIADB-SHELL-AGENT.md'),
+        'own text',
+      );
 
       const toolSet: ManagedToolSet = {
         sessionId: 'session-1',

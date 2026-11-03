@@ -2,7 +2,7 @@
 
 ## Baseline and scope
 
-Reviewed PR [#9040](https://github.com/QwenLM/qwen-code/pull/9040) at
+Reviewed PR [#9040](https://github.invalid/QwenLM/qwen-code/pull/9040) at
 `68ea6ff2b2cc0d73e515285f45a55cf62c06f4a6`: 19 changed files, 75 review
 threads, and the latest runtime reports. The 18 historical Critical inline
 findings have corresponding fixes. One Critical regression remains: supplying
@@ -104,7 +104,7 @@ multiline descriptions and paths, unstable manager mocks, hidden-query Escape
 and navigation behavior, stale Enter targets, and the missing `isSkillEnabled`
 mock after a main merge. Shared truncation is opt-in, preserving Arena labels.
 
-[Issue #9170](https://github.com/QwenLM/qwen-code/issues/9170) still has seven
+[Issue #9170](https://github.invalid/QwenLM/qwen-code/issues/9170) still has seven
 unchecked entries at review time, but they are already fixed or superseded:
 
 | Entry                               | Current disposition                                                          |
@@ -127,7 +127,7 @@ Before integration, the four changed test files passed 70/70 cases; eight
 changed TypeScript files passed ESLint. Independent render probes confirmed
 the Critical and the capacity/resize follow-ups. The local pre-merge CLI
 typecheck failed in unchanged files, including stale workspace declarations;
-it was not reported as passing. Global `qwen` and `tmux` were unavailable, so
+it was not reported as passing. Global `mariadb-shell-agent` and `tmux` were unavailable, so
 those baseline results are rendered-component evidence rather than CLI E2E.
 
 The main integration is recorded as merge commit `e4cbcadddd`, preserving

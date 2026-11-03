@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -66,7 +67,7 @@ const ciCleanSteps = Object.entries(ciYaml.jobs)
         JSON.stringify(job['runs-on'] ?? ''),
       ) ||
         (job.steps ?? []).some(
-          (s) => s.name === 'Clean stale .qwen before checkout',
+          (s) => s.name === 'Clean stale .mariadb-shell-agent before checkout',
         )) &&
       (job.steps ?? []).some((s) =>
         String(s.uses ?? '').includes('actions/checkout'),
@@ -75,8 +76,9 @@ const ciCleanSteps = Object.entries(ciYaml.jobs)
   .map(([id, job]) => ({
     id,
     steps: job.steps,
-    run: job.steps.find((s) => s.name === 'Clean stale .qwen before checkout')
-      ?.run,
+    run: job.steps.find(
+      (s) => s.name === 'Clean stale .mariadb-shell-agent before checkout',
+    )?.run,
   }));
 const classifyPrSteps = ciYaml.jobs.classify_pr.steps;
 const trustedClassifierGuardIndex = classifyPrSteps.findIndex(
@@ -99,7 +101,7 @@ const agentStateCleanStep = reviewCleanSteps.find(
   (s) => s.name === 'Clean stale agent state',
 ).run;
 const reviewPreCheckoutSweepIndex = reviewCleanSteps.findIndex(
-  (s) => s.name === 'Clean stale .qwen before checkout',
+  (s) => s.name === 'Clean stale .mariadb-shell-agent before checkout',
 );
 const reviewPreCheckoutSweepStep =
   reviewCleanSteps[reviewPreCheckoutSweepIndex]?.run;
@@ -182,14 +184,14 @@ function expectQuarantineFallback(run) {
   expect(code).toContain('_qwen-quarantine');
   // A cancelled verify can leave the protected tree under the recovery name
   // seen in run 33146730771, so both known top-level names must be swept.
-  // `.qwen.root-orig` is emitted by recovery tooling OUTSIDE this repo —
+  // `.mariadb-shell-agent.root-orig` is emitted by recovery tooling OUTSIDE this repo —
   // nothing here produces it (git grep matches only the sweep copies and
   // these pins), so the pins keep the copies honest, not the producer: if
   // its naming changes or a third residue name appears on the pool, update
   // the for-loop list in ci.yml and qwen-code-pr-review.yml, or the sweep
   // silently no-ops and the checkout poisoning recurs.
   expect(code).toContain(
-    'for stale_qwen in "$GITHUB_WORKSPACE/.qwen" "$GITHUB_WORKSPACE/.qwen.root-orig" "$GITHUB_WORKSPACE/trusted-ci-classifier"; do',
+    'for stale_qwen in "$GITHUB_WORKSPACE/.mariadb-shell-agent" "$GITHUB_WORKSPACE/.mariadb-shell-agent.root-orig" "$GITHUB_WORKSPACE/trusted-ci-classifier"; do',
   );
   // The existence guard's `-L` arm is the only thing that sees a dangling
   // symlink (`-e` follows the link and reports it absent), and the chmod
@@ -254,7 +256,7 @@ const removeReviewTreeFn = reviewCleanStep.slice(
 const bashAvailable = spawnSync('bash', ['-c', 'exit 0']).status === 0;
 // The pre-checkout sweep's ladder is individually guarded: every rung ends
 // in `|| true` with stderr swallowed, so on a Git-Bash-only PATH without
-// coreutils the whole sweep exits 0 while leaving `.qwen` on disk — the
+// coreutils the whole sweep exits 0 while leaving `.mariadb-shell-agent` on disk — the
 // behavioral fixture asserting removal must skip there instead of failing.
 const sweepToolsAvailable =
   bashAvailable &&
@@ -356,7 +358,7 @@ describe('review worktree cleanup steps', () => {
 
   it('fails closed if the trusted classifier residue survives cleanup', () => {
     const cleanupIndex = classifyPrSteps.findIndex(
-      (s) => s.name === 'Clean stale .qwen before checkout',
+      (s) => s.name === 'Clean stale .mariadb-shell-agent before checkout',
     );
     expect(trustedClassifierGuardIndex).toBeGreaterThan(cleanupIndex);
     expect(trustedClassifierGuardIndex).toBeLessThan(
@@ -392,13 +394,13 @@ describe('review worktree cleanup steps', () => {
     for (const { id, steps, run } of ciCleanSteps) {
       expect(
         run,
-        `job "${id}" checks out on the shared pool and must clean stale .qwen state first`,
+        `job "${id}" checks out on the shared pool and must clean stale .mariadb-shell-agent state first`,
       ).toBeDefined();
       // Position is load-bearing: the sweep must run after the ownership
       // restore (git refuses root-owned leftovers) and before checkout
       // (after checkout it no-ops on the fresh tree).
       const cleanIdx = steps.findIndex(
-        (s) => s.name === 'Clean stale .qwen before checkout',
+        (s) => s.name === 'Clean stale .mariadb-shell-agent before checkout',
       );
       const checkoutIdx = steps.findIndex((s) =>
         String(s.uses ?? '').includes('actions/checkout'),
@@ -432,16 +434,18 @@ describe('review worktree cleanup steps', () => {
   });
 
   it.skipIf(!sweepToolsAvailable)(
-    'removes both known qwen state names without touching .qwenignore',
+    'removes both known qwen state names without touching .mariadb-shell-agentignore',
     () => {
       for (const { id, run } of executableCleanCopies) {
         const root = mkdtempSync(join(tmpdir(), 'qwen-ci-cleanup-'));
         const workspace = join(root, 'workspace');
-        mkdirSync(join(workspace, '.qwen', 'agents'), { recursive: true });
-        mkdirSync(join(workspace, '.qwen.root-orig', 'agents'), {
+        mkdirSync(join(workspace, '.mariadb-shell-agent', 'agents'), {
           recursive: true,
         });
-        writeFileSync(join(workspace, '.qwenignore'), 'keep\n');
+        mkdirSync(join(workspace, '.mariadb-shell-agent.root-orig', 'agents'), {
+          recursive: true,
+        });
+        writeFileSync(join(workspace, '.mariadb-shell-agentignore'), 'keep\n');
 
         try {
           const result = spawnSync('bash', ['-c', run], {
@@ -451,11 +455,17 @@ describe('review worktree cleanup steps', () => {
           });
 
           expect(result.status, `${id}: ${result.stderr}`).toBe(0);
-          expect(existsSync(join(workspace, '.qwen')), id).toBe(false);
-          expect(existsSync(join(workspace, '.qwen.root-orig')), id).toBe(
+          expect(existsSync(join(workspace, '.mariadb-shell-agent')), id).toBe(
             false,
           );
-          expect(existsSync(join(workspace, '.qwenignore')), id).toBe(true);
+          expect(
+            existsSync(join(workspace, '.mariadb-shell-agent.root-orig')),
+            id,
+          ).toBe(false);
+          expect(
+            existsSync(join(workspace, '.mariadb-shell-agentignore')),
+            id,
+          ).toBe(true);
           // Deleted, not moved: a workspace that removes cleanly must not
           // leave a quarantine directory behind on either copy.
           expect(existsSync(join(root, '_qwen-quarantine')), id).toBe(false);
@@ -524,13 +534,13 @@ describe('review worktree cleanup steps', () => {
   });
 
   it.skipIf(!permissionFixturesAvailable)(
-    'pre-checkout sweeps unlink a dangling-symlink .qwen via the -L existence arm',
+    'pre-checkout sweeps unlink a dangling-symlink .mariadb-shell-agent via the -L existence arm',
     () => {
       for (const { id, run } of executableCleanCopies) {
         const root = mkdtempSync(join(tmpdir(), 'qwen-ci-cleanup-'));
         const workspace = join(root, 'workspace');
         mkdirSync(workspace, { recursive: true });
-        const link = join(workspace, '.qwen');
+        const link = join(workspace, '.mariadb-shell-agent');
         try {
           symlinkSync(join(root, 'missing-target'), link);
           // -e follows the link, so a dangling leftover reports as absent:
@@ -553,7 +563,7 @@ describe('review worktree cleanup steps', () => {
   );
 
   it.skipIf(!permissionFixturesAvailable)(
-    'pre-checkout sweeps unlink a live-symlink .qwen without touching its target',
+    'pre-checkout sweeps unlink a live-symlink .mariadb-shell-agent without touching its target',
     () => {
       for (const { id, run } of executableCleanCopies) {
         const root = mkdtempSync(join(tmpdir(), 'qwen-ci-cleanup-'));
@@ -563,7 +573,7 @@ describe('review worktree cleanup steps', () => {
         mkdirSync(workspace, { recursive: true });
         mkdirSync(target, { recursive: true });
         writeFileSync(marker, 'keep\n');
-        const link = join(workspace, '.qwen');
+        const link = join(workspace, '.mariadb-shell-agent');
         try {
           symlinkSync(target, link);
           const result = spawnSync('bash', ['-c', run], {
@@ -775,7 +785,7 @@ describe('review worktree cleanup steps', () => {
     'filter selects review worktrees only, never the main checkout',
     () => {
       const main = '/home/runner/work/qwen-code/qwen-code';
-      const review = `${main}/.qwen/tmp/review-pr-42`;
+      const review = `${main}/.mariadb-shell-agent/tmp/review-pr-42`;
       const out = spawnSync('awk', [worktreeFilter], {
         input: [
           `worktree ${main}`,
@@ -796,7 +806,7 @@ describe('review worktree cleanup steps', () => {
       for (const { id, run } of executableCleanCopies) {
         const root = mkdtempSync(join(tmpdir(), 'ci-quarantine-'));
         const workspace = join(root, 'repo', 'repo');
-        const residue = join(workspace, '.qwen.root-orig');
+        const residue = join(workspace, '.mariadb-shell-agent.root-orig');
         const marker = join(workspace, 'warm-cache-marker');
         try {
           mkdirSync(residue, { recursive: true });
@@ -809,7 +819,7 @@ describe('review worktree cleanup steps', () => {
               // Model the incident runner: delete/permission repair fail and
               // the foreign-owned residue cannot cross to another parent,
               // while the runner-owned workspace itself still can.
-              `set -euo pipefail\nrm() { return 1; }\nchmod() { return 1; }\nsudo() { return 1; }\nmv() {\n  if [ "$2" = "$GITHUB_WORKSPACE/.qwen.root-orig" ]; then return 1; fi\n  command mv "$@"\n}\n${run}\nprintf '::cwd::%s\\n' "$PWD"`,
+              `set -euo pipefail\nrm() { return 1; }\nchmod() { return 1; }\nsudo() { return 1; }\nmv() {\n  if [ "$2" = "$GITHUB_WORKSPACE/.mariadb-shell-agent.root-orig" ]; then return 1; fi\n  command mv "$@"\n}\n${run}\nprintf '::cwd::%s\\n' "$PWD"`,
               'clean-stale-qwen',
             ],
             {
@@ -829,7 +839,10 @@ describe('review worktree cleanup steps', () => {
           ).toBe('warm\n');
           expect(
             readFileSync(
-              join(movedWorkspace, '.qwen.root-orig/review-context.json'),
+              join(
+                movedWorkspace,
+                '.mariadb-shell-agent.root-orig/review-context.json',
+              ),
               'utf8',
             ),
             id,
@@ -868,7 +881,9 @@ describe('review worktree cleanup steps', () => {
             encoding: 'utf8',
           });
           expect(out.status, `${id}: ${out.stderr}`).toBe(0);
-          expect(existsSync(join(workspace, '.qwen')), id).toBe(false);
+          expect(existsSync(join(workspace, '.mariadb-shell-agent')), id).toBe(
+            false,
+          );
           expect(existsSync(join(root, 'repo', '_qwen-quarantine')), id).toBe(
             false,
           );
@@ -885,11 +900,17 @@ describe('review worktree cleanup steps', () => {
     () => {
       const fixture = mkdtempSync(join(tmpdir(), 'review-tree-fixture-'));
       try {
-        const leftover = join(fixture, '.qwen/tmp/review-pr-101');
+        const leftover = join(
+          fixture,
+          '.mariadb-shell-agent/tmp/review-pr-101',
+        );
         mkdirSync(leftover, { recursive: true });
         writeFileSync(join(leftover, 'leftover.txt'), 'x');
         // Relative input: the leftover loop's glob entries are relative.
-        const out = runRemoveReviewTree(fixture, '.qwen/tmp/review-pr-101');
+        const out = runRemoveReviewTree(
+          fixture,
+          '.mariadb-shell-agent/tmp/review-pr-101',
+        );
         expect(out.status).toBe(0);
         expect(out.stdout).toBe('');
         expect(existsSync(leftover)).toBe(false);
@@ -907,7 +928,7 @@ describe('review worktree cleanup steps', () => {
         const target = join(fixture, 'target');
         mkdirSync(target);
         writeFileSync(join(target, 'keep.txt'), 'x');
-        const leftoverDir = join(fixture, '.qwen/tmp');
+        const leftoverDir = join(fixture, '.mariadb-shell-agent/tmp');
         mkdirSync(leftoverDir, { recursive: true });
         const link = join(leftoverDir, 'review-pr-102');
         symlinkSync(target, link);
@@ -926,7 +947,7 @@ describe('review worktree cleanup steps', () => {
         );
         expect(readFileSync(join(target, 'keep.txt'), 'utf8')).toBe('x');
       } finally {
-        chmodSync(join(fixture, '.qwen/tmp'), 0o755);
+        chmodSync(join(fixture, '.mariadb-shell-agent/tmp'), 0o755);
         rmSync(fixture, { recursive: true, force: true });
       }
     },
@@ -937,7 +958,7 @@ describe('review worktree cleanup steps', () => {
     () => {
       const fixture = mkdtempSync(join(tmpdir(), 'review-tree-fixture-'));
       try {
-        const leftoverDir = join(fixture, '.qwen/tmp');
+        const leftoverDir = join(fixture, '.mariadb-shell-agent/tmp');
         mkdirSync(leftoverDir, { recursive: true });
         const hostile = join(leftoverDir, 'review-pr-\n::error::injected');
         mkdirSync(hostile);
@@ -954,7 +975,7 @@ describe('review worktree cleanup steps', () => {
           lines[0].startsWith('::warning::could not remove review worktree'),
         ).toBe(true);
       } finally {
-        chmodSync(join(fixture, '.qwen/tmp'), 0o755);
+        chmodSync(join(fixture, '.mariadb-shell-agent/tmp'), 0o755);
         rmSync(fixture, { recursive: true, force: true });
       }
     },
@@ -968,7 +989,7 @@ describe('review worktree cleanup steps', () => {
         const target = join(fixture, 'target');
         mkdirSync(target);
         writeFileSync(join(target, 'keep.txt'), 'x');
-        const leftoverDir = join(fixture, '.qwen/tmp');
+        const leftoverDir = join(fixture, '.mariadb-shell-agent/tmp');
         mkdirSync(leftoverDir, { recursive: true });
         const link = join(leftoverDir, 'review-pr-103');
         symlinkSync(target, link);
@@ -991,7 +1012,7 @@ describe('review worktree cleanup steps', () => {
     () => {
       const fixture = mkdtempSync(join(tmpdir(), 'review-tree-fixture-'));
       try {
-        const leftoverDir = join(fixture, '.qwen/tmp');
+        const leftoverDir = join(fixture, '.mariadb-shell-agent/tmp');
         mkdirSync(leftoverDir, { recursive: true });
         const link = join(leftoverDir, 'review-pr-104');
         symlinkSync(join(fixture, 'missing-target'), link);
@@ -1044,7 +1065,7 @@ describe('review worktree cleanup steps', () => {
     'remove_review_tree repairs a permission-locked tree and then removes it',
     () => {
       const fixture = mkdtempSync(join(tmpdir(), 'review-tree-fixture-'));
-      const leftover = join(fixture, '.qwen/tmp/review-pr-106');
+      const leftover = join(fixture, '.mariadb-shell-agent/tmp/review-pr-106');
       try {
         mkdirSync(leftover, { recursive: true });
         writeFileSync(join(leftover, 'locked.txt'), 'x');
@@ -1053,7 +1074,10 @@ describe('review worktree cleanup steps', () => {
         // path this exercises — first rm fails, chmod rung heals, retry rm
         // removes.
         chmodSync(leftover, 0o555);
-        const out = runRemoveReviewTree(fixture, '.qwen/tmp/review-pr-106');
+        const out = runRemoveReviewTree(
+          fixture,
+          '.mariadb-shell-agent/tmp/review-pr-106',
+        );
         expect(out.status).toBe(0);
         expect(out.stdout).toBe('');
         expect(existsSync(leftover)).toBe(false);
@@ -1068,7 +1092,7 @@ describe('review worktree cleanup steps', () => {
     () => {
       // The shape the ladder's lease loop exists for: a reviewed PR leaves a
       // mode-000 directory at a lease's name inside the (read-write mounted)
-      // `.qwen/tmp`, and the next job on this reused runner inherits it.
+      // `.mariadb-shell-agent/tmp`, and the next job on this reused runner inherits it.
       // Measured: `rm -rf` on that shape exits 1 with `Permission denied`
       // and leaves it standing — under the old bare `rm -rf ... 2>/dev/null
       // || true` lines nothing was logged, so the wedge survived silently.
@@ -1076,7 +1100,7 @@ describe('review worktree cleanup steps', () => {
       const fixture = mkdtempSync(join(tmpdir(), 'review-lease-sweep-'));
       const wedge = join(
         fixture,
-        '.qwen',
+        '.mariadb-shell-agent',
         'tmp',
         'qwen-review-lease-pr-1.json',
       );
@@ -1088,11 +1112,11 @@ describe('review worktree cleanup steps', () => {
         // A plain lease file at the NEW location rides the same loop.
         const newLease = join(
           fixture,
-          '.qwen',
+          '.mariadb-shell-agent',
           'review-leases',
           'qwen-review-lease-pr-2.json',
         );
-        mkdirSync(join(fixture, '.qwen', 'review-leases'), {
+        mkdirSync(join(fixture, '.mariadb-shell-agent', 'review-leases'), {
           recursive: true,
         });
         writeFileSync(newLease, '{}\n');
@@ -1128,9 +1152,9 @@ describe('review worktree cleanup steps', () => {
           // `..` routes to the suspicious-skip echo; the other two fail
           // the workspace prefix check and route to the unexpected-skip
           // echo.
-          `${fixture}/.qwen/tmp/review-pr-1/../pwn\r::stop-commands::pwned`,
-          `/elsewhere/.qwen/tmp/review-pr-2\r::endgroup::`,
-          `/elsewhere/.qwen/tmp/review-pr-3\r::notice::forged/git`,
+          `${fixture}/.mariadb-shell-agent/tmp/review-pr-1/../pwn\r::stop-commands::pwned`,
+          `/elsewhere/.mariadb-shell-agent/tmp/review-pr-2\r::endgroup::`,
+          `/elsewhere/.mariadb-shell-agent/tmp/review-pr-3\r::notice::forged/git`,
         ];
         const out = runReviewCleanStep(fixture, hostile);
         expect(out.status).toBe(0);

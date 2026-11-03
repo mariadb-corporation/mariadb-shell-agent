@@ -1,6 +1,6 @@
 # Agent Tool (`agent`)
 
-This document describes the `agent` tool for Qwen Code.
+This document describes the `agent` tool for MariaDB Shell Agent.
 
 ## Description
 
@@ -15,12 +15,12 @@ Use `agent` to launch a specialized subagent to handle complex, multi-step tasks
 - `subagent_type` (string, optional): The type of specialized agent to use for this task. Defaults to `general-purpose` if omitted.
 - `fork_turns` (string, optional): Only valid with `subagent_type="fork"`. Omit it or use `all` for the full parent conversation, or use a positive integer string such as `"3"` for the most recent three real user turns. Tool responses and pure system reminders do not count as turns.
 - `fork_tools` (array of strings, optional): Only valid with `subagent_type="fork"`. Restricts execution to exact canonical tool names or MCP server patterns while keeping the fork's current model-visible tool declarations unchanged for prompt-cache sharing. Entries cannot have surrounding whitespace; wildcards are limited to `mcp__*` or a trailing MCP tool-prefix pattern such as `mcp__github__read_*`. Forks never execute `ask_user_question`; omit `fork_tools` to allow every other inherited tool, or use an empty array to reject every tool call.
-- `fork_profile` (string, optional): Only valid with `subagent_type="fork"`. Loads a frontmatter-only regular `.qwen/fork-profiles/<name>.md` of at most 64 KiB from the active project root and applies its required `tools` array plus an optional `promptHint` of at most 200 characters. The file cannot resolve outside the project profile directory. `fork_profile` cannot be combined with `fork_tools` or a named teammate, and it is unavailable in safe mode or bare mode.
+- `fork_profile` (string, optional): Only valid with `subagent_type="fork"`. Loads a frontmatter-only regular `.mariadb-shell-agent/fork-profiles/<name>.md` of at most 64 KiB from the active project root and applies its required `tools` array plus an optional `promptHint` of at most 200 characters. The file cannot resolve outside the project profile directory. `fork_profile` cannot be combined with `fork_tools` or a named teammate, and it is unavailable in safe mode or bare mode.
 - `run_in_background` (boolean, optional): Defaults to `true` for top-level regular agents. Set to `false` to wait for a regular agent's result inline. Headless forks always run in the background. Nested agents run in the foreground unless `run_in_background` is explicitly `true`, which is rejected because nested agents cannot receive background completion notifications. Unnamed caller-owned `working_dir` launches run in the foreground: an explicit `run_in_background: true` request is rejected, while a configured background default (`background: true` in a subagent definition) is rejected at the top level and downgraded to the foreground when nested.
-- `isolation` (string, optional): Set to `"worktree"` to run an explicitly named, non-fork agent in an isolated git worktree that Qwen Code creates and manages.
+- `isolation` (string, optional): Set to `"worktree"` to run an explicitly named, non-fork agent in an isolated git worktree that MariaDB Shell Agent creates and manages.
 - `working_dir` (string, optional): Pin an explicitly named, non-fork agent to an existing registered git worktree inside the current repository. Unnamed launches run in the foreground because the caller owns the worktree lifecycle (see `run_in_background`); a named teammate pinned to one runs concurrently and must be shut down before the worktree is removed. If both `working_dir` and `isolation` are provided, `working_dir` takes precedence.
 
-## How to use `agent` with Qwen Code
+## How to use `agent` with MariaDB Shell Agent
 
 The Agent tool dynamically loads available subagents from your configuration and delegates tasks to them. Each subagent runs independently and can use its own set of tools, allowing for specialized expertise and parallel execution.
 
@@ -51,7 +51,7 @@ The available subagents depend on your configuration. Common subagent types migh
 - **test-runner**: For running tests and analyzing results
 - **documentation-writer**: For creating and updating documentation
 
-You can view available subagents by using the `/agents` command in Qwen Code.
+You can view available subagents by using the `/agents` command in MariaDB Shell Agent.
 
 ## Agent Tool Features
 
@@ -150,7 +150,7 @@ Don't use the Agent tool for:
 - **Independent context**: Regular subagents start without parent conversation history. Forks inherit the full conversation by default and accept `fork_turns` when a bounded recent window is sufficient.
 - **Subagent interaction**: Regular subagents do not receive `ask_user_question`. Forks keep the parent's declaration list for cache sharing but reject that tool before scheduling or approval; when missing user input blocks work, the subagent reports the blocker to its parent.
 - **Fork execution restrictions**: `fork_tools` further narrows which already-declared tools a fork may execute. Disallowed calls return an error before scheduling or approval; the same declaration list remains model-visible for cache sharing. This is a per-call restriction chosen by the caller, not an administrator-enforced sandbox.
-- **Fork profiles**: A project profile under `.qwen/fork-profiles/` reuses the same execution gate as `fork_tools`. It is resolved once before launch; the resolved list is persisted for revival, and an optional `promptHint` is added only to the task directive.
+- **Fork profiles**: A project profile under `.mariadb-shell-agent/fork-profiles/` reuses the same execution gate as `fork_tools`. It is resolved once before launch; the resolved list is persisted for revival, and an optional `promptHint` is added only to the task directive.
 - **Completion delivery**: Background results arrive through completion notifications in a later turn. Do not assume a result before the notification arrives.
 - **Continuation**: Use `list_agents` and `send_message` for related follow-up work instead of launching a duplicate agent. Continuation depends on compatible retained state and may be unavailable.
 - **Comprehensive prompts**: Your initial prompt should contain all necessary context and instructions for autonomous execution. A regular subagent does not see the parent conversation.
@@ -160,7 +160,7 @@ Don't use the Agent tool for:
 
 ## Configuration
 
-Subagents are configured through Qwen Code's agent configuration system. Use the `/agents` command to:
+Subagents are configured through MariaDB Shell Agent's agent configuration system. Use the `/agents` command to:
 
 - View available subagents
 - Create new subagent configurations

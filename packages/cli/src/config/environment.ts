@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -180,7 +181,7 @@ let lastReloadSnapshotSeeded = false;
  *
  * User-level paths cover the home `.env` and the global Qwen config dir
  * `.env` (which respects `QWEN_HOME`). When `QWEN_HOME` redirects elsewhere,
- * the legacy `<homedir>/.qwen/.env` is also included so credentials users
+ * the legacy `<homedir>/.mariadb-shell-agent/.env` is also included so credentials users
  * left there continue to load (and the trust check in untrusted workspaces
  * still allows reading it).
  */
@@ -202,7 +203,7 @@ function getUserLevelEnvPaths(): Set<string> {
  * module-load `Storage.getGlobalQwenDir()` would otherwise snapshot legacy
  * paths for settings.json, OAuth tokens, installation_id, etc., while the
  * regular `.env` load only runs later — splitting global state between
- * `~/.qwen/...` and `<QWEN_HOME>/...`.
+ * `~/.mariadb-shell-agent/...` and `<QWEN_HOME>/...`.
  */
 let homeEnvBootstrapped = false;
 export function preResolveHomeEnvOverrides(): void {
@@ -217,7 +218,7 @@ export function preResolveHomeEnvOverrides(): void {
 
   // Storage.getGlobalQwenDir() shares the same homedir resolution as the
   // rest of the storage layer; when QWEN_HOME is unset it equals
-  // `<homedir>/.qwen`, so path.dirname() recovers `<homedir>`.
+  // `<homedir>/.mariadb-shell-agent`, so path.dirname() recovers `<homedir>`.
   const initialQwenHome = process.env['QWEN_HOME'];
   const initialQwenDir = Storage.getGlobalQwenDir();
   const candidates: string[] = [path.join(initialQwenDir, '.env')];
@@ -281,7 +282,7 @@ export function resetEnvironmentTrackingForTesting(): void {
  * rather than by the process's actual environment.
  *
  * The distinction matters wherever a value decides something the file's author
- * must not decide. `<repo>/.qwen/.env` is repository content: it is read from
+ * must not decide. `<repo>/.mariadb-shell-agent/.env` is repository content: it is read from
  * the checkout under review, and folder trust defaults off, so a fresh runner
  * admits it. A setting that a repository is deliberately barred from making
  * through `settings.json` (see `operatorReviewSettings`, which skips the
@@ -323,7 +324,7 @@ export function isFileSourcedEnvKey(key: string): boolean {
  * Collects environment variables from user-level `.env` files and returns
  * them as a plain dictionary **without** mutating `process.env`.
  *
- * Candidates are iterated most-specific-first (`~/.qwen/.env` before
+ * Candidates are iterated most-specific-first (`~/.mariadb-shell-agent/.env` before
  * `~/.env`). `??=` ensures the first file to define a key wins, matching
  * dotenv's first-occurrence-wins semantics used elsewhere.
  */
@@ -366,7 +367,7 @@ export function getHomeEnvFallbackVars(
  *
  * When workspace is untrusted (or has no recorded trust decision yet), only
  * allow user-level .env files at:
- * - ~/.qwen/.env
+ * - ~/.mariadb-shell-agent/.env
  * - ~/.env
  * - <QWEN_HOME>/.env (when set)
  *
@@ -426,7 +427,7 @@ export function findEnvFiles(
   };
 
   // Home-dir candidates in priority order: globalQwenDir/.env, then legacy
-  // ~/.qwen/.env (only when QWEN_HOME redirects), then ~/.env.
+  // ~/.mariadb-shell-agent/.env (only when QWEN_HOME redirects), then ~/.env.
   const pushCandidate = (filePath: string): boolean => {
     const normalized = path.normalize(filePath);
     if (
@@ -465,7 +466,7 @@ export function findEnvFiles(
       pushHomeCandidates();
       return found;
     } else {
-      // Workspace step: prefer .qwen/.env, then plain .env.
+      // Workspace step: prefer .mariadb-shell-agent/.env, then plain .env.
       const geminiEnvPath = path.join(currentDir, QWEN_DIR, '.env');
       if (pushCandidate(geminiEnvPath)) {
         pushHomeCandidates();
@@ -759,8 +760,8 @@ export function loadEnvironment(
       settings?.advanced?.excludedEnvVars || DEFAULT_EXCLUDED_ENV_VARS;
     // homeScoped: `.env` lives under the user's home Qwen dir or `~/.env` —
     //   only these may set QWEN_HOME / QWEN_RUNTIME_DIR.
-    // qwenScoped: any `.env` whose immediate parent is `.qwen` (including
-    //   `<repo>/.qwen/.env`) — exempt from the user `excludedEnvVars` list.
+    // qwenScoped: any `.env` whose immediate parent is `.mariadb-shell-agent` (including
+    //   `<repo>/.mariadb-shell-agent/.env`) — exempt from the user `excludedEnvVars` list.
     for (const key in envFile.parsedEnv) {
       if (!canApplyParsedEnvKey(envFile, key, excludedVars)) continue;
 

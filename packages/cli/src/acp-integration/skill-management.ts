@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -68,7 +69,7 @@ type QwenManagedSkillFile = {
   content: string;
 };
 
-const PROJECT_SKILL_DIRS = ['.qwen', '.agents'] as const;
+const PROJECT_SKILL_DIRS = ['.mariadb-shell-agent', '.agents'] as const;
 const SKILLS_DIR = 'skills';
 
 // Skill slugs are used to build filesystem paths under `<globalQwenDir>/skills`.

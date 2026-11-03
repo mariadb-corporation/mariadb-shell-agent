@@ -45,7 +45,7 @@ JVM 测试覆盖序列化、迁移/故障路径和认证加密；Android instrum
 
 ## 参考与待决事项
 
-- [维护者架构决策](https://github.com/QwenLM/qwen-code/issues/11704#issuecomment-5645279859)。
+- [维护者架构决策](https://github.invalid/QwenLM/qwen-code/issues/11704#issuecomment-5645279859)。
 - [AndroidX 命名 profile](<https://developer.android.com/reference/androidx/webkit/WebViewCompat#setProfile(android.webkit.WebView,java.lang.String)>)。
 - [Android Keystore](https://developer.android.com/privacy-and-security/keystore)。
 

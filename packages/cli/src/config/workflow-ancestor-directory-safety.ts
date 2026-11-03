@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,8 +13,8 @@ export function isWorkflowAncestorDirectorySafe(directory: string): boolean {
   if (process.platform === 'win32') return true;
   for (const location of [
     directory,
-    path.join(directory, '.qwen'),
-    path.join(directory, '.qwen', 'workflows'),
+    path.join(directory, '.mariadb-shell-agent'),
+    path.join(directory, '.mariadb-shell-agent', 'workflows'),
   ]) {
     try {
       if ((fs.statSync(location).mode & 0o002) !== 0) return false;

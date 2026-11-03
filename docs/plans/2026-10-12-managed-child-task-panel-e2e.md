@@ -4,11 +4,11 @@
 
 ## Baseline
 
-Use global `qwen --version` and `qwen serve --help` before implementation. This CLI baseline establishes runtime availability, not browser feature support. Launch a dedicated Web Shell Vite process on port 18480 and the existing Managed Java provider browser fixture. Before the change there is no child Agent tasks entry, despite the Java Session declaring `tasks: true`. Browser tests use a controlled BFF to force response loss and races; they are not proof of real Hosted execution.
+Use global `mariadb-shell-agent --version` and `mariadb-shell-agent serve --help` before implementation. This CLI baseline establishes runtime availability, not browser feature support. Launch a dedicated Web Shell Vite process on port 18480 and the existing Managed Java provider browser fixture. Before the change there is no child Agent tasks entry, despite the Java Session declaring `tasks: true`. Browser tests use a controlled BFF to force response loss and races; they are not proof of real Hosted execution.
 
 ## Browser groups
 
-Run isolated Playwright contexts from `.qwen/e2e-tests/managed-child-task-panel-browser.mjs`; temporary browser state and screenshots stay in `.qwen/e2e-tests/`. Use the installed Chromium runtime. Each context owns its Session and operation map.
+Run isolated Playwright contexts from `.mariadb-shell-agent/e2e-tests/managed-child-task-panel-browser.mjs`; temporary browser state and screenshots stay in `.mariadb-shell-agent/e2e-tests/`. Use the installed Chromium runtime. Each context owns its Session and operation map.
 
 1. Compatibility: absent task capability and Daemon have no entry; Java without identity scope reads tasks but has no cancel action.
 2. Browsing: mixed raw pages, an empty filtered page with a next page, previous navigation and scroll restoration; no invented task name or count. Open detail, state history and missing Artifact output; verify draft and history preservation and no transcript reload.
@@ -41,4 +41,4 @@ A real browser connected through a same-origin proxy to Java, Hosted Harness, Br
 | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | ![No task entry](../design/assets/managed-child-task-panel-before.png) | ![Task panel beside conversation](../design/assets/managed-child-task-panel-after-wide.png) | ![Themed task Dialog](../design/assets/managed-child-task-panel-after-narrow.png) |
 
-Reusable local commands are `node .qwen/e2e-tests/managed-child-task-panel-browser.mjs`, the same command with `--extras`, and the sequential `managed-child-task-hosted-launch.mjs` / `managed-child-task-panel-hosted-browser.mjs` under `.qwen/e2e-tests/`. Scripts and raw reports are ignored working artifacts; the PR's separate report publishes their results. The dedicated Vite and real Java/Hosted processes were stopped after verification.
+Reusable local commands are `node .mariadb-shell-agent/e2e-tests/managed-child-task-panel-browser.mjs`, the same command with `--extras`, and the sequential `managed-child-task-hosted-launch.mjs` / `managed-child-task-panel-hosted-browser.mjs` under `.mariadb-shell-agent/e2e-tests/`. Scripts and raw reports are ignored working artifacts; the PR's separate report publishes their results. The dedicated Vite and real Java/Hosted processes were stopped after verification.

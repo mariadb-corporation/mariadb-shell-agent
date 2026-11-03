@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -53,14 +54,14 @@ it('renders instructions independently from auto memory', () => {
       builtinTools={[]}
       mcpTools={[]}
       skills={[]}
-      instructionFiles={[{ path: 'QWEN.md', tokens: 100 }]}
+      instructionFiles={[{ path: 'MARIADB-SHELL-AGENT.md', tokens: 100 }]}
       memoryFiles={[{ path: 'auto memory', tokens: 200 }]}
       showDetails={true}
     />,
   );
   expect(lastFrame()).toMatch(/Instruction files\s+100 tokens/);
   expect(lastFrame()).toMatch(/Auto memory\s+200 tokens/);
-  expect(lastFrame()).toContain('QWEN.md');
+  expect(lastFrame()).toContain('MARIADB-SHELL-AGENT.md');
   expect(lastFrame()).not.toContain('Memory files');
 });
 
@@ -76,7 +77,7 @@ it.each([false, true])(
         builtinTools={[]}
         mcpTools={[]}
         skills={[]}
-        memoryFiles={[{ path: 'QWEN.md', tokens: 200 }]}
+        memoryFiles={[{ path: 'MARIADB-SHELL-AGENT.md', tokens: 200 }]}
         showDetails={showDetails}
       />,
     );
@@ -84,7 +85,7 @@ it.each([false, true])(
     expect(frame).toMatch(/Memory files\s+200 tokens/);
     expect(frame).not.toContain('Instruction files');
     expect(frame).not.toContain('Auto memory');
-    expect(frame.includes('QWEN.md')).toBe(showDetails);
+    expect(frame.includes('MARIADB-SHELL-AGENT.md')).toBe(showDetails);
   },
 );
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -96,7 +97,12 @@ const passthroughMutate = (opts?: { strict?: boolean }) => {
 const ROOT = fs.realpathSync(
   fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-wt-routes-mocked-')),
 );
-const LINKED_PATH = path.join(ROOT, '.qwen', 'worktrees', 'swift-fox');
+const LINKED_PATH = path.join(
+  ROOT,
+  '.mariadb-shell-agent',
+  'worktrees',
+  'swift-fox',
+);
 
 afterAll(() => {
   fs.rmSync(ROOT, { recursive: true, force: true });
@@ -270,7 +276,7 @@ describe('workspace git worktree routes', () => {
     // prefix test on the relative path reads it as the parent and drops it.
     const dotted = {
       ...LINKED,
-      path: path.join(ROOT, '.qwen', 'worktrees', '..data'),
+      path: path.join(ROOT, '.mariadb-shell-agent', 'worktrees', '..data'),
     };
     listMock.mockResolvedValue([MAIN, dotted]);
     const app = mount([runtime('primary', ROOT, true)]);
@@ -471,7 +477,7 @@ describe('workspace git worktree routes', () => {
         { sessionId: 's1', worktree: { path: LINKED.path } },
         {
           sessionId: 's2',
-          worktree: { path: '/work/main/.qwen/worktrees/other' },
+          worktree: { path: '/work/main/.mariadb-shell-agent/worktrees/other' },
         },
         { sessionId: 's3' },
       ]),

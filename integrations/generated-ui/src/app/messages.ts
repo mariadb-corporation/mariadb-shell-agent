@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -32,7 +33,7 @@ const EN = {
   'continue.again': 'Review again after checking the session',
   'continue.fix': 'Ask the assistant to fix this view',
   'help.unavailable':
-    'Continuing analysis requires a connected Qwen Code host with message review. Local interactions remain available.',
+    'Continuing analysis requires a connected MariaDB Shell Agent host with message review. Local interactions remain available.',
   'help.fix':
     'Review a message with this error before sending it to this session. The assistant can then show a corrected view.',
   'help.continue':
@@ -84,7 +85,7 @@ const ZH_CN: Record<MessageKey, string> = {
   'continue.again': '确认会话状态后重新审阅',
   'continue.fix': '请助手修复此视图',
   'help.unavailable':
-    '继续分析需要连接到支持消息审阅的 Qwen Code 宿主。本地交互仍然可用。',
+    '继续分析需要连接到支持消息审阅的 MariaDB Shell Agent 宿主。本地交互仍然可用。',
   'help.fix':
     '发送前会先让你审阅包含此错误的消息，助手随后可以展示修正后的视图。',
   'help.continue': '把已应用的参数发送到此会话继续分析。',

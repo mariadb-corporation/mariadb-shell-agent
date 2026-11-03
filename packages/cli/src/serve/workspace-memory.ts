@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -39,8 +40,8 @@ import { resolveWithinWorkspace } from './fs/paths.js';
  * Issue #4175 PR 16: workspace memory CRUD routes.
  *
  * `GET /workspace/memory` returns the daemon's snapshot of explicit
- * `QWEN.md` / `AGENTS.md` files reachable from the bound workspace
- * plus the user's `~/.qwen/` global. Read-only; returns
+ * `MARIADB-SHELL-AGENT.md` / `AGENTS.md` files reachable from the bound workspace
+ * plus the user's `~/.mariadb-shell-agent/` global. Read-only; returns
  * `initialized: false` and an empty `files` list when no files exist
  * (no synthetic 500s, mirroring PR 12's read-only routes).
  * `?content=true` also returns each file's text, which is how a client
@@ -55,11 +56,11 @@ import { resolveWithinWorkspace } from './fs/paths.js';
  * Both routes are filesystem-only — neither spawns the ACP child.
  *
  * **Absolute filePath disclosure note**: success / 413 / GET-list
- * responses include absolute on-disk paths (`/work/<x>/QWEN.md`,
- * `/Users/<x>/.qwen/QWEN.md`). This is by design for a daemon
+ * responses include absolute on-disk paths (`/work/<x>/MARIADB-SHELL-AGENT.md`,
+ * `/Users/<x>/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md`). This is by design for a daemon
  * contract: clients pre-flight `caps.workspaceCwd` to learn the
  * bound workspace root and can compute relative paths if they
- * prefer; the global scope (`~/.qwen/QWEN.md`) is NOT under the
+ * prefer; the global scope (`~/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md`) is NOT under the
  * workspace root, so rewriting to a workspace-relative form would
  * lose information. Configured bearer auth or the daemon's trusted-loopback
  * binding already defines who can see these paths. If a
@@ -134,7 +135,7 @@ function sendWorkspaceMemoryWriteError(
   if (sendGenerationClosedError(res, err)) return;
   if (err instanceof WorkspaceMemoryWriteTimeoutError) {
     writeStderrLine(
-      `qwen serve: ${route} timeout — file lock at ` +
+      `mariadb-shell-agent serve: ${route} timeout — file lock at ` +
         `${err.filePath} did not acquire within ${err.timeoutMs}ms ` +
         `(stalled FS / OneDrive / NFS)`,
     );
@@ -153,7 +154,7 @@ function sendWorkspaceMemoryWriteError(
   }
   if (err instanceof WorkspaceMemoryFileTooLargeError) {
     writeStderrLine(
-      `qwen serve: ${route} refused — existing file ` +
+      `mariadb-shell-agent serve: ${route} refused — existing file ` +
         `${err.filePath} is ${err.bytes} bytes (cap ${err.limit})`,
     );
     const debug = isServeDebugMode();
@@ -171,7 +172,7 @@ function sendWorkspaceMemoryWriteError(
     return;
   }
   writeStderrLine(
-    `qwen serve: ${route} failed (scope=${scope} mode=${mode}): ${
+    `mariadb-shell-agent serve: ${route} failed (scope=${scope} mode=${mode}): ${
       err instanceof Error ? (err.stack ?? err.message) : String(err)
     }`,
   );
@@ -222,7 +223,7 @@ export function mountWorkspaceMemoryRoutes(
       // exactly the silent-failure mode PR 12's read-only routes
       // avoided by routing bridge errors through `sendBridgeError`.
       writeStderrLine(
-        `qwen serve: GET /workspace/memory failed: ${
+        `mariadb-shell-agent serve: GET /workspace/memory failed: ${
           err instanceof Error ? (err.stack ?? err.message) : String(err)
         }`,
       );
@@ -376,7 +377,7 @@ export function mountWorkspaceQualifiedMemoryRoutes(
     } catch (err) {
       if (sendGenerationClosedError(res, err)) return;
       writeStderrLine(
-        `qwen serve: GET /workspaces/:workspace/memory failed: ${
+        `mariadb-shell-agent serve: GET /workspaces/:workspace/memory failed: ${
           err instanceof Error ? (err.stack ?? err.message) : String(err)
         }`,
       );
@@ -513,9 +514,9 @@ export interface CollectWorkspaceMemoryStatusOptions {
 }
 
 /**
- * Filesystem-only discovery of explicit `QWEN.md` / `AGENTS.md`
+ * Filesystem-only discovery of explicit `MARIADB-SHELL-AGENT.md` / `AGENTS.md`
  * files reachable from the daemon's bound workspace plus the user's
- * `~/.qwen/` global directory.
+ * `~/.mariadb-shell-agent/` global directory.
  *
  * Discovers the bound-workspace-root file(s) (no parent-directory
  * walk in this version) plus the global dir. `walkWorkspaceForMemory`
@@ -524,7 +525,7 @@ export interface CollectWorkspaceMemoryStatusOptions {
  * surface as "workspace root + global". Auto-memory (the `MEMORY.md`
  * index + per-type files) is intentionally NOT included; that's PR
  * 16.5's responsibility per scope decision in issue #4175. Path-
- * based rules (`.qwen/rules/`) are also out of scope for v1.
+ * based rules (`.mariadb-shell-agent/rules/`) are also out of scope for v1.
  */
 export async function collectWorkspaceMemoryStatus(
   boundWorkspace: string,
@@ -616,7 +617,7 @@ export async function collectWorkspaceMemoryStatus(
 }
 
 /**
- * Stat each known memory filename (`QWEN.md`, `AGENTS.md`) at the
+ * Stat each known memory filename (`MARIADB-SHELL-AGENT.md`, `AGENTS.md`) at the
  * bound workspace root and return the matches. v1 does not walk
  * parent directories — that's reserved for PR 16.5's hierarchical
  * mode, which will replace this helper with a real upward walk

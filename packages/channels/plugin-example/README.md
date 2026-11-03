@@ -1,6 +1,6 @@
 # @qwen-code/channel-plugin-example
 
-A reference channel plugin for Qwen Code. It connects to a WebSocket server and routes messages through the full channel pipeline (access control, session routing, agent bridge).
+A reference channel plugin for MariaDB Shell Agent. It connects to a WebSocket server and routes messages through the full channel pipeline (access control, session routing, agent bridge).
 
 Use this package to:
 
@@ -15,17 +15,17 @@ Use this package to:
 npm install @qwen-code/channel-plugin-example
 ```
 
-### 2. Link it as a Qwen Code extension
+### 2. Link it as a MariaDB Shell Agent extension
 
 The package ships a `qwen-extension.json` manifest, so it works as an extension out of the box:
 
 ```bash
-qwen extensions link ./node_modules/@qwen-code/channel-plugin-example
+mariadb-shell-agent extensions link ./node_modules/@qwen-code/channel-plugin-example
 ```
 
 ### 3. Configure the channel
 
-Add a channel entry to `~/.qwen/settings.json`:
+Add a channel entry to `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -58,17 +58,17 @@ HTTP_PORT=8080 WS_PORT=8081 npx qwen-channel-plugin-example-server
 In a separate terminal:
 
 ```bash
-qwen channel start my-plugin-test
+mariadb-shell-agent channel start my-plugin-test
 ```
 
 Or run the same adapter under the experimental daemon-managed channel worker:
 
 ```bash
 cd /path/to/your/project
-qwen serve --channel my-plugin-test
+mariadb-shell-agent serve --channel my-plugin-test
 ```
 
-`qwen serve --channel` requires the channel's configured `cwd` to resolve to one registered, trusted daemon workspace. In a multi-workspace daemon, named channels are grouped into one worker per owning workspace; `--channel all` still selects only the primary workspace's channels.
+`mariadb-shell-agent serve --channel` requires the channel's configured `cwd` to resolve to one registered, trusted daemon workspace. In a multi-workspace daemon, named channels are grouped into one worker per owning workspace; `--channel all` still selects only the primary workspace's channels.
 
 ### 6. Send a message
 
@@ -104,11 +104,11 @@ See `src/MockPluginChannel.ts` for a working example. The key points:
 4. Export a `plugin` object conforming to `ChannelPlugin`
 5. Add a `qwen-extension.json` manifest
 
-`AcpBridge` is still the current standalone `qwen channel start` implementation. Plugin adapters should depend on the `ChannelAgentBridge` abstraction provided by `@qwen-code/channel-base`.
+`AcpBridge` is still the current standalone `mariadb-shell-agent channel start` implementation. Plugin adapters should depend on the `ChannelAgentBridge` abstraction provided by `@qwen-code/channel-base`.
 
 Existing TypeScript plugins that explicitly type the adapter constructor or factory `bridge` parameter as `AcpBridge` should change that annotation to `ChannelAgentBridge`. JavaScript plugins are unaffected at runtime.
 
-`qwen serve --channel <name>` hosts the same plugin through a daemon-managed worker backed by `DaemonChannelBridge`. The worker is owned by `qwen serve`; stop the daemon to stop serve-managed channels.
+`mariadb-shell-agent serve --channel <name>` hosts the same plugin through a daemon-managed worker backed by `DaemonChannelBridge`. The worker is owned by `mariadb-shell-agent serve`; stop the daemon to stop serve-managed channels.
 
 ### Features you get for free
 

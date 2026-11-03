@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -47,7 +48,7 @@ describe('formatInterruptedWorkflowRunsNotice', () => {
       formatInterruptedWorkflowRunsNotice([run({ args: { files: ['a'] } })]),
     ).toBe(
       [
-        'A workflow run was interrupted when the Qwen Code process running it exited:',
+        'A workflow run was interrupted when the MariaDB Shell Agent process running it exited:',
         '  wf_0123abcd · audit · 3/7 agents finished',
         '    resume: Workflow({ scriptPath: "/runs/generated/inline/wf_0123abcd.js", resumeFromRunId: "wf_0123abcd", args: {"files":["a"]} })',
         'Run /workflows to see them.',
@@ -102,7 +103,7 @@ describe('formatInterruptedWorkflowRunsNotice', () => {
     const lines = notice.split('\n');
 
     expect(lines[0]).toBe(
-      '5 workflow runs were interrupted when the Qwen Code process running them exited:',
+      '5 workflow runs were interrupted when the MariaDB Shell Agent process running them exited:',
     );
     expect(lines).toContain('  wf_3');
     expect(notice).not.toContain('wf_4');

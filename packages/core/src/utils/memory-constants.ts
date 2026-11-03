@@ -1,17 +1,18 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export const DEFAULT_CONTEXT_FILENAME = 'QWEN.md';
+export const DEFAULT_CONTEXT_FILENAME = 'MARIADB-SHELL-AGENT.md';
 export const AGENT_CONTEXT_FILENAME = 'AGENTS.md';
 /**
  * Per-developer, project-scoped context file. Anchored at
- * `<projectRoot>/.qwen/QWEN.local.md`. Intended to be gitignored so each
+ * `<projectRoot>/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md`. Intended to be gitignored so each
  * developer can keep personal instructions (local cluster IDs, account
- * names, paths) without polluting the shared project `QWEN.md` or the
- * global `~/.qwen/QWEN.md`.
+ * names, paths) without polluting the shared project `MARIADB-SHELL-AGENT.md` or the
+ * global `~/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md`.
  *
  * Unlike `DEFAULT_CONTEXT_FILENAME` / `AGENT_CONTEXT_FILENAME`, this name is
  * NOT part of the hierarchical upward-search list — it is loaded from a
@@ -23,14 +24,14 @@ export const AGENT_CONTEXT_FILENAME = 'AGENTS.md';
  * project root can be found, the slot is skipped — the loader does NOT
  * fall back to cwd, because that would turn a "single fixed slot" into a
  * per-cwd file and (when cwd is the home directory) would collide with
- * the global Qwen dir at `~/.qwen/`.
+ * the global Qwen dir at `~/.mariadb-shell-agent/`.
  */
-export const LOCAL_CONTEXT_FILENAME = 'QWEN.local.md';
+export const LOCAL_CONTEXT_FILENAME = 'MARIADB-SHELL-AGENT.local.md';
 export const MEMORY_SECTION_HEADER = '## Qwen Added Memories';
 
 // This variable will hold the currently configured filename for context files.
-// It defaults to include both QWEN.md and AGENTS.md but can be overridden by setMemoryFilename.
-// QWEN.md is first to maintain backward compatibility (used by /init command tool).
+// It defaults to include both MARIADB-SHELL-AGENT.md and AGENTS.md but can be overridden by setMemoryFilename.
+// MARIADB-SHELL-AGENT.md is first to maintain backward compatibility (used by /init command tool).
 let currentMemoryFilename: string | string[] = [
   DEFAULT_CONTEXT_FILENAME,
   AGENT_CONTEXT_FILENAME,

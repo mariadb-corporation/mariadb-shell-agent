@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -60,7 +61,7 @@ describe('makeRunEnvironment', () => {
     fs.rmSync(root, { recursive: true, force: true });
   });
   const layout = (run) => {
-    const qwenDir = path.join(run.env.HOME, '.qwen');
+    const qwenDir = path.join(run.env.HOME, '.mariadb-shell-agent');
     const dotenv = path.join(qwenDir, '.env');
     return {
       settings: JSON.parse(
@@ -95,7 +96,7 @@ describe('makeRunEnvironment', () => {
     expect(dotenv).toBeNull();
   });
 
-  it('puts them in ~/.qwen/.env for credentials: dotenv', () => {
+  it('puts them in ~/.mariadb-shell-agent/.env for credentials: dotenv', () => {
     const run = makeRunEnvironment({
       root,
       modelServer,

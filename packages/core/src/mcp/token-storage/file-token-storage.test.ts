@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -59,7 +60,7 @@ const bearer = ({
 
 const ENCRYPTED = /^[0-9a-f]+:[0-9a-f]+:[0-9a-f]+$/;
 const WRITE_OPTIONS = { mode: 0o600, forceMode: true, noFollow: true };
-const qwenDir = path.join('/home/test', '.qwen');
+const qwenDir = path.join('/home/test', '.mariadb-shell-agent');
 const tokenFile = path.join(qwenDir, 'mcp-oauth-tokens-v2.json');
 
 describe('FileTokenStorage', () => {

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,7 +29,7 @@ const PROBE_SOURCE =
   '[...new Intl.Segmenter("en", { granularity: "grapheme" }).segment("q")];';
 
 const ICU_ERROR_MESSAGE = [
-  'Qwen Code cannot start the interactive UI: this Node.js runtime is missing',
+  'MariaDB Shell Agent cannot start the interactive UI: this Node.js runtime is missing',
   'full ICU data, and segmenting text with Intl.Segmenter crashes the process.',
   'Install the full ICU package for your Node distribution',
   '(e.g. `sudo dnf install nodejs-full-i18n` on RHEL) or use a Node build',
@@ -119,7 +120,7 @@ export function assertFullIcuAvailable(probe: Probe = defaultProbe): void {
     // A child that never started is not a verdict on this host's ICU data:
     // warn and continue rather than refuse a healthy host.
     writeStderrLine(
-      'Qwen Code could not probe the Node.js ICU runtime (the probe process ' +
+      'MariaDB Shell Agent could not probe the Node.js ICU runtime (the probe process ' +
         'failed to start); continuing without the check.',
     );
     return;

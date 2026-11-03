@@ -72,7 +72,7 @@ Workspace 和 writer generation 校验保持权威。编辑器说明可移植语
 
 ## 验证与验收
 
-E2E 计划位于 `.qwen/e2e-tests/managed-permission-policy.md`。先在隔离状态中检查全局
+E2E 计划位于 `.mariadb-shell-agent/e2e-tests/managed-permission-policy.md`。先在隔离状态中检查全局
 CLI 基线。覆盖规则优先级、复合命令、MCP 身份、非法及超限策略、分类器允许、阻断
 及不可用、Plan 与 Hook ask、待决 Action 恢复、幂等、授权、旧修订、冷态策略快照及
 不支持的 Harness。

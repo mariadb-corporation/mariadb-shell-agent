@@ -69,7 +69,7 @@ reference 是 harness 分配的原始调用身份；Runtime 不会得知任何 B
 
 ### 4.1 Java transport
 
-`acknowledge` 不是 Broker 的操作：Java transport 不暴露也不发送它，worker 按 schema 声明作答。普通（`qwen serve`）Managed 宿主在自己的结果提交落盘之后调用它。Java conformance 消费方钉住新增的路由与新的状态词汇表，实现了它的 worker 保持兼容。
+`acknowledge` 不是 Broker 的操作：Java transport 不暴露也不发送它，worker 按 schema 声明作答。普通（`mariadb-shell-agent serve`）Managed 宿主在自己的结果提交落盘之后调用它。Java conformance 消费方钉住新增的路由与新的状态词汇表，实现了它的 worker 保持兼容。
 
 `HttpRuntimeTransport` 在发送前校验调用方 reference 的键集。`execute` 的调用方 map 包含四个身份字段及 `toolName`、`input`；线上请求将后两者与 `reference` 分开。`status` 和 `cancel` 只发送四个身份字段，也允许复用同一个调用方 map。`session` 参数为未来的服务适配层保留，不发送给 Runtime，也不替换原始调用身份。
 

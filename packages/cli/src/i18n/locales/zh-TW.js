@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2025 Qwen team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Traditional Chinese (zh-TW) translations for Qwen Code CLI
+// Traditional Chinese (zh-TW) translations for MariaDB Shell Agent CLI
 // Bootstrapped from en.js structure with opencc(zh.js s2t),
 // then extensively hand-corrected for Taiwan vocabulary conventions.
 // This file is the authoritative source — do not overwrite with auto-generated output.
@@ -25,8 +26,8 @@ export default {
 
   'User level': '使用者層級',
   'Project level': '專案層級',
-  'Clipboard image paste is unavailable because the native clipboard module could not be loaded. Reinstall Qwen Code or use the npm installation method.':
-    '剪貼簿圖片貼上功能無法使用，因為原生剪貼簿模組載入失敗。請重新安裝 Qwen Code，或改用 npm 安裝方式。',
+  'Clipboard image paste is unavailable because the native clipboard module could not be loaded. Reinstall MariaDB Shell Agent or use the npm installation method.':
+    '剪貼簿圖片貼上功能無法使用，因為原生剪貼簿模組載入失敗。請重新安裝 MariaDB Shell Agent，或改用 npm 安裝方式。',
   'Clipboard image paste is unavailable: no supported clipboard tool was reached. On Linux, install `wl-clipboard` (Wayland) or `xclip` (X11), or set DISPLAY/WAYLAND_DISPLAY if running headless.':
     '剪貼簿圖片貼上功能無法使用：未找到支援的剪貼簿工具。在 Linux 上請安裝 `wl-clipboard`（Wayland）或 `xclip`（X11），若為無頭環境請設定 DISPLAY/WAYLAND_DISPLAY。',
 
@@ -321,12 +322,12 @@ export default {
   'For a full list of shortcuts, see {{docPath}}':
     '完整快捷鍵列表，請參閱 {{docPath}}',
   'docs/keyboard-shortcuts.md': 'docs/keyboard-shortcuts.md',
-  'for help on Qwen Code': '獲取 Qwen Code 幫助',
+  'for help on MariaDB Shell Agent': '獲取 MariaDB Shell Agent 幫助',
   'show version info': '顯示版本信息',
   'show paths for current session files and logs': '顯示目前會話檔案和日誌路徑',
   'submit a bug report': '提交錯誤報告',
   Status: '狀態',
-  'Qwen Code': 'Qwen Code',
+  'MariaDB Shell Agent': 'MariaDB Shell Agent',
   Runtime: '運行環境',
   OS: '操作系統',
   Auth: '認證',
@@ -338,10 +339,10 @@ export default {
   Proxy: '代理',
   'Memory Usage': '內存使用',
   'IDE Client': 'IDE 客戶端',
-  'Analyzes the project and creates a tailored QWEN.md file.':
-    '分析項目並創建定製的 QWEN.md 檔案',
-  'List available Qwen Code tools. Usage: /tools [desc]':
-    '列出可用的 Qwen Code 工具。用法：/tools [desc]',
+  'Analyzes the project and creates a tailored MARIADB-SHELL-AGENT.md file.':
+    '分析項目並創建定製的 MARIADB-SHELL-AGENT.md 檔案',
+  'List available MariaDB Shell Agent tools. Usage: /tools [desc]':
+    '列出可用的 MariaDB Shell Agent 工具。用法：/tools [desc]',
   'Open the skills panel (browse, search, toggle, pick).':
     '開啟技能面板（瀏覽、搜尋、啟停、選擇）。',
   'Move this session to a new working directory': '將此會話移動到新的工作目錄',
@@ -349,15 +350,15 @@ export default {
   'Skills configuration saved.': '技能設定已儲存。',
   'Skills configuration saved, but refresh failed: {{error}}. Restart to ensure the new state is applied.':
     '技能設定已儲存，但重新整理失敗：{{error}}。請重新啟動以確保新狀態生效。',
-  'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.qwen/settings.json directly to manage skills at user scope.':
-    '目前工作區未受信任，工作區設定會被合併設定忽略。請先執行 /trust，或直接編輯 ~/.qwen/settings.json 在使用者範圍管理技能。',
+  'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.mariadb-shell-agent/settings.json directly to manage skills at user scope.':
+    '目前工作區未受信任，工作區設定會被合併設定忽略。請先執行 /trust，或直接編輯 ~/.mariadb-shell-agent/settings.json 在使用者範圍管理技能。',
   'SkillManager not available.': 'SkillManager 不可用。',
   'Loading skills…': '正在載入技能…',
   'Failed to load skills: {{error}}': '載入技能失敗：{{error}}',
   'Failed to save skills configuration: {{error}}':
     '儲存技能設定失敗：{{error}}',
-  'All available skills are disabled. Edit ~/.qwen/settings.json or .qwen/settings.json (skills.disabled) to re-enable.':
-    '所有可用技能皆已停用。請編輯 ~/.qwen/settings.json 或 .qwen/settings.json（skills.disabled）以重新啟用。',
+  'All available skills are disabled. Edit ~/.mariadb-shell-agent/settings.json or .mariadb-shell-agent/settings.json (skills.disabled) to re-enable.':
+    '所有可用技能皆已停用。請編輯 ~/.mariadb-shell-agent/settings.json 或 .mariadb-shell-agent/settings.json（skills.disabled）以重新啟用。',
   'Press esc to close.': '按 Esc 關閉。',
   '{{count}} skills · ': '{{count}} 個技能 · ',
   '{{matched}} / {{total}} skills · ': '{{matched}} / {{total}} 個技能 · ',
@@ -375,7 +376,8 @@ export default {
     '  {{name}} {{description}}  [已鎖定：{{scope}}]',
   '↑/↓ navigate · backspace edits search': '↑/↓ 導覽 · 倒退 編輯搜尋',
   Bundled: '內建',
-  'Available Qwen Code CLI tools:': '可用的 Qwen Code CLI 工具：',
+  'Available MariaDB Shell Agent CLI tools:':
+    '可用的 MariaDB Shell Agent CLI 工具：',
   'No tools available': '沒有可用工具',
   'View or change the approval mode for tool usage':
     '查看或更改工具使用的審批模式',
@@ -450,8 +452,8 @@ export default {
     '通過摘要替換來壓縮上下文',
   'Fast context compression without AI. Strips old tool outputs and thinking parts.':
     '無需 AI 的快速上下文壓縮。清理舊工具輸出並剝離思考過程。',
-  'open full Qwen Code documentation in your browser':
-    '在瀏覽器中打開完整的 Qwen Code 文檔',
+  'open full MariaDB Shell Agent documentation in your browser':
+    '在瀏覽器中打開完整的 MariaDB Shell Agent 文檔',
   'Configuration not available.': '配置不可用',
   'Connect an LLM provider': '連接 LLM 提供商',
   'Copy to clipboard: reply, code (by lang), LaTeX, or Mermaid. N = Nth-latest message, index = block number':
@@ -566,8 +568,10 @@ export default {
   '✗ Error:': '✗ 錯誤:',
   'Are you sure you want to delete agent "{{name}}"?':
     '您確定要刪除智能體 "{{name}}" 嗎？',
-  'Project Level (.qwen/agents/)': '項目級 (.qwen/agents/)',
-  'User Level (~/.qwen/agents/)': '用戶級 (~/.qwen/agents/)',
+  'Project Level (.mariadb-shell-agent/agents/)':
+    '項目級 (.mariadb-shell-agent/agents/)',
+  'User Level (~/.mariadb-shell-agent/agents/)':
+    '用戶級 (~/.mariadb-shell-agent/agents/)',
   '✓ Subagent Created Successfully!': '✓ 子智能體創建成功！',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     '子智能體 "{{name}}" 已保存到 {{level}} 級別。',
@@ -586,7 +590,8 @@ export default {
     '系統提示超過 {{length}} 個字符',
   'Step {{n}}: Choose Location': '步驟 {{n}}: 選擇位置',
   'Step {{n}}: Choose Generation Method': '步驟 {{n}}: 選擇生成方式',
-  'Generate with Qwen Code (Recommended)': '使用 Qwen Code 生成（推薦）',
+  'Generate with MariaDB Shell Agent (Recommended)':
+    '使用 MariaDB Shell Agent 生成（推薦）',
   'Manual Creation': '手動創建',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     '描述此子智能體應該做什麼以及何時使用它。（為了獲得最佳效果，請全面描述）',
@@ -714,10 +719,11 @@ export default {
   'Setting tools.approvalMode to "yolo" is blocked via /config for security reasons. Edit settings.json directly if you understand the risks.':
     '出於安全原因，禁止透過 /config 將 tools.approvalMode 設定為 "yolo"。如果您了解相關風險，請直接編輯 settings.json。',
   '(empty)': '(空)',
-  'View and edit Qwen Code settings': '查看和編輯 Qwen Code 設置',
+  'View and edit MariaDB Shell Agent settings':
+    '查看和編輯 MariaDB Shell Agent 設置',
   Settings: '設置',
-  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
-    '要查看更改，必須重啟 Qwen Code。按 r 退出並立即應用更改。',
+  'To see changes, MariaDB Shell Agent must be restarted. Press r to exit and apply changes now.':
+    '要查看更改，必須重啟 MariaDB Shell Agent。按 r 退出並立即應用更改。',
   'Code Mode Only (Experimental)': '僅程式碼模式（實驗性）',
   'Mods (Experimental)': 'Mods（實驗性）',
   'Enable experimental Mods from enabled extensions in trusted local terminal and headless sessions. Restart required.':
@@ -742,7 +748,8 @@ export default {
   'Custom Witty Phrases': '自定義詼諧短語',
   'Show Welcome Back Dialog': '顯示歡迎回來對話框',
   'Enable User Feedback': '啟用用戶反饋',
-  'How is Qwen doing this session? (optional)': 'Qwen 這次表現如何？（可選）',
+  'How is MariaDB Shell Agent doing this session? (optional)':
+    'Qwen 這次表現如何？（可選）',
   Bad: '不滿意',
   Fine: '還行',
   Good: '滿意',
@@ -758,7 +765,7 @@ export default {
   'Max Retries': '最大重試次數',
   'Load Memory From Include Directories': '從包含目錄加載內存',
   'Respect .gitignore': '遵守 .gitignore',
-  'Respect .qwenignore': '遵守 .qwenignore',
+  'Respect .mariadb-shell-agentignore': '遵守 .mariadb-shell-agentignore',
   'Enable Recursive File Search': '啟用遞歸檔案搜索',
   'Interactive Shell (PTY)': '交互式 Shell (PTY)',
   'Show Color': '顯示顏色',
@@ -885,8 +892,8 @@ export default {
   remote: '遠程',
   'This extension will add the following commands: {{commands}}.':
     '此擴展將添加以下命令：{{commands}}。',
-  'This extension will append info to your QWEN.md context using {{fileName}}':
-    '此擴展將使用 {{fileName}} 向您的 QWEN.md 上下文追加信息',
+  'This extension will append info to your MARIADB-SHELL-AGENT.md context using {{fileName}}':
+    '此擴展將使用 {{fileName}} 向您的 MARIADB-SHELL-AGENT.md 上下文追加信息',
   'This extension will install the following skills:': '此擴展將安裝以下技能：',
   'This extension will install the following subagents:':
     '此擴展將安裝以下子智能體：',
@@ -895,8 +902,8 @@ export default {
   'These workflow scripts changed since the installed version: {{names}}.':
     '以下工作流程腳本與已安裝版本相比有變更：{{names}}。',
   'Installation cancelled for "{{name}}".': '已取消安裝 "{{name}}"。',
-  'You are installing an extension from {{originSource}}. Some features may not work perfectly with Qwen Code.':
-    '您正在安裝來自 {{originSource}} 的擴展。某些功能可能無法完美兼容 Qwen Code。',
+  'You are installing an extension from {{originSource}}. Some features may not work perfectly with MariaDB Shell Agent.':
+    '您正在安裝來自 {{originSource}} 的擴展。某些功能可能無法完美兼容 MariaDB Shell Agent。',
   '--ref and --auto-update are not applicable for marketplace extensions.':
     '--ref 和 --auto-update 不適用於市場擴展。',
   'Extension "{{name}}" installed successfully and enabled.':
@@ -1006,8 +1013,8 @@ export default {
     '安裝 {{ideName}} 所需的 IDE 配套工具',
   'enable IDE integration': '啟用 IDE 集成',
   'disable IDE integration': '禁用 IDE 集成',
-  'IDE integration is not supported in your current environment. To use this feature, run Qwen Code in one of these supported IDEs: VS Code or VS Code forks.':
-    '您當前環境不支持 IDE 集成。要使用此功能，請在以下支持的 IDE 之一中運行 Qwen Code：VS Code 或 VS Code 分支版本。',
+  'IDE integration is not supported in your current environment. To use this feature, run MariaDB Shell Agent in one of these supported IDEs: VS Code or VS Code forks.':
+    '您當前環境不支持 IDE 集成。要使用此功能，請在以下支持的 IDE 之一中運行 MariaDB Shell Agent：VS Code 或 VS Code 分支版本。',
   'Set up GitHub Actions': '設置 GitHub Actions',
   'Configure terminal keybindings for multiline input (VS Code, Cursor, Windsurf, Trae)':
     '配置終端按鍵綁定以支持多行輸入（VS Code、Cursor、Windsurf、Trae）',
@@ -1036,7 +1043,7 @@ export default {
   'Failed to configure {{terminalName}}.': '配置 {{terminalName}} 失敗。',
   'Your terminal is already configured for an optimal experience with multiline input (Shift+Enter and Ctrl+Enter).':
     '您的終端已配置為支持多行輸入（Shift+Enter 和 Ctrl+Enter）的最佳體驗。',
-  'Manage Qwen Code hooks': '管理 Qwen Code Hook',
+  'Manage MariaDB Shell Agent hooks': '管理 MariaDB Shell Agent Hook',
   'List all configured hooks': '列出所有已配置的 Hook',
   Hooks: 'Hook',
   'Loading hooks...': '正在加載 Hook...',
@@ -1049,8 +1056,8 @@ export default {
   'No hook events found.': '未找到 Hook 事件。',
   '{{count}} hook configured': '{{count}} 個 Hook 已配置',
   '{{count}} hooks configured': '{{count}} 個 Hook 已配置',
-  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask Qwen Code.':
-    '此選單為只讀。要添加或修改 Hook，請直接編輯 settings.json 或詢問 Qwen Code。',
+  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask MariaDB Shell Agent.':
+    '此選單為只讀。要添加或修改 Hook，請直接編輯 settings.json 或詢問 MariaDB Shell Agent。',
   'Reopen this menu to reload hook definitions.':
     '重新開啟此選單可重新載入 Hook 定義。',
   'Hook controls and HTTP security settings require a restart.':
@@ -1061,7 +1068,7 @@ export default {
   'Exit codes:': '退出碼：',
   'Configured hooks:': '已配置的 Hook：',
   'No hooks configured for this event.': '此事件未配置 Hook。',
-  'To add hooks, edit settings.json directly or ask Qwen.':
+  'To add hooks, edit settings.json directly or ask MariaDB Shell Agent.':
     '要添加 Hook，請直接編輯 settings.json 或詢問 Qwen。',
   'Enter to select · Esc to go back': 'Enter 選擇 · Esc 返回',
   'Hook details': 'Hook 詳情',
@@ -1069,7 +1076,7 @@ export default {
   'Extension:': '擴展：',
   'Desc:': '描述：',
   'No hook config selected': '未選擇 Hook 配置',
-  'To modify or remove this hook, edit settings.json directly or ask Qwen to help.':
+  'To modify or remove this hook, edit settings.json directly or ask MariaDB Shell Agent to help.':
     '要修改或刪除此 Hook，請直接編輯 settings.json 或詢問 Qwen。',
   'Safe mode is on, so no hooks run in this session.':
     '安全模式已開啟，本會話不會執行任何 Hook。',
@@ -1095,8 +1102,8 @@ export default {
   'StatusLine will not be displayed': '不會顯示狀態欄',
   'Tool operations will proceed without hook validation':
     '工具操作將在沒有 Hook 驗證的情況下繼續',
-  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask Qwen Code.':
-    '要重新啟用 Hook，請從 settings.json 中刪除 "disableAllHooks" 或詢問 Qwen Code。',
+  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask MariaDB Shell Agent.':
+    '要重新啟用 Hook，請從 settings.json 中刪除 "disableAllHooks" 或詢問 MariaDB Shell Agent。',
   Project: '項目',
   User: '用戶',
   Skill: '技能',
@@ -1114,7 +1121,8 @@ export default {
   'When the user submits a prompt': '用戶提交提示時',
   'When a slash command expands into a prompt': '斜線命令展開為提示時',
   'When a new session is started': '新會話開始時',
-  'Right before Qwen Code concludes its response': 'Qwen Code 結束響應之前',
+  'Right before MariaDB Shell Agent concludes its response':
+    'MariaDB Shell Agent 結束響應之前',
   'When a subagent (Agent tool call) is started':
     '子智能體（Agent 工具調用）啟動時',
   'Right before a subagent concludes its response': '子智能體結束響應之前',
@@ -1157,7 +1165,7 @@ export default {
     '阻止處理，擦除原始提示，僅向用戶顯示 stderr',
   'block expanded prompt submission and show stderr to user only':
     '阻止提交展開後的提示，並僅向用戶顯示 stderr',
-  'stdout shown to Qwen': '向 Qwen 顯示 stdout',
+  'stdout shown to MariaDB Shell Agent': '向 Qwen 顯示 stdout',
   'show stderr to user only (blocking errors ignored)':
     '僅向用戶顯示 stderr（忽略阻塞錯誤）',
   'command completes successfully': '命令成功完成',
@@ -1319,7 +1327,8 @@ export default {
   servers: '個伺服器',
   'Add MCP servers to your settings to get started.':
     '請在設置中添加 MCP servers 以開始使用。',
-  'Run qwen --debug to see error logs': '運行 qwen --debug 查看錯誤日誌',
+  'Run mariadb-shell-agent --debug to see error logs':
+    '運行 mariadb-shell-agent --debug 查看錯誤日誌',
   'OAuth Authentication': 'OAuth 認證',
   'Authenticating... Please complete the login in your browser.':
     '認證中... 請在瀏覽器中完成登錄。',
@@ -1364,8 +1373,8 @@ export default {
   Reason: '原因',
   'Tools must have both name and description to be used by the LLM.':
     '工具必須同時具有名稱和描述才能被 LLM 使用。',
-  'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md':
-    '生成項目摘要並保存到 .qwen/PROJECT_SUMMARY.md',
+  'Generate a project summary and save it to .mariadb-shell-agent/PROJECT_SUMMARY.md':
+    '生成項目摘要並保存到 .mariadb-shell-agent/PROJECT_SUMMARY.md',
   'No chat client available to generate summary.':
     '沒有可用的聊天客戶端來生成摘要',
   'Already generating summary, wait for previous request to complete':
@@ -1461,8 +1470,8 @@ export default {
     '麥克風存取被拒絕。請在系統設定 → 隱私權與安全性 → 麥克風中允許目前終端機存取，然後重新啟動語音聽寫。',
   'Voice dictation is not supported on {{platform}}.':
     '語音聽寫不支援 {{platform}}。',
-  'Voice dictation needs microphone access, which is unavailable in this WSL session. Use WSLg/PulseAudio, or run Qwen Code on a host with a microphone.':
-    '語音聽寫需要麥克風存取，但目前 WSL 會話不可用。請使用 WSLg/PulseAudio，或在具備麥克風的主機上執行 Qwen Code。',
+  'Voice dictation needs microphone access, which is unavailable in this WSL session. Use WSLg/PulseAudio, or run MariaDB Shell Agent on a host with a microphone.':
+    '語音聽寫需要麥克風存取，但目前 WSL 會話不可用。請使用 WSLg/PulseAudio，或在具備麥克風的主機上執行 MariaDB Shell Agent。',
   'Voice dictation needs microphone access. macOS will ask the first time you record — approve it, then start again. Your first recording may be empty while the dialog is open.':
     '語音聽寫需要麥克風存取。macOS 會在你首次錄音時彈出授權請求——請同意後重新開始。彈窗開啟期間的首次錄音可能為空。',
   'Voice: recording': '語音：錄音中',
@@ -1503,8 +1512,8 @@ export default {
   'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.':
     '/directory add 命令在限制性沙箱配置檔案中不受支持。請改為在啟動會話時使用 --include-directories。',
   "Error adding '{{path}}': {{error}}": "添加 '{{path}}' 時出錯：{{error}}",
-  'Successfully added QWEN.md files from the following directories if there are:\n- {{directories}}':
-    '如果存在，已成功從以下目錄添加 QWEN.md 檔案：\n- {{directories}}',
+  'Successfully added MARIADB-SHELL-AGENT.md files from the following directories if there are:\n- {{directories}}':
+    '如果存在，已成功從以下目錄添加 MARIADB-SHELL-AGENT.md 檔案：\n- {{directories}}',
   'Error refreshing memory: {{error}}': '刷新內存時出錯：{{error}}',
   'Successfully added directories:\n- {{directories}}':
     '成功添加目錄：\n- {{directories}}',
@@ -1664,12 +1673,12 @@ export default {
   Ask: '詢問',
   Deny: '拒絕',
   Workspace: '工作區',
-  "Qwen Code won't ask before using allowed tools.":
-    'Qwen Code 使用已允許的工具前不會詢問。',
-  'Qwen Code will ask before using these tools.':
-    'Qwen Code 使用這些工具前會先詢問。',
-  'Qwen Code is not allowed to use denied tools.':
-    'Qwen Code 不允許使用被拒絕的工具。',
+  "MariaDB Shell Agent won't ask before using allowed tools.":
+    'MariaDB Shell Agent 使用已允許的工具前不會詢問。',
+  'MariaDB Shell Agent will ask before using these tools.':
+    'MariaDB Shell Agent 使用這些工具前會先詢問。',
+  'MariaDB Shell Agent is not allowed to use denied tools.':
+    'MariaDB Shell Agent 不允許使用被拒絕的工具。',
   'Manage trusted directories for this workspace.':
     '管理此工作區的受信任目錄。',
   'Any use of the {{tool}} tool': '{{tool}} 工具的任何使用',
@@ -1679,9 +1688,11 @@ export default {
   'From project settings': '來自項目設置',
   'From session': '來自會話',
   'Project settings': '項目設置',
-  'Checked in at .qwen/settings.json': '保存在 .qwen/settings.json',
+  'Checked in at .mariadb-shell-agent/settings.json':
+    '保存在 .mariadb-shell-agent/settings.json',
   'User settings': '用戶設置',
-  'Saved in at ~/.qwen/settings.json': '保存在 ~/.qwen/settings.json',
+  'Saved in at ~/.mariadb-shell-agent/settings.json':
+    '保存在 ~/.mariadb-shell-agent/settings.json',
   'Add a new rule…': '添加新規則…',
   'Add {{type}} permission rule': '添加 {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1702,10 +1713,10 @@ export default {
   'Search…': '搜索…',
   'Add directory…': '添加目錄…',
   'Add directory to workspace': '添加工作區目錄',
-  'Qwen Code can read files in the workspace, and make edits when auto-accept edits is on.':
-    'Qwen Code 可以讀取工作區中的檔案，並在自動接受編輯模式開啟時進行編輯。',
-  'Qwen Code will be able to read files in this directory and make edits when auto-accept edits is on.':
-    'Qwen Code 將能夠讀取此目錄中的檔案，並在自動接受編輯模式開啟時進行編輯。',
+  'MariaDB Shell Agent can read files in the workspace, and make edits when auto-accept edits is on.':
+    'MariaDB Shell Agent 可以讀取工作區中的檔案，並在自動接受編輯模式開啟時進行編輯。',
+  'MariaDB Shell Agent will be able to read files in this directory and make edits when auto-accept edits is on.':
+    'MariaDB Shell Agent 將能夠讀取此目錄中的檔案，並在自動接受編輯模式開啟時進行編輯。',
   'Enter the path to the directory:': '輸入目錄路徑：',
   'Enter directory path…': '輸入目錄路徑…',
   'Tab to complete · Enter to add · Esc to cancel':
@@ -1783,20 +1794,20 @@ export default {
   'Use /bug to submit issues to the maintainers when something goes off.':
     '遇到問題時，用 /bug 將問題提交給維護者。',
   'Switch auth type quickly with /auth.': '用 /auth 快速切換認證方式。',
-  'You can run any shell commands from Qwen Code using ! (e.g. !ls).':
-    '在 Qwen Code 中使用 ! 可運行任意 shell 命令（例如 !ls）。',
+  'You can run any shell commands from MariaDB Shell Agent using ! (e.g. !ls).':
+    '在 MariaDB Shell Agent 中使用 ! 可運行任意 shell 命令（例如 !ls）。',
   'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.':
     '輸入 / 打開命令彈窗；按 Tab 自動補全斜槓命令和保存的提示詞。',
-  'You can resume a previous conversation by running qwen --continue or qwen --resume.':
-    '運行 qwen --continue 或 qwen --resume 可繼續之前的會話。',
+  'You can resume a previous conversation by running mariadb-shell-agent --continue or mariadb-shell-agent --resume.':
+    '運行 mariadb-shell-agent --continue 或 mariadb-shell-agent --resume 可繼續之前的會話。',
   'You can switch permission mode quickly with Shift+Tab or /approval-mode.':
     '按 Shift+Tab 或輸入 /approval-mode 可快速切換權限模式。',
   'You can switch permission mode quickly with Tab or /approval-mode.':
     '按 Tab 或輸入 /approval-mode 可快速切換權限模式。',
   'Try /insight to generate personalized insights from your chat history.':
     '試試 /insight，從聊天記錄中生成個性化洞察。',
-  'Add a QWEN.md file to give Qwen Code persistent project context.':
-    '添加 QWEN.md 檔案，為 Qwen Code 提供持久的項目上下文。',
+  'Add a MARIADB-SHELL-AGENT.md file to give MariaDB Shell Agent persistent project context.':
+    '添加 MARIADB-SHELL-AGENT.md 檔案，為 MariaDB Shell Agent 提供持久的項目上下文。',
   'Use /btw to ask a quick side question without disrupting the conversation.':
     '用 /btw 快速問一個小問題，不會打斷當前對話。',
   'Context is almost full! Run /compress now or start /new to continue.':
@@ -1805,7 +1816,7 @@ export default {
     '上下文空間不足，用 /compress 釋放空間。',
   'Long conversation? /compress summarizes history to free context.':
     '對話太長？用 /compress 總結歷史，釋放上下文。',
-  'Agent powering down. Goodbye!': 'Qwen Code 正在關閉，再見！',
+  'Agent powering down. Goodbye!': 'MariaDB Shell Agent 正在關閉，再見！',
   'To continue this session, run': '要繼續此會話，請運行',
   'Interaction Summary': '交互摘要',
   'Session ID:': '會話 ID：',
@@ -2070,9 +2081,10 @@ export default {
   'Failed to authenticate with Coding Plan: {{error}}':
     'Coding Plan 認證失敗：{{error}}',
   '中国 (China)': '中國 (China)',
-  '阿里云百炼 (aliyun.com)': '阿里雲百鍊 (aliyun.com)',
+  '阿里云百炼 (aliyun.invalid)': '阿里雲百鍊 (aliyun.invalid)',
   Global: '全球',
-  'Alibaba Cloud (alibabacloud.com)': 'Alibaba Cloud (alibabacloud.com)',
+  'Alibaba Cloud (alibabacloud.invalid)':
+    'Alibaba Cloud (alibabacloud.invalid)',
   'Select region for Coding Plan:': '選擇 Coding Plan 區域：',
   'Enter your Coding Plan API key: ': '請輸入您的 Coding Plan API Key：',
   'Select authentication method:': '選擇認證方式：',
@@ -2080,11 +2092,11 @@ export default {
   '⚠  No authentication method configured.\n': '⚠  未配置認證方式。\n',
   'Run one of the following commands to get started:\n':
     '運行以下命令之一開始配置：\n',
-  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  qwen auth qwen-oauth     - 使用 Qwen OAuth 登錄（已停用）',
+  '  mariadb-shell-agent auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
+    '  mariadb-shell-agent auth qwen-oauth     - 使用 Qwen OAuth 登錄（已停用）',
   'Or simply run:': '或者直接運行：',
-  '  qwen auth                - Interactive authentication setup\n':
-    '  qwen auth                - 交互式認證配置\n',
+  '  mariadb-shell-agent auth                - Interactive authentication setup\n':
+    '  mariadb-shell-agent auth                - 交互式認證配置\n',
   '✓ Authentication Method: Qwen OAuth': '✓ 認證方式：Qwen OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  類型：免費額度（2026-04-15 已停用）',
@@ -2103,8 +2115,8 @@ export default {
     '⚠  認證方式：阿里雲百鍊 Coding Plan（不完整）',
   '  Issue: API key not found in environment or settings\n':
     '  問題：在環境變量或設置中未找到 API Key\n',
-  '  Run `qwen auth coding-plan` to re-configure.\n':
-    '  運行 `qwen auth coding-plan` 重新配置。\n',
+  '  Run `mariadb-shell-agent auth coding-plan` to re-configure.\n':
+    '  運行 `mariadb-shell-agent auth coding-plan` 重新配置。\n',
   '✓ Authentication Method: {{type}}': '✓ 認證方式：{{type}}',
   '  Status: Configured\n': '  狀態：已配置\n',
   'Failed to check authentication status: {{error}}':
@@ -2130,7 +2142,8 @@ export default {
     '已處於計劃模式。使用 "/plan exit" 退出計劃模式。',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     '未處於計劃模式。請先使用 "/plan" 進入計劃模式。',
-  "Set up Qwen Code's status line UI": '配置 Qwen Code 的狀態欄',
+  "Set up MariaDB Shell Agent's status line UI":
+    '配置 MariaDB Shell Agent 的狀態欄',
   'When a new todo item is created': '建立新待辦事項時',
   'When a todo item is marked as completed': '待辦事項標記為完成時',
   'Input to command is JSON with todo_id, todo_content, todo_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.':
@@ -2376,13 +2389,14 @@ export default {
   // Update command
   'Exact-version updates require a standalone installation. Install version {{version}} manually using your installation method.':
     '指定版本升級需要獨立安裝。請使用目前的安裝方式手動安裝 {{version}} 版本。',
-  'Check for Qwen Code updates and install if available':
-    '檢查 Qwen Code 更新並安裝（如果可用）',
-  'Qwen Code update available! {{current}} → {{latest}}':
-    'Qwen Code 有可用更新！{{current}} → {{latest}}',
-  'A new version of Qwen Code is available! {{current}} → {{latest}}':
-    'Qwen Code 有新版本可用！{{current}} → {{latest}}',
-  'Qwen Code {{version}} is up to date!': 'Qwen Code {{version}} 已是最新！',
+  'Check for MariaDB Shell Agent updates and install if available':
+    '檢查 MariaDB Shell Agent 更新並安裝（如果可用）',
+  'MariaDB Shell Agent update available! {{current}} → {{latest}}':
+    'MariaDB Shell Agent 有可用更新！{{current}} → {{latest}}',
+  'A new version of MariaDB Shell Agent is available! {{current}} → {{latest}}':
+    'MariaDB Shell Agent 有新版本可用！{{current}} → {{latest}}',
+  'MariaDB Shell Agent {{version}} is up to date!':
+    'MariaDB Shell Agent {{version}} 已是最新！',
   'Failed to check for updates ({{reason}}). Please check your network or registry configuration.':
     '檢查更新失敗（{{reason}}）。請檢查網路或 registry 設定。',
   'Update check skipped ({{reason}}) — run /update to retry.':
@@ -2398,8 +2412,8 @@ export default {
     '更新已下載。將在結束目前工作階段後套用。',
   'Update failed: {{error}}': '更新失敗：{{error}}',
   'Downloading update...': '正在下載更新...',
-  'Update successful! Please restart Qwen Code to use the new version. Switching model providers before restarting may not work correctly.':
-    '更新成功！請重新啟動 Qwen Code 以使用新版本。重新啟動前切換模型提供商可能無法正常運作。',
+  'Update successful! Please restart MariaDB Shell Agent to use the new version. Switching model providers before restarting may not work correctly.':
+    '更新成功！請重新啟動 MariaDB Shell Agent 以使用新版本。重新啟動前切換模型提供商可能無法正常運作。',
   'Automatic update failed. Please try updating manually.':
     '自動更新失敗。請嘗試手動更新。',
   'Automatic update failed: {{error}}. Re-run the installer to update manually.':
@@ -2423,12 +2437,12 @@ export default {
   'Run the following to update:': '執行以下命令進行更新：',
   'Unable to auto-update this standalone installation. Please reinstall from:':
     '無法自動更新此獨立安裝。請從以下位址重新安裝：',
-  'Manual update required. Please reinstall Qwen Code.':
-    '需要手動更新。請重新安裝 Qwen Code。',
-  'This session uses the custom sandbox image {{image}}. Update that image and restart Qwen Code.':
-    '此工作階段使用自訂沙箱映像 {{image}}。請更新該映像並重新啟動 Qwen Code。',
-  'Update Qwen Code on the host, then restart the sandbox.':
-    '請在主機上更新 Qwen Code，然後重新啟動沙箱。',
+  'Manual update required. Please reinstall MariaDB Shell Agent.':
+    '需要手動更新。請重新安裝 MariaDB Shell Agent。',
+  'This session uses the custom sandbox image {{image}}. Update that image and restart MariaDB Shell Agent.':
+    '此工作階段使用自訂沙箱映像 {{image}}。請更新該映像並重新啟動 MariaDB Shell Agent。',
+  'Update MariaDB Shell Agent on the host, then restart the sandbox.':
+    '請在主機上更新 MariaDB Shell Agent，然後重新啟動沙箱。',
   'The update will be installed after you exit this session.':
     '結束目前工作階段後將自動安裝更新。',
   'Run /update to install the update on the host.':
@@ -2537,8 +2551,8 @@ export default {
   'Auto-skill curator changes are only available in trusted workspaces. Trust this folder via `/trust` and try again.':
     '只有受信任的工作區可以變更自動技能管理器。請透過 `/trust` 信任此資料夾後再試一次。',
   'Kept model as {{model}}': '模型保持為 {{model}}',
-  'Review messages held from other Qwen Code sessions (accept | deny), and manage trusted controllers (controllers | revoke)':
-    '檢視其他 Qwen Code 工作階段傳來的待處理訊息（accept | deny），並管理受信任控制器（controllers | revoke）',
+  'Review messages held from other MariaDB Shell Agent sessions (accept | deny), and manage trusted controllers (controllers | revoke)':
+    '檢視其他 MariaDB Shell Agent 工作階段傳來的待處理訊息（accept | deny），並管理受信任控制器（controllers | revoke）',
   'Create a git commit with an AI-drafted message':
     '使用 AI 起草的提交訊息建立 git 提交',
 };

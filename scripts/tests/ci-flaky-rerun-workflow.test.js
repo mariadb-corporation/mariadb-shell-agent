@@ -10,7 +10,10 @@ const workflow = readFileSync(
   'utf8',
 );
 const yml = parse(workflow);
-const skill = readFileSync('.qwen/skills/ci-flaky-patrol/SKILL.md', 'utf8');
+const skill = readFileSync(
+  '.mariadb-shell-agent/skills/ci-flaky-patrol/SKILL.md',
+  'utf8',
+);
 
 describe('ci failure patrol workflow', () => {
   it('runs every ten minutes with serialized configurable batches', () => {

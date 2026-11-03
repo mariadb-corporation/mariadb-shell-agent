@@ -2,7 +2,7 @@
 
 [English](2026-10-21-opentui-npm-distribution.md) | [简体中文](2026-10-21-opentui-npm-distribution.zh-CN.md)
 
-**已合并 [#14959](https://github.com/QwenLM/qwen-code/pull/14959) 的运行时后续批次。** 本批将 OpenTUI 统一为 Bun-only，并把 npm 私有运行时和 standalone preview 的 Bun pin 更新为 **1.4.4**，OpenTUI 保持 **0.5.10**。该更新包含上游 Brotli decoder 错误传播修复，不改变直接运行时兼容下限或默认 renderer。当前提案从原 `249ab50d` 基线整合 main `949a71e2`，本次整合产物的安装与平台验收尚未执行。
+**已合并 [#14959](https://github.invalid/QwenLM/qwen-code/pull/14959) 的运行时后续批次。** 本批将 OpenTUI 统一为 Bun-only，并把 npm 私有运行时和 standalone preview 的 Bun pin 更新为 **1.4.4**，OpenTUI 保持 **0.5.10**。该更新包含上游 Brotli decoder 错误传播修复，不改变直接运行时兼容下限或默认 renderer。当前提案从原 `249ab50d` 基线整合 main `949a71e2`，本次整合产物的安装与平台验收尚未执行。
 
 历史证据保持其原始产物归属：main `32b4234b` 加早期运行时改动通过正常 build/typecheck/bundle、87 项 CLI 和 46 项打包/工作流测试。真实 Node 26.4.0/npm 11.17.0 pack 与自有目录 `--ignore-scripts` 安装验证了 1,355 个发布文件及执行权限，解包大小为 152,316,775 字节，低于 160 MiB。一项 macOS arm64 strict 安装版 smoke 观察到 Node launcher、同安装私有 Bun 1.4.4、原生库、一次模型 HTTP、语法分色及 `/quit` 自然退出 0。随后禁用 relaunch、缺失私有 Bun、继承 FFI flag 的 fallback/strict 六项拒绝负控通过。这些不是本次新整合产物、其他安装布局、npm 子进程身份或其他平台的验收。
 
@@ -10,7 +10,7 @@
 
 ## 状态与问题
 
-源码检查点 `0d353777bb054b9d5c9925f134dd63db7c316614` 通过普通 merge 纳入 main `19d3289f4818617efdf31ca46d4db0522da36f95`，包含已接受的输入/输出批次 #15067 和 Bun PTY #14046。49 项分发改动与现有依赖输入完整保留。该检查点的 macOS arm64 fresh build 和 typecheck 已通过。受影响 consumer、native、bundle 与安装版产品门禁分别记录在 [#14959](https://github.com/QwenLM/qwen-code/pull/14959)；源码构建成功不能代替安装产物验收。
+源码检查点 `0d353777bb054b9d5c9925f134dd63db7c316614` 通过普通 merge 纳入 main `19d3289f4818617efdf31ca46d4db0522da36f95`，包含已接受的输入/输出批次 #15067 和 Bun PTY #14046。49 项分发改动与现有依赖输入完整保留。该检查点的 macOS arm64 fresh build 和 typecheck 已通过。受影响 consumer、native、bundle 与安装版产品门禁分别记录在 [#14959](https://github.invalid/QwenLM/qwen-code/pull/14959)；源码构建成功不能代替安装产物验收。
 
 历史证据继续绑定原源码和产物。候选 `e8192c18` 通过五种安装布局与 41 个不同实际产品场景，另有三个合成协议场景通过。更新夹具使用自有 0.0.0 克隆和候选 tarball，不代表两个正式发布版本之间的升级。后续 `7368b97` 的 22 个安装用例记录为 20 个功能通过与两个 Ink deny 已知差异；`61f4e5be` 的源码/运行时门禁早于本次 main 整合，均不能证明最终组合产物。原始失败、平台跳过及修正后的 harness 运行分别保留；最终 tarball 须重新实测 160 MiB 解包体积门禁。
 
@@ -23,11 +23,11 @@ OpenTUI 所需的 native/parser 资产，而独立 Bun standalone preview 当时
 
 相关工作：
 
-- [运行时总议题 #11607](https://github.com/QwenLM/qwen-code/issues/11607)。
-- [Bun PTY #14046](https://github.com/QwenLM/qwen-code/pull/14046)，已合入审阅版本
+- [运行时总议题 #11607](https://github.invalid/QwenLM/qwen-code/issues/11607)。
+- [Bun PTY #14046](https://github.invalid/QwenLM/qwen-code/pull/14046)，已合入审阅版本
   `2972234e`；新组合产物的 shell 一致性仍未验证。
-- [R1 standalone 更新 #14934](https://github.com/QwenLM/qwen-code/pull/14934)。
-- [发布执行权限 #14907](https://github.com/QwenLM/qwen-code/pull/14907)。
+- [R1 standalone 更新 #14934](https://github.invalid/QwenLM/qwen-code/pull/14934)。
+- [发布执行权限 #14907](https://github.invalid/QwenLM/qwen-code/pull/14907)。
 
 ## 目标与边界
 
@@ -43,8 +43,8 @@ Node classic standalone 与 Node 源码调用保持 Node/Ink；Bun standalone pr
 与受支持 Bun 源码调用可以显式选择 OpenTUI。standalone 运行时打包与更新解释器边界保留。
 
 直接 `process.execPath` 审计还识别出
-[#14134 的 c807de17](https://github.com/QwenLM/qwen-code/pull/14134) 与
-[#14187 的 d14b2ad1](https://github.com/QwenLM/qwen-code/pull/14187) 中有界的剩余工作，
+[#14134 的 c807de17](https://github.invalid/QwenLM/qwen-code/pull/14134) 与
+[#14187 的 d14b2ad1](https://github.invalid/QwenLM/qwen-code/pull/14187) 中有界的剩余工作，
 统一纳入现有 R3 交付。沙箱诊断、Mem0 MCP spawn 与 bundled hook 身份、cgroup
 launcher，以及 bwrap/landlock relay/protected root 成对复用
 `getJsInterpreterCommand`。保留原 payload、环境、reaper 与沙箱权限，并完整保留
@@ -185,7 +185,7 @@ PTY 资产。本批保留该实现并加入 92d4b193 已回收主进程 guard；
 ## 验证与验收
 
 先用全局 CLI 建立模式/运行时基线，再做产品 E2E。详细计划和结果保存在
-`.qwen/e2e-tests/`。所有测试使用独占临时 HOME、QWEN_HOME、npm prefix/cache
+`.mariadb-shell-agent/e2e-tests/`。所有测试使用独占临时 HOME、QWEN_HOME、npm prefix/cache
 和 shell 配置路径。
 
 1. 单测覆盖完整模式表、设置优先级、运行时参数、包身份、版本/执行权限校验，以及原

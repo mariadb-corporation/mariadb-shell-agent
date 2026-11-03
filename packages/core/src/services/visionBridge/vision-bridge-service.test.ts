@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -43,7 +44,7 @@ const jpeg = (data: string, displayName: string): Part => ({
 const hasImage = (parts: unknown) =>
   (parts as Part[]).some((p) => p.inlineData);
 
-const DASHSCOPE = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+const DASHSCOPE = 'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
 /** A Config whose default bridge model is `model`, plus any `extra` getters. */
 const configFor = (model: { id: string; baseUrl?: string }, extra = {}) =>
   ({
@@ -213,7 +214,7 @@ describe('runVisionBridge', () => {
       config: dashscopeConfig,
     });
     expect(result.status).toBe('ok');
-    expect(result.modelEndpoint).toBe('dashscope.aliyuncs.com');
+    expect(result.modelEndpoint).toBe('dashscope.aliyuncs.invalid');
   });
 
   it('labels rendered PDF pages and permits continuation on the original PDF', async () => {
@@ -330,7 +331,7 @@ describe('runVisionBridge', () => {
     });
 
     expect(mockSideQuery.mock.calls[0][1].model).toBe(
-      'openai:qwen3-vl-plus\0https://dashscope.aliyuncs.com/compatible-mode/v1',
+      'openai:qwen3-vl-plus\0https://dashscope.aliyuncs.invalid/compatible-mode/v1',
     );
     expect(result.modelId).toBe('openai:qwen3-vl-plus');
     expect(textOf(result.parts)).toContain('by qwen3-vl-plus');
@@ -634,13 +635,13 @@ describe('runVisionBridge', () => {
     expect(result.error).toMatch(/no usable image/);
     expect(result.omittedCount).toBe(1);
     expect(result.egressOccurred).toBeUndefined();
-    expect(result.modelEndpoint).toBe('dashscope.aliyuncs.com');
+    expect(result.modelEndpoint).toBe('dashscope.aliyuncs.invalid');
     expect(mockSideQuery).not.toHaveBeenCalled();
     expect(textOf(result.parts)).toContain('describe this');
     expect(hasImage(result.parts)).toBe(false);
     const notice = formatVisionBridgeNotice(result);
     expect(notice).toContain(
-      'Vision bridge (qwen3-vl-plus (dashscope.aliyuncs.com)) failed',
+      'Vision bridge (qwen3-vl-plus (dashscope.aliyuncs.invalid)) failed',
     );
     expect(notice).not.toContain('were sent');
   });
@@ -656,20 +657,20 @@ describe('formatVisionBridgeNotice', () => {
       convertedCount: 1,
       omittedCount: 0,
       modelId: 'qwen3-vl-plus',
-      modelEndpoint: 'dashscope.aliyuncs.com',
+      modelEndpoint: 'dashscope.aliyuncs.invalid',
       egressOccurred: true,
       ...overrides,
     });
 
   it('discloses the selected model and endpoint on success', () => {
     expect(noticeFor({ convertedCount: 4 })).toContain(
-      'qwen3-vl-plus (dashscope.aliyuncs.com)',
+      'qwen3-vl-plus (dashscope.aliyuncs.invalid)',
     );
   });
 
   it('hides auth-qualified routing prefixes from user-facing notices', () => {
     expect(noticeFor({ modelId: 'openai:qwen3-vl-plus' })).toContain(
-      'via qwen3-vl-plus (dashscope.aliyuncs.com)',
+      'via qwen3-vl-plus (dashscope.aliyuncs.invalid)',
     );
 
     expect(
@@ -678,7 +679,7 @@ describe('formatVisionBridgeNotice', () => {
         baseUrl: DASHSCOPE,
         agentCapable: true,
       }),
-    ).toContain('to qwen3-vl-plus (dashscope.aliyuncs.com)');
+    ).toContain('to qwen3-vl-plus (dashscope.aliyuncs.invalid)');
   });
 
   it('does not claim egress for a success result without egress', () => {
@@ -694,7 +695,7 @@ describe('formatVisionBridgeNotice', () => {
       convertedCount: 0,
     });
 
-    expect(notice.match(/dashscope\.aliyuncs\.com/g)).toHaveLength(1);
+    expect(notice.match(/dashscope\.aliyuncs\.invalid/g)).toHaveLength(1);
   });
 
   it.each([

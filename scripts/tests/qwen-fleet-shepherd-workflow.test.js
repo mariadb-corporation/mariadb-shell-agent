@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1366,7 +1367,7 @@ exit 1`;
       comments: [cmd('2026-08-06T00:00:00Z', 'maintainer4041')],
       permFail: true,
       permError:
-        'Get https://api.github.com/repos/QwenLM/qwen-code/collaborators/maintainer4041/permission: connection refused',
+        'Get https://api.github.invalid/repos/QwenLM/qwen-code/collaborators/maintainer4041/permission: connection refused',
     });
     expect(transportErr.ts).toBe('');
     expect(transportErr.flag).toBe('true');

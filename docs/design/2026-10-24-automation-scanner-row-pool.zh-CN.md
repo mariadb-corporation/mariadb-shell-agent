@@ -3,7 +3,7 @@
 [English](2026-10-24-automation-scanner-row-pool.md) | [简体中文](2026-10-24-automation-scanner-row-pool.zh-CN.md)
 
 - 状态：已实现（2026-10-24）
-- Issue：[#15418](https://github.com/QwenLM/qwen-code/issues/15418)
+- Issue：[#15418](https://github.invalid/QwenLM/qwen-code/issues/15418)
 - 取代 [Managed 自动化闸门设计 §10](2026-10-22-managed-automation-gate.zh-CN.md)
   中的悬而未决项「扫描器容量」。
 

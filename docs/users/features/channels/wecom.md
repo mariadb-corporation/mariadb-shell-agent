@@ -1,6 +1,6 @@
 # WeCom (Enterprise WeChat)
 
-This guide covers setting up Qwen Code with a WeCom intelligent robot (企业微信智能机器人).
+This guide covers setting up MariaDB Shell Agent with a WeCom intelligent robot (企业微信智能机器人).
 
 For a self-built application using Corp ID, Agent ID, Token and EncodingAESKey,
 use the separate [WeCom Callback channel](./wecom-callback).
@@ -15,20 +15,20 @@ use the separate [WeCom Callback channel](./wecom-callback).
 
 1. Open the WeCom admin console and create an intelligent robot.
 
-![](https://gw.alicdn.com/imgextra/i2/O1CN017w1jWj1TTvNBcfya8_!!6000000002384-2-tps-2212-887.png)
+![](https://gw.alicdn.invalid/imgextra/i2/O1CN017w1jWj1TTvNBcfya8_!!6000000002384-2-tps-2212-887.png)
 
 2. Choose API mode.
 
-![](https://gw.alicdn.com/imgextra/i3/O1CN01buuik0207paQUuLQW_!!6000000006803-1-tps-1276-720.gif)
+![](https://gw.alicdn.invalid/imgextra/i3/O1CN01buuik0207paQUuLQW_!!6000000006803-1-tps-1276-720.gif)
 
 3. Copy the Bot ID and Secret.
 4. Add the robot to the direct chats or groups where it should be available.
 
-The intelligent robot uses a WebSocket connection from Qwen Code to WeCom. You do not need a public callback URL, Token, EncodingAESKey, Corp ID, or Agent ID.
+The intelligent robot uses a WebSocket connection from MariaDB Shell Agent to WeCom. You do not need a public callback URL, Token, EncodingAESKey, Corp ID, or Agent ID.
 
 ## Configuration
 
-Add the channel to `~/.qwen/settings.json`:
+Add the channel to `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -69,7 +69,7 @@ Or define them in the `env` section of `settings.json`:
 ## Running
 
 ```bash
-qwen channel start my-wecom
+mariadb-shell-agent channel start my-wecom
 ```
 
 Open WeCom and send a message to the intelligent robot.
@@ -87,9 +87,9 @@ For groups, set `groupPolicy` to `"allowlist"`, `"pairing"`, or `"open"`. Under 
 
 ### Group Mention Compatibility
 
-Earlier Qwen Code versions also applied the generic `requireMention` gate after WeCom delivered a group callback. Because the callback does not include separate mention metadata, `requireMention: true`—including the default value—could reject every delivered group message and make group chat appear nonfunctional.
+Earlier MariaDB Shell Agent versions also applied the generic `requireMention` gate after WeCom delivered a group callback. Because the callback does not include separate mention metadata, `requireMention: true`—including the default value—could reject every delivered group message and make group chat appear nonfunctional.
 
-Qwen Code now relies on WeCom's mention-scoped delivery and does not apply a second mention decision. Existing WeCom configurations containing either `requireMention: true` or `requireMention: false` remain valid and do not produce configuration errors. Both values have the same behavior for WeCom, so the field can be removed. Other settings in the same group entry, such as `dispatchMode`, continue to apply. `groupHistoryLimit` remains accepted but cannot collect new WeCom history because unmentioned group messages are not delivered.
+MariaDB Shell Agent now relies on WeCom's mention-scoped delivery and does not apply a second mention decision. Existing WeCom configurations containing either `requireMention: true` or `requireMention: false` remain valid and do not produce configuration errors. Both values have the same behavior for WeCom, so the field can be removed. Other settings in the same group entry, such as `dispatchMode`, continue to apply. `groupHistoryLimit` remains accepted but cannot collect new WeCom history because unmentioned group messages are not delivered.
 
 ## Images and Files
 
@@ -109,7 +109,7 @@ For safety, local image paths must be inside the channel file directory under th
 
 - Verify the Bot ID and Secret.
 - Make sure the robot is created in API mode.
-- Check that the environment variables are available in the shell running `qwen channel start`.
+- Check that the environment variables are available in the shell running `mariadb-shell-agent channel start`.
 
 ### Bot does not respond in groups
 

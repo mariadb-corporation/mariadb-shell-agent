@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -294,7 +295,7 @@ export async function runHostedWorkflowTurn(input: {
       });
     } catch (cause) {
       writeStderrLineSafe(
-        `qwen serve: Hosted Harness model cleanup failed: ${String(cause)}`,
+        `mariadb-shell-agent serve: Hosted Harness model cleanup failed: ${String(cause)}`,
       );
     }
   }

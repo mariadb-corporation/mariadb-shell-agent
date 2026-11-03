@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -184,7 +185,7 @@ describe('validateMaxToolCalls', () => {
   });
 
   it('rejects NaN — yargs coerces non-numeric flag values to NaN', () => {
-    // `qwen -p '...' --max-tool-calls abc` would otherwise silently
+    // `mariadb-shell-agent -p '...' --max-tool-calls abc` would otherwise silently
     // disable the budget; the >= 0 gate in tickToolCall is false for NaN.
     expect(() => validateMaxToolCalls(Number.NaN)).toThrow();
   });

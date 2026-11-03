@@ -39,7 +39,7 @@ export PROVIDER_CONTEXT_TOKEN=replace-me
 ```
 
 For a managed launch, export both values before starting Qwen. Qwen loads
-trusted repository `.env` and `.qwen/.env` files before resolving this
+trusted repository `.env` and `.mariadb-shell-agent/.env` files before resolving this
 manifest; those files can fill a missing value but cannot override an existing
 process environment value. Treat the repository, its environment files, and
 same-UID code as trusted, or use a separately isolated service boundary.
@@ -56,7 +56,7 @@ Outbound Provider requests honor `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY`.
 npm install
 npm run typecheck
 npm run build
-qwen extensions link "$PWD"
+mariadb-shell-agent extensions link "$PWD"
 ```
 
 `npm run build` bundles the MCP server and its runtime dependencies into

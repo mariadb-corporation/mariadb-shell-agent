@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -238,13 +239,18 @@ describe('runPlan', () => {
 
   it('keeps the project plans directory out of git', async () => {
     const h = (harness = setup());
-    const plansDir = path.join(h.root, '.qwen', 'batch', 'plans');
+    const plansDir = path.join(
+      h.root,
+      '.mariadb-shell-agent',
+      'batch',
+      'plans',
+    );
     fs.mkdirSync(plansDir, { recursive: true });
     fs.copyFileSync(h.planPath, path.join(plansDir, 'p.json'));
-    await runPlan(h.deps, '.qwen/batch/plans/p.json');
+    await runPlan(h.deps, '.mariadb-shell-agent/batch/plans/p.json');
     expect(
       fs.readFileSync(
-        path.join(h.root, '.qwen', 'batch', '.gitignore'),
+        path.join(h.root, '.mariadb-shell-agent', 'batch', '.gitignore'),
         'utf8',
       ),
     ).toBe('*\n');
@@ -648,7 +654,7 @@ describe('collectTask', () => {
     await collectTask(h.deps, taskId);
     const task = h.store.load(taskId);
     expect(task.items[0]).toMatchObject({ state: 'submitted', lastAttempt: 2 });
-    expect(h.out.join('\n')).not.toMatch(/qwen batch retry/);
+    expect(h.out.join('\n')).not.toMatch(/mariadb-shell-agent batch retry/);
 
     // Attempt 2 settles; a retry before collecting finds nothing to pay for.
     const job2 = h.jobs.get('batch-2');

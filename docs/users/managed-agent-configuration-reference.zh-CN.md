@@ -26,7 +26,7 @@ mvn -f packages/managed-agent-server/pom.xml -DskipTests clean process-classes &
 | `spring.datasource.druid.max-active` | `QWEN_MANAGED_AGENT_DB_MAX_POOL_SIZE` | 整数 | `20` | 控制面 Druid 数据库连接池最多可持有的连接数。连接全部占用时，获取连接的请求最多等待 30 秒，随后失败。`managed-local` profile 下不生效，其连接池固定为 20。 |
 | `spring.datasource.password` | `SPRING_DATASOURCE_PASSWORD` | 字符串 | *（空）* | `spring.datasource.username` 的密码。属于机密：应放在 `server.env` 这类私有环境文件中，不要写在命令行上。 |
 | `spring.datasource.url` | `SPRING_DATASOURCE_URL` | 字符串 | `jdbc:mysql://127.0.0.1:3306/qwen_managed_agent` | 存放控制面状态的 MySQL 8 数据库的 JDBC URL；启动时 Flyway 会对其执行 schema 迁移。`managed-local` profile 改用私有 H2 文件数据库，其他 URL 启动时拒绝。 |
-| `spring.datasource.username` | `SPRING_DATASOURCE_USERNAME` | 字符串 | `qwen` | 控制面连接数据库所用的用户。除控制面数据库的权限外，还需要 `performance_schema.user_variables_by_thread` 的 `SELECT` 权限，预检 `--check` 会校验该权限。 |
+| `spring.datasource.username` | `SPRING_DATASOURCE_USERNAME` | 字符串 | `mariadb-shell-agent` | 控制面连接数据库所用的用户。除控制面数据库的权限外，还需要 `performance_schema.user_variables_by_thread` 的 `SELECT` 权限，预检 `--check` 会校验该权限。 |
 
 ## `qwen.managed-agent`
 
@@ -156,7 +156,7 @@ Workspace 扩展包的发布与管理，以及哪些 actor 有权执行这些操
 
 ## `qwen.managed-agent.harness`
 
-与运行 Session 的 Hosted Harness（`qwen serve --profile hosted-harness`）之间的连接：地址与共享凭据、调用超时、审批策略，以及 Session 创建时可获得哪些 Workspace 工具。
+与运行 Session 的 Hosted Harness（`mariadb-shell-agent serve --profile hosted-harness`）之间的连接：地址与共享凭据、调用超时、审批策略，以及 Session 创建时可获得哪些 Workspace 工具。
 
 | 属性 | 环境变量 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
@@ -263,7 +263,7 @@ Workspace 扩展包的发布与管理，以及哪些 actor 有权执行这些操
 | `trusted-local-reboot-recovery` | `QWEN_MANAGED_AGENT_RUNTIME_TRUSTED_LOCAL_REBOOT_RECOVERY` | 布尔 | `true` | Linux 主机整机重启后，Broker 是否把内核 boot ID 的变化视为原本地 worker 已停止的证据，并在所有执行都已终结后清除这些已保存 Runtime 绑定的持有者。它每 5 秒扫描 8 个已保存的绑定，从不启动替代 worker，也不重放执行。要求 `qwen.managed-agent.runtime-broker.durable-local-process` 和 `local-process` provisioner；不满足条件、在 macOS 上或配置了常驻 Workspace 时启动时拒绝。 |
 | `v3-result-window` | `QWEN_MANAGED_AGENT_RUNTIME_BROKER_V3_RESULT_WINDOW` | 时长 | `30m` | Runtime Broker 等待 worker 返回已派发的、会发布输出的 Shell 或 Monitor 执行（Tool v3，开启 `qwen.managed-agent.tool-publication.enabled` 时使用）结果的最长时间，超时后把该执行标记为 `UNKNOWN`；若短于最长的此类调用，该调用会变成 `UNKNOWN`。其他工具执行不使用此窗口。大于 `30m` 在随发行版提供的执行路径上没有作用：Hosted Harness 自身等待 Tool v3 执行的期限固定为 30 分钟。不带单位的数字按秒解析。低于 `1s` 时启动时拒绝。 |
 | `verified-workspace-recovery-enabled` | `QWEN_MANAGED_AGENT_RUNTIME_VERIFIED_WORKSPACE_RECOVERY_ENABLED` | 布尔 | `false` | LOCAL Workspace 的执行是否以已验证的物理存储登记为前提：在工具、文件访问或子 Git 操作运行前，服务端检查 Workspace 根目录是否仍与登记的身份和标记一致，否则以 `409 workspace_unavailable` 拒绝。`qwen.managed-agent.runtime-broker.workspace-creation-root` 和 `qwen.managed-agent.runtime-broker.local-directory-import-enabled` 都依赖它；未配置 `qwen.managed-agent.runtime-broker.workspace-mounts` 时，它也满足 `qwen.managed-agent.harness.workspace-files-enabled` 对 Workspace 来源的要求。与外部 provisioner 或常驻 Workspace 同时使用时启动时拒绝。 |
-| `worker-entry` | `QWEN_MANAGED_AGENT_RUNTIME_WORKER_ENTRY` | 字符串 | *（空）* | 已构建的 Qwen Code CLI 包路径（例如 `dist/cli.js`），由 `qwen.managed-agent.runtime-broker.node-executable` 以 `managed-runtime-worker` 参数运行，以启动 local-process worker；LOCAL Workspace 的文件引用检查和上传也通过它执行。`qwen.managed-agent.runtime-broker.provisioner` 为 `local-process` 时必填；相对路径按服务端的工作目录解析。 |
+| `worker-entry` | `QWEN_MANAGED_AGENT_RUNTIME_WORKER_ENTRY` | 字符串 | *（空）* | 已构建的 MariaDB Shell Agent CLI 包路径（例如 `dist/cli.js`），由 `qwen.managed-agent.runtime-broker.node-executable` 以 `managed-runtime-worker` 参数运行，以启动 local-process worker；LOCAL Workspace 的文件引用检查和上传也通过它执行。`qwen.managed-agent.runtime-broker.provisioner` 为 `local-process` 时必填；相对路径按服务端的工作目录解析。 |
 | `workspace-creation-root` | `QWEN_MANAGED_AGENT_WORKSPACE_CREATION_ROOT` | 字符串 | *（空）* | 已存在、规范化且服务账号可写的目录，用户“从零开始”创建 Workspace 时，服务端在其下按租户分子目录新建空 Workspace；留空则禁用 Workspace 创建。它不得与任何 `qwen.managed-agent.runtime-broker.workspace-mounts` 根目录、`qwen.managed-agent.runtime-broker.state-directory` 或 `qwen.managed-agent.runtime-broker.workspace-cwd` 重叠，并要求启用 `qwen.managed-agent.harness.workspace-files-enabled`、`qwen.managed-agent.runtime-broker.durable-local-process` 和 `qwen.managed-agent.runtime-broker.verified-workspace-recovery-enabled`；不满足条件或使用外部 provisioner 时启动时拒绝。启用后，任何已认证的租户用户都可以在其中分配存储并成为所有者。 |
 | `workspace-cwd` | `QWEN_MANAGED_AGENT_WORKSPACE_CWD` | 字符串 | *（空）* | Broker 默认 Workspace 的工作目录，供未绑定已登记 Workspace 的 Session 使用。`qwen.managed-agent.runtime-broker.enabled` 为 true 时必填。使用 `local-process` 时目录必须存在，并被解析为规范路径，默认 workspace ID 由此派生（即使 Broker 未启用，Session Store 也会据此派生）；`kubernetes-workspace` 要求绝对且规范化的路径；外部 provisioner 要求 worker 侧的绝对规范化路径，且不能是 `/`。 |
 | `workspace-generation` | `QWEN_MANAGED_AGENT_WORKSPACE_GENERATION` | 字符串 | `1` | Broker 默认 Workspace 的代数（generation），写入未绑定已登记 Workspace 的 Session 的 Runtime 作用域。须为非空字符串，最长 512 个字符；`qwen.managed-agent.runtime-broker.enabled` 为 true 时必填。 |
@@ -320,7 +320,7 @@ SSH Runtime 节点：服务端通过 SSH 访问的主机，用户可以在这些
 | `max-verification-timeout` | — | 时长 | — | 发布校验可获得的最长期限。必须为正且不超过 25 分钟；若 `qwen.managed-agent.tool-publication.operation-timeout` 加上按 `qwen.managed-agent.tool-publication.verification-bytes-per-second` 校验 `qwen.managed-agent.tool-publication.execution-bytes`（外加固定的 producer 额度）所需的时间超过该值，启动时拒绝。启用工具发布时必填。不带单位的数字按秒解析。 |
 | `operation-timeout` | — | 时长 | — | 发布操作（上传、校验或完成）在到期前可运行的时长；校验已存储内容时，每 `qwen.managed-agent.tool-publication.verification-bytes-per-second` 字节额外增加一秒。启用工具发布时必填，必须为正且长于 `qwen.managed-agent.tool-publication.claim-timeout`（否则启动时拒绝）。不带单位的数字按秒解析。 |
 | `oss-bucket` | — | 字符串 | *（空）* | 存放工具输出对象的阿里云 OSS bucket。启用工具发布且使用默认 OSS 存储时必填（否则启动时拒绝）；注册了自定义 `ToolPublicationObjectStore` bean 时忽略。 |
-| `oss-endpoint` | — | 字符串 | *（空）* | 工具输出对象使用的阿里云 OSS endpoint。必须是与 `qwen.managed-agent.tool-publication.oss-region` 对应的 `https://oss-<region>.aliyuncs.com`，且不带路径、查询参数或用户信息（否则启动时拒绝）。OSS 凭据属于 secret，从 `OSS_ACCESS_KEY_ID` 和 `OSS_ACCESS_KEY_SECRET` 环境变量读取（临时凭据另加 `OSS_SESSION_TOKEN`）。使用默认 OSS 存储时必填；注册了自定义存储 bean 时忽略。 |
+| `oss-endpoint` | — | 字符串 | *（空）* | 工具输出对象使用的阿里云 OSS endpoint。必须是与 `qwen.managed-agent.tool-publication.oss-region` 对应的 `https://oss-<region>.aliyuncs.invalid`，且不带路径、查询参数或用户信息（否则启动时拒绝）。OSS 凭据属于 secret，从 `OSS_ACCESS_KEY_ID` 和 `OSS_ACCESS_KEY_SECRET` 环境变量读取（临时凭据另加 `OSS_SESSION_TOKEN`）。使用默认 OSS 存储时必填；注册了自定义存储 bean 时忽略。 |
 | `oss-region` | — | 字符串 | *（空）* | 用于 V4 请求签名的阿里云 OSS region（例如 `cn-hangzhou`），必须与 `qwen.managed-agent.tool-publication.oss-endpoint` 的主机名一致。使用默认 OSS 存储时必填（否则启动时拒绝）；注册了自定义存储 bean 时忽略。 |
 | `service-base-url` | — | 字符串 | *（空）* | Runtime 访问本服务工具发布 API 所用的基础 URL，Runtime 会基于它解析 `/internal/managed-tool-publications`。必须是不带路径、查询参数或片段的绝对 `http` 或 `https` URL；指向非回环主机的明文 `http` 会在启动时被拒绝，除非 `qwen.managed-agent.auth.allow-insecure-bind` 为 true。启用工具发布时必填。配置了 SSH Runtime 节点时必须为 `http` URL。 |
 | `session-bytes` | — | 整数 | — | 单个 Session 所有捕获合计可预留的工具输出字节数；每次预留按其捕获大小加上固定的 `4784128` 字节开销计算。超出该值的预留会被拒绝。启用工具发布时必填，且至少为 `1`（否则启动时拒绝）。 |

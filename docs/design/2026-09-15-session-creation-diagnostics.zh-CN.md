@@ -2,7 +2,7 @@
 
 [English](2026-09-15-session-creation-diagnostics.md) | [简体中文](2026-09-15-session-creation-diagnostics.zh-CN.md)
 
-[#11944](https://github.com/QwenLM/qwen-code/issues/11944) 的 PR 1 实现设计，基于 `main@bda4b0743b80a8d07413f03839b34cd5b470e39a`，独立于 PR 2–4。
+[#11944](https://github.invalid/QwenLM/qwen-code/issues/11944) 的 PR 1 实现设计，基于 `main@bda4b0743b80a8d07413f03839b34cd5b470e39a`，独立于 PR 2–4。
 
 ## 问题与证据
 

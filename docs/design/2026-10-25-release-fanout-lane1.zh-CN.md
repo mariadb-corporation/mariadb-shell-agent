@@ -4,7 +4,7 @@
 
 ## 问题与范围
 
-[#15465](https://github.com/QwenLM/qwen-code/issues/15465) 记录了发布元数据任务等待 GitHub-hosted 容量 37–42 分钟的情况。本次只实现该 issue 的 Lane 1，遵循[发布任务迁离 Hosted 池](2026-10-16-release-jobs-off-hosted-pool.zh-CN.md)的凭据边界，不完成整个 issue，也不启用 Lane 2。
+[#15465](https://github.invalid/QwenLM/qwen-code/issues/15465) 记录了发布元数据任务等待 GitHub-hosted 容量 37–42 分钟的情况。本次只实现该 issue 的 Lane 1，遵循[发布任务迁离 Hosted 池](2026-10-16-release-jobs-off-hosted-pool.zh-CN.md)的凭据边界，不完成整个 issue，也不启用 Lane 2。
 
 逐个核查的 job 均没有 `secrets` 引用或部署 environment。其 token 权限为 `contents: read`；这里“无凭据”指不含发布、签名、模型 API 或 OSS 凭据，并非没有临时 GitHub token。
 

@@ -4,7 +4,7 @@
 
 ## Context
 
-When this infrastructure was proposed, Qwen Code had no settings file change detection mechanism. Users had to restart the session after modifying `settings.json` for changes to take effect. This design describes the infrastructure layer for the #3696 hot-reload system — automatic detection and event dispatching for settings file changes.
+When this infrastructure was proposed, MariaDB Shell Agent had no settings file change detection mechanism. Users had to restart the session after modifying `settings.json` for changes to take effect. This design describes the infrastructure layer for the #3696 hot-reload system — automatic detection and event dispatching for settings file changes.
 
 **Scope**: This sub-task is only responsible for "detect file changes → reload → notify listeners". `Config` copies many settings fields at construction time (`approvalMode`, `mcpServers`, `telemetry`, etc.), and these snapshots are NOT automatically updated by this sub-task. Only consumers that read `LoadedSettings.merged` in real time (e.g., the `useSettings()` hook, `disabledSkillNamesProvider`) will immediately see changes. Other sub-tasks (MCP reconnection, `/reload` command) are responsible for pushing updates to Config's internal state.
 
@@ -21,19 +21,19 @@ When this infrastructure was proposed, Qwen Code had no settings file change det
 
 The `writeWithBackupSync` write flow stages complete bytes and copies the old settings inside an invocation-owned `settings.json.write-*` directory, then publishes with one replacement rename. An existing target stays present; publication replaces its inode. Watching the parent directory (`depth: 0`) detects replacement and later file creation or deletion without tying the watch to the old inode. We filter by **exact basename match**, only responding to `settings.json` file events and ignoring `settings.json.write-*` directories, their children, legacy `.tmp`/`.orig` files and editor temporary files. Successful publication cleans its private artifacts best effort; failed saves, crashes or cleanup failures may retain them, and the watcher must ignore these leftovers. See the [atomic settings save design](../2026-09-30-atomic-settings-save.md) for the publication and recovery contract.
 
-### Lazy Directory Handling: Never Create `.qwen/` at Startup
+### Lazy Directory Handling: Never Create `.mariadb-shell-agent/` at Startup
 
-> **Startup filesystem side effect (intentionally avoided).** The watcher must **never** create `<project>/.qwen/` (or `~/.qwen/`) just to be able to watch it. An earlier version called `mkdirSync({ recursive: true })` for any missing settings directory, which meant a normal non-bare startup silently created `<project>/.qwen/` even in projects that never had Qwen settings — polluting the workspace and git status. Directory creation is owned solely by settings _persistence_ (`saveSettings()` does its own `mkdirSync` when the user actually writes settings).
+> **Startup filesystem side effect (intentionally avoided).** The watcher must **never** create `<project>/.mariadb-shell-agent/` (or `~/.mariadb-shell-agent/`) just to be able to watch it. An earlier version called `mkdirSync({ recursive: true })` for any missing settings directory, which meant a normal non-bare startup silently created `<project>/.mariadb-shell-agent/` even in projects that never had Qwen settings — polluting the workspace and git status. Directory creation is owned solely by settings _persistence_ (`saveSettings()` does its own `mkdirSync` when the user actually writes settings).
 
 To still detect a `settings.json` added later in the session without creating the directory and without recursing the project tree, the watcher uses a two-stage, per-scope strategy keyed on **directory** existence:
 
-- **`.qwen` exists at startup** → watch it directly (`watchTargetDir`, the strategy above).
-- **`.qwen` missing** → **bootstrap-watch the parent** (`watchParentForDir`): `chokidar.watch(parentDir, { depth: 0, ignoreInitial: true, ignored })` where the `ignored` predicate `(p) => p !== parentDir && basename(p) !== '.qwen'` allows **only** the `.qwen` entry through. This suppresses all unrelated top-level churn and never recurses. Once `.qwen` appears, the watcher **promotes**: it closes the bootstrap watcher and starts a target watcher on `.qwen`, then schedules a refresh to pick up a `settings.json` that may already be inside.
+- **`.mariadb-shell-agent` exists at startup** → watch it directly (`watchTargetDir`, the strategy above).
+- **`.mariadb-shell-agent` missing** → **bootstrap-watch the parent** (`watchParentForDir`): `chokidar.watch(parentDir, { depth: 0, ignoreInitial: true, ignored })` where the `ignored` predicate `(p) => p !== parentDir && basename(p) !== '.mariadb-shell-agent'` allows **only** the `.mariadb-shell-agent` entry through. This suppresses all unrelated top-level churn and never recurses. Once `.mariadb-shell-agent` appears, the watcher **promotes**: it closes the bootstrap watcher and starts a target watcher on `.mariadb-shell-agent`, then schedules a refresh to pick up a `settings.json` that may already be inside.
 
 Robustness details:
 
-- **TOCTOU guard**: after arming the bootstrap watcher (which uses `ignoreInitial`), `existsSync(dir)` is re-checked; if `.qwen` was created in the gap, promotion happens immediately.
-- **Demote on removal**: if `.qwen` itself is deleted (`unlinkDir`), the target watcher demotes back to a parent bootstrap watcher so a later re-create is still caught.
+- **TOCTOU guard**: after arming the bootstrap watcher (which uses `ignoreInitial`), `existsSync(dir)` is re-checked; if `.mariadb-shell-agent` was created in the gap, promotion happens immediately.
+- **Demote on removal**: if `.mariadb-shell-agent` itself is deleted (`unlinkDir`), the target watcher demotes back to a parent bootstrap watcher so a later re-create is still caught.
 - **Generation guard**: chokidar `close()` is async, so a stale `'all'` callback from a watcher being torn down could otherwise re-trigger promotion and stack watchers. A per-scope monotonic generation token (bumped on every promote/demote, and on `stopWatching`) makes stale callbacks no-ops, guaranteeing at most one active watcher per scope.
 
 ### Change Detection: Semantic Diff as the Primary Deduplication Mechanism
@@ -71,7 +71,7 @@ export type SettingsChangeListener = (
 export class SettingsWatcher {
   private readonly settings: LoadedSettings;
   private readonly watchers: Map<SettingScope, FSWatcher> = new Map();
-  // 'bootstrap' = watching parent for `.qwen`; 'target' = watching `.qwen`
+  // 'bootstrap' = watching parent for `.mariadb-shell-agent`; 'target' = watching `.mariadb-shell-agent`
   private readonly watchStage: Map<SettingScope, 'bootstrap' | 'target'> =
     new Map();
   // Monotonic token per scope; bumped on promote/demote to void stale callbacks
@@ -92,7 +92,7 @@ export class SettingsWatcher {
 #### `startWatching()`
 
 - Iterates both User and Workspace scopes
-- Branches on **directory** existence: watch `.qwen` directly if it exists, otherwise bootstrap-watch the parent (see [Lazy Directory Handling](#lazy-directory-handling-never-create-qwen-at-startup))
+- Branches on **directory** existence: watch `.mariadb-shell-agent` directly if it exists, otherwise bootstrap-watch the parent (see [Lazy Directory Handling](#lazy-directory-handling-never-create-qwen-at-startup))
 - **Never** creates the directory — no `mkdirSync`
 - `ignoreInitial: true`, `depth: 0` throughout
 - Not called in bare mode
@@ -115,13 +115,13 @@ startWatching(): void {
 }
 ```
 
-`watchTargetDir` is the parent-directory + strict-basename watcher described above (it also demotes back to a bootstrap watcher if `.qwen` itself is removed). `watchParentForDir` arms the `.qwen`-only bootstrap watcher and promotes once `.qwen` appears:
+`watchTargetDir` is the parent-directory + strict-basename watcher described above (it also demotes back to a bootstrap watcher if `.mariadb-shell-agent` itself is removed). `watchParentForDir` arms the `.mariadb-shell-agent`-only bootstrap watcher and promotes once `.mariadb-shell-agent` appears:
 
 ```typescript
 private watchParentForDir(scope: SettingScope, settingsPath: string): void {
   const dir = path.dirname(settingsPath);
   const parentDir = path.dirname(dir);
-  const dirBasename = path.basename(dir); // ".qwen"
+  const dirBasename = path.basename(dir); // ".mariadb-shell-agent"
   const gen = this.bumpGeneration(scope);
 
   const watcher = watchFs(parentDir, {
@@ -142,7 +142,7 @@ private watchParentForDir(scope: SettingScope, settingsPath: string): void {
   this.watchers.set(scope, watcher);
   this.watchStage.set(scope, 'bootstrap');
 
-  // TOCTOU guard: `.qwen` may have appeared between the existence check and here.
+  // TOCTOU guard: `.mariadb-shell-agent` may have appeared between the existence check and here.
   if (fs.existsSync(dir)) void this.promoteScope(scope, settingsPath);
 }
 
@@ -151,7 +151,7 @@ private async promoteScope(scope: SettingScope, settingsPath: string): Promise<v
   await this.replaceWatcher(scope); // bumps generation + awaits async close()
   if (!this.started) return;
   this.watchTargetDir(scope, settingsPath);
-  this.scheduleRefresh(scope); // pick up a settings.json already inside .qwen
+  this.scheduleRefresh(scope); // pick up a settings.json already inside .mariadb-shell-agent
 }
 ```
 
@@ -312,28 +312,28 @@ settingsWatcher?.addChangeListener(async (events) => {
 
 ## Edge Case Handling
 
-| Scenario                                 | Handling                                                                                                      |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `.qwen` directory doesn't exist          | **Never created.** Bootstrap-watch the parent (`depth: 0`, `.qwen`-only filter), promote once `.qwen` appears |
-| `.qwen` created after startup            | Bootstrap watcher catches `addDir`, promotes to a target watcher + schedules a refresh                        |
-| `.qwen` deleted after promotion          | Target watcher catches `unlinkDir` → demotes back to a parent bootstrap watcher                               |
-| File deleted                             | `reloadScopeFromDisk` detects `!existsSync`, resets to `{}`, diff triggers `deleted` event                    |
-| File created after startup (dir existed) | Directory watcher catches `add` event, `reloadScopeFromDisk` reads the new file                               |
-| Stale callback during promote/demote     | Per-scope generation token makes the closing watcher's in-flight callback a no-op (no watcher stacking)       |
-| Editor atomic writes                     | Directory watching + strict basename filtering (excludes `.tmp`/`.orig`) + 300ms debounce coalescing          |
-| Save artifacts and `.tmp`/`.orig` events | Basename filter exact-matches `settings.json`; other names and private directory contents are ignored         |
-| Self-write (`setValue` → `saveSettings`) | Semantic diff: reload content matches in-memory snapshot → no notification                                    |
-| Self-write concurrent with external edit | External edit changes content → diff detects the change → correctly notifies                                  |
-| Format/comment-only changes              | `reloadScopeFromDisk` resolves settings without comments → diff matches → no notification                     |
-| Duplicate chokidar events                | Debounce coalescing + semantic diff provide dual protection                                                   |
-| `QWEN_HOME` redirect                     | `getUserSettingsPath()` already resolves the path; watcher uses the resolved path                             |
-| Bare mode                                | `startWatching()` is never called, zero overhead                                                              |
-| Watcher creation failure                 | Exception caught, warning logged, that scope has no real-time detection but functionality is unaffected       |
-| `reloadScopeFromDisk` parse failure      | Internal try/catch (`settings.ts:501`) preserves old state → before/after diff matches → no notification      |
-| Key order change (no value change)       | `JSON.stringify` is sensitive to key order; may produce one harmless extra notification                       |
-| Config initialization failure            | `shutdown()` stops watcher before `initialized` check, preventing leaks                                       |
-| Re-entrancy (listener still running)     | `processing` flag + `drainPendingChanges` loop serializes processing                                          |
-| Invalid JSON                             | `reloadScopeFromDisk` internal try/catch preserves old state                                                  |
+| Scenario                                       | Handling                                                                                                                                    |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.mariadb-shell-agent` directory doesn't exist | **Never created.** Bootstrap-watch the parent (`depth: 0`, `.mariadb-shell-agent`-only filter), promote once `.mariadb-shell-agent` appears |
+| `.mariadb-shell-agent` created after startup   | Bootstrap watcher catches `addDir`, promotes to a target watcher + schedules a refresh                                                      |
+| `.mariadb-shell-agent` deleted after promotion | Target watcher catches `unlinkDir` → demotes back to a parent bootstrap watcher                                                             |
+| File deleted                                   | `reloadScopeFromDisk` detects `!existsSync`, resets to `{}`, diff triggers `deleted` event                                                  |
+| File created after startup (dir existed)       | Directory watcher catches `add` event, `reloadScopeFromDisk` reads the new file                                                             |
+| Stale callback during promote/demote           | Per-scope generation token makes the closing watcher's in-flight callback a no-op (no watcher stacking)                                     |
+| Editor atomic writes                           | Directory watching + strict basename filtering (excludes `.tmp`/`.orig`) + 300ms debounce coalescing                                        |
+| Save artifacts and `.tmp`/`.orig` events       | Basename filter exact-matches `settings.json`; other names and private directory contents are ignored                                       |
+| Self-write (`setValue` → `saveSettings`)       | Semantic diff: reload content matches in-memory snapshot → no notification                                                                  |
+| Self-write concurrent with external edit       | External edit changes content → diff detects the change → correctly notifies                                                                |
+| Format/comment-only changes                    | `reloadScopeFromDisk` resolves settings without comments → diff matches → no notification                                                   |
+| Duplicate chokidar events                      | Debounce coalescing + semantic diff provide dual protection                                                                                 |
+| `QWEN_HOME` redirect                           | `getUserSettingsPath()` already resolves the path; watcher uses the resolved path                                                           |
+| Bare mode                                      | `startWatching()` is never called, zero overhead                                                                                            |
+| Watcher creation failure                       | Exception caught, warning logged, that scope has no real-time detection but functionality is unaffected                                     |
+| `reloadScopeFromDisk` parse failure            | Internal try/catch (`settings.ts:501`) preserves old state → before/after diff matches → no notification                                    |
+| Key order change (no value change)             | `JSON.stringify` is sensitive to key order; may produce one harmless extra notification                                                     |
+| Config initialization failure                  | `shutdown()` stops watcher before `initialized` check, preventing leaks                                                                     |
+| Re-entrancy (listener still running)           | `processing` flag + `drainPendingChanges` loop serializes processing                                                                        |
+| Invalid JSON                                   | `reloadScopeFromDisk` internal try/catch preserves old state                                                                                |
 
 ## Performance Analysis
 
@@ -374,9 +374,9 @@ Mock chokidar (reusing the `skill-manager.test.ts` mock pattern):
 6. **Serialization**: New events during `handleChange` are accumulated, drained after processing completes
 7. **Error isolation**: chokidar errors don't crash; listener exceptions don't affect other listeners; `reloadScopeFromDisk` failures are caught
 8. **Listener timeout**: 30s timeout protection
-9. **Lazy directory watching**: when `.qwen` is missing, `mkdirSync` is never called; a bootstrap watcher is armed on the parent and its `ignored` predicate allows only the `.qwen` entry
-10. **Promote / TOCTOU**: `.qwen` appearing (via `addDir` or the post-arm re-check) closes the bootstrap watcher and opens a target watcher on `.qwen` + schedules a refresh
-11. **Demote / re-create**: removing `.qwen` (`unlinkDir`) re-bootstraps on the parent; a subsequent re-create promotes again
+9. **Lazy directory watching**: when `.mariadb-shell-agent` is missing, `mkdirSync` is never called; a bootstrap watcher is armed on the parent and its `ignored` predicate allows only the `.mariadb-shell-agent` entry
+10. **Promote / TOCTOU**: `.mariadb-shell-agent` appearing (via `addDir` or the post-arm re-check) closes the bootstrap watcher and opens a target watcher on `.mariadb-shell-agent` + schedules a refresh
+11. **Demote / re-create**: removing `.mariadb-shell-agent` (`unlinkDir`) re-bootstraps on the parent; a subsequent re-create promotes again
 12. **Generation guard**: a stale callback from an already-closed bootstrap watcher does not create a second target watcher
 
 ### Regression Verification
@@ -390,7 +390,7 @@ cd packages/core && npx vitest run src/config/
 
 ### Manual Verification
 
-Edit `~/.qwen/settings.json` during a running session and observe debug log output for change events.
+Edit `~/.mariadb-shell-agent/settings.json` during a running session and observe debug log output for change events.
 
 ---
 

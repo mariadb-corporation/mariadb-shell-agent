@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review publish-assets`: host evidence images for a PR review in the
+// `mariadb-shell-agent review publish-assets`: host evidence images for a PR review in the
 // user-designated assets repository, and hand back commit-pinned URLs.
 //
 // GitHub's API cannot attach images to review comments — the web UI's

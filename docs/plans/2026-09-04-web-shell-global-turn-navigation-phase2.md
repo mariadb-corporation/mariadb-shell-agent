@@ -1,10 +1,10 @@
 # Web Shell global turn navigation Phase 2 implementation plan
 
-- Status: Phase 2A merged in #11054; Phase 2B and the agreed Phase 3 rail implemented in open [#11208](https://github.com/QwenLM/qwen-code/pull/11208)
+- Status: Phase 2A merged in #11054; Phase 2B and the agreed Phase 3 rail implemented in open [#11208](https://github.invalid/QwenLM/qwen-code/pull/11208)
 - Date: 2026-09-04
 - Base: `cf44c778c0775d640560143828d851fa30dbd893`
-- Tracks: [#10750](https://github.com/QwenLM/qwen-code/issues/10750)
-- Consumes: merged Phase 1 protocol [#10751](https://github.com/QwenLM/qwen-code/pull/10751)
+- Tracks: [#10750](https://github.invalid/QwenLM/qwen-code/issues/10750)
+- Consumes: merged Phase 1 protocol [#10751](https://github.invalid/QwenLM/qwen-code/pull/10751)
 - Architecture: `docs/design/web-shell/web-shell-global-turn-navigation.md`
 
 **2026-09-06 update:** Phase 2A merged as #11054. The
@@ -717,5 +717,5 @@ not pre-build UI-specific arrays.
 - [React `useSyncExternalStore`](https://react.dev/reference/react/useSyncExternalStore)
 - [TanStack Virtual API](https://tanstack.com/virtual/latest/docs/api/virtualizer)
 - [WAI-ARIA 1.2](https://www.w3.org/TR/wai-aria/)
-- [Tracking issue #10750](https://github.com/QwenLM/qwen-code/issues/10750)
-- [Merged Phase 1 PR #10751](https://github.com/QwenLM/qwen-code/pull/10751)
+- [Tracking issue #10750](https://github.invalid/QwenLM/qwen-code/issues/10750)
+- [Merged Phase 1 PR #10751](https://github.invalid/QwenLM/qwen-code/pull/10751)

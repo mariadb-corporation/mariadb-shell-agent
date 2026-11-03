@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,7 +18,7 @@ import {
   parseJsonl,
 } from '../generate-changelog.js';
 
-const PR = (n) => `https://github.com/QwenLM/qwen-code/pull/${n}`;
+const PR = (n) => `https://github.invalid/QwenLM/qwen-code/pull/${n}`;
 
 describe('categorize', () => {
   it('splits type, scope, and description', () => {
@@ -92,7 +93,7 @@ describe('parseReleaseEntries', () => {
       '## New Contributors',
       '* @newbie made their first contribution in ' + PR(99),
       '',
-      '**Full Changelog**: https://github.com/QwenLM/qwen-code/compare/v1...v2',
+      '**Full Changelog**: https://github.invalid/QwenLM/qwen-code/compare/v1...v2',
     ].join('\n');
 
     expect(parseReleaseEntries(body)).toEqual([

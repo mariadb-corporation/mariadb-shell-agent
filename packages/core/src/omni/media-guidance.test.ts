@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +22,7 @@ import {
 const DASHSCOPE_CGC = {
   authType: AuthType.USE_OPENAI,
   apiKey: 'sk-real-key',
-  baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
 };
 
 function stubConfig(overrides?: {
@@ -95,7 +96,7 @@ describe('buildOmniMediaGuidanceSection', () => {
         },
         upload: {
           apiKey: 'upload-key',
-          baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+          baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
           model: 'qwen3.5-omni-plus',
         },
       }),

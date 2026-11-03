@@ -50,7 +50,7 @@ App 的旧 onSessionChange(turn_complete) 和侧边栏 completedUnread 来自 UI
 | 标签页同步       | 监听 storage 事件；写入页面直接更新本地状态                                    |
 | 存储失败         | 本页面内继续可用，提示“设置仅在当前页面有效”                                   |
 
-不写入 `.qwen/settings.json`：浏览器权限是设备/站点状态，daemon 配置不能代替用户授权；同一个 workspace 可以同时被权限不同的浏览器打开。
+不写入 `.mariadb-shell-agent/settings.json`：浏览器权限是设备/站点状态，daemon 配置不能代替用户授权；同一个 workspace 可以同时被权限不同的浏览器打开。
 
 ### 权限与设置状态
 
@@ -85,7 +85,7 @@ App 的旧 onSessionChange(turn_complete) 和侧边栏 completedUnread 来自 UI
 
 展示条件为 `document.visibilityState !== 'visible' || !document.hasFocus()`。前台聚焦时消费终态但不展示，后来失焦不补弹。首版不增加时长阈值、声音选择或自定义正文。
 
-标题固定 Qwen Code，正文仅上述通用文案，不含 prompt、答复、错误、会话标题、路径或 workspace 名。点击尝试 window.focus() 并关闭通知，不自动切换会话；操作系统可能拒绝聚焦，不能保证成功。展示失败不改变回合结果。
+标题固定 MariaDB Shell Agent，正文仅上述通用文案，不含 prompt、答复、错误、会话标题、路径或 workspace 名。点击尝试 window.focus() 并关闭通知，不自动切换会话；操作系统可能拒绝聚焦，不能保证成功。展示失败不改变回合结果。
 
 ## 内部架构
 
@@ -159,7 +159,7 @@ Web Locks 提供同源互斥，tag 是通知替换而非事务幂等。参见 [M
 | 去重       | 前台/关闭消费后不补弹、缓存边界、多页锁竞争、无锁/存储降级、失败不改变聊天。                    |
 | 手工       | Chrome/Safari 桌面后台完成和失败、OS 权限、点击聚焦；其他浏览器未测需明确标注，手机不宣称支持。 |
 
-E2E 清单见 `.qwen/e2e-tests/web-shell-browser-turn-notifications-independent.md`。实现完成后审阅完整 diff，按仓库要求完成两轮干净自审和独立代码复核；提交 PR 另按用户指示执行。
+E2E 清单见 `.mariadb-shell-agent/e2e-tests/web-shell-browser-turn-notifications-independent.md`。实现完成后审阅完整 diff，按仓库要求完成两轮干净自审和独立代码复核；提交 PR 另按用户指示执行。
 
 ## 后续能力
 
@@ -173,6 +173,6 @@ E2E 清单见 `.qwen/e2e-tests/web-shell-browser-turn-notifications-independent.
 
 实现仅修改 Web Shell：根组件提供页面级通知状态和本地设置，DaemonSessionProvider 在 live / recovery 已完成 transcript 投影后观察权威终态，既有提交回调用于恢复跟踪。没有新增 daemon 路由、SSE 连接或公开 SDK 回调。页面验证同时发现并修正共享 Switch 的状态选择器：匹配 Radix 的 data-state 属性，以正确显示开关颜色和滑块位置。
 
-单元测试覆盖终态分类、权限与偏好、重复消费、历史静默、存储受限、通知失败隔离，以及实际 Provider 的终态投影顺序和 epoch reset 恢复。页面级验证使用真实 Web Shell、mockDaemon SSE、Chromium 和 Notification stub，覆盖设置入口、无 daemon 设置写入、前后台差异、双页开关同步与真实 Web Locks 竞争。操作系统最终展示、移动端及关闭页面后的推送不属于本次验证。详细命令和结果位于本地 `.qwen/e2e-tests/web-shell-browser-turn-notifications-independent.md`。
+单元测试覆盖终态分类、权限与偏好、重复消费、历史静默、存储受限、通知失败隔离，以及实际 Provider 的终态投影顺序和 epoch reset 恢复。页面级验证使用真实 Web Shell、mockDaemon SSE、Chromium 和 Notification stub，覆盖设置入口、无 daemon 设置写入、前后台差异、双页开关同步与真实 Web Locks 竞争。操作系统最终展示、移动端及关闭页面后的推送不属于本次验证。详细命令和结果位于本地 `.mariadb-shell-agent/e2e-tests/web-shell-browser-turn-notifications-independent.md`。
 
 最终源码通过全仓 `npm run build`、`npm run typecheck`、`npm run bundle`，6 个相关测试文件合计 365 项通过；修改文件 ESLint、Prettier 和 diff 检查通过。独立复核发现并修复迟到授权覆盖其他标签页关闭操作的竞态，修复后的复核无新增问题。

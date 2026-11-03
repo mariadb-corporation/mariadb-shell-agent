@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,7 +24,7 @@ export function programLabel(program: string | undefined): string {
     ? 'Codex'
     : program === 'claude'
       ? 'Claude Code'
-      : 'Qwen Code';
+      : 'MariaDB Shell Agent';
 }
 
 /** Narrows a server-sent program id; anything unknown is dropped. */

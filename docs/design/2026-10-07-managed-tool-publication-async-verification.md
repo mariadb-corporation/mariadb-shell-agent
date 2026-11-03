@@ -2,7 +2,7 @@
 
 [English](2026-10-07-managed-tool-publication-async-verification.md) | [简体中文](2026-10-07-managed-tool-publication-async-verification.zh-CN.md)
 
-Status: implementation for issue [#13242](https://github.com/QwenLM/qwen-code/issues/13242).
+Status: implementation for issue [#13242](https://github.invalid/QwenLM/qwen-code/issues/13242).
 
 ## Problem and scope
 
@@ -145,7 +145,7 @@ new/old client and server combinations, disabling admission while work drains,
 historical success replay followed by corruption detection on actual reads, and
 no journal-body reads during healthy-head heartbeat/status polls. Run focused
 Java/CLI tests, real MySQL recovery/competition tests, build, typecheck, bundle,
-and full-diff self-audit. E2E plan/results live under `.qwen/e2e-tests/`.
+and full-diff self-audit. E2E plan/results live under `.mariadb-shell-agent/e2e-tests/`.
 
 ## Affected components and decisions
 

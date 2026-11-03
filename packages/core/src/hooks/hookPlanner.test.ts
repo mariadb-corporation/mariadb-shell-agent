@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -126,9 +127,12 @@ describe('HookPlanner', () => {
     it('returns file path targets for instruction load events', () => {
       expect(
         getHookMatcherTarget(InstructionsLoaded, {
-          filePath: '/repo/.qwen/QWEN.local.md',
+          filePath: '/repo/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md',
         }),
-      ).toEqual({ kind: 'filePath', target: '/repo/.qwen/QWEN.local.md' });
+      ).toEqual({
+        kind: 'filePath',
+        target: '/repo/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md',
+      });
     });
 
     it('returns command name targets for user prompt expansion events', () => {
@@ -388,15 +392,23 @@ describe('HookPlanner', () => {
     });
 
     it('should match instruction loaded file paths with regex', () => {
-      expectMatch(InstructionsLoaded, '\\.qwen/QWEN\\.local\\.md$', {
-        filePath: '/repo/.qwen/QWEN.local.md',
-      });
+      expectMatch(
+        InstructionsLoaded,
+        '\\.mariadb-shell-agent/MARIADB-SHELL-AGENT\\.local\\.md$',
+        {
+          filePath: '/repo/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md',
+        },
+      );
     });
 
     it('should not match unrelated instruction loaded file paths', () => {
-      expectNoMatch(InstructionsLoaded, '\\.qwen/QWEN\\.local\\.md$', {
-        filePath: '/repo/QWEN.md',
-      });
+      expectNoMatch(
+        InstructionsLoaded,
+        '\\.mariadb-shell-agent/MARIADB-SHELL-AGENT\\.local\\.md$',
+        {
+          filePath: '/repo/MARIADB-SHELL-AGENT.md',
+        },
+      );
     });
 
     it('should match auth_success notification type', () => {

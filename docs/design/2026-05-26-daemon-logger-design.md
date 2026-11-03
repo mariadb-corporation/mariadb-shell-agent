@@ -1,13 +1,13 @@
-# `qwen serve` Daemon File Logger — Design
+# `mariadb-shell-agent serve` Daemon File Logger — Design
 
-- **Issue**: [QwenLM/qwen-code#4548](https://github.com/QwenLM/qwen-code/issues/4548)
+- **Issue**: [QwenLM/qwen-code#4548](https://github.invalid/QwenLM/qwen-code/issues/4548)
 - **Branch**: `feat/support_daemon_logger`
 - **Status**: design approved, awaiting implementation plan
 - **Date**: 2026-05-26
 
 ## 1. Problem
 
-`qwen serve` emits daemon-level diagnostics (lifecycle, route errors, ACP child stderr) to `process.stderr`. That works under systemd/Docker but is fragile for SDK / Desktop / local daemon use: when a client sees `POST /session/:id/prompt` return HTTP 500, the route + session + stack context is gone unless the operator manually redirected stderr.
+`mariadb-shell-agent serve` emits daemon-level diagnostics (lifecycle, route errors, ACP child stderr) to `process.stderr`. That works under systemd/Docker but is fragile for SDK / Desktop / local daemon use: when a client sees `POST /session/:id/prompt` return HTTP 500, the route + session + stack context is gone unless the operator manually redirected stderr.
 
 `createDebugLogger` (in `packages/core/src/utils/debugLogger.ts`) is session-scoped: it requires an active `DebugLogSession` and writes to `${runtimeBaseDir}/debug/<sessionId>.txt`. The serve daemon starts **before** any session exists, so daemon-level calls would silently no-op. It also can't be reused without changing the per-session `debug/latest` semantics.
 
@@ -18,7 +18,7 @@ This design adds a daemon-specific file sink, additive to existing stderr behavi
 ### In scope
 
 - A new logger initialized once per `runQwenServe` process.
-- File at `${QWEN_RUNTIME_DIR or ~/.qwen}/debug/daemon/<daemon-id>.log`, append mode.
+- File at `${QWEN_RUNTIME_DIR or ~/.mariadb-shell-agent}/debug/daemon/<daemon-id>.log`, append mode.
 - Tee of:
   - `runQwenServe.ts` lifecycle / shutdown / signal messages
   - `sendBridgeError` (`server.ts`) route errors
@@ -60,13 +60,13 @@ Logger is created in `runQwenServe`, passed by closure to internal serve modules
 ## 4. Daemon ID & File Path
 
 - Path: `Storage.getGlobalDebugDir() + '/daemon/<daemon-id>.log'`
-  - Resolves to `${QWEN_RUNTIME_DIR or ~/.qwen}/debug/daemon/<daemon-id>.log`.
+  - Resolves to `${QWEN_RUNTIME_DIR or ~/.mariadb-shell-agent}/debug/daemon/<daemon-id>.log`.
   - Reuses `Storage.getGlobalDebugDir()` so the runtime-dir override (env var, contextual) automatically applies.
 - `daemon-id` = `serve-${pid}-${workspaceHash}`
   - `workspaceHash` = `crypto.createHash('sha256').update(boundWorkspace).digest('hex').slice(0, 8)`
   - `pid` disambiguates multiple daemons on the same workspace.
   - `workspaceHash` is fixed-length, filename-safe, and stable for the same workspace path.
-- `latest` symlink: `~/.qwen/debug/daemon/latest` → current process's log file. Updated on init using the existing `updateSymlink` helper (`packages/core/src/utils/symlink.ts`). Symlink failure is logged and ignored — does not degrade primary writes. Distinct from `${runtimeBaseDir}/debug/latest` (session-scoped) per non-goal.
+- `latest` symlink: `~/.mariadb-shell-agent/debug/daemon/latest` → current process's log file. Updated on init using the existing `updateSymlink` helper (`packages/core/src/utils/symlink.ts`). Symlink failure is logged and ignored — does not degrade primary writes. Distinct from `${runtimeBaseDir}/debug/latest` (session-scoped) per non-goal.
 - File mode: `'a'` (append on `O_APPEND | O_CREAT`). Existing files survive restarts for forensics.
 
 ## 5. Public API
@@ -156,7 +156,7 @@ Mirror `debugLogger.buildLogLine` for visual parity:
 runQwenServe(opts):
   ...
   daemonLog = initDaemonLogger({ boundWorkspace })
-  writeStderrLine(`qwen serve: daemon log → ${daemonLog.getLogPath()}`)
+  writeStderrLine(`mariadb-shell-agent serve: daemon log → ${daemonLog.getLogPath()}`)
   // boot banner is stderr-only to avoid the line referencing itself
 
   bridge = createHttpAcpBridge({
@@ -179,15 +179,15 @@ runQwenServe(opts):
 
 ## 8. Coverage Table
 
-| Source                                                        | Today                                        | After                                                                                            |
-| ------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `runQwenServe.ts` lifecycle / signals / config warnings       | `writeStderrLine(...)`                       | `daemonLog.info \| warn(...)` (stderr still happens — `daemonLog` tees)                          |
-| `runQwenServe.ts` "listening on URL" (stdout)                 | `writeStdoutLine(...)`                       | unchanged — operator scripts parse stdout                                                        |
-| `server.ts:sendBridgeError`                                   | `writeStderrLine(...)` with route/sessionId  | `daemonLog.error(msg, err, { route, sessionId, ... })` (stderr still emitted by daemonLog's tee) |
-| `bridge.ts:writeServeDebugLine` (`QWEN_SERVE_DEBUG`)          | `writeStderrLine('qwen serve debug: ...')`   | tee to `onDiagnosticLine(line, 'info')`                                                          |
-| `spawnChannel.ts` child stderr                                | `process.stderr.write(prefix + line + '\n')` | also `onDiagnosticLine(prefix + line, 'warn')`                                                   |
-| `writeStdoutLine` callers                                     | unchanged                                    | unchanged                                                                                        |
-| CLI usage / argparse errors (`runQwenServe` early validation) | `writeStderrLine(...)`                       | unchanged (logger may not exist yet)                                                             |
+| Source                                                        | Today                                                     | After                                                                                            |
+| ------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `runQwenServe.ts` lifecycle / signals / config warnings       | `writeStderrLine(...)`                                    | `daemonLog.info \| warn(...)` (stderr still happens — `daemonLog` tees)                          |
+| `runQwenServe.ts` "listening on URL" (stdout)                 | `writeStdoutLine(...)`                                    | unchanged — operator scripts parse stdout                                                        |
+| `server.ts:sendBridgeError`                                   | `writeStderrLine(...)` with route/sessionId               | `daemonLog.error(msg, err, { route, sessionId, ... })` (stderr still emitted by daemonLog's tee) |
+| `bridge.ts:writeServeDebugLine` (`QWEN_SERVE_DEBUG`)          | `writeStderrLine('mariadb-shell-agent serve debug: ...')` | tee to `onDiagnosticLine(line, 'info')`                                                          |
+| `spawnChannel.ts` child stderr                                | `process.stderr.write(prefix + line + '\n')`              | also `onDiagnosticLine(prefix + line, 'warn')`                                                   |
+| `writeStdoutLine` callers                                     | unchanged                                                 | unchanged                                                                                        |
+| CLI usage / argparse errors (`runQwenServe` early validation) | `writeStderrLine(...)`                                    | unchanged (logger may not exist yet)                                                             |
 
 Every existing stderr write is preserved. Daemon log is **additive**, never substitutive.
 
@@ -202,12 +202,12 @@ Every existing stderr write is preserved. Daemon log is **additive**, never subs
 
 ## 10. Configuration
 
-| Env var                                         | Behavior                                                                     |
-| ----------------------------------------------- | ---------------------------------------------------------------------------- |
-| `QWEN_DAEMON_LOG_FILE=0\|false\|off\|no`        | `initDaemonLogger` returns no-op; tee is a no-op; stderr unchanged           |
-| `QWEN_DAEMON_LOG_FILE=<anything else>` or unset | Enabled (default)                                                            |
-| `QWEN_RUNTIME_DIR=<path>`                       | Relocates `~/.qwen` root, daemon log moves with it (existing semantics)      |
-| `QWEN_SERVE_DEBUG=1`                            | Existing — `writeServeDebugLine` activates; lines now also tee to daemon log |
+| Env var                                         | Behavior                                                                               |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `QWEN_DAEMON_LOG_FILE=0\|false\|off\|no`        | `initDaemonLogger` returns no-op; tee is a no-op; stderr unchanged                     |
+| `QWEN_DAEMON_LOG_FILE=<anything else>` or unset | Enabled (default)                                                                      |
+| `QWEN_RUNTIME_DIR=<path>`                       | Relocates `~/.mariadb-shell-agent` root, daemon log moves with it (existing semantics) |
+| `QWEN_SERVE_DEBUG=1`                            | Existing — `writeServeDebugLine` activates; lines now also tee to daemon log           |
 
 `QWEN_DAEMON_LOG_FILE` is intentionally separate from `QWEN_DEBUG_LOG_FILE` so disabling per-session debug logs doesn't take down the operator's daemon log (and vice versa).
 
@@ -263,18 +263,18 @@ Every existing stderr write is preserved. Daemon log is **additive**, never subs
 
 ## 15. Acceptance Criteria (from issue)
 
-| Criterion                                                           | How met                                                                                           |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `qwen serve` creates / appends daemon log without shell redirection | `initDaemonLogger` opens the file at boot                                                         |
-| HTTP 500 from `POST /session/:id/prompt` correlatable in daemon log | `sendBridgeError` writes `route=` + `sessionId=`                                                  |
-| ACP child stderr lines also in daemon log                           | `spawnChannel` tees through `onDiagnosticLine`                                                    |
-| Logging works before first session and after all sessions closed    | Not session-scoped; lives for daemon lifetime                                                     |
-| Existing stderr behavior intact                                     | All writes are additive; no `writeStderrLine` call is removed without an equivalent left in place |
-| Log path + opt-out documented                                       | Docs section in §13                                                                               |
+| Criterion                                                                          | How met                                                                                           |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `mariadb-shell-agent serve` creates / appends daemon log without shell redirection | `initDaemonLogger` opens the file at boot                                                         |
+| HTTP 500 from `POST /session/:id/prompt` correlatable in daemon log                | `sendBridgeError` writes `route=` + `sessionId=`                                                  |
+| ACP child stderr lines also in daemon log                                          | `spawnChannel` tees through `onDiagnosticLine`                                                    |
+| Logging works before first session and after all sessions closed                   | Not session-scoped; lives for daemon lifetime                                                     |
+| Existing stderr behavior intact                                                    | All writes are additive; no `writeStderrLine` call is removed without an equivalent left in place |
+| Log path + opt-out documented                                                      | Docs section in §13                                                                               |
 
 ## 16. Open Questions
 
 None blocking. Possible follow-ups:
 
-- Should `latest` symlink go in `~/.qwen/debug/daemon/latest` or `~/.qwen/debug/daemon-latest`? Spec picks the former for directory tidiness.
+- Should `latest` symlink go in `~/.mariadb-shell-agent/debug/daemon/latest` or `~/.mariadb-shell-agent/debug/daemon-latest`? Spec picks the former for directory tidiness.
 - Should we offer JSON-line output as a future flag (e.g., `QWEN_DAEMON_LOG_FORMAT=json`)? Out of scope for this PR; structured export is what #2014 owns.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -87,14 +88,14 @@ describe('SkillTool', () => {
       name: 'code-review',
       description: 'Specialized skill for reviewing code quality',
       level: 'project',
-      filePath: '/project/.qwen/skills/code-review/SKILL.md',
+      filePath: '/project/.mariadb-shell-agent/skills/code-review/SKILL.md',
       body: 'Review code for quality and best practices.',
     },
     {
       name: 'testing',
       description: 'Skill for writing and running tests',
       level: 'user',
-      filePath: '/home/user/.qwen/skills/testing/SKILL.md',
+      filePath: '/home/user/.mariadb-shell-agent/skills/testing/SKILL.md',
       body: 'Help write comprehensive tests.',
       allowedTools: ['read_file', 'write_file', 'shell'],
     },
@@ -111,7 +112,7 @@ describe('SkillTool', () => {
     name: 'tsx-helper',
     description: 'React TSX helper',
     level: 'project',
-    filePath: '/test/project/.qwen/skills/tsx-helper/SKILL.md',
+    filePath: '/test/project/.mariadb-shell-agent/skills/tsx-helper/SKILL.md',
     body: 'Body.',
     paths: ['src/**/*.tsx'],
   };
@@ -123,7 +124,7 @@ describe('SkillTool', () => {
     name: 'mcp-prompt-a',
     description,
     level: 'project',
-    filePath: '/test/project/.qwen/skills/mcp-prompt-a/SKILL.md',
+    filePath: '/test/project/.mariadb-shell-agent/skills/mcp-prompt-a/SKILL.md',
     body,
     disableModelInvocation: true,
   });
@@ -131,7 +132,7 @@ describe('SkillTool', () => {
     name: 'mytool',
     description: 'Skill body',
     level: 'project',
-    filePath: '/p/.qwen/skills/mytool/SKILL.md',
+    filePath: '/p/.mariadb-shell-agent/skills/mytool/SKILL.md',
     body: 'skill body',
   };
 
@@ -364,7 +365,7 @@ describe('SkillTool', () => {
           description: 'Skill <b>bold</b> & more',
           whenToUse: 'When <script> tags > nothing',
           level: 'project',
-          filePath: '/project/.qwen/skills/xss-skill/SKILL.md',
+          filePath: '/project/.mariadb-shell-agent/skills/xss-skill/SKILL.md',
           body: 'Body text.',
         },
       ]);
@@ -654,7 +655,7 @@ describe('SkillTool', () => {
       name: 'repo-skill',
       description: 'Skill shipped by the repository',
       level: 'project',
-      filePath: '/project/.qwen/skills/repo-skill/SKILL.md',
+      filePath: '/project/.mariadb-shell-agent/skills/repo-skill/SKILL.md',
       body: 'Repo skill body.',
       allowedTools: ['Bash(curl *)', 'Write'],
       hooks: {
@@ -727,7 +728,7 @@ describe('SkillTool', () => {
         ...repoSkill,
         name: 'home-skill',
         level: 'user',
-        filePath: '/home/user/.qwen/skills/home-skill/SKILL.md',
+        filePath: '/home/user/.mariadb-shell-agent/skills/home-skill/SKILL.md',
       });
       expect(mockAddSessionAllowRule).toHaveBeenCalledTimes(2);
       // Not repository-controlled: never gated on folder trust.
@@ -964,7 +965,7 @@ describe('SkillTool', () => {
           name: 'new-skill',
           description: 'A brand new skill',
           level: 'project',
-          filePath: '/project/.qwen/skills/new-skill/SKILL.md',
+          filePath: '/project/.mariadb-shell-agent/skills/new-skill/SKILL.md',
           body: 'New skill content.',
         },
       ]);
@@ -983,7 +984,7 @@ describe('SkillTool', () => {
           name: 'test-skill',
           description: 'A test skill',
           level: 'project',
-          filePath: '/project/.qwen/skills/test-skill/SKILL.md',
+          filePath: '/project/.mariadb-shell-agent/skills/test-skill/SKILL.md',
           body: 'Test content.',
         },
       ]);
@@ -1029,7 +1030,7 @@ describe('SkillTool', () => {
       );
       const llmText = partToString(result.llmContent);
       expect(llmText).toContain(
-        'Base directory for this skill: /project/.qwen/skills/code-review',
+        'Base directory for this skill: /project/.mariadb-shell-agent/skills/code-review',
       );
       expect(llmText.trim()).toContain(
         'Review code for quality and best practices.',
@@ -1320,8 +1321,8 @@ describe('SkillTool', () => {
         name: 'gated-skill',
         description: 'Gated',
         level: 'user',
-        filePath: '/home/user/.qwen/skills/gated-skill/SKILL.md',
-        skillRoot: '/home/user/.qwen/skills/gated-skill',
+        filePath: '/home/user/.mariadb-shell-agent/skills/gated-skill/SKILL.md',
+        skillRoot: '/home/user/.mariadb-shell-agent/skills/gated-skill',
         body: 'Gated body.',
         allowedTools: ['Edit'],
         hooks: {
@@ -1419,8 +1420,8 @@ describe('SkillTool', () => {
         const projectSkill: SkillConfig = {
           ...gatedSkill,
           level: 'project',
-          filePath: '/project/.qwen/skills/gated-skill/SKILL.md',
-          skillRoot: '/project/.qwen/skills/gated-skill',
+          filePath: '/project/.mariadb-shell-agent/skills/gated-skill/SKILL.md',
+          skillRoot: '/project/.mariadb-shell-agent/skills/gated-skill',
         };
         caches([projectSkill]);
         vi.mocked(config.isTrustedFolder).mockReturnValue(false);
@@ -1497,14 +1498,14 @@ describe('SkillTool', () => {
           ...gatedSkill,
           name: 'deploy',
           level: 'project',
-          filePath: '/project/.qwen/skills/deploy/SKILL.md',
+          filePath: '/project/.mariadb-shell-agent/skills/deploy/SKILL.md',
           allowedTools: ['Bash(npm *)'],
           hooks: undefined,
         };
         const userDeploy: SkillConfig = {
           ...gatedSkill,
           name: 'Deploy',
-          filePath: '/home/user/.qwen/skills/Deploy/SKILL.md',
+          filePath: '/home/user/.mariadb-shell-agent/skills/Deploy/SKILL.md',
           allowedTools: undefined,
           hooks: undefined,
         };

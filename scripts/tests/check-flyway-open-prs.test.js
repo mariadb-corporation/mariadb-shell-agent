@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -173,7 +174,7 @@ async function check(prs, options = {}) {
     modules: MODULES,
     repo: 'QwenLM/qwen-code',
     mainSha: MAIN_SHA,
-    targetUrl: 'https://github.com/QwenLM/qwen-code/actions/runs/1',
+    targetUrl: 'https://github.invalid/QwenLM/qwen-code/actions/runs/1',
     dryRun: options.dryRun ?? false,
     gh: fake.gh,
   });
@@ -198,7 +199,7 @@ describe('check-flyway-open-prs', () => {
         context: STATUS_CONTEXT,
         description:
           'Version collision when merged into main: V53 = V53__workspace_roles.sql + V53__session_index.sql',
-        targetUrl: 'https://github.com/QwenLM/qwen-code/actions/runs/1',
+        targetUrl: 'https://github.invalid/QwenLM/qwen-code/actions/runs/1',
       },
     ]);
     expect(lines[0]).toBe(
@@ -612,7 +613,7 @@ process.stdout.write(JSON.stringify({ data: { repository: { pullRequests: {
         '-f',
         'description=Version collision when merged into main: V53 = V53__workspace_roles.sql + V53__async.sql',
         '-f',
-        'target_url=https://github.com/QwenLM/qwen-code/actions/runs/7',
+        'target_url=https://github.invalid/QwenLM/qwen-code/actions/runs/7',
       ]);
     });
 

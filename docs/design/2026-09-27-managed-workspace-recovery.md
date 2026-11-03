@@ -5,9 +5,9 @@
 Status: W0e-1/2/3 source implementation, 2026-09-28.
 Dedicated Linux physical reboot acceptance remains pending. Baseline: `e0b8bea9e0ba369a0661bc51cbbb9a27555aff48`.
 
-Related: [roadmap #12380](https://github.com/QwenLM/qwen-code/issues/12380),
-[lost executions #12670](https://github.com/QwenLM/qwen-code/issues/12670),
-[local workers #12766](https://github.com/QwenLM/qwen-code/issues/12766),
+Related: [roadmap #12380](https://github.invalid/QwenLM/qwen-code/issues/12380),
+[lost executions #12670](https://github.invalid/QwenLM/qwen-code/issues/12670),
+[local workers #12766](https://github.invalid/QwenLM/qwen-code/issues/12766),
 [W0c-3](2026-09-26-managed-workspace-execution.md), and
 [W0d](managed-workspace-w0d-web-shell-binding.md).
 
@@ -405,7 +405,7 @@ These are implementation slices, not three already completed features. Land
 W0e-1 before enabling W0e-2 adoption. W0e is complete only after W0e-3; a
 passing helper-based test does not qualify a production provisioner.
 
-[Hosted file-tool PR #12831](https://github.com/QwenLM/qwen-code/pull/12831)
+[Hosted file-tool PR #12831](https://github.invalid/QwenLM/qwen-code/pull/12831)
 already covers private gated Read/Write/Edit orchestration and excludes process
 loss recovery. Coordinate its saved execution-identity and unknown-result
 consumers before integration. Public bound-message execution, Stage G Turn
@@ -440,7 +440,7 @@ isolation-domain tests. Use real escaped descendants for the negative gate;
 mock observations alone cannot prove physical safety. Run repository build,
 typecheck, bundle, focused TypeScript tests, Java verification/Checkstyle and
 two consecutive clean full-diff audits for implementation. The detailed local
-test plan lives in `.qwen/e2e-tests/managed-workspace-w0e.md`.
+test plan lives in `.mariadb-shell-agent/e2e-tests/managed-workspace-w0e.md`.
 
 ## 9. Review decisions and remaining prerequisites
 

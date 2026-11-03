@@ -51,7 +51,10 @@ for (const theme of ['light', 'dark']) {
         ],
         mcpTools: [{ name: longName, tokens: 5_000 }],
         memoryFiles: [
-          { path: '/workspace/a/long/project/path/QWEN.md', tokens: 5_000 },
+          {
+            path: '/workspace/a/long/project/path/MARIADB-SHELL-AGENT.md',
+            tokens: 5_000,
+          },
         ],
         skills: [
           { name: 'review', tokens: 5_000, loaded: true, bodyTokens: 5_000 },

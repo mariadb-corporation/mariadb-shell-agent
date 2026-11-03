@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,10 +28,10 @@ describe('package.json command metadata', () => {
     const manifest = readManifest();
 
     const command = manifest.contributes.commands.find(
-      (item) => item.command === 'qwen-code.focusChat',
+      (item) => item.command === 'mariadb-shell-agent.focusChat',
     );
 
-    expect(command?.title).toBe('Qwen Code: Focus Chat View');
+    expect(command?.title).toBe('MariaDB Shell Agent: Focus Chat View');
   });
 
   it('keeps the Activity Bar chat entry visible without runtime context', () => {
@@ -38,11 +39,11 @@ describe('package.json command metadata', () => {
 
     const sidebarContainer =
       manifest.contributes.viewsContainers.activitybar.find(
-        (item) => item.id === 'qwen-code-sidebar',
+        (item) => item.id === 'mariadb-shell-agent-sidebar',
       );
-    const sidebarView = manifest.contributes.views['qwen-code-sidebar']?.find(
-      (item) => item.id === 'qwen-code.chatView.sidebar',
-    );
+    const sidebarView = manifest.contributes.views[
+      'mariadb-shell-agent-sidebar'
+    ]?.find((item) => item.id === 'mariadb-shell-agent.chatView.sidebar');
 
     expect(sidebarContainer?.when).toBeUndefined();
     expect(sidebarView?.when).toBeUndefined();

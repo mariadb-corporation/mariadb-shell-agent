@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -50,14 +51,23 @@ describe('createWorkspaceSkillsStatusProvider', () => {
         ['disabled', ''],
         ['hidden', 'user-invocable: false'],
       ]) {
-        const directory = path.join(workspace, '.qwen', 'skills', name!);
+        const directory = path.join(
+          workspace,
+          '.mariadb-shell-agent',
+          'skills',
+          name!,
+        );
         await fsp.mkdir(directory, { recursive: true });
         await fsp.writeFile(
           path.join(directory, 'SKILL.md'),
           `---\nname: ${name}\ndescription: Test ${name}\n${flags}\n---\nBODY_${name}`,
         );
       }
-      const settings = path.join(workspace, '.qwen', 'settings.json');
+      const settings = path.join(
+        workspace,
+        '.mariadb-shell-agent',
+        'settings.json',
+      );
       await fsp.writeFile(
         settings,
         JSON.stringify({
@@ -209,9 +219,11 @@ describe('createWorkspaceSkillsStatusProvider', () => {
     const workspace = await fsp.mkdtemp(
       path.join(os.tmpdir(), 'qwen-skills-disabled-'),
     );
-    await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         skills: {
           defaultDisabled: ['disabled', 'enabled'],
@@ -258,9 +270,11 @@ describe('createWorkspaceSkillsStatusProvider', () => {
     const workspace = await fsp.mkdtemp(
       path.join(os.tmpdir(), 'qwen-skills-hard-disabled-'),
     );
-    await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         skills: {
           disabled: ['disabled'],
@@ -309,9 +323,11 @@ describe('createWorkspaceSkillsStatusProvider', () => {
     const workspace = await fsp.mkdtemp(
       path.join(os.tmpdir(), 'qwen-skills-safe-mode-'),
     );
-    await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         skills: {
           disabled: ['blocked'],
@@ -351,9 +367,11 @@ describe('createWorkspaceSkillsStatusProvider', () => {
     const workspace = await fsp.mkdtemp(
       path.join(os.tmpdir(), 'qwen-skills-untrusted-'),
     );
-    await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ skills: { disabled: ['project-skill'] } }),
     );
     const provider = createWorkspaceSkillsStatusProvider({
@@ -373,7 +391,12 @@ describe('createWorkspaceSkillsStatusProvider', () => {
     const workspace = await fsp.mkdtemp(
       path.join(os.tmpdir(), 'qwen-skills-untrusted-config-'),
     );
-    const skillDir = path.join(workspace, '.qwen', 'skills', 'local-skill');
+    const skillDir = path.join(
+      workspace,
+      '.mariadb-shell-agent',
+      'skills',
+      'local-skill',
+    );
     await fsp.mkdir(skillDir, { recursive: true });
     await fsp.writeFile(
       path.join(skillDir, 'SKILL.md'),
@@ -440,9 +463,11 @@ describe('createWorkspaceSkillsStatusProvider', () => {
     const workspace = await fsp.mkdtemp(
       path.join(os.tmpdir(), 'qwen-skills-disabled-levels-'),
     );
-    await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ skills: { disabledLevels: ['bundled'] } }),
     );
     try {
@@ -462,9 +487,11 @@ describe('createWorkspaceSkillsStatusProvider', () => {
     const workspace = await fsp.mkdtemp(
       path.join(os.tmpdir(), 'qwen-skills-safe-levels-'),
     );
-    await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ skills: { disabledLevels: ['bundled'] } }),
     );
     const saved = process.env['QWEN_CODE_SAFE_MODE'];
@@ -541,9 +568,11 @@ describe('createWorkspaceSkillsStatusProvider', () => {
     );
     // A settings opt-in must not enable a Skill whose parent extension is
     // inactive.
-    await fsp.mkdir(path.join(qwenHome, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(qwenHome, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fsp.writeFile(
-      path.join(qwenHome, '.qwen', 'settings.json'),
+      path.join(qwenHome, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ skills: { enabled: ['inactive:inactive-skill'] } }),
     );
     const refreshRuntime = vi.spyOn(ExtensionManager.prototype, 'refreshTools');
@@ -585,7 +614,12 @@ describe('createWorkspaceSkillsStatusProvider', () => {
       path.join(qwenHome, 'extensions', 'extension-enablement.json'),
       JSON.stringify({ inactive: { overrides: ['!*'] } }),
     );
-    const projectSkill = path.join(qwenHome, '.qwen', 'skills', 'shared');
+    const projectSkill = path.join(
+      qwenHome,
+      '.mariadb-shell-agent',
+      'skills',
+      'shared',
+    );
     await fsp.mkdir(projectSkill, { recursive: true });
     await fsp.writeFile(
       path.join(projectSkill, 'SKILL.md'),
@@ -618,9 +652,11 @@ describe('createWorkspaceSkillsStatusProvider', () => {
     );
     const workspace = path.join(qwenHome, 'workspace');
     const other = path.join(qwenHome, 'other');
-    await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         skills: { enabled: ['SUITE:OPT-IN'], disabled: ['blocked'] },
       }),
@@ -679,9 +715,11 @@ describe('createWorkspaceSkillsStatusProvider', () => {
       for (const name of ['first', 'second']) {
         await writeExtension(name, ['audit:detail'], { 'audit:detail': false });
       }
-      await fsp.mkdir(path.join(qwenHome, '.qwen'), { recursive: true });
+      await fsp.mkdir(path.join(qwenHome, '.mariadb-shell-agent'), {
+        recursive: true,
+      });
       await fsp.writeFile(
-        path.join(qwenHome, '.qwen', 'settings.json'),
+        path.join(qwenHome, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({ skills: { enabled, disabled } }),
       );
       const status = await createWorkspaceSkillsStatusProvider()(qwenHome);
@@ -697,7 +735,9 @@ describe('createWorkspaceSkillsStatusProvider', () => {
   it('maps manifest defaults, reloads settings, and rebuilds after invalidation', async () => {
     await writeExtension('suite', ['default-off'], { 'default-off': false });
     const workspace = path.join(qwenHome, 'workspace');
-    await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     const provider = createWorkspaceSkillsStatusProvider();
     const readSkill = async () =>
       (await provider(workspace)).skills.find(
@@ -708,7 +748,7 @@ describe('createWorkspaceSkillsStatusProvider', () => {
       disabledReason: 'default',
     });
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ skills: { enabled: ['suite:default-off'] } }),
     );
     expect(await readSkill()).toMatchObject({ status: 'ok' });
@@ -835,9 +875,11 @@ describe('createWorkspaceSkillsStatusProvider', () => {
         path.join(qwenHome, 'extensions', 'extension-enablement.json'),
         JSON.stringify({ inactive: { overrides: ['!*'] } }),
       );
-      await fsp.mkdir(path.join(qwenHome, '.qwen'), { recursive: true });
+      await fsp.mkdir(path.join(qwenHome, '.mariadb-shell-agent'), {
+        recursive: true,
+      });
       await fsp.writeFile(
-        path.join(qwenHome, '.qwen', 'settings.json'),
+        path.join(qwenHome, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({ general: { language } }),
       );
       const status = await createWorkspaceSkillsStatusProvider()(qwenHome);
@@ -866,9 +908,11 @@ describe('createWorkspaceSkillsStatusProvider', () => {
       path.join(qwenHome, 'extensions', 'extension-enablement.json'),
       JSON.stringify({ inactive: { overrides: ['!*'] } }),
     );
-    await fsp.mkdir(path.join(qwenHome, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(qwenHome, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fsp.writeFile(
-      path.join(qwenHome, '.qwen', 'settings.json'),
+      path.join(qwenHome, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ skills: { disabledLevels: ['extension'] } }),
     );
     const refresh = vi.spyOn(
@@ -914,9 +958,11 @@ describe('createWorkspaceSkillsStatusProvider', () => {
       JSON.stringify({ inactive: { overrides: ['!*'] } }),
     );
     const workspace = path.join(qwenHome, 'workspace');
-    await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ general: { language: 'en' } }),
     );
     const refresh = vi.spyOn(
@@ -933,7 +979,7 @@ describe('createWorkspaceSkillsStatusProvider', () => {
       'inactive:inactive-skill:Extension',
     ]);
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ general: { language: 'zh' } }),
     );
     expect(await readNames()).toEqual([
@@ -949,9 +995,11 @@ describe('createWorkspaceSkillsStatusProvider', () => {
     // non-string guard unexercised.
     vi.stubEnv('QWEN_CODE_LANG', '');
     const workspace = path.join(qwenHome, 'workspace');
-    await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ general: { language: 1 } }),
     );
     const status = await createWorkspaceSkillsStatusProvider()(workspace);
@@ -1129,7 +1177,12 @@ describe('createWorkspaceSkillsStatusProvider', () => {
 
   it('rebuilds after an invalidation that lands during an in-flight enumeration', async () => {
     const workspace = path.join(qwenHome, 'workspace');
-    const skillDir = path.join(workspace, '.qwen', 'skills', 'alpha');
+    const skillDir = path.join(
+      workspace,
+      '.mariadb-shell-agent',
+      'skills',
+      'alpha',
+    );
     await fsp.mkdir(skillDir, { recursive: true });
     await fsp.writeFile(
       path.join(skillDir, 'SKILL.md'),
@@ -1159,7 +1212,7 @@ describe('createWorkspaceSkillsStatusProvider', () => {
     const first = provider(workspace);
     await entered;
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ skills: { disabledLevels: ['project'] } }),
     );
     provider.invalidate?.(workspace);
@@ -1172,7 +1225,12 @@ describe('createWorkspaceSkillsStatusProvider', () => {
 
   it('starts a post-invalidation read instead of joining the pre-invalidation enumeration', async () => {
     const workspace = path.join(qwenHome, 'workspace');
-    const alphaDir = path.join(workspace, '.qwen', 'skills', 'alpha');
+    const alphaDir = path.join(
+      workspace,
+      '.mariadb-shell-agent',
+      'skills',
+      'alpha',
+    );
     await fsp.mkdir(alphaDir, { recursive: true });
     await fsp.writeFile(
       path.join(alphaDir, 'SKILL.md'),
@@ -1202,7 +1260,12 @@ describe('createWorkspaceSkillsStatusProvider', () => {
     const provider = createWorkspaceSkillsStatusProvider();
     const first = provider(workspace);
     await entered;
-    const betaDir = path.join(workspace, '.qwen', 'skills', 'beta');
+    const betaDir = path.join(
+      workspace,
+      '.mariadb-shell-agent',
+      'skills',
+      'beta',
+    );
     await fsp.mkdir(betaDir, { recursive: true });
     await fsp.writeFile(
       path.join(betaDir, 'SKILL.md'),

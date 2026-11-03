@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Cache-first for same-origin build assets. Manifest, daemon API requests,
@@ -83,8 +84,8 @@ self.addEventListener('fetch', function (event) {
         return new Response(
           '<!doctype html><html lang="en"><meta charset="utf-8">' +
             '<meta name="viewport" content="width=device-width,initial-scale=1">' +
-            '<title>Qwen Code unavailable</title><body>' +
-            '<h1>Cannot reach Qwen Code / <span lang="zh-CN">无法连接 Qwen Code</span></h1>' +
+            '<title>MariaDB Shell Agent unavailable</title><body>' +
+            '<h1>Cannot reach MariaDB Shell Agent / <span lang="zh-CN">无法连接 MariaDB Shell Agent</span></h1>' +
             '<p>Reconnect to the daemon, then reload this page. / ' +
             '<span lang="zh-CN">请重新连接守护进程，然后重新加载此页面。</span></p>' +
             '<a href="" onclick="location.reload();return false">Try again / <span lang="zh-CN">重试</span></a></body></html>',

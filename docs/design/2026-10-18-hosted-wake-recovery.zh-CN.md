@@ -2,7 +2,7 @@
 
 [English](2026-10-18-hosted-wake-recovery.md) | [简体中文](2026-10-18-hosted-wake-recovery.zh-CN.md)
 
-状态：为 [#14116](https://github.com/QwenLM/qwen-code/issues/14116) 实现修复，已在 macOS/MySQL 8.4 本地验证。真实 MQ 开启、Linux/Windows 及部署后的 provider 验收仍未验证。
+状态：为 [#14116](https://github.invalid/QwenLM/qwen-code/issues/14116) 实现修复，已在 macOS/MySQL 8.4 本地验证。真实 MQ 开启、Linux/Windows 及部署后的 provider 验收仍未验证。
 
 ## 问题
 
@@ -62,7 +62,7 @@ MQ 继续加速首次发现。其 `wake_covered_sequence` 仅用于通知去重�
 
 评审修复前，完整 Java 单测执行 4,670 项，失败和错误为零，18 项按预设条件跳过。11 个隔离 MySQL 测试覆盖发现、精确结算、版本竞态、持久化认领及先 Session 后 head 的锁顺序。Checkstyle、SpotBugs、最新主干根目录 build/bundle 和 Markdown 格式、引用检查均通过。
 
-后续评审修复的验证记录见 [PR #14603](https://github.com/QwenLM/qwen-code/pull/14603)。下方初始实现的结果不证明后续修改已验证。
+后续评审修复的验证记录见 [PR #14603](https://github.invalid/QwenLM/qwen-code/pull/14603)。下方初始实现的结果不证明后续修改已验证。
 
 真实 Spring/MySQL/Harness 进程探针复现了缺少自动 load 的问题，并验证 monitor、实际 Automation define/fire 和实际 channel 输入无需新输入即可恢复。最终 Automation 构建产物探针在 34,807 毫秒恢复，旧 boot 的 409 后自动获得新 boot 的 200，再观察 35 秒，输入、模型和结算仍各一次。被中断的已尝试 Automation 按 `outcome_unknown` 结算，不重复模型请求。在认领后完成公共关闭，现在会以 `managed_session_not_writable` 拒绝普通 writer 获取，head 和模型计数不推进。
 

@@ -20,13 +20,13 @@ GitHub 上 PR 与 Issue 的关联已经存在——PR 正文里的 `Fixes #N` �
 ```json
 {
   "number": 10303,
-  "url": "https://github.com/QwenLM/qwen-code/pull/10303",
+  "url": "https://github.invalid/QwenLM/qwen-code/pull/10303",
   "createdAt": "...",
   "state": "open",
   "issues": [
     {
       "number": 10293,
-      "url": "https://github.com/QwenLM/qwen-code/issues/10293",
+      "url": "https://github.invalid/QwenLM/qwen-code/issues/10293",
       "state": "open"
     }
   ]

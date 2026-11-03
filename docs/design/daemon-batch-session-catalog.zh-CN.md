@@ -2,7 +2,7 @@
 
 [English](daemon-batch-session-catalog.md) | [简体中文](daemon-batch-session-catalog.zh-CN.md)
 
-状态：为 [#12249](https://github.com/QwenLM/qwen-code/issues/12249) 随本文档一同实现的设计。
+状态：为 [#12249](https://github.invalid/QwenLM/qwen-code/issues/12249) 随本文档一同实现的设计。
 
 ## 问题与范围
 

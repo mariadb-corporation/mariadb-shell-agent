@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -717,7 +718,7 @@ describe('auto-memory topic scanning', () => {
   });
 
   it('follows a symlinked memory root when scanning (dotfiles layout)', async () => {
-    // A symlinked ROOT is the user's own layout choice (e.g. ~/.qwen/memories
+    // A symlinked ROOT is the user's own layout choice (e.g. ~/.mariadb-shell-agent/memories
     // linked into a synced dotfiles dir) — the pre-trust scans followed it, so
     // read paths do too. Within-root entries stay symlink-screened (see the
     // test above), and migration/write paths keep the strict rejection.
@@ -758,7 +759,7 @@ describe('auto-memory topic scanning', () => {
 
   it('refuses a symlinked in-repo project memory root instead of scanning its target', async () => {
     // With QWEN_CODE_MEMORY_LOCAL=1 (the test setup default) the project root
-    // is the repo-tracked `<projectRoot>/.qwen/memory`: a committed symlink
+    // is the repo-tracked `<projectRoot>/.mariadb-shell-agent/memory`: a committed symlink
     // there must not redirect the scan outside the repository. The write side
     // already rejects this shape (TeamMemoryRootSecurityError); the read side
     // matches it. Only the user-owned root keeps the dotfiles exemption.
@@ -874,7 +875,7 @@ describe('auto-memory topic scanning', () => {
     try {
       const localPath = path.join(
         projectRoot,
-        '.qwen',
+        '.mariadb-shell-agent',
         'memory',
         'feedback',
         'local.md',
@@ -917,7 +918,7 @@ describe('auto-memory topic scanning', () => {
       );
       const localFile = path.join(
         projectRoot,
-        '.qwen',
+        '.mariadb-shell-agent',
         'memory',
         'project',
         'collision.md',
@@ -991,12 +992,16 @@ describe('auto-memory topic scanning', () => {
         '---\ntype: project\nname: Runtime\ndescription: runtime copy\n---\nbody',
         'utf-8',
       );
-      // A cloned repo can ship .qwen/memory as a symlink (the shape
+      // A cloned repo can ship .mariadb-shell-agent/memory as a symlink (the shape
       // listMarkdownFiles calls an attack vector): that one repo-controlled
       // root must not take the healthy runtime root down with it.
       const outside = path.join(tempDir, 'outside');
       await fs.mkdir(outside, { recursive: true });
-      const localRoot = path.join(projectRoot, '.qwen', 'memory');
+      const localRoot = path.join(
+        projectRoot,
+        '.mariadb-shell-agent',
+        'memory',
+      );
       await fs.rm(localRoot, { recursive: true, force: true });
       await fs.symlink(
         outside,
@@ -1060,7 +1065,7 @@ describe('auto-memory topic scanning', () => {
       );
       const localFile = path.join(
         projectRoot,
-        '.qwen',
+        '.mariadb-shell-agent',
         'memory',
         'feedback',
         'local.md',
@@ -1072,7 +1077,7 @@ describe('auto-memory topic scanning', () => {
       );
       const collidingLocal = path.join(
         projectRoot,
-        '.qwen',
+        '.mariadb-shell-agent',
         'memory',
         'project',
         'collision.md',
@@ -1134,7 +1139,11 @@ describe('auto-memory topic scanning', () => {
     clearAutoMemoryRootCache();
     try {
       const runtimeRoot = getAutoMemoryRoot(projectRoot);
-      const localRoot = path.join(projectRoot, '.qwen', 'memory');
+      const localRoot = path.join(
+        projectRoot,
+        '.mariadb-shell-agent',
+        'memory',
+      );
       const writeDocs = async (
         root: string,
         prefix: string,

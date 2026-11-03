@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -40,9 +41,11 @@ describe('alibabaStandardProvider', () => {
     const urls = (
       alibabaStandardProvider.baseUrl as Array<{ url: string }>
     ).map((o) => o.url);
-    expect(urls).toContain('https://dashscope.aliyuncs.com/compatible-mode/v1');
     expect(urls).toContain(
-      'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
+    );
+    expect(urls).toContain(
+      'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
     );
   });
 
@@ -71,14 +74,16 @@ describe('alibabaStandardProvider', () => {
   it('resolves baseUrl for known region', () => {
     const url = resolveBaseUrl(
       alibabaStandardProvider,
-      'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
     );
-    expect(url).toBe('https://dashscope-intl.aliyuncs.com/compatible-mode/v1');
+    expect(url).toBe(
+      'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
+    );
   });
 
   it('creates an install plan with editable models', () => {
     const plan = buildInstallPlan(alibabaStandardProvider, {
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       apiKey: 'sk-standard',
       modelIds: ['qwen3.6-plus', 'custom-model'],
     });
@@ -103,7 +108,7 @@ describe('alibabaStandardProvider', () => {
 
   it('marks only DeepSeek V4.1 Flash as multimodal', () => {
     const plan = buildInstallPlan(alibabaStandardProvider, {
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       apiKey: 'sk-standard',
       modelIds: ['deepseek-v4-pro', 'deepseek-v4.1-flash'],
     });
@@ -156,7 +161,7 @@ describe('alibabaStandardProvider', () => {
 
   it('auto-derives ownership via envKey + prefix', () => {
     const plan = buildInstallPlan(alibabaStandardProvider, {
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       apiKey: 'sk-standard',
       modelIds: ['qwen3.5-plus'],
     });

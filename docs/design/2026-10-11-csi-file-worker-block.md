@@ -59,7 +59,7 @@ setters in the composer and read sites in the tools, history and executor.
 Ordinary workers do not select this backend and retain their current behavior.
 
 Private team-memory secret checks are anchored at the verified Session working
-directory supplied by the composer, specifically its `.qwen/team-memory`
+directory supplied by the composer, specifically its `.mariadb-shell-agent/team-memory`
 subtree. They do not search for an ancestor Git root, even when the working
 directory is below a repository root. Ordinary tools retain their nearest-Git-root
 and realpath classification. This difference is intentional: private tools must

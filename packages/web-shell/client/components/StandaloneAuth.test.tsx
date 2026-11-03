@@ -624,7 +624,7 @@ it('renders the zh-CN copy for an invalid token', async () => {
     vi.fn().mockResolvedValue(stubResponse({ status: 401 })),
   );
   await mount('wrong', 'zh-CN');
-  expect(container.textContent).toContain('连接到 Qwen Code');
+  expect(container.textContent).toContain('连接到 MariaDB Shell Agent');
   expect(container.textContent).toContain('令牌无效或已过期');
   expect(container.textContent).not.toContain('Invalid or expired');
   // The token-safety hint is the only in-UI warning distinguishing the real

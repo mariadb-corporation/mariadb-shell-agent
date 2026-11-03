@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -224,7 +225,9 @@ export async function runManagedLocalServe(
     const failed = (reason: string) => {
       failure ??= new Error(`${name} ${reason}. See ${logPath}`);
       if (ready && !closing) {
-        writeStderrLine(`qwen serve --managed: ${failure.message}`);
+        writeStderrLine(
+          `mariadb-shell-agent serve --managed: ${failure.message}`,
+        );
         void shutdown(1);
       }
     };
@@ -407,7 +410,9 @@ export async function runManagedLocalServe(
     );
     frontDoor.server.once('close', () => {
       if (!closing) {
-        writeStderrLine('qwen serve --managed: daemon listener closed.');
+        writeStderrLine(
+          'mariadb-shell-agent serve --managed: daemon listener closed.',
+        );
         void shutdown(1);
       }
     });

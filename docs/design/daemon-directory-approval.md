@@ -8,7 +8,7 @@ Ordinary daemon tool calls already pass the core permission flow, but the
 built-in Git guard then rejects external directories unconditionally. Both
 a user-approved call and Full Access fail. The original report also hit
 early rejection of external `directory` parameters in Shell and Monitor;
-that part is now addressed by [#12927](https://github.com/QwenLM/qwen-code/pull/12927)
+that part is now addressed by [#12927](https://github.invalid/QwenLM/qwen-code/pull/12927)
 and included in main. This change completes the daemon-side handling.
 
 ## Decision

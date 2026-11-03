@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2179,10 +2180,15 @@ describe('DaemonClient', () => {
       });
       await ws.workspaceGitHubDefaultBranch();
       await ws.workspaceGitWorktrees();
-      await ws.workspaceGitWorktreeStatus('/work/secondary/.qwen/wt');
-      await ws.workspaceGitRemoveWorktree('/work/secondary/.qwen/wt', {
-        force: true,
-      });
+      await ws.workspaceGitWorktreeStatus(
+        '/work/secondary/.mariadb-shell-agent/wt',
+      );
+      await ws.workspaceGitRemoveWorktree(
+        '/work/secondary/.mariadb-shell-agent/wt',
+        {
+          force: true,
+        },
+      );
 
       const base = 'http://daemon/workspaces/%2Fwork%2Fsecondary';
       expect(calls.map((c) => [c.method, c.url])).toEqual([
@@ -2197,14 +2203,14 @@ describe('DaemonClient', () => {
         ['GET', `${base}/git/worktrees`],
         [
           'GET',
-          `${base}/git/worktrees/status?path=%2Fwork%2Fsecondary%2F.qwen%2Fwt`,
+          `${base}/git/worktrees/status?path=%2Fwork%2Fsecondary%2F.mariadb-shell-agent%2Fwt`,
         ],
         ['POST', `${base}/git/worktrees/remove`],
       ]);
       // The destructive one carries the path it was asked for and the force
       // flag the second click adds.
       expect(JSON.parse(calls[10]!.body!)).toEqual({
-        path: '/work/secondary/.qwen/wt',
+        path: '/work/secondary/.mariadb-shell-agent/wt',
         force: true,
       });
       expect(JSON.parse(calls[1]!.body!)).toEqual({ ref: 'feat/thing' });
@@ -2374,7 +2380,7 @@ describe('DaemonClient', () => {
       const { fetch, calls } = recordingFetch(() => jsonResponse(200, ok));
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       const ws = client.workspaceByCwd('/work/secondary');
-      const cwd = '/repo/.qwen/worktrees/branch-a';
+      const cwd = '/repo/.mariadb-shell-agent/worktrees/branch-a';
       const sessionId = 'session-a';
 
       await ws.workspaceGit({ cwd, sessionId });
@@ -2666,7 +2672,7 @@ describe('DaemonClient', () => {
           sessionId: 'with/slash',
           name: 'deep review',
           source: 'project' as const,
-          scriptPath: '/work/a/.qwen/workflows/deep review.js',
+          scriptPath: '/work/a/.mariadb-shell-agent/workflows/deep review.js',
           script: 'export const meta = { name: "deep review" }',
           meta: null,
           metaError: 'missing description',
@@ -5615,7 +5621,7 @@ describe('DaemonClient', () => {
       const reply = {
         sessionId: 'branch-worktree',
         workspaceCwd: '/work/a',
-        currentCwd: '/repo/.qwen/worktrees/branch-worktree',
+        currentCwd: '/repo/.mariadb-shell-agent/worktrees/branch-worktree',
         attached: false,
         clientId: 'branch-client',
         state: {},
@@ -5626,7 +5632,7 @@ describe('DaemonClient', () => {
         },
         worktree: {
           slug: 'branch-worktree',
-          path: '/repo/.qwen/worktrees/branch-worktree',
+          path: '/repo/.mariadb-shell-agent/worktrees/branch-worktree',
           branch: 'worktree-branch-worktree',
         },
       };
@@ -8302,7 +8308,8 @@ describe('DaemonClient', () => {
       const response = {
         skillName: 'demo-skill',
         scope: 'workspace',
-        installedPath: '/workspace/.qwen/skills/demo-skill/SKILL.md',
+        installedPath:
+          '/workspace/.mariadb-shell-agent/skills/demo-skill/SKILL.md',
       };
       const { fetch, calls } = recordingFetch(() =>
         jsonResponse(200, response),
@@ -8351,11 +8358,17 @@ describe('DaemonClient', () => {
   describe('initWorkspace (#4175 Wave 4 PR 17)', () => {
     it('POSTs an empty body when force is omitted', async () => {
       const { fetch, calls } = recordingFetch(() =>
-        jsonResponse(200, { path: '/work/QWEN.md', action: 'created' }),
+        jsonResponse(200, {
+          path: '/work/MARIADB-SHELL-AGENT.md',
+          action: 'created',
+        }),
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       const result = await client.initWorkspace();
-      expect(result).toEqual({ path: '/work/QWEN.md', action: 'created' });
+      expect(result).toEqual({
+        path: '/work/MARIADB-SHELL-AGENT.md',
+        action: 'created',
+      });
       expect(calls[0]?.url).toBe('http://daemon/workspace/init');
       expect(calls[0]?.method).toBe('POST');
       expect(JSON.parse(calls[0]!.body!)).toEqual({});
@@ -8363,7 +8376,10 @@ describe('DaemonClient', () => {
 
     it('forwards force:true in the body', async () => {
       const { fetch, calls } = recordingFetch(() =>
-        jsonResponse(200, { path: '/work/QWEN.md', action: 'overwrote' }),
+        jsonResponse(200, {
+          path: '/work/MARIADB-SHELL-AGENT.md',
+          action: 'overwrote',
+        }),
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       const result = await client.initWorkspace({ force: true });
@@ -8373,7 +8389,10 @@ describe('DaemonClient', () => {
 
     it('omits force when explicitly false (default-empty body)', async () => {
       const { fetch, calls } = recordingFetch(() =>
-        jsonResponse(200, { path: '/work/QWEN.md', action: 'created' }),
+        jsonResponse(200, {
+          path: '/work/MARIADB-SHELL-AGENT.md',
+          action: 'created',
+        }),
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       await client.initWorkspace({ force: false });
@@ -8385,7 +8404,7 @@ describe('DaemonClient', () => {
         jsonResponse(409, {
           error: 'file exists',
           code: 'workspace_init_conflict',
-          path: '/work/QWEN.md',
+          path: '/work/MARIADB-SHELL-AGENT.md',
           existingSize: 1234,
         }),
       );
@@ -8498,11 +8517,11 @@ describe('DaemonClient', () => {
     const permissionsStatus = {
       v: 1,
       user: {
-        path: '/home/.qwen/settings.json',
+        path: '/home/.mariadb-shell-agent/settings.json',
         rules: { allow: ['Bash(git status)'], ask: [], deny: [] },
       },
       workspace: {
-        path: '/work/.qwen/settings.json',
+        path: '/work/.mariadb-shell-agent/settings.json',
         rules: { allow: [], ask: ['Bash(npm *)'], deny: ['Read(.env)'] },
       },
       merged: {
@@ -8589,7 +8608,7 @@ describe('DaemonClient', () => {
         workspaceCwd: '/work',
         gitRepoRoot: '/work',
         releaseTag: 'v1.2.3',
-        readmeUrl: 'https://github.com/QwenLM/qwen-code-action',
+        readmeUrl: 'https://github.invalid/QwenLM/qwen-code-action',
         workflows: [],
         gitignore: { path: '.gitignore', status: 'unchanged' },
         warnings: [],
@@ -8612,7 +8631,7 @@ describe('DaemonClient', () => {
           workspaceCwd: '/work',
           gitRepoRoot: '/work',
           releaseTag: 'v1.2.3',
-          readmeUrl: 'https://github.com/QwenLM/qwen-code-action',
+          readmeUrl: 'https://github.invalid/QwenLM/qwen-code-action',
           workflows: [],
           gitignore: { path: '.gitignore', status: 'unchanged' },
           warnings: [],
@@ -8645,7 +8664,7 @@ describe('DaemonClient', () => {
         workspaceCwd: '/work',
         gitRepoRoot: '/work',
         releaseTag: 'v1.2.3',
-        readmeUrl: 'https://github.com/QwenLM/qwen-code-action',
+        readmeUrl: 'https://github.invalid/QwenLM/qwen-code-action',
         workflows: [],
         gitignore: { path: '.gitignore', status: 'unchanged' },
         warnings: [],
@@ -10493,7 +10512,7 @@ describe('DaemonClient', () => {
         files: [
           {
             kind: 'memory_file' as const,
-            path: '/work/a/QWEN.md',
+            path: '/work/a/MARIADB-SHELL-AGENT.md',
             scope: 'workspace' as const,
             bytes: 42,
           },
@@ -10516,7 +10535,7 @@ describe('DaemonClient', () => {
     it('POSTs /workspace/memory and forwards X-Qwen-Client-Id', async () => {
       const reply = {
         ok: true,
-        filePath: '/work/QWEN.md',
+        filePath: '/work/MARIADB-SHELL-AGENT.md',
         bytesWritten: 17,
         mode: 'append',
         changed: true,

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -859,7 +860,11 @@ export function createCodexAppServerAdapter(
       await request(
         'initialize',
         {
-          clientInfo: { name: 'qwen-code', title: 'Qwen Code', version: '1' },
+          clientInfo: {
+            name: 'qwen-code',
+            title: 'MariaDB Shell Agent',
+            version: '1',
+          },
           capabilities: { experimentalApi: true },
         },
         timeouts.handshakeMs,

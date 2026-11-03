@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,11 +39,11 @@ const RULING_CORPUS = [
   ['R1-2 fixed by the guard rewrite <!-- qwen-review-fixed-ruling -->', true],
   ['R1-2 fixed <!-- qwen-review-fixed-ruling -->', true],
   [
-    'R01-2 fixed by x <!-- qwen-review-fixed-ruling -->\n\n_— m via Qwen Code /review (v0.21.3)_',
+    'R01-2 fixed by x <!-- qwen-review-fixed-ruling -->\n\n_— m via MariaDB Shell Agent /review (v0.21.3)_',
     true,
   ],
   [
-    'R123-456 fixed by the retry; the old path still fails <!-- qwen-review-fixed-ruling -->\r\n\r\n_— m via Qwen Code /review (v1)_',
+    'R123-456 fixed by the retry; the old path still fails <!-- qwen-review-fixed-ruling -->\r\n\r\n_— m via MariaDB Shell Agent /review (v1)_',
     true,
   ],
   // A Critical that QUOTES the note — the shape must end at the marker,
@@ -66,7 +67,7 @@ const RULING_CORPUS = [
   ['R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\n', true],
   ['R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\r\n', true],
   [
-    'R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\n\n_— m via Qwen Code /review (v1)_\r\n',
+    'R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\n\n_— m via MariaDB Shell Agent /review (v1)_\r\n',
     true,
   ],
   // A `by` carrying a line break of ANY kind is not a bare note. jq's
@@ -84,13 +85,13 @@ const RULING_CORPUS = [
   ['R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\u0085', false],
   ['R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\ufeff', false],
   [
-    'R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\n\u0085_— m via Qwen Code /review (v1)_',
+    'R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\n\u0085_— m via MariaDB Shell Agent /review (v1)_',
     false,
   ],
   // …and the gap before the footer is the same story the other way round:
   // JS `\s` matches U+00A0, Oniguruma's does not.
   [
-    'R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\n\u00a0_— m via Qwen Code /review (v1)_',
+    'R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\n\u00a0_— m via MariaDB Shell Agent /review (v1)_',
     false,
   ],
   ['R1-2 fixed by x', false],
@@ -105,7 +106,7 @@ const RULING_CORPUS = [
     false,
   ],
   [
-    'R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\n\n_— m via Qwen Code /review (v1)_\n\nand then some prose',
+    'R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\n\n_— m via MariaDB Shell Agent /review (v1)_\n\nand then some prose',
     false,
   ],
   // The tail after the marker is the CANONICAL footer, not "any italic
@@ -122,11 +123,11 @@ const RULING_CORPUS = [
   // note in both dialects and the census dropped the comment (#9940
   // review, round 31 reverse audit).
   [
-    'R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\n_— m\rSTILL OPEN: the auth check via Qwen Code /review_',
+    'R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\n_— m\rSTILL OPEN: the auth check via MariaDB Shell Agent /review_',
     false,
   ],
   [
-    'R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\n_— m\u2028STILL OPEN: the auth check via Qwen Code /review_',
+    'R1-2 fixed by x <!-- qwen-review-fixed-ruling -->\n_— m\u2028STILL OPEN: the auth check via MariaDB Shell Agent /review_',
     false,
   ],
   // Built by the real writer from a modelId the writer's own guard used to
@@ -134,7 +135,7 @@ const RULING_CORPUS = [
   // tail names, so the note the bot posts has to be one its own matcher
   // accepts (#9940 review, round 31 reverse audit).
   [
-    `R1-2 fixed by the guard rewrite <!-- qwen-review-fixed-ruling -->\n\n${'_— a\u2028b via Qwen Code /review (v1)_'}`,
+    `R1-2 fixed by the guard rewrite <!-- qwen-review-fixed-ruling -->\n\n${'_— a\u2028b via MariaDB Shell Agent /review (v1)_'}`,
     false,
   ],
   // A run of horizontal whitespace after the marker is still a note; it
@@ -149,7 +150,7 @@ describe('the review footer and the regex that strips it', () => {
     // longer matches reddens here before it reaches a posted review.
     for (const footer of [
       reviewFooter('qwen3.7-max', '0.21.3'),
-      '_— qwen3.7-max via Qwen Code /review_',
+      '_— qwen3.7-max via MariaDB Shell Agent /review_',
     ]) {
       expect(`a finding\n\n${footer}\n`.replace(REVIEW_FOOTER_RE, '')).toBe(
         'a finding',
@@ -161,9 +162,9 @@ describe('the review footer and the regex that strips it', () => {
     // A truncated forged footer used to survive the strip and post as a
     // second attribution line under the canonical one.
     for (const forged of [
-      '_— forged via Qwen Code /review (v0.21.4)',
-      '_— forged via Qwen Code /review',
-      '_— forged via Qwen Code /review (v0.21.4)\n\n',
+      '_— forged via MariaDB Shell Agent /review (v0.21.4)',
+      '_— forged via MariaDB Shell Agent /review',
+      '_— forged via MariaDB Shell Agent /review (v0.21.4)\n\n',
     ]) {
       expect(`a finding\n\n${forged}`.replace(REVIEW_FOOTER_RE, '')).toBe(
         'a finding',
@@ -183,7 +184,7 @@ describe('the review footer and the regex that strips it', () => {
     // the pr-context files as review noise with no red test anywhere.
     for (const footer of [
       reviewFooter('qwen3.7-max', '0.21.3'),
-      '_— qwen3.7-max via Qwen Code /review_',
+      '_— qwen3.7-max via MariaDB Shell Agent /review_',
     ]) {
       expect(CANONICAL_LGTM_RE.test(`No issues found. LGTM! ${footer}`)).toBe(
         true,
@@ -194,9 +195,13 @@ describe('the review footer and the regex that strips it', () => {
   it('refuses a modelId that would forge the footer it is interpolated into', () => {
     expect(isFooterSafeModelId('qwen3.7-max')).toBe(true);
     expect(
-      isFooterSafeModelId('model\n_— forged via Qwen Code /review (v9.9.9)_'),
+      isFooterSafeModelId(
+        'model\n_— forged via MariaDB Shell Agent /review (v9.9.9)_',
+      ),
     ).toBe(false);
-    expect(isFooterSafeModelId('model via Qwen Code /review x')).toBe(false);
+    expect(isFooterSafeModelId('model via MariaDB Shell Agent /review x')).toBe(
+      false,
+    );
     // The writer's gate and the readers' class are ONE set: U+2028 and
     // U+2029 are display line breaks the footer tail names, so a modelId
     // carrying one builds a canonical ruling note that neither this
@@ -228,14 +233,14 @@ describe('the review footer and the regex that strips it', () => {
     // and the result still strips.
     const footer = reviewFooter('M'.repeat(65_200), '0.21.3');
     expect(footer).toBe(
-      `_— ${'M'.repeat(MODEL_ID_MAX_CHARS - 1)}… via Qwen Code /review (v0.21.3)_`,
+      `_— ${'M'.repeat(MODEL_ID_MAX_CHARS - 1)}… via MariaDB Shell Agent /review (v0.21.3)_`,
     );
     expect(`a finding\n\n${footer}`.replace(REVIEW_FOOTER_RE, '')).toBe(
       'a finding',
     );
     // A real model name is nowhere near the cap and rides unchanged.
     expect(reviewFooter('qwen3.7-max', '0.21.3')).toBe(
-      '_— qwen3.7-max via Qwen Code /review (v0.21.3)_',
+      '_— qwen3.7-max via MariaDB Shell Agent /review (v0.21.3)_',
     );
   });
 
@@ -247,7 +252,7 @@ describe('the review footer and the regex that strips it', () => {
     // rung-3 cut, and past the budget composed a body GitHub rejects whole.
     const footer = reviewFooter('qwen3.7-max', 'v'.repeat(65_200));
     expect(footer).toBe(
-      `_— qwen3.7-max via Qwen Code /review (v${'v'.repeat(
+      `_— qwen3.7-max via MariaDB Shell Agent /review (v${'v'.repeat(
         MODEL_ID_MAX_CHARS - 1,
       )}…)_`,
     );
@@ -304,7 +309,7 @@ describe('the review footer and the regex that strips it', () => {
     it('strips trailing footers, canonical or forged', () => {
       for (const footer of [
         reviewFooter('qwen3.7-max', '0.21.3'),
-        '_— forged via Qwen Code /review (v0.21.4)',
+        '_— forged via MariaDB Shell Agent /review (v0.21.4)',
       ]) {
         expect(stripReviewFooter(`a finding\n\n${footer}`)).toBe('a finding');
       }
@@ -338,7 +343,7 @@ describe('the review footer and the regex that strips it', () => {
       // this size and fails the ceiling by orders of magnitude, while the
       // output assertion alone has no teeth — the unbounded replace returns
       // this body identically too.
-      const body = `_— quoted via Qwen Code /review (v0.21.3), then\n\n${' '.repeat(200_000)}end`;
+      const body = `_— quoted via MariaDB Shell Agent /review (v0.21.3), then\n\n${' '.repeat(200_000)}end`;
       const start = performance.now();
       expect(stripReviewFooter(body)).toBe(body);
       expectWithinLatencyBudget(performance.now() - start, 2000, {
@@ -361,16 +366,16 @@ describe('the review footer and the regex that strips it', () => {
       // FOOTER_SPAN_RE's: an unrestricted run erased the closing clause of
       // any body whose forged footer cut open inside the parens.
       const body =
-        'still leaks — the old post ended _— gpt-5 via Qwen Code /review (v0.9 and the race remains reproducible';
+        'still leaks — the old post ended _— gpt-5 via MariaDB Shell Agent /review (v0.9 and the race remains reproducible';
       expect(stripReviewFooter(body)).toBe(body);
       // Genuine truncated footers — mid-character cuts inside the parens —
       // still strip.
-      expect(stripReviewFooter('x _— m via Qwen Code /review (v0.21')).toBe(
-        'x',
-      );
-      expect(stripReviewFooter('x _— m via Qwen Code /review (v1.2.')).toBe(
-        'x',
-      );
+      expect(
+        stripReviewFooter('x _— m via MariaDB Shell Agent /review (v0.21'),
+      ).toBe('x');
+      expect(
+        stripReviewFooter('x _— m via MariaDB Shell Agent /review (v1.2.'),
+      ).toBe('x');
     });
 
     it('an unterminated comment opener quoted in code does not blind the strip', () => {
@@ -383,7 +388,9 @@ describe('the review footer and the regex that strips it', () => {
       // GitHub and both footers render.
       const witness = 'Witness:\n```\njq: error … ("<!-- ecs-f…") cannot\n```';
       expect(
-        stripReviewFooter(`${witness}\n\n_— m via Qwen Code /review_`),
+        stripReviewFooter(
+          `${witness}\n\n_— m via MariaDB Shell Agent /review_`,
+        ),
       ).toBe(witness);
     });
 
@@ -392,8 +399,8 @@ describe('the review footer and the regex that strips it', () => {
       // code content is a quotation, so a footer inside an unclosed fence
       // or an indented block is not the attribution this strip removes.
       for (const quoted of [
-        '```\n_— m via Qwen Code /review (v1)_',
-        'a finding\n\n    _— m via Qwen Code /review (v1)_',
+        '```\n_— m via MariaDB Shell Agent /review (v1)_',
+        'a finding\n\n    _— m via MariaDB Shell Agent /review (v1)_',
       ]) {
         expect(stripReviewFooter(quoted)).toBe(quoted);
       }
@@ -406,12 +413,12 @@ describe('the review footer and the regex that strips it', () => {
       // the end of the input, and hide the trailing footer.
       expect(
         stripReviewFooter(
-          '```js <!--\ncode\n```\n\n_— m via Qwen Code /review_',
+          '```js <!--\ncode\n```\n\n_— m via MariaDB Shell Agent /review_',
         ),
       ).toBe('```js <!--\ncode\n```');
       expect(
         stripReviewFooter(
-          '~~~js <!--\ncode\n~~~\n\n_— m via Qwen Code /review_',
+          '~~~js <!--\ncode\n~~~\n\n_— m via MariaDB Shell Agent /review_',
         ),
       ).toBe('~~~js <!--\ncode\n~~~');
     });
@@ -425,45 +432,59 @@ describe('the review footer and the regex that strips it', () => {
       // kept the forged footer) and the tab as prose (an unterminated
       // `<!--` quoted in it then blinded the strip).
       expect(
-        stripReviewFooter('a finding\n    _— m via Qwen Code /review_'),
+        stripReviewFooter(
+          'a finding\n    _— m via MariaDB Shell Agent /review_',
+        ),
       ).toBe('a finding');
-      expect(stripReviewFooter('- item\n    _— m via Qwen Code /review_')).toBe(
-        '- item',
-      );
       expect(
-        stripReviewFooter('1. finding\n\n    _— m via Qwen Code /review (v1)_'),
+        stripReviewFooter('- item\n    _— m via MariaDB Shell Agent /review_'),
+      ).toBe('- item');
+      expect(
+        stripReviewFooter(
+          '1. finding\n\n    _— m via MariaDB Shell Agent /review (v1)_',
+        ),
       ).toBe('1. finding');
       expect(
-        stripReviewFooter('> finding\n    _— m via Qwen Code /review_'),
+        stripReviewFooter(
+          '> finding\n    _— m via MariaDB Shell Agent /review_',
+        ),
       ).toBe('> finding');
       expect(
-        stripReviewFooter('-   item\n\n      _— m via Qwen Code /review_'),
+        stripReviewFooter(
+          '-   item\n\n      _— m via MariaDB Shell Agent /review_',
+        ),
       ).toBe('-   item');
       expect(
         stripReviewFooter(
-          '- item\n\n  > quoted\n\n    _— m via Qwen Code /review_',
+          '- item\n\n  > quoted\n\n    _— m via MariaDB Shell Agent /review_',
         ),
       ).toBe('- item\n\n  > quoted');
       expect(
-        stripReviewFooter('para\n- item\n\n _— m via Qwen Code /review_'),
+        stripReviewFooter(
+          'para\n- item\n\n _— m via MariaDB Shell Agent /review_',
+        ),
       ).toBe('para\n- item');
       expect(
-        stripReviewFooter('finding\n===\n\n_— m via Qwen Code /review_'),
+        stripReviewFooter(
+          'finding\n===\n\n_— m via MariaDB Shell Agent /review_',
+        ),
       ).toBe('finding\n===');
       expect(
         stripReviewFooter(
-          '- x\n ```\n code\n ```\n\n_— m via Qwen Code /review_',
+          '- x\n ```\n code\n ```\n\n_— m via MariaDB Shell Agent /review_',
         ),
       ).toBe('- x\n ```\n code\n ```');
-      const tabQuoted = 'a finding\n\n\t_— m via Qwen Code /review_';
+      const tabQuoted = 'a finding\n\n\t_— m via MariaDB Shell Agent /review_';
       expect(stripReviewFooter(tabQuoted)).toBe(tabQuoted);
       expect(
-        stripReviewFooter('a finding\n\n\t<!--\n\n_— m via Qwen Code /review_'),
+        stripReviewFooter(
+          'a finding\n\n\t<!--\n\n_— m via MariaDB Shell Agent /review_',
+        ),
       ).toBe('a finding\n\n\t<!--');
       // A >= 4-column `<div>` line is indented code, not an HTML block.
       expect(
         stripReviewFooter(
-          'x\n\n    <div>\n    <!-- y\n\n_— m via Qwen Code /review_',
+          'x\n\n    <div>\n    <!-- y\n\n_— m via MariaDB Shell Agent /review_',
         ),
       ).toBe('x\n\n    <div>\n    <!-- y');
     });
@@ -477,11 +498,11 @@ describe('the review footer and the regex that strips it', () => {
       const keep = (body: string): void => {
         expect(stripReviewFooter(body)).toBe(body);
       };
-      keep('a finding\n---\n    _— m via Qwen Code /review_');
-      keep('# h\n    _— m via Qwen Code /review_');
-      keep('a finding\n## h\n    _— m via Qwen Code /review_');
-      keep('- item\n\n        _— m via Qwen Code /review_');
-      keep('- item\n# h\n\n    _— m via Qwen Code /review (v1)_');
+      keep('a finding\n---\n    _— m via MariaDB Shell Agent /review_');
+      keep('# h\n    _— m via MariaDB Shell Agent /review_');
+      keep('a finding\n## h\n    _— m via MariaDB Shell Agent /review_');
+      keep('- item\n\n        _— m via MariaDB Shell Agent /review_');
+      keep('- item\n# h\n\n    _— m via MariaDB Shell Agent /review (v1)_');
     });
 
     it('a comment closer quoted in a raw-HTML block still closes the projected comment', () => {
@@ -494,23 +515,31 @@ describe('the review footer and the regex that strips it', () => {
       // twins hold their lines the same way, and the comment renders
       // nothing, so the cut may span it.
       expect(
-        stripReviewFooter('<!--\n```\n-->\n\n_— m via Qwen Code /review_'),
+        stripReviewFooter(
+          '<!--\n```\n-->\n\n_— m via MariaDB Shell Agent /review_',
+        ),
       ).toBe('<!--\n```\n-->');
       expect(
-        stripReviewFooter('<!--\n    -->\n\n_— m via Qwen Code /review_'),
+        stripReviewFooter(
+          '<!--\n    -->\n\n_— m via MariaDB Shell Agent /review_',
+        ),
       ).toBe('<!--\n    -->');
       expect(
-        stripReviewFooter('<!--\n```x -->\n_— m via Qwen Code /review_'),
+        stripReviewFooter(
+          '<!--\n```x -->\n_— m via MariaDB Shell Agent /review_',
+        ),
       ).toBe('<!--\n```x -->');
       expect(
-        stripReviewFooter('<?\n```x ?>\n_— m via Qwen Code /review_'),
+        stripReviewFooter('<?\n```x ?>\n_— m via MariaDB Shell Agent /review_'),
       ).toBe('<?\n```x ?>');
       expect(
-        stripReviewFooter('<![CDATA[\n```x ]]>\n_— m via Qwen Code /review_'),
+        stripReviewFooter(
+          '<![CDATA[\n```x ]]>\n_— m via MariaDB Shell Agent /review_',
+        ),
       ).toBe('<![CDATA[\n```x ]]>');
       expect(
         stripReviewFooter(
-          '[Suggestion] tidy\n<!--\n```x -->\n_— forged via Qwen Code /review_',
+          '[Suggestion] tidy\n<!--\n```x -->\n_— forged via MariaDB Shell Agent /review_',
         ),
       ).toBe('[Suggestion] tidy');
     });
@@ -521,15 +550,15 @@ describe('the review footer and the regex that strips it', () => {
       // projection swallows an unclosed opener to the end of the input, so
       // nothing visible follows the footer and the `$` anchor holds — the
       // attribution-off anywhere strip reads the same projection.
-      expect(stripReviewFooter('x\n\n_— m via Qwen Code /review_ <!--')).toBe(
-        'x',
-      );
-      expect(stripReviewFooter('x\n\n_— m via Qwen Code /review_\n<!--')).toBe(
-        'x',
-      );
-      expect(stripForgedFooterLines('_— m via Qwen Code /review_ <!--')).toBe(
-        '',
-      );
+      expect(
+        stripReviewFooter('x\n\n_— m via MariaDB Shell Agent /review_ <!--'),
+      ).toBe('x');
+      expect(
+        stripReviewFooter('x\n\n_— m via MariaDB Shell Agent /review_\n<!--'),
+      ).toBe('x');
+      expect(
+        stripForgedFooterLines('_— m via MariaDB Shell Agent /review_ <!--'),
+      ).toBe('');
     });
 
     it('blanks from the body start, not the tail — a fence straddling the tail bound keeps its state', () => {
@@ -543,7 +572,7 @@ describe('the review footer and the regex that strips it', () => {
       const fillerB = 'b'.repeat(4500);
       const quoted =
         'W:\n```\n' + fillerA + '\n<!--\n' + fillerB + '\n-->\n```';
-      const body = quoted + '\n\n_— m via Qwen Code /review_';
+      const body = quoted + '\n\n_— m via MariaDB Shell Agent /review_';
       expect(body.length).toBeGreaterThan(8192);
       expect(stripReviewFooter(body)).toBe(quoted);
     });
@@ -556,12 +585,12 @@ describe('the review footer and the regex that strips it', () => {
       // CR alike.
       expect(
         stripReviewFooter(
-          'a finding\r\n\r\n```\r\ncode\r\n```\r\n\r\n_— m via Qwen Code /review_',
+          'a finding\r\n\r\n```\r\ncode\r\n```\r\n\r\n_— m via MariaDB Shell Agent /review_',
         ),
       ).toBe('a finding\r\n\r\n```\r\ncode\r\n```');
       expect(
         stripReviewFooter(
-          'a finding\r\r    code\r\r_— m via Qwen Code /review_',
+          'a finding\r\r    code\r\r_— m via MariaDB Shell Agent /review_',
         ),
       ).toBe('a finding\r\r    code');
     });
@@ -572,10 +601,14 @@ describe('the review footer and the regex that strips it', () => {
       // `/review` nor an `&`, and only the `<` arm of the gate lets it
       // reach the projection at all.
       expect(
-        stripReviewFooter('finding\n\n_— m via Qwen Code /<!-- x -->review_'),
+        stripReviewFooter(
+          'finding\n\n_— m via MariaDB Shell Agent /<!-- x -->review_',
+        ),
       ).toBe('finding');
       expect(
-        stripReviewFooter('finding\n\n_— m via Qwen Code /rev<!-- x -->iew_'),
+        stripReviewFooter(
+          'finding\n\n_— m via MariaDB Shell Agent /rev<!-- x -->iew_',
+        ),
       ).toBe('finding');
     });
 
@@ -587,9 +620,9 @@ describe('the review footer and the regex that strips it', () => {
       // test — an output assertion alone cannot see the guard.
       const run = '['.repeat(4 * 65536);
       const start = performance.now();
-      expect(stripReviewFooter(`${run}\n\n_— m via Qwen Code /review_`)).toBe(
-        run,
-      );
+      expect(
+        stripReviewFooter(`${run}\n\n_— m via MariaDB Shell Agent /review_`),
+      ).toBe(run);
       expectWithinLatencyBudget(performance.now() - start, 40, {
         poolMultiplier: 5,
       });
@@ -608,7 +641,7 @@ describe('the review footer and the regex that strips it', () => {
       const body =
         Array.from(
           { length: 22 },
-          () => '_— qwen3.7-max via Qwen Code /review (v0.21.0 ',
+          () => '_— qwen3.7-max via MariaDB Shell Agent /review (v0.21.0 ',
         ).join('\n') + '\nclosing prose';
       const start = performance.now();
       expect(stripReviewFooter(body)).toBe(body);
@@ -629,22 +662,26 @@ describe('the review footer and the regex that strips it', () => {
       // this shape; a ``` run does not, because the projection masks it as
       // a code span.
       expect(
-        stripReviewFooterLine('x ~~~ <!-- x ~~~ _— m via Qwen Code /review_'),
+        stripReviewFooterLine(
+          'x ~~~ <!-- x ~~~ _— m via MariaDB Shell Agent /review_',
+        ),
       ).toBe('x ~~~ <!-- x ~~~');
       expect(
-        stripReviewFooterLine('x <!-- x _— m via Qwen Code /review_'),
+        stripReviewFooterLine('x <!-- x _— m via MariaDB Shell Agent /review_'),
       ).toBe('x <!-- x');
       // A closed comment still drops whole: a footer after it strips, one
       // inside it is invisible either way.
       expect(
-        stripReviewFooterLine('x <!-- hidden --> _— m via Qwen Code /review_'),
+        stripReviewFooterLine(
+          'x <!-- hidden --> _— m via MariaDB Shell Agent /review_',
+        ),
       ).toBe('x');
-      const hidden = 'x <!-- _— m via Qwen Code /review_ -->';
+      const hidden = 'x <!-- _— m via MariaDB Shell Agent /review_ -->';
       expect(stripReviewFooterLine(hidden)).toBe(hidden);
       // The multi-line strip keeps the aggressive reading: a line-leading
       // opener opens a comment block running to the end of the input, and
       // the footer inside it renders as nothing.
-      const swallowed = 'x\n<!-- y\n_— m via Qwen Code /review_';
+      const swallowed = 'x\n<!-- y\n_— m via MariaDB Shell Agent /review_';
       expect(stripReviewFooter(swallowed)).toBe(swallowed);
     });
 
@@ -655,23 +692,25 @@ describe('the review footer and the regex that strips it', () => {
       // cannot keep a footer here: a fence delimiter leading the line is
       // posted text, and the forged attribution must not ride it.
       expect(
-        stripReviewFooterLine('tidy ``` _— m via Qwen Code /review_'),
+        stripReviewFooterLine('tidy ``` _— m via MariaDB Shell Agent /review_'),
       ).toBe('tidy ```');
-      expect(stripReviewFooterLine('``` _— m via Qwen Code /review_')).toBe(
-        '```',
-      );
       expect(
-        stripReviewFooterLine('    finding _— m via Qwen Code /review_'),
+        stripReviewFooterLine('``` _— m via MariaDB Shell Agent /review_'),
+      ).toBe('```');
+      expect(
+        stripReviewFooterLine(
+          '    finding _— m via MariaDB Shell Agent /review_',
+        ),
       ).toBe('    finding');
     });
 
     it('keeps a footer an inline code span quotes on the line', () => {
       // Inline code renders visibly — the projection masks it, so a
       // quoted footer stays while a forged one outside the span strips.
-      const quoted = 'see `_— m via Qwen Code /review_` quoted above';
+      const quoted = 'see `_— m via MariaDB Shell Agent /review_` quoted above';
       expect(stripReviewFooterLine(quoted)).toBe(quoted);
       expect(
-        stripReviewFooterLine('x `code` _— m via Qwen Code /review_'),
+        stripReviewFooterLine('x `code` _— m via MariaDB Shell Agent /review_'),
       ).toBe('x `code`');
     });
   });
@@ -686,13 +725,13 @@ describe('the review footer and the regex that strips it', () => {
       // ACTUAL whitespace after the marker — two tabs past a 5-column
       // indent is item prose, not code.
       const fenceInList =
-        '- item\n\n    ```\n    _— m via Qwen Code /review_\n    ```\n\nmore';
+        '- item\n\n    ```\n    _— m via MariaDB Shell Agent /review_\n    ```\n\nmore';
       expect(stripForUnattributedPost(fenceInList)).toBe(fenceInList);
-      const setext = 'para\n===\n    _— m via Qwen Code /review_';
+      const setext = 'para\n===\n    _— m via MariaDB Shell Agent /review_';
       expect(stripForUnattributedPost(setext)).toBe(setext);
       expect(
         stripForUnattributedPost(
-          '-    para\n\n\t\t_— m via Qwen Code /review_',
+          '-    para\n\n\t\t_— m via MariaDB Shell Agent /review_',
         ),
       ).toBe('-    para');
     });
@@ -700,7 +739,7 @@ describe('the review footer and the regex that strips it', () => {
     it('strips a forged footer on the very first line', () => {
       expect(
         stripForgedFooterLines(
-          '_— forged via Qwen Code /review (v0.21.4)_\n\na finding',
+          '_— forged via MariaDB Shell Agent /review (v0.21.4)_\n\na finding',
         ),
       ).toBe('a finding');
     });
@@ -710,7 +749,7 @@ describe('the review footer and the regex that strips it', () => {
       // case this strip exists for.
       expect(
         stripForgedFooterLines(
-          'a finding\n\n_— qwen3.7-max via Qwen Code /review (v0.21.3)\n\nUpdate: reproduced again',
+          'a finding\n\n_— qwen3.7-max via MariaDB Shell Agent /review (v0.21.3)\n\nUpdate: reproduced again',
         ),
       ).toBe('a finding\n\nUpdate: reproduced again');
     });
@@ -718,7 +757,7 @@ describe('the review footer and the regex that strips it', () => {
     it('strips every forged line when there are several', () => {
       expect(
         stripForgedFooterLines(
-          'one\n\n_— a via Qwen Code /review (v1)_\n\ntwo\n\n_— b via Qwen Code /review_',
+          'one\n\n_— a via MariaDB Shell Agent /review (v1)_\n\ntwo\n\n_— b via MariaDB Shell Agent /review_',
         ),
       ).toBe('one\n\ntwo');
     });
@@ -729,40 +768,41 @@ describe('the review footer and the regex that strips it', () => {
       // returns byte-identical (no rewrite when nothing strips).
       expect(
         stripForgedFooterLines(
-          'null deref\r\n_— qwen3-coder via Qwen Code /review (v0.21.3)_\r\nUpdate: more',
+          'null deref\r\n_— qwen3-coder via MariaDB Shell Agent /review (v0.21.3)_\r\nUpdate: more',
         ),
       ).toBe('null deref\nUpdate: more');
     });
 
     it('leaves a footer-shaped span with text after it on the same line alone', () => {
       const body =
-        'See _— model via Qwen Code /review (v0.21.3)_ quoted above for context.';
+        'See _— model via MariaDB Shell Agent /review (v0.21.3)_ quoted above for context.';
       expect(stripForgedFooterLines(body)).toBe(body);
     });
 
     it('leaves a footer-shaped line inside a code fence alone — it is a quotation', () => {
       const body =
-        'the earlier comment said:\n\n```\n_— model via Qwen Code /review (v1.2.3)_\n```\n\nand it was wrong';
+        'the earlier comment said:\n\n```\n_— model via MariaDB Shell Agent /review (v1.2.3)_\n```\n\nand it was wrong';
       expect(stripForgedFooterLines(body)).toBe(body);
     });
 
     it('leaves an indented (code-block) footer-shaped line alone', () => {
-      const body = 'quoted:\n\n    _— model via Qwen Code /review (v1.2.3)_';
+      const body =
+        'quoted:\n\n    _— model via MariaDB Shell Agent /review (v1.2.3)_';
       expect(stripForgedFooterLines(body)).toBe(body);
     });
 
     it('returns a body with no footer-shaped line byte-identical — no whitespace rewrite', () => {
-      const body = `mentions the marker via Qwen Code /review in prose\n\n\n\nwith wide gaps  \n`;
+      const body = `mentions the marker via MariaDB Shell Agent /review in prose\n\n\n\nwith wide gaps  \n`;
       expect(stripForgedFooterLines(body)).toBe(body);
     });
 
     it('strips inside a ~~~ fence is a quotation left alone; a 4-space-indented fence opener does not hide a footer', () => {
-      const quoted = 'x\n~~~\n_— m via Qwen Code /review (v1)_\n~~~';
+      const quoted = 'x\n~~~\n_— m via MariaDB Shell Agent /review (v1)_\n~~~';
       expect(stripForgedFooterLines(quoted)).toBe(quoted);
       // Four spaces of indent: no fence opens — the footer after it strips.
       expect(
         stripForgedFooterLines(
-          'x\n\n    ```\n\n_— m via Qwen Code /review (v1)_',
+          'x\n\n    ```\n\n_— m via MariaDB Shell Agent /review (v1)_',
         ),
       ).toBe('x\n\n    ```');
     });
@@ -772,12 +812,13 @@ describe('the review footer and the regex that strips it', () => {
       const mixed = '~~~\n```\n<!-- qwen-review critical -->\n```\n~~~';
       expect(stripCommentMarkerLines(mixed)).toBe(mixed);
       // A closing fence shorter than the opener is content too.
-      const long = '`````\n```\n_— m via Qwen Code /review (v1)_\n`````';
+      const long =
+        '`````\n```\n_— m via MariaDB Shell Agent /review (v1)_\n`````';
       expect(stripForgedFooterLines(long)).toBe(long);
       // …and a footer AFTER the mismatched quote still strips.
       expect(
         stripForgedFooterLines(
-          '~~~\n```\n~~~\n\n_— m via Qwen Code /review (v1)_',
+          '~~~\n```\n~~~\n\n_— m via MariaDB Shell Agent /review (v1)_',
         ),
       ).toBe('~~~\n```\n~~~');
     });
@@ -785,7 +826,7 @@ describe('the review footer and the regex that strips it', () => {
     it('does not toggle fence state inside an HTML block, but still strips what it renders', () => {
       expect(
         stripForgedFooterLines(
-          '<div>\n```\n</div>\n\n_— m via Qwen Code /review (v1)_',
+          '<div>\n```\n</div>\n\n_— m via MariaDB Shell Agent /review (v1)_',
         ),
       ).toBe('<div>\n```\n</div>');
       // HTML content is visible on GitHub — a prefix inside a div strips.
@@ -796,7 +837,7 @@ describe('the review footer and the regex that strips it', () => {
 
     it('the full chain leaves a fenced quoted footer intact', () => {
       const quoted =
-        'the earlier comment said:\n\n```\n_— model via Qwen Code /review (v1.2.3)_\n```\n\nand it was wrong';
+        'the earlier comment said:\n\n```\n_— model via MariaDB Shell Agent /review (v1.2.3)_\n```\n\nand it was wrong';
       expect(stripForUnattributedPost(quoted)).toBe(quoted);
     });
 
@@ -815,7 +856,7 @@ describe('the review footer and the regex that strips it', () => {
         'the sample posts <!-- qwen-review suggestion --> verbatim';
       expect(stripForUnattributedPost(mention)).toBe(mention);
       const wrapped =
-        'blocker <!-- _— m via Qwen Code /review (v1)_ --> stands';
+        'blocker <!-- _— m via MariaDB Shell Agent /review (v1)_ --> stands';
       expect(stripForUnattributedPost(wrapped)).toBe(wrapped);
     });
 
@@ -826,14 +867,14 @@ describe('the review footer and the regex that strips it', () => {
       // render, and deleting one corrupts the quotation the post carries.
       expect(
         stripForgedFooterLines(
-          'A\n<pre>\n\n\n_— x via Qwen Code /review_\n</pre>\nB',
+          'A\n<pre>\n\n\n_— x via MariaDB Shell Agent /review_\n</pre>\nB',
         ),
       ).toBe('A\n<pre>\n\n\n</pre>\nB');
       // The <script> twin and the planted-marker twin (through the full
       // chain) behave the same.
       expect(
         stripForgedFooterLines(
-          'A\n<script>\n\n\n_— x via Qwen Code /review_\n</script>\nB',
+          'A\n<script>\n\n\n_— x via MariaDB Shell Agent /review_\n</script>\nB',
         ),
       ).toBe('A\n<script>\n\n\n</script>\nB');
       expect(
@@ -845,7 +886,9 @@ describe('the review footer and the regex that strips it', () => {
       // run, and blanks inside a fenced quotation survive (fence lines
       // are never droppable, so no junction lands in their runs).
       expect(
-        stripForgedFooterLines('A\n\n\n\n_— x via Qwen Code /review_\nB'),
+        stripForgedFooterLines(
+          'A\n\n\n\n_— x via MariaDB Shell Agent /review_\nB',
+        ),
       ).toBe('A\n\nB');
       const fence = 'A\n```\n\n\nx\n```\nB';
       expect(stripForgedFooterLines(fence)).toBe(fence);
@@ -857,7 +900,7 @@ describe('the review footer and the regex that strips it', () => {
       // the attribution-off post while the LF twin stripped.
       expect(
         stripForgedFooterLines(
-          'real text\r_— gpt-5 via Qwen Code /review (v1.2.3)_',
+          'real text\r_— gpt-5 via MariaDB Shell Agent /review (v1.2.3)_',
         ),
       ).toBe('real text');
       // The marker-line twin and the full chain carry the same guarantee.
@@ -868,7 +911,7 @@ describe('the review footer and the regex that strips it', () => {
       ).toBe('a finding\rmore'.replace(/\r/g, '\n'));
       expect(
         stripForUnattributedPost(
-          'real text\r_— gpt-5 via Qwen Code /review (v1.2.3)_',
+          'real text\r_— gpt-5 via MariaDB Shell Agent /review (v1.2.3)_',
         ),
       ).toBe('real text');
     });
@@ -1244,7 +1287,7 @@ describe('the review footer and the regex that strips it', () => {
       // shape: excising the quoted span leaves empty backticks where the
       // evidence was.
       const body =
-        'the footer `_— qwen3.7-max via Qwen Code /review (v0.21.3)_` leaks the model name';
+        'the footer `_— qwen3.7-max via MariaDB Shell Agent /review (v0.21.3)_` leaks the model name';
       expect(stripFooterSpans(body)).toBe(body);
       expect(stripForUnattributedPost(body)).toBe(body);
       // Multi-line entries run through the fence-aware line map — same
@@ -1254,9 +1297,9 @@ describe('the review footer and the regex that strips it', () => {
     });
 
     it('still strips a mid-line span outside code spans', () => {
-      expect(stripFooterSpans('a _— m via Qwen Code /review (v1)_ b')).toBe(
-        'a b',
-      );
+      expect(
+        stripFooterSpans('a _— m via MariaDB Shell Agent /review (v1)_ b'),
+      ).toBe('a b');
     });
 
     it('a span truncated inside the version parens cannot swallow the prose after it', () => {
@@ -1266,20 +1309,24 @@ describe('the review footer and the regex that strips it', () => {
       // of the bound documented on the regex.
       expect(
         stripFooterSpans(
-          'still leaks — the old post ended _— gpt-5 via Qwen Code /review (v0.9 and the race remains reproducible',
+          'still leaks — the old post ended _— gpt-5 via MariaDB Shell Agent /review (v0.9 and the race remains reproducible',
         ),
       ).toBe(
         'still leaks — the old post ended and the race remains reproducible',
       );
       expect(
         stripForUnattributedPost(
-          'see _— m via Qwen Code /review (v1 as noted in _docs_ for the origin',
+          'see _— m via MariaDB Shell Agent /review (v1 as noted in _docs_ for the origin',
         ),
       ).toBe('see as noted in _docs_ for the origin');
       // Genuine truncated footers — mid-character cuts inside the parens —
       // still strip.
-      expect(stripFooterSpans('x _— m via Qwen Code /review (v1.2.')).toBe('x');
-      expect(stripFooterSpans('x _— m via Qwen Code /review (v0.21')).toBe('x');
+      expect(
+        stripFooterSpans('x _— m via MariaDB Shell Agent /review (v1.2.'),
+      ).toBe('x');
+      expect(
+        stripFooterSpans('x _— m via MariaDB Shell Agent /review (v0.21'),
+      ).toBe('x');
     });
 
     it('strips a forged footer re-wrapping split across a soft break', () => {
@@ -1288,13 +1335,13 @@ describe('the review footer and the regex that strips it', () => {
       // rejoined.
       expect(
         stripFooterSpans(
-          'reproduced on 45f836d _— qwen3.7-max via\nQwen Code /review (v0.21.3)_ and still stands',
+          'reproduced on 45f836d _— qwen3.7-max via\nMariaDB Shell Agent /review (v0.21.3)_ and still stands',
         ),
       ).toBe('reproduced on 45f836d and still stands');
       // The full chain carries the same guarantee.
       expect(
         stripForUnattributedPost(
-          'reproduced on 45f836d _— qwen3.7-max via\nQwen Code /review (v0.21.3)_ and still stands',
+          'reproduced on 45f836d _— qwen3.7-max via\nMariaDB Shell Agent /review (v0.21.3)_ and still stands',
         ),
       ).toBe('reproduced on 45f836d and still stands');
     });
@@ -1304,9 +1351,9 @@ describe('the review footer and the regex that strips it', () => {
       // break as one space — the injected double space (or a CRLF `\r`)
       // must not shield the contiguous forged footer.
       for (const body of [
-        'repro _— qwen3.7-max via \nQwen Code /review (v0.21.3)_ stands',
-        'repro _— qwen3.7-max via Qwen \nCode /review (v0.21.3)_ stands',
-        'repro _— qwen3.7-max via\r\nQwen Code /review (v0.21.3)_ stands',
+        'repro _— qwen3.7-max via \nMariaDB Shell Agent /review (v0.21.3)_ stands',
+        'repro _— qwen3.7-max via MariaDB Shell \nAgent /review (v0.21.3)_ stands',
+        'repro _— qwen3.7-max via\r\nMariaDB Shell Agent /review (v0.21.3)_ stands',
       ]) {
         expect(stripFooterSpans(body)).toBe('repro stands');
       }
@@ -1316,7 +1363,7 @@ describe('the review footer and the regex that strips it', () => {
       // Fenced and indented quotations keep their lines — the soft-break
       // join only touches ordinary paragraph text.
       const quoted =
-        'the earlier comment said:\n\n```\n_— model via Qwen Code /review (v1.2.3)_\n```\n\nand it was wrong';
+        'the earlier comment said:\n\n```\n_— model via MariaDB Shell Agent /review (v1.2.3)_\n```\n\nand it was wrong';
       expect(stripForUnattributedPost(quoted)).toBe(quoted);
     });
 
@@ -1329,7 +1376,7 @@ describe('the review footer and the regex that strips it', () => {
       // The two lines render as a paragraph plus a blockquote; the footer
       // never displays contiguous, so nothing may be rewritten.
       const body =
-        'See _— model\n> via Qwen Code /review (v1)_ for the earlier note';
+        'See _— model\n> via MariaDB Shell Agent /review (v1)_ for the earlier note';
       expect(stripFooterSpans(body)).toBe(body);
     });
 
@@ -1337,7 +1384,8 @@ describe('the review footer and the regex that strips it', () => {
       // Two trailing spaces before the line end are a hard break (renders a
       // line break, not a space) — the trailing `\r` of CRLF input must not
       // hide them and turn the break into a join.
-      const body = 'See _— model  \r\nvia Qwen Code /review (v1)_ for details';
+      const body =
+        'See _— model  \r\nvia MariaDB Shell Agent /review (v1)_ for details';
       expect(stripFooterSpans(body)).toBe(body);
     });
 
@@ -1345,9 +1393,9 @@ describe('the review footer and the regex that strips it', () => {
       // These are separate blocks on GitHub at any quote depth; joining
       // across them rewrites blocks that never display contiguous.
       for (const body of [
-        'See _— model\n- via Qwen Code /review (v1)_ for details',
-        'See _— model\n## via Qwen Code /review (v1)_ notes',
-        'See _— model\n---\nvia Qwen Code /review (v1)_ more',
+        'See _— model\n- via MariaDB Shell Agent /review (v1)_ for details',
+        'See _— model\n## via MariaDB Shell Agent /review (v1)_ notes',
+        'See _— model\n---\nvia MariaDB Shell Agent /review (v1)_ more',
       ]) {
         expect(stripFooterSpans(body)).toBe(body);
       }
@@ -1358,7 +1406,8 @@ describe('the review footer and the regex that strips it', () => {
     // pr-context's quoteBlock quotes every earlier comment containing code
     // as '> ``` …' — the strips must not reach inside quoted code.
     it('a forged footer inside a quoted fence survives', () => {
-      const quoted = '> ```\n> _— model via Qwen Code /review (v1.2.3)_\n> ```';
+      const quoted =
+        '> ```\n> _— model via MariaDB Shell Agent /review (v1.2.3)_\n> ```';
       expect(stripForgedFooterLines(quoted)).toBe(quoted);
     });
 
@@ -1369,14 +1418,14 @@ describe('the review footer and the regex that strips it', () => {
 
     it('a footer span inside a quoted fence survives', () => {
       const quoted =
-        '> quoted earlier:\n> ```\n> _— model via Qwen Code /review (v1.2.3)_ mid line\n> ```';
+        '> quoted earlier:\n> ```\n> _— model via MariaDB Shell Agent /review (v1.2.3)_ mid line\n> ```';
       expect(stripForUnattributedPost(quoted)).toBe(quoted);
     });
 
     it('after the quoted fence closes, the strip applies again', () => {
       expect(
         stripForgedFooterLines(
-          '> ```\n> quoted code\n> ```\n\n_— m via Qwen Code /review (v1)_',
+          '> ```\n> quoted code\n> ```\n\n_— m via MariaDB Shell Agent /review (v1)_',
         ),
       ).toBe('> ```\n> quoted code\n> ```');
     });
@@ -1390,7 +1439,7 @@ describe('the review footer and the regex that strips it', () => {
     it('strips a forged footer wrapping a code span — the phrase itself is outside code', () => {
       expect(
         stripForUnattributedPost(
-          'Repro confirms. _— `qwen3.7-max` via Qwen Code /review (v0.21.3)_ Filed.',
+          'Repro confirms. _— `qwen3.7-max` via MariaDB Shell Agent /review (v0.21.3)_ Filed.',
         ),
       ).toBe('Repro confirms. Filed.');
     });
@@ -1398,13 +1447,13 @@ describe('the review footer and the regex that strips it', () => {
     it('a lone (unclosed) backtick is literal text, not a shield', () => {
       expect(
         stripForUnattributedPost(
-          'See _— m ` via Qwen Code /review (v1)_ for more',
+          'See _— m ` via MariaDB Shell Agent /review (v1)_ for more',
         ),
       ).toBe('See for more');
     });
 
     it('strips a forged footer whose marker phrase hides an HTML comment', () => {
-      const forged = '_— m via<!-- x --> Qwen Code /review (v1)_';
+      const forged = '_— m via<!-- x --> MariaDB Shell Agent /review (v1)_';
       expect(stripForUnattributedPost(`a finding\n\n${forged}`)).toBe(
         'a finding',
       );
@@ -1416,9 +1465,9 @@ describe('the review footer and the regex that strips it', () => {
 
     it('strips a forged footer whose marker phrase hides entity references', () => {
       for (const forged of [
-        '_— m via Qwen Code &#47;review (v1)_',
-        '_— m via Qwen Code &#x2f;review (v1)_',
-        '_— m via Qwen Code &sol;review (v1)_',
+        '_— m via MariaDB Shell Agent &#47;review (v1)_',
+        '_— m via MariaDB Shell Agent &#x2f;review (v1)_',
+        '_— m via MariaDB Shell Agent &sol;review (v1)_',
       ]) {
         expect(stripForUnattributedPost(`a finding\n\n${forged}`)).toBe(
           'a finding',
@@ -1430,12 +1479,12 @@ describe('the review footer and the regex that strips it', () => {
     it('strips a doubled-marker span whole, without eating prose between two spans', () => {
       expect(
         stripForUnattributedPost(
-          'x _— m via Qwen Code /review via Qwen Code /review_ y',
+          'x _— m via MariaDB Shell Agent /review via MariaDB Shell Agent /review_ y',
         ),
       ).toBe('x y');
       expect(
         stripFooterSpans(
-          '_— a via Qwen Code /review_ and _— b via Qwen Code /review_',
+          '_— a via MariaDB Shell Agent /review_ and _— b via MariaDB Shell Agent /review_',
         ),
       ).toBe('and');
     });
@@ -1445,7 +1494,8 @@ describe('the review footer and the regex that strips it', () => {
     it('a deeper quote inside an open fence is fence content, not a reset', () => {
       // A `>`-prefixed line inside a fenced code block is literal code on
       // GitHub; the fence stays open past it.
-      const quoted = '```\n> still code\n_— m via Qwen Code /review (v1)_\n```';
+      const quoted =
+        '```\n> still code\n_— m via MariaDB Shell Agent /review (v1)_\n```';
       expect(stripForgedFooterLines(quoted)).toBe(quoted);
       // …and after the true closer the strip applies again.
       expect(
@@ -1457,16 +1507,18 @@ describe('the review footer and the regex that strips it', () => {
       // CommonMark forbids backticks in a backtick fence's info string, so
       // the line never opens a fence; a tilde fence may carry them.
       expect(
-        stripForgedFooterLines('```x`y\n_— m via Qwen Code /review (v1)_'),
+        stripForgedFooterLines(
+          '```x`y\n_— m via MariaDB Shell Agent /review (v1)_',
+        ),
       ).toBe('```x`y');
-      const tilde = '~~~x`y\n_— m via Qwen Code /review (v1)_\n~~~';
+      const tilde = '~~~x`y\n_— m via MariaDB Shell Agent /review (v1)_\n~~~';
       expect(stripForgedFooterLines(tilde)).toBe(tilde);
     });
 
     it('a closing block-level tag alone on a line opens an HTML block', () => {
       expect(
         stripForgedFooterLines(
-          '</div>\n```\n_— m via Qwen Code /review (v1)_\n\nafter',
+          '</div>\n```\n_— m via MariaDB Shell Agent /review (v1)_\n\nafter',
         ),
       ).toBe('</div>\n```\n\nafter');
     });
@@ -1474,17 +1526,18 @@ describe('the review footer and the regex that strips it', () => {
     it('a type-6 opener with trailing text opens an HTML block — the start condition ends at the tag name (#9940 review, round 27)', () => {
       expect(
         stripForgedFooterLines(
-          '<div class="x">foo\n```\n_— m via Qwen Code /review (v1)_\n\nafter',
+          '<div class="x">foo\n```\n_— m via MariaDB Shell Agent /review (v1)_\n\nafter',
         ),
       ).toBe('<div class="x">foo\n```\n\nafter');
       // A type-1 block runs past a blank line to its closing tag.
       expect(
         stripForgedFooterLines(
-          '<pre>foo\n\n```\n_— m via Qwen Code /review (v1)_\n</pre>\n\nafter',
+          '<pre>foo\n\n```\n_— m via MariaDB Shell Agent /review (v1)_\n</pre>\n\nafter',
         ),
       ).toBe('<pre>foo\n\n```\n</pre>\n\nafter');
       // A name that only starts with a block-level tag name is text.
-      const text = '<divx>foo\n```\n_— m via Qwen Code /review (v1)_\n```';
+      const text =
+        '<divx>foo\n```\n_— m via MariaDB Shell Agent /review (v1)_\n```';
       expect(stripForgedFooterLines(text)).toBe(text);
     });
 
@@ -1497,7 +1550,7 @@ describe('the review footer and the regex that strips it', () => {
       ).toBe(false);
       expect(
         stripForUnattributedPost(
-          '<pre>x</pre>\n\nfoo _— a via Qwen\nCode /review_ bar',
+          '<pre>x</pre>\n\nfoo _— a via MariaDB Shell\nAgent /review_ bar',
         ),
       ).toBe('<pre>x</pre>\n\nfoo bar');
       // Still open when the closing tag is not on the line.
@@ -1508,48 +1561,52 @@ describe('the review footer and the regex that strips it', () => {
     it('a tab-indented code line is code in the line model — its footer or marker text is quotation, kept (#9940 review, audit 4)', () => {
       const marker = 'claim\n\n\t<!-- qwen-review critical -->\n\tmore code';
       expect(stripCommentMarkerLines(marker)).toBe(marker);
-      const footer = 'claim\n\n\t_— a via Qwen Code /review_\n\tmore code';
+      const footer =
+        'claim\n\n\t_— a via MariaDB Shell Agent /review_\n\tmore code';
       expect(stripForgedFooterLines(footer)).toBe(footer);
-      const mixed = 'claim\n\n  \t_— a via Qwen Code /review_\n  \tmore code';
+      const mixed =
+        'claim\n\n  \t_— a via MariaDB Shell Agent /review_\n  \tmore code';
       expect(stripForgedFooterLines(mixed)).toBe(mixed);
     });
 
     it('four columns is code before it is an opener or a fence — quotation kept, a real forged footer behind a tab-fence stripped (#9940 review, audit 5)', () => {
-      const code = 'claim\n\n\t<div>\n    _— x via Qwen Code /review_ keep';
+      const code =
+        'claim\n\n\t<div>\n    _— x via MariaDB Shell Agent /review_ keep';
       expect(stripForUnattributedPost(`**[Critical]** ${code}`)).toBe(code);
-      const fenced = '    <div>\n```\n_— x via Qwen Code /review_\n```';
+      const fenced =
+        '    <div>\n```\n_— x via MariaDB Shell Agent /review_\n```';
       expect(stripForgedFooterLines(fenced)).toBe(fenced);
       expect(
         stripForgedFooterLines(
-          'claim\n\n\t```\n_— x via Qwen Code /review_\nprose',
+          'claim\n\n\t```\n_— x via MariaDB Shell Agent /review_\nprose',
         ),
       ).toBe('claim\n\n\t```\nprose');
       // A single code-indented line is quotation — the span stays.
-      expect(stripFooterSpans('    quoted _— x via Qwen Code /review_')).toBe(
-        '    quoted _— x via Qwen Code /review_',
-      );
-      expect(stripFooterSpans('_— x via Qwen Code /review_ claim')).toBe(
-        'claim',
-      );
+      expect(
+        stripFooterSpans('    quoted _— x via MariaDB Shell Agent /review_'),
+      ).toBe('    quoted _— x via MariaDB Shell Agent /review_');
+      expect(
+        stripFooterSpans('_— x via MariaDB Shell Agent /review_ claim'),
+      ).toBe('claim');
     });
 
     it('a single code-indented line keeps its footer span — quotation on the one-line path too (#9940 review, audit 5)', () => {
-      const code = '    quoted _— x via Qwen Code /review_';
+      const code = '    quoted _— x via MariaDB Shell Agent /review_';
       expect(stripFooterSpans(code)).toBe(code);
-      expect(stripFooterSpans('\t_— x via Qwen Code /review_')).toBe(
-        '\t_— x via Qwen Code /review_',
+      expect(stripFooterSpans('\t_— x via MariaDB Shell Agent /review_')).toBe(
+        '\t_— x via MariaDB Shell Agent /review_',
       );
       // The marker-stripped shape of a comment whose only content is a
       // quoted footer in a code block: visible code, not "nothing".
       expect(
         stripForUnattributedPost(
-          '**[Critical]**\n\n    _— m via Qwen Code /review_',
+          '**[Critical]**\n\n    _— m via MariaDB Shell Agent /review_',
         ),
-      ).toBe('    _— m via Qwen Code /review_');
+      ).toBe('    _— m via MariaDB Shell Agent /review_');
       expect(
         rendersAsNothing(
           stripForUnattributedPost(
-            '**[Critical]**\n\n    _— m via Qwen Code /review_',
+            '**[Critical]**\n\n    _— m via MariaDB Shell Agent /review_',
           ),
         ),
       ).toBe(false);
@@ -1558,20 +1615,20 @@ describe('the review footer and the regex that strips it', () => {
     it('a bare-CR body takes the line-aware path — its first line cannot vouch for the rest (#9940 review, round 28)', () => {
       expect(
         stripForUnattributedPost(
-          '    quoted code\rmore prose _— gpt-5 via Qwen Code /review (v1.2.3)_ tail',
+          '    quoted code\rmore prose _— gpt-5 via MariaDB Shell Agent /review (v1.2.3)_ tail',
         ),
       ).toBe('    quoted code\nmore prose tail');
       expect(
         stripForUnattributedPost(
-          '    R1-2: the guard drops a case\rmore prose _— qwen3-max via Qwen Code /review (v0.21)_ tail',
+          '    R1-2: the guard drops a case\rmore prose _— qwen3-max via MariaDB Shell Agent /review (v0.21)_ tail',
         ),
-      ).not.toContain('via Qwen Code /review');
+      ).not.toContain('via MariaDB Shell Agent /review');
     });
 
     it('a >-only line is not blank — the HTML block continues past it', () => {
       expect(
         stripForgedFooterLines(
-          '<div>\n>\n```\n_— m via Qwen Code /review (v1)_\n\nafter',
+          '<div>\n>\n```\n_— m via MariaDB Shell Agent /review (v1)_\n\nafter',
         ),
       ).toBe('<div>\n>\n```\n\nafter');
     });
@@ -1579,7 +1636,7 @@ describe('the review footer and the regex that strips it', () => {
     it('a type-1 HTML block ends at its closing tag, not a blank line', () => {
       expect(
         stripForgedFooterLines(
-          '<pre>\n\n```\n_— m via Qwen Code /review (v1)_\n</pre>\nafter',
+          '<pre>\n\n```\n_— m via MariaDB Shell Agent /review (v1)_\n</pre>\nafter',
         ),
       ).toBe('<pre>\n\n```\n</pre>\nafter');
     });
@@ -1624,7 +1681,7 @@ describe('the review footer and the regex that strips it', () => {
         'code B',
         '```',
         '',
-        '_— forged via Qwen Code /review (v1)_',
+        '_— forged via MariaDB Shell Agent /review (v1)_',
       ].join('\n');
       expect(stripForgedFooterLines(body)).toBe(
         'earlier round said:\n\n```\ncode A\n\n\ncode B\n```',
@@ -1636,7 +1693,7 @@ describe('the review footer and the regex that strips it', () => {
       // rendering change.
       expect(
         stripForgedFooterLines(
-          '<pre>\na\n\n\nb\n</pre>\n\n_— forged via Qwen Code /review (v1)_',
+          '<pre>\na\n\n\nb\n</pre>\n\n_— forged via MariaDB Shell Agent /review (v1)_',
         ),
       ).toBe('<pre>\na\n\n\nb\n</pre>');
     });
@@ -1700,7 +1757,7 @@ describe('FIXED_RULING_SHAPE_RE — the ruling note by its posted shape', () => 
     for (const pad of [' '.repeat(60000), '\t'.repeat(60000)]) {
       for (const body of [
         `R1-2 fixed by x ${FIXED_RULING_MARKER}${pad}x`,
-        `R1-2 fixed by x ${FIXED_RULING_MARKER}\n_— m via Qwen Code /review (v1)_${pad}x`,
+        `R1-2 fixed by x ${FIXED_RULING_MARKER}\n_— m via MariaDB Shell Agent /review (v1)_${pad}x`,
       ]) {
         const t0 = Date.now();
         expect(FIXED_RULING_SHAPE_RE.test(body)).toBe(false);

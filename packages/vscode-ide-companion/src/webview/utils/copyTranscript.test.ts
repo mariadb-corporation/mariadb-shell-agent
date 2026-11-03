@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -162,7 +163,7 @@ describe('formatBlocksForCopyAll', () => {
         '**Error:** Model stream interrupted',
         '**Debug:** retrying request',
         '**Thinking:** pondering',
-        '**Qwen Code:** answer',
+        '**MariaDB Shell Agent:** answer',
       ].join('\n\n---\n\n'),
     );
   });
@@ -185,7 +186,9 @@ describe('formatBlocksForCopyAll', () => {
       statusBlock('st-1', ''),
       textBlock('assistant', 'a-1', 'answer'),
     ];
-    expect(formatBlocksForCopyAll(blocks)).toBe('**Qwen Code:** answer');
+    expect(formatBlocksForCopyAll(blocks)).toBe(
+      '**MariaDB Shell Agent:** answer',
+    );
   });
 
   it('returns an empty string when there is nothing to copy', () => {

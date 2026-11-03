@@ -377,7 +377,7 @@ describe('startupProfiler', () => {
       expect(writtenPath).toMatch(/[\\/]outer-/);
     });
 
-    it('collects outside sandbox for qwen serve with the primary startup flag', () => {
+    it('collects outside sandbox for mariadb-shell-agent serve with the primary startup flag', () => {
       process.env['QWEN_CODE_PROFILE_STARTUP'] = '1';
       delete process.env['SANDBOX'];
       process.argv = ['node', 'qwen', 'serve'];
@@ -391,7 +391,7 @@ describe('startupProfiler', () => {
       expect(report!.phases[0]!.name).toBe('serve_listener_ready');
     });
 
-    it('collects outside sandbox for bundled qwen serve argv shape', () => {
+    it('collects outside sandbox for bundled mariadb-shell-agent serve argv shape', () => {
       process.env['QWEN_CODE_PROFILE_STARTUP'] = '1';
       delete process.env['SANDBOX'];
       process.argv = ['node', 'qwen', '/repo/dist/cli.js', 'serve'];

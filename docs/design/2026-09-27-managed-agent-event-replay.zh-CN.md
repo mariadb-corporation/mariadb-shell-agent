@@ -4,7 +4,7 @@
 
 状态：已在本次变更中实现
 日期：2026-09-27
-Issue：[#12793](https://github.com/QwenLM/qwen-code/issues/12793)，属于 [#12380](https://github.com/QwenLM/qwen-code/issues/12380)
+Issue：[#12793](https://github.invalid/QwenLM/qwen-code/issues/12793)，属于 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380)
 前置：[Managed Agent API 契约（D1 阶段）](2026-09-27-managed-agent-api-contract.zh-CN.md) 与 [会话查询（D2 阶段）](2026-09-27-managed-agent-session-query.zh-CN.md)
 
 ## 1. 问题

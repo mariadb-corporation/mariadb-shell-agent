@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -33,7 +34,7 @@ const validPlan = {
 describe('validatePlan', () => {
   it('refuses targets outside the project or inside any hidden path', () => {
     for (const target of [
-      'packages/app/.qwen/settings.json',
+      'packages/app/.mariadb-shell-agent/settings.json',
       'vendor/x/.git/hooks/pre-commit',
       '../en/intro.md',
       '/tmp/intro.md',

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -275,7 +276,7 @@ export const SERVE_CONTROL_EXT_METHODS = {
   workspaceChange: 'qwen/control/workspace/change',
   /**
    * Reverse tool channel (issue #5626, Phase 2). Unlike every other entry
-   * here — which the PARENT serve process calls DOWN into the `qwen --acp`
+   * here — which the PARENT serve process calls DOWN into the `mariadb-shell-agent --acp`
    * child — this one is called by the CHILD UP into the parent: a
    * client-hosted (extension) MCP server's `sendSdkMcpMessage` round-trips a
    * JSON-RPC `mcp_message` from the child's `McpClientManager` back to the
@@ -1381,7 +1382,7 @@ export interface ServeWorkspaceMemoryFile {
   path: string;
   /**
    * 'workspace' for files under the bound workspace tree, 'global' for
-   * `~/.qwen/QWEN.md` style entries. Helps adapters render scope chips.
+   * `~/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md` style entries. Helps adapters render scope chips.
    */
   scope: ServeContextFileScope;
   /** Size in bytes of the file's serialized contents on disk. */
@@ -1412,11 +1413,11 @@ export interface ServeWorkspaceMemoryStatus {
   /** Total bytes across all hierarchical files (sum of `files[].bytes`). */
   totalBytes: number;
   /**
-   * Number of merged QWEN.md / AGENTS.md files the loader pulled in.
+   * Number of merged MARIADB-SHELL-AGENT.md / AGENTS.md files the loader pulled in.
    * Mirrors `LoadServerHierarchicalMemoryResponse.fileCount`.
    */
   fileCount: number;
-  /** Baseline path-rule count from `.qwen/rules/`. */
+  /** Baseline path-rule count from `.mariadb-shell-agent/rules/`. */
   ruleCount: number;
   errors?: ServeStatusCell[];
 }
@@ -1618,7 +1619,9 @@ export const IDLE_HOOK_EVENTS: Record<HookEventName, ServeHookEventMeta> = {
   MessageDisplay: {
     description: 'Repeatedly, as the assistant reply streams',
   },
-  Stop: { description: 'Right before Qwen Code concludes its response' },
+  Stop: {
+    description: 'Right before MariaDB Shell Agent concludes its response',
+  },
   SubagentStart: {
     description: 'When a subagent is started',
     matcherKind: 'agentType',

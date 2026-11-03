@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +9,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { _setSandboxMountExistsForTest } from '@qwen-code/acp-bridge/workspacePaths';
 import { validateAndCanonicalizeWorkspaceInput } from './run-qwen-serve.js';
 
-// #7139 wiring for the PRIMARY reproduction path: `qwen serve --workspace
+// #7139 wiring for the PRIMARY reproduction path: `mariadb-shell-agent serve --workspace
 // C:\qwen-repro` relaunched into a Linux Docker sandbox. The boot validator
 // must translate to the bind mount BEFORE its absolute-path guard. statSync
 // is mocked so the (root-level, uncreatable) translated mount stats as a

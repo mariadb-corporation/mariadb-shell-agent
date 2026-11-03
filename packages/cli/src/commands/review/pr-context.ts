@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review pr-context`: fetch a PR's metadata + existing comments and
+// `mariadb-shell-agent review pr-context`: fetch a PR's metadata + existing comments and
 // emit a single Markdown file that agents can consume as context.
 //
 // The Markdown is shaped so the calling LLM can pass it to review agents
@@ -608,7 +609,7 @@ export function findRootId<
  * file, letting the re-check approve past the blocker.
  */
 export const CANONICAL_LGTM_RE =
-  /^No issues found\.?\s*LGTM!?\s*(?:✅\s*)?(?:_— [^\n]{0,200} via Qwen Code \/review(?: \(v[^\n]{1,100}\))?_\s*)?$/i;
+  /^No issues found\.?\s*LGTM!?\s*(?:✅\s*)?(?:_— [^\n]{0,200} via MariaDB Shell Agent \/review(?: \(v[^\n]{1,100}\))?_\s*)?$/i;
 
 /**
  * Should this review-level summary be shown to agents?
@@ -2974,7 +2975,7 @@ export const prContextCommand: CommandModule = {
       .option('host', {
         type: 'string',
         describe:
-          "The host the target lives on. An Aone host (*.alibaba-inc.com) selects the a1 backend; omitted: detected from the clone's origin, else GitHub (GH_HOST, then github.com). Baked into the emitted comment-body refetch commands.",
+          "The host the target lives on. An Aone host (*.alibaba-inc.invalid) selects the a1 backend; omitted: detected from the clone's origin, else GitHub (GH_HOST, then github.com). Baked into the emitted comment-body refetch commands.",
       }),
   handler: async (argv) => {
     const host = (argv as { host?: string }).host;

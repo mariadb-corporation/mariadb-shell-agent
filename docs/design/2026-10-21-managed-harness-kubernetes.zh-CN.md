@@ -214,9 +214,9 @@ PreStop 通过本地端点发起实例 drain，只尝试释放满足条件的归
 | Kubernetes 丢失 | 真实 preStop、SIGTERM、宽限期超时、OOM/节点丢失模拟、滚动更新和任意缩容目标；观察原始执行，未知结果继续阻塞。                                                                                    |
 | 扩缩容          | HPA 读取 Hosted 而非 ACP 计数；区分可执行积压、外部瓶颈、指标缺失和等待审批。证明租户限制和受控扩容。                                                                                            |
 
-复用已有打包 Harness 测试及三个根脚本 `npm run test:e2e:managed-harness-restart-failover`、`npm run test:e2e:managed-harness-restart-inflight-failover` 和 `npm run test:e2e:managed-harness-restart-continuation-failover`，作为回归基础，不当作 Kubernetes 支持证明。纳入 Java Hosted process/Hook/MCP 故障 profile、MySQL 集成、受影响包测试、build/typecheck/bundle 和重复 diff 自审。未来可执行计划保存在 `.qwen/e2e-tests/`，使用一次性数据库、namespace、凭据、存储和测试拥有的进程身份。
+复用已有打包 Harness 测试及三个根脚本 `npm run test:e2e:managed-harness-restart-failover`、`npm run test:e2e:managed-harness-restart-inflight-failover` 和 `npm run test:e2e:managed-harness-restart-continuation-failover`，作为回归基础，不当作 Kubernetes 支持证明。纳入 Java Hosted process/Hook/MCP 故障 profile、MySQL 集成、受影响包测试、build/typecheck/bundle 和重复 diff 自审。未来可执行计划保存在 `.mariadb-shell-agent/e2e-tests/`，使用一次性数据库、namespace、凭据、存储和测试拥有的进程身份。
 
-最初调研执行了文档检查和源码审阅。本地实现证据记录在 `.qwen/e2e-tests/managed-harness-kubernetes.md`。随后在本次新建、隔离的 ACK `1.35.7-aliyun.1` 集群上，使用 Terway `1.17.7`、Envoy `1.39.4` 和 MySQL `8.4.11`，通过空闲服务池链路。Java 验证了两个租户跨两台 Pod、mTLS 与跨范围拒绝、粘性归属、持久 drain 回执与旧 grant 拒绝、手动扩至三副本、完整滚动替换及 epoch 递增、缩容至零。最终独立 SQL 审计确认十个 ACTIVE Session、十个 RELEASED placement 和已 seal 的 writer head、十九份释放回执、零 Turn 及零生命周期 operation；Java 验收入口以零退出码结束。本地报告 `.qwen/e2e-tests/managed-harness-ack-20261022.md` 记录不可变镜像、仅用于测试的 Pod IP SAN 签发、部署适配、失败尝试及资源清理。这些合成空闲 Session 不构成前台/模型/工具执行、SSE 连续性、完整用户授权矩阵、崩溃恢复、生产证书签发、HPA 或生产容量测量的证明。完整 CI 门禁仍待完成。
+最初调研执行了文档检查和源码审阅。本地实现证据记录在 `.mariadb-shell-agent/e2e-tests/managed-harness-kubernetes.md`。随后在本次新建、隔离的 ACK `1.35.7-aliyun.1` 集群上，使用 Terway `1.17.7`、Envoy `1.39.4` 和 MySQL `8.4.11`，通过空闲服务池链路。Java 验证了两个租户跨两台 Pod、mTLS 与跨范围拒绝、粘性归属、持久 drain 回执与旧 grant 拒绝、手动扩至三副本、完整滚动替换及 epoch 递增、缩容至零。最终独立 SQL 审计确认十个 ACTIVE Session、十个 RELEASED placement 和已 seal 的 writer head、十九份释放回执、零 Turn 及零生命周期 operation；Java 验收入口以零退出码结束。本地报告 `.mariadb-shell-agent/e2e-tests/managed-harness-ack-20261022.md` 记录不可变镜像、仅用于测试的 Pod IP SAN 签发、部署适配、失败尝试及资源清理。这些合成空闲 Session 不构成前台/模型/工具执行、SSE 连续性、完整用户授权矩阵、崩溃恢复、生产证书签发、HPA 或生产容量测量的证明。完整 CI 门禁仍待完成。
 
 ## 部署输入与剩余限制
 

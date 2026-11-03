@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,7 +19,7 @@ describe('SpeakToUserTool', () => {
 
     expect(tool.name).toBe(SPEAK_TO_USER_TOOL_NAME);
     expect(tool.description).toContain(
-      'Automatic backend Qwen Code text is silent context',
+      'Automatic backend MariaDB Shell Agent text is silent context',
     );
     await expect(invocation.getDefaultPermission()).resolves.toBe('allow');
     await expect(

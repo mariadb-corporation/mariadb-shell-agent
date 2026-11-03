@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -53,13 +54,13 @@ describe('FileDiscoveryService', () => {
       expect(service.shouldGitIgnoreFile('node_modules/foo.js')).toBe(false);
     });
 
-    it('should load .qwenignore patterns even when not in a git repo', async () => {
-      await createTestFile('.qwenignore', 'secrets.txt');
+    it('should load .mariadb-shell-agentignore patterns even when not in a git repo', async () => {
+      await createTestFile('.mariadb-shell-agentignore', 'secrets.txt');
       const service = new FileDiscoveryService(projectRoot);
 
       expect(service.shouldQwenIgnoreFile('secrets.txt')).toBe(true);
       expect(service.getQwenIgnoreFileDisplayForPath('secrets.txt')).toBe(
-        '.qwenignore',
+        '.mariadb-shell-agentignore',
       );
       expect(service.shouldQwenIgnoreFile('src/index.js')).toBe(false);
     });
@@ -86,7 +87,7 @@ describe('FileDiscoveryService', () => {
       const service = new FileDiscoveryService(projectRoot, ['.cursorignore']);
 
       expect(service.getQwenIgnoreFileNamesDisplay()).toBe(
-        '.qwenignore, .cursorignore',
+        '.mariadb-shell-agentignore, .cursorignore',
       );
       expect(service.shouldQwenIgnoreFile('cursor-secret.txt')).toBe(true);
       expect(service.getQwenIgnoreFileDisplayForPath('cursor-secret.txt')).toBe(
@@ -101,7 +102,7 @@ describe('FileDiscoveryService', () => {
     beforeEach(async () => {
       await fs.mkdir(path.join(projectRoot, '.git'));
       await createTestFile('.gitignore', 'node_modules/\n.git/\ndist');
-      await createTestFile('.qwenignore', 'logs/');
+      await createTestFile('.mariadb-shell-agentignore', 'logs/');
     });
 
     it('should filter out git-ignored and qwen-ignored files by default', () => {
@@ -175,7 +176,7 @@ describe('FileDiscoveryService', () => {
     beforeEach(async () => {
       await fs.mkdir(path.join(projectRoot, '.git'));
       await createTestFile('.gitignore', 'node_modules/');
-      await createTestFile('.qwenignore', '*.log');
+      await createTestFile('.mariadb-shell-agentignore', '*.log');
     });
 
     it('should return true for git-ignored files', () => {

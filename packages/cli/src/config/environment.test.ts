@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -163,7 +164,7 @@ beforeEach(() => {
     delete process.env[key];
   }
   // Hermetic against the runner's real user-level .env files: findEnvFiles()
-  // always discovers ~/.env and ~/.qwen/.env, and home scope deliberately
+  // always discovers ~/.env and ~/.mariadb-shell-agent/.env, and home scope deliberately
   // bypasses the hardcoded exclusions — so a dev machine with
   // QWEN_CLI_ENTRY/NODE_OPTIONS in its home .env would both add warnings the
   // source-scoped counts never expect and apply keys the process.env
@@ -199,7 +200,11 @@ describe('operator container requirement across environment reload', () => {
       resetEnvironmentTrackingForTesting();
       const workspace = makeWorkspace();
       const key = AGENT_EXECUTION_BACKEND_ENV;
-      const settingsFile = path.join(os.homedir(), '.qwen', 'settings.json');
+      const settingsFile = path.join(
+        os.homedir(),
+        '.mariadb-shell-agent',
+        'settings.json',
+      );
       fs.mkdirSync(path.dirname(settingsFile), { recursive: true });
       fs.writeFileSync(
         settingsFile,
@@ -248,7 +253,11 @@ describe('operator container requirement across environment reload', () => {
       // dropped it while the exact-spelling lookup reported nothing.
       resetEnvironmentTrackingForTesting();
       const workspace = makeWorkspace();
-      const settingsFile = path.join(os.homedir(), '.qwen', 'settings.json');
+      const settingsFile = path.join(
+        os.homedir(),
+        '.mariadb-shell-agent',
+        'settings.json',
+      );
       fs.mkdirSync(path.dirname(settingsFile), { recursive: true });
       fs.writeFileSync(
         settingsFile,
@@ -273,7 +282,7 @@ describe('operator container requirement across environment reload', () => {
   );
 
   it.each(
-    ['.env', '.qwen/.env', 'settings.env'].flatMap((source) =>
+    ['.env', '.mariadb-shell-agent/.env', 'settings.env'].flatMap((source) =>
       ['', 'docker', 'podman'].map((value) => ({ source, value })),
     ),
   )(
@@ -322,7 +331,7 @@ describe('operator container requirement across environment reload', () => {
     },
   );
 
-  it.each(['.env', '.qwen/.env'])(
+  it.each(['.env', '.mariadb-shell-agent/.env'])(
     'rejects the home %s requirement across reload and relaunch',
     async (source) => {
       resetEnvironmentTrackingForTesting();
@@ -359,7 +368,7 @@ describe('operator container requirement across environment reload', () => {
     },
   );
 
-  it.each(['.env', '.qwen/.env', 'settings.env'])(
+  it.each(['.env', '.mariadb-shell-agent/.env', 'settings.env'])(
     'does not acquire a requirement from project %s',
     (source) => {
       resetEnvironmentTrackingForTesting();
@@ -579,7 +588,7 @@ describe('update download source environment', () => {
     resetEnvironmentTrackingForTesting();
   });
 
-  it.each(['.env', '.qwen/.env', 'settings.env'])(
+  it.each(['.env', '.mariadb-shell-agent/.env', 'settings.env'])(
     'rejects update sources from %s on load, reload, and runtime snapshots',
     (source) => {
       const workspace = makeWorkspace();
@@ -623,7 +632,7 @@ describe('update download source environment', () => {
     },
   );
 
-  it.each(['shell', '.env', '.qwen/.env'])(
+  it.each(['shell', '.env', '.mariadb-shell-agent/.env'])(
     'preserves the update source from %s against project configuration',
     (source) => {
       const workspace = makeWorkspace();
@@ -635,9 +644,9 @@ describe('update download source environment', () => {
         fs.mkdirSync(path.dirname(homeEnvPath), { recursive: true });
         fs.writeFileSync(homeEnvPath, `QWEN_UPDATE_BASE_URL=${trustedUrl}\n`);
       }
-      fs.mkdirSync(path.join(workspace, '.qwen'));
+      fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'));
       fs.writeFileSync(
-        path.join(workspace, '.qwen', '.env'),
+        path.join(workspace, '.mariadb-shell-agent', '.env'),
         'QWEN_UPDATE_BASE_URL=https://project.example.com\n',
       );
       const settings = testSettings({
@@ -672,7 +681,7 @@ describe('model catalog download source environment', () => {
     resetEnvironmentTrackingForTesting();
   });
 
-  it.each(['.env', '.qwen/.env', 'settings.env'])(
+  it.each(['.env', '.mariadb-shell-agent/.env', 'settings.env'])(
     'rejects the project-scoped catalog keys from %s',
     (source) => {
       const workspace = makeWorkspace();
@@ -1084,7 +1093,12 @@ describe('loadEnvironment', () => {
   // initial .env load afterwards. That load must not refill the scrubbed
   // slots, or one workspace's .env loader hook reaches every other
   // workspace's session subprocesses through the shared daemon env.
-  it.each(['project .env', '.qwen/.env', 'home .env', 'settings.env'])(
+  it.each([
+    'project .env',
+    '.mariadb-shell-agent/.env',
+    'home .env',
+    'settings.env',
+  ])(
     'rejects Bun preload options from %s on load, reload and runtime snapshots',
     (source) => {
       const workspace = makeWorkspace();
@@ -1098,7 +1112,7 @@ describe('loadEnvironment', () => {
         const directory =
           source === 'home .env'
             ? os.homedir()
-            : source === '.qwen/.env'
+            : source === '.mariadb-shell-agent/.env'
               ? path.join(workspace, SETTINGS_DIRECTORY_NAME)
               : workspace;
         fs.mkdirSync(directory, { recursive: true });
@@ -1361,10 +1375,10 @@ describe('loadEnvironment', () => {
     );
   });
 
-  // The privileged <workspace>/.qwen/.env scope deliberately bypasses
+  // The privileged <workspace>/.mariadb-shell-agent/.env scope deliberately bypasses
   // excludedEnvVars and is discovered before the plain .env, so exempting it
   // from the loader denylist must not ship green.
-  it('never applies loader-affecting keys from the .qwen/.env scope either', () => {
+  it('never applies loader-affecting keys from the .mariadb-shell-agent/.env scope either', () => {
     const workspace = makeWorkspace();
     fs.mkdirSync(path.join(workspace, SETTINGS_DIRECTORY_NAME));
     fs.writeFileSync(
@@ -1845,7 +1859,7 @@ describe('loadEnvironment', () => {
   });
 
   // The serve daemon bearer token is the same operator-only class as the
-  // keys above: `qwen serve` takes it from --token, an exported env var, or
+  // keys above: `mariadb-shell-agent serve` takes it from --token, an exported env var, or
   // a home-scoped .env, and generates a one-time random bearer otherwise.
   // Repository content must never preset that credential, on the initial
   // load included — under either case spelling.
@@ -2104,10 +2118,10 @@ describe('hasLoadedEnvironmentValues', () => {
     expect(hasLoadedEnvironmentValues()).toBe(false);
   });
 
-  it('ignores the documented OpenAI variables that ~/.qwen/.env supplies', () => {
+  it('ignores the documented OpenAI variables that ~/.mariadb-shell-agent/.env supplies', () => {
     resetEnvironmentTrackingForTesting();
     const workspace = makeWorkspace();
-    const envFile = path.join(os.homedir(), '.qwen', '.env');
+    const envFile = path.join(os.homedir(), '.mariadb-shell-agent', '.env');
     fs.mkdirSync(path.dirname(envFile), { recursive: true });
     fs.writeFileSync(
       envFile,
@@ -2122,7 +2136,7 @@ describe('hasLoadedEnvironmentValues', () => {
   it('never exempts a boot-time key that a provider entry names', () => {
     resetEnvironmentTrackingForTesting();
     const workspace = makeWorkspace();
-    const envFile = path.join(os.homedir(), '.qwen', '.env');
+    const envFile = path.join(os.homedir(), '.mariadb-shell-agent', '.env');
     fs.mkdirSync(path.dirname(envFile), { recursive: true });
     fs.writeFileSync(envFile, 'NODE_EXTRA_CA_CERTS=/certs/ca.pem\n');
     loadEnvironment(

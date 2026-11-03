@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -64,7 +65,7 @@ const realPath = (p: string) => {
 };
 
 /** The task belongs to this session: its root is the session root or below
- * it (the agent's shell may have run `qwen batch run` from a subdirectory). */
+ * it (the agent's shell may have run `mariadb-shell-agent batch run` from a subdirectory). */
 const belongsTo = (sessionRoot: string, taskRoot: string) =>
   isWithinRoot(realPath(taskRoot), realPath(sessionRoot));
 
@@ -95,13 +96,13 @@ export function describeCollect(summary: CollectSummary): string | undefined {
   if (summary.failed.length > 0) {
     parts.push(
       `${summary.failed.length} failed (${summary.failed[0].lastError ?? 'see collect'})` +
-        ` — retry with: qwen batch retry ${summary.taskId}`,
+        ` — retry with: mariadb-shell-agent batch retry ${summary.taskId}`,
     );
   }
   if (summary.held.length > 0) {
     parts.push(
       `${summary.held.length} held (${summary.held[0].heldReason ?? 'see collect'})` +
-        ` — resolve, then: qwen batch collect ${summary.taskId}`,
+        ` — resolve, then: mariadb-shell-agent batch collect ${summary.taskId}`,
     );
   }
   if (summary.awaiting > 0) {
@@ -154,7 +155,7 @@ export function createBatchAutoCollector(
     warnedAmbiguous.add(taskId);
     options.notify(
       `Batch task ${taskId} has a submission that could not be matched to a provider batch — it may exist and be billing. ` +
-        `Check with: qwen batch collect ${taskId}`,
+        `Check with: mariadb-shell-agent batch collect ${taskId}`,
     );
   };
 
@@ -195,7 +196,7 @@ export function createBatchAutoCollector(
         // A record this build cannot parse is never collected, so it is worth
         // a line — logged rather than notified, because from here an archived
         // or hand-edited record is indistinguishable from a paid batch, and
-        // `qwen batch list` is the surface that names it to the user.
+        // `mariadb-shell-agent batch list` is the surface that names it to the user.
         .list(records, (detail) =>
           log(`batch auto-collect: unreadable task record ${detail}`),
         )

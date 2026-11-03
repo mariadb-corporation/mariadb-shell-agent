@@ -1,13 +1,14 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * The seam between the live orchestrator and a coding-agent backend.
  *
- * An adaptor owns one backend (a qwen serve daemon, an ACP agent, ...) and
+ * An adaptor owns one backend (a mariadb-shell-agent serve daemon, an ACP agent, ...) and
  * exposes the small primitive set the orchestrator needs. Capability bits
  * describe what the backend can actually do so the orchestrator can degrade
  * per feature instead of branching on adaptor names.
@@ -15,7 +16,7 @@
 
 /** Opaque backend session identity, scoped to the owning adaptor. */
 export interface BackendHandle {
-  /** Adaptor-scoped stable id (for qwen serve: the session id). */
+  /** Adaptor-scoped stable id (for mariadb-shell-agent serve: the session id). */
   readonly id: string;
   /** Identifies the owning adaptor (e.g. 'qwen-code'). */
   readonly adaptor: string;
@@ -45,7 +46,7 @@ export interface SessionSummary {
 /** Receipt returned by prompt(): the task was accepted, not completed. */
 export interface PromptReceipt {
   status: 'accepted' | 'queued' | 'rejected';
-  /** Correlates later turn events with this prompt (qwen serve: promptId). */
+  /** Correlates later turn events with this prompt (mariadb-shell-agent serve: promptId). */
   jobRef?: string;
   /** Human note for the realtime model to relay ("queue full", ...). */
   note?: string;

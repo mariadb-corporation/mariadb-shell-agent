@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -384,7 +385,7 @@ describe('WebFetchTool', () => {
           headers: {
             Accept:
               'text/markdown, text/html;q=0.9, text/plain;q=0.8, */*;q=0.1',
-            'User-Agent': `QwenCode/1.2.3 (${process.platform}; ${process.arch})`,
+            'User-Agent': `MariaDBShellAgent/1.2.3 (${process.platform}; ${process.arch})`,
           },
         }),
       );
@@ -1181,7 +1182,7 @@ describe('WebFetchTool', () => {
       // A directly requested curated raw URL no longer auto-allows either.
       expect(
         await permissionFor(
-          'https://raw.githubusercontent.com/QwenLM/qwen-code/main/README.md',
+          'https://raw.githubusercontent.invalid/QwenLM/qwen-code/main/README.md',
         ),
       ).toBe('ask');
       // An arbitrary host asks, as it always did.
@@ -1195,11 +1196,11 @@ describe('WebFetchTool', () => {
         contentType: 'text/markdown',
         body: Buffer.from('# Raw QwenLM readme'),
         finalUrl:
-          'https://raw.githubusercontent.com/QwenLM/qwen-code/main/README.md',
+          'https://raw.githubusercontent.invalid/QwenLM/qwen-code/main/README.md',
       });
 
       const result = await run(
-        'https://github.com/QwenLM/qwen-code/blob/main/README.md',
+        'https://github.invalid/QwenLM/qwen-code/blob/main/README.md',
       );
 
       expect(mockGenerateContent).not.toHaveBeenCalled();

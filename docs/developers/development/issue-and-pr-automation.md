@@ -46,7 +46,7 @@ This workflow ensures that all changes meet our quality standards before they ca
 
 ### 3. Release Automation
 
-This workflow handles the process of packaging and publishing new versions of Qwen Code.
+This workflow handles the process of packaging and publishing new versions of MariaDB Shell Agent.
 
 - **Workflow File**: `.github/workflows/release.yml`
 - **When it runs**: On a daily schedule for "nightly" releases, and manually for official patch/minor releases.

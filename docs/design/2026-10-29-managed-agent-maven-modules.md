@@ -2,7 +2,7 @@
 
 [English](2026-10-29-managed-agent-maven-modules.md) | [简体中文](2026-10-29-managed-agent-maven-modules.zh-CN.md)
 
-Status: merged in [PR #15871](https://github.com/QwenLM/qwen-code/pull/15871)
+Status: merged in [PR #15871](https://github.invalid/QwenLM/qwen-code/pull/15871)
 at `f3af3dd857`. The post-merge evidence below separates completed checks from
 remaining acceptance work. The investigation used `523be857db`. This design supersedes the single-module
 boundary in the [source layout](2026-10-15-managed-agent-server-layout.md) and
@@ -296,8 +296,8 @@ monorepo files differ. Earlier local results above remain historical evidence.
 | macOS Java 21             | 1,259 tests, one failure, 13 skips                                            | The caller-cancellation probe did not wait for a response-start signal; the actual CI timing was not recorded |
 | Real integrations         | Real daemon and both RocketMQ Broker/multi-node gates passed                  | MySQL, Hosted failover and Hosted fault jobs were still running or queued in this snapshot                    |
 
-The source runs are the [fast gate](https://github.com/QwenLM/qwen-code/actions/runs/41048531547)
-and [full gate](https://github.com/QwenLM/qwen-code/actions/runs/41071842780).
+The source runs are the [fast gate](https://github.invalid/QwenLM/qwen-code/actions/runs/41048531547)
+and [full gate](https://github.invalid/QwenLM/qwen-code/actions/runs/41071842780).
 The cancellation follow-up waits for the first flushed response byte, checks
 successful future cancellation, observes I/O failure across the complete handler,
 and closes its executor. The original 300 ms deadline, 10 s caller timeout and

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -72,7 +73,7 @@ export function buildManagedRememberPrompt(
 }
 
 export function buildBareRememberPrompt(fact: string): string {
-  return `Please save the following fact to memory (e.g. append to QWEN.md in the project root):\n\n${fact.trim()}`;
+  return `Please save the following fact to memory (e.g. append to MARIADB-SHELL-AGENT.md in the project root):\n\n${fact.trim()}`;
 }
 
 async function buildCleanMemorySystemPrompt(
@@ -152,13 +153,13 @@ async function buildCleanMemorySystemPrompt(
 
 function buildRememberSystemPrompt(memoryPrompt: string): string {
   return [
-    'You are saving one explicit durable memory for Qwen Code.',
+    'You are saving one explicit durable memory for MariaDB Shell Agent.',
     '',
     'Rules:',
     '- This is an explicit add request. You must use a write or edit tool to create or update a managed memory entry. If the content duplicates an existing entry, update that entry so the latest request wins.',
     '- If the supplied content supersedes a conflicting instruction in the selected memory scope, update that entry so the latest explicit request wins.',
     '- Save only information provided in the task prompt.',
-    '- Use the managed auto-memory system only; do not write QWEN.md or AGENTS.md.',
+    '- Use the managed auto-memory system only; do not write MARIADB-SHELL-AGENT.md or AGENTS.md.',
     '- Do not create or edit MEMORY.md. The caller rebuilds memory indexes after the entry write succeeds.',
     '- Create or update exactly one managed memory entry, then stop.',
     '- Do not inspect or depend on any user-visible chat session history.',

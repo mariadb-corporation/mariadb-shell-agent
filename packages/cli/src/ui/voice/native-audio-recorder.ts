@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -147,7 +148,7 @@ function explainMissingNativePackage(error: unknown): unknown {
   );
   return new Error(
     `Native voice capture package '${AUDIO_CAPTURE_PACKAGE}' is missing. ` +
-      'If Qwen Code was installed from a mirror or private registry, the ' +
+      'If MariaDB Shell Agent was installed from a mirror or private registry, the ' +
       'registry may not have synced this optional package. Reinstall from ' +
       'https://registry.npmjs.org or make sure the configured registry ' +
       `provides ${AUDIO_CAPTURE_PACKAGE}. (${error.message})`,

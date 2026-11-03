@@ -8,7 +8,7 @@ Implemented in this change.
 
 ## Problem
 
-`qwen serve` has a detailed HTTP protocol document and a shorter integration
+`mariadb-shell-agent serve` has a detailed HTTP protocol document and a shorter integration
 guide, but it does not publish a machine-readable API definition. Integrators
 must combine prose, route handlers, capability documentation, and TypeScript
 SDK methods to answer basic interface questions. Eight routes in the curated

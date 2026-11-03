@@ -60,11 +60,11 @@
 
 ```bash
 # A：默认配置（不设 tools.eager）
-QWEN_WRITE_SYSTEM_MD=/tmp/prompt-default.md qwen -p "hi"
+QWEN_WRITE_SYSTEM_MD=/tmp/prompt-default.md mariadb-shell-agent -p "hi"
 
-# B：裁剪配置。在 <projectRoot>/.qwen/settings.json 的 tools 对象里加：
+# B：裁剪配置。在 <projectRoot>/.mariadb-shell-agent/settings.json 的 tools 对象里加：
 #   "eager": ["read_file","write_file","edit","glob","grep_search","run_shell_command","skill"]
-QWEN_WRITE_SYSTEM_MD=/tmp/prompt-eager.md qwen -p "hi"
+QWEN_WRITE_SYSTEM_MD=/tmp/prompt-eager.md mariadb-shell-agent -p "hi"
 
 wc -c /tmp/prompt-default.md /tmp/prompt-eager.md
 diff /tmp/prompt-default.md /tmp/prompt-eager.md

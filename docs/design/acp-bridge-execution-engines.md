@@ -172,7 +172,7 @@ branch/side-task requests reject before mutating history.
 | Verification        | Collocated Bridge/lifecycle tests and isolated process test script                         |
 
 Every constructor stays on the single-factory path unless paired engines are
-enabled: `qwen serve --experimental-paired-engines` pairs the daemon's ordinary
+enabled: `mariadb-shell-agent serve --experimental-paired-engines` pairs the daemon's ordinary
 workspace runtimes, and an embedder that sets the same serve option pairs the
 serve app's default Bridge
 ([paired engine host wiring](./2026-09-26-paired-engine-host-wiring.md)). There

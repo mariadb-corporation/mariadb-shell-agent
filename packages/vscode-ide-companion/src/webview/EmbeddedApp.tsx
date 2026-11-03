@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,6 +26,11 @@ import {
 import { ChevronDown, FileText, LoaderCircle, Plus, X } from 'lucide-react';
 import { useVSCode } from './hooks/useVSCode.js';
 import { QwenOnboarding } from './components/QwenOnboarding.js';
+import { AuthWizard } from './components/AuthWizard.js';
+import type {
+  AuthWizardProvider,
+  AuthWizardSubmission,
+} from './authWizardTypes.js';
 import { SessionHistoryDropdown } from './components/SessionHistoryDropdown.js';
 import {
   createChromeStrings,
@@ -218,6 +224,13 @@ const VSCODE_EMBEDDED_CSS = `
     background: var(--vscode-toolbar-hoverBackground);
     outline: none;
   }
+  .qwen-vscode-wizard-option { background: transparent; }
+  .qwen-vscode-wizard-option:hover:not(:disabled),
+  .qwen-vscode-wizard-option:focus-visible {
+    background: var(--vscode-list-hoverBackground);
+    outline: 1px solid var(--vscode-focusBorder);
+    outline-offset: -1px;
+  }
   .qwen-vscode-toolbar-start {
     display: inline-flex;
     min-width: 0;
@@ -358,6 +371,14 @@ export function EmbeddedApp() {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [authConnecting, setAuthConnecting] = useState(false);
   const [authError, setAuthError] = useState<string>();
+  // The provider setup wizard (open while set), started by Get Started,
+  // /auth or the auth command.
+  const [authWizard, setAuthWizard] = useState<AuthWizardProvider[]>();
+  const [authWizardSubmitting, setAuthWizardSubmitting] = useState(false);
+  const [authWizardError, setAuthWizardError] = useState<string>();
+  // Whether the current submission failed; read by the authWizardDone
+  // handler, which runs in the message listener's closure.
+  const authWizardFailedRef = useRef(false);
   const [hostNotice, setHostNotice] = useState<HostNotice>();
   const [accountInfo, setAccountInfo] = useState<AccountInfo>();
   const [insightProgress, setInsightProgress] = useState<InsightProgress>();
@@ -879,6 +900,25 @@ export function EmbeddedApp() {
         if (typeof text === 'string') setHostNotice({ tone: 'error', text });
       } else if (message.type === 'accountInfo' && message.data) {
         setAccountInfo(message.data as AccountInfo);
+      } else if (message.type === 'authWizard') {
+        const providers = (message.data as { providers?: unknown } | null)
+          ?.providers;
+        if (Array.isArray(providers)) {
+          setAuthWizard(providers as AuthWizardProvider[]);
+          setAuthWizardSubmitting(false);
+          setAuthWizardError(undefined);
+          authWizardFailedRef.current = false;
+        }
+      } else if (message.type === 'authWizardError') {
+        const text = (message.data as { message?: unknown } | null)?.message;
+        authWizardFailedRef.current = true;
+        setAuthWizardSubmitting(false);
+        setAuthConnecting(false);
+        setAuthWizardError(typeof text === 'string' ? text : t('auth.failed'));
+      } else if (message.type === 'authWizardDone') {
+        setAuthWizardSubmitting(false);
+        setAuthConnecting(false);
+        if (!authWizardFailedRef.current) setAuthWizard(undefined);
       } else if (message.type === 'authState') {
         const state = (message.data as { authenticated?: unknown } | null)
           ?.authenticated;
@@ -898,6 +938,7 @@ export function EmbeddedApp() {
         setAuthConnecting(false);
         setAuthError(undefined);
         if (message.type === 'authSuccess') {
+          setAuthWizard(undefined);
           setHostNotice({ tone: 'info', text: t('auth.signedIn') });
         }
       } else if (message.type === 'authCancelled') {
@@ -907,6 +948,7 @@ export function EmbeddedApp() {
         setAuthenticated((current) => current ?? false);
         setAuthConnecting(false);
         setAuthError(undefined);
+        setAuthWizard(undefined);
         clearInsight();
       } else if (
         message.type === 'authError' ||
@@ -925,6 +967,13 @@ export function EmbeddedApp() {
         setAuthenticated(false);
         setAuthConnecting(false);
         setAuthError(text);
+        // An open wizard stays open with the error, so the answers can be
+        // corrected without starting over.
+        if (message.type === 'authError') {
+          authWizardFailedRef.current = true;
+          setAuthWizardSubmitting(false);
+          setAuthWizardError(text);
+        }
         clearInsight();
       } else if (message.type === 'insightProgress' && message.data) {
         const data = message.data as {
@@ -1506,8 +1555,8 @@ export function EmbeddedApp() {
           connecting={authConnecting}
           error={authError}
           t={t}
+          theme={theme}
           onGetStarted={() => {
-            setAuthConnecting(true);
             setAuthError(undefined);
             vscode.postMessage({ type: 'auth', data: {} });
           }}
@@ -2094,6 +2143,28 @@ export function EmbeddedApp() {
             </div>
           </div>
         </div>
+      )}
+      {authWizard && (
+        <AuthWizard
+          providers={authWizard}
+          t={t}
+          theme={theme}
+          submitting={authWizardSubmitting}
+          error={authWizardError}
+          onSubmit={(submission: AuthWizardSubmission) => {
+            authWizardFailedRef.current = false;
+            setAuthWizardSubmitting(true);
+            setAuthWizardError(undefined);
+            setAuthConnecting(true);
+            setAuthError(undefined);
+            vscode.postMessage({ type: 'authWizardSubmit', data: submission });
+          }}
+          onCancel={() => {
+            setAuthWizard(undefined);
+            setAuthWizardError(undefined);
+            vscode.postMessage({ type: 'authWizardCancel', data: {} });
+          }}
+        />
       )}
     </div>
   );

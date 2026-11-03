@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Code
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -155,7 +156,7 @@ export function startPostRenderPrefetches(
   postRenderStarted.add(config);
 
   if (
-    settings.merged.general?.enableAutoUpdate !== false &&
+    settings.merged.general?.enableAutoUpdate === true &&
     process.env[SKIP_UPDATE_CHECK_ENV_VAR] !== 'true' &&
     !process.env[CUSTOM_SANDBOX_IMAGE_ENV_VAR]
   ) {
@@ -201,7 +202,7 @@ export function startPostRenderPrefetches(
           if (hostUpdateRelaunch === 'false') {
             updateEventEmitter.emit('update-info', {
               message: `${result.info.message}\n${t(
-                'Update Qwen Code on the host, then restart the sandbox.',
+                'Update MariaDB Shell Agent on the host, then restart the sandbox.',
               )}`,
             });
             return;

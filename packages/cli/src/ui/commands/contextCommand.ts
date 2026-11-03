@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -595,7 +596,7 @@ export async function collectContextData(
   }
 
   // The listing also carries model-invocable commands — a user's own
-  // `.qwen/commands/*.toml`, extension saved workflows with `whenToUse` — which
+  // `.mariadb-shell-agent/commands/*.toml`, extension saved workflows with `whenToUse` — which
   // `listSkills()` never returns, while their tokens are inside the measured
   // listing that `skillsTokens` bills. Give each one a row so the rows and the
   // category cover the same set. Rows never feed `skillsTokens`: Built-in tools

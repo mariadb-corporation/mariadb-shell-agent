@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -77,7 +78,7 @@ function configure(dir: string): void {
   git(dir, 'config', 'core.hooksPath', path.join(dir, '.git', 'hooks'));
 }
 
-/** A repository with `.qwen/worktrees/<slug>` checkouts, as the daemon makes. */
+/** A repository with `.mariadb-shell-agent/worktrees/<slug>` checkouts, as the daemon makes. */
 function makeRepo(slugs: string[] = []): { repo: string; worktrees: string[] } {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-wt-routes-'));
   tmpRoots.push(root);
@@ -89,7 +90,7 @@ function makeRepo(slugs: string[] = []): { repo: string; worktrees: string[] } {
   git(repo, 'add', '.');
   git(repo, 'commit', '-q', '-m', 'init');
   const worktrees = slugs.map((slug) => {
-    const target = path.join(repo, '.qwen', 'worktrees', slug);
+    const target = path.join(repo, '.mariadb-shell-agent', 'worktrees', slug);
     git(repo, 'worktree', 'add', '-q', target, '-b', `qwen/${slug}`);
     return target;
   });
@@ -208,7 +209,7 @@ describe('workspace git worktree routes against real git', () => {
   }, 20_000);
 
   it('answers for the main worktree, whose `.git` is a directory', async () => {
-    // No linked worktree: `.qwen/worktrees/` would itself be untracked and
+    // No linked worktree: `.mariadb-shell-agent/worktrees/` would itself be untracked and
     // the count is the assertion here.
     const { repo } = makeRepo();
     fs.writeFileSync(path.join(repo, 'untracked.txt'), 'x\n');
@@ -743,7 +744,12 @@ describe('workspace git worktree routes against real git', () => {
       'sub',
     );
     git(repo, 'commit', '-q', '-m', 'add submodule');
-    const target = path.join(repo, '.qwen', 'worktrees', 'swift-fox');
+    const target = path.join(
+      repo,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'swift-fox',
+    );
     git(repo, 'worktree', 'add', '-q', target, '-b', 'qwen/swift-fox');
     git(
       target,
@@ -804,7 +810,12 @@ describe('workspace git worktree routes against real git', () => {
       'sub',
     );
     git(repo, 'commit', '-q', '-m', 'add submodule');
-    const target = path.join(repo, '.qwen', 'worktrees', 'swift-fox');
+    const target = path.join(
+      repo,
+      '.mariadb-shell-agent',
+      'worktrees',
+      'swift-fox',
+    );
     git(repo, 'worktree', 'add', '-q', target, '-b', 'qwen/swift-fox');
     git(
       target,

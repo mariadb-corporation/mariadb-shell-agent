@@ -158,6 +158,6 @@ daemon 侧取回。
 以及折叠卡片是否以附件形式进入提交载荷。
 浏览器验证覆盖粘贴到卡片、短粘贴仍内联、以及移入编辑器；发送链路在 actions 层验证，
 因为浏览器侧的 mock daemon 没有附件存储。
-命令与结果见 `.qwen/e2e-tests/web-shell-paste-as-attachment.md`。
+命令与结果见 `.mariadb-shell-agent/e2e-tests/web-shell-paste-as-attachment.md`。
 
 没有待定的设计问题。上面记录的后续项（插入也携带附件）是刻意排除的范围，不是未决的决策。

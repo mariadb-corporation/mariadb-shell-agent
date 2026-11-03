@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Code
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -186,7 +187,7 @@ export interface SessionListItem {
    * precedence (title > prompt > goal objective) is still resolved by each
    * consumer, so the other label surfaces keep their degraded rendering of a
    * Goal-only session: the ACP `ListSessions` title, the serve summaries'
-   * `displayName`, `@`-completion labels, and `qwen sessions list`. Unifying
+   * `displayName`, `@`-completion labels, and `mariadb-shell-agent sessions list`. Unifying
    * them means resolving the label once here — a computed `displayName` on
    * this interface, or a shared `sessionDisplayName(item)` helper — and
    * widening `serve/server/session-list.ts`'s `toSummary` parameter to carry
@@ -873,7 +874,7 @@ async function copyFileHistoryBackupsToStaging(
  * - Removing sessions
  *
  * Sessions are stored as JSONL files, one per session.
- * File location: ~/.qwen/tmp/<project_id>/chats/
+ * File location: ~/.mariadb-shell-agent/tmp/<project_id>/chats/
  */
 export class SessionService {
   private readonly storage: Storage;
@@ -1014,15 +1015,15 @@ export class SessionService {
     }
 
     // Worktree sessions record cwd as the worktree path
-    // (<repoRoot>/.qwen/worktrees/<slug>), which has a different project
+    // (<repoRoot>/.mariadb-shell-agent/worktrees/<slug>), which has a different project
     // hash. Infer the repo root from the path and check its hash. This
     // is durable — it doesn't depend on the sidecar file, which is
     // transient and cleared when the worktree is removed. Pure string
     // ops, so check before the file-read runtime status below.
     // Use lastIndexOf to handle nested worktrees: for
-    // /repo/.qwen/worktrees/parent/.qwen/worktrees/child, the innermost
-    // marker gives repoRoot = /repo/.qwen/worktrees/parent (the workspace).
-    const worktreesMarker = `${path.sep}.qwen${path.sep}worktrees${path.sep}`;
+    // /repo/.mariadb-shell-agent/worktrees/parent/.mariadb-shell-agent/worktrees/child, the innermost
+    // marker gives repoRoot = /repo/.mariadb-shell-agent/worktrees/parent (the workspace).
+    const worktreesMarker = `${path.sep}.mariadb-shell-agent${path.sep}worktrees${path.sep}`;
     const markerIdx = recordCwd.lastIndexOf(worktreesMarker);
     if (markerIdx > 0) {
       const repoRoot = recordCwd.substring(0, markerIdx);

@@ -4,9 +4,9 @@ Internal design document for porting Claude Code's declarative agent (markdown +
 YAML frontmatter) schema to qwen-code, addressing issue [#4821][i4821] and
 coordinating with the workflow port in issue [#4721][i4721] / PR [#4732][p4732].
 
-[i4821]: https://github.com/QwenLM/qwen-code/issues/4821
-[i4721]: https://github.com/QwenLM/qwen-code/issues/4721
-[p4732]: https://github.com/QwenLM/qwen-code/pull/4732
+[i4821]: https://github.invalid/QwenLM/qwen-code/issues/4821
+[i4721]: https://github.invalid/QwenLM/qwen-code/issues/4721
+[p4732]: https://github.invalid/QwenLM/qwen-code/pull/4732
 
 ## Implementation status (vertical-sliced)
 
@@ -36,8 +36,8 @@ for the deferred fields — schema constants, DL7/Ig5 semantics, error
 messages, and the coordination matrix with workflow are still load-bearing
 for that work.
 
-[p4842]: https://github.com/QwenLM/qwen-code/pull/4842
-[p4870]: https://github.com/QwenLM/qwen-code/pull/4870
+[p4842]: https://github.invalid/QwenLM/qwen-code/pull/4842
+[p4870]: https://github.invalid/QwenLM/qwen-code/pull/4870
 
 ---
 
@@ -216,8 +216,8 @@ projectSettings. This is surprising — flag in open questions.
 
 qwen-code already ships substantial subagent infrastructure:
 `SubagentManager` (`packages/core/src/subagents/subagent-manager.ts`) implements
-CRUD over markdown+YAML frontmatter files in `.qwen/agents/` (project) and
-`~/.qwen/agents/` (user), backed by a custom YAML parser
+CRUD over markdown+YAML frontmatter files in `.mariadb-shell-agent/agents/` (project) and
+`~/.mariadb-shell-agent/agents/` (user), backed by a custom YAML parser
 (`packages/core/src/utils/yaml-parser.ts` — no `gray-matter` / `yaml` dep,
 confirmed by `package.json`). `SubagentConfig`
 (`packages/core/src/subagents/types.ts:41-122`) already has `name`,
@@ -252,7 +252,7 @@ splitting and is silent on malformed input (matches `lz`'s
 
 #### D2. Resolution / precedence order
 
-**Decision:** Use `session > project (.qwen/agents/) > user (~/.qwen/agents/)
+**Decision:** Use `session > project (.mariadb-shell-agent/agents/) > user (~/.mariadb-shell-agent/agents/)
 
 > extension > builtin`— i.e. **keep the existing qwen-code SubagentLevel
 order, do NOT mirror Claude Code's`flagSettings`/`policySettings` buckets in
@@ -359,7 +359,7 @@ is set, map it to `approvalMode` using the existing table in
 `acceptEdits → auto-edit`, `dontAsk → default`, `bypassPermissions → yolo`).
 If both are present, `approvalMode` wins (more specific to qwen-code) and emit
 a `tengu_frontmatter_shadow_*`-style telemetry event noting both were set.
-**Rationale:** Preserves backward compat with existing `.qwen/agents/*.md`
+**Rationale:** Preserves backward compat with existing `.mariadb-shell-agent/agents/*.md`
 that use `approvalMode`, while accepting Claude Code's `permissionMode`
 verbatim so users can drop in Claude Code agent files unchanged.
 
@@ -379,7 +379,7 @@ verbatim so users can drop in Claude Code agent files unchanged.
 | `maxTurns`                 | `maxTurns` (new top-level)                         | positive integer; accept numeric string for parity                                                           | **promote from `runConfig.max_turns`**; keep nested form as deprecated alias                             |
 | `skills`                   | `skills` (new)                                     | array of skill names; comma-separated string also accepted                                                   | runtime: preload via skillManager when agent starts                                                      |
 | `initialPrompt`            | `initialPrompt` (new)                              | string; whitespace-only → undefined; only fires when agent is main session                                   | wired via `--agent` flag path                                                                            |
-| `memory`                   | `memory` (new)                                     | enum `user/project/local`; loads from `.qwen/agent-memory/<name>/` etc.                                      | runtime in P4                                                                                            |
+| `memory`                   | `memory` (new)                                     | enum `user/project/local`; loads from `.mariadb-shell-agent/agent-memory/<name>/` etc.                       | runtime in P4                                                                                            |
 | `background`               | `background`                                       | accept bool or string `"true"/"false"`; only truthy → true                                                   | already supported; loosen parse rules                                                                    |
 | `isolation`                | `isolation` (new)                                  | enum **only** `["worktree"]`                                                                                 | runtime owned by workflow PR (#4732 P3+); registry just carries the field                                |
 | `color` (undocumented #16) | `color`                                            | enum `_Y = ["red","blue","green","yellow","purple","orange","pink","cyan"]`; values outside silently dropped | already in qwen `SubagentConfig`; tighten validation to match Claude Code allowlist                      |
@@ -389,7 +389,7 @@ verbatim so users can drop in Claude Code agent files unchanged.
 | Chunk                        | Test file                                | What it asserts                                                                                                                                                                                       |
 | ---------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Schema enum constants        | `agent-frontmatter-schema.test.ts` (new) | `EFFORT_VALUES`, `PERMISSION_MODE_VALUES`, `MEMORY_VALUES`, `ISOLATION_VALUES`, `COLOR_VALUES` match Claude Code 2.1.168 byte-for-byte (snapshot)                                                     |
-| Parser — happy path          | `subagent-manager.test.ts`               | Round-trip parse `.qwen/agents/test.md` with all 16 fields → emitted record has expected shape                                                                                                        |
+| Parser — happy path          | `subagent-manager.test.ts`               | Round-trip parse `.mariadb-shell-agent/agents/test.md` with all 16 fields → emitted record has expected shape                                                                                         |
 | Parser — required fields     | `subagent-manager.test.ts`               | Missing `name` returns null + warn log; missing `description` returns null + warn log                                                                                                                 |
 | Parser — enum validation     | `subagent-manager.test.ts`               | Bad `permissionMode` / `memory` / `isolation` / `effort` / `color` each emit specific warn (matching DL7 wording) and field is dropped                                                                |
 | Parser — lenient field types | `subagent-manager.test.ts`               | `background: "true"` → `true`; `maxTurns: "5"` → `5`; `effort: "med"` → `"medium"`; `tools: "Read,Edit"` → `["Read","Edit"]`; `tools: "*"` → undefined                                                |
@@ -451,7 +451,7 @@ this PR lands.
 | #   | Risk                                                                                                                                                                                                | Mitigation                                                                                                                                                     |
 | --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1  | Schema drift between Claude Code minor releases (2.1.168 → 2.1.x)                                                                                                                                   | Pin the enum constants module to "verified against 2.1.168" with a doc comment; rerun the strings-grep against new releases as part of `feature-reverse` skill |
-| R2  | `runConfig.max_turns` → top-level `maxTurns` is a breaking schema change for existing `.qwen/agents/*.md` files                                                                                     | Keep nested form as deprecated alias with one-cycle deprecation; emit warn on parse, document in CHANGELOG                                                     |
+| R2  | `runConfig.max_turns` → top-level `maxTurns` is a breaking schema change for existing `.mariadb-shell-agent/agents/*.md` files                                                                      | Keep nested form as deprecated alias with one-cycle deprecation; emit warn on parse, document in CHANGELOG                                                     |
 | R3  | `permissionMode` ↔ `approvalMode` round-trip lossy (Claude has 6 modes, qwen has 4-ish)                                                                                                            | Map both directions explicitly per D7; emit telemetry on dual-set; do NOT silently rewrite on save                                                             |
 | R4  | New fields (`hooks`, `mcpServers`, `skills`, `memory`) carried in registry but no runtime in v1 → users may set them and silently get no effect                                                     | Document v1 scope clearly; emit a one-time info log per agent when a "carried but not yet runtime" field is non-empty                                          |
 | R5  | Adversarial-verify flagged that `EXCLUDED_TOOLS_FOR_SUBAGENTS` does NOT include `WORKFLOW` on `main` — could mean the workflow port is not yet merged or that the recursive-fanout guard is missing | Confirm with the workflow PR author (LaZzyMan = self) that the guard lands with PR #4732, not in this port                                                     |
@@ -466,7 +466,7 @@ this PR lands.
 | Q2  | Lenient DL7 behaviour: document or hack?                                                                                                                       | **Mirror it**. Accept `background: "true"`, `maxTurns: "5"`, `effort: "med"` for parity, even if undocumented. Add tests.                                                                                                                                                                                                                                |
 | Q3  | Why isolation enum differs between agent schema and background-session schema?                                                                                 | **Document the divergence in code comment**; "no isolation" = field omitted, not an enum value.                                                                                                                                                                                                                                                          |
 | Q4  | Should `--agents <json>` (plural, flagSettings) land in v1?                                                                                                    | **Defer to P4**. CLI surface for power users; v1 only ships `--agent <name>` (singular) which is what #4821 cares about.                                                                                                                                                                                                                                 |
-| Q5  | Inner-tree vs outer-tree precedence for nested `.qwen/agents/`?                                                                                                | **Innermost-wins**. Override Claude Code's accidental outer-wins behaviour. Test fixture in P1.                                                                                                                                                                                                                                                          |
+| Q5  | Inner-tree vs outer-tree precedence for nested `.mariadb-shell-agent/agents/`?                                                                                 | **Innermost-wins**. Override Claude Code's accidental outer-wins behaviour. Test fixture in P1.                                                                                                                                                                                                                                                          |
 | Q6  | `tools` vs `disallowedTools` precedence: #4821 says "ignored if tools is set"; #4721 says "union with workflow floor"                                          | **Registry is dumb data**. Parser preserves both fields independently. Precedence rules live at the dispatch site (Agent tool / workflow). Resolves the contradiction.                                                                                                                                                                                   |
 | Q7  | Tool-name canonical form for the workflow disallowedTools floor — verified against PR #4732 as `ToolNames.SEND_MESSAGE`, `ToolNames.EXIT_PLAN_MODE`            | **Not this PR's concern** — owned by the workflow PR. Document in coordination matrix only.                                                                                                                                                                                                                                                              |
 | Q8  | Does #2409 close-resolution affect anything?                                                                                                                   | **Inherit #2409's "promote model + maxTurns to top-level" guidance**. Already baked into this plan.                                                                                                                                                                                                                                                      |

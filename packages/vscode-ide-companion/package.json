@@ -1,14 +1,14 @@
 {
-  "name": "qwen-code-vscode-ide-companion",
+  "name": "mariadb-shell-agent",
   "private": true,
-  "displayName": "Qwen Code Companion",
-  "description": "Enable Qwen Code with direct access to your VS Code workspace.",
+  "displayName": "MariaDB Shell Agent",
+  "description": "An AI agent for MariaDB, with direct access to your VS Code workspace.",
   "version": "0.26.5",
-  "publisher": "qwenlm",
+  "publisher": "MariaDB",
   "icon": "assets/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/QwenLM/qwen-code.git",
+    "url": "git+https://github.com/mariadb-corporation/mariadb-shell-agent.git",
     "directory": "packages/vscode-ide-companion"
   },
   "engines": {
@@ -20,230 +20,198 @@
     "AI"
   ],
   "keywords": [
-    "qwen-code",
-    "qwen code",
-    "qwen",
-    "qwen code",
+    "mariadb",
+    "mariadb shell",
+    "mariadb shell agent",
+    "ai",
+    "agent",
     "cli",
-    "ide integration",
     "ide companion"
   ],
   "activationEvents": [
     "onStartupFinished",
-    "onView:qwen-code.chatView.sidebar",
-    "onCommand:qwen-code.openChat",
-    "onCommand:qwen-code.focusChat",
-    "onCommand:qwen-code.newConversation",
-    "onCommand:qwen-code.showLogs"
+    "onView:mariadb-shell-agent.chatView.sidebar",
+    "onCommand:mariadb-shell-agent.openChat",
+    "onCommand:mariadb-shell-agent.focusChat",
+    "onCommand:mariadb-shell-agent.newConversation",
+    "onCommand:mariadb-shell-agent.showLogs"
   ],
   "contributes": {
     "jsonValidation": [
       {
-        "fileMatch": "**/.qwen/settings.json",
+        "fileMatch": "**/.mariadb-shell-agent/settings.json",
         "url": "./schemas/settings.schema.json"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "qwen-code-sidebar",
-          "title": "Qwen Code",
-          "icon": "assets/sidebar-icon.svg"
+          "id": "mariadb-shell-agent-sidebar",
+          "title": "MariaDB Shell Agent",
+          "icon": "assets/activity-bar-78bbfacd.svg"
         }
       ]
     },
     "views": {
-      "qwen-code-sidebar": [
+      "mariadb-shell-agent-sidebar": [
         {
           "type": "webview",
-          "id": "qwen-code.chatView.sidebar",
-          "name": "Qwen Code",
-          "icon": "assets/sidebar-icon.svg"
+          "id": "mariadb-shell-agent.chatView.sidebar",
+          "name": "MariaDB Shell Agent",
+          "icon": "assets/activity-bar-78bbfacd.svg"
         }
       ]
     },
     "languages": [
       {
-        "id": "qwen-diff-editable"
+        "id": "mariadb-shell-agent-diff-editable"
       }
     ],
     "commands": [
       {
-        "command": "qwen.diff.accept",
-        "title": "Qwen Code: Accept Current Diff",
+        "command": "mariadb-shell-agent.diff.accept",
+        "title": "MariaDB Shell Agent: Accept Current Diff",
         "icon": "$(check)"
       },
       {
-        "command": "qwen.diff.cancel",
-        "title": "Qwen Code: Close Diff Editor",
+        "command": "mariadb-shell-agent.diff.cancel",
+        "title": "MariaDB Shell Agent: Close Diff Editor",
         "icon": "$(close)"
       },
       {
-        "command": "qwen-code.runQwenCode",
-        "title": "Qwen Code: Run"
+        "command": "mariadb-shell-agent.runQwenCode",
+        "title": "MariaDB Shell Agent: Run"
       },
       {
-        "command": "qwen-code.showNotices",
-        "title": "Qwen Code: View Third-Party Notices"
+        "command": "mariadb-shell-agent.showNotices",
+        "title": "MariaDB Shell Agent: View Third-Party Notices"
       },
       {
-        "command": "qwen-code.openChat",
-        "title": "Qwen Code: Open",
+        "command": "mariadb-shell-agent.openChat",
+        "title": "MariaDB Shell Agent: Open",
         "icon": "./assets/icon.png"
       },
       {
-        "command": "qwen-code.auth",
-        "title": "Qwen Code: Auth"
+        "command": "mariadb-shell-agent.auth",
+        "title": "MariaDB Shell Agent: Auth"
       },
       {
-        "command": "qwen-code.focusChat",
-        "title": "Qwen Code: Focus Chat View"
+        "command": "mariadb-shell-agent.focusChat",
+        "title": "MariaDB Shell Agent: Focus Chat View"
       },
       {
-        "command": "qwen-code.newConversation",
-        "title": "Qwen Code: New Conversation"
+        "command": "mariadb-shell-agent.newConversation",
+        "title": "MariaDB Shell Agent: New Conversation"
       },
       {
-        "command": "qwen-code.showLogs",
-        "title": "Qwen Code: Show Logs"
+        "command": "mariadb-shell-agent.showLogs",
+        "title": "MariaDB Shell Agent: Show Logs"
       },
       {
-        "command": "qwen-code.copyMessage",
-        "title": "%qwen-code.copyMessage.title%"
+        "command": "mariadb-shell-agent.copyMessage",
+        "title": "%mariadb-shell-agent.copyMessage.title%"
       },
       {
-        "command": "qwen-code.copyAllMessages",
-        "title": "%qwen-code.copyAllMessages.title%"
+        "command": "mariadb-shell-agent.copyAllMessages",
+        "title": "%mariadb-shell-agent.copyAllMessages.title%"
       },
       {
-        "command": "qwen-code.copyLastReply",
-        "title": "%qwen-code.copyLastReply.title%"
+        "command": "mariadb-shell-agent.copyLastReply",
+        "title": "%mariadb-shell-agent.copyLastReply.title%"
       }
     ],
     "menus": {
       "commandPalette": [
         {
-          "command": "qwen.diff.accept",
-          "when": "qwen.diff.isVisible"
+          "command": "mariadb-shell-agent.diff.accept",
+          "when": "mariadb-shell-agent.diff.isVisible"
         },
         {
-          "command": "qwen.diff.cancel",
-          "when": "qwen.diff.isVisible"
+          "command": "mariadb-shell-agent.diff.cancel",
+          "when": "mariadb-shell-agent.diff.isVisible"
         },
         {
-          "command": "qwen-code.auth"
+          "command": "mariadb-shell-agent.auth"
         },
         {
-          "command": "qwen-code.copyMessage",
+          "command": "mariadb-shell-agent.copyMessage",
           "when": "false"
         },
         {
-          "command": "qwen-code.copyAllMessages",
+          "command": "mariadb-shell-agent.copyAllMessages",
           "when": "false"
         },
         {
-          "command": "qwen-code.copyLastReply",
+          "command": "mariadb-shell-agent.copyLastReply",
           "when": "false"
         }
       ],
       "webview/context": [
         {
-          "command": "qwen-code.copyMessage",
+          "command": "mariadb-shell-agent.copyMessage",
           "when": "webviewSection == 'chat-messages'",
           "group": "9_cutcopypaste@1"
         },
         {
-          "command": "qwen-code.copyAllMessages",
+          "command": "mariadb-shell-agent.copyAllMessages",
           "when": "webviewSection == 'chat-messages'",
           "group": "9_cutcopypaste@2"
         },
         {
-          "command": "qwen-code.copyLastReply",
+          "command": "mariadb-shell-agent.copyLastReply",
           "when": "webviewSection == 'chat-messages'",
           "group": "9_cutcopypaste@3"
         }
       ],
       "editor/title": [
         {
-          "command": "qwen.diff.accept",
-          "when": "qwen.diff.isVisible",
+          "command": "mariadb-shell-agent.diff.accept",
+          "when": "mariadb-shell-agent.diff.isVisible",
           "group": "navigation"
         },
         {
-          "command": "qwen.diff.cancel",
-          "when": "qwen.diff.isVisible",
-          "group": "navigation"
-        },
-        {
-          "command": "qwen-code.openChat",
+          "command": "mariadb-shell-agent.diff.cancel",
+          "when": "mariadb-shell-agent.diff.isVisible",
           "group": "navigation"
         }
       ]
     },
     "configuration": {
-      "title": "Qwen Code",
+      "title": "MariaDB Shell Agent",
       "properties": {
-        "qwen-code.provider": {
-          "order": 0,
-          "type": "string",
-          "enum": [
-            "coding-plan",
-            "api-key"
-          ],
-          "enumDescriptions": [
-            "Alibaba Cloud Coding Plan — configurable from VS Code Settings",
-            "Configured via Qwen Code: Auth or the onboarding button"
-          ],
-          "default": "coding-plan",
-          "markdownDescription": "**Coding Plan**: enter API Key + Region here to sync `~/.qwen/settings.json`.\n\n**API Key**: use **Qwen Code: Auth** or the onboarding button to configure ModelStudio or custom OpenAI-compatible providers."
-        },
-        "qwen-code.apiKey": {
-          "order": 1,
-          "type": "string",
-          "default": "",
-          "markdownDescription": "API key used for **Coding Plan** settings sync. For **API Key** providers, configure the full provider details through **Qwen Code: Auth**."
-        },
-        "qwen-code.codingPlanRegion": {
-          "order": 2,
-          "type": "string",
-          "enum": [
-            "china",
-            "global"
-          ],
-          "enumDescriptions": [
-            "China — 阿里云百炼 (aliyun.com)",
-            "Global — Alibaba Cloud (alibabacloud.com)"
-          ],
-          "default": "china",
-          "markdownDescription": "Region for Coding Plan. _(Only used when Provider is `coding-plan`)_"
-        },
-        "qwen-code.dotIndicator": {
+        "mariadb-shell-agent.dotIndicator": {
           "order": 3,
           "type": "boolean",
           "default": true,
           "description": "Show a colored dot on the tab icon when a task completes (orange) or needs your attention (blue) while the tab is hidden."
         },
-        "qwen-code.notifications": {
+        "mariadb-shell-agent.notifications": {
           "order": 4,
           "type": "boolean",
           "default": true,
-          "description": "Show notifications with sound when a task completes (at least 20 seconds) or needs your attention, while you are not actively viewing the Qwen Code panel."
+          "description": "Show notifications with sound when a task completes (at least 20 seconds) or needs your attention, while you are not actively viewing the MariaDB Shell Agent panel."
+        },
+        "mariadb-shell-agent.experimentalLsp": {
+          "order": 5,
+          "type": "boolean",
+          "default": false,
+          "description": "Start language servers (from .lsp.json files and extensions) for the agent's code intelligence. Experimental; takes effect for newly started sessions (reload the window)."
         }
       }
     },
     "keybindings": [
       {
-        "command": "qwen.diff.accept",
+        "command": "mariadb-shell-agent.diff.accept",
         "key": "ctrl+s",
-        "when": "qwen.diff.isVisible"
+        "when": "mariadb-shell-agent.diff.isVisible"
       },
       {
-        "command": "qwen.diff.accept",
+        "command": "mariadb-shell-agent.diff.accept",
         "key": "cmd+s",
-        "when": "qwen.diff.isVisible"
+        "when": "mariadb-shell-agent.diff.isVisible"
       },
       {
-        "command": "qwen-code.focusChat",
+        "command": "mariadb-shell-agent.focusChat",
         "key": "ctrl+shift+l",
         "mac": "cmd+shift+l"
       }

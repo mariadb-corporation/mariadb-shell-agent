@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -408,7 +409,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
       if (this.authHandler) {
         await this.authHandler();
       } else {
-        await vscode.commands.executeCommand('qwen-code.auth');
+        await vscode.commands.executeCommand('mariadb-shell-agent.auth');
       }
       return true;
     }
@@ -432,7 +433,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
       if (this.authHandler) {
         await this.authHandler();
       } else {
-        await vscode.commands.executeCommand('qwen-code.auth');
+        await vscode.commands.executeCommand('mariadb-shell-agent.auth');
       }
       return 'auth';
     }
@@ -484,7 +485,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
       // volume, a dangling symlink) must not block the export. For a
       // non-symlinked folder whose spelling already matches the on-disk casing,
       // the raw spelling IS the canonical one, so the transcript bucket under
-      // `~/.qwen/tmp/<getProjectHash(cwd)>/chats` still matches. The daemon
+      // `~/.mariadb-shell-agent/tmp/<getProjectHash(cwd)>/chats` still matches. The daemon
       // hashes the *canonicalized* workspace (packages/cli/src/serve/server.ts),
       // so two spellings do not: a case-variant on a case-insensitive volume
       // (`getProjectHash` lowercases only on win32) and any alias in a symlinked
@@ -737,7 +738,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
       }
       if (!this.agentManager.isConnected) {
         await this.promptAuth(
-          'You need to configure your provider to use Qwen Code.',
+          'You need to configure your provider to use MariaDB Shell Agent.',
         );
         return;
       }
@@ -874,7 +875,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
 
       // Show non-modal notification with Configure button
       await this.promptAuth(
-        'You need to configure your provider to use Qwen Code.',
+        'You need to configure your provider to use MariaDB Shell Agent.',
       );
       return;
     }
@@ -899,7 +900,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
         const errorMsg = this.getErrorMessage(createErr);
         if (this.shouldPromptAuth(createErr)) {
           await this.promptAuth(
-            'Your session has expired or is invalid. Please configure your provider to continue using Qwen Code.',
+            'Your session has expired or is invalid. Please configure your provider to continue using MariaDB Shell Agent.',
           );
           return;
         }
@@ -1068,7 +1069,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
       ) {
         // Show a more user-friendly error message for expired sessions
         await this.promptAuth(
-          'Your session has expired or is invalid. Please configure your provider to continue using Qwen Code.',
+          'Your session has expired or is invalid. Please configure your provider to continue using MariaDB Shell Agent.',
         );
 
         // Send a specific error to the webview for better UI handling

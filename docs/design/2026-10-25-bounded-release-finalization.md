@@ -4,9 +4,9 @@
 
 ## Problem and evidence
 
-The v0.26.1 [finalize run](https://github.com/QwenLM/qwen-code/actions/runs/40108617400) processed 156 pull requests. Serial batches of eight exhausted the shared 30-minute model budget after repeated 180-second request timeouts. Successful requests took 126–172 seconds. The script wrote fallback notes and skipped highlights and themes; the 35-minute workflow timeout did not fire. Output token counts were not logged, so reducing output limits is not a demonstrated latency fix.
+The v0.26.1 [finalize run](https://github.invalid/QwenLM/qwen-code/actions/runs/40108617400) processed 156 pull requests. Serial batches of eight exhausted the shared 30-minute model budget after repeated 180-second request timeouts. Successful requests took 126–172 seconds. The script wrote fallback notes and skipped highlights and themes; the 35-minute workflow timeout did not fire. Output token counts were not logged, so reducing output limits is not a demonstrated latency fix.
 
-The resulting [release PR](https://github.com/QwenLM/qwen-code/pull/15468) also lacked a newer main commit defining the lint gate. Its head-only CI correctly rejected the stale gate. Synchronizing main into the branch resolved that missing ancestry.
+The resulting [release PR](https://github.invalid/QwenLM/qwen-code/pull/15468) also lacked a newer main commit defining the lint gate. Its head-only CI correctly rejected the stale gate. Synchronizing main into the branch resolved that missing ancestry.
 
 ## Scope and decisions
 
@@ -14,7 +14,7 @@ Run summary requests in waves of at most three. Settle each wave and validate it
 
 After finding or creating the release PR, update its branch from main before recording that it should receive automated approvals. An already merged PR exits before this update. Conflicts or permission failures stop the job; there is no force push, automatic conflict resolution, or protection bypass. This reduces the interval in which the gate can become stale; it cannot prevent main changing again after the update.
 
-The release tag and published artifacts stay immutable. This change neither dispatches a release nor rotates credentials. The second approval remains subject to the separate identity collision tracked in [#14341](https://github.com/QwenLM/qwen-code/issues/14341). Runner migration remains in [#15465](https://github.com/QwenLM/qwen-code/issues/15465).
+The release tag and published artifacts stay immutable. This change neither dispatches a release nor rotates credentials. The second approval remains subject to the separate identity collision tracked in [#14341](https://github.invalid/QwenLM/qwen-code/issues/14341). Runner migration remains in [#15465](https://github.invalid/QwenLM/qwen-code/issues/15465).
 
 ## Risks and limits
 

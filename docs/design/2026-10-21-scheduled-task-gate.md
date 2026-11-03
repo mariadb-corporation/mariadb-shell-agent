@@ -15,7 +15,7 @@
 
 ## 1. Problem
 
-Two workflows need a Qwen Code session to react to GitHub without a person
+Two workflows need a MariaDB Shell Agent session to react to GitHub without a person
 watching:
 
 - A developer keeps a pull request moving: a check fails, a reviewer comments,
@@ -43,7 +43,7 @@ Building blocks on `main`:
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Recurring trigger          | `cron_create` and `CronScheduler` (`packages/core/src/services/cronScheduler.ts`). One scheduler per session, created by `Config.getCronScheduler()`. The tick is synchronous and every fire kind (tick, catch-up, final, forced) ends in one `onFire(job)` callback.                                                                                                              |
 | Fire consumers             | The interactive TUI (`packages/cli/src/ui/hooks/use-llm-stream.ts`, a `kind: 'cron'` entry in the background notification queue), the ACP `Session` (its own cron queue; `per_run` tasks spawn a fresh child session with a `buildScheduledTaskRunPrompt` header) and the headless CLI (`packages/cli/src/nonInteractiveCli.ts`). All three deliver `job.prompt` as the turn text. |
-| Durable tasks              | `packages/core/src/services/cronTasksFile.ts`: `~/.qwen/tmp/<project-hash>/scheduled_tasks.json`, atomic writes under a lock, unknown keys accepted and preserved on rewrite, a 20-entry run ring, and fail-closed handling of the removed `condition` field (`taskHasLegacyCondition`).                                                                                           |
+| Durable tasks              | `packages/core/src/services/cronTasksFile.ts`: `~/.mariadb-shell-agent/tmp/<project-hash>/scheduled_tasks.json`, atomic writes under a lock, unknown keys accepted and preserved on rewrite, a 20-entry run ring, and fail-closed handling of the removed `condition` field (`taskHasLegacyCondition`).                                                                            |
 | Daemon                     | There is no daemon-level scheduler. Each ACP session runs its own, and `packages/cli/src/serve/scheduled-task-keepalive.ts` keeps every bound session loaded, so a fire never restores a cold session. `packages/cli/src/serve/routes/scheduled-tasks.ts` and the Web Shell dialog create, edit and "run now" tasks.                                                               |
 | Unattended shell execution | The `Monitor` tool (`packages/core/src/tools/monitor.ts`): command validation, an `exec` confirmation with `Monitor(...)` permission rules and the read-only AST shortcut, `executeRuntimeShell` with a sanitized environment, and output sanitization that defangs envelope tags.                                                                                                 |
 
@@ -121,7 +121,7 @@ The reviewer watch becomes:
 
 ```text
 cron: "*/2 * * * *"
-gate: "qwen review watch-repo --repo QwenLM/qwen-code --review-requested"
+gate: "mariadb-shell-agent review watch-repo --repo QwenLM/qwen-code --review-requested"
 prompt: "For each pull request event in the gate output, run /qreview <number>."
 ```
 
@@ -457,7 +457,7 @@ Rejected:
   dies with the session, cannot be durable, and every line is a notification.
 - A `pr_watch` tool with a GitHub poller in core: GitHub-specific code in the
   backbone, and a second implementation of what `snapshot` already does.
-- A GitHub webhook route in `qwen serve`: no inbound path on an intranet, and
+- A GitHub webhook route in `mariadb-shell-agent serve`: no inbound path on an intranet, and
   no conflict events anyway.
 - Running gates in the daemon process or the keepalive: no session `Config`
   there, so the command would run with the daemon's environment.
@@ -545,9 +545,9 @@ Unit tests:
 Integration: `integration-tests/cli/cron-tools.test.ts` with
 `QWEN_CODE_TEST_CRON_FAST` and a gate script that prints on its second run.
 
-E2E plan: `.qwen/e2e-tests/2026-10-21-scheduled-task-gate.md` — an
+E2E plan: `.mariadb-shell-agent/e2e-tests/2026-10-21-scheduled-task-gate.md` — an
 interactive TUI watch on a sandbox repository (quiet polls produce no turn; a
-pushed comment wakes the session once) and a `qwen serve` daemon watch with a
+pushed comment wakes the session once) and a `mariadb-shell-agent serve` daemon watch with a
 Web Shell-created gated task across a daemon restart.
 
 ## 10. Acceptance criteria

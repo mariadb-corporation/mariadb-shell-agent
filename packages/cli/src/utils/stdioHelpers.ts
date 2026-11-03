@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,7 +11,7 @@ import { stripAnsiAndControl } from '@qwen-code/qwen-code-core/utils/textUtils.j
  * Utility functions for writing to stdout/stderr in CLI commands.
  *
  * These helpers are used instead of console.log/console.error in standalone
- * CLI commands (like `qwen extensions list`) where the output IS the user-facing
+ * CLI commands (like `mariadb-shell-agent extensions list`) where the output IS the user-facing
  * result, not debug logging.
  *
  * For debug/diagnostic logging, use `createDebugLogger()` from @qwen-code/qwen-code-core.

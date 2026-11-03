@@ -4,7 +4,7 @@
 
 状态：H0a 已实现，仅限契约（它新增的每个路由和 schema，以及它加到现有 schema 的每个属性，当时均为 `planned`）；H0b 已合入；H0c 把四条任务读取路由及其 schema 标记为 `partial`，并去掉 `capabilities.tasks` 上的标记，提供任务列表与详情并宣告任务变化（[设计](2026-09-27-managed-extension-authority.zh-CN.md)）；H3 提供任务事件；H4f 自 `1.40.0` 起为 `child_agent` 任务以 `partial` 提供取消（[设计](2026-10-10-managed-task-cancel.zh-CN.md)）；H1～H6 其余部分待实现
 日期：2026-09-27；契约后续修订：2026-09-29
-Issue：[#12827](https://github.com/QwenLM/qwen-code/issues/12827)，属于 [#12380](https://github.com/QwenLM/qwen-code/issues/12380)
+Issue：[#12827](https://github.invalid/QwenLM/qwen-code/issues/12827)，属于 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380)
 
 ## 1. 问题
 
@@ -13,7 +13,7 @@ Issue：[#12827](https://github.com/QwenLM/qwen-code/issues/12827)，属于 [#12
 `SessionTaskView`，并在第 11 节列出公共资源。[API 契约][api]第 6 节要求在实现 H0
 之前，先在 OpenAPI 中冻结任务视图、任务查询与取消、幂等命令和错误。
 
-[#12808](https://github.com/QwenLM/qwen-code/pull/12808) 引入的仓库内 OpenAPI
+[#12808](https://github.invalid/QwenLM/qwen-code/pull/12808) 引入的仓库内 OpenAPI
 没有这些资源。目前唯一的任务接口是 daemon 路由（`GET /session/:id/tasks`、
 `GET /session/:id/hooks`、`/workspace/mcp`、`/scheduled-tasks`）。设计把它们视为内部适配来源，
 而不是租户级契约。没有冻结的公共结构，WebShell 和 SDK 的工作就只能以这些 daemon 路由为依据。
@@ -38,7 +38,7 @@ Issue：[#12827](https://github.com/QwenLM/qwen-code/issues/12827)，属于 [#12
 
 ## 4. 决定
 
-2026-09-29 的后续修订在契约 v1.23.0 中确定 [#12847](https://github.com/QwenLM/qwen-code/issues/12847) 的 A1–A8。事件和取消仍为 `planned`，不增加运行时行为。A9 与 A10 的任务路由部分已由 #12966 合入。下文原 H0a 的范围与验证仍作为历史记录保留。
+2026-09-29 的后续修订在契约 v1.23.0 中确定 [#12847](https://github.invalid/QwenLM/qwen-code/issues/12847) 的 A1–A8。事件和取消仍为 `planned`，不增加运行时行为。A9 与 A10 的任务路由部分已由 #12966 合入。下文原 H0a 的范围与验证仍作为历史记录保留。
 
 ### 4.1 新增内容均为 `planned`
 

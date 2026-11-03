@@ -2,7 +2,7 @@
 
 [English](2026-09-26-managed-context-worker.md) | [简体中文](2026-09-26-managed-context-worker.zh-CN.md)
 
-状态：已在 worker 中实现，Broker（W0c-2）和控制面（W0c-3）尚未使用。更新：2026-09-26。本文是 Managed Agent proposal [#12380](https://github.com/QwenLM/qwen-code/issues/12380) 中 W0c（执行目录）的第一个切片，在 [#12724](https://github.com/QwenLM/qwen-code/issues/12724) 跟踪。它在 [Workspace 绑定契约](2026-09-25-managed-workspace-binding-contract.zh-CN.md)（W0a）之上，实现 [Managed Context Envelope](2026-09-25-managed-context-envelope.zh-CN.md)（W0a-2）的 worker 一侧。下文的“envelope”指该设计，“参考设计”指该提案的 [Workspace 与 Session cwd 设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-workspace-context.md)。
+状态：已在 worker 中实现，Broker（W0c-2）和控制面（W0c-3）尚未使用。更新：2026-09-26。本文是 Managed Agent proposal [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380) 中 W0c（执行目录）的第一个切片，在 [#12724](https://github.invalid/QwenLM/qwen-code/issues/12724) 跟踪。它在 [Workspace 绑定契约](2026-09-25-managed-workspace-binding-contract.zh-CN.md)（W0a）之上，实现 [Managed Context Envelope](2026-09-25-managed-context-envelope.zh-CN.md)（W0a-2）的 worker 一侧。下文的“envelope”指该设计，“参考设计”指该提案的 [Workspace 与 Session cwd 设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-workspace-context.md)。
 
 ## 问题
 

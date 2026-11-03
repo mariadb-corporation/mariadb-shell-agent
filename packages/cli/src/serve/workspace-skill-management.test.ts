@@ -164,7 +164,7 @@ async function expectNoPartialInstall(
   workspace: string,
   skillName: string,
 ): Promise<void> {
-  const qwen = path.join(workspace, '.qwen');
+  const qwen = path.join(workspace, '.mariadb-shell-agent');
   const entries = await fs
     .readdir(qwen)
     .catch((error: NodeJS.ErrnoException) => {
@@ -219,13 +219,19 @@ describe('workspace Skill management', () => {
     });
 
     expect(result.installedPath).toBe(
-      path.join(workspace, '.qwen', 'skills', 'demo-skill', 'SKILL.md'),
+      path.join(
+        workspace,
+        '.mariadb-shell-agent',
+        'skills',
+        'demo-skill',
+        'SKILL.md',
+      ),
     );
     expect(
       await fs.readFile(
         path.join(
           workspace,
-          '.qwen',
+          '.mariadb-shell-agent',
           'skills',
           'demo-skill',
           'references',
@@ -251,7 +257,7 @@ describe('workspace Skill management', () => {
     await fs.writeFile(path.join(workspace, 'SKILL.md'), skillMarkdown('self'));
     await fs.writeFile(path.join(workspace, 'A0.txt'), 'must survive');
 
-    // Force the source walk to descend into .qwen after the two root files
+    // Force the source walk to descend into .mariadb-shell-agent after the two root files
     // are staged, which is the order that exposes the self-copy.
     const nativeReaddir = fs.readdir.bind(fs);
     const readdirSpy = vi.spyOn(fs, 'readdir').mockImplementation(((
@@ -264,8 +270,8 @@ describe('workspace Skill management', () => {
         const nameOf = (entry: unknown) =>
           typeof entry === 'string' ? entry : (entry as { name: string }).name;
         return [...entries].sort((left, right) => {
-          if (nameOf(left) === '.qwen') return 1;
-          if (nameOf(right) === '.qwen') return -1;
+          if (nameOf(left) === '.mariadb-shell-agent') return 1;
+          if (nameOf(right) === '.mariadb-shell-agent') return -1;
           return 0;
         });
       })) as typeof fs.readdir);
@@ -281,14 +287,19 @@ describe('workspace Skill management', () => {
     }
 
     const entries = (
-      await fs.readdir(path.join(workspace, '.qwen', 'skills', 'self'), {
-        recursive: true,
-      })
+      await fs.readdir(
+        path.join(workspace, '.mariadb-shell-agent', 'skills', 'self'),
+        {
+          recursive: true,
+        },
+      )
     ).map(String);
     expect(entries.filter((entry) => entry.includes('.installing-'))).toEqual(
       [],
     );
-    expect(entries.some((entry) => entry.startsWith('.qwen'))).toBe(false);
+    expect(
+      entries.some((entry) => entry.startsWith('.mariadb-shell-agent')),
+    ).toBe(false);
     expect(entries.sort()).toEqual(['A0.txt', 'SKILL.md']);
   });
 
@@ -317,7 +328,9 @@ describe('workspace Skill management', () => {
       ),
     ).rejects.toThrow('generation closed');
 
-    await expect(fs.access(path.join(workspace, '.qwen'))).rejects.toThrow();
+    await expect(
+      fs.access(path.join(workspace, '.mariadb-shell-agent')),
+    ).rejects.toThrow();
   });
 
   it('installs a ZIP into the global Skill directory', async () => {
@@ -599,7 +612,9 @@ describe('workspace Skill management', () => {
       fs.readFile(installed.installedPath!, 'utf8'),
     ).resolves.toContain('name: probe');
     expect(
-      (await fs.readdir(path.join(workspace, '.qwen', 'skills'))).sort(),
+      (
+        await fs.readdir(path.join(workspace, '.mariadb-shell-agent', 'skills'))
+      ).sort(),
     ).toEqual(['probe']);
   });
 
@@ -631,7 +646,9 @@ describe('workspace Skill management', () => {
         }),
       ).rejects.toMatchObject({ code: 'invalid_skill_source' });
 
-      await expect(fs.access(path.join(workspace, '.qwen'))).rejects.toThrow();
+      await expect(
+        fs.access(path.join(workspace, '.mariadb-shell-agent')),
+      ).rejects.toThrow();
     },
   );
 
@@ -1405,7 +1422,12 @@ describe('workspace Skill management', () => {
   it('deletes legacy install-artifact-shaped Skill directories', async () => {
     const workspace = await temporaryDirectory('qwen-skill-workspace-');
     const name = 'foo.backup-1-2';
-    const skillDir = path.join(workspace, '.qwen', 'skills', name);
+    const skillDir = path.join(
+      workspace,
+      '.mariadb-shell-agent',
+      'skills',
+      name,
+    );
     const skillFile = path.join(skillDir, 'SKILL.md');
     await fs.mkdir(skillDir, { recursive: true });
     await fs.writeFile(skillFile, skillMarkdown(name));
@@ -1449,7 +1471,7 @@ describe('workspace Skill management', () => {
       'Replacement instructions.',
     );
     await expect(
-      fs.readdir(path.join(workspace, '.qwen', 'skills')),
+      fs.readdir(path.join(workspace, '.mariadb-shell-agent', 'skills')),
     ).resolves.toEqual(['stable-skill']);
   });
 
@@ -1470,14 +1492,14 @@ describe('workspace Skill management', () => {
       }),
     ).rejects.toThrow('does not match requested name');
     await expect(
-      fs.readdir(path.join(workspace, '.qwen', 'skills')),
+      fs.readdir(path.join(workspace, '.mariadb-shell-agent', 'skills')),
     ).resolves.toEqual([]);
   });
 
   it('removes legacy install artifacts before installing', async () => {
     const workspace = await temporaryDirectory('qwen-skill-workspace-');
     const source = await temporaryDirectory('qwen-skill-source-');
-    const baseDir = path.join(workspace, '.qwen', 'skills');
+    const baseDir = path.join(workspace, '.mariadb-shell-agent', 'skills');
     const legacyBackup = path.join(baseDir, '.stable-skill.backup-legacy');
     const staleBackup = path.join(
       path.dirname(baseDir),
@@ -1911,7 +1933,9 @@ describe('workspace Skill management', () => {
       statusCode: 400,
     });
     await expect(fs.access(result.installedPath!)).resolves.toBeUndefined();
-    const entries = await fs.readdir(path.join(workspace, '.qwen'));
+    const entries = await fs.readdir(
+      path.join(workspace, '.mariadb-shell-agent'),
+    );
     expect(
       entries.filter(
         (entry) => entry.includes('.installing-') || entry.includes('.backup-'),

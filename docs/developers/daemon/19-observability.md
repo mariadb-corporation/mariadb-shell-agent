@@ -2,13 +2,13 @@
 
 ## Overview
 
-`qwen serve` currently ships with **OpenTelemetry span instrumentation**, **structured file logs** (`DaemonLogger`), **per-request access logs**, debug stderr logs, structured preflight cells, and an in-memory permission audit ring. This page is a practical guide to the current observability surface and the gaps to remember during triage.
+`mariadb-shell-agent serve` currently ships with **OpenTelemetry span instrumentation**, **structured file logs** (`DaemonLogger`), **per-request access logs**, debug stderr logs, structured preflight cells, and an in-memory permission audit ring. This page is a practical guide to the current observability surface and the gaps to remember during triage.
 
 ## What exists today
 
 | Surface                             | Location                                                   | Purpose                                                                                                                                                                                                                                                                                                                                               |
 | ----------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `QWEN_SERVE_DEBUG` stderr logs      | `bridge.ts` and call sites                                 | Env values `1` / `true` / `on` / `yes` (case-insensitive) print `qwen serve debug: ...` lines to stderr.                                                                                                                                                                                                                                              |
+| `QWEN_SERVE_DEBUG` stderr logs      | `bridge.ts` and call sites                                 | Env values `1` / `true` / `on` / `yes` (case-insensitive) print `mariadb-shell-agent serve debug: ...` lines to stderr.                                                                                                                                                                                                                               |
 | OpenTelemetry span instrumentation  | `server.ts` `daemonTelemetryMiddleware`                    | Classified daemon API requests that reach the telemetry middleware are wrapped in `withDaemonRequestSpan`; attributes include canonical route, workspace hash when resolved, sessionId, clientId, and status code. Permission routes have dedicated spans. Prompt lifecycle is traced end-to-end. Configuration lives in `settings.json` `telemetry`. |
 | OpenTelemetry daemon perf metrics   | `telemetry/*event-loop-lag*`, `daemon-metrics`             | Event loop lag gauges for daemon and ACP child processes, plus daemon-child pipe message byte histograms.                                                                                                                                                                                                                                             |
 | `DaemonLogger` structured file logs | `serve/daemon-logger.ts`                                   | Appends to a stable, size-rotated `daemon.log`. Caller `info` / `warn` / `error` records emitted with an active, recording, sampled OTel span include `trace_id` and `span_id`; file records also include `runId` and PID. Boot prints the selected stable/fallback path; full status exposes health, issues, and file-copy loss counters.            |
@@ -175,7 +175,7 @@ pressure. This is separate from the thresholds being uncalibrated: no threshold
 choice fixes a denominator that is measuring the wrong thing.
 
 Two further things this does **not** cover. It is the daemon **root** process only, so
-a daemon whose `qwen --acp` children are the ones growing can report `normal`
+a daemon whose `mariadb-shell-agent --acp` children are the ones growing can report `normal`
 throughout — read `runtime.memory.children` beside it, which sums the live
 children's own RSS (and says via `sampled` how many actually reported).
 And nothing remediates: leaving `normal` raises a `daemon_memory_pressure`

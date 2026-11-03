@@ -697,7 +697,7 @@ _左：upstream `main` `a1fb0306ae`，用 Playwright mock daemon 截取。右：
   `cd packages/web-shell && npx vitest run`。
 - `npx playwright test --config playwright.config.ts client/e2e/web-shell.trajectory.spec.ts`，
   以及视觉配置下的轨迹截图。
-- 真实 daemon 验证：构建 bundle，用隔离的 `HOME` 启动 `qwen serve`，跑一个包含子代理、
+- 真实 daemon 验证：构建 bundle，用隔离的 `HOME` 启动 `mariadb-shell-agent serve`，跑一个包含子代理、
   失败的 Shell 命令和一次审批的会话，然后在两种主题、两种语言下检查停靠和全屏的
   面板。
 

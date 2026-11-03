@@ -90,4 +90,4 @@ transcript returned the same aggregate for each call ID while the next prompt
 was active and after both prompts settled. These were complete small pages
 (`hasMore=false`), not cross-page, browser, or real-model verification. Attach
 the E2E report summary to the PR; raw evidence is retained under the ignored
-`.qwen/issues/pr1-summary-terminal-usage.md` and its companion directories.
+`.mariadb-shell-agent/issues/pr1-summary-terminal-usage.md` and its companion directories.

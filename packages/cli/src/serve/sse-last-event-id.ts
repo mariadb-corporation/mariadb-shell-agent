@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -44,7 +45,7 @@ export function parseLastEventId(
   if (typeof raw !== 'string' || !/^\d+$/.test(raw)) {
     if (typeof raw === 'string' && raw.length > 0) {
       writeStderrLine(
-        `qwen serve: ${logPrefix}rejected Last-Event-ID ${safeLogValue(raw)} ` +
+        `mariadb-shell-agent serve: ${logPrefix}rejected Last-Event-ID ${safeLogValue(raw)} ` +
           `(not a decimal integer)`,
       );
     }
@@ -53,7 +54,7 @@ export function parseLastEventId(
   const n = Number.parseInt(raw, 10);
   if (!Number.isFinite(n) || n > Number.MAX_SAFE_INTEGER) {
     writeStderrLine(
-      `qwen serve: ${logPrefix}rejected Last-Event-ID ${safeLogValue(raw)} ` +
+      `mariadb-shell-agent serve: ${logPrefix}rejected Last-Event-ID ${safeLogValue(raw)} ` +
         `(exceeds Number.MAX_SAFE_INTEGER)`,
     );
     return undefined;
@@ -82,7 +83,7 @@ export function parseEventEpochHeader(
   if (typeof raw !== 'string' || raw.length === 0) return undefined;
   if (raw.length > 64 || !/^[\w-]+$/.test(raw)) {
     writeStderrLine(
-      `qwen serve: ${logPrefix}rejected X-Qwen-Event-Epoch ` +
+      `mariadb-shell-agent serve: ${logPrefix}rejected X-Qwen-Event-Epoch ` +
         `${safeLogValue(raw)} (expected [A-Za-z0-9_-]{1,64})`,
     );
     return undefined;

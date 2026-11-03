@@ -4,7 +4,7 @@
 
 ## 问题与范围
 
-本地 `qwen serve --managed` 适配层为 Hosted Harness 执行继承了用户模型配置，却没有配置 Java 模型目录，也没有提供新建任务模型预设。即使本地已经配置模型，页面仍只显示服务端默认模型。主干已有 Session 模型目录与审批协议。本次将本地启动器接到这些协议，并为 WebShell 创建增加可选初始模型选择，详见[创建模型设计](2026-10-22-managed-initial-model-selection.zh-CN.md)。不新增提供方凭据传输或远程部署行为，也不修改已有 Session。
+本地 `mariadb-shell-agent serve --managed` 适配层为 Hosted Harness 执行继承了用户模型配置，却没有配置 Java 模型目录，也没有提供新建任务模型预设。即使本地已经配置模型，页面仍只显示服务端默认模型。主干已有 Session 模型目录与审批协议。本次将本地启动器接到这些协议，并为 WebShell 创建增加可选初始模型选择，详见[创建模型设计](2026-10-22-managed-initial-model-selection.zh-CN.md)。不新增提供方凭据传输或远程部署行为，也不修改已有 Session。
 
 ## 设计
 

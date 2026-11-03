@@ -1,6 +1,6 @@
 # REST API integration guide
 
-For teams putting Qwen Code inside their own product over HTTP: run `qwen serve`
+For teams putting MariaDB Shell Agent inside their own product over HTTP: run `mariadb-shell-agent serve`
 as a backend and drive it from your own front end.
 
 This page is the entry point. The curated
@@ -19,13 +19,13 @@ front end do you own?**
 | ------------------------------------ | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | daemon + bundled Web Shell           | nothing — use it as shipped                  | ships today ([user guide](../users/qwen-serve.md))                                                                                                                                                         |
 | daemon `--no-web` + your own UI      | the entire front end                         | ships today — **this page**                                                                                                                                                                                |
-| daemon + branded Web Shell           | branding, not code                           | not built ([#11357](https://github.com/QwenLM/qwen-code/issues/11357))                                                                                                                                     |
-| daemon + self-hosted Web Shell build | the front-end build                          | not built ([#11358](https://github.com/QwenLM/qwen-code/issues/11358))                                                                                                                                     |
+| daemon + branded Web Shell           | branding, not code                           | not built ([#11357](https://github.invalid/QwenLM/qwen-code/issues/11357))                                                                                                                                 |
+| daemon + self-hosted Web Shell build | the front-end build                          | not built ([#11358](https://github.invalid/QwenLM/qwen-code/issues/11358))                                                                                                                                 |
 | daemon via SDK `DaemonClient`        | client code, never raw HTTP                  | ships today ([TS](./sdk-typescript.md), [Java](./sdk-java.md)) — the [Python SDK](./sdk-python.md) is process-transport-only and has no daemon client, so a Python integration drives path 2 over raw HTTP |
 | daemon via MCP bridge                | nothing — another agent drives it            | ships as `qwen-serve-mcp` in `@qwen-code/sdk` — see [Drive the daemon through MCP](#drive-the-daemon-through-mcp)                                                                                          |
 | embeddable Web Shell components      | your app and server; QC supplies the chat UI | workspace-internal (not yet on npm) — build from the monorepo, see [Embed the Web Shell](#embed-the-web-shell)                                                                                             |
 
-Headless `qwen -p` and ACP over stdio for editors are separate integration
+Headless `mariadb-shell-agent -p` and ACP over stdio for editors are separate integration
 paths. Channels and extensions can also run through the daemon; see the
 [channel guide](../users/features/channels/overview.md) and
 [Extension reference](./qwen-serve-protocol.md#extension-management-v2-wire-contract).
@@ -33,7 +33,7 @@ paths. Channels and extensions can also run through the daemon; see the
 ### Drive the daemon through MCP
 
 `@qwen-code/sdk` publishes `qwen-serve-mcp`, a stdio MCP server that maps its
-tools to a running daemon. Start `qwen serve`, then add this server to any MCP
+tools to a running daemon. Start `mariadb-shell-agent serve`, then add this server to any MCP
 client on Node.js 22 or newer:
 
 ```json
@@ -69,15 +69,15 @@ to perform restricted writes. Set it to `true` to enable exactly: the
 approval-mode write; workspace tool toggling; MCP server restart; and
 global-scope memory and agent writes. Switching between `plan` and `default`
 and workspace-scope memory writes work without it. The package's
-[bridge README](https://github.com/QwenLM/qwen-code/blob/main/packages/sdk-typescript/src/daemon-mcp/serve-bridge/README.md)
+[bridge README](https://github.invalid/QwenLM/qwen-code/blob/main/packages/sdk-typescript/src/daemon-mcp/serve-bridge/README.md)
 lists every tool and the programmatic API.
 
 ### Embed the Web Shell
 
 Use `@qwen-code/web-shell` when your React application should own the page and
-server while Qwen Code supplies the chat UI. The package is workspace-internal
+server while MariaDB Shell Agent supplies the chat UI. The package is workspace-internal
 for now — no release step publishes it to npm yet — so build it from the
-[monorepo](https://github.com/QwenLM/qwen-code) and depend on it by path, the
+[monorepo](https://github.invalid/QwenLM/qwen-code) and depend on it by path, the
 same way `packages/web-templates` consumes it:
 
 ```bash
@@ -113,16 +113,16 @@ see [Start the daemon](#start-the-daemon). The package also exports
 providers for sharing one daemon session across several views and a separate
 `@qwen-code/web-shell/transcript` entry point for read-only transcript
 rendering. See the
-[package README](https://github.com/QwenLM/qwen-code/blob/main/packages/web-shell/README.md)
+[package README](https://github.invalid/QwenLM/qwen-code/blob/main/packages/web-shell/README.md)
 for those variants and the prop contract.
 
 ## Two things to know before designing
 
-**The daemon does not run inference in-process.** It spawns `qwen --acp` child
+**The daemon does not run inference in-process.** It spawns `mariadb-shell-agent --acp` child
 processes and brokers between them and HTTP. It runs the CLI entry script under
 the same Node binary, using `QWEN_CLI_ENTRY` or otherwise `process.argv[1]`.
 An embedding Node backend must point `QWEN_CLI_ENTRY` at the installed Qwen CLI
-entry script; there is no `qwen` lookup on `PATH`. A missing entry point surfaces
+entry script; there is no `mariadb-shell-agent` lookup on `PATH`. A missing entry point surfaces
 as `MissingCliEntryError`.
 
 In steady state there is **one child per active workspace runtime**, not one per
@@ -166,7 +166,7 @@ export DAEMON_URL=http://127.0.0.1:4170
 Terminal 1 — this command blocks, so leave it running:
 
 ```bash
-qwen serve --no-web --require-auth \
+mariadb-shell-agent serve --no-web --require-auth \
   --hostname 0.0.0.0 --port 4170 \
   --workspace /srv/project
 ```

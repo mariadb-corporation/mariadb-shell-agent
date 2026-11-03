@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -318,7 +319,7 @@ describe('writeServiceInfoOrExit error mapping', () => {
     // Mirrors pidfile-lock.ts: `code: 'ELOCKED'` plus a message that already
     // states the automatic stale-lock recovery window.
     const reason =
-      'Channel pidfile lock /home/u/.qwen/channels/service.pid.lock is held; an abandoned lock recovers automatically after 30 seconds.';
+      'Channel pidfile lock /home/u/.mariadb-shell-agent/channels/service.pid.lock is held; an abandoned lock recovers automatically after 30 seconds.';
     const failure = Object.assign(new Error(reason), { code: 'ELOCKED' });
 
     expectSingleOperatorLine(await startWithPidfileFailure(failure), reason);
@@ -357,14 +358,14 @@ describe('writeServiceInfoOrExit error mapping', () => {
     expect(observed.thrown).toBeInstanceOf(Error);
     expect((observed.thrown as Error).message).toBe('process.exit: 1');
     expect(linesOf(observed.stderr)).toEqual([
-      'Error: Channel service was started concurrently. Use "qwen channel status" to inspect it.',
+      'Error: Channel service was started concurrently. Use "mariadb-shell-agent channel status" to inspect it.',
     ]);
     expect(linesOf(observed.stdout)).toEqual([]);
   });
 
   it('keeps the unverifiable-pidfile mapping unchanged', async () => {
     const reason =
-      'Channel service pidfile /home/u/.qwen/channels/service.pid holds a record this machine cannot verify.';
+      'Channel service pidfile /home/u/.mariadb-shell-agent/channels/service.pid holds a record this machine cannot verify.';
     const failure = Object.assign(new Error(reason), {
       code: 'channel_service_conflict',
     });

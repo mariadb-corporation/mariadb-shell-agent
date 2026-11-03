@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -72,7 +73,7 @@ export interface ArtifactHostConfig {
 export interface ArtifactOssConfig {
   /** Bucket name. */
   bucket: string;
-  /** OSS endpoint host, e.g. `oss-cn-hangzhou.aliyuncs.com`. */
+  /** OSS endpoint host, e.g. `oss-cn-hangzhou.aliyuncs.invalid`. */
   endpoint: string;
   /** Remote key prefix (default `artifacts`). Key = `{prefix}/{id}/index.html`. */
   keyPrefix?: string;

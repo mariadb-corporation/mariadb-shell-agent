@@ -10,29 +10,29 @@ If you know up front that the entire session should run inside a worktree, pass 
 
 ```bash
 # Auto-generated slug (e.g. tender-jemison-037f0a)
-qwen --worktree
+mariadb-shell-agent --worktree
 
 # Explicit name
-qwen --worktree my-feature
+mariadb-shell-agent --worktree my-feature
 
 # `=` form (recommended when also passing a positional prompt — see tip below)
-qwen --worktree=my-feature
+mariadb-shell-agent --worktree=my-feature
 
 # PR reference — fetches refs/pull/<N>/head from `origin`
-qwen --worktree=#4174
-qwen --worktree https://github.com/QwenLM/qwen-code/pull/4174
+mariadb-shell-agent --worktree=#4174
+mariadb-shell-agent --worktree https://github.invalid/QwenLM/qwen-code/pull/4174
 
 # Continue a previous --worktree session — re-attaches to the existing dir
-qwen --resume <session-id> --worktree=my-feature
+mariadb-shell-agent --resume <session-id> --worktree=my-feature
 ```
 
-> **Tip — bare `--worktree` followed by a positional prompt is ambiguous.** Because `--worktree` takes an optional value, `qwen --worktree "say hi"` makes yargs consume `"say hi"` as the slug (and reject it because of the space). Use one of:
+> **Tip — bare `--worktree` followed by a positional prompt is ambiguous.** Because `--worktree` takes an optional value, `mariadb-shell-agent --worktree "say hi"` makes yargs consume `"say hi"` as the slug (and reject it because of the space). Use one of:
 >
-> - `qwen --worktree=my-feature "say hi"` (always works — explicit slug via `=`)
+> - `mariadb-shell-agent --worktree=my-feature "say hi"` (always works — explicit slug via `=`)
 > - `qwen "say hi" --worktree` (positional first, flag at the end → auto slug)
-> - `qwen --worktree --approval-mode yolo "say hi"` (any flag between them anchors the bare form)
+> - `mariadb-shell-agent --worktree --approval-mode yolo "say hi"` (any flag between them anchors the bare form)
 
-> **Tip — `qwen --resume --worktree foo` (no session ID) shows an empty picker on first use.** The picker scopes to the chosen worktree's session storage; sessions started outside that worktree are not listed. To resume a session that was started inside `foo`, use `qwen --resume <id> --worktree foo` directly — the CLI re-attaches to the existing `foo/` directory rather than re-creating it.
+> **Tip — `mariadb-shell-agent --resume --worktree foo` (no session ID) shows an empty picker on first use.** The picker scopes to the chosen worktree's session storage; sessions started outside that worktree are not listed. To resume a session that was started inside `foo`, use `mariadb-shell-agent --resume <id> --worktree foo` directly — the CLI re-attaches to the existing `foo/` directory rather than re-creating it.
 
 `process.cwd()` and the model's workspace are switched to the worktree before the first turn runs. Exit with `Ctrl+C` twice and the [Exit Dialog](#exit-dialog-ctrlc--ctrld) prompts to keep or remove the worktree.
 
@@ -40,15 +40,15 @@ The `--worktree` flag cannot be combined with `--acp`/`--experimental-acp` — f
 
 ### Or ask mid-session
 
-Alternatively, ask Qwen Code in plain language to create a worktree from inside an existing session:
+Alternatively, ask MariaDB Shell Agent in plain language to create a worktree from inside an existing session:
 
 ```text
 > start a worktree called experiment-a
 Worktree experiment-a created on branch worktree-experiment-a
-.qwen/worktrees/experiment-a
+.mariadb-shell-agent/worktrees/experiment-a
 ```
 
-From this point on, the model routes every file edit and shell command through `.qwen/worktrees/experiment-a/`. Your original working directory is untouched.
+From this point on, the model routes every file edit and shell command through `.mariadb-shell-agent/worktrees/experiment-a/`. Your original working directory is untouched.
 
 When you are done:
 
@@ -61,7 +61,7 @@ If you want to come back later, ask to exit with the worktree kept on disk inste
 
 ```text
 > exit the worktree but keep it
-Kept worktree experiment-a at .qwen/worktrees/experiment-a
+Kept worktree experiment-a at .mariadb-shell-agent/worktrees/experiment-a
 ```
 
 ## When Worktrees Are Used
@@ -79,10 +79,10 @@ The two mid-session tools (`enter_worktree` / `exit_worktree`) are deliberately 
 
 ## What Gets Created
 
-Every Qwen-managed worktree is placed under your project's `.qwen` directory:
+Every Qwen-managed worktree is placed under your project's `.mariadb-shell-agent` directory:
 
 ```
-<repoRoot>/.qwen/worktrees/<slug>/         # Working directory
+<repoRoot>/.mariadb-shell-agent/worktrees/<slug>/         # Working directory
                           ↳ branch worktree-<slug>   # Created off your current branch
 ```
 
@@ -91,7 +91,7 @@ Every Qwen-managed worktree is placed under your project's `.qwen` directory:
 - **Hooks** — the worktree's `core.hooksPath` is automatically pointed at the main repo's `.husky/` (preferred) or `.git/hooks/` so commits inside the worktree still trigger your existing pre-commit / commit-msg hooks.
 - **Optional symlinks** — directories listed in `worktree.symlinkDirectories` (see [Settings](#settings)) are symlinked from the main repo into the new worktree so heavy dirs like `node_modules` can be reused without reinstalling.
 
-The general-purpose worktree path is **not configurable** — it must live under `<repoRoot>/.qwen/worktrees/` so the CLI can find it on restart and on stale-cleanup sweeps. (The unrelated `agents.arena.worktreeBaseDir` setting controls only [Agent Arena](./arena.md) worktrees, which use a separate path tree under `~/.qwen/arena/`.)
+The general-purpose worktree path is **not configurable** — it must live under `<repoRoot>/.mariadb-shell-agent/worktrees/` so the CLI can find it on restart and on stale-cleanup sweeps. (The unrelated `agents.arena.worktreeBaseDir` setting controls only [Agent Arena](./arena.md) worktrees, which use a separate path tree under `~/.mariadb-shell-agent/arena/`.)
 
 ## Footer and Status Line
 
@@ -107,7 +107,7 @@ If you use a [custom status line script](./status-line.md), it also receives a `
 {
   "worktree": {
     "name": "experiment-a",
-    "path": "/path/to/repo/.qwen/worktrees/experiment-a",
+    "path": "/path/to/repo/.mariadb-shell-agent/worktrees/experiment-a",
     "branch": "worktree-experiment-a",
     "original_cwd": "/path/to/repo",
     "original_branch": "main"
@@ -169,13 +169,13 @@ The model is **not** automatically `chdir`'d into the worktree — the reminder 
 
 ## Sub-Agent Isolation
 
-The `agent` tool accepts an optional `isolation: "worktree"` parameter. When set, Qwen Code creates an ephemeral worktree at `<repoRoot>/.qwen/worktrees/agent-<7hex>/` before the sub-agent starts, and:
+The `agent` tool accepts an optional `isolation: "worktree"` parameter. When set, MariaDB Shell Agent creates an ephemeral worktree at `<repoRoot>/.mariadb-shell-agent/worktrees/agent-<7hex>/` before the sub-agent starts, and:
 
 - **No changes** → the worktree is automatically removed when the agent finishes.
 - **Has changes** → the worktree is preserved; its path and branch are appended to the agent's result, e.g.
   ```
   …agent output…
-  [worktree preserved: /path/to/.qwen/worktrees/agent-3f2a1b9 (branch worktree-agent-3f2a1b9)]
+  [worktree preserved: /path/to/.mariadb-shell-agent/worktrees/agent-3f2a1b9 (branch worktree-agent-3f2a1b9)]
   ```
   Review the diff and merge or delete it manually.
 
@@ -198,7 +198,7 @@ Ephemeral agent worktrees that survived a crash or `--no-cleanup` shutdown are r
 
 Named user worktrees (`enter_worktree` slugs) are never auto-cleaned, with one exception: the reserved `agent-<7hex>` shape, which the sweep cannot tell apart from an ephemeral agent worktree, is reaped after 30 days once it holds no uncommitted content and no unmerged commits. Pick any other name for work you want kept.
 
-The uncommitted-content guard reads `git status --porcelain --untracked-files=normal --ignored=matching`, so even content your ignore rules hide — a `.env`, `.qwen/pr-drafts/` — preserves an aged `agent-<7hex>` worktree. The only exemptions are:
+The uncommitted-content guard reads `git status --porcelain --untracked-files=normal --ignored=matching`, so even content your ignore rules hide — a `.env`, `.mariadb-shell-agent/pr-drafts/` — preserves an aged `agent-<7hex>` worktree. The only exemptions are:
 
 - **Disposable build output** — an _ignored_ entry whose _first_ path segment is `node_modules`, `dist` or `coverage`, so that output and anything git lists under it, a single ignored file included (`!! dist/archive.zip` under a `*.zip` rule). Also an ignored _directory_ nested inside the checkout whose own name is one of those three (a monorepo's `packages/app/node_modules/`) — but only when git collapses the entry _at_ that directory, which needs an ignore rule matching the directory itself (`node_modules/`, or a bare `node_modules`). A rule matching the directory's _contents_ instead (`**/node_modules/*`, or a package-local `node_modules/**`) makes git list the files individually (`!! packages/app/node_modules/x/`), which is not exempt and preserves the checkout. A nested ignored _file_ with one of those names is not build output and still preserves the worktree, so `go test -coverprofile=coverage` writing `packages/app/coverage` keeps the checkout — but nothing stored under a root `dist/`, `coverage/` or `node_modules/` is kept. The same tree left _untracked_, so git says `?? dist/`, is not exempt and preserves the checkout. Note that `??` describes the _rendered entry_, not the absence of a rule: git collapses an untracked parent (`?? packages/`) whenever it holds any non-ignored untracked file, and lists ignored files inside it separately as `!!` at the same time. The usual reasons an entry renders `??` are that no ignore rule reaches it — including a rule whose spelling does not reach that path, since a root `node_modules/**` covers only the root-level tree — or that the rule was committed after the worktree branch was cut.
 - **Symlinks** — removing the checkout unlinks them and never touches what they point at, which is what keeps `worktree.symlinkDirectories` checkouts reapable. A nested value (`tools/cache`) makes git collapse the subtree to a single `?? tools/` entry, so a collapsed directory qualifies only when it holds at least one entry and everything inside it is itself a symlink; one real file beside the links — or an empty directory, which holds no link to speak of — preserves the worktree.
@@ -228,7 +228,7 @@ Two settings shape the general-purpose worktree experience:
 Example:
 
 ```jsonc
-// ~/.qwen/settings.json or <repo>/.qwen/settings.json
+// ~/.mariadb-shell-agent/settings.json or <repo>/.mariadb-shell-agent/settings.json
 {
   "worktree": {
     "symlinkDirectories": ["node_modules", ".turbo", "dist"],
@@ -240,7 +240,7 @@ Applies to ALL worktree-creation paths: `--worktree` flag, `enter_worktree` tool
 
 Settings unrelated to general worktrees but worth knowing about:
 
-- `agents.arena.worktreeBaseDir` — controls **Agent Arena** worktree placement (default `~/.qwen/arena`). Does not affect general-purpose worktrees, which always live under `<repoRoot>/.qwen/worktrees/`.
+- `agents.arena.worktreeBaseDir` — controls **Agent Arena** worktree placement (default `~/.mariadb-shell-agent/arena`). Does not affect general-purpose worktrees, which always live under `<repoRoot>/.mariadb-shell-agent/worktrees/`.
 
 There is no schema for `worktree.sparsePaths` yet — that's a roadmap item (see [Limitations](#limitations)).
 
@@ -259,7 +259,7 @@ There is no schema for `worktree.sparsePaths` yet — that's a roadmap item (see
 Refuses to run when:
 
 - The CLI is not in a git repository.
-- The current working directory is already inside `.qwen/worktrees/` (no nested worktrees).
+- The current working directory is already inside `.mariadb-shell-agent/worktrees/` (no nested worktrees).
 
 ### `exit_worktree`
 
@@ -297,11 +297,11 @@ See [Sub-Agents](./sub-agents.md) for the rest of the agent tool reference.
 ### `--worktree [name | #N | url]`
 
 ```bash
-qwen --worktree                                               # auto-generate slug
-qwen --worktree my-feature                                    # explicit slug
-qwen --worktree=my-feature                                    # = form
-qwen --worktree=#123                                          # PR reference
-qwen --worktree https://github.com/owner/repo/pull/123        # PR URL
+mariadb-shell-agent --worktree                                               # auto-generate slug
+mariadb-shell-agent --worktree my-feature                                    # explicit slug
+mariadb-shell-agent --worktree=my-feature                                    # = form
+mariadb-shell-agent --worktree=#123                                          # PR reference
+mariadb-shell-agent --worktree https://github.com/owner/repo/pull/123        # PR URL
 ```
 
 | Input                         | Result                                                                                                                |
@@ -332,7 +332,7 @@ The following items are intentionally not implemented in the current phase:
 - **No sparse checkout.** Large monorepos check out the full tree. (`worktree.sparsePaths` is a roadmap item.)
 - **No tmux integration.** The CLI does not spawn worktree sessions in new tmux windows.
 - **Worktrees are separate "projects" for session storage.** Sessions started with `--worktree foo` are saved under that worktree's chats dir; to resume them later you must pass `--worktree foo` again. Sessions started without `--worktree` are saved under the main checkout and won't appear in the worktree's resume picker.
-- **No cross-slug session override.** `qwen --resume <sid> --worktree second` where `<sid>` was created with `--worktree first` will fail to find the session — sessions and worktrees are tightly bound by `projectHash(cwd)`. To switch worktrees on an existing session you must exit, then re-launch with the new `--worktree` and a fresh prompt. A future architectural change (anchoring storage at the repo root instead of `cwd`) would lift this constraint.
+- **No cross-slug session override.** `mariadb-shell-agent --resume <sid> --worktree second` where `<sid>` was created with `--worktree first` will fail to find the session — sessions and worktrees are tightly bound by `projectHash(cwd)`. To switch worktrees on an existing session you must exit, then re-launch with the new `--worktree` and a fresh prompt. A future architectural change (anchoring storage at the repo root instead of `cwd`) would lift this constraint.
 - **Mid-session `enter_worktree` does NOT switch `process.cwd()` or `Config.targetDir`.** That tool uses the model-context-only convention (see [Sub-Agents](./sub-agents.md)). Only the startup `--worktree` flag actually switches the process working directory.
 - **Relative paths in other arg fields are resolved BEFORE the worktree chdir.** Path-taking flags (`--mcp-config`, `--openai-logging-dir`, `--json-file`, `--input-file`, `--telemetry-outfile`, `--include-directories`) are normalized to absolute paths against the launch cwd when `--worktree` is set. Other path-shaped argv fields not in this list still resolve against the worktree cwd — use absolute paths to be safe.
 

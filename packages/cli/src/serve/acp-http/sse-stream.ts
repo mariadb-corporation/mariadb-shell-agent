@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -122,7 +123,7 @@ export class SseStream implements TransportStream {
       this.onClose?.();
     } catch (err) {
       writeStderrLine(
-        `qwen serve: /acp SSE onClose threw: ${
+        `mariadb-shell-agent serve: /acp SSE onClose threw: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );
@@ -147,7 +148,7 @@ export class SseStream implements TransportStream {
       .catch((err: unknown) => {
         if (!this.closed) {
           writeStderrLine(
-            `qwen serve: /acp SSE write failed, closing stream: ${
+            `mariadb-shell-agent serve: /acp SSE write failed, closing stream: ${
               err instanceof Error ? err.message : String(err)
             }`,
           );

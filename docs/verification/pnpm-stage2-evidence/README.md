@@ -1,7 +1,7 @@
 # pnpm Stage 2 go/no-go evidence
 
 The post-Stage 1 review on
-[#10444](https://github.com/QwenLM/qwen-code/issues/10444#issuecomment-5630188013)
+[#10444](https://github.invalid/QwenLM/qwen-code/issues/10444#issuecomment-5630188013)
 recommends holding Stage 2 (pnpm for development and CI) until two
 measurements exist. Neither could run on the machine that wrote this brief,
 because it does not run builds or test suites. Every number below that is not
@@ -86,7 +86,7 @@ developer Macs.
    rather than record a count (a bare `git worktree list` from a directory
    that is not a clone fails but still feeds `wc` a 0). Sum the per-clone
    counts for the per-host peak. Worktrees on these hosts can live for under
-   an hour — review worktrees under `.qwen/tmp` are created and swept within
+   an hour — review worktrees under `.mariadb-shell-agent/tmp` are created and swept within
    a single run — so a daily sample reports the floor between runs, not the
    peak.
 

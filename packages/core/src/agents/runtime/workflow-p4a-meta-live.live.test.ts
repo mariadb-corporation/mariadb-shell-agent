@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -41,7 +42,7 @@ const apiKey = process.env['DASHSCOPE_API_KEY'];
 const runLiveTests = process.env['QWEN_CODE_RUN_LIVE_TESTS'] === '1';
 const baseUrl =
   process.env['DASHSCOPE_BASE_URL'] ||
-  'https://dashscope.aliyuncs.com/compatible-mode/v1';
+  'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
 const MODEL = 'qwen3-coder-plus';
 
 // Inferred return type is Promise<string> so callers can assign directly to

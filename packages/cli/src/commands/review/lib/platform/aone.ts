@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1020,7 +1021,7 @@ export function getMrStatusChecks(
 }
 
 // ---------------------------------------------------------------------------
-// Write path — the Aone half of `qwen review submit` (Phase 3 of
+// Write path — the Aone half of `mariadb-shell-agent review submit` (Phase 3 of
 // docs/design/2026-08-13-review-platform-provider-abstraction.md).
 //
 // Aone has no Create-Review batch API: a review is N+1 calls — one

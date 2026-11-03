@@ -48,7 +48,7 @@
 
 永久 clipboard 产品用例保留 Node+Ink、Bun+Ink、strict OpenTUI 原有首轮粘贴完整精确断言。仅 native 分支继续召回原始 raw 文本，在不换行的第二行末进行独立原输入所定义的编辑，再显式提交，验证两次 HTTP 关闭及两个真实模型侧 JSONL user 记录的 UUID、session、promptId、parent 链接与祖先。oracle 来自原始用户输入字节，不来自模型输出。finally 在断言失败时也保留原始 journal 文件。这些模型记录不证明普通 TUI 已持久化 humanInput。
 
-当前 Ink 历史记录的是 compact display placeholder，因此新增 native 原文召回合同不声称三 renderer 一致。保留 Ink 参考失败及恢复原始粘贴内容的明确后续项 [#15397](https://github.com/QwenLM/qwen-code/issues/15397)，不能把 placeholder 当成通过预期，也不能跳过首轮粘贴用例。native 条件续段是公开的行为边界，不是 skip。独立 strict 产品证明已存在；新整合的永久版本仍需重新进行整文件三腿验证。
+当前 Ink 历史记录的是 compact display placeholder，因此新增 native 原文召回合同不声称三 renderer 一致。保留 Ink 参考失败及恢复原始粘贴内容的明确后续项 [#15397](https://github.invalid/QwenLM/qwen-code/issues/15397)，不能把 placeholder 当成通过预期，也不能跳过首轮粘贴用例。native 条件续段是公开的行为边界，不是 skip。独立 strict 产品证明已存在；新整合的永久版本仍需重新进行整文件三腿验证。
 
 | 层级                | 必需用例/复用                                                                                                                                                                                                                                                                                   |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -63,6 +63,6 @@
 
 ## 双语文档与完整体量
 
-新增完整paired docs/design/2026-10-24-opentui-clipboard-source-lifetime.{md,zh-CN.md}。既有input-ownership双语“Integration with main input provenance”“Baseline decisions”同步当前来源事务及保留的图像例外；editor-transaction双语pending-paste/外编段改引用，不改历史通过数。更新.qwen/e2e-tests原计划记录baseline/RED/green。旧delivery/CI保持历史标识，不改写成本批PASS。
+新增完整paired docs/design/2026-10-24-opentui-clipboard-source-lifetime.{md,zh-CN.md}。既有input-ownership双语“Integration with main input provenance”“Baseline decisions”同步当前来源事务及保留的图像例外；editor-transaction双语pending-paste/外编段改引用，不改历史通过数。更新.mariadb-shell-agent/e2e-tests原计划记录baseline/RED/green。旧delivery/CI保持历史标识，不改写成本批PASS。
 
 预计完整范围：pure共享提取+Ink兼容100–180行；OpenTUI finalizer/owner/fallback/recall及必需queue180–330生产行；独特pure/composer/joined回归900–1400；实际产品fixture/证据250–450；双语文档200–350。约1.6–2.7k，真实joined race需要时接近3k；以实际diff衡量，不承诺行数。若保来源安全需要更多，应保完整事务并解释体量，不能删测试或拆散setter/consumer。实现必须保留此完整边界，验证结果另行记录。

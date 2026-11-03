@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -194,7 +195,7 @@ describe('remember memory helper', () => {
 
     const bare = buildBareRememberPrompt('  appends to qwen  ');
     expect(bare).toBe(
-      'Please save the following fact to memory (e.g. append to QWEN.md in the project root):\n\nappends to qwen',
+      'Please save the following fact to memory (e.g. append to MARIADB-SHELL-AGENT.md in the project root):\n\nappends to qwen',
     );
   });
 
@@ -556,7 +557,7 @@ describe('remember memory helper', () => {
       expect.objectContaining({ maxTimeMinutes: 30 }),
     );
     // Non-clean mode still suppresses the duplicate auto-memory append while
-    // keeping the session's context files (QWEN.md/AGENTS.md) intact.
+    // keeping the session's context files (MARIADB-SHELL-AGENT.md/AGENTS.md) intact.
     const forked = forkParams().config;
     expect(forked.getAutoMemoryPrompt()).toBe('');
     expect(forked.getUserMemory()).toBe('QWEN/AGENTS guidance');

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -74,7 +75,7 @@ async function temporaryStableBase(): Promise<string> {
     path.join(os.tmpdir(), 'qwen-conversation-owner-'),
   );
   temporaryDirectories.push(root);
-  return path.join(root, '.qwen');
+  return path.join(root, '.mariadb-shell-agent');
 }
 
 async function readRecord(stableBaseDir: string) {

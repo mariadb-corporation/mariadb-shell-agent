@@ -2,11 +2,11 @@
 
 The DWS channel uses an account already authenticated by the DingTalk Workspace CLI. It receives direct and group messages, recognizes DingTalk document-mention notification cards, and publishes the agent's response back to the originating message or document comment.
 
-This is separate from the [DingTalk bot channel](./dingtalk). Keep using `type: "dingtalk"` for a dedicated application bot; use `type: "dws"` when Qwen Code should act through an existing DWS login.
+This is separate from the [DingTalk bot channel](./dingtalk). Keep using `type: "dingtalk"` for a dedicated application bot; use `type: "dws"` when MariaDB Shell Agent should act through an existing DWS login.
 
 ## Prerequisites
 
-Install DWS CLI 1.0.57 or newer on the host that runs Qwen Code, and ensure `dws` resolves from that process's `PATH`:
+Install DWS CLI 1.0.57 or newer on the host that runs MariaDB Shell Agent, and ensure `dws` resolves from that process's `PATH`:
 
 ```bash
 dws version --format json
@@ -24,7 +24,7 @@ On a headless server, use `dws auth login --device`. A channel pins exactly one 
 
 ## Configuration
 
-Add a channel to `~/.qwen/settings.json`:
+Add a channel to `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -72,7 +72,7 @@ and workspace.
 New managed DWS channels default to `privatePolicy: "pairing"` and `groupPolicy: "pairing"`. Approve a user or group with the code returned by the channel:
 
 ```bash
-qwen channel pairing approve dws-work CODE
+mariadb-shell-agent channel pairing approve dws-work CODE
 ```
 
 `privatePolicy` controls direct messages, document-notification authors, and native-todo creators. Document threads and native todos are personal requests; `groups.senders` never applies to them. `groupPolicy` controls group admission, and `groups["*"].senders` or a per-group override controls which members may start tasks. Group members default to `open`, independently of private access. Shared-session management requires explicit `operators`; see [Shared-Session Operators](./overview.md#shared-session-operators).
@@ -128,13 +128,13 @@ Native todos follow `privatePolicy` using the todo creator identity. Under `pair
 Run the channel directly:
 
 ```bash
-qwen channel start dws-work
+mariadb-shell-agent channel start dws-work
 ```
 
 Or let the daemon own it:
 
 ```bash
-qwen serve --workspace /path/to/your/project --channel dws-work
+mariadb-shell-agent serve --workspace /path/to/your/project --channel dws-work
 ```
 
 Do not run both forms at once because they share the channel-service lease.

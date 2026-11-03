@@ -2,7 +2,7 @@
 
 [English](2026-10-11-managed-agent-team-mailbox.md) | [简体中文](2026-10-11-managed-agent-team-mailbox.zh-CN.md)
 
-Status: implemented, except the physical acceptance pass on a real Hosted stack (decision 10), which runs before this change merges. This is the second runtime slice of **H4e** of [#12827](https://github.com/QwenLM/qwen-code/issues/12827), stage H of the Managed Agent proposal [#12380](https://github.com/QwenLM/qwen-code/issues/12380), tracked by [#13745](https://github.com/QwenLM/qwen-code/issues/13745). It builds on H4e-a ([team record contract](2026-10-10-managed-agent-teams.md), #13811), H4e-b1 ([lead-side team runtime](2026-10-10-managed-agent-team-lead-runtime.md), #13824, enabled by #13846) and H4d-b ([Session message runtime](2026-10-10-managed-session-message-runtime.md), #13822). It answers H4e-a open questions 1, 2 and 4, and H4e-b1 open question 3. It also re-scopes H4e-b2 and H4e-b3 from the H4e-b1 design: see decisions 1, 7 and 8 below.
+Status: implemented, except the physical acceptance pass on a real Hosted stack (decision 10), which runs before this change merges. This is the second runtime slice of **H4e** of [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827), stage H of the Managed Agent proposal [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380), tracked by [#13745](https://github.invalid/QwenLM/qwen-code/issues/13745). It builds on H4e-a ([team record contract](2026-10-10-managed-agent-teams.md), #13811), H4e-b1 ([lead-side team runtime](2026-10-10-managed-agent-team-lead-runtime.md), #13824, enabled by #13846) and H4d-b ([Session message runtime](2026-10-10-managed-session-message-runtime.md), #13822). It answers H4e-a open questions 1, 2 and 4, and H4e-b1 open question 3. It also re-scopes H4e-b2 and H4e-b3 from the H4e-b1 design: see decisions 1, 7 and 8 below.
 
 ## Problem and scope
 
@@ -320,7 +320,7 @@ To a running member, step 1 is an outbound `session_message` to the head, and H4
   - the "was not notified" text and the owner refusal text (`hosted-team-session.test.ts`);
   - the roster that shows a task id only for a running member (`hosted-team-session.test.ts`, and the roster assertion in `hosted-workspace-tool-turn.team.test.ts`);
   - the team `send_message` declaration, its description and its H4d-b schema (`hosted-workspace-tool-turn.team.test.ts`).
-- The E2E plan in `.qwen/e2e-tests/`.
+- The E2E plan in `.mariadb-shell-agent/e2e-tests/`.
 - This design in both languages, plus pointers from the H4e-a, H4e-b1 and H4d-b designs.
 
 ## Validation plan

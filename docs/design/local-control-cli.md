@@ -2,10 +2,10 @@
 
 ## Goal
 
-Make phone access to an existing `qwen serve` session a single explicit command:
+Make phone access to an existing `mariadb-shell-agent serve` session a single explicit command:
 
 ```bash
-qwen serve --local-control
+mariadb-shell-agent serve --local-control
 ```
 
 The command keeps the primary daemon on loopback, starts one selected LAN listener, mints a revocable pairing token, prints its QR code, and inhibits system sleep until Local Control is disabled. Desktop exposes the same daemon-owned workflow from the Web Shell Settings card.
@@ -16,7 +16,7 @@ The command keeps the primary daemon on loopback, starts one selected LAN listen
 
 The terminal remains the visible enabled indicator. `Ctrl+C` ends the whole daemon, not just Local Control: the graceful drain closes the LAN listener, invalidates the pairing token, and releases the existing cross-platform sleep inhibitor before the process exits. Turning Local Control off while the daemon keeps running is done from the Web Shell Settings card, which is also the only in-process re-enable path.
 
-The mode rejects a non-default `--hostname` and `--no-web` instead of silently creating incomplete configurations. It composes with `--token`, `--allow-origin`, and ephemeral port `0`; `--local-control-address` selects the LAN address when several candidates exist. Existing explicit `qwen serve` deployments are unchanged.
+The mode rejects a non-default `--hostname` and `--no-web` instead of silently creating incomplete configurations. It composes with `--token`, `--allow-origin`, and ephemeral port `0`; `--local-control-address` selects the LAN address when several candidates exist. Existing explicit `mariadb-shell-agent serve` deployments are unchanged.
 
 ## Security
 

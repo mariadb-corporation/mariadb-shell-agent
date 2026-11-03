@@ -6,7 +6,7 @@
 
 Unsent images and files must follow their text draft across session switches and page reloads. Text uses localStorage, whose quota is too small for 8 MiB attachments. Keep the existing text format and daemon protocol; store attachment payloads in IndexedDB under the same draft key.
 
-The follow-up to [PR #15025](https://github.com/QwenLM/qwen-code/pull/15025) fixes two defects left by that change: losing an unsent archive during a Managed summary reload, and leaving an accepted draft behind after session allocation.
+The follow-up to [PR #15025](https://github.invalid/QwenLM/qwen-code/pull/15025) fixes two defects left by that change: losing an unsent archive during a Managed summary reload, and leaving an accepted draft behind after session allocation.
 
 ## Storage and restoration
 
@@ -58,4 +58,4 @@ IndexedDB is best-effort origin storage; quota failures and browser eviction can
 - Clearing and adding during a pending read does not resurrect cleared attachments.
 - Host layout-time restores preserve their attachments with and without IndexedDB, and merge rather than replace existing archives. Existing session creation, chip removal, remount, disabled-capability, local-handle, and managed-pending storage tests remain green.
 
-The test plan and reproduction evidence live under `.qwen/e2e-tests/` and `.qwen/issues/`. The installed global CLI does not contain this unpublished feature; delayed-read regression tests exercise the worktree's actual composer hook with an IndexedDB stand-in.
+The test plan and reproduction evidence live under `.mariadb-shell-agent/e2e-tests/` and `.mariadb-shell-agent/issues/`. The installed global CLI does not contain this unpublished feature; delayed-read regression tests exercise the worktree's actual composer hook with an IndexedDB stand-in.

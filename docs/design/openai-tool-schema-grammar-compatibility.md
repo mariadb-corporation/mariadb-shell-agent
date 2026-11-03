@@ -2,7 +2,7 @@
 
 ## Problem
 
-Some OpenAI-compatible runtimes compile every function schema in a request into one grammar. Older llama.cpp builds reject empty `properties` maps and large string or array repetition limits, so one valid but unsupported schema prevents the entire request from starting. Qwen Code ships tools with both shapes and can also receive them from MCP servers.
+Some OpenAI-compatible runtimes compile every function schema in a request into one grammar. Older llama.cpp builds reject empty `properties` maps and large string or array repetition limits, so one valid but unsupported schema prevents the entire request from starting. MariaDB Shell Agent ships tools with both shapes and can also receive them from MCP servers.
 
 Disabling all tools avoids grammar construction but also removes the functionality the user asked the agent to use. It is therefore a diagnostic fallback, not the primary fix.
 
@@ -16,7 +16,7 @@ Keep the registered tool set unchanged. Before an OpenAI-compatible request is s
 
 Apply these grammar-specific relaxations only when the source schema passes the existing isolated strict compilation for its selected dialect and has no top-level `$id`. Schemas with a top-level `$id` keep their constraints because runtime validation uses a shared schema registry where duplicate IDs can prevent enforcement. If local validation cannot enforce the complete schema, keep its grammar constraints on the wire rather than broadening both enforcement layers.
 
-The original schema remains attached to the tool and continues to drive client-side parameter validation. The provider receives a schema it can compile, while Qwen Code still rejects tool calls that violate the original limits.
+The original schema remains attached to the tool and continues to drive client-side parameter validation. The provider receives a schema it can compile, while MariaDB Shell Agent still rejects tool calls that violate the original limits.
 
 ## Compatibility
 

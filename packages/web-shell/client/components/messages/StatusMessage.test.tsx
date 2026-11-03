@@ -53,13 +53,13 @@ describe('StatusMessage brand', () => {
 
     expect(container.textContent).toContain('QiuQiu Code');
     expect(container.textContent).toContain('1.2.3');
-    expect(container.textContent).not.toContain('Qwen Code');
+    expect(container.textContent).not.toContain('MariaDB Shell Agent');
   });
 
   it('labels the version row with the built-in name when no brand is configured', () => {
     renderStatus();
 
-    expect(container.textContent).toContain('Qwen Code');
+    expect(container.textContent).toContain('MariaDB Shell Agent');
   });
 
   it('leaves the auth row naming the identity provider, not the product', () => {

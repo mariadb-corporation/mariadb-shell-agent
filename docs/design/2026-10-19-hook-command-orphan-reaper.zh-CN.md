@@ -4,7 +4,7 @@
 
 ## 问题与范围
 
-Issue [#14502](https://github.com/QwenLM/qwen-code/issues/14502)（由 FG13 轮次 [#14449](https://github.com/QwenLM/qwen-code/issues/14449) 发现）记录了 Hosted Hook 命令运行期间 Runtime worker 可能死亡。SIGKILL、V8 堆 OOM 中止或原生崩溃都不会执行 worker 的任何 JS 处理器。命令的 cgroup 单元（`qwen-hook-<uuid>`）会保留前台进程与已脱离的后代；单元名只存在已死 worker 的内存里，生产中没有任何东西能找到、杀掉或删除它。孤儿进程可以在记录已为 `recovery_blocked`/`outcome_unknown` 之后继续修改 Workspace。
+Issue [#14502](https://github.invalid/QwenLM/qwen-code/issues/14502)（由 FG13 轮次 [#14449](https://github.invalid/QwenLM/qwen-code/issues/14449) 发现）记录了 Hosted Hook 命令运行期间 Runtime worker 可能死亡。SIGKILL、V8 堆 OOM 中止或原生崩溃都不会执行 worker 的任何 JS 处理器。命令的 cgroup 单元（`qwen-hook-<uuid>`）会保留前台进程与已脱离的后代；单元名只存在已死 worker 的内存里，生产中没有任何东西能找到、杀掉或删除它。孤儿进程可以在记录已为 `recovery_blocked`/`outcome_unknown` 之后继续修改 Workspace。
 
 本切片在既有 cgroup launcher 上加入 Hook 专用的父进程死亡回收。launcher 本身就是单元成员；worker 消失时它写 `cgroup.kill`，内核会杀掉包括 `setsid` 后代在内的所有成员。它不新增 Broker/Java 侧回收，不把未知结果变成已结算，也不删除空的单元目录。
 

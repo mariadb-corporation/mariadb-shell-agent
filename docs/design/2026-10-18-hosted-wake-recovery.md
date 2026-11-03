@@ -3,7 +3,7 @@
 [English](2026-10-18-hosted-wake-recovery.md) | [简体中文](2026-10-18-hosted-wake-recovery.zh-CN.md)
 
 Status: implemented and locally verified on macOS/MySQL 8.4 for
-[#14116](https://github.com/QwenLM/qwen-code/issues/14116). Real MQ-on,
+[#14116](https://github.invalid/QwenLM/qwen-code/issues/14116). Real MQ-on,
 Linux/Windows and deployed provider acceptance remain unverified.
 
 ## Problem
@@ -173,7 +173,7 @@ order. Checkstyle, SpotBugs, the latest-main root build/bundle and Markdown
 formatting/reference checks pass.
 
 Validation of subsequent review fixes is recorded on
-[PR #14603](https://github.com/QwenLM/qwen-code/pull/14603). The initial counts
+[PR #14603](https://github.invalid/QwenLM/qwen-code/pull/14603). The initial counts
 below do not establish validation of those later changes.
 
 Real Spring/MySQL/Harness process probes reproduce the missing automatic load

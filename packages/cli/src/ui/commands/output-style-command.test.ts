@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,7 +25,7 @@ vi.mock('../../i18n/index.js', () => ({
 const mockedT = vi.mocked(t);
 
 // The catalog is read from disk; substitute a fixed one so the test never
-// depends on the developer's own ~/.qwen/output-styles.
+// depends on the developer's own ~/.mariadb-shell-agent/output-styles.
 vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('@qwen-code/qwen-code-core')>();

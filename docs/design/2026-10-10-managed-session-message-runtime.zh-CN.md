@@ -2,7 +2,7 @@
 
 [English](2026-10-10-managed-session-message-runtime.md) | [简体中文](2026-10-10-managed-session-message-runtime.zh-CN.md)
 
-状态:已在本变更中实现。这是 [#12827](https://github.com/QwenLM/qwen-code/issues/12827) 的 **H4d** 切片中运行时那一半,即 Managed Agent 提案 [#12380](https://github.com/QwenLM/qwen-code/issues/12380) 的 H 阶段,由 [#13744](https://github.com/QwenLM/qwen-code/issues/13744) 跟踪。它生产 [H4d-a 契约](2026-10-09-managed-session-messages.zh-CN.md) 固定下来的记录:managed `send_message` 工具、控制面的消息 relay、投递边界、消费、已完成 child 的复活,以及启用。凡是消息会改变"child 何时算完成"的地方,它修订 H4b 的 [child Session 运行时](2026-10-07-managed-child-session-runtime.zh-CN.md)。下文"契约"指 H4d-a 设计,"自动化设计"指 #12827 所固定提交上的 [automation、Channels 与 child 投递设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-automation.md) 第 5.1 节。
+状态:已在本变更中实现。这是 [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827) 的 **H4d** 切片中运行时那一半,即 Managed Agent 提案 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380) 的 H 阶段,由 [#13744](https://github.invalid/QwenLM/qwen-code/issues/13744) 跟踪。它生产 [H4d-a 契约](2026-10-09-managed-session-messages.zh-CN.md) 固定下来的记录:managed `send_message` 工具、控制面的消息 relay、投递边界、消费、已完成 child 的复活,以及启用。凡是消息会改变"child 何时算完成"的地方,它修订 H4b 的 [child Session 运行时](2026-10-07-managed-child-session-runtime.zh-CN.md)。下文"契约"指 H4d-a 设计,"自动化设计"指 #12827 所固定提交上的 [automation、Channels 与 child 投递设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-automation.md) 第 5.1 节。
 
 ## 问题与范围
 
@@ -45,7 +45,7 @@ H4d-a 让投递所需的每个事实都成为已提交的记录,并在两种语�
 11. **relay 在记录之外证明了什么(契约开放问题 5)。** input 的文本绑定目标自己的副本,目标在提交之前按发送方的摘要校验该副本;回执以 `messageId` 与摘要指名发送方的消息;父方接受来自其 run 已结束的 child 的消息,所以结束之前发出的消息仍能到达。
 12. **审批与预览。** `send_message` 在 Agent 工具需要审批的模式下同样请求审批,并在两种语言中加入封闭的输入预览集合(`HOSTED_INPUT_PREVIEW_TOOLS`、Java `PREVIEW_TOOLS`),所以审批卡片会显示正在批准的消息。
 13. **启用,server 优先。** `session_message` 加入 `MANAGED_SESSION_ENABLED_DOMAINS`,续跑门禁打开。Java store 自 H4d-a 发布起就校验二者,relay 与写入方在同一个版本中发布,所以 H1–H4c 的 server 优先顺序成立:不运行该 relay 的 server 永远不会遇到生产这些记录的写入方。
-14. **不改公开契约。** OpenAPI 契约、其路由与 `contract-known-gaps.txt` 都不变。新的 Hosted 路由 `POST /session/:id/messages/operations` 是控制面与 `qwen serve` 之间的私有路由,与 H4b 的 `/children/operations` 相同。V64 是唯一的迁移。
+14. **不改公开契约。** OpenAPI 契约、其路由与 `contract-known-gaps.txt` 都不变。新的 Hosted 路由 `POST /session/:id/messages/operations` 是控制面与 `mariadb-shell-agent serve` 之间的私有路由,与 H4b 的 `/children/operations` 相同。V64 是唯一的迁移。
 15. **被停止的 run 连同其 child 的消息工作一起停止(H4f)。** H4f 的停止分支依据 child 的 API Turn 作决定,但消息 turn 从不成为 API Turn(决策 8),所以对持有 session message 的 child,它还会读取该 child 的 journal。只要还有消息 input 在等待或运行,停止就向 child 的消息路由发送 `stop`:此后 child 的 wake pump 不再启动它的任何消息 input,运行中的消息 turn 被中止(由它自己的结束结算为 cancelled),等到没有 turn 在运行时,等待中的消息 input 以 `stop_requested` 结算为 cancelled,其间 Session 像关闭时一样被占住。本控制面已不再持有的 child,会在加载时就带上停止(被动加载上的 `stopMessages`),所以连这次加载触发的第一轮也不会启动任何消息 input。该加载与已持久化的取消一样,由停止分支读到的已提交停止请求授权,只校验 Session 自身的绑定:消息工作不会留下 `CANCELLING` 的 Turn,事后变更的授权也不能撤销一次停止。停止先于停止分支对 Turn 的取消发出,因为后者自己的加载不会带上停止;在停止仍在结算 child 的消息工作期间,消息 relay 也不会为该 child 的任何步骤 attach 它:其中的 consume 对账与 child 自己的 outbox 步骤都会等待。一旦不再欠消息工作,它们就继续进行,因为这时加载不会启动任何东西,而自然结算可能正在等待 child 的 outbox。在更早进程中崩溃的消息 turn 不是等待中的 input;wake pump 不会再为已停止的 Session 挑选它,由停止执行其善后。停止只在没有 pump pass 在途时执行它,最多等 10 s,因为某一轮可能在停止之前已挑中该 turn;且只在开始时没有其他东西占住 Session 才执行。被某一轮留在 blocked 的崩溃仍归 pump 的 blocked 周期处理,什么都没结算的停止由停止分支重复发送。停止分支在心跳时重复发送 `stop`,只有在不再欠任何东西时才结算该 run;正在等待恢复或正在关闭的 child 会拒绝 `stop`,这不消耗尝试次数;在决策 8 的 30 分钟上限内没有 turn 接手的消息 input 不再挡住停止,于是 run 得以结算,剩下的由 child 的关闭取消。胜过停止的自然结果,是决策 8 所说的最新已结算 turn(API 或消息):先完成的消息 turn 交付其结果,自行失败的以 `child_failed` 结算,被取消的则归于停止。中止失败而进入恢复的消息 turn(其工具的取消失败)会以 error 结算,run 随之以 `child_failed` 结算:journal 中没有任何东西能把这种结束与 child 自身的失败区分开。停止之前已交接、尚未收到的消息会被拒绝而不是被收下(`accepting → rejected`),正如交接本就会取消仍处于 planned 的消息,所以不会唤醒一个正在离开的 child。停止关闭 child 时不经过其自身 outbox 的关闭挡板:与任何正在关闭的发送方一样(决策 10),其仍欠交接的条目会成为 orphaned,所以 child 发往父的最后几条消息会随取消一起丢失。
 16. **被中断的 `send_message` 按其已提交的内容作答。** 与 team 调用或后台启动一样,`send_message` 在作答之前只写入 journal。每条结算或恢复被中断 turn 的路由(包括停放轮的补答)都依据记录回答它:outbox 条目答为已排队投递,续跑答为已续跑;在恢复该 turn 的路由上,什么都没提交的答为从未运行。模型永远不会再次发送已提交的消息,恢复的那一轮也是完整的。[H4e-b2 设计](2026-10-11-managed-agent-team-mailbox.zh-CN.md)(其决策 9)细化了这些答复:run 此后被证明从未启动,或消息投递已失败的发送,答为未到达,并说明如何再次发送。记录为 `unknown` 的投递答为无法确认,任何重发前都必须先向收件方核实。一条处于 `accepting` 的投递若在 relay 记录之后的拒绝前遇到 run 停止,仍可能答为已排队,因为记录无法判断其回执是否已经存在。
 
@@ -81,7 +81,7 @@ child 发往父的消息走同样的步骤,只是两个 journal 互换;其第 2 
 
 ## 非目标
 
-- team 收件方与 mailbox(H4e,[#13745](https://github.com/QwenLM/qwen-code/issues/13745))、血缘之外的具名 peer(契约决策 2),以及轮中投递。
+- team 收件方与 mailbox(H4e,[#13745](https://github.invalid/QwenLM/qwen-code/issues/13745))、血缘之外的具名 peer(契约决策 2),以及轮中投递。
 - 续跑的 transcript 导入(决策 9)。
 - `queryChildRun`,契约规定不实现它。
 - 任何公开契约变更,以及对 Legacy `send_message` 的任何改动。

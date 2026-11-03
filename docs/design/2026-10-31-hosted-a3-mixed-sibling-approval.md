@@ -157,7 +157,7 @@ the env var + a process-wide fire-once latch; fires only when the value equals
 the current session ID; armed only on gen2 via a new
 `startReplacementHarness(name, holdPendingSiblingApproval = false)` parameter
 (gen3 passes nothing). After `commitDurableWait` it logs
-`qwen serve: E2E holding pending sibling approval for Session <id> call <callId>`
+`mariadb-shell-agent serve: E2E holding pending sibling approval for Session <id> call <callId>`
 and parks on a promise that rejects when the abort signal fires, so a leaked
 flag cannot wedge a real Session un-cancelably. A `process-env-guard.test.ts`
 allowlist entry pins the new key with its exact access count.
@@ -292,4 +292,4 @@ rewritten-input / Hook half.
   real-stack arm, the M1 mutation red, the env-guard access count and the contract
   pins, and its abort-aware hold mirrors the unit-tested B3a pattern.
 
-[issue]: https://github.com/QwenLM/qwen-code/issues/14481
+[issue]: https://github.invalid/QwenLM/qwen-code/issues/14481

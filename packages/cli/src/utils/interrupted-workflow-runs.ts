@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -32,8 +33,8 @@ export function formatInterruptedWorkflowRunsNotice(
   if (runs.length === 0) return undefined;
   const lines = [
     runs.length === 1
-      ? 'A workflow run was interrupted when the Qwen Code process running it exited:'
-      : `${runs.length} workflow runs were interrupted when the Qwen Code process running them exited:`,
+      ? 'A workflow run was interrupted when the MariaDB Shell Agent process running it exited:'
+      : `${runs.length} workflow runs were interrupted when the MariaDB Shell Agent process running them exited:`,
   ];
   for (const { snapshot, resumeName, hasJournal } of runs.slice(
     0,

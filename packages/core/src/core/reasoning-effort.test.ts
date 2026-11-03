@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -60,6 +61,10 @@ describe('getGptReasoningCapabilities', () => {
     ['openai/gpt-5.6.1:batch', REASONING_EFFORT_TIERS, 'medium', true, false],
     ['gpt-6-astra', REASONING_EFFORT_TIERS, 'medium', true, true],
     ['GPT-6-ASTRA', REASONING_EFFORT_TIERS, 'medium', true, true],
+    ['gpt-6.1-sol', REASONING_EFFORT_TIERS, 'medium', true, true],
+    ['openai/gpt-6.1-sol', REASONING_EFFORT_TIERS, 'medium', true, true],
+    ['gpt-6.1-terra', REASONING_EFFORT_TIERS, 'medium', true, false],
+    ['gpt-6-luna', REASONING_EFFORT_TIERS, 'medium', true, false],
     [
       'openai/gpt-6-astra-2026-09-03',
       REASONING_EFFORT_TIERS,
@@ -106,6 +111,9 @@ describe('getGptReasoningCapabilities', () => {
     'gpt-6-astra-custom',
     'my-gpt-6-astra',
     'gpt-6-astra-chat-latest',
+    'gpt-6.1-sol-custom',
+    'gpt-6.1-luna',
+    'gpt-6-terra',
     'qwen3.8-max',
   ])('does not assign GPT reasoning controls to %s', (model) => {
     expect(getGptReasoningCapabilities(model)).toBeUndefined();

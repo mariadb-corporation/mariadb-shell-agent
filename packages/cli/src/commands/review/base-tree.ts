@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review base-tree`: stand up a BUILT tree at the merge base, so a claim
+// `mariadb-shell-agent review base-tree`: stand up a BUILT tree at the merge base, so a claim
 // about changed behaviour can be measured instead of read.
 //
 // Every other step in this pipeline looks at one tree. The agents read the PR's
@@ -1146,7 +1147,7 @@ function undescribableEntry(
  * things the A/B's base side runs walk UP through it: npm prepends every
  * ancestor `node_modules/.bin` ahead of the inherited PATH, and Node resolves
  * a bare specifier by walking ancestors' `node_modules`. So
- * `<repo>/.qwen/tmp/node_modules/.bin/node` — written during the
+ * `<repo>/.mariadb-shell-agent/tmp/node_modules/.bin/node` — written during the
  * containerized phase, never touching the base tree at all — wins over
  * `/usr/bin/node` for every command the shard runs in the certified tree, on
  * the HOST, outside the container. Measured on npm 10 / node 22: an ancestor
@@ -1191,7 +1192,7 @@ function unfencedResolutionAncestor(tree: string): string | null {
   // against the process directory answers for whatever directory the command
   // happens to be run from, which is not the tree's repository in the nested
   // geometry and is not the fixture's in a test. The base tree always sits
-  // at `<root>/.qwen/tmp/<name>-base`, so the marker on its own path is the
+  // at `<root>/.mariadb-shell-agent/tmp/<name>-base`, so the marker on its own path is the
   // answer.
   //
   // The FIRST occurrence — the OUTERMOST review temp dir on this path, the

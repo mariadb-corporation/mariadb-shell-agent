@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -105,17 +106,17 @@ describe('substituteHookVariables', () => {
 
     const result = substituteHookVariables(
       hooks,
-      '/home/user/.qwen/extensions/my-extension',
+      '/home/user/.mariadb-shell-agent/extensions/my-extension',
     );
 
     expect(result).toBeDefined();
     expect(result!['PreToolUse']).toHaveLength(1);
     expect(commandAt(result, 'PreToolUse')).toBe(
-      '/home/user/.qwen/extensions/my-extension/scripts/pre-start.sh',
+      '/home/user/.mariadb-shell-agent/extensions/my-extension/scripts/pre-start.sh',
     );
     expect(result!['UserPromptSubmit']).toHaveLength(1);
     expect(commandAt(result, 'UserPromptSubmit')).toBe(
-      '/home/user/.qwen/extensions/my-extension/setup/install.py',
+      '/home/user/.mariadb-shell-agent/extensions/my-extension/setup/install.py',
     );
   });
 
@@ -267,7 +268,7 @@ describe('performVariableReplacement', () => {
     expect(result).not.toContain('```!');
   });
 
-  it('should replace .claude with .qwen in markdown files', () => {
+  it('should replace .claude with .mariadb-shell-agent in markdown files', () => {
     const mdContent = [
       '---',
       'description: "Cancel active loop"',
@@ -283,10 +284,10 @@ describe('performVariableReplacement', () => {
     const { read } = replaceIn({ 'cancel.md': mdContent });
 
     const result = read('cancel.md');
-    expect(result).toContain('.qwen/loop.local.md');
-    expect(result).toContain('rm .qwen/loop.local.md');
-    expect(result).toContain('$HOME/.qwen/cache');
-    expect(result).toContain('./.qwen/local');
+    expect(result).toContain('.mariadb-shell-agent/loop.local.md');
+    expect(result).toContain('rm .mariadb-shell-agent/loop.local.md');
+    expect(result).toContain('$HOME/.mariadb-shell-agent/cache');
+    expect(result).toContain('./.mariadb-shell-agent/local');
     expect(result).not.toContain('.claude/');
   });
 
@@ -318,7 +319,7 @@ describe('performVariableReplacement', () => {
     expect(result).not.toContain('.message.content');
   });
 
-  it('should replace .claude with .qwen in shell scripts', () => {
+  it('should replace .claude with .mariadb-shell-agent in shell scripts', () => {
     const shContent = [
       '#!/bin/bash',
       'HOME_CLAUDE="$HOME/.claude"',
@@ -331,11 +332,11 @@ describe('performVariableReplacement', () => {
 
     const result = read('setup.sh');
     expect(result).toContain('$HOME/.claude');
-    expect(result).toContain('~/.qwen/cache');
-    expect(result).toContain('./.qwen/local');
-    expect(result).toContain('.qwen/config');
+    expect(result).toContain('~/.mariadb-shell-agent/cache');
+    expect(result).toContain('./.mariadb-shell-agent/local');
+    expect(result).toContain('.mariadb-shell-agent/config');
     // Note: URLs are also being replaced in current implementation
-    expect(result).toContain('https://example.com/.qwen/page');
+    expect(result).toContain('https://example.com/.mariadb-shell-agent/page');
   });
 
   it('should handle multiple markdown files', () => {

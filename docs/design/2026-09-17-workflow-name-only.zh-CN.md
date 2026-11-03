@@ -54,7 +54,7 @@
 
 ## 与 Claude Code 的差异
 
-Claude Code 的 `CLAUDE_WORKFLOW_NAME_ONLY` 拒绝 `script`、`scriptPath` 和 `resumeFromRunId`，只解析内置 workflow，并对所有运行拒绝嵌套的 `workflow({ scriptPath })`。Qwen Code 没有内置 workflow，而这个锁面向的是启动命名运行并恢复它们的部署，所以保留全部名字层级（项目、用户、扩展），允许按名恢复，并且不限制宿主发起的运行。
+Claude Code 的 `CLAUDE_WORKFLOW_NAME_ONLY` 拒绝 `script`、`scriptPath` 和 `resumeFromRunId`，只解析内置 workflow，并对所有运行拒绝嵌套的 `workflow({ scriptPath })`。MariaDB Shell Agent 没有内置 workflow，而这个锁面向的是启动命名运行并恢复它们的部署，所以保留全部名字层级（项目、用户、扩展），允许按名恢复，并且不限制宿主发起的运行。
 
 ## 相关修复
 

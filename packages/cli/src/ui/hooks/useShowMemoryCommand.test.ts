@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -46,7 +47,7 @@ function createMockConfig({
 }
 
 const mockSettings = {
-  merged: { context: { fileName: 'QWEN.md' } },
+  merged: { context: { fileName: 'MARIADB-SHELL-AGENT.md' } },
 } as unknown as LoadedSettings;
 
 describe('createShowMemoryAction', () => {

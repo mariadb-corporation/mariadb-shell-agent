@@ -4,7 +4,7 @@
 
 Status: continuation design, not yet implemented. 2026-09-09. Superseded for collaboration: the thread model described here (threads, `thread_*` tools, the dispatcher and Host v1 leases) was replaced and removed by the [session multi-agent design](2026-10-05-session-multi-agent.md); the A2A contract is in [2026-09-09-a2a-frozen-contract.md](2026-09-09-a2a-frozen-contract.md).
 
-Core goal: Qwen Code can expose local Agents to authorized external callers and contact existing local or remote Agents. Users still start work from their existing conversation entry and view delegation, intervene, and accept results in the same interface. Independent identity does not require a permanently running process; an external Agent need not become a Qwen subagent or Team member.
+Core goal: MariaDB Shell Agent can expose local Agents to authorized external callers and contact existing local or remote Agents. Users still start work from their existing conversation entry and view delegation, intervene, and accept results in the same interface. Independent identity does not require a permanently running process; an external Agent need not become a Qwen subagent or Team member.
 
 ## 1. Scope and Evidence
 
@@ -14,8 +14,8 @@ Code inspection is pinned to `6a69c0b5bbf1232644a297b567bb36350eb58ff4` of main 
 
 References:
 
-- [Original design](https://github.com/QwenLM/qwen-code/blob/6a69c0b5bbf1232644a297b567bb36350eb58ff4/docs/plans/2026-09-06-multi-agent-board-collaboration.md), starting with §0.2: existing identity, task, session, and delivery foundations are reusable; historical execution evidence does not automatically apply to a new protocol.
-- [Current gap plan](https://github.com/QwenLM/qwen-code/blob/6a69c0b5bbf1232644a297b567bb36350eb58ff4/docs/plans/2026-09-08-workspace-agents-vs-multica-gap-and-plan.md): top-level ACP sessions are isolated by `(agent, thread)`; Host H1 has registration and heartbeats, while H2/H3 are not implemented remote services.
+- [Original design](https://github.invalid/QwenLM/qwen-code/blob/6a69c0b5bbf1232644a297b567bb36350eb58ff4/docs/plans/2026-09-06-multi-agent-board-collaboration.md), starting with §0.2: existing identity, task, session, and delivery foundations are reusable; historical execution evidence does not automatically apply to a new protocol.
+- [Current gap plan](https://github.invalid/QwenLM/qwen-code/blob/6a69c0b5bbf1232644a297b567bb36350eb58ff4/docs/plans/2026-09-08-workspace-agents-vs-multica-gap-and-plan.md): top-level ACP sessions are isolated by `(agent, thread)`; Host H1 has registration and heartbeats, while H2/H3 are not implemented remote services.
 - User-provided “CoCo bot-start Script and aone-channel Remote Agent Architecture Analysis — Session Record” (`coco-aone-channel-session.md`): read in full this round, without independently checking its private source package or repeating installation. Only architectural observations are adopted; internal addresses, credentials, installation scripts, and vendor-specific commands are not copied.
 - Multica pinned at `7a438bd5b8bf39afd54259a7eb0971390e50a8ef`: [runtime storage](https://github.com/multica-ai/multica/blob/7a438bd5b8bf39afd54259a7eb0971390e50a8ef/server/migrations/004_agent_runtime_loop.up.sql), [PriorSessionID in task structures](https://github.com/multica-ai/multica/blob/7a438bd5b8bf39afd54259a7eb0971390e50a8ef/server/internal/daemon/types.go), [Qwen execution adapter](https://github.com/multica-ai/multica/blob/7a438bd5b8bf39afd54259a7eb0971390e50a8ef/server/pkg/agent/qwen.go). Persistent identity, task continuation, and execution-process lifetime should be separate.
 - [A2A specification](https://a2a-protocol.org/latest/specification/) and [Codex App Server](https://learn.chatgpt.com/docs/app-server): official pages checked during this discussion. Freeze the exact version, transport binding, and optional capabilities before implementation; rolling documentation is not a fixed compatibility promise.
@@ -107,7 +107,7 @@ Three mechanisms jointly maintain the current local run-frame trust boundary: th
 
 ## 5. Codex and Other Runtimes
 
-The first Host increment ships Qwen Code only. Codex, Claude, and other external providers stay deferred until their launch path can exclude ambient user configuration and credentials and can prove workspace-confined reads. The protocol keeps provider identity for that future extension, but the built-in Host neither detects nor advertises those programs.
+The first Host increment ships MariaDB Shell Agent only. Codex, Claude, and other external providers stay deferred until their launch path can exclude ambient user configuration and credentials and can prove workspace-confined reads. The protocol keeps provider identity for that future extension, but the built-in Host neither detects nor advertises those programs.
 
 The Codex adapter lives on the machine executing Codex and maps local tasks to `thread/start`, `thread/resume`, `turn/start`, `turn/steer`, `turn/interrupt`, and events. Negotiate supported capabilities against the installed version rather than exposing all App Server management capabilities to callers.
 

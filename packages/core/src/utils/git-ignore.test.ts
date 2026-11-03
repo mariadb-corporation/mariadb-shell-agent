@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -50,7 +51,7 @@ describe('isGitIgnored', () => {
     mkdirSync(dir, { recursive: true });
     // Process-level git-config hermeticity: the probe spawns git with the
     // ambient process.env, so a host global exclude (e.g. one ignoring
-    // .qwen/) would leak into the verdicts. The config pins block the
+    // .mariadb-shell-agent/) would leak into the verdicts. The config pins block the
     // gitconfig channel but NOT git's XDG default excludes file
     // ($XDG_CONFIG_HOME/git/ignore), which git consults without any
     // config — pin XDG_CONFIG_HOME away from the host's too. HOME as well:
@@ -85,19 +86,19 @@ describe('isGitIgnored', () => {
   });
 
   it('answers git’s own verdict for a representative file path', () => {
-    expect(isGitIgnored(dir, '.qwen/audits/x.md')).toBe(false);
-    writeFileSync(join(dir, '.gitignore'), '.qwen/\n');
-    expect(isGitIgnored(dir, '.qwen/audits/x.md')).toBe(true);
+    expect(isGitIgnored(dir, '.mariadb-shell-agent/audits/x.md')).toBe(false);
+    writeFileSync(join(dir, '.gitignore'), '.mariadb-shell-agent/\n');
+    expect(isGitIgnored(dir, '.mariadb-shell-agent/audits/x.md')).toBe(true);
   });
 
   it('is fresh by default: a rule edit flips the next answer', () => {
-    writeFileSync(join(dir, '.gitignore'), '.qwen/\n');
-    expect(isGitIgnored(dir, '.qwen/audits/x.md')).toBe(true);
+    writeFileSync(join(dir, '.gitignore'), '.mariadb-shell-agent/\n');
+    expect(isGitIgnored(dir, '.mariadb-shell-agent/audits/x.md')).toBe(true);
     writeFileSync(
       join(dir, '.gitignore'),
-      '.qwen/*\n!.qwen/audits/\n!.qwen/audits/**\n',
+      '.mariadb-shell-agent/*\n!.mariadb-shell-agent/audits/\n!.mariadb-shell-agent/audits/**\n',
     );
-    expect(isGitIgnored(dir, '.qwen/audits/x.md')).toBe(false);
+    expect(isGitIgnored(dir, '.mariadb-shell-agent/audits/x.md')).toBe(false);
   });
 
   it('treats a non-worktree as not-ignored', () => {
@@ -119,7 +120,7 @@ describe('isGitIgnored', () => {
       cwd: foreign,
       env: scrubbedInitEnv(),
     });
-    writeFileSync(join(foreign, '.gitignore'), '.qwen/\n');
+    writeFileSync(join(foreign, '.gitignore'), '.mariadb-shell-agent/\n');
     const saved = process.env['GIT_WORK_TREE'];
     const savedGitDir = process.env['GIT_DIR'];
     // GIT_WORK_TREE needs a paired GIT_DIR to be legal; point both at the
@@ -127,9 +128,9 @@ describe('isGitIgnored', () => {
     process.env['GIT_WORK_TREE'] = foreign;
     process.env['GIT_DIR'] = join(foreign, '.git');
     try {
-      // dir itself has no ignore rules: the foreign tree's .qwen/ rule
+      // dir itself has no ignore rules: the foreign tree's .mariadb-shell-agent/ rule
       // must not answer for it.
-      expect(isGitIgnored(dir, '.qwen/audits/x.md')).toBe(false);
+      expect(isGitIgnored(dir, '.mariadb-shell-agent/audits/x.md')).toBe(false);
     } finally {
       if (saved === undefined) delete process.env['GIT_WORK_TREE'];
       else process.env['GIT_WORK_TREE'] = saved;
@@ -150,11 +151,14 @@ describe('isGitIgnored', () => {
       env: scrubbedInitEnv(),
     });
     mkdirSync(join(foreign, '.git', 'info'), { recursive: true });
-    writeFileSync(join(foreign, '.git', 'info', 'exclude'), '.qwen/\n');
+    writeFileSync(
+      join(foreign, '.git', 'info', 'exclude'),
+      '.mariadb-shell-agent/\n',
+    );
     const saved = process.env['GIT_DIR'];
     process.env['GIT_DIR'] = join(foreign, '.git');
     try {
-      expect(isGitIgnored(dir, '.qwen/audits/x.md')).toBe(false);
+      expect(isGitIgnored(dir, '.mariadb-shell-agent/audits/x.md')).toBe(false);
     } finally {
       if (saved === undefined) delete process.env['GIT_DIR'];
       else process.env['GIT_DIR'] = saved;
@@ -175,16 +179,25 @@ describe('isGitIgnored', () => {
       cwd: foreign,
       env: scrubbedInitEnv(),
     });
-    mkdirSync(join(foreign, '.qwen', 'audits'), { recursive: true });
-    writeFileSync(join(foreign, '.qwen', 'audits', 'x.md'), 'tracked\n');
-    execFileSync('git', ['-C', foreign, 'add', '.qwen/audits/x.md'], {
-      env: scrubbedInitEnv(),
+    mkdirSync(join(foreign, '.mariadb-shell-agent', 'audits'), {
+      recursive: true,
     });
-    writeFileSync(join(dir, '.gitignore'), '.qwen/\n');
+    writeFileSync(
+      join(foreign, '.mariadb-shell-agent', 'audits', 'x.md'),
+      'tracked\n',
+    );
+    execFileSync(
+      'git',
+      ['-C', foreign, 'add', '.mariadb-shell-agent/audits/x.md'],
+      {
+        env: scrubbedInitEnv(),
+      },
+    );
+    writeFileSync(join(dir, '.gitignore'), '.mariadb-shell-agent/\n');
     const saved = process.env['GIT_INDEX_FILE'];
     process.env['GIT_INDEX_FILE'] = join(foreign, '.git', 'index');
     try {
-      expect(isGitIgnored(dir, '.qwen/audits/x.md')).toBe(true);
+      expect(isGitIgnored(dir, '.mariadb-shell-agent/audits/x.md')).toBe(true);
     } finally {
       if (saved === undefined) delete process.env['GIT_INDEX_FILE'];
       else process.env['GIT_INDEX_FILE'] = saved;
@@ -199,11 +212,11 @@ describe('isGitIgnored', () => {
     // not-ignored through the catch unless the probe scrubs it. The ambient
     // value is a path that does not exist; dir's own rule keeps the
     // expected verdict true.
-    writeFileSync(join(dir, '.gitignore'), '.qwen/\n');
+    writeFileSync(join(dir, '.gitignore'), '.mariadb-shell-agent/\n');
     const saved = process.env['GIT_OBJECT_DIRECTORY'];
     process.env['GIT_OBJECT_DIRECTORY'] = join(dir, 'no-such-object-store');
     try {
-      expect(isGitIgnored(dir, '.qwen/audits/x.md')).toBe(true);
+      expect(isGitIgnored(dir, '.mariadb-shell-agent/audits/x.md')).toBe(true);
     } finally {
       if (saved === undefined) delete process.env['GIT_OBJECT_DIRECTORY'];
       else process.env['GIT_OBJECT_DIRECTORY'] = saved;
@@ -220,11 +233,14 @@ describe('isGitIgnored', () => {
       env: scrubbedInitEnv(),
     });
     mkdirSync(join(foreign, '.git', 'info'), { recursive: true });
-    writeFileSync(join(foreign, '.git', 'info', 'exclude'), '.qwen/\n');
+    writeFileSync(
+      join(foreign, '.git', 'info', 'exclude'),
+      '.mariadb-shell-agent/\n',
+    );
     const saved = process.env['GIT_COMMON_DIR'];
     process.env['GIT_COMMON_DIR'] = join(foreign, '.git');
     try {
-      expect(isGitIgnored(dir, '.qwen/audits/x.md')).toBe(false);
+      expect(isGitIgnored(dir, '.mariadb-shell-agent/audits/x.md')).toBe(false);
     } finally {
       if (saved === undefined) delete process.env['GIT_COMMON_DIR'];
       else process.env['GIT_COMMON_DIR'] = saved;
@@ -237,7 +253,7 @@ describe('isGitIgnored', () => {
     // foreign excludesFile. Without the COUNT scrub the injected rule
     // answers for the -C worktree (measured: the verdict flips to true).
     const excludes = join(outside, 'foreign-excludes');
-    writeFileSync(excludes, '.qwen/\n');
+    writeFileSync(excludes, '.mariadb-shell-agent/\n');
     const savedCount = process.env['GIT_CONFIG_COUNT'];
     const savedKey = process.env['GIT_CONFIG_KEY_0'];
     const savedValue = process.env['GIT_CONFIG_VALUE_0'];
@@ -245,7 +261,7 @@ describe('isGitIgnored', () => {
     process.env['GIT_CONFIG_KEY_0'] = 'core.excludesFile';
     process.env['GIT_CONFIG_VALUE_0'] = excludes;
     try {
-      expect(isGitIgnored(dir, '.qwen/audits/x.md')).toBe(false);
+      expect(isGitIgnored(dir, '.mariadb-shell-agent/audits/x.md')).toBe(false);
     } finally {
       if (savedCount === undefined) delete process.env['GIT_CONFIG_COUNT'];
       else process.env['GIT_CONFIG_COUNT'] = savedCount;
@@ -263,13 +279,13 @@ describe('isGitIgnored', () => {
     // -C worktree (measured: the verdict flips to true). Forward slashes
     // keep the fixture parseable on Windows, as in the redirect arm.
     const excludes = join(outside, 'foreign-excludes');
-    writeFileSync(excludes, '.qwen/\n');
+    writeFileSync(excludes, '.mariadb-shell-agent/\n');
     const saved = process.env['GIT_CONFIG_PARAMETERS'];
     process.env['GIT_CONFIG_PARAMETERS'] = `'core.excludesfile'='${excludes
       .split('\\')
       .join('/')}'`;
     try {
-      expect(isGitIgnored(dir, '.qwen/audits/x.md')).toBe(false);
+      expect(isGitIgnored(dir, '.mariadb-shell-agent/audits/x.md')).toBe(false);
     } finally {
       if (saved === undefined) delete process.env['GIT_CONFIG_PARAMETERS'];
       else process.env['GIT_CONFIG_PARAMETERS'] = saved;
@@ -284,7 +300,7 @@ describe('isGitIgnored', () => {
     // the host's real /etc/gitconfig answer for the fixture — a red suite
     // on any host whose system config matches the probe path.
     const excludes = join(outside, 'foreign-excludes');
-    writeFileSync(excludes, '.qwen/\n');
+    writeFileSync(excludes, '.mariadb-shell-agent/\n');
     // Git config treats backslashes as escapes, so a platform-native
     // Windows path would leave the fixture unparseable there; git accepts
     // forward slashes on every platform.
@@ -298,7 +314,7 @@ describe('isGitIgnored', () => {
     process.env['GIT_CONFIG_GLOBAL'] = foreignConfig;
     process.env['GIT_CONFIG_SYSTEM'] = foreignConfig;
     try {
-      expect(isGitIgnored(dir, '.qwen/audits/x.md')).toBe(false);
+      expect(isGitIgnored(dir, '.mariadb-shell-agent/audits/x.md')).toBe(false);
     } finally {
       if (savedGlobal === undefined) delete process.env['GIT_CONFIG_GLOBAL'];
       else process.env['GIT_CONFIG_GLOBAL'] = savedGlobal;
@@ -318,11 +334,11 @@ describe('isGitIgnored', () => {
     'GIT_NOGLOB_PATHSPECS',
     'GIT_ICASE_PATHSPECS',
   ])('answers for the -C worktree even when %s is set', (variable) => {
-    writeFileSync(join(dir, '.gitignore'), '.qwen/\n');
+    writeFileSync(join(dir, '.gitignore'), '.mariadb-shell-agent/\n');
     const saved = process.env[variable];
     process.env[variable] = '1';
     try {
-      expect(isGitIgnored(dir, '.qwen/audits/x.md')).toBe(true);
+      expect(isGitIgnored(dir, '.mariadb-shell-agent/audits/x.md')).toBe(true);
     } finally {
       if (saved === undefined) delete process.env[variable];
       else process.env[variable] = saved;
@@ -343,13 +359,15 @@ describe('isGitIgnored', () => {
   it.skipIf(process.platform === 'win32')(
     'probes a colon-leading path literally, not as pathspec magic',
     () => {
-      mkdirSync(join(dir, ':weird', '.qwen'), { recursive: true });
+      mkdirSync(join(dir, ':weird', '.mariadb-shell-agent'), {
+        recursive: true,
+      });
       // Without the './' disambiguation git parses ':weird/...' as a
       // pathspec magic and answers the wrong pathname (ignored here while
       // the literal directory is not).
-      expect(isGitIgnored(dir, ':weird/.qwen/x.md')).toBe(false);
-      writeFileSync(join(dir, '.gitignore'), ':weird/.qwen/\n');
-      expect(isGitIgnored(dir, ':weird/.qwen/x.md')).toBe(true);
+      expect(isGitIgnored(dir, ':weird/.mariadb-shell-agent/x.md')).toBe(false);
+      writeFileSync(join(dir, '.gitignore'), ':weird/.mariadb-shell-agent/\n');
+      expect(isGitIgnored(dir, ':weird/.mariadb-shell-agent/x.md')).toBe(true);
     },
   );
 

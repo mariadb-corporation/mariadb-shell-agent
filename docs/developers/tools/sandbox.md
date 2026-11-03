@@ -8,7 +8,7 @@
 
 If you need extra tools inside the container (e.g., `git`, `python`, `rg`), create a custom Dockerfile, The specific operation is as follows
 
-#### 1、Clone qwen code project first, https://github.com/QwenLM/qwen-code.git
+#### 1、Clone qwen code project first, https://github.invalid/QwenLM/qwen-code.git
 
 #### 2、Make sure you perform the following operation in the source code repository directory
 
@@ -16,7 +16,7 @@ If you need extra tools inside the container (e.g., `git`, `python`, `rg`), crea
 # 1. First, install the dependencies of the project
 npm install
 
-# 2. Build the Qwen Code project
+# 2. Build the MariaDB Shell Agent project
 npm run build
 
 # 3. Verify that the dist directory has been generated
@@ -36,20 +36,20 @@ ls -la $(dirname $(which qwen))/../lib/node_modules/@qwen-code/qwen-code
 # It should show that this is a symbolic link pointing to your source code directory
 
 # 7.Test the version of qwen
-qwen -v
+mariadb-shell-agent -v
 # npm link will overwrite the global qwen. To avoid being unable to distinguish the same version number, you can uninstall the global CLI first
 
 ```
 
 #### 3、Create your sandbox Dockerfile under the root directory of your own project
 
-- Path: `.qwen/sandbox.Dockerfile`
+- Path: `.mariadb-shell-agent/sandbox.Dockerfile`
 
-- Official mirror image address:https://github.com/QwenLM/qwen-code/pkgs/container/qwen-code
+- Official mirror image address:https://github.invalid/QwenLM/qwen-code/pkgs/container/qwen-code
 
 ```bash
 # Based on the official Qwen sandbox image (It is recommended to explicitly specify the version)
-FROM ghcr.io/qwenlm/qwen-code:sha-570ec43
+FROM ghcr.invalid/qwenlm/qwen-code:sha-570ec43
 # Add your extra tools here
 RUN apt-get update && apt-get install -y \
     git \
@@ -60,7 +60,7 @@ RUN apt-get update && apt-get install -y \
 #### 4、Create the first sandbox image under the root directory of your project
 
 ```bash
-QWEN_SANDBOX=docker BUILD_SANDBOX=1 qwen -s
+QWEN_SANDBOX=docker BUILD_SANDBOX=1 mariadb-shell-agent -s
 # Observe whether the sandbox version of the tool you launched is consistent with the version of your custom image. If they are consistent, the startup will be successful
 ```
 
@@ -87,5 +87,5 @@ npm install -g @qwen-code/qwen-code
 
 # Verification Recovery
 which qwen
-qwen --version
+mariadb-shell-agent --version
 ```

@@ -4,7 +4,7 @@
 
 WebShell 的 `@` 能力已经支持在输入框中把选中的文件、扩展、MCP 资源以及 host 自定义 provider 项渲染为 chip。输入框内的 chip 来自 CodeMirror inline widget，widget 持有完整的 `WebShellComposerTag`，因此可以稳定拿到 `id`、`kind`、`label`、`value`、`serialized`、`removable` 以及 host 通过 `composerTagIcons` 注入的 icon。
 
-当前 PR1 的第一版实现没有改变发送链路，只在用户消息渲染阶段从 `content` 文本中重新解析 `@...` 引用，再把能够识别的 built-in 引用渲染为 chip。这解决了部分可逆场景，例如 `@.qwen/`、`@ext:name`、`@mcp:name`，但它依赖文本猜测，无法覆盖所有真实输入。
+当前 PR1 的第一版实现没有改变发送链路，只在用户消息渲染阶段从 `content` 文本中重新解析 `@...` 引用，再把能够识别的 built-in 引用渲染为 chip。这解决了部分可逆场景，例如 `@.mariadb-shell-agent/`、`@ext:name`、`@mcp:name`，但它依赖文本猜测，无法覆盖所有真实输入。
 
 review 反馈暴露了这个方向的根本问题：
 
@@ -359,7 +359,7 @@ provider 如果没有提供 `composerTag`，发送后仍然只有纯文本，默
 
 ### Integration / browser verification
 
-- 在本地 WebShell 选择 `.qwen/`、`Makefile` 或 `LICENSE`，发送后用户消息仍显示 file chip。
+- 在本地 WebShell 选择 `.mariadb-shell-agent/`、`Makefile` 或 `LICENSE`，发送后用户消息仍显示 file chip。
 - 选择 MCP resource，发送后用户消息显示 MCP chip，resource 中的转义字符不被错误 trim。
 - 注入一个 custom provider，选择后发送，用户消息显示 custom label/value/icon。
 - 刷新页面或重新打开同一 session，用户消息 chip 仍然存在。

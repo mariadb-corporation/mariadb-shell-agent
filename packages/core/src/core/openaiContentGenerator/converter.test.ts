@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2062,7 +2063,7 @@ describe('OpenAIContentConverter', () => {
   });
 
   describe('MCP multi-part tool results (issue #1520)', () => {
-    // Regression tests for https://github.com/QwenLM/qwen-code/issues/1520:
+    // Regression tests for https://github.invalid/QwenLM/qwen-code/issues/1520:
     // when an MCP tool returns several content blocks (text + image, or
     // multiple text sections), all content must end up in the tool message,
     // NOT in a separate user message. Inputs mimic the fixed
@@ -3706,7 +3707,7 @@ describe('OpenAIContentConverter', () => {
 });
 
 describe('MCP tool result end-to-end through OpenAI converter (issue #1520)', () => {
-  // End-to-end regression tests for https://github.com/QwenLM/qwen-code/issues/1520.
+  // End-to-end regression tests for https://github.invalid/QwenLM/qwen-code/issues/1520.
   // Simulates transformMcpContentToParts → convertToFunctionResponse → OpenAI
   // converter and verifies multi-part MCP results land in the OpenAI tool
   // message, with no content leaking into user messages.

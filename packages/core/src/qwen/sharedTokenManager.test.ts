@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  *
  */
@@ -221,7 +222,7 @@ describe('SharedTokenManager', () => {
     mockPath.dirname.mockImplementation((filePath) => {
       // Handle undefined/null input gracefully
       if (!filePath || typeof filePath !== 'string') {
-        return '/home/user/.qwen'; // Return the expected directory path
+        return '/home/user/.mariadb-shell-agent'; // Return the expected directory path
       }
       const parts = filePath.split('/');
       const result = parts.slice(0, -1).join('/');

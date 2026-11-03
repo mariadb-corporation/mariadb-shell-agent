@@ -24,7 +24,7 @@ Claude 子进程不因此自动获得 Qwen 内部工具策略的保护；两者�
 ## 2. 定义与启动
 
 agent 定义通过独立的 `executor` 字段选择执行器，不能把 `model` 当作后端选择器。
-示例放在 `.qwen/agents/claude-worker.md`；先由用户安装并固定所需 adapter 版本，
+示例放在 `.mariadb-shell-agent/agents/claude-worker.md`；先由用户安装并固定所需 adapter 版本，
 确认其可执行文件 `claude-agent-acp` 位于 PATH，并按 adapter 要求完成 Claude 认证：
 
 ```markdown

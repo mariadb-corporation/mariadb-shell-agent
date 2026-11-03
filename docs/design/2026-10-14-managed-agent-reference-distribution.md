@@ -68,7 +68,7 @@ The release also publishes a detached copy of `manifest.json` and `SHA256SUMS.tx
 
 - distribution name, version, experimental status, repository, and exact Git revision;
 - each component's Maven version, bundle path, byte size, and SHA-256 digest;
-- the exact Qwen Code version and Hosted Harness profile from the same source tree;
+- the exact MariaDB Shell Agent version and Hosted Harness profile from the same source tree;
 - the Serve protocol, Runtime Broker protocol, public API, Java, Node.js, and Flyway migration compatibility read from the same source tree;
 - the accepted one-control-plane, trusted-Linux, embedded-Broker topology;
 - explicit defaults: public Shell execution is `false`, canonical Shell v2 advertisement is `true`, and MCP lifecycle remains explicitly enabled;
@@ -86,7 +86,7 @@ The distribution version is independent of the Maven component versions. The man
 
 ## Deployment and upgrade
 
-The operator verifies `SHA256SUMS.txt`, extracts the archive, reads `manifest.json`, installs the exact compatible Qwen CLI/Harness, configures MySQL and the existing server environment, starts `qwen serve --profile hosted-harness`, then starts the bundled server launcher. `/actuator/health` is the startup gate.
+The operator verifies `SHA256SUMS.txt`, extracts the archive, reads `manifest.json`, installs the exact compatible Qwen CLI/Harness, configures MySQL and the existing server environment, starts `mariadb-shell-agent serve --profile hosted-harness`, then starts the bundled server launcher. `/actuator/health` is the startup gate.
 
 Upgrade uses one stopped admission window on the accepted single-control-plane topology: retain the database, Runtime credential key, and durable Runtime state; back them up; stop ingress, server, and Harness; verify the new artifact and compatibility manifest; start the matching Harness; then start the new server and allow Flyway to migrate forward. Traffic resumes only after health and a new no-tool Turn succeed. Database downgrade is not supported; rollback after a migration requires restoring the pre-upgrade database and state backup before accepting new writes. On the systemd layout, `bin/qwen-managed-agent-upgrade` runs the stop, backup, install, start and verification in phases, and prints the steps it leaves to the operator, such as stopping ingress and installing the Harness, where they fall; see the [upgrade command design](2026-10-25-managed-agent-upgrade-command.md).
 

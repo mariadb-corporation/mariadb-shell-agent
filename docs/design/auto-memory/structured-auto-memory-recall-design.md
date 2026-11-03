@@ -39,11 +39,11 @@ directory follows the platform and runtime configuration.
 | ------- | ---------------------------------------------- | ---------------------------------------------------- |
 | Project | `<memory-base>/projects/<project-key>/memory/` | Private memory for the current Git root or workspace |
 | User    | `<memory-base>/memories/`                      | Cross-project user preferences and background        |
-| Team    | `<git-root>/.qwen/team-memory/`                | Git-tracked memory shared by a team                  |
+| Team    | `<git-root>/.mariadb-shell-agent/team-memory/` | Git-tracked memory shared by a team                  |
 
 `QWEN_CODE_MEMORY_BASE_DIR` overrides the base directory. Only Project Memory
 honors `QWEN_CODE_MEMORY_LOCAL=1`, which moves it to
-`<project>/.qwen/memory/`. User Memory remains under the global memory base; a
+`<project>/.mariadb-shell-agent/memory/`. User Memory remains under the global memory base; a
 `user/*.md` file under a Project root is still Project Memory. Scope comes from
 the scanned root, not the first relative-path segment.
 
@@ -57,7 +57,7 @@ Each topic file uses YAML frontmatter followed by a Markdown body:
 ```yaml
 ---
 name: model-pull-memory-design
-description: Qwen Code Auto Memory uses structured metadata and on-demand body retrieval.
+description: MariaDB Shell Agent Auto Memory uses structured metadata and on-demand body retrieval.
 type: project
 category: tool_experience
 keywords:
@@ -314,7 +314,7 @@ snapshot. The ordering is shared by the normal model loop and ACP sessions.
 
 Structured recall does not turn general Core file tools into a Memory
 filesystem sandbox. `read_file`, Glob, Grep, directory listing, write tools,
-and Shell retain Qwen Code's existing permission and sandbox semantics. The
+and Shell retain MariaDB Shell Agent's existing permission and sandbox semantics. The
 structured prompt tells the main model to use `search_memory` for body reads
 and `manage_memory` for writes, and not to access managed-memory paths through
 general tools. This is a model routing contract, not a security boundary.

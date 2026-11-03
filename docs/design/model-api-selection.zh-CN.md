@@ -4,13 +4,13 @@
 
 ## 问题与范围
 
-OpenAI Chat Completions 与 Responses 共用凭据配置，但目前 Qwen Code 将它们作为
+OpenAI Chat Completions 与 Responses 共用凭据配置，但目前 MariaDB Shell Agent 将它们作为
 不同认证选项和提供商配置组。用户必须将 `openai` 改为 `openai-responses` 才能选择
 请求格式。
 
 在每个 OpenAI-compatible 模型中增加 `wireApi: "chat-completions" | "responses"`，
 与 `id`、`baseUrl`、`envKey` 同级。界面统一为 OpenAI-compatible 入口，再选择 API。
-保留内部协议身份和已记录会话的精确路由。这是 Qwen Code 自身功能，并非从其他代码库
+保留内部协议身份和已记录会话的精确路由。这是 MariaDB Shell Agent 自身功能，并非从其他代码库
 移植。原生 computer-use 行为、reasoning 默认值、传输实现、协议自动探测以及凭据
 自动迁移不在本次范围内。
 
@@ -142,11 +142,11 @@ CLI 在写入模型后刷新可写作用域内的所有提供商配置组，避�
 - 隔离的 localhost 服务记录实际 CLI 请求路径和负载：隐式 Chat、显式 Chat、新格式
   Responses、自定义提供商 Responses、已发布 Responses 声明、在请求前拒绝非法 API，
   以及两种 API 的工具调用续接。
-- 先对全局 `qwen` 执行基线，再验证本地构建 CLI。使用临时 `QWEN_HOME` 和 mock key，
+- 先对全局 `mariadb-shell-agent` 执行基线，再验证本地构建 CLI。使用临时 `QWEN_HOME` 和 mock key，
   不修改真实设置，不向远端模型发送测试提示。
 - 完成 build、typecheck、相关单元测试、bundle、格式和 lint 检查、两次干净自审及
   独立 review 后才宣布完成。
 
 验收依据是正确的请求格式和保留的路由身份，不能只看 JSON 解析成功或进程退出码。
-详细运行结果放在 git 忽略的 `.qwen/e2e-tests/pr11538-canonical-wire-api/` 目录，
+详细运行结果放在 git 忽略的 `.mariadb-shell-agent/e2e-tests/pr11538-canonical-wire-api/` 目录，
 验证报告发布到 PR，供 reviewer 直接查看。

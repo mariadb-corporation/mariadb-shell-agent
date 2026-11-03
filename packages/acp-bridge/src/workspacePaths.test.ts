@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -88,7 +89,7 @@ describe('translateAndCheckAbsoluteWorkspacePath', () => {
   });
 });
 
-// Regression for #7139: a Windows host relaunching `qwen serve` into a Linux
+// Regression for #7139: a Windows host relaunching `mariadb-shell-agent serve` into a Linux
 // Docker sandbox forwards `--workspace C:\…` (and client/persisted workspace
 // registrations) in host shape; every ACP child then failed with
 // `chdir(2) ENOENT`. These tests pin the container-side translation.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +39,7 @@ vi.mock('../../semantic-colors.js', () => ({
 describe('HookConfigDetailStep', () => {
   const createMockHookEvent = (): HookEventDisplayInfo => ({
     event: HookEventName.Stop,
-    shortDescription: 'Right before Qwen Code concludes its response',
+    shortDescription: 'Right before MariaDB Shell Agent concludes its response',
     description: '',
     exitCodes: [
       { code: 0, description: 'stdout/stderr not shown' },
@@ -133,7 +134,7 @@ describe('HookConfigDetailStep', () => {
     const hookConfig = createMockHookConfig(
       HooksConfigSource.Extensions,
       'ralph-wiggum',
-      '/Users/test/.qwen/extensions/ralph-wiggum',
+      '/Users/test/.mariadb-shell-agent/extensions/ralph-wiggum',
     );
 
     const { lastFrame } = render(
@@ -141,7 +142,9 @@ describe('HookConfigDetailStep', () => {
     );
 
     expect(lastFrame()).toContain('Extensions');
-    expect(lastFrame()).toContain('/Users/test/.qwen/extensions/ralph-wiggum');
+    expect(lastFrame()).toContain(
+      '/Users/test/.mariadb-shell-agent/extensions/ralph-wiggum',
+    );
   });
 
   it('should render Extension field for extensions', () => {

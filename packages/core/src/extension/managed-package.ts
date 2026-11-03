@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -511,12 +512,12 @@ export async function compileManagedExtensionPackage(
   }
   const contextRoots =
     config['contextFileName'] === undefined
-      ? files.includes('QWEN.md')
-        ? ['QWEN.md']
+      ? files.includes('MARIADB-SHELL-AGENT.md')
+        ? ['MARIADB-SHELL-AGENT.md']
         : files.includes('system-prompt.md')
           ? ['system-prompt.md']
           : []
-      : resourceRoots(config, 'contextFileName', 'QWEN.md');
+      : resourceRoots(config, 'contextFileName', 'MARIADB-SHELL-AGENT.md');
   for (const file of contextRoots)
     contributions.context.push({
       path: file,

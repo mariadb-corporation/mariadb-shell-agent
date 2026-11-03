@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -79,7 +80,7 @@ export type SettingsChangeListener = (
  * change events when the resolved settings content differs from the
  * in-memory state.
  *
- * Uses chokidar to monitor the `.qwen` directory (depth: 0) with strict
+ * Uses chokidar to monitor the `.mariadb-shell-agent` directory (depth: 0) with strict
  * basename filtering. Self-writes from `LoadedSettings.setValue()` are
  * naturally suppressed via a before/after semantic diff — `setValue()`
  * mutates memory before writing disk, so `reloadScopeFromDisk()` produces
@@ -90,9 +91,9 @@ export type SettingsChangeListener = (
  * providers, MCP servers, …), no event is emitted, since such values are read
  * once at startup and cannot take effect without a restart.
  *
- * The watcher never creates `.qwen` itself. When the directory is missing at
- * startup it bootstrap-watches the parent (depth: 0, `.qwen`-only filter) and
- * promotes to watching `.qwen` once it appears — so a `settings.json` added
+ * The watcher never creates `.mariadb-shell-agent` itself. When the directory is missing at
+ * startup it bootstrap-watches the parent (depth: 0, `.mariadb-shell-agent`-only filter) and
+ * promotes to watching `.mariadb-shell-agent` once it appears — so a `settings.json` added
  * later in the session is still detected without recursing the project tree.
  */
 export class SettingsWatcher {
@@ -100,7 +101,7 @@ export class SettingsWatcher {
   private readonly watchers: Map<SettingScope, FSWatcher> = new Map();
   /**
    * Per-scope watch stage. `bootstrap` watches the parent directory waiting
-   * for the missing `.qwen` dir to appear; `target` watches `.qwen` itself.
+   * for the missing `.mariadb-shell-agent` dir to appear; `target` watches `.mariadb-shell-agent` itself.
    */
   private readonly watchStage: Map<SettingScope, 'bootstrap' | 'target'> =
     new Map();
@@ -131,8 +132,8 @@ export class SettingsWatcher {
       if (!settingsPath) continue;
       const dir = path.dirname(settingsPath);
 
-      // Watch `.qwen` directly when it already exists; otherwise bootstrap on
-      // the parent and promote once `.qwen` appears. We never create the
+      // Watch `.mariadb-shell-agent` directly when it already exists; otherwise bootstrap on
+      // the parent and promote once `.mariadb-shell-agent` appears. We never create the
       // directory ourselves — settings persistence (`saveSettings`) does that
       // when the user actually writes settings.
       if (fs.existsSync(dir)) {
@@ -144,8 +145,8 @@ export class SettingsWatcher {
   }
 
   /**
-   * Watches the resolved `.qwen` directory for changes to `settings.json`.
-   * If `.qwen` itself is removed, demotes back to a parent bootstrap watcher
+   * Watches the resolved `.mariadb-shell-agent` directory for changes to `settings.json`.
+   * If `.mariadb-shell-agent` itself is removed, demotes back to a parent bootstrap watcher
    * so a later re-creation is still caught.
    */
   private watchTargetDir(scope: SettingScope, settingsPath: string): void {
@@ -164,7 +165,7 @@ export class SettingsWatcher {
       })
         .on('all', (event: string, changedPath: string) => {
           if (this.watchGeneration.get(scope) !== gen) return;
-          // The `.qwen` directory itself was removed — demote so we can catch
+          // The `.mariadb-shell-agent` directory itself was removed — demote so we can catch
           // a later re-create instead of holding a stale watcher.
           if (event === 'unlinkDir' && changedPath === dir) {
             void this.demoteScope(scope, settingsPath);
@@ -189,9 +190,9 @@ export class SettingsWatcher {
 
   /**
    * Bootstrap watcher: monitors the parent directory (depth 0) with a strict
-   * predicate that only allows the `.qwen` entry through, so unrelated
+   * predicate that only allows the `.mariadb-shell-agent` entry through, so unrelated
    * top-level churn is suppressed and the project tree is never recursed.
-   * Promotes to a target watcher once `.qwen` appears.
+   * Promotes to a target watcher once `.mariadb-shell-agent` appears.
    */
   private watchParentForDir(scope: SettingScope, settingsPath: string): void {
     const dir = path.dirname(settingsPath);
@@ -228,14 +229,14 @@ export class SettingsWatcher {
       return;
     }
 
-    // Close the TOCTOU gap: `.qwen` may have been created between the
+    // Close the TOCTOU gap: `.mariadb-shell-agent` may have been created between the
     // existence check and the watcher arming (bootstrap uses ignoreInitial).
     if (fs.existsSync(dir)) {
       void this.promoteScope(scope, settingsPath);
     }
   }
 
-  /** Swaps a scope's bootstrap watcher for a target watcher on `.qwen`. */
+  /** Swaps a scope's bootstrap watcher for a target watcher on `.mariadb-shell-agent`. */
   private async promoteScope(
     scope: SettingScope,
     settingsPath: string,
@@ -244,7 +245,7 @@ export class SettingsWatcher {
     await this.replaceWatcher(scope);
     if (!this.started) return;
     this.watchTargetDir(scope, settingsPath);
-    // Pick up a settings.json that already exists inside the new `.qwen`.
+    // Pick up a settings.json that already exists inside the new `.mariadb-shell-agent`.
     this.scheduleRefresh(scope);
   }
 

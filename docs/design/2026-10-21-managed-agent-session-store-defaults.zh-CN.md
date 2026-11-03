@@ -92,7 +92,7 @@ URL 或 ID 为空时的启动拒绝消息也会给出要设置的变量。
 - preflight 测试：`session-store` 行报告 `SKIP`、`FAIL` 和 `PASS`，且 preflight 通过其 environment 推导 URL。
 - 模板测试：bootstrap 输出和 `server.env.example` 不再包含被删除的变量，并设置了 Workspace 目录。
 - 模块验证：在 `packages/managed-agent-server` 中运行 `mvn verify`。
-- 端到端：构建参考发行包，然后按部署文档原文对接 MySQL 和真实的 `qwen serve --profile hosted-harness`。依次运行 `--check`、启动，并完成一个纯文本 Turn。再按文档列出的变量开启 local-process 工具路径，重复上述步骤。以 `main` 上的同样步骤作为基线。
+- 端到端：构建参考发行包，然后按部署文档原文对接 MySQL 和真实的 `mariadb-shell-agent serve --profile hosted-harness`。依次运行 `--check`、启动，并完成一个纯文本 Turn。再按文档列出的变量开启 local-process 工具路径，重复上述步骤。以 `main` 上的同样步骤作为基线。
 
 ## 验收标准
 

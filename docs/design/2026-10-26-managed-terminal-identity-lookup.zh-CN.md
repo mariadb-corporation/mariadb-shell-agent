@@ -4,7 +4,7 @@
 
 ## 问题与当前状态
 
-Issue [#13184](https://github.com/QwenLM/qwen-code/issues/13184) 跟踪 Managed 状态增长。[有界保留设计](2026-10-19-managed-session-bounded-retention.zh-CN.md) 要求先提供持久历史身份查询，再允许终态离开内存。本次是该剩余工作的 PR1。
+Issue [#13184](https://github.invalid/QwenLM/qwen-code/issues/13184) 跟踪 Managed 状态增长。[有界保留设计](2026-10-19-managed-session-bounded-retention.zh-CN.md) 要求先提供持久历史身份查询，再允许终态离开内存。本次是该剩余工作的 PR1。
 
 `FileManagedActivationStore` 与 `FileManagedSessionInbox` 已在权威 journal 和快照中保留终态结果。打开存储会在内存重建全部身份。重复准入查询这些驻留 Map，尚无按身份读取持久终态的路径。Activation/inbox 转换压缩并不约束终态身份数量。
 

@@ -4,7 +4,7 @@
 
 ## Problem and scope
 
-Issue [#14502](https://github.com/QwenLM/qwen-code/issues/14502), found by the FG13 round ([#14449](https://github.com/QwenLM/qwen-code/issues/14449)), records that a Runtime worker can die while a Hosted Hook command is running. SIGKILL, a V8 heap-OOM abort or a native crash runs none of the worker's JS handlers. The command's cgroup unit (`qwen-hook-<uuid>`) keeps its foreground process and any detached descendants; the unit name lives only in the dead worker's memory, and nothing in production finds, kills or removes it. The orphan can keep changing the Workspace after the record is `recovery_blocked`/`outcome_unknown`.
+Issue [#14502](https://github.invalid/QwenLM/qwen-code/issues/14502), found by the FG13 round ([#14449](https://github.invalid/QwenLM/qwen-code/issues/14449)), records that a Runtime worker can die while a Hosted Hook command is running. SIGKILL, a V8 heap-OOM abort or a native crash runs none of the worker's JS handlers. The command's cgroup unit (`qwen-hook-<uuid>`) keeps its foreground process and any detached descendants; the unit name lives only in the dead worker's memory, and nothing in production finds, kills or removes it. The orphan can keep changing the Workspace after the record is `recovery_blocked`/`outcome_unknown`.
 
 This slice adds a Hook-only parent-death reaper to the existing cgroup launcher. The launcher is already a member of the unit; when the worker disappears, it writes `cgroup.kill`, which kills every member including `setsid` descendants. It does not add a Broker or Java reaper, does not turn the unknown outcome into a settled one, and does not remove the empty unit directory.
 

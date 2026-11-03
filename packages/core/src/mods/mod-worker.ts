@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -418,7 +419,7 @@ async function bounded(
 
 // The engine names the plugin behind an ask it made or reworded; an answer
 // passed up as heard keeps the owner it had, and a hook cannot write one.
-// `setting` names a host option's own check, which Qwen Code does not report,
+// `setting` names a host option's own check, which MariaDB Shell Agent does not report,
 // so a hook's is dropped too.
 async function ownCheck(
   value: ModToolCheckResult,

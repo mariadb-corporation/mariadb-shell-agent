@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -159,9 +160,14 @@ describe('runReply', () => {
       handledCommentIds: [],
       postedCommentIds: [],
     };
-    execFileSync('mkdir', ['-p', join(repo, '.qwen', 'tmp')]);
+    execFileSync('mkdir', ['-p', join(repo, '.mariadb-shell-agent', 'tmp')]);
     writeState(paths.statePath, initial);
-    planPath = join(repo, '.qwen', 'tmp', 'autofix-pr-7-plan.json');
+    planPath = join(
+      repo,
+      '.mariadb-shell-agent',
+      'tmp',
+      'autofix-pr-7-plan.json',
+    );
     nextId = 1;
     mocks.ghWithInput.mockReset();
     mocks.ghWithInput.mockImplementation(() => {
@@ -1226,9 +1232,11 @@ describe('runReply', () => {
     expect(mocks.ghWithInput).toHaveBeenCalledTimes(1);
     expect(state().handledCommentIds).toEqual(['PRRC_101']);
     // Released afterwards.
-    expect(existsSync(join(repo, '.qwen', 'tmp', 'autofix-pr-7.lock'))).toBe(
-      false,
-    );
+    expect(
+      existsSync(
+        join(repo, '.mariadb-shell-agent', 'tmp', 'autofix-pr-7.lock'),
+      ),
+    ).toBe(false);
   });
 
   it('refuses to post on a PR that is no longer open', () => {

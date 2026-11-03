@@ -88,15 +88,15 @@ describe('getComposerTagViewModel', () => {
 
   it('hides labels for built-in tag kinds and resolves icons', () => {
     const model = getComposerTagViewModel({
-      id: 'file:@.qwen/',
+      id: 'file:@.mariadb-shell-agent/',
       kind: 'file',
       label: 'File',
-      value: '.qwen/',
+      value: '.mariadb-shell-agent/',
     });
 
     expect(model.tagLabel).toBe('');
-    expect(model.tagValue).toBe('.qwen/');
-    expect(model.fallback).toBe('file:@.qwen/');
+    expect(model.tagValue).toBe('.mariadb-shell-agent/');
+    expect(model.fallback).toBe('file:@.mariadb-shell-agent/');
     expect(model.iconUrl).toBeTruthy();
   });
 
@@ -684,41 +684,47 @@ describe('composer tag input annotations', () => {
   });
 
   it('leaves unannotated references as text', () => {
-    expect(splitComposerTagContentByAnnotations('list @.qwen/ files')).toEqual([
-      { type: 'text', text: 'list @.qwen/ files' },
-    ]);
+    expect(
+      splitComposerTagContentByAnnotations('list @.mariadb-shell-agent/ files'),
+    ).toEqual([{ type: 'text', text: 'list @.mariadb-shell-agent/ files' }]);
   });
 
   it('leaves invalid annotation ranges as text', () => {
     expect(
-      splitComposerTagContentByAnnotations('list @.qwen/ files', [
-        {
-          type: 'reference',
-          start: 5,
-          end: 12,
-          text: '@wrong/',
-          reference: {
-            id: 'file:@wrong/',
-            kind: 'file',
-            value: 'wrong/',
-            serialized: '@wrong/',
+      splitComposerTagContentByAnnotations(
+        'list @.mariadb-shell-agent/ files',
+        [
+          {
+            type: 'reference',
+            start: 5,
+            end: 12,
+            text: '@wrong/',
+            reference: {
+              id: 'file:@wrong/',
+              kind: 'file',
+              value: 'wrong/',
+              serialized: '@wrong/',
+            },
           },
-        },
-      ]),
-    ).toEqual([{ type: 'text', text: 'list @.qwen/ files' }]);
+        ],
+      ),
+    ).toEqual([{ type: 'text', text: 'list @.mariadb-shell-agent/ files' }]);
   });
 
   it('leaves malformed reference annotations as text', () => {
     expect(
-      splitComposerTagContentByAnnotations('list @.qwen/ files', [
-        {
-          type: 'reference',
-          start: 5,
-          end: 12,
-          text: '@.qwen/',
-        } as unknown as DaemonInputAnnotation,
-      ]),
-    ).toEqual([{ type: 'text', text: 'list @.qwen/ files' }]);
+      splitComposerTagContentByAnnotations(
+        'list @.mariadb-shell-agent/ files',
+        [
+          {
+            type: 'reference',
+            start: 5,
+            end: 12,
+            text: '@.mariadb-shell-agent/',
+          } as unknown as DaemonInputAnnotation,
+        ],
+      ),
+    ).toEqual([{ type: 'text', text: 'list @.mariadb-shell-agent/ files' }]);
   });
 
   it('skips non-object annotation entries from untrusted metadata', () => {

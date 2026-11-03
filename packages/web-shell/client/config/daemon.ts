@@ -164,7 +164,7 @@ export function persistDaemonToken(token: string, baseUrl?: string): void {
 /**
  * The one parse of the URL token grammar: `#token=` (preferred — unlike a
  * query param it is never sent to the server, so it stays out of access logs
- * and Referer headers; this is what `qwen serve --open` uses) with `?token=`
+ * and Referer headers; this is what `mariadb-shell-agent serve --open` uses) with `?token=`
  * as legacy fallback (the dev launcher, hand-built URLs). Shared by
  * `getDaemonToken()` (which caches and persists the result) and
  * `hasReloadSurvivableDaemonToken()` (which must not touch the cache), so the
@@ -301,7 +301,7 @@ export function getAllowedDaemonOrigin(raw: string): string {
     // while the rest of connect-src stays in effect, so a remote
     // http://[::1]:4170 target remains blocked and the gate would loop on
     // "unreachable" with only a console violation as evidence. Exempt the
-    // page's own origin: 'self' covers it, and qwen serve --hostname '[::1]'
+    // page's own origin: 'self' covers it, and mariadb-shell-agent serve --hostname '[::1]'
     // is a documented deployment.
     if (
       parsed.hostname.startsWith('[') &&

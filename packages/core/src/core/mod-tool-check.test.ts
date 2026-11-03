@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -314,7 +315,7 @@ describe('headless-owned Mod tool.check restriction', () => {
     const call = await harness.run();
     expect(call.status).toBe('error');
     expect(call.response.error?.message).toBe(
-      'Qwen Code could not ask the user to confirm "checked_tool" in non-interactive mode, so it was not run. Mod guard requested confirmation before running checked_tool.',
+      'MariaDB Shell Agent could not ask the user to confirm "checked_tool" in non-interactive mode, so it was not run. Mod guard requested confirmation before running checked_tool.',
     );
     expect(call.response.approvalRequired).toBeUndefined();
     expect(harness.execute).not.toHaveBeenCalled();

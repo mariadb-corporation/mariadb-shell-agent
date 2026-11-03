@@ -1,6 +1,6 @@
 # QQ Bot (QQ机器人)
 
-This guide covers setting up a Qwen Code channel on QQ via the official QQ Bot Open Platform API.
+This guide covers setting up a MariaDB Shell Agent channel on QQ via the official QQ Bot Open Platform API.
 
 ## Prerequisites
 
@@ -23,7 +23,7 @@ Start the channel — the first time it will show a QR code. Scan it with your Q
 ```
 
 ```bash
-qwen channel start my-qq
+mariadb-shell-agent channel start my-qq
 # Scan the QR code in the terminal with your QQ app
 ```
 
@@ -93,10 +93,10 @@ All standard channel options (see [Channel Overview](./overview#options)) are al
 
 ```bash
 # Start only the QQ channel
-qwen channel start my-qq
+mariadb-shell-agent channel start my-qq
 
 # Or start all configured channels together
-qwen channel start
+mariadb-shell-agent channel start
 ```
 
 Open QQ and send a message to your bot. You should see the response arrive in your chat.
@@ -122,7 +122,7 @@ For full-message mode this default is already what you want — with `groupAllPo
 
 The other shared scopes are not equivalents. `sessionScope: "chat_thread"` routes group messages exactly like `"thread"` (QQ supplies no thread id, so both key on `<channel>:<chatId>`), but it is treated as shared for **every** chat: each direct message becomes a shared session subject to the `operators` gate, so `/clear` in a DM is refused and a tool call raised in a DM has no one to answer it. `sessionScope: "single"` also shares direct messages, and additionally keys **every** group and every direct message to the one context `<channel>:__single__`, so group A's history is answered with group B's and with DM history — the cross-group leakage this section is about. The channel warns at startup whenever `groupAllPolicy` is `"keyword"` or `"all"` and the scope is not `"thread"`. With `multiSession` enabled the scope is pinned to `"user"`, so that warning names the two settings as mutually exclusive and tells the operator to change `groupAllPolicy` or turn `multiSession` off, instead of advising `"thread"`.
 
-**Upgrading from an older QQ channel.** The default scope changed from `"user"` to `"thread"`. (A channel configured with `groupAllPolicy: "keyword"` or `"all"` was previously forced to `"single"` — one global session. A channel that did not pin `sessionScope` now resolves to `"thread"` unless `multiSession` is on, which resolves to `"user"` — per-sender sessions are the only shape `multiSession` supports, so it wins over the plugin default; for a channel without `multiSession` the effective change is from that global session to a per-group one. A channel that pinned `sessionScope` explicitly is no longer overridden, so an explicit `"user"` now takes effect and fragments group full-message traffic per sender — change it to `"thread"` by hand.) Legacy session routes are not deleted automatically: while `purgeLegacySessions` is off, each start counts the routes the purge covers — the single-scope-era `<channel>:__single__` key and this channel's legacy user-scope `<channel>:<senderId>:<chatId>` keys — and leaves them, and their daemon-side sessions, untouched. A `chat_thread`-era `<channel>:<chatId>:<threadId>` route is not covered: it is neither counted nor purged. To remove the covered routes, set `purgeLegacySessions` to `true` on the channel. With it enabled, every such route is released and its daemon-side session discarded, so the old conversation mappings stop existing; the purge runs on each start while the option stays on. Nothing is deleted unless the rescue copy reaches disk: immediately before the first deletion the channel appends the doomed routes to `<channel>-sessions-purged.json` in the channel state directory (for example `~/.qwen/channels/my-qq-sessions-purged.json`; characters outside `A-Za-z0-9_-` in the channel name become `_`) and if that write fails it deletes nothing and leaves the routes in place. The file is written only when a deletion actually happens — never on a start that leaves everything alone. It is a JSON list of purge records, each with its `purgedAt` timestamp, `sessionScope`, and `routes`; each route carries its `kind`, `key`, `sessionId`, `target`, and — when the router's persisted session state still records them — `cwd`, `turns`, `startedAt`, `isolation`, and `workspaceCwd`. Records are appended rather than overwritten, so an earlier purge's record survives a later one (the oldest records are dropped once the list passes 20); a file that cannot be read, or does not hold a purge-record list, is reported in the log and renamed to a sibling `<path>.corrupt-<timestamp>` file before the new record is written, so the damaged copy is kept for hand recovery and the new record is never lost. That is routing metadata only — no conversation content — so it shows you what was dropped and lets you re-create the mapping by hand: a route whose record includes `cwd` and no `isolation` resolves to that same workspace when restored; when the record also carries `isolation: "worktree"`, `cwd` is the (usually already removed) per-session worktree, so restore against the record's `workspaceCwd` and keep `isolation` so the router re-attaches it through the managed load path. When the stored state for a route has no `cwd` (the entry is missing, or predates the field), the record simply omits `cwd` rather than guessing, so restoring such a route by hand also needs the channel's workspace path. Setting `sessionScope: "user"` after a purge does **not** bring the old conversations back by itself — those routes are already gone and are not restored automatically.
+**Upgrading from an older QQ channel.** The default scope changed from `"user"` to `"thread"`. (A channel configured with `groupAllPolicy: "keyword"` or `"all"` was previously forced to `"single"` — one global session. A channel that did not pin `sessionScope` now resolves to `"thread"` unless `multiSession` is on, which resolves to `"user"` — per-sender sessions are the only shape `multiSession` supports, so it wins over the plugin default; for a channel without `multiSession` the effective change is from that global session to a per-group one. A channel that pinned `sessionScope` explicitly is no longer overridden, so an explicit `"user"` now takes effect and fragments group full-message traffic per sender — change it to `"thread"` by hand.) Legacy session routes are not deleted automatically: while `purgeLegacySessions` is off, each start counts the routes the purge covers — the single-scope-era `<channel>:__single__` key and this channel's legacy user-scope `<channel>:<senderId>:<chatId>` keys — and leaves them, and their daemon-side sessions, untouched. A `chat_thread`-era `<channel>:<chatId>:<threadId>` route is not covered: it is neither counted nor purged. To remove the covered routes, set `purgeLegacySessions` to `true` on the channel. With it enabled, every such route is released and its daemon-side session discarded, so the old conversation mappings stop existing; the purge runs on each start while the option stays on. Nothing is deleted unless the rescue copy reaches disk: immediately before the first deletion the channel appends the doomed routes to `<channel>-sessions-purged.json` in the channel state directory (for example `~/.mariadb-shell-agent/channels/my-qq-sessions-purged.json`; characters outside `A-Za-z0-9_-` in the channel name become `_`) and if that write fails it deletes nothing and leaves the routes in place. The file is written only when a deletion actually happens — never on a start that leaves everything alone. It is a JSON list of purge records, each with its `purgedAt` timestamp, `sessionScope`, and `routes`; each route carries its `kind`, `key`, `sessionId`, `target`, and — when the router's persisted session state still records them — `cwd`, `turns`, `startedAt`, `isolation`, and `workspaceCwd`. Records are appended rather than overwritten, so an earlier purge's record survives a later one (the oldest records are dropped once the list passes 20); a file that cannot be read, or does not hold a purge-record list, is reported in the log and renamed to a sibling `<path>.corrupt-<timestamp>` file before the new record is written, so the damaged copy is kept for hand recovery and the new record is never lost. That is routing metadata only — no conversation content — so it shows you what was dropped and lets you re-create the mapping by hand: a route whose record includes `cwd` and no `isolation` resolves to that same workspace when restored; when the record also carries `isolation: "worktree"`, `cwd` is the (usually already removed) per-session worktree, so restore against the record's `workspaceCwd` and keep `isolation` so the router re-attaches it through the managed load path. When the stored state for a route has no `cwd` (the entry is missing, or predates the field), the record simply omits `cwd` rather than guessing, so restoring such a route by hand also needs the channel's workspace path. Setting `sessionScope: "user"` after a purge does **not** bring the old conversations back by itself — those routes are already gone and are not restored automatically.
 
 See [Group Chats](./overview#group-chats) for full details on group policies and mention gating.
 
@@ -235,7 +235,7 @@ Token refresh continues across WebSocket reconnects — the channel never goes o
 ### Bot doesn't respond
 
 - Check the terminal output for errors
-- Verify the channel is running (`qwen channel status`)
+- Verify the channel is running (`mariadb-shell-agent channel status`)
 - If using `privatePolicy: "allowlist"`, make sure your QQ user ID is in `allowedUsers`
 - On first start, a QR code will appear in the terminal — scan it with your QQ app
 
@@ -259,4 +259,4 @@ Token refresh continues across WebSocket reconnects — the channel never goes o
 ### Token expired after long downtime
 
 - If the channel is offline for more than 2 hours, the access token will have expired. The channel fetches a fresh token on reconnect — no action needed
-- If the AppSecret itself is invalid (e.g., rotated in the developer portal), update the `appSecret` field or delete `~/.qwen/channels/<name>-credentials.json` to re-trigger QR code login
+- If the AppSecret itself is invalid (e.g., rotated in the developer portal), update the `appSecret` field or delete `~/.mariadb-shell-agent/channels/<name>-credentials.json` to re-trigger QR code login

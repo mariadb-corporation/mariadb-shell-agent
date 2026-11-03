@@ -1,6 +1,6 @@
 /**
  * File I/O for durable cron tasks. Reads/writes the per-project tasks file
- * under the user's runtime dir (`~/.qwen/tmp/<project-hash>/`), NOT the
+ * under the user's runtime dir (`~/.mariadb-shell-agent/tmp/<project-hash>/`), NOT the
  * working tree — durable tasks are the user's own automation against a
  * project, not project-shared config, so they live alongside the other
  * per-project-private runtime state (checkpoints, shell history) and never
@@ -347,7 +347,7 @@ const TASKS_FILENAME = 'scheduled_tasks.json';
 /** Generic label for the tasks file, for user-facing messages and tool
  * descriptions. The real path is per-project (hashed); this template
  * communicates the location without leaking the hash. */
-export const CRON_TASKS_DISPLAY_PATH = `~/.qwen/tmp/<project-hash>/${TASKS_FILENAME}`;
+export const CRON_TASKS_DISPLAY_PATH = `~/.mariadb-shell-agent/tmp/<project-hash>/${TASKS_FILENAME}`;
 
 // Cross-process write-lock tuning for updateCronTasks. Updates hold the
 // lock for single-digit milliseconds, so anything older than STALE_MS is

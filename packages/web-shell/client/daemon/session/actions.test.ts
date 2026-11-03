@@ -3998,7 +3998,7 @@ describe('createDaemonSessionActions', () => {
       sessionId: 'session-a',
       name: 'deep-review',
       source: 'project' as const,
-      scriptPath: '/workspace/.qwen/workflows/deep-review.js',
+      scriptPath: '/workspace/.mariadb-shell-agent/workflows/deep-review.js',
       script: 'export const meta = { name: "deep-review", description: "d" }',
       meta: { name: 'deep-review', description: 'd' },
     };
@@ -7995,7 +7995,8 @@ describe('model catalog refresh', () => {
   it('reloads the admission workspace even when context reports a worktree subdirectory', async () => {
     const h = setup();
     const context = h.context;
-    context.workspaceCwd = '/workspace/.qwen/worktrees/branch/subdir';
+    context.workspaceCwd =
+      '/workspace/.mariadb-shell-agent/worktrees/branch/subdir';
     h.session.context.mockResolvedValue(context);
     await h.actions.refreshModels();
     expect(h.session.client.workspaceByCwd).toHaveBeenLastCalledWith(

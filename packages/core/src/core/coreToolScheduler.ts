@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -341,7 +342,7 @@ const OPT_IN_TOOL_MESSAGES: Record<
   [ToolNames.TODO_WRITE]: {
     setting: 'tools.todoWrite.enabled',
     defaultUnavailableMessage:
-      'is a built-in tool that is disabled by default. Enable it with the tools.todoWrite.enabled setting and restart Qwen Code.',
+      'is a built-in tool that is disabled by default. Enable it with the tools.todoWrite.enabled setting and restart MariaDB Shell Agent.',
   },
 };
 
@@ -386,28 +387,28 @@ export async function getOptInToolNotFoundMessage(
     const settingAction = settingEnabled
       ? ''
       : ` Also enable ${definition.setting}.`;
-    return `Tool "${unknownToolName}" has been disabled for this workspace via the workspace tools toggle. Re-enable it there.${settingAction} Restart Qwen Code after updating these controls.`;
+    return `Tool "${unknownToolName}" has been disabled for this workspace via the workspace tools toggle. Re-enable it there.${settingAction} Restart MariaDB Shell Agent after updating these controls.`;
   }
 
   if (denyRule) {
     const settingAction = settingEnabled
       ? ''
       : ` Enable ${definition.setting} as well.`;
-    return `Tool "${unknownToolName}" is blocked by the permissions.deny or --exclude-tools rule "${denyRule}".${settingAction} Remove the deny rule and restart Qwen Code.`;
+    return `Tool "${unknownToolName}" is blocked by the permissions.deny or --exclude-tools rule "${denyRule}".${settingAction} Remove the deny rule and restart MariaDB Shell Agent.`;
   }
 
   if (omittedFromCoreTools) {
     const settingAction = settingEnabled
       ? ''
       : ` Enable ${definition.setting} as well.`;
-    return `Tool "${unknownToolName}" is not listed in the active core tools allowlist (--core-tools or settings tools.core).${settingAction} Add it to the allowlist and restart Qwen Code.`;
+    return `Tool "${unknownToolName}" is not listed in the active core tools allowlist (--core-tools or settings tools.core).${settingAction} Add it to the allowlist and restart MariaDB Shell Agent.`;
   }
 
   if (!settingEnabled) {
     return `Tool "${unknownToolName}" ${definition.defaultUnavailableMessage}`;
   }
 
-  return `Tool "${unknownToolName}" is enabled by ${definition.setting} but is blocked by active tool registration rules. Check permissions.deny, --exclude-tools, and tools.core or --core-tools, then restart Qwen Code.`;
+  return `Tool "${unknownToolName}" is enabled by ${definition.setting} but is blocked by active tool registration rules. Check permissions.deny, --exclude-tools, and tools.core or --core-tools, then restart MariaDB Shell Agent.`;
 }
 
 function extractTextFromPartListUnion(c: PartListUnion): string {
@@ -3423,7 +3424,7 @@ export class CoreToolScheduler {
             });
             let permissionErrorMessage: string;
             if (matchingRule) {
-              permissionErrorMessage = `Qwen Code requires permission to use "${reqInfo.name}", but that permission was declined. Matching deny rule: "${matchingRule}".`;
+              permissionErrorMessage = `MariaDB Shell Agent requires permission to use "${reqInfo.name}", but that permission was declined. Matching deny rule: "${matchingRule}".`;
             } else if (
               // The legacy `coreTools` allowlist (`--core-tools` / settings
               // `tools.core`) keeps its hard-disable semantic: an unlisted
@@ -3441,7 +3442,7 @@ export class CoreToolScheduler {
             ) {
               permissionErrorMessage = `"${reqInfo.name}" is not listed in the active core tools allowlist (--core-tools or settings tools.core), so the tool is not available. Add it to the core tools list to re-enable it.`;
             } else {
-              permissionErrorMessage = `Qwen Code requires permission to use "${reqInfo.name}", but that permission was declined.`;
+              permissionErrorMessage = `MariaDB Shell Agent requires permission to use "${reqInfo.name}", but that permission was declined.`;
             }
             newToolCalls.push({
               status: 'error',
@@ -3472,7 +3473,7 @@ export class CoreToolScheduler {
                   excludedTool.toLowerCase().trim() === normalizedToolName,
               );
               if (excludedMatch) {
-                const permissionErrorMessage = `Qwen Code requires permission to use ${excludedMatch}, but that permission was declined.`;
+                const permissionErrorMessage = `MariaDB Shell Agent requires permission to use ${excludedMatch}, but that permission was declined.`;
                 newToolCalls.push({
                   status: 'error',
                   request: reqInfo,
@@ -4463,8 +4464,8 @@ export class CoreToolScheduler {
                 planShellDecision.classification === 'unknown'
                   ? planShellDecision.noApprovalMessage
                   : modAsk
-                    ? `Qwen Code could not ask the user to confirm "${reqInfo.name}" in non-interactive mode, so it was not run. ${modAsk}`
-                    : `Qwen Code requires permission to use "${reqInfo.name}", but that permission was declined (non-interactive mode cannot prompt for confirmation).`;
+                    ? `MariaDB Shell Agent could not ask the user to confirm "${reqInfo.name}" in non-interactive mode, so it was not run. ${modAsk}`
+                    : `MariaDB Shell Agent requires permission to use "${reqInfo.name}", but that permission was declined (non-interactive mode cannot prompt for confirmation).`;
               if (planShellDecision.classification === 'unknown') {
                 rejectPlanShell(errorMessage);
                 continue;
@@ -4869,7 +4870,7 @@ export class CoreToolScheduler {
             if (hooksEnabled && messageBus) {
               fireNotificationHook(
                 messageBus,
-                `Qwen Code needs your permission to use ${reqInfo.name}`,
+                `MariaDB Shell Agent needs your permission to use ${reqInfo.name}`,
                 NotificationType.PermissionPrompt,
                 'Permission needed',
                 undefined,
@@ -6138,7 +6139,7 @@ export class CoreToolScheduler {
     //
     const sleepInhibitorHandle = acquireSleepInhibitor(
       this.config,
-      `Qwen Code is executing tool ${canonicalName}`,
+      `MariaDB Shell Agent is executing tool ${canonicalName}`,
     );
     let removeParentAbortForward: (() => void) | undefined;
     let executionStatus: ToolExecutionStatus = 'not_started';

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -378,11 +379,13 @@ describe('extractClaims', () => {
     });
   });
 
-  it('excludes a cd base under .qwen/ or build output from path claims', () => {
+  it('excludes a cd base under .mariadb-shell-agent/ or build output from path claims', () => {
     // The cd base is a directory the Test Plan tells the reader to CREATE
-    // (.qwen/) or gitignored build output (dist/) — absent at the reviewed
+    // (.mariadb-shell-agent/) or gitignored build output (dist/) — absent at the reviewed
     // commit by construction, the same exclusion isPathClaim applies to tokens.
-    const qwen = extractClaims('`cd .qwen/tmp/review-pr-9 && npm test`');
+    const qwen = extractClaims(
+      '`cd .mariadb-shell-agent/tmp/review-pr-9 && npm test`',
+    );
     expect(qwen.filter((c) => c.kind === 'path')).toEqual([]);
 
     const dist = extractClaims('`cd dist/foo && npm test`');
@@ -786,18 +789,20 @@ describe('runTestPlan', () => {
 
     it('claims a slash token as a path only with EVIDENCE it is one', () => {
       // This PR's own Test Plan produced two false `contradicted` notes before
-      // this bar: `QwenLM/qwen-code` (a --repo slug) and `.qwen/tmp/review-…`
+      // this bar: `QwenLM/qwen-code` (a --repo slug) and `.mariadb-shell-agent/tmp/review-…`
       // (a path the reader is told to CREATE). A bare two-segment token with
       // no extension is a slug or a ref far more often than a directory.
       const r = run(
         '## Test Plan\n\nRun `gh pr view 1 --repo QwenLM/qwen-code`, ' +
-          'check `origin/main`, create `.qwen/tmp/review-pr-1/x.json`, ' +
+          'check `origin/main`, create `.mariadb-shell-agent/tmp/review-pr-1/x.json`, ' +
           'then read `packages/cli/` and `./run.sh`',
       );
       const texts = r.claims.map((c) => c.text);
       expect(texts).not.toContain('QwenLM/qwen-code'); // flag value AND slug
       expect(texts).not.toContain('origin/main'); // ref, no extension
-      expect(texts.some((t) => t.startsWith('.qwen/'))).toBe(false); // temp root
+      expect(texts.some((t) => t.startsWith('.mariadb-shell-agent/'))).toBe(
+        false,
+      ); // temp root
       expect(texts).not.toContain('packages/cli/'); // bare dir, no evidence
       expect(texts).toContain('./run.sh'); // explicit ./ prefix qualifies
     });
@@ -1403,7 +1408,7 @@ describe('platformBodyFetcher — the body fetch routes through the platform rea
 
   it('routes an Aone host at the reader: the MR description', () => {
     aoneFetchMetaMock.mockReturnValue({ body: '## Test Plan\n\nran it' });
-    const fetcher = platformBodyFetcher('gitlab.alibaba-inc.com');
+    const fetcher = platformBodyFetcher('gitlab.alibaba-inc.invalid');
     expect(fetcher('maxcompute/odps_src', '29295886')).toBe(
       '## Test Plan\n\nran it',
     );
@@ -1415,7 +1420,9 @@ describe('platformBodyFetcher — the body fetch routes through the platform rea
 
   it('the web host is Aone too — one platform under two host names', () => {
     aoneFetchMetaMock.mockReturnValue({ body: 'x' });
-    expect(platformBodyFetcher('code.alibaba-inc.com')('g/p', '7')).toBe('x');
+    expect(platformBodyFetcher('code.alibaba-inc.invalid')('g/p', '7')).toBe(
+      'x',
+    );
   });
 
   it('an absent description degrades to an empty body, not a fetch failure', () => {
@@ -1423,11 +1430,13 @@ describe('platformBodyFetcher — the body fetch routes through the platform rea
     // Plan section", the same as a body-less PR on GitHub, never as a
     // failed fetch.
     aoneFetchMetaMock.mockReturnValue({});
-    expect(platformBodyFetcher('gitlab.alibaba-inc.com')('g/p', '7')).toBe('');
+    expect(platformBodyFetcher('gitlab.alibaba-inc.invalid')('g/p', '7')).toBe(
+      '',
+    );
   });
 
   it('refuses a malformed MR id before any platform call', () => {
-    const fetcher = platformBodyFetcher('gitlab.alibaba-inc.com');
+    const fetcher = platformBodyFetcher('gitlab.alibaba-inc.invalid');
     expect(() => fetcher('g/p', 'not-a-number')).toThrow(TypeError);
     expect(() => fetcher('g/p', '0')).toThrow(TypeError);
     // Non-decimal spellings a bare `Number()` would admit — '0x10' is MR
@@ -1454,14 +1463,14 @@ describe('platformBodyFetcher — the body fetch routes through the platform rea
     aoneEnsureAuthMock.mockImplementation(() => {
       throw new Error('a1 CLI not found on PATH — install the `a1` CLI first.');
     });
-    expect(() => platformBodyFetcher('gitlab.alibaba-inc.com')).toThrow(
+    expect(() => platformBodyFetcher('gitlab.alibaba-inc.invalid')).toThrow(
       /a1 CLI not found on PATH/,
     );
     expect(aoneFetchMetaMock).not.toHaveBeenCalled();
   });
 
   it('passes the gate when the a1 is fresh and authed', () => {
-    platformBodyFetcher('gitlab.alibaba-inc.com');
+    platformBodyFetcher('gitlab.alibaba-inc.invalid');
     expect(aoneEnsureAuthMock).toHaveBeenCalledTimes(1);
   });
 
@@ -1496,7 +1505,7 @@ describe('platformBodyFetcher — the body fetch routes through the platform rea
           repo: 'maxcompute/odps_src',
           worktree: dir,
         },
-        platformBodyFetcher('gitlab.alibaba-inc.com'),
+        platformBodyFetcher('gitlab.alibaba-inc.invalid'),
       );
       expect(r.found).toBe(true);
       expect(r.claims).toHaveLength(1);
@@ -1514,7 +1523,7 @@ describe('platformBodyFetcher — the body fetch routes through the platform rea
           repo: 'g/p',
           worktree: dir,
         },
-        platformBodyFetcher('gitlab.alibaba-inc.com'),
+        platformBodyFetcher('gitlab.alibaba-inc.invalid'),
       );
       expect(r.found).toBe(false);
       expect(r.note).toMatch(/could not be fetched/);
@@ -1562,7 +1571,7 @@ describe('the handler wiring — the integration point of the Aone fix', () => {
       repo: 'maxcompute/odps_src',
       worktree: dir,
       out: join(dir, 'report.json'),
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
     }) as never;
 
   it('an Aone --host routes the body through the reader, gates first, and never touches gh', async () => {

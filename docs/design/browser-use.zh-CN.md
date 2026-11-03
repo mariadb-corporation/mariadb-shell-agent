@@ -8,7 +8,7 @@
 
 ## 目标
 
-Browser Use 为模型提供结构化 API，使其能够从 Qwen Code 控制用户现有的 Chrome。
+Browser Use 为模型提供结构化 API，使其能够从 MariaDB Shell Agent 控制用户现有的 Chrome。
 
 - Browser SDK 作为库运行在 Node REPL MCP server 暴露的持久 Node Kernel 内。
 - `playwright-core` 提供标准浏览器自动化语义。
@@ -19,7 +19,7 @@ Browser Use 为模型提供结构化 API，使其能够从 Qwen Code 控制用�
 
 ```mermaid
 flowchart TB
-  Agent["Qwen Code agent"] -->|"MCP"| Repl["Node REPL MCP server"]
+  Agent["MariaDB Shell Agent agent"] -->|"MCP"| Repl["Node REPL MCP server"]
   Repl -->|"执行 cell"| SDK
 
   subgraph Kernel["持久 Node Kernel 进程"]
@@ -43,7 +43,7 @@ flowchart TB
 
 `playwright-core@1.62.1` 通过 `chromium.connectOverCDP(transport)` 接受公共自定义 CDP transport。因此 Qwen 保留 Native Messaging，不添加本地 WebSocket server。
 
-Browser Use 以内置 skill 及其运行时资源随 Qwen Code 一起发布，无需单独安装 Browser Use 运行时包或第二个 Qwen 扩展，复用现有的 Qwen Chrome 扩展。Skill 的 `runtime/` 目录包含 Browser SDK、Native Host 和固定版本的 Playwright 依赖。Skill 直接在现有 Node REPL 中导入 `runtime/index.js`，无需注册任何模块目录；CLI 本身不执行浏览器逻辑。kernel 在没有 Node 全局对象的隔离 realm 中执行该导入，且只从已注册的模块根和工作目录的 `node_modules` 解析裸包名，因此运行时 bundle 通过 `createRequire` 自行绑定 `process` 并加载固定版本的 `playwright-core`，后者从 bundle 自身所在位置解析。构建时的加载检查运行在主 realm，无法发现这两类问题，故由一个基于 kernel 的测试固定该行为。源码开发、转译构建和发布的 CLI 使用同一布局。仍需配置通用 Node REPL MCP server，并在浏览器安装 Qwen Chrome 扩展。内置资源不会在 CLI 启动时连接 Chrome；SDK 在首次使用时才连接。
+Browser Use 以内置 skill 及其运行时资源随 MariaDB Shell Agent 一起发布，无需单独安装 Browser Use 运行时包或第二个 Qwen 扩展，复用现有的 Qwen Chrome 扩展。Skill 的 `runtime/` 目录包含 Browser SDK、Native Host 和固定版本的 Playwright 依赖。Skill 直接在现有 Node REPL 中导入 `runtime/index.js`，无需注册任何模块目录；CLI 本身不执行浏览器逻辑。kernel 在没有 Node 全局对象的隔离 realm 中执行该导入，且只从已注册的模块根和工作目录的 `node_modules` 解析裸包名，因此运行时 bundle 通过 `createRequire` 自行绑定 `process` 并加载固定版本的 `playwright-core`，后者从 bundle 自身所在位置解析。构建时的加载检查运行在主 realm，无法发现这两类问题，故由一个基于 kernel 的测试固定该行为。源码开发、转译构建和发布的 CLI 使用同一布局。仍需配置通用 Node REPL MCP server，并在浏览器安装 Qwen Chrome 扩展。内置资源不会在 CLI 启动时连接 Chrome；SDK 在首次使用时才连接。
 
 没有任何构建步骤会把该运行时写进源码树：打包步骤把它复制到 `dist/bundled/browser-use/runtime` 供发布的 CLI 使用；`npm run dev` 把同样的文件复制到源码 `SKILL.md` 旁边（git 忽略的位置），因为只有开发模式会从源码树读取内置 skill；正常安装的 `prepare` hook 负责构建这些副本的来源包。修改 Browser Use 源码或依赖后，运行 `npm run build --workspace=@qwen-code/browser-use` 并重新启动 `npm run dev` 以刷新开发副本；CLI 和 Core 仍直接运行 TypeScript 源码。若运行时入口缺失，导入会失败，skill 会让模型停止并报告运行时不完整；若找不到固定版本的 `playwright-core`，SDK 会自行报告运行时不完整。Node 的查找会延伸到上层目录，因此 SDK 会校验找到的副本版本：其他版本按运行时不完整拒绝加载；固定版本的副本则照常使用，因为其代码完全相同。
 
@@ -106,7 +106,7 @@ Locator plan 的每个数组最多包含 32 步，最多嵌套 32 层，顶层�
 
 Playwright 公共 CDP session API 提供坐标 CUA 的按钮 4（后退）和 5（前进）；较高层的 Playwright mouse API 不暴露它们。快照截断、截图编码和预算、会话失效检测及 JSON 传输封装属于运行时实现细节，不作为面向模型的选项。
 
-视口截图返回 JPEG 字节、MIME 类型及元数据。元数据包含原始图像尺寸、视口、设备像素比和 CSS 像素坐标空间，使模型客户端缩放预览后视觉坐标仍可用。Skill 将完整截图传给 `nodeRepl.emitImage()`。元数据随图像事件传递，紧邻每张保留图像之前返回，独立于普通文本输出预算。被拒绝或省略的图像不会遗留元数据。没有元数据专用大小上限；已有协议帧和客户端输出限制仍然适用。把 Node REPL MCP server 随 Qwen Code 一起打包留待后续工作。该协议支持自 `@qwen-code/node-repl-mcp` 0.1.6 起首次发布；已发布的 0.1.2 至 0.1.5 包不具备该支持，因此 Browser Use skill 固定使用该版本而非 `latest`。视口截图根据编码字节数限制，不会仅因视口尺寸而拒绝。显式 clip 和整页截图保留像素预算，因为其尺寸由调用方控制或可能无界。从页面脚本探测到的设备像素比只在真实 Chrome 窗口可能报告的范围内被信任；当截图像素与请求的 CSS 区域不一致时，运行时根据 Chrome 自身的输出推算真实像素比并重拍一次。
+视口截图返回 JPEG 字节、MIME 类型及元数据。元数据包含原始图像尺寸、视口、设备像素比和 CSS 像素坐标空间，使模型客户端缩放预览后视觉坐标仍可用。Skill 将完整截图传给 `nodeRepl.emitImage()`。元数据随图像事件传递，紧邻每张保留图像之前返回，独立于普通文本输出预算。被拒绝或省略的图像不会遗留元数据。没有元数据专用大小上限；已有协议帧和客户端输出限制仍然适用。把 Node REPL MCP server 随 MariaDB Shell Agent 一起打包留待后续工作。该协议支持自 `@qwen-code/node-repl-mcp` 0.1.6 起首次发布；已发布的 0.1.2 至 0.1.5 包不具备该支持，因此 Browser Use skill 固定使用该版本而非 `latest`。视口截图根据编码字节数限制，不会仅因视口尺寸而拒绝。显式 clip 和整页截图保留像素预算，因为其尺寸由调用方控制或可能无界。从页面脚本探测到的设备像素比只在真实 Chrome 窗口可能报告的范围内被信任；当截图像素与请求的 CSS 区域不一致时，运行时根据 Chrome 自身的输出推算真实像素比并重拍一次。
 
 截图获取采用 Codex Browser Use 策略，独立于 Playwright 的截图准备。短暂且有上限的渲染同步让待处理绘制在截图前完成。普通视口截图请求新的 CDP screencast 帧，帧期限为两秒，然后回退到命令超时为五秒的 `Page.captureScreenshot`。Clip 和整页截图直接使用后者。请求之前的旧帧会被丢弃；每个标签页的截图串行执行，事件监听器和 screencast 均会清理。运行时拥有这些事件，Playwright 不会重复确认同一帧。图像采用 JPEG quality 80，保留 CSS 像素坐标，不需要激活标签页或将 Chrome 置于前台。单次截图超时不会断开浏览器会话。
 
@@ -159,7 +159,7 @@ Node Kernel 直接拥有本地 Chrome 扩展 transport：
 
 首个版本不添加独立的 Browser Use 授权或进程认证层。
 
-`qwen serve` 的 `/cdp` bridge 不属于 Browser Use。它是 serve 模式下供外部自动化适配器与活跃 Chrome 标签页使用的隧道。Browser Use 在普通 Qwen Code 会话运行，提供多标签页发现和 Qwen 特有的非 CDP 控制操作。
+`mariadb-shell-agent serve` 的 `/cdp` bridge 不属于 Browser Use。它是 serve 模式下供外部自动化适配器与活跃 Chrome 标签页使用的隧道。Browser Use 在普通 MariaDB Shell Agent 会话运行，提供多标签页发现和 Qwen 特有的非 CDP 控制操作。
 
 两条路径是独立 debugger 客户端，在单个标签页上互斥。当 `/cdp`、DevTools 或其他 debugger 已拥有标签页时，Browser Use 会明确失败。
 

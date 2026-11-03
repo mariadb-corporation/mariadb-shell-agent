@@ -2,7 +2,7 @@
 
 ## Status and decision
 
-Implemented in [#11208](https://github.com/QwenLM/qwen-code/pull/11208),
+Implemented in [#11208](https://github.invalid/QwenLM/qwen-code/pull/11208),
 2026-09-07. Review and verification status are tracked on that PR.
 The same open PR now includes the agreed Phase 3 global rail, implemented at
 `02e975e9fa`. Its final interaction preserves ordinary upward pagination and
@@ -16,9 +16,9 @@ keep `HistoricalTranscriptRange` and the legacy navigation snapshot unchanged;
 expose sequential ranges through an additional viewport snapshot/command surface
 over the same page table. Never synthesize turn IDs for before-record origins.
 Global baseline evidence is recorded in
-`.qwen/e2e-tests/phase2b-baseline-result.md`.
-Tracks [#10750](https://github.com/QwenLM/qwen-code/issues/10750), building on
-[#11054](https://github.com/QwenLM/qwen-code/pull/11054).
+`.mariadb-shell-agent/e2e-tests/phase2b-baseline-result.md`.
+Tracks [#10750](https://github.invalid/QwenLM/qwen-code/issues/10750), building on
+[#11054](https://github.invalid/QwenLM/qwen-code/pull/11054).
 Code observations below are pinned to `ec572f68e16c954927d20fee57a0507411c72702`.
 Implementation is based on main `1a86cd6c5`; the listed consumers were rechecked.
 
@@ -383,7 +383,7 @@ primitives; preserve React 18 refs, portal-root scoping, themes, and embedded us
 ## Acceptance and verification
 
 The execution test plan is
-`.qwen/e2e-tests/web-shell-global-turn-navigation-phase2b.md` (local artifact).
+`.mariadb-shell-agent/e2e-tests/web-shell-global-turn-navigation-phase2b.md` (local artifact).
 The following requirements remain committed even when that local file is absent:
 
 - Capable live view opens the immediately preceding page, including a tool-only
@@ -429,7 +429,7 @@ six older and two newer admissions (including equal-sized eviction windows),
 live background output, and composer approval during history. Ordinary-list
 anchor drift measured at most 0.125 CSS pixels; virtual-list drift was zero.
 Mock-browser checks do not prove signed-cursor behavior; real-reader probes do
-not prove React layout. Reports remain under `.qwen/e2e-tests/`.
+not prove React layout. Reports remain under `.mariadb-shell-agent/e2e-tests/`.
 
 Final root build, typecheck and bundle passed. The broad focused run passed
 1,726 tests; after the virtual-transition fix, the affected renderer/viewport,

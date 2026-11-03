@@ -4,7 +4,7 @@
 [简体中文](2026-10-21-opentui-input-ownership.zh-CN.md)
 
 当前交付（2026-10-21）：本工作与输入所有权、编辑和状态栏统一整合到
-[#14964](https://github.com/QwenLM/qwen-code/pull/14964)。下文原分批边界、代码基线、
+[#14964](https://github.invalid/QwenLM/qwen-code/pull/14964)。下文原分批边界、代码基线、
 验证结果及 stacked PR 转正式步骤均为历史记录；当前推进顺序以
 [交付计划](2026-10-20-opentui-migration-delivery.zh-CN.md)为准。
 统一验收仍待完成，必须以整合提交的新结果为依据。
@@ -152,7 +152,7 @@ accept/restore 恰好一次。检查 100×30、80×12、40×10 及 resize/restor
 次数、顺序、MIME、解码长度和预期 hash，不能只看图片字段或截图。
 
 完成前在最终 artifact 上跑 build/typecheck、定向 unit、native 回归，以及
-Node+Ink/Bun+Ink/Bun+strict OpenTUI 产品三腿。在 `.qwen/e2e-tests/` 记录
+Node+Ink/Bun+Ink/Bun+strict OpenTUI 产品三腿。在 `.mariadb-shell-agent/e2e-tests/` 记录
 source/bundle/fixture/runtime 身份、原始输入、viewport、请求及清理结果。修复后
 完整阅读 diff 并反证绿色 oracle，连续两轮干净自审才完成。parent 统一协调单一
 重型 lease。macOS 结果不代表 Linux/Windows 剪贴板或 IME 覆盖，须保留在迁移
@@ -169,5 +169,5 @@ native 和 14 项产品场景；四个已见证 Ink 例外单元明确跳过。�
 保留的 fixture 失败尝试在内，17 次 PTY 均完成清理。原始失败继续保留：held
 stream 无法达到输出静止、Ink 标题冒号被裁切、active 路径补全消费 Enter。
 仅修正 fixture 假设，产品源码与 bundle 始终冻结。两轮干净全 diff 自审、独立
-审查及原始报告随候选 manifest 保存在 `.qwen/`。本地结果不能替代剩余平台门禁，
+审查及原始报告随候选 manifest 保存在 `.mariadb-shell-agent/`。本地结果不能替代剩余平台门禁，
 也不代表完整 Ink parity。

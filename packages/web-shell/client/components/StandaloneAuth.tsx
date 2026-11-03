@@ -84,7 +84,7 @@ interface AuthCopy {
 const EN_COPY: AuthCopy = {
   pairingFailed:
     'Pairing failed or the QR code expired. Scan a fresh QR code, or enter the daemon token.',
-  heading: 'Connect to Qwen Code',
+  heading: 'Connect to MariaDB Shell Agent',
   connecting: 'Connecting…',
   starting: 'Daemon is starting…',
   unreachable: 'Cannot reach the daemon. Retrying…',
@@ -121,7 +121,7 @@ const COPY: Record<WebShellLanguage, AuthCopy> = {
   'zh-CN': {
     pairingFailed:
       '配对失败或二维码已过期。请扫描新的二维码，或输入 daemon 令牌。',
-    heading: '连接到 Qwen Code',
+    heading: '连接到 MariaDB Shell Agent',
     connecting: '正在连接…',
     starting: '守护进程正在启动…',
     unreachable: '无法访问守护进程，正在重试…',

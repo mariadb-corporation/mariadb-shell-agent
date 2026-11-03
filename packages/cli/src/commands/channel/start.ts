@@ -129,7 +129,7 @@ async function writeServiceInfoOrExit(
     await cleanup();
     if (isFileExistsError(err)) {
       writeStderrLine(
-        'Error: Channel service was started concurrently. Use "qwen channel status" to inspect it.',
+        'Error: Channel service was started concurrently. Use "mariadb-shell-agent channel status" to inspect it.',
       );
       process.exit(1);
     }
@@ -367,15 +367,17 @@ function checkDuplicateInstance(): void {
   if (existing) {
     if (existing.owner === 'serve') {
       writeStderrLine(
-        `Error: Channel service is managed by qwen serve (PID ${existing.pid}, started ${existing.startedAt}).`,
+        `Error: Channel service is managed by mariadb-shell-agent serve (PID ${existing.pid}, started ${existing.startedAt}).`,
       );
-      writeStderrLine('Stop the qwen serve process to stop managed channels.');
+      writeStderrLine(
+        'Stop the mariadb-shell-agent serve process to stop managed channels.',
+      );
       process.exit(1);
     }
     writeStderrLine(
       `Error: Channel service is already running (PID ${existing.pid}, started ${existing.startedAt}).`,
     );
-    writeStderrLine('Use "qwen channel stop" to stop it first.');
+    writeStderrLine('Use "mariadb-shell-agent channel stop" to stop it first.');
     process.exit(1);
   }
 }
@@ -410,7 +412,7 @@ async function startSingle(
     );
     if (config.multiSession) {
       throw new Error(
-        'multiSession is available only for daemon-managed Channels started by qwen serve.',
+        'multiSession is available only for daemon-managed Channels started by mariadb-shell-agent serve.',
       );
     }
   } catch (err) {
@@ -569,7 +571,7 @@ async function startAll(
     );
     if (parsed.some(({ config }) => config.multiSession)) {
       throw new Error(
-        'multiSession is available only for daemon-managed Channels started by qwen serve.',
+        'multiSession is available only for daemon-managed Channels started by mariadb-shell-agent serve.',
       );
     }
   } catch (err) {

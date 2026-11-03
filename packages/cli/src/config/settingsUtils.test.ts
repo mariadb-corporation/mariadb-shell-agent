@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -419,7 +420,7 @@ describe('SettingsUtils', () => {
     describe('getDialogSettingKeys', () => {
       // R4-2: Workspace scope strips these before the merge, so listing them
       // there lets a user toggle a setting that silently never takes effect
-      // and writes a dead entry into the repo's .qwen/settings.json.
+      // and writes a dead entry into the repo's .mariadb-shell-agent/settings.json.
       describe('workspace-restricted filtering', () => {
         const restrictedKey = WORKSPACE_RESTRICTED_SETTING_KEYS[0]!;
         const [section, leaf] = restrictedKey.split('.') as [string, string];

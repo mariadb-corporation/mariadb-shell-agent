@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,8 +13,8 @@ import {
 import type { ShellOperation } from './shell-semantics.js';
 
 const CWD = '/home/user/project';
-const SETTINGS = `${CWD}/.qwen/settings.json`;
-const REPO_SETTINGS = '/repo/.qwen/settings.json';
+const SETTINGS = `${CWD}/.mariadb-shell-agent/settings.json`;
+const REPO_SETTINGS = '/repo/.mariadb-shell-agent/settings.json';
 
 // Helper: sort ops for stable comparison
 function sorted(ops: ShellOperation[]) {
@@ -103,7 +104,7 @@ describe('extractShellOperations', () => {
     ['find: no starting dir defaults to cwd', 'find -name "*.txt"', [dir(CWD)]],
     [
       'find: extracts write ops from exec clauses',
-      'find . -exec cp payload .qwen/settings.json ;',
+      'find . -exec cp payload .mariadb-shell-agent/settings.json ;',
       [dir(CWD), read(`${CWD}/payload`), write(SETTINGS)],
     ],
     [
@@ -251,7 +252,7 @@ describe('extractShellOperations', () => {
     ],
     [
       'rsync destination is a write',
-      'rsync /tmp/payload .qwen/settings.json',
+      'rsync /tmp/payload .mariadb-shell-agent/settings.json',
       [read('/tmp/payload'), write(SETTINGS)],
     ],
     [
@@ -301,12 +302,12 @@ describe('extractShellOperations', () => {
   it.each<[title: string, command: string, expected: ShellOperation]>([
     [
       'find: preserves exec placeholder operands for write detection',
-      'find . -exec cp {} .qwen/settings.json ;',
+      'find . -exec cp {} .mariadb-shell-agent/settings.json ;',
       write(SETTINGS),
     ],
     [
       'patch edits positional target files',
-      'patch .qwen/settings.json fix.patch',
+      'patch .mariadb-shell-agent/settings.json fix.patch',
       edit(SETTINGS),
     ],
     ['redirect <: read_file', 'sort < /tmp/data.txt', read('/tmp/data.txt')],
@@ -317,12 +318,12 @@ describe('extractShellOperations', () => {
     ],
     [
       'combined stdout fd redirect 1>file without space',
-      'echo hi 1>.qwen/settings.json',
+      'echo hi 1>.mariadb-shell-agent/settings.json',
       write(SETTINGS),
     ],
     [
       'combined stdout fd append redirect 1>>file without space',
-      'echo hi 1>>.qwen/settings.json',
+      'echo hi 1>>.mariadb-shell-agent/settings.json',
       write(SETTINGS),
     ],
   ])('%s', (_title, command, expected) => {
@@ -379,52 +380,52 @@ describe('extractShellOperations', () => {
   });
 
   it('cp/mv/install/ln -t forms emit target-directory writes', () => {
-    expectSorted('cp -t .qwen /tmp/settings.json', [
+    expectSorted('cp -t .mariadb-shell-agent /tmp/settings.json', [
       read('/tmp/settings.json'),
       write(SETTINGS),
     ]);
-    expectSorted('mv --target-directory=.qwen /tmp/a', [
+    expectSorted('mv --target-directory=.mariadb-shell-agent /tmp/a', [
       edit('/tmp/a'),
-      write(`${CWD}/.qwen/a`),
+      write(`${CWD}/.mariadb-shell-agent/a`),
     ]);
-    expectSorted('install -t .qwen /tmp/tool', [
+    expectSorted('install -t .mariadb-shell-agent /tmp/tool', [
       read('/tmp/tool'),
-      write(`${CWD}/.qwen/tool`),
+      write(`${CWD}/.mariadb-shell-agent/tool`),
     ]);
-    expectSorted('ln -t .qwen /tmp/target', [
+    expectSorted('ln -t .mariadb-shell-agent /tmp/target', [
       read('/tmp/target'),
-      write(`${CWD}/.qwen/target`),
+      write(`${CWD}/.mariadb-shell-agent/target`),
     ]);
-    expectSorted('cp -rt .qwen /tmp/payload', [
+    expectSorted('cp -rt .mariadb-shell-agent /tmp/payload', [
       read('/tmp/payload'),
-      write(`${CWD}/.qwen/payload`),
+      write(`${CWD}/.mariadb-shell-agent/payload`),
     ]);
   });
 
   it('perl -i edits file operands', () => {
-    expect(ops("perl -i -pe 's/x/y/' .qwen/settings.json")).toEqual([
-      edit(SETTINGS),
-    ]);
-    expect(ops("perl -i -e 's/x/y/' .qwen/settings.json")).toEqual([
-      edit(SETTINGS),
-    ]);
+    expect(
+      ops("perl -i -pe 's/x/y/' .mariadb-shell-agent/settings.json"),
+    ).toEqual([edit(SETTINGS)]);
+    expect(
+      ops("perl -i -e 's/x/y/' .mariadb-shell-agent/settings.json"),
+    ).toEqual([edit(SETTINGS)]);
   });
 
   it('patch edits output flag targets', () => {
     for (const command of [
-      'patch --output=.qwen/settings.json -i fix.patch',
-      'patch -o .qwen/settings.json -i fix.patch',
+      'patch --output=.mariadb-shell-agent/settings.json -i fix.patch',
+      'patch -o .mariadb-shell-agent/settings.json -i fix.patch',
     ]) {
       expect(ops(command)).toContainEqual(edit(SETTINGS));
     }
   });
 
   it('sort -o emits the output path as a write', () => {
-    expectSorted('sort -o .qwen/settings.json /tmp/in', [
+    expectSorted('sort -o .mariadb-shell-agent/settings.json /tmp/in', [
       read('/tmp/in'),
       write(SETTINGS),
     ]);
-    expectSorted('sort --output=.qwen/settings.json /tmp/in', [
+    expectSorted('sort --output=.mariadb-shell-agent/settings.json /tmp/in', [
       read('/tmp/in'),
       write(SETTINGS),
     ]);
@@ -450,8 +451,12 @@ describe('extractShellOperations', () => {
   });
 
   it('>&file and 1>&file write the named file, not "&file"', () => {
-    expect(ops('echo hi >&.qwen/settings.json')).toEqual([write(SETTINGS)]);
-    expect(ops('echo hi 1>&.qwen/settings.json')).toEqual([write(SETTINGS)]);
+    expect(ops('echo hi >&.mariadb-shell-agent/settings.json')).toEqual([
+      write(SETTINGS),
+    ]);
+    expect(ops('echo hi 1>&.mariadb-shell-agent/settings.json')).toEqual([
+      write(SETTINGS),
+    ]);
   });
 
   // Bash writes a file named `&1` when the `&` is quoted or escaped.
@@ -609,22 +614,22 @@ describe('extractShellOperationsAcrossCommand', () => {
   it.each<Row>([
     [
       'tracks literal `cd` across compound segments before resolving writes',
-      "cd .qwen && bash -lc 'echo {} > settings.json'",
+      "cd .mariadb-shell-agent && bash -lc 'echo {} > settings.json'",
       [write(REPO_SETTINGS)],
     ],
     [
       'handles leading env assignments before redirected commands',
-      'FOO=bar echo x > .qwen/settings.json',
+      'FOO=bar echo x > .mariadb-shell-agent/settings.json',
       [write(REPO_SETTINGS)],
     ],
     [
       'handles leading env assignments before write commands',
-      'FOO=bar tee .qwen/settings.json',
+      'FOO=bar tee .mariadb-shell-agent/settings.json',
       [write(REPO_SETTINGS)],
     ],
     [
       'tracks cwd before leading env assignments',
-      "cd .qwen && FOO=bar echo '{}' > settings.json",
+      "cd .mariadb-shell-agent && FOO=bar echo '{}' > settings.json",
       [write(REPO_SETTINGS)],
     ],
     // The foreground form below cannot know where it landed; the backgrounded
@@ -659,28 +664,28 @@ describe('extractShellOperationsAcrossCommand', () => {
     ],
     [
       'preserves sibling segments after a shell wrapper',
-      "bash -lc 'echo ok' && echo hi > .qwen/settings.json",
+      "bash -lc 'echo ok' && echo hi > .mariadb-shell-agent/settings.json",
       [write(REPO_SETTINGS)],
     ],
     [
       'splits literal newlines as command boundaries',
-      'cd .qwen\ncp /tmp/malicious settings.json',
+      'cd .mariadb-shell-agent\ncp /tmp/malicious settings.json',
       [read('/tmp/malicious'), write(REPO_SETTINGS)],
     ],
     [
       'tracks cwd through brace-grouped commands',
-      "{ cd .qwen && echo '{}' > settings.json; }",
+      "{ cd .mariadb-shell-agent && echo '{}' > settings.json; }",
       [write(REPO_SETTINGS)],
     ],
     [
       'strips grouping and background syntax from command and path tokens',
-      '(echo > .qwen/settings.json) && echo > .qwen/hooks/run.sh&',
-      [write(REPO_SETTINGS), write('/repo/.qwen/hooks/run.sh')],
+      '(echo > .mariadb-shell-agent/settings.json) && echo > .mariadb-shell-agent/hooks/run.sh&',
+      [write(REPO_SETTINGS), write('/repo/.mariadb-shell-agent/hooks/run.sh')],
     ],
     [
       'does not treat heredoc body lines as executable shell segments',
       [
-        'cd .qwen',
+        'cd .mariadb-shell-agent',
         "cat <<'EOF'",
         'cd /tmp',
         'EOF',
@@ -690,13 +695,17 @@ describe('extractShellOperationsAcrossCommand', () => {
     ],
     [
       'does not treat quoted heredoc-looking text as a heredoc marker',
-      ["echo '<<EOF'", 'cd .qwen', "echo '{}' > settings.json"].join('\n'),
+      [
+        "echo '<<EOF'",
+        'cd .mariadb-shell-agent',
+        "echo '{}' > settings.json",
+      ].join('\n'),
       [write(REPO_SETTINGS)],
     ],
     [
       'handles `cd --` and other POSIX flag forms before the target',
-      "cd -- .qwen && printf '{}' > settings.local.json",
-      [write('/repo/.qwen/settings.local.json')],
+      "cd -- .mariadb-shell-agent && printf '{}' > settings.local.json",
+      [write('/repo/.mariadb-shell-agent/settings.local.json')],
     ],
     [
       'treats the word after `cd --` as the target even when it starts with dash',
@@ -705,13 +714,13 @@ describe('extractShellOperationsAcrossCommand', () => {
     ],
     [
       'ignores redirects attached to cd when resolving static cwd',
-      "cd .qwen >/dev/null && echo '{}' > settings.json",
+      "cd .mariadb-shell-agent >/dev/null && echo '{}' > settings.json",
       [write(REPO_SETTINGS)],
     ],
     [
       'tracks static pushd targets like cd targets',
-      "pushd .qwen && printf '{}' > settings.local.json",
-      [write('/repo/.qwen/settings.local.json')],
+      "pushd .mariadb-shell-agent && printf '{}' > settings.local.json",
+      [write('/repo/.mariadb-shell-agent/settings.local.json')],
     ],
     [
       'marks writes after popd as cwd-unknown',
@@ -736,7 +745,7 @@ describe('extractShellOperationsAcrossCommand', () => {
     ],
     [
       'clears cwd-unknown after an absolute static `cd`',
-      'cd $TARGET && cd /repo/.qwen && echo hi > settings.json',
+      'cd $TARGET && cd /repo/.mariadb-shell-agent && echo hi > settings.json',
       [write(REPO_SETTINGS)],
     ],
     [
@@ -746,7 +755,7 @@ describe('extractShellOperationsAcrossCommand', () => {
     ],
     [
       'returns no ops when only `cd` segments are present',
-      'cd .qwen && cd ..',
+      'cd .mariadb-shell-agent && cd ..',
       [],
     ],
   ])('%s', (_title, command, expected) => {
@@ -759,7 +768,7 @@ describe('extractShellOperationsAcrossCommand', () => {
   // write to the `cd` target instead would check the wrong path.
   it.each([
     ['cd /tmp & echo {} > settings.json'],
-    ['cd .qwen & echo {} > settings.json'],
+    ['cd .mariadb-shell-agent & echo {} > settings.json'],
   ])('does not move the cwd for the backgrounded `cd` in %s', (command) => {
     expect(across(command)).toEqual([write('/repo/settings.json')]);
   });

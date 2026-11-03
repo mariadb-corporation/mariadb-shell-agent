@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -70,7 +71,7 @@ export interface OpenTuiArenaDialogProps {
 }
 
 const MODEL_PROVIDERS_DOCUMENTATION_URL =
-  'https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/#modelproviders';
+  'https://qwenlm.github.invalid/qwen-code-docs/en/users/configuration/settings/#modelproviders';
 const ARENA_NO_MODELS = 'No models available. Please configure models first.';
 const ARENA_OAUTH_NOTE = 'Note: qwen-oauth models are not supported in Arena.';
 const ARENA_NEED_MORE = 'Arena requires at least 2 models. To add more:';

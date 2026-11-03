@@ -4,7 +4,7 @@
 
 ## 问题与当前实现
 
-Issue [#13883](https://github.com/QwenLM/qwen-code/issues/13883) 描述原始 stream-capture 回收器的 P2 后续工作。其 10 月 11 日基线
+Issue [#13883](https://github.invalid/QwenLM/qwen-code/issues/13883) 描述原始 stream-capture 回收器的 P2 后续工作。其 10 月 11 日基线
 早于共享 schema 整合。在 `main` 的 `06efd789b1` 上，回收器已经覆盖
 `PUBLISHED` 和 `REFERENCED` 两种状态的不可变 `MYSQL_INLINE` 资源，不再限制
 kind。新增 MCP 回收器或扩展 kind 白名单会重复已有实现。目前缺少的是生产者专属
@@ -48,10 +48,10 @@ Session 的永久退役仍是保留根。配置的删除宽限期过后，现有
 
 全局 CLI 不暴露内部 SQL 回收调度器。先检查其可用性，再以生产者、事务和退役测试
 作为这一服务端生命周期的替代验证。这不代表 Hosted 进程崩溃或部署验收通过。
-物理 GC 开关继续默认关闭；[#13090](https://github.com/QwenLM/qwen-code/issues/13090) 的部署门禁仍然适用。
+物理 GC 开关继续默认关闭；[#13090](https://github.invalid/QwenLM/qwen-code/issues/13090) 的部署门禁仍然适用。
 
 ## 范围与验收
 
 此变更新增测试并纠正历史文档，不改变 schema、线协议、生产谓词或默认值。它补齐
-[#13883](https://github.com/QwenLM/qwen-code/issues/13883) 中生产者专属的 SQL 生命周期证据缺口。本地文件系统保留、外部 MCP 对象存储
-结果、Hosted 部署验收，以及媒体与共享输出后续 [#13884](https://github.com/QwenLM/qwen-code/issues/13884) 仍是独立范围。
+[#13883](https://github.invalid/QwenLM/qwen-code/issues/13883) 中生产者专属的 SQL 生命周期证据缺口。本地文件系统保留、外部 MCP 对象存储
+结果、Hosted 部署验收，以及媒体与共享输出后续 [#13884](https://github.invalid/QwenLM/qwen-code/issues/13884) 仍是独立范围。

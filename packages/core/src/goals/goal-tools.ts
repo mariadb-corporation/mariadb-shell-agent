@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -647,9 +648,9 @@ function activeGoalMessage(revision: number): string {
 
 function proposalPromptHeadline(current: GoalRecord | null): string {
   if (current) {
-    return `Replace the ${current.status} Goal and start working toward this objective? Approving sets it like /goal set: after each turn an independent verifier checks the transcript, and Qwen Code keeps working until it is met.`;
+    return `Replace the ${current.status} Goal and start working toward this objective? Approving sets it like /goal set: after each turn an independent verifier checks the transcript, and MariaDB Shell Agent keeps working until it is met.`;
   }
-  return 'Set this as the session Goal? Approving sets it like /goal set: after each turn an independent verifier checks the transcript, and Qwen Code keeps working until it is met.';
+  return 'Set this as the session Goal? Approving sets it like /goal set: after each turn an independent verifier checks the transcript, and MariaDB Shell Agent keeps working until it is met.';
 }
 
 class ProposeGoalInvocation extends BaseToolInvocation<

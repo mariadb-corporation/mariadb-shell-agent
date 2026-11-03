@@ -42,7 +42,7 @@ and exited 0 while logging EPIPE for a closed reader. Head `cc0f7c6949` exited 1
 with the drain timeout or original EPIPE respectively. This is improved failure
 reporting, not preservation of the baseline exit status. IDE and embedding
 clients that disconnect by closing their read pipe can observe the new exit 1.
-The [Linux A/B report](https://github.com/QwenLM/qwen-code/pull/11916#issuecomment-5677832569)
+The [Linux A/B report](https://github.invalid/QwenLM/qwen-code/pull/11916#issuecomment-5677832569)
 records those measurements; they were not rerun for this documentation update.
 
 Keep signal handlers installed during the bounded drain. The existing
@@ -55,7 +55,7 @@ sealing: they finish, or the drain reports a failure. Calls still queued in the
 SDK, NDJSON or gated Web stream have not crossed that boundary, even if the
 caller issued them before EOF. They can later be rejected with
 `ACP output is closed`, logged by the SDK, and omitted while ACP still exits 0. The
-[sandbox report](https://github.com/QwenLM/qwen-code/pull/11916#issuecomment-5691411334)
+[sandbox report](https://github.invalid/QwenLM/qwen-code/pull/11916#issuecomment-5691411334)
 measured this residual at `b8124075c6`: its 200-frame backlog delivered 93 complete
 frames (200,405 of 431,090 issued bytes, 46.5%) and exited 0, versus no bytes and
 exit 0 on its base. This is one harness observation, not a delivery percentage
@@ -76,7 +76,7 @@ ACP exit plus stdout end/close, and checks complete NDJSON and process/port clea
 
 Run affected tests, build, typecheck, bundle and lint, followed by two clean audits
 and independent review. The original reproduction and any failed observations
-stay in `.qwen/issues/issue-11866-acp-eof-output.md`.
+stay in `.mariadb-shell-agent/issues/issue-11866-acp-eof-output.md`.
 
 ## Final verification results
 

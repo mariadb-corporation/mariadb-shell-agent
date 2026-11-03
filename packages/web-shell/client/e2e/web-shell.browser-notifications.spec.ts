@@ -165,7 +165,7 @@ for (const kind of ['approval', 'question'] as const) {
       return { title, options };
     });
     await page.screenshot({
-      path: `../../.qwen/e2e-tests/browser-action-notifications/${kind}.png`,
+      path: `../../.mariadb-shell-agent/e2e-tests/browser-action-notifications/${kind}.png`,
       fullPage: true,
     });
     expect(notification.title).toBe(`QwenCode · ${scenario.displayName}`);
@@ -365,7 +365,7 @@ for (const kind of ['approval', 'question'] as const) {
       expect(daemon.permissionRequests()).toHaveLength(0);
     }
     await page.screenshot({
-      path: `../../.qwen/e2e-tests/browser-action-notifications/${kind}-popover.png`,
+      path: `../../.mariadb-shell-agent/e2e-tests/browser-action-notifications/${kind}-popover.png`,
       fullPage: true,
     });
     await help.focus();
@@ -541,7 +541,7 @@ test('shows localized notification help in the question header', async ({
     )
     .toBe(true);
   await page.screenshot({
-    path: '../../.qwen/e2e-tests/browser-action-notifications/question-popover-zh-CN.png',
+    path: '../../.mariadb-shell-agent/e2e-tests/browser-action-notifications/question-popover-zh-CN.png',
     fullPage: true,
   });
 });

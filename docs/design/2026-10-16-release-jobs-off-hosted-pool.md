@@ -12,7 +12,7 @@ minutes (eligible 14:21, dispatched 15:25, after operators mass-cancelled
 ~300 queued runs by hand), the `Quality Checks` aggregate 53 minutes, and
 `Audio Capture Prebuilds / collect prebuilds` 49 minutes. The hosted pool's
 20-queue concurrency was saturated by ~146 queued automation jobs (`Qwen
-Pull Request Review`, `Qwen Code CI`, `Qwen Triage`, …). GitHub Actions
+Pull Request Review`, `MariaDB Shell Agent CI`, `Qwen Triage`, …). GitHub Actions
 dispatches hosted runners FIFO with no per-workflow priority, so releases
 could only wait or have operators mass-cancel runs by hand.
 

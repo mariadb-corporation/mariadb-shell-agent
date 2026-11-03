@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -323,7 +324,7 @@ describe('acpModelUtils', () => {
       // the string `url.href` returns. A caller that reads a defined result as
       // "provably public" — `shareableAuxSelector`'s identity check at the
       // workspace-scope persist point — would then keep the suffix and write
-      // the secret into the committable `.qwen/settings.json`. Enumerating
+      // the secret into the committable `.mariadb-shell-agent/settings.json`. Enumerating
       // join characters does not converge: the slash case involves no folding
       // at all, and the brace case only differed by percent-encoding luck.
       expect(publicProviderBaseUrl(input)).toBeUndefined();

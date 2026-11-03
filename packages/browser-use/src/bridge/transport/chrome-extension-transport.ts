@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -605,7 +606,7 @@ function isCompatible(profile: ChromeProfileEndpoint): boolean {
 function versionMismatch(): BrowserRuntimeError {
   return new BrowserRuntimeError(
     'EXTENSION_VERSION_MISMATCH',
-    'Browser Use CLI, Native Host and Chrome extension versions must match. Update Qwen Code, run native-host-setup.js install, and reload the extension at chrome://extensions.',
+    'Browser Use CLI, Native Host and Chrome extension versions must match. Update MariaDB Shell Agent, run native-host-setup.js install, and reload the extension at chrome://extensions.',
   );
 }
 
@@ -647,7 +648,7 @@ export function disconnectedMessage(
   if (platform !== 'darwin' && platform !== 'linux') {
     const target =
       platform === 'win32' ? 'Windows' : `this platform (${platform})`;
-    return `Qwen Chrome extension is not connected: Browser Use does not support ${target}, because its Native Messaging host is only registered on macOS and Linux. Run Qwen Code on macOS or Linux to use Browser Use. ${lastError}`;
+    return `Qwen Chrome extension is not connected: Browser Use does not support ${target}, because its Native Messaging host is only registered on macOS and Linux. Run MariaDB Shell Agent on macOS or Linux to use Browser Use. ${lastError}`;
   }
   return `Qwen Chrome extension is not connected. Open Chrome and, in the profile you want to use, install the extension from ${CHROME_WEB_STORE_URL} or enable it at chrome://extensions, then retry. ${lastError}`;
 }

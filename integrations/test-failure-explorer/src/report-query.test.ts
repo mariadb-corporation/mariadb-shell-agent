@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -49,7 +50,7 @@ function snapshot(count = 80, diagnostic = 'Failure evidence'): ReportSnapshot {
     schemaVersion: 1,
     reportId: `r1_${'a'.repeat(64)}`,
     source: {
-      relativePath: '.qwen/test-reports/report.json',
+      relativePath: '.mariadb-shell-agent/test-reports/report.json',
       sha256: 'b'.repeat(64),
       bytes: 100,
     },

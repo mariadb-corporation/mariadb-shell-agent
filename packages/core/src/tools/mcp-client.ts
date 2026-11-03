@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -150,9 +151,9 @@ export function getMcpOAuthDialogInstruction(
   mcpServerName: string,
 ): string {
   return [
-    `In interactive Qwen Code sessions, open the /mcp dialog to ${action}`,
+    `In interactive MariaDB Shell Agent sessions, open the /mcp dialog to ${action}`,
     `with MCP server '${mcpServerName}'.`,
-    `For headless or SDK usage, configure MCP OAuth with qwen mcp add --oauth-*`,
+    `For headless or SDK usage, configure MCP OAuth with mariadb-shell-agent mcp add --oauth-*`,
     `or settings.json, then ${action} once in an interactive session before connecting.`,
   ].join(' ');
 }
@@ -576,7 +577,7 @@ export class McpClient {
     private readonly sendSdkMcpMessage?: SendSdkMcpMessage,
   ) {
     this.client = createMcpClient(
-      `qwen-cli-mcp-client-${this.serverName}`,
+      `mariadb-shell-agent-mcp-client-${this.serverName}`,
       this.serverConfig,
     );
   }
@@ -669,7 +670,7 @@ export class McpClient {
       // Preserve the cause: the manager's discovery catch swallows this
       // error (best-effort discovery), leaving the status registry's enum as
       // the only other witness. Recording it lets status consumers (e.g.
-      // `qwen mcp reconnect`) tell the user WHY the connection failed
+      // `mariadb-shell-agent mcp reconnect`) tell the user WHY the connection failed
       // instead of a bare "status: disconnected" (issue #9944).
       // Same guard as `updateStatus()`: a late rejection from a doomed
       // in-flight connect (server disabled/removed mid-connect) must not
@@ -874,7 +875,7 @@ export class McpClient {
       // abandon keeps occupying the server: single-session HTTP servers
       // then reject every later `initialize` with "Server already
       // initialized" (issue #9944 — e.g. the internal reconnect path or a
-      // later `qwen mcp reconnect` can never recover them), and
+      // later `mariadb-shell-agent mcp reconnect` can never recover them), and
       // multi-session servers accumulate orphaned sessions. Best-effort —
       // a dead/unreachable server must not block teardown. Must run BEFORE
       // `close()` aborts the transport's request machinery.

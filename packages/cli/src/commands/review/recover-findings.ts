@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -357,7 +358,7 @@ export function recoverFindings(
   const sections: string[] = [
     '# Recovered agent results',
     '',
-    'Written by `qwen review recover-findings` from the harness transcripts',
+    'Written by `mariadb-shell-agent review recover-findings` from the harness transcripts',
     "of the interrupted attempt. Each section is one certified agent's own",
     'final text, verbatim. Findings in here still owe Step 4 verification',
     'unless a findings list already carries them as verified.',

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -897,7 +898,7 @@ describe('Agent View PTY host process server', () => {
     );
     expect(
       getAgentViewPtyHostSocketPath('session-1', {
-        globalDir: 'C:\\Users\\test\\.qwen',
+        globalDir: 'C:\\Users\\test\\.mariadb-shell-agent',
         platform: 'win32',
       }),
     ).toMatch(/^\\\\\.\\pipe\\qwen-agent-pty-[a-f0-9]{12}$/);
@@ -918,7 +919,10 @@ describe('Agent View PTY host process server', () => {
 
   it('returns a short fallback path when the temp directory is long', () => {
     const fallbackPath = getAgentViewPtyHostSocketPath('session-1', {
-      globalDir: path.join('/very-long-path'.repeat(20), '.qwen'),
+      globalDir: path.join(
+        '/very-long-path'.repeat(20),
+        '.mariadb-shell-agent',
+      ),
       platform: 'linux',
     });
 
@@ -937,7 +941,10 @@ describe('Agent View PTY host process server', () => {
       process.env['TMPDIR'] = tmpFile;
       try {
         const fallbackPath = getAgentViewPtyHostSocketPath('session-1', {
-          globalDir: path.join('/very-long-path'.repeat(20), '.qwen'),
+          globalDir: path.join(
+            '/very-long-path'.repeat(20),
+            '.mariadb-shell-agent',
+          ),
           platform: 'linux',
         });
         const uid =

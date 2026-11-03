@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1866,15 +1867,15 @@ describe('PermissionManager', () => {
         'deny',
       ],
       [
-        "echo done # note 'a\\''\necho {} > .qwen/settings.json",
-        ['Write(.qwen/settings.json)'],
+        "echo done # note 'a\\''\necho {} > .mariadb-shell-agent/settings.json",
+        ['Write(.mariadb-shell-agent/settings.json)'],
         'deny',
       ],
       // bash backgrounds the `cd`, so the write lands in the cwd — the
       // permissions file itself. main sees one segment and no write at all.
       [
-        "cd 'a\\' & echo {} > .qwen/settings.json",
-        ['Write(.qwen/settings.json)'],
+        "cd 'a\\' & echo {} > .mariadb-shell-agent/settings.json",
+        ['Write(.mariadb-shell-agent/settings.json)'],
         'deny',
       ],
       ["echo 'a\\'' ; rm x'", ['Bash(rm *)'], 'deny'],
@@ -3108,8 +3109,8 @@ describe('buildHumanReadableRuleLabel', () => {
     [
       'Read',
       'absolute path',
-      'Read(//Users/mochi/.qwen/**)',
-      'read files in /Users/mochi/.qwen/',
+      'Read(//Users/mochi/.mariadb-shell-agent/**)',
+      'read files in /Users/mochi/.mariadb-shell-agent/',
     ],
     ['Read', 'relative path', 'Read(/src/**)', 'read files in /src/'],
     ['Edit', 'path', 'Edit(//tmp/**)', 'edit files in /tmp/'],
@@ -3328,7 +3329,7 @@ describe('PermissionManager — compound shell write attribution', () => {
   const repoPm = (rules: PmOpts) =>
     makePm({ ...rules, cwd: '/repo', projectRoot: '/repo' });
   const denySettings = {
-    permissionsDeny: ['WriteFileTool(.qwen/settings.json)'],
+    permissionsDeny: ['WriteFileTool(.mariadb-shell-agent/settings.json)'],
   };
   const opsIn = (command: string) =>
     extractShellOperationsAcrossCommand(command, '/project');
@@ -3337,12 +3338,18 @@ describe('PermissionManager — compound shell write attribution', () => {
   ];
 
   it('deny rule matches a write after `cd` into a subdir', async () => {
-    const ctx = sh("cd .qwen && echo '{}' > settings.json", '/repo');
+    const ctx = sh(
+      "cd .mariadb-shell-agent && echo '{}' > settings.json",
+      '/repo',
+    );
     expect(await repoPm(denySettings).evaluate(ctx)).toBe('deny');
   });
 
   it('deny rule matches a write through a `bash -lc` wrapper after `cd`', async () => {
-    const ctx = sh("cd .qwen && bash -lc 'echo {} > settings.json'", '/repo');
+    const ctx = sh(
+      "cd .mariadb-shell-agent && bash -lc 'echo {} > settings.json'",
+      '/repo',
+    );
     expect(await repoPm(denySettings).evaluate(ctx)).toBe('deny');
   });
 
@@ -3357,7 +3364,10 @@ describe('PermissionManager — compound shell write attribution', () => {
     // virtual-op pass surfaces the write target, whose deny rule escalates
     // the verdict: allow + virtual-op deny → deny ("deny > ask > allow").
     const pm = repoPm({ permissionsAllow: ['Bash(*)'], ...denySettings });
-    const ctx = sh("cd .qwen && bash -lc 'echo {} > settings.json'", '/repo');
+    const ctx = sh(
+      "cd .mariadb-shell-agent && bash -lc 'echo {} > settings.json'",
+      '/repo',
+    );
     expect(await pm.evaluate(ctx)).toBe('deny');
   });
 
@@ -3503,22 +3513,31 @@ describe('PermissionManager — compound shell write attribution', () => {
     }));
 
   it('hasRelevantRules sees protected writes after sibling shell-wrapper segments', () => {
-    const command = "bash -lc 'echo ok' && echo hi > .qwen/settings.json";
+    const command =
+      "bash -lc 'echo ok' && echo hi > .mariadb-shell-agent/settings.json";
     const ctx = sh(command, '/repo');
     expect(repoPm(denySettings).hasRelevantRules(ctx)).toBe(true);
   });
 
   it('hasRelevantRules sees protected writes after `cd` before compound recursion', () => {
-    const pm = repoPm({ permissionsDeny: ['Write(.qwen/settings.json)'] });
-    const ctx = sh("cd .qwen && bash -lc 'echo {} > settings.json'", '/repo');
+    const pm = repoPm({
+      permissionsDeny: ['Write(.mariadb-shell-agent/settings.json)'],
+    });
+    const ctx = sh(
+      "cd .mariadb-shell-agent && bash -lc 'echo {} > settings.json'",
+      '/repo',
+    );
     expect(pm.hasRelevantRules(ctx)).toBe(true);
   });
 
   it('hasMatchingAskRule sees writes after `cd` into a subdir', () => {
     const pm = repoPm({
-      permissionsAsk: ['WriteFileTool(.qwen/settings.json)'],
+      permissionsAsk: ['WriteFileTool(.mariadb-shell-agent/settings.json)'],
     });
-    const ctx = sh("cd .qwen && bash -lc 'echo {} > settings.json'", '/repo');
+    const ctx = sh(
+      "cd .mariadb-shell-agent && bash -lc 'echo {} > settings.json'",
+      '/repo',
+    );
     expect(pm.hasMatchingAskRule(ctx)).toBe(true);
   });
 

@@ -6,7 +6,7 @@ Current database integration CI runs on MySQL 8.4 only. The two-engine descripti
 
 ## Problem and evidence
 
-The main nightly [run 39664846210](https://github.com/QwenLM/qwen-code/actions/runs/39664846210) spent 33 minutes 41 seconds executing 1,060 integration tests in 52 classes. Their reported class times sum to 33 minutes 39 seconds, so execution was effectively serial. This excludes unit tests, Maven cache work, and the runner's Java lock wait.
+The main nightly [run 39664846210](https://github.invalid/QwenLM/qwen-code/actions/runs/39664846210) spent 33 minutes 41 seconds executing 1,060 integration tests in 52 classes. Their reported class times sum to 33 minutes 39 seconds, so execution was effectively serial. This excludes unit tests, Maven cache work, and the runner's Java lock wait.
 
 `EventTransportConsumerMySqlIT` drops its database while its cached Spring context remains active. The same run then emitted 7,320 unknown-database exceptions over the following 30 minutes. A separate Spring/JUnit/MySQL probe reproduced the lifecycle error and verified closing the context through Spring's test lifecycle before dropping its database.
 
@@ -55,4 +55,4 @@ The PR also preserves the database matrix restored on main by #15003: shell regr
 
 ## Status
 
-Implementation and the recorded local checks are complete; full acceptance of the rebased revision remains pending CI. Results and the earlier failed verification attempt are preserved in `.qwen/e2e-tests/mysql-ci-optimization.md`. Online CI timing remains to be measured; no CI speedup percentage is claimed.
+Implementation and the recorded local checks are complete; full acceptance of the rebased revision remains pending CI. Results and the earlier failed verification attempt are preserved in `.mariadb-shell-agent/e2e-tests/mysql-ci-optimization.md`. Online CI timing remains to be measured; no CI speedup percentage is claimed.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -176,7 +177,7 @@ describe('session-model-persistence', () => {
       getActiveRuntimeModelSnapshot: vi.fn().mockReturnValue(undefined),
       getCurrentModelRegistryBaseUrl: vi.fn().mockReturnValue(null),
       getContentGeneratorConfig: vi.fn().mockReturnValue({
-        baseUrl: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+        baseUrl: 'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
       }),
       getChatRecordingService: vi.fn().mockReturnValue({ recordSessionModel }),
     } as unknown as Config;

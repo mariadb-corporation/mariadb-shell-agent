@@ -407,7 +407,7 @@ describe('StandaloneApp brand', () => {
 
     resolveBrand({});
 
-    expect(document.title).toBe('Qwen Code Web chat');
+    expect(document.title).toBe('MariaDB Shell Agent Web chat');
     expect(readCachedBrand()).toBeNull();
   });
 
@@ -459,7 +459,7 @@ describe('StandaloneApp brand', () => {
     const script = extractInlineScript('qwen-code-web-shell-brand');
     const stubIcon = { href: 'data:image/svg+xml,BUILT-IN' };
     const stubDocument = {
-      title: 'Qwen Code Web chat',
+      title: 'MariaDB Shell Agent Web chat',
       querySelector: (selector: string) =>
         selector === 'link[rel="icon"]' ? stubIcon : null,
     };

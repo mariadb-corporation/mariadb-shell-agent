@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -658,6 +659,8 @@ describe('Session', () => {
     discardManagedAutoMemoryRecallDelivery: ReturnType<typeof vi.fn>;
     finishManagedAutoMemoryRecall: ReturnType<typeof vi.fn>;
     runManagedAutoMemoryBackgroundTasks: ReturnType<typeof vi.fn>;
+    scheduleManagedMemoryRun: ReturnType<typeof vi.fn>;
+    clearPendingManagedMemoryRun: ReturnType<typeof vi.fn>;
     consumePendingMemoryTaskPromises: ReturnType<typeof vi.fn>;
     captureCacheSafeParams: ReturnType<typeof vi.fn>;
     recordCompletedToolCall: ReturnType<typeof vi.fn>;
@@ -933,6 +936,8 @@ describe('Session', () => {
       discardManagedAutoMemoryRecallDelivery: vi.fn(),
       finishManagedAutoMemoryRecall: vi.fn(),
       runManagedAutoMemoryBackgroundTasks: vi.fn(),
+      scheduleManagedMemoryRun: vi.fn(),
+      clearPendingManagedMemoryRun: vi.fn(),
       consumePendingMemoryTaskPromises: vi.fn().mockReturnValue([]),
       captureCacheSafeParams: vi.fn(),
       recordCompletedToolCall: vi.fn(),
@@ -1143,7 +1148,7 @@ describe('Session', () => {
       assertCanStartTurn: vi.fn().mockResolvedValue(undefined),
       getWorkingDir: vi.fn().mockReturnValue(process.cwd()),
       getProjectRoot: vi.fn().mockReturnValue('/repo'),
-      // Folder trust gates the project `.qwen/loop.md`; default trusted (the
+      // Folder trust gates the project `.mariadb-shell-agent/loop.md`; default trusted (the
       // production default). Untrusted-folder tests override to false.
       isTrustedFolder: vi.fn().mockReturnValue(true),
       getTelemetryLogPromptsEnabled: vi.fn().mockReturnValue(false),
@@ -2079,7 +2084,9 @@ describe('Session', () => {
         const second = path.join(root, 'second');
         await Promise.all(
           [first, second].map((workspace) =>
-            fs.mkdir(path.join(workspace, '.qwen'), { recursive: true }),
+            fs.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+              recursive: true,
+            }),
           ),
         );
         await fs.writeFile(
@@ -2087,11 +2094,11 @@ describe('Session', () => {
           JSON.stringify({ ui: { disableWorkflowKeywordTrigger: true } }),
         );
         await fs.writeFile(
-          path.join(first, '.qwen/settings.json'),
+          path.join(first, '.mariadb-shell-agent/settings.json'),
           JSON.stringify({ ui: { disableWorkflowKeywordTrigger: false } }),
         );
         await fs.writeFile(
-          path.join(second, '.qwen/settings.json'),
+          path.join(second, '.mariadb-shell-agent/settings.json'),
           JSON.stringify({ ui: { disableWorkflowKeywordTrigger: true } }),
         );
         vi.mocked(mockConfig.getProjectRoot).mockReturnValue(second);
@@ -6146,27 +6153,25 @@ describe('Session', () => {
       });
 
       // Captured twice: once inside `#recordPromptCompletionEffects` (before
-      // `scheduleExtract`, pinned below) and once at the turn boundary that
+      // the memory run, pinned below) and once at the turn boundary that
       // feeds the follow-up suggestion.
       expect(mockLlmClient.captureCacheSafeParams).toHaveBeenCalledTimes(2);
       expect(
         mockLlmClient.captureCacheSafeParams.mock.invocationCallOrder[0],
       ).toBeLessThan(
-        mockMemoryManager.scheduleExtract.mock.invocationCallOrder[0]!,
+        mockLlmClient.scheduleManagedMemoryRun.mock.invocationCallOrder[0]!,
       );
-      expect(mockMemoryManager.scheduleExtract).toHaveBeenCalledWith({
-        projectRoot: '/repo',
-        sessionId: 'test-session-id',
-        history: finalHistory,
-        config: mockConfig,
-      });
-      expect(mockMemoryManager.scheduleExtract).toHaveBeenCalledOnce();
-      expect(mockMemoryManager.scheduleDream).toHaveBeenCalledWith({
-        projectRoot: '/repo',
-        sessionId: 'test-session-id',
-        config: mockConfig,
-      });
-      expect(mockMemoryManager.scheduleDream).toHaveBeenCalledOnce();
+      // Extraction and dream start through the client, which waits for an
+      // idle session; ACP reports no memory updates, so the queued tasks are
+      // taken at once.
+      expect(mockLlmClient.scheduleManagedMemoryRun).toHaveBeenCalledOnce();
+      expect(
+        mockLlmClient.consumePendingMemoryTaskPromises.mock
+          .invocationCallOrder[0],
+      ).toBeGreaterThan(
+        mockLlmClient.scheduleManagedMemoryRun.mock.invocationCallOrder[0]!,
+      );
+      expect(mockMemoryManager.scheduleExtract).not.toHaveBeenCalled();
       expect(
         mockLlmClient.finishManagedAutoMemoryRecall,
       ).toHaveBeenCalledOnce();
@@ -6279,8 +6284,8 @@ describe('Session', () => {
       expect(
         mockMemoryManager.resetExhaustedBodyRefsForCurrentTurn,
       ).not.toHaveBeenCalled();
-      expect(mockMemoryManager.scheduleExtract).not.toHaveBeenCalled();
-      expect(mockMemoryManager.scheduleDream).not.toHaveBeenCalled();
+      expect(mockLlmClient.scheduleManagedMemoryRun).not.toHaveBeenCalled();
+      expect(mockLlmClient.clearPendingManagedMemoryRun).not.toHaveBeenCalled();
       // A retry skips managed auto-memory, but the turn still ends `end_turn`,
       // so the follow-up suggestion fires and reads the process-global
       // cache-safe slot. The turn boundary has to refresh it anyway, or the
@@ -6298,8 +6303,9 @@ describe('Session', () => {
       ).rejects.toThrow('provider failed');
 
       expect(mockLlmClient.beginManagedAutoMemoryRecall).toHaveBeenCalledOnce();
-      expect(mockMemoryManager.scheduleExtract).not.toHaveBeenCalled();
-      expect(mockMemoryManager.scheduleDream).not.toHaveBeenCalled();
+      expect(mockLlmClient.scheduleManagedMemoryRun).not.toHaveBeenCalled();
+      // A new question restarts the wait for an idle session; a retry is none.
+      expect(mockLlmClient.clearPendingManagedMemoryRun).toHaveBeenCalledOnce();
       // A failed turn never reaches the success path, so it must not publish
       // its partial transcript as cache-safe.
       expect(mockLlmClient.captureCacheSafeParams).toHaveBeenCalledOnce();
@@ -10239,7 +10245,7 @@ describe('Session', () => {
         ]),
       );
       const notice =
-        '[Resumed] Active worktree: "feat" at /repo/.qwen/worktrees/feat';
+        '[Resumed] Active worktree: "feat" at /repo/.mariadb-shell-agent/worktrees/feat';
       session.pendingWorktreeNotice = notice;
 
       await session.prompt({
@@ -13544,7 +13550,7 @@ describe('Session', () => {
       'reconciles persisted %s across official and MaaS routes of the same DeepSeek model',
       async (selection) => {
         const official = 'https://api.deepseek.com/v1';
-        const maas = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+        const maas = 'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
         const models = [official, maas].map((baseUrl) => ({
           id: 'deepseek-v4-pro',
           label: baseUrl,
@@ -13601,7 +13607,7 @@ describe('Session', () => {
         Object.assign(state.live, {
           model: currentModel,
           authType: AuthType.USE_OPENAI,
-          baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+          baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
           extra_body: { model: 'deepseek-v4-pro' },
         });
         Object.assign(state.rebuildable, state.live);
@@ -22242,7 +22248,7 @@ describe('Session', () => {
         convertedCount: 0,
         omittedCount: 0,
         modelId: 'idealab:qwen3.7-plus',
-        modelEndpoint: 'idealab.alibaba-inc.com',
+        modelEndpoint: 'idealab.alibaba-inc.invalid',
         egressOccurred: true,
       });
       mockChat.sendMessageStream = vi
@@ -22272,7 +22278,7 @@ describe('Session', () => {
           sessionUpdate: 'agent_message_chunk',
           content: {
             type: 'text',
-            text: 'Vision bridge cancelled. Your image and prompt/context were sent to qwen3.7-plus (idealab.alibaba-inc.com).',
+            text: 'Vision bridge cancelled. Your image and prompt/context were sent to qwen3.7-plus (idealab.alibaba-inc.invalid).',
           },
           _meta: {
             source: 'vision_bridge_notice',
@@ -22282,7 +22288,7 @@ describe('Session', () => {
               convertedCount: 0,
               omittedCount: 0,
               modelName: 'qwen3.7-plus',
-              modelEndpoint: 'idealab.alibaba-inc.com',
+              modelEndpoint: 'idealab.alibaba-inc.invalid',
               egressOccurred: true,
             },
           },
@@ -32865,8 +32871,7 @@ describe('Session', () => {
           }),
           {},
         );
-        expect(mockMemoryManager.scheduleExtract).not.toHaveBeenCalled();
-        expect(mockMemoryManager.scheduleDream).not.toHaveBeenCalled();
+        expect(mockLlmClient.scheduleManagedMemoryRun).not.toHaveBeenCalled();
       });
 
       it('keeps continuation retry text in the delivered prompt final', async () => {
@@ -33625,7 +33630,7 @@ describe('Session', () => {
         const tmpDir = await fs.mkdtemp(
           path.join(os.tmpdir(), 'loop-md-session-'),
         );
-        const loopMdPath = path.join(tmpDir, '.qwen', 'loop.md');
+        const loopMdPath = path.join(tmpDir, '.mariadb-shell-agent', 'loop.md');
         await fs.mkdir(path.dirname(loopMdPath), { recursive: true });
         await fs.writeFile(loopMdPath, '- finish the migration');
         mockConfig.getWorkingDir = vi.fn().mockReturnValue(tmpDir);
@@ -33719,7 +33724,7 @@ describe('Session', () => {
         const tmpDir = await fs.mkdtemp(
           path.join(os.tmpdir(), 'loop-md-reminder-'),
         );
-        const loopMdPath = path.join(tmpDir, '.qwen', 'loop.md');
+        const loopMdPath = path.join(tmpDir, '.mariadb-shell-agent', 'loop.md');
         await fs.mkdir(path.dirname(loopMdPath), { recursive: true });
         await fs.writeFile(loopMdPath, '- finish the migration');
         mockConfig.getWorkingDir = vi.fn().mockReturnValue(tmpDir);
@@ -33826,14 +33831,18 @@ describe('Session', () => {
         // model (the unchanged OLD content is re-served as a short reminder).
         const oldDir = await fs.mkdtemp(path.join(os.tmpdir(), 'loop-md-old-'));
         const newDir = await fs.mkdtemp(path.join(os.tmpdir(), 'loop-md-new-'));
-        await fs.mkdir(path.join(oldDir, '.qwen'), { recursive: true });
-        await fs.mkdir(path.join(newDir, '.qwen'), { recursive: true });
+        await fs.mkdir(path.join(oldDir, '.mariadb-shell-agent'), {
+          recursive: true,
+        });
+        await fs.mkdir(path.join(newDir, '.mariadb-shell-agent'), {
+          recursive: true,
+        });
         await fs.writeFile(
-          path.join(oldDir, '.qwen', 'loop.md'),
+          path.join(oldDir, '.mariadb-shell-agent', 'loop.md'),
           '- task from OLD root',
         );
         await fs.writeFile(
-          path.join(newDir, '.qwen', 'loop.md'),
+          path.join(newDir, '.mariadb-shell-agent', 'loop.md'),
           '- task from NEW root',
         );
 
@@ -33914,8 +33923,8 @@ describe('Session', () => {
       });
 
       it('does not expand the project loop.md sentinel in an untrusted folder', async () => {
-        // An untrusted folder's repo-controlled .qwen/loop.md must not be read
-        // and fed to the model. With no user-owned ~/.qwen/loop.md the tick is
+        // An untrusted folder's repo-controlled .mariadb-shell-agent/loop.md must not be read
+        // and fed to the model. With no user-owned ~/.mariadb-shell-agent/loop.md the tick is
         // absent, which converges on the autonomous preamble — and the repo task
         // block still never reaches the model.
         const tmpDir = await fs.mkdtemp(
@@ -33924,7 +33933,7 @@ describe('Session', () => {
         const fakeHome = await fs.mkdtemp(
           path.join(os.tmpdir(), 'loop-md-home-'),
         );
-        const loopMdPath = path.join(tmpDir, '.qwen', 'loop.md');
+        const loopMdPath = path.join(tmpDir, '.mariadb-shell-agent', 'loop.md');
         await fs.mkdir(path.dirname(loopMdPath), { recursive: true });
         await fs.writeFile(loopMdPath, '- finish the migration');
         mockConfig.getWorkingDir = vi.fn().mockReturnValue(tmpDir);
@@ -34109,11 +34118,11 @@ describe('Session', () => {
         // Minimal containers with no HOME make os.homedir() === ''. With QWEN_HOME
         // unset the home confinement root must NOT collapse to '': isWithin('',
         // anyPath) is trivially true, so an empty root lets a home
-        // `~/.qwen/loop.md` symlink resolve anywhere and bypass the confinement.
+        // `~/.mariadb-shell-agent/loop.md` symlink resolve anywhere and bypass the confinement.
         // The guard falls back to the parent of the global qwen dir
         // (Storage.getGlobalQwenDir(), itself empty-home-safe), which is the
         // homeQwenDir Session passes to the resolver.
-        const homeQwenDir = path.join(os.tmpdir(), '.qwen');
+        const homeQwenDir = path.join(os.tmpdir(), '.mariadb-shell-agent');
 
         const roots = resolveHomeLoopResolverRoots({
           homeDir: '',
@@ -34142,7 +34151,7 @@ describe('Session', () => {
         expect(roots.homeQwenDir).toBe(homeQwenDir);
       });
 
-      it('reads the home loop.md from QWEN_HOME, not the real ~/.qwen', async () => {
+      it('reads the home loop.md from QWEN_HOME, not the real ~/.mariadb-shell-agent', async () => {
         // The home/global candidate must honor QWEN_HOME (the relocated global
         // dir) instead of always reading the real OS home. Point QWEN_HOME at a
         // dir holding loop.md, leave the project dir and fake $HOME empty, and
@@ -34230,7 +34239,7 @@ describe('Session', () => {
 
       it('propagates a sentinel resolve() error (EACCES) without leaking the absolute path to the client', async () => {
         // #executeCronPrompt: when resolve() throws (e.g. EACCES on
-        // .qwen/loop.md) it logs a loop.md-specific warn and RE-THROWS into the
+        // .mariadb-shell-agent/loop.md) it logs a loop.md-specific warn and RE-THROWS into the
         // cron catch. Regression guard: the failure must PROPAGATE (surface as a
         // cron error, never degrade to a default/normal tick sent to the model)
         // and the loop.md-tagged warn must fire so a resolution failure stays
@@ -34242,7 +34251,8 @@ describe('Session', () => {
         // message must be SANITIZED — relative label + errno code only, never the
         // absolute path. The full detail stays in the LOCAL debug warn.
         debugLoggerWarnSpy.mockClear();
-        const absoluteLoopMdPath = '/home/alice/project/.qwen/loop.md';
+        const absoluteLoopMdPath =
+          '/home/alice/project/.mariadb-shell-agent/loop.md';
         const eacces = Object.assign(
           new Error(`EACCES: permission denied, open '${absoluteLoopMdPath}'`),
           { code: 'EACCES' },
@@ -34284,7 +34294,7 @@ describe('Session', () => {
           // client).
           await vi.waitFor(() => {
             expect(debugLoggerWarnSpy).toHaveBeenCalledWith(
-              'loop.md sentinel resolution failed (mode=cron, code=EACCES) — check .qwen/loop.md permissions/IO',
+              'loop.md sentinel resolution failed (mode=cron, code=EACCES) — check .mariadb-shell-agent/loop.md permissions/IO',
               eacces,
             );
           });
@@ -34317,7 +34327,7 @@ describe('Session', () => {
           for (const text of cronErrorTexts()) {
             // Relative label + errno code present...
             expect(text).toContain('EACCES');
-            expect(text).toContain('.qwen/loop.md (project)');
+            expect(text).toContain('.mariadb-shell-agent/loop.md (project)');
             // ...and NO absolute path leaked to the client/API.
             expect(text).not.toContain(absoluteLoopMdPath);
             expect(text).not.toContain('/home/alice');
@@ -34341,8 +34351,8 @@ describe('Session', () => {
         }
       });
 
-      it('names the QWEN_HOME-aware home path in the sanitized resolve error, not a hardcoded ~/.qwen', async () => {
-        // Regression: the sanitized resolve-error hardcoded `~/.qwen/loop.md
+      it('names the QWEN_HOME-aware home path in the sanitized resolve error, not a hardcoded ~/.mariadb-shell-agent', async () => {
+        // Regression: the sanitized resolve-error hardcoded `~/.mariadb-shell-agent/loop.md
         // (home)`, but the resolver's home candidate is QWEN_HOME-aware. With
         // QWEN_HOME relocated OUTSIDE $HOME, the error reuses homeLoopLabel(),
         // which names it via the literal `$QWEN_HOME/loop.md` — leak-safe (never
@@ -34368,7 +34378,7 @@ describe('Session', () => {
 
         const eacces = Object.assign(
           new Error(
-            `EACCES: permission denied, open '${path.join(tmpDir, '.qwen', 'loop.md')}'`,
+            `EACCES: permission denied, open '${path.join(tmpDir, '.mariadb-shell-agent', 'loop.md')}'`,
           ),
           { code: 'EACCES' },
         );
@@ -34426,12 +34436,14 @@ describe('Session', () => {
           for (const text of cronErrorTexts()) {
             // The QWEN_HOME-aware home path is named...
             expect(text).toContain(expectedHomeLabel);
-            expect(text).toContain('.qwen/loop.md (project)');
+            expect(text).toContain('.mariadb-shell-agent/loop.md (project)');
             // ...and the old hardcoded label is gone.
-            expect(text).not.toContain('~/.qwen/loop.md');
+            expect(text).not.toContain('~/.mariadb-shell-agent/loop.md');
             // Still leak-safe: neither the absolute project path nor the
             // resolved $QWEN_HOME global dir reaches the client/API.
-            expect(text).not.toContain(path.join(tmpDir, '.qwen', 'loop.md'));
+            expect(text).not.toContain(
+              path.join(tmpDir, '.mariadb-shell-agent', 'loop.md'),
+            );
             expect(text).not.toContain(path.join(qwenHome, 'loop.md'));
           }
         } finally {
@@ -34446,12 +34458,12 @@ describe('Session', () => {
       });
 
       it('omits the project candidate from the sanitized resolve error in an untrusted folder', async () => {
-        // An untrusted folder never reads `.qwen/loop.md` (the resolver gets
+        // An untrusted folder never reads `.mariadb-shell-agent/loop.md` (the resolver gets
         // allowProjectFile=false), so the sanitized error must NOT claim the
         // project candidate was checked — it would be a lie. It still names the
         // QWEN_HOME-aware home candidate (the only one actually probed) and the
         // errno code, and stays leak-safe. Mutation guard: hardcoding
-        // `.qwen/loop.md (project)` back into the throw re-introduces the false
+        // `.mariadb-shell-agent/loop.md (project)` back into the throw re-introduces the false
         // claim and fails this test.
         debugLoggerWarnSpy.mockClear();
         const tmpDir = await fs.mkdtemp(
@@ -34464,7 +34476,11 @@ describe('Session', () => {
         mockConfig.isTrustedFolder = vi.fn().mockReturnValue(false);
         const restoreHome = setFakeHome(fakeHome);
 
-        const absoluteLoopMdPath = path.join(tmpDir, '.qwen', 'loop.md');
+        const absoluteLoopMdPath = path.join(
+          tmpDir,
+          '.mariadb-shell-agent',
+          'loop.md',
+        );
         const eacces = Object.assign(
           new Error(`EACCES: permission denied, open '${absoluteLoopMdPath}'`),
           { code: 'EACCES' },
@@ -34547,7 +34563,9 @@ describe('Session', () => {
         // trust arg (undefined), so the two no longer match.
         debugLoggerWarnSpy.mockClear();
         const eacces = Object.assign(
-          new Error("EACCES: permission denied, open '/home/x/.qwen/loop.md'"),
+          new Error(
+            "EACCES: permission denied, open '/home/x/.mariadb-shell-agent/loop.md'",
+          ),
           { code: 'EACCES' },
         );
         const resolveSpy = vi
@@ -34683,7 +34701,7 @@ describe('Session', () => {
           expect(errorEchoes()).toHaveLength(0);
           // The real errno is still recorded in the LOCAL debug warn.
           expect(debugLoggerWarnSpy).toHaveBeenCalledWith(
-            'loop.md sentinel resolution failed (mode=dynamic, code=EIO) — check .qwen/loop.md permissions/IO',
+            'loop.md sentinel resolution failed (mode=dynamic, code=EIO) — check .mariadb-shell-agent/loop.md permissions/IO',
             eio,
           );
           expect(debugLoggerDebugSpy).toHaveBeenCalledWith(
@@ -34821,7 +34839,7 @@ describe('Session', () => {
           // The loop did NOT surface an error (it survived).
           expect(errorEchoes()).toHaveLength(0);
           expect(debugLoggerWarnSpy).toHaveBeenCalledWith(
-            'loop.md sentinel resolution failed (mode=dynamic, code=EACCES) — check .qwen/loop.md permissions/IO',
+            'loop.md sentinel resolution failed (mode=dynamic, code=EACCES) — check .mariadb-shell-agent/loop.md permissions/IO',
             eacces,
           );
         } finally {
@@ -34895,7 +34913,7 @@ describe('Session', () => {
           // The loop did NOT surface an error (it survived).
           expect(errorEchoes()).toHaveLength(0);
           expect(debugLoggerWarnSpy).toHaveBeenCalledWith(
-            'loop.md sentinel resolution failed (mode=dynamic, code=EISDIR) — check .qwen/loop.md permissions/IO',
+            'loop.md sentinel resolution failed (mode=dynamic, code=EISDIR) — check .mariadb-shell-agent/loop.md permissions/IO',
             eisdir,
           );
         } finally {
@@ -34964,7 +34982,7 @@ describe('Session', () => {
           );
           expect(errorEchoes()).toHaveLength(0);
           expect(debugLoggerWarnSpy).toHaveBeenCalledWith(
-            'loop.md sentinel resolution failed (mode=dynamic, code=ENOTDIR) — check .qwen/loop.md permissions/IO',
+            'loop.md sentinel resolution failed (mode=dynamic, code=ENOTDIR) — check .mariadb-shell-agent/loop.md permissions/IO',
             enotdir,
           );
         } finally {
@@ -35040,7 +35058,7 @@ describe('Session', () => {
           expect(sentToModel()).not.toContain('# /loop tick');
           // The real (unsanitized) bug is still recorded in the LOCAL debug warn.
           expect(debugLoggerWarnSpy).toHaveBeenCalledWith(
-            'loop.md sentinel resolution failed (mode=dynamic, code=unknown) — check .qwen/loop.md permissions/IO',
+            'loop.md sentinel resolution failed (mode=dynamic, code=unknown) — check .mariadb-shell-agent/loop.md permissions/IO',
             bug,
           );
         } finally {
@@ -35277,7 +35295,7 @@ describe('Session', () => {
         const tmpDir = await fs.mkdtemp(
           path.join(os.tmpdir(), 'loop-md-compact-'),
         );
-        const loopMdPath = path.join(tmpDir, '.qwen', 'loop.md');
+        const loopMdPath = path.join(tmpDir, '.mariadb-shell-agent', 'loop.md');
         await fs.mkdir(path.dirname(loopMdPath), { recursive: true });
         await fs.writeFile(loopMdPath, '- stable task list');
         mockConfig.getWorkingDir = vi.fn().mockReturnValue(tmpDir);
@@ -36445,7 +36463,7 @@ describe('Session', () => {
                 kind: 'cleared',
                 condition: 'ship the thing',
                 lastReason: expect.stringContaining(
-                  'recorded by an earlier version of Qwen Code',
+                  'recorded by an earlier version of MariaDB Shell Agent',
                 ),
               }),
             },
@@ -38090,8 +38108,7 @@ describe('Session', () => {
           });
 
           expect(mockChat.sendMessageStream).toHaveBeenCalledOnce();
-          expect(mockMemoryManager.scheduleExtract).toHaveBeenCalledOnce();
-          expect(mockMemoryManager.scheduleDream).toHaveBeenCalledOnce();
+          expect(mockLlmClient.scheduleManagedMemoryRun).toHaveBeenCalledOnce();
         });
 
         it('waits for a requested delivery final without a channel marker', async () => {
@@ -42579,12 +42596,15 @@ describe('Session', () => {
         returnDisplay: 'ok',
       });
       const invocation = {
-        params: { file_path: '/repo/.qwen/settings.json', content: '{}' },
+        params: {
+          file_path: '/repo/.mariadb-shell-agent/settings.json',
+          content: '{}',
+        },
         getDefaultPermission: vi.fn().mockResolvedValue('ask'),
         getConfirmationDetails: vi.fn().mockResolvedValue({
           type: 'edit',
           title: 'Confirm file write',
-          fileName: '/repo/.qwen/settings.json',
+          fileName: '/repo/.mariadb-shell-agent/settings.json',
           fileDiff: 'diff',
           onConfirm: vi.fn(),
         }),
@@ -42631,7 +42651,7 @@ describe('Session', () => {
                   id: 'call-protected-write',
                   name: core.ToolNames.WRITE_FILE,
                   args: {
-                    file_path: '/repo/.qwen/settings.json',
+                    file_path: '/repo/.mariadb-shell-agent/settings.json',
                     content: '{}',
                   },
                 },
@@ -42654,7 +42674,7 @@ describe('Session', () => {
 
     it('routes ACP Bash(*) protected writes through AUTO review', async () => {
       const cwd = '/repo';
-      const command = "echo '{}' > .qwen/settings.json";
+      const command = "echo '{}' > .mariadb-shell-agent/settings.json";
       let denialState = {
         consecutiveBlock: 0,
         consecutiveUnavailable: 0,
@@ -42753,7 +42773,7 @@ describe('Session', () => {
 
     it('blocks ACP Bash(*) protected writes when AUTO classifier denies', async () => {
       const cwd = '/repo';
-      const command = "echo '{}' > .qwen/settings.json";
+      const command = "echo '{}' > .mariadb-shell-agent/settings.json";
       let denialState = {
         consecutiveBlock: 0,
         consecutiveUnavailable: 0,
@@ -42871,7 +42891,7 @@ describe('Session', () => {
 
     it('asks when the AUTO classifier is unavailable and can switch to Default', async () => {
       const cwd = '/repo';
-      const command = "echo '{}' > .qwen/settings.json";
+      const command = "echo '{}' > .mariadb-shell-agent/settings.json";
       let approvalMode = ApprovalMode.AUTO;
       let denialState = {
         consecutiveBlock: 0,
@@ -43937,7 +43957,7 @@ describe('Session', () => {
           expect(
             mockLlmClient.beginManagedAutoMemoryRecall,
           ).not.toHaveBeenCalled();
-          expect(mockMemoryManager.scheduleExtract).not.toHaveBeenCalled();
+          expect(mockLlmClient.scheduleManagedMemoryRun).not.toHaveBeenCalled();
         });
 
         it('wraps additionalContext in the reserved tag before sending', async () => {
@@ -52533,7 +52553,9 @@ describe('Session', () => {
         {
           id: 'write_memory',
           name: core.ToolNames.WRITE_FILE,
-          args: { file_path: '/workspace/.qwen/memory/project.md' },
+          args: {
+            file_path: '/workspace/.mariadb-shell-agent/memory/project.md',
+          },
         },
       ]);
 
@@ -52544,7 +52566,9 @@ describe('Session', () => {
         [
           {
             toolName: core.ToolNames.WRITE_FILE,
-            args: { file_path: '/workspace/.qwen/memory/project.md' },
+            args: {
+              file_path: '/workspace/.mariadb-shell-agent/memory/project.md',
+            },
             status: 'success',
           },
         ],
@@ -52601,13 +52625,16 @@ describe('Session', () => {
       );
     }
 
-    it('refreshes context-file instructions after ACP bare remember writes QWEN.md', async () => {
+    it('refreshes context-file instructions after ACP bare remember writes MARIADB-SHELL-AGENT.md', async () => {
       await markAcpContextRefreshIntent();
       refreshMemoryAfterManagedWriteSpy.mockClear();
       refreshMemoryInstructionSpy.mockClear();
 
       allowAcpWriteFile();
-      await runAcpWriteFile('/repo/QWEN.md', 'prompt-context-write');
+      await runAcpWriteFile(
+        '/repo/MARIADB-SHELL-AGENT.md',
+        'prompt-context-write',
+      );
 
       expect(refreshMemoryAfterManagedWriteSpy).toHaveBeenCalledTimes(1);
       expect(refreshMemoryInstructionSpy).toHaveBeenCalledWith(mockConfig, {
@@ -52622,12 +52649,12 @@ describe('Session', () => {
 
       allowAcpWriteFile();
       await runAcpWriteFile(
-        '/repo/QWEN.md',
+        '/repo/MARIADB-SHELL-AGENT.md',
         'prompt-context-write-1',
         'write_context_1',
       );
       await runAcpWriteFile(
-        '/repo/QWEN.md',
+        '/repo/MARIADB-SHELL-AGENT.md',
         'prompt-context-write-2',
         'write_context_2',
       );
@@ -52666,7 +52693,10 @@ describe('Session', () => {
         sessionId: 'test-session-id',
         prompt: [{ type: 'text', text: 'ordinary turn' }],
       });
-      await runAcpWriteFile('/repo/QWEN.md', 'prompt-ordinary-context-write');
+      await runAcpWriteFile(
+        '/repo/MARIADB-SHELL-AGENT.md',
+        'prompt-ordinary-context-write',
+      );
 
       expect(refreshMemoryInstructionSpy).not.toHaveBeenCalled();
     });
@@ -52706,7 +52736,7 @@ describe('Session', () => {
 
         allowAcpWriteFile();
         await runAcpWriteFile(
-          '/repo/QWEN.md',
+          '/repo/MARIADB-SHELL-AGENT.md',
           'prompt-preserved-context-write',
         );
 
@@ -52717,7 +52747,7 @@ describe('Session', () => {
       },
     );
 
-    it('does not refresh context-file instructions for ordinary ACP QWEN.md writes', async () => {
+    it('does not refresh context-file instructions for ordinary ACP MARIADB-SHELL-AGENT.md writes', async () => {
       const execute = vi.fn().mockResolvedValue({
         llmContent: 'wrote context',
         returnDisplay: 'wrote context',
@@ -52734,7 +52764,7 @@ describe('Session', () => {
           {
             id: 'write_context',
             name: core.ToolNames.WRITE_FILE,
-            args: { file_path: '/repo/QWEN.md' },
+            args: { file_path: '/repo/MARIADB-SHELL-AGENT.md' },
           },
         ],
       );

@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review cache-commit`: promote a capture's cache candidate into
-// `.qwen/review-cache/`, merged with the round's model-written ledger.
+// `mariadb-shell-agent review cache-commit`: promote a capture's cache candidate into
+// `.mariadb-shell-agent/review-cache/`, merged with the round's model-written ledger.
 //
 // The cache used to be hand-written by the model from a JSON template, which
 // was fine while it held six scalar fields and a findings list. The content
@@ -341,7 +342,7 @@ function runCacheCommit(args: CacheCommitArgs): void {
 export const cacheCommitCommand: CommandModule = {
   command: 'cache-commit',
   describe:
-    "Promote a capture's cache candidate into .qwen/review-cache/, merged " +
+    "Promote a capture's cache candidate into .mariadb-shell-agent/review-cache/, merged " +
     "with the round's ledger",
   builder: (y) =>
     y
@@ -361,7 +362,8 @@ export const cacheCommitCommand: CommandModule = {
       .option('out', {
         type: 'string',
         demandOption: true,
-        describe: 'The cache file to write (.qwen/review-cache/<target>.json)',
+        describe:
+          'The cache file to write (.mariadb-shell-agent/review-cache/<target>.json)',
       })
       .option('state-id', {
         type: 'string',

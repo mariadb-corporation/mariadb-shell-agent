@@ -2,7 +2,7 @@
 
 [English](2026-09-25-managed-context-envelope.md) | [简体中文](2026-09-25-managed-context-envelope.zh-CN.md)
 
-状态：契约已定义。自 W0c-1 起 worker 提供它（[Managed Context Worker](2026-09-26-managed-context-worker.zh-CN.md)），尚无 Broker 写出 boot v2。更新：2026-09-26。本文是 Managed Agent proposal [#12380](https://github.com/QwenLM/qwen-code/issues/12380) 的第二个 W0 切片，建立在 [Workspace 绑定契约](2026-09-25-managed-workspace-binding-contract.zh-CN.md)（W0a，#12681）之上。[这条答复](https://github.com/QwenLM/qwen-code/issues/12380#issuecomment-5825755703)要求现在就定下 envelope 的形状，契约先行：“先 envelope 形状 + 共享 schema/fixtures，后处理器”。下文的“参考设计”指该提案的 [Workspace 与 Session cwd 设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-workspace-context.md)、[契约收口](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-contract-closure.md)和 [attestation 设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-runtime-attestation.zh-CN.md)，都取自 #12380 所链接的提交。
+状态：契约已定义。自 W0c-1 起 worker 提供它（[Managed Context Worker](2026-09-26-managed-context-worker.zh-CN.md)），尚无 Broker 写出 boot v2。更新：2026-09-26。本文是 Managed Agent proposal [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380) 的第二个 W0 切片，建立在 [Workspace 绑定契约](2026-09-25-managed-workspace-binding-contract.zh-CN.md)（W0a，#12681）之上。[这条答复](https://github.invalid/QwenLM/qwen-code/issues/12380#issuecomment-5825755703)要求现在就定下 envelope 的形状，契约先行：“先 envelope 形状 + 共享 schema/fixtures，后处理器”。下文的“参考设计”指该提案的 [Workspace 与 Session cwd 设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-workspace-context.md)、[契约收口](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-contract-closure.md)和 [attestation 设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-runtime-attestation.zh-CN.md)，都取自 #12380 所链接的提交。
 
 ## 问题
 
@@ -188,7 +188,7 @@ schema 固定每种记录的形状，以及它能以可读方式表达的规则�
 - `packages/managed-agent-server/src/test/java/com/alibaba/qwen/code/runtimebroker/managedworkspace/` 中的一致性测试（新增）。
 - `packages/cli/src/serve/managed-workspace-binding.ts` 导出它的三项 W0a 检查以供复用，行为不变。
 - 本设计文档的中英文两个版本（新增），以及 W0a 文档的“启动信封”一节和后续工作表，它们现在指向本文。
-- runtime-broker 的 `README.md` 和 `QWEN.md`，其中关于摘要的维护规则现在也点名这些 fixtures。
+- runtime-broker 的 `README.md` 和 `MARIADB-SHELL-AGENT.md`，其中关于摘要的维护规则现在也点名这些 fixtures。
 
 worker、attestation 契约、provisioner、transport、fake worker 和 CI workflow 都不变。
 

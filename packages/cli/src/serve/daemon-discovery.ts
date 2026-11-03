@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,8 +21,8 @@ const RECORD_SUFFIX = '.json';
 export type DaemonDiscoveryAuth = 'none' | 'bearer';
 
 /**
- * A machine-readable record of one live `qwen serve` listener. It is written
- * by the daemon and read by `qwen daemon`. It deliberately carries no bearer
+ * A machine-readable record of one live `mariadb-shell-agent serve` listener. It is written
+ * by the daemon and read by `mariadb-shell-agent daemon`. It deliberately carries no bearer
  * token: a served workspace can expose files the daemon owns, so a record
  * inside one must never be a credential store.
  */

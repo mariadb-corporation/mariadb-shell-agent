@@ -2,7 +2,7 @@
 
 [English](web-shell-host-directory-picker.md) | [简体中文](web-shell-host-directory-picker.zh-CN.md)
 
-Status: implementation proposal for [#15186](https://github.com/QwenLM/qwen-code/issues/15186). The API shape and precedence below are choices for this implementation, pending maintainer review; the issue discussion has not approved a final public contract.
+Status: implementation proposal for [#15186](https://github.invalid/QwenLM/qwen-code/issues/15186). The API shape and precedence below are choices for this implementation, pending maintainer review; the issue discussion has not approved a final public contract.
 
 ## Problem and current behavior
 

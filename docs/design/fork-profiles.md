@@ -5,7 +5,7 @@
 Add a project-level named profile layer on top of the fork execution allowlist
 introduced by #8066. A caller can pass `fork_profile: "<name>"` instead of
 repeating `fork_tools`; the runtime resolves
-`.qwen/fork-profiles/<name>.md` once at launch and feeds the resulting tool
+`.mariadb-shell-agent/fork-profiles/<name>.md` once at launch and feeds the resulting tool
 list into the existing execution gate.
 
 This phase adds no new authorization mechanism. The resolved profile must
@@ -16,7 +16,7 @@ behave exactly like the equivalent inline `fork_tools` call.
 Profiles live under the active project root:
 
 ```text
-.qwen/fork-profiles/<name>.md
+.mariadb-shell-agent/fork-profiles/<name>.md
 ```
 
 Each file contains YAML frontmatter:
@@ -48,7 +48,7 @@ deny-all, bare `*` is invalid, and MCP wildcard syntax is unchanged.
 Project scope is the only lookup scope in this phase. User-level profiles,
 scope precedence, built-in profiles, profile listing, and management UI are
 deferred. Safe mode and bare mode reject project profiles because they are
-local customizations. AUTO mode treats writes under `.qwen/fork-profiles/` as
+local customizations. AUTO mode treats writes under `.mariadb-shell-agent/fork-profiles/` as
 self-modification, so they cannot use the normal in-workspace edit fast path.
 
 ## Launch Resolution

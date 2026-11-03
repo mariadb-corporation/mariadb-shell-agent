@@ -4,7 +4,7 @@
 
 ## 问题与范围
 
-Issue [#8281](https://github.com/QwenLM/qwen-code/issues/8281) 要求通过不绑定服务商的 IMAP 和 SMTP 接入专用 Agent 邮箱。main 尚无邮件适配器。本次增加内置的私有工作区包，复用 ChannelBase 的访问控制、会话、命令、附件和 Agent 桥接。OAuth、邮箱管理、日历及加密邮件、任意邮件撰写、HTML 输出不在范围内。
+Issue [#8281](https://github.invalid/QwenLM/qwen-code/issues/8281) 要求通过不绑定服务商的 IMAP 和 SMTP 接入专用 Agent 邮箱。main 尚无邮件适配器。本次增加内置的私有工作区包，复用 ChannelBase 的访问控制、会话、命令、附件和 Agent 桥接。OAuth、邮箱管理、日历及加密邮件、任意邮件撰写、HTML 输出不在范围内。
 
 ## 架构
 

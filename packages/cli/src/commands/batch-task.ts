@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -79,7 +80,7 @@ export type BatchPlan = z.infer<typeof batchPlanSchema>;
  * anything is billed. Delivery happens hours after approval with nobody
  * watching, so a target must stay inside the project and outside every
  * hidden path — at any depth, since `.git/hooks`, `.github/workflows` and
- * `.qwen/settings.json` configure tools or run code in nested projects too.
+ * `.mariadb-shell-agent/settings.json` configure tools or run code in nested projects too.
  */
 export function targetProblem(target: string): string | undefined {
   const normalized = path.normalize(target);
@@ -436,8 +437,8 @@ export class BatchTaskStore {
         ? ` (pid ${pid}${elsewhere ? ` on ${holderHost}` : ''})`
         : '';
       throw new Error(
-        `task "${id}" is in use by another \`qwen batch\` process${who}. ` +
-          `An open qwen session collects batch tasks automatically and holds the lock only briefly — try again in a few seconds. ` +
+        `task "${id}" is in use by another \`mariadb-shell-agent batch\` process${who}. ` +
+          `An open mariadb-shell-agent session collects batch tasks automatically and holds the lock only briefly — try again in a few seconds. ` +
           `If no such process is running, delete ${lock} and ${recovery}, then retry.`,
       );
     }

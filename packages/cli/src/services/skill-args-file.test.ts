@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -63,7 +64,7 @@ describe('writeSkillArgs', () => {
     // `.._.._etc_passwd`, and those dots are harmless once the separators are
     // gone. The property is that the *resolved* path is still inside the temp
     // directory, which is what a traversal would break.
-    const inside = resolve('.qwen', 'tmp');
+    const inside = resolve('.mariadb-shell-agent', 'tmp');
     const rel = relative(inside, resolve(path));
     expect(rel.startsWith('..')).toBe(false);
     expect(isAbsolute(rel)).toBe(false);
@@ -74,7 +75,7 @@ describe('writeSkillArgs', () => {
     // fixture would reach the real filesystem root, so assert on the fixture's
     // own tree — the traversal, had it worked, would have created these.)
     expect(existsSync(join(dir, 'etc'))).toBe(false);
-    expect(existsSync(join(dir, '.qwen', 'etc'))).toBe(false);
+    expect(existsSync(join(dir, '.mariadb-shell-agent', 'etc'))).toBe(false);
   });
 
   it('scopes the path to the session, and derives the same path both sides', () => {
@@ -149,8 +150,11 @@ describe('writeSkillArgs', () => {
       const victim = join(dir, 'victim');
       mkdirSync(victim, { recursive: true });
       writeFileSync(join(victim, 'qwen-skill-args-review.txt'), 'precious');
-      mkdirSync(join(dir, '.qwen', 'tmp'), { recursive: true });
-      symlinkSync(victim, join(dir, '.qwen', 'tmp', 's-attacker'));
+      mkdirSync(join(dir, '.mariadb-shell-agent', 'tmp'), { recursive: true });
+      symlinkSync(
+        victim,
+        join(dir, '.mariadb-shell-agent', 'tmp', 's-attacker'),
+      );
 
       expect(writeSkillArgs('review', '6771 --comment')).toBeNull();
       expect(

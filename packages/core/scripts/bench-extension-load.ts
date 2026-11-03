@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,7 +12,7 @@
  * Builds a throwaway fixture under the system temp dir (100 extensions x 40
  * skills / 10 commands / 5 agents) and refreshes the cache N times against
  * it. Both the extensions dir and the extension store live inside the
- * fixture root, so a run never touches the real `~/.qwen` state; the whole
+ * fixture root, so a run never touches the real `~/.mariadb-shell-agent` state; the whole
  * root is removed afterwards.
  *
  * Each sample is validated against the fixture constants before it is
@@ -28,7 +29,7 @@
  * Usage:
  *   npx tsx packages/core/scripts/bench-extension-load.ts [--manifest-only] [--baseline] [--runs 10]
  *
- * `--baseline` stores the result in .qwen/bench-baseline.json at the repo
+ * `--baseline` stores the result in .mariadb-shell-agent/bench-baseline.json at the repo
  * root; a later run without the flag loads that file (if present) and
  * prints the delta.
  */
@@ -55,7 +56,11 @@ const EXPECTED_SKILLS = EXTENSION_COUNT * SKILLS_PER_EXTENSION;
 // import.meta.url is packages/core/scripts/bench-extension-load.ts, so four
 // dirname hops land on the repo root (scripts -> core -> packages -> repo).
 const REPO_ROOT = path.resolve(fileURLToPath(import.meta.url), '../../../..');
-const BASELINE_PATH = path.join(REPO_ROOT, '.qwen', 'bench-baseline.json');
+const BASELINE_PATH = path.join(
+  REPO_ROOT,
+  '.mariadb-shell-agent',
+  'bench-baseline.json',
+);
 
 interface RunResult {
   medianMs: number;
@@ -162,7 +167,7 @@ async function runOnce(
     extensionStore: new ExtensionStore({
       extensionsDir,
       // Keep the store inside the throwaway fixture root; the default would
-      // be the real ~/.qwen/extension-store.
+      // be the real ~/.mariadb-shell-agent/extension-store.
       storeDir: path.join(extensionsDir, '..', 'extension-store'),
     }),
   });

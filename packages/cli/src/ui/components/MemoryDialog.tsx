@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -150,7 +151,7 @@ export function MemoryDialog({ onClose }: MemoryDialogProps) {
     () =>
       path.join(
         Storage.getGlobalQwenDir(),
-        getAllMemoryFilenames()[0] ?? 'QWEN.md',
+        getAllMemoryFilenames()[0] ?? 'MARIADB-SHELL-AGENT.md',
       ),
     [],
   );
@@ -158,7 +159,7 @@ export function MemoryDialog({ onClose }: MemoryDialogProps) {
     () =>
       path.join(
         config.getWorkingDir(),
-        getAllMemoryFilenames()[0] ?? 'QWEN.md',
+        getAllMemoryFilenames()[0] ?? 'MARIADB-SHELL-AGENT.md',
       ),
     [config],
   );
@@ -273,12 +274,12 @@ export function MemoryDialog({ onClose }: MemoryDialogProps) {
         case 'project':
           return resolvePreferredMemoryFile(
             config.getWorkingDir(),
-            getAllMemoryFilenames()[0] ?? 'QWEN.md',
+            getAllMemoryFilenames()[0] ?? 'MARIADB-SHELL-AGENT.md',
           );
         case 'global':
           return resolvePreferredMemoryFile(
             Storage.getGlobalQwenDir(),
-            getAllMemoryFilenames()[0] ?? 'QWEN.md',
+            getAllMemoryFilenames()[0] ?? 'MARIADB-SHELL-AGENT.md',
           );
         default: {
           const _exhaustive: never = item.value;

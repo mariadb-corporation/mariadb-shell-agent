@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -110,7 +111,9 @@ describe('ReadFileTool', () => {
       storage: {
         getProjectTempDir: () => path.join(tempRootDir, '.temp'),
         getProjectDir: () => path.join(tempRootDir, '.project'),
-        getUserSkillsDirs: () => [path.join(os.homedir(), '.qwen', 'skills')],
+        getUserSkillsDirs: () => [
+          path.join(os.homedir(), '.mariadb-shell-agent', 'skills'),
+        ],
         ...storage,
       },
       getTruncateToolOutputThreshold: () => 2500,
@@ -185,7 +188,8 @@ describe('ReadFileTool', () => {
     tool = new ReadFileTool(
       makeConfig(
         {
-          getPlansDir: () => path.join(os.homedir(), '.qwen', 'plans'),
+          getPlansDir: () =>
+            path.join(os.homedir(), '.mariadb-shell-agent', 'plans'),
           getEffectiveInputModalities: () => ({ ...allModalities }),
         },
         {
@@ -1145,12 +1149,17 @@ describe('ReadFileTool', () => {
       ],
       [
         'should return allow for saved plan files under the plans directory',
-        path.join(os.homedir(), '.qwen', 'plans', 'session-1.md'),
+        path.join(
+          os.homedir(),
+          '.mariadb-shell-agent',
+          'plans',
+          'session-1.md',
+        ),
         'allow',
       ],
       [
-        'should still return ask for ~/.qwen files outside the plans directory',
-        path.join(os.homedir(), '.qwen', 'settings.json'),
+        'should still return ask for ~/.mariadb-shell-agent files outside the plans directory',
+        path.join(os.homedir(), '.mariadb-shell-agent', 'settings.json'),
         'ask',
       ],
       [
@@ -1441,7 +1450,7 @@ describe('ReadFileTool', () => {
             getEffectiveInputModalities: () => ({}),
             getDefaultVisionBridgeModel: () => ({
               id: 'qwen3-vl-plus',
-              baseUrl: 'https://dashscope.aliyuncs.com/v1',
+              baseUrl: 'https://dashscope.aliyuncs.invalid/v1',
             }),
           }),
         );
@@ -1459,7 +1468,7 @@ describe('ReadFileTool', () => {
             convertedCount: 4,
             omittedCount: 0,
             modelId: 'qwen3-vl-plus',
-            modelEndpoint: 'dashscope.aliyuncs.com',
+            modelEndpoint: 'dashscope.aliyuncs.invalid',
             egressOccurred: true,
             ...bridge,
           });
@@ -1513,7 +1522,7 @@ describe('ReadFileTool', () => {
           'transcribed PDF pages 20-23; remaining pages 24-25',
         );
         expect(display.notice).toContain('qwen3-vl-plus');
-        expect(display.notice).toContain('dashscope.aliyuncs.com');
+        expect(display.notice).toContain('dashscope.aliyuncs.invalid');
         expect(visionBridgeMocks.runVisionBridge).toHaveBeenCalledWith(
           expect.objectContaining({
             sourceContext: {
@@ -1578,7 +1587,7 @@ describe('ReadFileTool', () => {
         expect(display.summary).toContain(
           'rendered PDF pages 20-23; remaining pages 24-25',
         );
-        expect(display.notice).toContain('dashscope.aliyuncs.com');
+        expect(display.notice).toContain('dashscope.aliyuncs.invalid');
       });
 
       it('restores the PDF error for an unusable successful bridge result', async () => {
@@ -1587,7 +1596,7 @@ describe('ReadFileTool', () => {
         expect(result.error?.type).toBe(ToolErrorType.READ_CONTENT_FAILURE);
         expect(JSON.stringify(result.llmContent)).not.toContain('inlineData');
         expect(bridgeDisplay(result).notice).toContain(
-          'dashscope.aliyuncs.com',
+          'dashscope.aliyuncs.invalid',
         );
       });
 
@@ -1615,7 +1624,7 @@ describe('ReadFileTool', () => {
           expect(JSON.stringify(result.llmContent)).not.toContain(mediaKey);
           const display = bridgeDisplay(result);
           expect(display.notice).toContain('qwen3-vl-plus');
-          expect(display.notice).toContain('dashscope.aliyuncs.com');
+          expect(display.notice).toContain('dashscope.aliyuncs.invalid');
           expect(display.notice).toContain('transcription was discarded');
           expect(display.notice).not.toContain('vision model request failed');
         },
@@ -1631,7 +1640,7 @@ describe('ReadFileTool', () => {
         expect(result.error?.type).toBe(ToolErrorType.READ_CONTENT_FAILURE);
         expect(result.llmContent).toContain('Cannot extract text from PDF');
         const notice = () => bridgeDisplay(result).notice;
-        expect(notice()).toContain('dashscope.aliyuncs.com');
+        expect(notice()).toContain('dashscope.aliyuncs.invalid');
         expect(notice()).toContain('transcription was discarded');
         expect(notice()).not.toContain('vision model request failed');
         expect(JSON.stringify(result.llmContent)).not.toContain('inlineData');
@@ -2010,7 +2019,7 @@ describe('ReadFileTool', () => {
         // per-read freshness `<system-reminder>` must be re-emitted) but MUST
         // still be recorded, or prior-read enforcement on Edit / WriteFile
         // refuses a file the model just read. QWEN_CODE_MEMORY_LOCAL=1 puts
-        // the file under .qwen/<auto-memory>/.
+        // the file under .mariadb-shell-agent/<auto-memory>/.
         vi.stubEnv('QWEN_CODE_MEMORY_LOCAL', '1'); // restored in afterEach
         const { getAutoMemoryRoot, clearAutoMemoryRootCache } = await import(
           '../memory/paths.js'
@@ -2140,14 +2149,17 @@ describe('ReadFileTool', () => {
       });
     });
 
-    describe('with .qwenignore', () => {
+    describe('with .mariadb-shell-agentignore', () => {
       beforeEach(async () => {
-        await put('.qwenignore', ['foo.*', 'ignored/'].join('\n'));
+        await put(
+          '.mariadb-shell-agentignore',
+          ['foo.*', 'ignored/'].join('\n'),
+        );
       });
 
       it.each([
         [
-          'should throw error if path is ignored by a .qwenignore pattern',
+          'should throw error if path is ignored by a .mariadb-shell-agentignore pattern',
           'foo.bar',
         ],
         [
@@ -2156,7 +2168,7 @@ describe('ReadFileTool', () => {
         ],
       ])('%s', async (_title, file) => {
         const ignoredFilePath = await put(file, 'content');
-        const expectedError = `File path '${ignoredFilePath}' is ignored by .qwenignore pattern(s).`;
+        const expectedError = `File path '${ignoredFilePath}' is ignored by .mariadb-shell-agentignore pattern(s).`;
         expect(() => tool.build({ file_path: ignoredFilePath })).toThrow(
           expectedError,
         );

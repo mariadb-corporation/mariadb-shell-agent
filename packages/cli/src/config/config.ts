@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -252,7 +253,7 @@ export interface CliArgs {
    * - `--worktree=#123` / `--worktree https://github.com/o/r/pull/123` → PR ref
    *
    * Consumed by `setupStartupWorktree()` before `loadCliConfig()`. When set,
-   * the CLI chdirs into `<repoRoot>/.qwen/worktrees/<slug>/` and the entire
+   * the CLI chdirs into `<repoRoot>/.mariadb-shell-agent/worktrees/<slug>/` and the entire
    * session runs inside that worktree.
    */
   worktree?: string | undefined;
@@ -599,7 +600,7 @@ export async function parseArguments(): Promise<CliArgs> {
 
   const yargsInstance = yargs(rawArgv)
     .locale('en')
-    .scriptName('qwen')
+    .scriptName('mariadb-shell-agent')
     .usage(TOP_LEVEL_USAGE)
     .option('telemetry', TOP_LEVEL_GLOBAL_OPTIONS.telemetry)
     .option('telemetry-target', TOP_LEVEL_GLOBAL_OPTIONS['telemetry-target'])
@@ -666,7 +667,7 @@ export async function parseArguments(): Promise<CliArgs> {
           type: 'string' as const,
           choices: ['managed'] as const,
           description:
-            'Private to qwen serve: the execution engine this ACP host runs',
+            'Private to mariadb-shell-agent serve: the execution engine this ACP host runs',
           hidden: true,
         })
         .option('experimental-skills', {
@@ -876,7 +877,7 @@ export async function parseArguments(): Promise<CliArgs> {
             const hasPositionalQuery = Array.isArray(query)
               ? query.length > 0
               : !!query;
-            // Allow stdin piping (`echo "..." | qwen --json-schema ...`):
+            // Allow stdin piping (`echo "..." | mariadb-shell-agent --json-schema ...`):
             // when stdin is not a TTY, the prompt is supplied via the pipe
             // and headless mode runs normally. Only reject true interactive
             // invocations with neither flag nor positional nor pipe — the
@@ -902,20 +903,20 @@ export async function parseArguments(): Promise<CliArgs> {
     // Register Channel subcommands
     .command(channelCommand)
     .command(boardCommand)
-    // Register `qwen serve` (Stage 1 daemon)
+    // Register `mariadb-shell-agent serve` (Stage 1 daemon)
     .command(serveCommand)
-    // Register `qwen daemon` (local daemon inspection and control)
+    // Register `mariadb-shell-agent daemon` (local daemon inspection and control)
     .command(daemonCommand)
     // Register `qwen attach` (terminal client for a running daemon session)
     .command(attachCommand)
     // Register sessions subcommands
     .command(sessionsCommand)
-    // Register `qwen agents` (join a coordinator; session_send MCP server)
+    // Register `mariadb-shell-agent agents` (join a coordinator; session_send MCP server)
     .command(agentsCommand)
     .command(batchCommand)
     // Register update command
     .command(updateCommand)
-    // Register `qwen sandbox` (inspect / prove the resolved sandbox backend)
+    // Register `mariadb-shell-agent sandbox` (inspect / prove the resolved sandbox backend)
     .command(sandboxCommand);
 
   // /review skill helpers (presubmit checks, cleanup). The module pulls in
@@ -1649,7 +1650,7 @@ export function resolveOutputStyle(
 const OUTPUT_STYLE_NAME_ECHO_LIMIT = 64;
 
 /**
- * A repo-committed `.qwen/settings.json` is untrusted input. Beyond the
+ * A repo-committed `.mariadb-shell-agent/settings.json` is untrusted input. Beyond the
  * terminal escapes `stripAnsiAndControl` removes, Unicode format characters
  * (bidi overrides, zero-width joiners/spaces, BOM) can reorder or hide text
  * in the echoed name, so they are dropped here as well.
@@ -1858,7 +1859,7 @@ export async function loadCliConfig(
 
   // Set runtime output directory from settings (env var QWEN_RUNTIME_DIR
   // is auto-detected inside getRuntimeBaseDir() at each call site).
-  // Pass cwd so that relative paths like ".qwen" resolve per-project.
+  // Pass cwd so that relative paths like ".mariadb-shell-agent" resolve per-project.
   if (!Storage.hasRuntimeBaseDirContext()) {
     Storage.setRuntimeBaseDir(settings.advanced?.runtimeOutputDir, cwd);
   }
@@ -2369,7 +2370,7 @@ export async function loadCliConfig(
         sessionData = await sessionService.loadSession(argv.resume);
       }
       if (!sessionRestoreProjectionSource && !sessionData) {
-        const message = `No saved session found with ID ${argv.resume}. Run \`qwen --resume\` without an ID to choose from existing sessions.`;
+        const message = `No saved session found with ID ${argv.resume}. Run \`mariadb-shell-agent --resume\` without an ID to choose from existing sessions.`;
         writeStderrLine(message);
         process.exit(1);
       }
@@ -2498,7 +2499,7 @@ export async function loadCliConfig(
         }
       : undefined;
   // Only operator-owned configuration conflicts with `memory.mem0`. An entry a
-  // checked-in `.qwen/settings.json` ('workspace') or `.mcp.json` ('project')
+  // checked-in `.mariadb-shell-agent/settings.json` ('workspace') or `.mcp.json` ('project')
   // contributes is not the operator's, and aborting over it would wedge every
   // operator who configured `memory.mem0` inside a folder they do not own and
   // cannot fix — before `assembleMcpServers` ever applied the approval gate that
@@ -2704,7 +2705,7 @@ export async function loadCliConfig(
     telemetry: telemetrySettings,
     // Ordinary interactive TUI defers telemetry until after first paint; ACP
     // defers it until after the initialize response is written. Events emitted
-    // before deferred init are an accepted startup-latency tradeoff. `qwen -i
+    // before deferred init are an accepted startup-latency tradeoff. `mariadb-shell-agent -i
     // "prompt"` still initializes eagerly because it auto-submits after render.
     deferTelemetryInitialization: isAcpMode || (interactive && !question),
     outboundCorrelation: settings.outboundCorrelation,
@@ -3015,7 +3016,7 @@ export async function loadCliConfig(
     configParams.artifactEnabled = false;
     configParams.appendSystemPrompt = [
       argv.appendSystemPrompt,
-      `This is an SSH workspace on ${sshWorkspace.host}. The project directory is ${sshWorkspace.directory}. All file, search and shell tools operate on that remote project. The local directory ${cwd} is only for session storage; it is not the project. Use remote absolute paths or paths relative to the remote project. Read QWEN.md and AGENTS.md at the remote project root before working if they exist. Remote hooks, skills, MCP, LSP, subagents, workflows and worktree management are unavailable in this session.`,
+      `This is an SSH workspace on ${sshWorkspace.host}. The project directory is ${sshWorkspace.directory}. All file, search and shell tools operate on that remote project. The local directory ${cwd} is only for session storage; it is not the project. Use remote absolute paths or paths relative to the remote project. Read MARIADB-SHELL-AGENT.md and AGENTS.md at the remote project root before working if they exist. Remote hooks, skills, MCP, LSP, subagents, workflows and worktree management are unavailable in this session.`,
     ]
       .filter(Boolean)
       .join('\n\n');

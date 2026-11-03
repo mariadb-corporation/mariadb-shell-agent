@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -138,7 +139,7 @@ describe('token plan provider', () => {
 
   it('creates a Token Plan install plan for the Singapore region', () => {
     expect(TOKEN_PLAN_GLOBAL_BASE_URL).toBe(
-      'https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1',
+      'https://token-plan.ap-southeast-1.maas.aliyuncs.invalid/compatible-mode/v1',
     );
     expect(tokenPlanProvider.uiLabels?.baseUrlStepTitle).toBe('Region');
 
@@ -230,7 +231,7 @@ describe('token plan provider', () => {
       tokenPlanProvider.ownsModel?.({
         id: 'legacy-token-model',
         name: '[ModelStudio Token Plan] legacy-token-model',
-        baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
         envKey: TOKEN_PLAN_ENV_KEY,
       }),
     ).toBe(true);

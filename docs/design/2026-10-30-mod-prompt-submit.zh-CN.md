@@ -13,7 +13,7 @@
 - Mod 用 `next({ ...e, context: [...] })` 附上模型能读到、用户看不到的上下文。
 - Mod 用 `$.prompt.submit` 在会话空闲后发出自己的提示。
 
-Qwen Code 在加载时跳过 `prompt.submit` hook，并提示 `Hooks for unsupported events will not run: prompt.submit`。写在这里的守卫不会运行。
+MariaDB Shell Agent 在加载时跳过 `prompt.submit` hook，并提示 `Hooks for unsupported events will not run: prompt.submit`。写在这里的守卫不会运行。
 
 ## 目标与非目标
 

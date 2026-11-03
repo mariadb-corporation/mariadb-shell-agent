@@ -62,7 +62,7 @@ outcomes must continue to block retirement. This work does not establish
 Linux process-fault or deployment acceptance merely by passing unit tests.
 
 Run focused CLI and Java consumer checks, the root build/typecheck and the
-Hosted execution probe recorded in `.qwen/e2e-tests/managed-shell-profile.md`.
+Hosted execution probe recorded in `.mariadb-shell-agent/e2e-tests/managed-shell-profile.md`.
 Record unavailable checks separately from successful results.
 
 ## Rollout and open questions

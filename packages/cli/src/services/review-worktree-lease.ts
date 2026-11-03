@@ -1,4 +1,5 @@
 // Copyright 2026 Qwen Team
+// Copyright (c) 2026, MariaDB plc.
 // SPDX-License-Identifier: Apache-2.0
 
 import { execFileSync } from 'node:child_process';
@@ -779,7 +780,7 @@ export function readReviewWorktreeLease(
  * found at, so a recovery instruction names the file that actually holds
  * the lock.
  *
- * Only the new path answers. The pre-move path under `.qwen/tmp` carried an
+ * Only the new path answers. The pre-move path under `.mariadb-shell-agent/tmp` carried an
  * mtime-bounded read for one rollout window, and the window closed without
  * the bound ever protecting a post-cutoff acquisition — what it still did
  * was hand a `utimes`-backdated plant permanent gate authority (R30-7).

@@ -1,6 +1,7 @@
 import { useBrandName } from '../brandContext';
 import { useI18n } from '../i18n';
 import styles from './WelcomeHeader.module.css';
+import { WelcomeSeal } from './WelcomeSeal';
 
 export interface WelcomeHeaderProps {
   version: string;
@@ -17,6 +18,7 @@ export function WelcomeHeader(props: WelcomeHeaderProps) {
 
   return (
     <div className={styles.header}>
+      <WelcomeSeal className={styles.seal} />
       <div className={styles.titleRow}>
         <span>{t('welcome.titlePrefix')}</span>
         <span className={styles.title}>{brandName}</span>

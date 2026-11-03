@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,7 +29,7 @@ describe('auto-skill curator', () => {
   const plusDays = (days: number, base = now) =>
     new Date(base.getTime() + days * DAY_MS);
   const qwenPath = (...segments: string[]) =>
-    path.join(projectRoot, '.qwen', ...segments);
+    path.join(projectRoot, '.mariadb-shell-agent', ...segments);
   const statePath = () => qwenPath('skill-curator.json');
   const readState = async () =>
     JSON.parse(await fs.readFile(statePath(), 'utf8')) as {

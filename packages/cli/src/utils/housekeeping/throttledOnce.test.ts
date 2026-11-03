@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -214,7 +215,7 @@ describe('runThrottledOnce', () => {
     expect(task).toHaveBeenCalledOnce();
     const stat = fs.statSync(qwenDir);
     expect(stat.isDirectory()).toBe(true);
-    // No group/other access, per the ~/.qwen/ convention. Asserting the
+    // No group/other access, per the ~/.mariadb-shell-agent/ convention. Asserting the
     // absence of those bits rather than an exact mode keeps this umask-proof.
     // On Windows mkdir's mode is a no-op and libuv duplicates owner bits to
     // group/other, so only POSIX platforms can pin the 0o700 convention.

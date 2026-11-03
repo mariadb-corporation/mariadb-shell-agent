@@ -42,7 +42,7 @@ and removal of shadow and clipped animation.
 - End call stops interaction, leaving the app and gray orb available. Quit
   shuts down the connected standalone Live daemon gracefully and closes Host;
   owned session/adapter/media resources are released. It must not terminate
-  unrelated Qwen Code serve processes or sessions. Legacy WebShell connections
+  unrelated MariaDB Shell Agent serve processes or sessions. Legacy WebShell connections
   may end only their Live call and close Host, never shut down the shared server.
 - An idle camera preview remains local only, as before. No user camera/mic or
   model API is used for automated verification.

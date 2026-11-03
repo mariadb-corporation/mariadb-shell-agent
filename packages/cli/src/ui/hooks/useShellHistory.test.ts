@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 // @vitest-environment jsdom
@@ -29,12 +30,17 @@ vi.mock('fs', async (importOriginal) => {
 vi.mock('@qwen-code/qwen-code-core', () => {
   class Storage {
     getProjectTempDir(): string {
-      return path.join('/test/home/', '.qwen', 'tmp', 'mocked_hash');
+      return path.join(
+        '/test/home/',
+        '.mariadb-shell-agent',
+        'tmp',
+        'mocked_hash',
+      );
     }
     getHistoryFilePath(): string {
       return path.join(
         '/test/home/',
-        '.qwen',
+        '.mariadb-shell-agent',
         'tmp',
         'mocked_hash',
         'shell_history',
@@ -60,7 +66,7 @@ const MOCKED_PROJECT_HASH = 'mocked_hash';
 
 const MOCKED_HISTORY_DIR = path.join(
   MOCKED_HOME_DIR,
-  '.qwen',
+  '.mariadb-shell-agent',
   'tmp',
   MOCKED_PROJECT_HASH,
 );

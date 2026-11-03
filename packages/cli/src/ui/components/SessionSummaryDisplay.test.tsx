@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -97,7 +98,9 @@ describe('<SessionSummaryDisplay />', () => {
 
     expect(output).toContain('Agent powering down. Goodbye!');
     expect(output).toContain('To continue this session, run');
-    expect(output).toContain('qwen --resume test-session-id-12345');
+    expect(output).toContain(
+      'mariadb-shell-agent --resume test-session-id-12345',
+    );
     expect(output).toMatchSnapshot();
   });
 
@@ -128,7 +131,7 @@ describe('<SessionSummaryDisplay />', () => {
 
     expect(output).toContain('Agent powering down. Goodbye!');
     expect(output).not.toContain('To continue this session, run');
-    expect(output).not.toContain('qwen --resume');
+    expect(output).not.toContain('mariadb-shell-agent --resume');
   });
 
   it('does not show resume message when chat recording is disabled', () => {
@@ -158,6 +161,6 @@ describe('<SessionSummaryDisplay />', () => {
 
     expect(output).toContain('Agent powering down. Goodbye!');
     expect(output).not.toContain('To continue this session, run');
-    expect(output).not.toContain('qwen --resume');
+    expect(output).not.toContain('mariadb-shell-agent --resume');
   });
 });

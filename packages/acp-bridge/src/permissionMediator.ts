@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -191,7 +192,7 @@ function stringifyError(err: unknown): string {
 /**
  * No-op `PermissionAuditPublisher` used as the bridge's default when
  * the host omits `BridgeOptions.permissionAudit`. Production
- * `qwen serve` provides a ring-backed publisher; embedded callers and
+ * `mariadb-shell-agent serve` provides a ring-backed publisher; embedded callers and
  * unit tests that don't care about audit can let the bridge fall back
  * here. Single canonical fallback prevents stub-vs-prod divergence
  * (single canonical fallback).
@@ -527,7 +528,7 @@ export class MultiClientPermissionMediator implements PermissionMediator {
           // to crashing the daemon's timer queue.
           try {
             process.stderr.write(
-              `qwen serve: permission ${record.requestId} ` +
+              `mariadb-shell-agent serve: permission ${record.requestId} ` +
                 `(session ${record.sessionId}) timed out after ${timeoutMs}ms\n`,
             );
           } catch {
@@ -1168,7 +1169,7 @@ export class MultiClientPermissionMediator implements PermissionMediator {
           ? '<anonymous>'
           : JSON.stringify(vote.clientId);
       process.stderr.write(
-        `qwen serve: permission ${pending.requestId} ` +
+        `mariadb-shell-agent serve: permission ${pending.requestId} ` +
           `(session ${pending.sessionId}): vote rejected ` +
           `(${reasonDetail}) by client ${voterDescriptor}\n`,
       );

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,7 +25,7 @@ export type {
 
 // `SubagentErrorCode` is both a value (the const enum-like object used
 // at runtime) and a type. Re-export both shapes so callers like the
-// `qwen serve` workspace-agents route can use it as a value without
+// `mariadb-shell-agent serve` workspace-agents route can use it as a value without
 // reaching into `./types.js` directly.
 export { SubagentError, SubagentErrorCode } from './types.js';
 

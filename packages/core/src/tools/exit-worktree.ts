@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -143,8 +144,8 @@ class ExitWorktreeInvocation extends BaseToolInvocation<
   async execute(_signal: AbortSignal): Promise<ToolResult> {
     // Mirror `enter_worktree`: anchor at the repo top-level so we look
     // for the worktree under the same directory it was created in.
-    // Otherwise launching `qwen` from a subdirectory of a monorepo would
-    // make exit_worktree look at `<subdir>/.qwen/worktrees/<slug>`,
+    // Otherwise launching `mariadb-shell-agent` from a subdirectory of a monorepo would
+    // make exit_worktree look at `<subdir>/.mariadb-shell-agent/worktrees/<slug>`,
     // which never exists, and every call would return "Worktree not
     // found" even when the worktree is alive.
     const cwd = this.config.getTargetDir();
@@ -230,7 +231,7 @@ class ExitWorktreeInvocation extends BaseToolInvocation<
     // 0. Session ownership: refuse to drop a worktree that was created
     //    by a different session. Without this, a prompt injection (or
     //    just a confused model) in session A could enumerate
-    //    `.qwen/worktrees/` and call `exit_worktree` with a name
+    //    `.mariadb-shell-agent/worktrees/` and call `exit_worktree` with a name
     //    belonging to session B, destroying its work. Worktrees
     //    created before this guard existed lack the marker; we treat
     //    those as "owner unknown" and allow removal (matches prior
@@ -547,7 +548,8 @@ async function resolveManagedWorktreeFromCwd(
     if (
       path.basename(cursor) === slug &&
       path.basename(path.dirname(cursor)) === 'worktrees' &&
-      path.basename(path.dirname(path.dirname(cursor))) === '.qwen'
+      path.basename(path.dirname(path.dirname(cursor))) ===
+        '.mariadb-shell-agent'
     ) {
       const repoRoot = path.dirname(path.dirname(path.dirname(cursor)));
       if (await isDirectory(cursor)) {

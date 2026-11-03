@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -105,7 +106,7 @@ describe('publish-assets', () => {
     writeFileSync(argsFile, '8346 --comment\n');
     process.env['QWEN_REVIEW_ASSETS_REPO'] = 'owner/assets';
     // The skillArgs test seam is honoured only when no session id is present;
-    // running this suite from inside an active Qwen Code session would
+    // running this suite from inside an active MariaDB Shell Agent session would
     // otherwise route the gate at the real session-scoped path and fail eight
     // of these tests for reasons that have nothing to do with the code.
     savedSessionId = process.env['QWEN_CODE_SESSION_ID'];
@@ -270,7 +271,7 @@ describe('publish-assets', () => {
     // call drops `skipWorkspaceSettings`, the workspace-polluted mock view
     // answers comment:true and this refusal becomes a publish — the exact
     // regression review-settings.ts documents (a repository-controlled
-    // .qwen/settings.json deciding to publish for every reviewer).
+    // .mariadb-shell-agent/settings.json deciding to publish for every reviewer).
     writeFileSync(argsFile, '8346\n'); // no --comment
     reviewSettingsMock.mockReturnValue({}); // setting off
     happyGh();

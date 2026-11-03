@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -134,7 +135,7 @@ describe('session title metadata', () => {
           prs: [
             {
               number: 9260,
-              url: 'https://github.com/QwenLM/qwen-code/pull/9260',
+              url: 'https://github.invalid/QwenLM/qwen-code/pull/9260',
             },
           ],
         },

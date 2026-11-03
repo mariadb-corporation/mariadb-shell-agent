@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -53,14 +54,14 @@ function render(env, probeExit) {
 describe('configure-maven-mirror', () => {
   it('prefers the intranet mirror the pool hosts can read without public bandwidth', () => {
     expect(render({}, 0)).toContain(
-      'http://mirrors.cloud.aliyuncs.com/maven/repository/public',
+      'http://mirrors.cloud.aliyuncs.invalid/maven/repository/public',
     );
   });
 
   it('falls back to the public mirror when the probe fails', () => {
     const xml = render({}, 22);
-    expect(xml).toContain('https://maven.aliyun.com/repository/public');
-    expect(xml).not.toContain('mirrors.cloud.aliyuncs.com');
+    expect(xml).toContain('https://maven.aliyun.invalid/repository/public');
+    expect(xml).not.toContain('mirrors.cloud.aliyuncs.invalid');
   });
 
   it('honours an explicit MAVEN_MIRROR_URL', () => {

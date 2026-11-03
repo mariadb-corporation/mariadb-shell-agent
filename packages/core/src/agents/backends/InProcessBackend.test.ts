@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -703,7 +704,7 @@ describe('InProcessBackend', () => {
     const agentContext = await agentConfigOn(parentConfig);
     expect(parentConfig.getFileFilteringOptions).toHaveBeenCalled();
     expect(agentContext.getFileService().getQwenIgnoreFileNamesDisplay()).toBe(
-      '.qwenignore, .cursorignore',
+      '.mariadb-shell-agentignore, .cursorignore',
     );
   });
 

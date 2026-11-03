@@ -1,13 +1,14 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review run`: execute a full /review non-interactively and report the
+// `mariadb-shell-agent review run`: execute a full /review non-interactively and report the
 // verdict in a machine-readable way.
 //
-// The review pipeline already runs headless — `qwen --prompt "/review …"` expands
+// The review pipeline already runs headless — `mariadb-shell-agent --prompt "/review …"` expands
 // the bundled skill, launches the dimension agents, and honors the approval mode.
 // What that path does NOT give a caller is a contract: the verdict lives in the
 // model's prose and in files whose names the caller would have to know, the exit
@@ -88,7 +89,7 @@ export interface RunReviewResult {
   waivedFixes: string[];
   composedPath: string | null;
   /**
-   * The exact `.qwen/tmp` filename this run's target class pins — named in
+   * The exact `.mariadb-shell-agent/tmp` filename this run's target class pins — named in
    * the result so a completed-but-uncaptured review (a naming drift between
    * this pin and the skill's template) is diagnosable after Step 9 has
    * swept the directory that would show the near-miss.
@@ -185,13 +186,13 @@ const escapeRe = (s: string): string =>
 
 /**
  * The one composed-verdict filename this run's target class produces, per
- * the skill's literal `--out .qwen/tmp/qwen-review-{target}-composed.json`
+ * the skill's literal `--out .mariadb-shell-agent/tmp/qwen-review-{target}-composed.json`
  * template: `pr-<n>` for a PR, the file's basename for a file review, the
  * fixed token `local` for a bare run. Exact names, not shape heuristics —
  * a name-shape pin (`(?!pr-\d+-)…`) rejected a file run's OWN artifact
  * whenever the reviewed file was named `pr-<digits>-…`, and conversely let
  * a PR pin claim that file run's artifact. Two concurrent `review run`s
- * share `.qwen/tmp`, and the pre-pin newest-composed scan captured the
+ * share `.mariadb-shell-agent/tmp`, and the pre-pin newest-composed scan captured the
  * OTHER run's verdict the moment it appeared (measured: two of three
  * parallel PR reviews republished a neighbour's `composedPath`).
  *
@@ -303,7 +304,7 @@ export function composedPatternFor(cls: RunTargetClass): RegExp {
 }
 
 /**
- * The saved report under `.qwen/reviews/`, pinned as far as its naming
+ * The saved report under `.mariadb-shell-agent/reviews/`, pinned as far as its naming
  * allows. PR reports reliably end `-pr-<n>.md`, and file reports carry the
  * target token in the same slot (`<date>-<time>-<target>.md`, the `.md` not
  * doubled) — so a file target named `pr-1234.md` claims its OWN report
@@ -354,7 +355,7 @@ export function buildReviewPrompt(args: {
 }): string {
   const parts = ['/review'];
   // Presence, not truthiness: an EMPTY target is a target the caller named
-  // and got wrong — `qwen review run "$TARGET"` with `TARGET` unset — and
+  // and got wrong — `mariadb-shell-agent review run "$TARGET"` with `TARGET` unset — and
   // treating it as "no target given" silently launches a full local review
   // on the caller's tree, at the 120-minute default timeout and real model
   // spend, instead of the error its siblings `/`, `//`, `\` now get.
@@ -512,7 +513,7 @@ export function killProcessGroup(pid: number, signal: NodeJS.Signals): void {
  * stamps a *derived* `../index.js`, which does not exist beside the bundle, so
  * a `node dist/cli.js review run <pr>` never stamps anything and the child
  * review inherits nothing. Measured on PR #9113: the skill's second subcommand,
- * `"${QWEN_CODE_CLI:-qwen}" review match-remote`, resolved `qwen` off PATH,
+ * `"${QWEN_CODE_CLI:-qwen}" review match-remote`, resolved `mariadb-shell-agent` off PATH,
  * landed in an older global install whose `review` has no `match-remote`, and
  * came back `Unknown arguments: owner, repo, host, match-remote` — the review
  * then spent minutes diagnosing its own harness instead of reading the diff.
@@ -541,7 +542,7 @@ export function killProcessGroup(pid: number, signal: NodeJS.Signals): void {
  * root mismatch, an inherited path that does not resolve, or an UNSET slot,
  * stamp this build's own `argv[1]` — the entry this command is about to
  * re-enter — when a shell could exec it; write '' only when that entry fails
- * `isUnusableScriptEntry`, preserving the bare-`qwen` fallback instead of a
+ * `isUnusableScriptEntry`, preserving the bare-`mariadb-shell-agent` fallback instead of a
  * stamp that dies on exit 126.
  */
 function childEnv(runId: string): NodeJS.ProcessEnv {
@@ -591,7 +592,7 @@ async function runReview(args: RunReviewArgs): Promise<void> {
   // child and accepts only artifacts stamped back.
   const runId = randomUUID();
 
-  // Re-enter THIS build's CLI, not whatever `qwen` PATH resolves to — the same
+  // Re-enter THIS build's CLI, not whatever `mariadb-shell-agent` PATH resolves to — the same
   // version-skew rule the skill's own subprocesses follow via QWEN_CODE_CLI.
   // process.argv[1] is the entry that is already running this command.
   // --expose-gc comes first, exactly as the relaunch wrapper passes it
@@ -640,7 +641,7 @@ async function runReview(args: RunReviewArgs): Promise<void> {
   }
 
   // The composed verdict is transient: the child's Step 9 `cleanup` sweeps
-  // every `.qwen/tmp/qwen-review-<target>-*` file — including it — before the
+  // every `.mariadb-shell-agent/tmp/qwen-review-<target>-*` file — including it — before the
   // child exits. Reading it only AFTER `close` therefore sees nothing and
   // reports a review that completed as one that failed. Snapshot it the moment
   // compose-review writes it, and keep re-reading while the child runs: a
@@ -835,7 +836,7 @@ async function runReview(args: RunReviewArgs): Promise<void> {
     } else {
       // Name the expectation: the pin is an exact-filename contract with the
       // skill's naming template, and by the time anyone investigates, Step 9
-      // has swept `.qwen/tmp` — the near-miss name is gone. A no-verdict
+      // has swept `.mariadb-shell-agent/tmp` — the near-miss name is gone. A no-verdict
       // report that does not say which file it was waiting for cannot be
       // diagnosed as a naming drift.
       const detail =

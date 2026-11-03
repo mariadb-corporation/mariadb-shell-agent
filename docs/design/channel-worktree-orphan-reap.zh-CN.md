@@ -21,7 +21,7 @@ issue #10643 上指出，`session-archive.ts:656`）。
 
 场景：渠道 worktree 会话（`POST /session` 带 `worktree:{}`），产物 = JSONL 记
 录、sidecar `<chatsDir>/<sid>.worktree.json`、worktree 内标记 `.qwen-session`、
-checkout `W/.qwen/worktrees/<slug>`（已在 git 注册）、分支 `worktree-<slug>`。
+checkout `W/.mariadb-shell-agent/worktrees/<slug>`（已在 git 注册）、分支 `worktree-<slug>`。
 
 | 路径                                              | 记录       | Sidecar    | Checkout | Marker   | 分支     |
 | ------------------------------------------------- | ---------- | ---------- | -------- | -------- | -------- |
@@ -76,7 +76,7 @@ worktree 锁，后 coordinator——否则两种顺序可能死锁（AB-BA）。
 ## 安全契约
 
 只有当整条归属链都验证通过时清理才会触发；任何疑问都保留 checkout，并记录一条
-具名告警（通过 `writeStderrLine` 输出到 `qwen serve:` 的 stderr 行）。
+具名告警（通过 `writeStderrLine` 输出到 `mariadb-shell-agent serve:` 的 stderr 行）。
 
 分类（在记录删除之前，持有 worktree 锁）：
 
@@ -93,7 +93,7 @@ worktree 锁，后 coordinator——否则两种顺序可能死锁（AB-BA）。
 4. 严格读取 marker（`readWorktreeSessionMarkerStrict`）必须为 `valid`，且其
    中的会话 id 正好是被删除的那个会话。
 5. 路径包含性：checkout 必须解析到工作区的 worktree 根目录之下
-   （`<ws>/.qwen/worktrees`，或仓库顶层的等价目录，allowed-roots 的推导方式与
+   （`<ws>/.mariadb-shell-agent/worktrees`，或仓库顶层的等价目录，allowed-roots 的推导方式与
    create 路由一致）。
 6. 跨会话共享：扫描 sidecar 目录下的 `*.worktree.json`，必须找不到**其他**会话
    的 sidecar 指向同一个（规范化）worktree 路径。tombstone 前任会话

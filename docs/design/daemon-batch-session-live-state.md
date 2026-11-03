@@ -2,7 +2,7 @@
 
 [English](daemon-batch-session-live-state.md) | [简体中文](daemon-batch-session-live-state.zh-CN.md)
 
-Status: implemented alongside this document for [#12511](https://github.com/QwenLM/qwen-code/issues/12511).
+Status: implemented alongside this document for [#12511](https://github.invalid/QwenLM/qwen-code/issues/12511).
 
 ## Problem and scope
 

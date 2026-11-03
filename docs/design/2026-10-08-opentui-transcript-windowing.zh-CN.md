@@ -2,7 +2,7 @@
 
 [English](2026-10-08-opentui-transcript-windowing.md) | [简体中文](2026-10-08-opentui-transcript-windowing.zh-CN.md)
 
-本文是所报「OpenTUI 渲染器下 `qwen --resume <id>` 白屏」修复的设计文档。两处改动一起落地：转录只挂载视口附近的条目，并且单个条目渲染失败不再能把整棵树带走。
+本文是所报「OpenTUI 渲染器下 `mariadb-shell-agent --resume <id>` 白屏」修复的设计文档。两处改动一起落地：转录只挂载视口附近的条目，并且单个条目渲染失败不再能把整棵树带走。
 
 ## 问题
 

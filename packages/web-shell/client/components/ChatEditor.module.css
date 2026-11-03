@@ -225,8 +225,11 @@
   );
 }
 
+/* The dotted aura and halo around the focused composer are turned off; the
+   focused composer keeps only its accent border. */
 .dacAura,
 .dacHalo {
+  display: none;
   pointer-events: none;
 }
 
@@ -2321,7 +2324,7 @@
 .sendBtn:not(:disabled) {
   border: none;
   background: var(--agent-gray-800);
-  box-shadow: var(--agent-purple-shadow);
+  box-shadow: none;
   color: var(--chat-send-button-foreground);
   cursor: pointer;
 }

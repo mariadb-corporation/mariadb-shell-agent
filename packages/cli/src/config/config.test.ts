@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1207,7 +1208,7 @@ describe('parseArguments', () => {
   });
 
   it('should accept --json-schema with no -p / positional when stdin is piped', async () => {
-    // `echo "..." | qwen --json-schema ...` — input arrives via the
+    // `echo "..." | mariadb-shell-agent --json-schema ...` — input arrives via the
     // pipe, so the prompt-presence check must not block the run.
     process.argv = ['node', 'script.js', '--json-schema', '{"type":"object"}'];
 
@@ -1673,7 +1674,7 @@ describe('loadCliConfig', () => {
     vi.spyOn(Mem0Settings, 'createBundledMem0Server').mockReturnValue(server);
     process.argv = ['node', 'script.js', '-p', 'hello'];
     const argv = await parseArguments();
-    // A trusted repository's own `.qwen/settings.json` contributes this entry
+    // A trusted repository's own `.mariadb-shell-agent/settings.json` contributes this entry
     // stamped `scope: 'workspace'` (settings.ts tagMcpServerScope). It is not
     // operator configuration, so it must not wedge every operator who set
     // `memory.mem0` in a folder they cannot fix; the built-in binding overrides
@@ -1685,7 +1686,7 @@ describe('loadCliConfig', () => {
         mcpServers: {
           'external-context': {
             command: 'node',
-            args: ['.qwen/shim/loader.js'],
+            args: ['.mariadb-shell-agent/shim/loader.js'],
             scope: 'workspace',
           },
         },
@@ -1746,7 +1747,7 @@ describe('loadCliConfig', () => {
     },
   );
 
-  it('should reset context file names to QWEN.md and AGENTS.md by default', async () => {
+  it('should reset context file names to MARIADB-SHELL-AGENT.md and AGENTS.md by default', async () => {
     process.argv = ['node', 'script.js'];
     const argv = await parseArguments();
     const settings: Settings = {};
@@ -2064,7 +2065,7 @@ describe('loadCliConfig', () => {
 
   describe('usage statistics', () => {
     it.each<[string, string | undefined, boolean | undefined, boolean]>([
-      ['defaults to enabled', undefined, undefined, true],
+      ['defaults to disabled', undefined, undefined, false],
       ['uses a disabled setting', undefined, false, false],
       ['lets true override a disabled setting', 'true', false, true],
       ['lets 1 override a disabled setting', '1', false, true],
@@ -2763,7 +2764,7 @@ describe('loadCliConfig', () => {
           message.includes('Unknown output style "EVIL"'),
         ),
       ).toBe(true);
-      // A repo-committed .qwen/settings.json is untrusted input; the raw
+      // A repo-committed .mariadb-shell-agent/settings.json is untrusted input; the raw
       // value must never reach the terminal through the warning.
       for (const message of emitted) {
         // eslint-disable-next-line no-control-regex
@@ -3781,7 +3782,7 @@ describe('loadCliConfig', () => {
     process.argv = ['node', 'script.js'];
     const argv = await parseArguments();
     const settings: Settings = {};
-    const defaultContextFiles = ['QWEN.md', 'AGENTS.md'];
+    const defaultContextFiles = ['MARIADB-SHELL-AGENT.md', 'AGENTS.md'];
     const getAllSpy = vi
       .spyOn(ServerConfig, 'getAllMemoryFilenames')
       .mockReturnValue(defaultContextFiles);
@@ -4029,11 +4030,11 @@ describe('loadCliConfig', () => {
     it('resolves WEB_SEARCH_BASE_URL with the DASHSCOPE_API_KEY fallback', async () => {
       vi.stubEnv(
         'WEB_SEARCH_BASE_URL',
-        'https://dashscope.aliyuncs.com/api/v2',
+        'https://dashscope.aliyuncs.invalid/api/v2',
       );
       const config = await loadWithSettings({});
       expect(config.getWebSearchSettings()).toEqual({
-        baseUrl: 'https://dashscope.aliyuncs.com/api/v2',
+        baseUrl: 'https://dashscope.aliyuncs.invalid/api/v2',
         apiKeyEnv: 'DASHSCOPE_API_KEY',
       });
     });
@@ -4041,7 +4042,7 @@ describe('loadCliConfig', () => {
     it('selects WEB_SEARCH_API_KEY when it is non-empty', async () => {
       vi.stubEnv(
         'WEB_SEARCH_BASE_URL',
-        'https://dashscope.aliyuncs.com/api/v2',
+        'https://dashscope.aliyuncs.invalid/api/v2',
       );
       vi.stubEnv('WEB_SEARCH_API_KEY', 'sk-live');
       const config = await loadWithSettings({});
@@ -4053,7 +4054,7 @@ describe('loadCliConfig', () => {
     it('treats a whitespace-only WEB_SEARCH_API_KEY as unset', async () => {
       vi.stubEnv(
         'WEB_SEARCH_BASE_URL',
-        'https://dashscope.aliyuncs.com/api/v2',
+        'https://dashscope.aliyuncs.invalid/api/v2',
       );
       vi.stubEnv('WEB_SEARCH_API_KEY', '   ');
       const config = await loadWithSettings({});
@@ -7193,7 +7194,7 @@ describe('loadCliConfig fileFiltering', () => {
       '.cursorignore',
     ]);
     expect(config.getFileService().getQwenIgnoreFileNamesDisplay()).toBe(
-      '.qwenignore, .cursorignore',
+      '.mariadb-shell-agentignore, .cursorignore',
     );
   });
 });
@@ -7615,11 +7616,13 @@ describe('loadCliConfig runtimeOutputDir', () => {
   it('should resolve relative runtimeOutputDir against cwd', async () => {
     const argv = await parseArguments();
     const settings: Settings = {
-      advanced: { runtimeOutputDir: '.qwen' },
+      advanced: { runtimeOutputDir: '.mariadb-shell-agent' },
     };
     const cwd = path.resolve('workspace', 'my-project');
     await loadCliConfig(settings, argv, cwd);
-    expect(Storage.getRuntimeBaseDir()).toBe(path.join(cwd, '.qwen'));
+    expect(Storage.getRuntimeBaseDir()).toBe(
+      path.join(cwd, '.mariadb-shell-agent'),
+    );
   });
 
   it('should not set runtime base dir when runtimeOutputDir is absent', async () => {
@@ -7784,7 +7787,7 @@ describe('loadCliConfig omni settings key validation', () => {
       omni: {
         delivery: {
           upload: {
-            baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+            baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
             apiKeyEnv: 'DASHSCOPE_API_KEY',
             model: 'qwen3.5-omni-plus',
           },

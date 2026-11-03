@@ -2,11 +2,11 @@
 
 [English](2026-09-15-acp-bridge-completion.md) | [简体中文](2026-09-15-acp-bridge-completion.zh-CN.md)
 
-Status: merged in [#11916](https://github.com/QwenLM/qwen-code/pull/11916);
+Status: merged in [#11916](https://github.invalid/QwenLM/qwen-code/pull/11916);
 the configured Linux CI suite passed on the merged commit, 2026-09-16.
 See [post-merge acceptance](#post-merge-acceptance) for evidence and limits.
 Implements the remaining boundary extraction for
-[#11866](https://github.com/QwenLM/qwen-code/issues/11866) after the four
+[#11866](https://github.invalid/QwenLM/qwen-code/issues/11866) after the four
 [earlier slices](2026-09-14-acp-bridge-control-plane-harness-boundary.md).
 
 ## Problem and scope
@@ -117,7 +117,7 @@ Retain all existing workspace-isolation, spawn-coalescing, startup-failure,
 old/new-channel overlap, same-session FIFO, cross-session concurrency, exit fan-out,
 idle/preheat, restore, terminal, artifact and worktree/reset tests. Add deterministic
 coverage for boundary gaps, including synchronous binding and exit release ordering.
-The E2E plan is `.qwen/e2e-tests/issue-11866-completion.md`; it reuses established
+The E2E plan is `.mariadb-shell-agent/e2e-tests/issue-11866-completion.md`; it reuses established
 global public baselines and checks actual process exit and independent cleanup.
 
 Acceptance requires explicit separate owners, no session registry/queues/events in
@@ -160,7 +160,7 @@ Build, workspace typecheck, lint, formatting, core subpath exports and the serve
 bundle boundary passed. The complete ACP bridge suite passed 2,092 tests. Two
 clean self-audits and an independent review of the frozen 44-file candidate found
 no outstanding source defect. Their evidence is retained under
-`.qwen/investigations/issue-11866-completion/`.
+`.mariadb-shell-agent/investigations/issue-11866-completion/`.
 
 Eight serial final-bundle E2E samples passed their acceptance conditions: public
 lifecycle, native 32-skill watching, two active writer sessions, two direct EOF
@@ -222,8 +222,8 @@ All owned processes and listeners were gone. The normalized positive output
 matches the earlier final bundle; prior failures are preserved separately.
 Full-suite acceptance remained open at this stage because the repository-wide
 command was not green. Detailed evidence and separate
-follow-ups are retained in `.qwen/investigations/issue-11866-completion/` and
-`.qwen/issues/issue-11866-unrelated-unit-followups.md`.
+follow-ups are retained in `.mariadb-shell-agent/investigations/issue-11866-completion/` and
+`.mariadb-shell-agent/issues/issue-11866-unrelated-unit-followups.md`.
 
 ## First published candidate: main integration
 
@@ -309,7 +309,7 @@ All owned processes and listeners were independently checked. Actual direct
 ACP exit measurements remain separate from daemon-child absence. Rebase
 evidence is indexed by `rebase-e2e-manifest.json` in the completion investigation
 directory; source audits and the rebuilt artifact manifest are under
-`.qwen/pr-reviews/`. Historical failures and their limits remain above.
+`.mariadb-shell-agent/pr-reviews/`. Historical failures and their limits remain above.
 
 ## Follow-up integration with channel output modes
 
@@ -453,7 +453,7 @@ package-wide include patterns; it was stopped with exit 130, its original log
 and cleanup of observed ports/processes were retained, and it is excluded from
 the valid baseline/mutation counts. Exact-file filtering and load receipts
 verified each subsequent observation. Evidence is indexed by
-`.qwen/investigations/issue-11866-comments/mutation-summary.json`.
+`.mariadb-shell-agent/investigations/issue-11866-comments/mutation-summary.json`.
 
 All eight serial process scenarios met their positive or expected-negative
 acceptance conditions on the frozen artifact. Public multi-session lifecycle,
@@ -538,7 +538,7 @@ the recorded dist manifest digest is
 None of the historical totals or artifacts above are relabeled as these
 results. Current logs are the `conflict2-*` records in the completion
 investigation directory; process evidence is under
-`.qwen/investigations/issue-11866-conflict2/`. See the corresponding PR follow-up
+`.mariadb-shell-agent/investigations/issue-11866-conflict2/`. See the corresponding PR follow-up
 for final lint and audit outcomes.
 
 The review also identified a Linux two-file core run with 91 passes and six
@@ -552,7 +552,7 @@ tests, with unchanged source/test identity. This verifies an override-induced
 failure mechanism locally; it does not establish the environment or cause of
 the earlier Linux run. The three observations remain separate from the
 historical full-workspace failures. Evidence is under
-`.qwen/investigations/issue-11866-conflict2/skills-*`.
+`.mariadb-shell-agent/investigations/issue-11866-conflict2/skills-*`.
 
 ## Workflow start-input integration
 
@@ -570,7 +570,7 @@ the same test bytes. The built method was also inspected; this is source-test
 and build evidence, not a new real-daemon E2E run. Historical process results
 above remain tied to their original commits. Fresh integration checks and
 final audits are recorded in the PR follow-up; raw reproduction and verification
-are under `.qwen/investigations/issue-11866-conflict3/`.
+are under `.mariadb-shell-agent/investigations/issue-11866-conflict3/`.
 
 ## Post-merge acceptance
 
@@ -581,7 +581,7 @@ The checkout logs for both jobs below identify the merged commit, not a later
 main revision. These are completed CI results inspected after merge, not new
 local test runs.
 
-The [post-merge unit job](https://github.com/QwenLM/qwen-code/actions/runs/35068367808/job/104703832563)
+The [post-merge unit job](https://github.invalid/QwenLM/qwen-code/actions/runs/35068367808/job/104703832563)
 ran all 22 configured `test:ci` workspaces and then the root script suite:
 
 | Suite                | Passed | Failed | Skipped |
@@ -591,10 +591,10 @@ ran all 22 configured `test:ci` workspaces and then the root script suite:
 
 This includes 2,179 ACP bridge, 31,744 CLI, 26,808 core, 2,046 TypeScript SDK
 and 8,386 Web Shell passes. The
-[post-merge static job](https://github.com/QwenLM/qwen-code/actions/runs/35068367808/job/104703832566)
+[post-merge static job](https://github.invalid/QwenLM/qwen-code/actions/runs/35068367808/job/104703832566)
 also passed its configured Node helper suite: 580 passed, zero failed or
 skipped. Both jobs completed successfully. The
-[final PR unit job](https://github.com/QwenLM/qwen-code/actions/runs/35066664366/job/104698456229)
+[final PR unit job](https://github.invalid/QwenLM/qwen-code/actions/runs/35066664366/job/104698456229)
 separately reports the same workspace and root-script totals on the identical
 tree.
 
@@ -611,4 +611,4 @@ evidence; this Linux result neither fixes nor assigns a cause to them. No
 production code, tests, assertions, deadlines or CI policy changed to obtain
 this acceptance record. The boundary extraction is complete; stateless
 `wake(sessionId)` / `getEvents()`, worker pooling and external event storage
-remain follow-up work under [#11868](https://github.com/QwenLM/qwen-code/issues/11868).
+remain follow-up work under [#11868](https://github.invalid/QwenLM/qwen-code/issues/11868).

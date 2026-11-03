@@ -1,13 +1,14 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 // The cross-round findings ledger, carried IN the posted review body.
 //
 // The round ledger began as a local cache file, and its first live use exposed
-// the flaw: the cache lives in one clone's `.qwen/review-cache/`, so a re-review
+// the flaw: the cache lives in one clone's `.mariadb-shell-agent/review-cache/`, so a re-review
 // from CI, another machine, or a fresh checkout opens with amnesia — while the
 // one artifact every environment can see, the posted review itself, carried
 // nothing machine-readable. This module moves the authoritative copy into the

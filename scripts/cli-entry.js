@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Code
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -90,7 +91,7 @@ function getHomeDir() {
 
 function resolveQwenHome() {
   const configured = process.env['QWEN_HOME'];
-  if (!configured) return join(getHomeDir(), '.qwen');
+  if (!configured) return join(getHomeDir(), '.mariadb-shell-agent');
   if (configured === '~') return getHomeDir();
   if (configured.startsWith('~/') || configured.startsWith('~\\')) {
     return join(
@@ -107,7 +108,10 @@ function resolveQwenHome() {
 function preResolveQwenHome() {
   if (Object.hasOwn(process.env, 'QWEN_HOME')) return;
   const home = getHomeDir();
-  for (const candidate of [join(home, '.qwen', '.env'), join(home, '.env')]) {
+  for (const candidate of [
+    join(home, '.mariadb-shell-agent', '.env'),
+    join(home, '.env'),
+  ]) {
     try {
       const source = readFileSync(candidate, 'utf8')
         .replace(/^\uFEFF/, '')
@@ -213,13 +217,13 @@ function getManagedNpmInstallation() {
 
 // The entry a subprocess should call to reach THIS build.
 //
-// A skill that shells out to `qwen …` gets whatever `qwen` PATH resolves to, which
+// A skill that shells out to `qwen …` gets whatever `mariadb-shell-agent` PATH resolves to, which
 // is not necessarily the code that launched it: with an older global install on the
-// machine, a current-source daemon's `qwen review agent-prompt --role 0` landed in a
+// machine, a current-source daemon's `mariadb-shell-agent review agent-prompt --role 0` landed in a
 // v0.19.10 binary whose `agent-prompt` predates `--role`, and the run died on
 // "Missing required argument: chunk". This file is the executable entry and the one
 // thing that knows its own path, so it publishes it; `getShellContextEnvVars` passes
-// it to every shell subprocess, and a caller prefers it over a bare `qwen`.
+// it to every shell subprocess, and a caller prefers it over a bare `mariadb-shell-agent`.
 //
 // Assignment, not `||=`: an inherited value is another session's CLI — an outer
 // qwen shelling out to this one — and honouring it re-creates the exact skew above,

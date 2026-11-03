@@ -216,7 +216,7 @@ Expected: all affected DingTalk tests pass.
 
 **Files:**
 
-- Create: `.qwen/e2e-tests/2026-08-29-dingtalk-permission-cards.md` (ignored evidence)
+- Create: `.mariadb-shell-agent/e2e-tests/2026-08-29-dingtalk-permission-cards.md` (ignored evidence)
 - Modify if evidence changes: `docs/design/2026-08-29-dingtalk-permission-cards.md`
 
 **Interfaces:**

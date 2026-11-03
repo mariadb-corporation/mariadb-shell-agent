@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -55,6 +56,7 @@ export {
   minimaxProvider,
   modelscopeProvider,
   moonshotProvider,
+  openaiProvider,
   openRouterProvider,
   QWENCLOUD_PROVIDERS,
   qwencloudStandardProvider,
@@ -98,6 +100,10 @@ export {
   OPENROUTER_ENV_KEY,
 } from './presets/openrouter.js';
 export { REQUESTY_BASE_URL, REQUESTY_ENV_KEY } from './presets/requesty.js';
+export {
+  OPENAI_PROVIDER_BASE_URL,
+  OPENAI_PROVIDER_ENV_KEY,
+} from './presets/openai.js';
 
 // Install logic
 export {

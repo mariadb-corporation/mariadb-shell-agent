@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -550,8 +551,8 @@ describe('normalizeSessionData', () => {
           ? 'Failed to read PDF after rendering pages 20-23'
           : 'Transcribed PDF pages 20-23; remaining pages 24-25',
         notice: failed
-          ? 'Vision bridge (qwen3-vl-plus) failed after sending images to dashscope.aliyuncs.com.'
-          : 'Converted 4 images via qwen3-vl-plus (dashscope.aliyuncs.com).',
+          ? 'Vision bridge (qwen3-vl-plus) failed after sending images to dashscope.aliyuncs.invalid.'
+          : 'Converted 4 images via qwen3-vl-plus (dashscope.aliyuncs.invalid).',
       };
       const output = failed
         ? 'Cannot extract text from PDF'

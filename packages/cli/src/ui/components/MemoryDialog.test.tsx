@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -116,7 +117,7 @@ describe('MemoryDialog', () => {
     vi.clearAllMocks();
     vi.spyOn(os, 'homedir').mockReturnValue(path.resolve('/home/qwen'));
     vi.stubEnv('DISPLAY', ':99');
-    vi.stubEnv('QWEN_HOME', path.join(os.homedir(), '.qwen'));
+    vi.stubEnv('QWEN_HOME', path.join(os.homedir(), '.mariadb-shell-agent'));
     vi.stubEnv(
       'QWEN_CODE_MEMORY_BASE_DIR',
       path.join(os.homedir(), '.qwen-memory-test'),
@@ -159,14 +160,14 @@ describe('MemoryDialog', () => {
     vi.restoreAllMocks();
   });
 
-  it('renders managed memory folders without advertising QWEN.md', () => {
+  it('renders managed memory folders without advertising MARIADB-SHELL-AGENT.md', () => {
     const { lastFrame } = render(<MemoryDialog onClose={vi.fn()} />);
 
     expect(lastFrame()).toContain('› 1. User memory');
     expect(lastFrame()).toContain('2. Project memory');
     expect(lastFrame()).toContain(`${path.sep}memories`);
     expect(lastFrame()).toContain(`${path.sep}memory`);
-    expect(lastFrame()).not.toContain('QWEN.md');
+    expect(lastFrame()).not.toContain('MARIADB-SHELL-AGENT.md');
     expect(lastFrame()).not.toContain('Open auto-memory folder');
   });
 
@@ -520,7 +521,7 @@ describe('MemoryDialog', () => {
     expect(lastFrame()).toContain('› Confirm auto-skills before saving: off');
   });
 
-  it('keeps QWEN.md editor entries when managed memory is unavailable', async () => {
+  it('keeps MARIADB-SHELL-AGENT.md editor entries when managed memory is unavailable', async () => {
     const launchEditor = vi.fn();
     mockedUseLaunchEditor.mockReturnValue(launchEditor);
     mockedUseConfig.mockReturnValue({
@@ -538,10 +539,10 @@ describe('MemoryDialog', () => {
 
     expect(lastFrame()).toContain('› 1. User memory');
     expect(lastFrame()).toContain(
-      `Saved in ~${path.sep}.qwen${path.sep}QWEN.md`,
+      `Saved in ~${path.sep}.mariadb-shell-agent${path.sep}MARIADB-SHELL-AGENT.md`,
     );
     expect(lastFrame()).toContain('2. Project memory');
-    expect(lastFrame()).toContain('Saved in QWEN.md');
+    expect(lastFrame()).toContain('Saved in MARIADB-SHELL-AGENT.md');
 
     const keypressHandler = mockedUseKeypress.mock.calls[0][0];
     await act(async () => {
@@ -551,12 +552,14 @@ describe('MemoryDialog', () => {
     });
 
     expect(launchEditor).toHaveBeenCalledWith(
-      expect.stringMatching(/[/\\]\.qwen[/\\]QWEN\.md$/),
+      expect.stringMatching(
+        /[/\\]\.mariadb-shell-agent[/\\]MARIADB-SHELL-AGENT\.md$/,
+      ),
     );
     expect(mockedSpawn).not.toHaveBeenCalled();
   });
 
-  it('opens the project QWEN.md editor entry when managed memory is unavailable', async () => {
+  it('opens the project MARIADB-SHELL-AGENT.md editor entry when managed memory is unavailable', async () => {
     const launchEditor = vi.fn();
     mockedUseLaunchEditor.mockReturnValue(launchEditor);
     mockedUseConfig.mockReturnValue({
@@ -580,7 +583,7 @@ describe('MemoryDialog', () => {
     });
 
     expect(launchEditor).toHaveBeenCalledWith(
-      path.join('/tmp/project', 'QWEN.md'),
+      path.join('/tmp/project', 'MARIADB-SHELL-AGENT.md'),
     );
     expect(mockedSpawn).not.toHaveBeenCalled();
   });

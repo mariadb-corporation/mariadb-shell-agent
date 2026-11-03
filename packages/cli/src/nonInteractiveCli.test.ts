@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -233,7 +234,7 @@ describe('skipHeadlessLoopSentinel', () => {
   });
 
   it('does not delete a durable sentinel job (it persists for a future session)', () => {
-    // Durable jobs live under ~/.qwen and never count toward sessionSize, so
+    // Durable jobs live under ~/.mariadb-shell-agent and never count toward sessionSize, so
     // they don't pin the run; deleting one would wrongly remove it from disk.
     const scheduler = new CronScheduler();
     const job = scheduler.create('*/5 * * * *', LOOP_SENTINEL_CRON, true);
@@ -3342,7 +3343,7 @@ describe('runNonInteractive', () => {
 
   it('on EPIPE, destroys stdout and returns normally instead of process.exit', async () => {
     // Regression: process.exit(0) on EPIPE bypassed runExitCleanup → flush()
-    // and dropped queued JSONL writes for `qwen -p ... | head -1` patterns.
+    // and dropped queued JSONL writes for `mariadb-shell-agent -p ... | head -1` patterns.
     // process.exit is mocked to throw in beforeEach, so reaching the
     // assertion also proves the bypass route is gone.
     setupMetricsMock();
@@ -5776,7 +5777,7 @@ describe('runNonInteractive', () => {
       label: 'a call denied for approval',
       approvalRequired: true as const,
       reason:
-        'Qwen Code requires permission to use "run_shell_command", but that permission was declined (non-interactive mode cannot prompt for confirmation).',
+        'MariaDB Shell Agent requires permission to use "run_shell_command", but that permission was declined (non-interactive mode cannot prompt for confirmation).',
       expected: 'use the -y flag (YOLO mode)',
       unexpected: 'was not run',
     },
@@ -11350,10 +11351,10 @@ describe('runNonInteractive', () => {
     it('emits structuredResult to stdout in OutputFormat.TEXT mode', async () => {
       // The other --json-schema tests pin OutputFormat.JSON /
       // OutputFormat.STREAM_JSON. TEXT is the default for headless runs
-      // (`qwen -p "..."` without --output-format), so it needs its own
+      // (`mariadb-shell-agent -p "..."` without --output-format), so it needs its own
       // pin: a regression that diverged the TEXT adapter's
       // structuredResult handling from the JSON / stream-json paths
-      // would only surface to users running plain `qwen -p`.
+      // would only surface to users running plain `mariadb-shell-agent -p`.
       (mockConfig.getJsonSchema as Mock).mockReturnValue({
         type: 'object',
         properties: { summary: { type: 'string' } },
@@ -11430,12 +11431,12 @@ describe('runNonInteractive', () => {
       );
       const realTmpDir = await fs.realpath(tmpDir);
       // restoreWorktreeContext enforces a structural invariant:
-      // worktreePath MUST live under `<originalCwd>/.qwen/worktrees/`
+      // worktreePath MUST live under `<originalCwd>/.mariadb-shell-agent/worktrees/`
       // (PR #4174 review #3256839787). The test fixture mirrors that
       // shape so the restore path isn't rejected as tampered.
       const worktreeDir = path.join(
         realTmpDir,
-        '.qwen',
+        '.mariadb-shell-agent',
         'worktrees',
         'worktree-real',
       );

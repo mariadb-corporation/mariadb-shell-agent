@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -89,8 +90,8 @@ describe('runScratchTree', () => {
     git(repo, 'add', '-A');
     git(repo, 'commit', '-qm', 'head');
     headSha = git(repo, 'rev-parse', 'HEAD');
-    worktree = join(repo, '.qwen', 'tmp', 'review-pr-1');
-    mkdirSync(join(repo, '.qwen', 'tmp'), { recursive: true });
+    worktree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
+    mkdirSync(join(repo, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     git(repo, 'worktree', 'add', '--detach', '-q', worktree, headSha);
   });
 
@@ -129,13 +130,13 @@ describe('runScratchTree', () => {
       // filter are where the location gate is load-bearing.
       const canary = join(repo, 'PWNED-SCRATCH');
       const fakeCommon = plantRepository(
-        join(repo, '.qwen', 'tmp', '.evil-common'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-common'),
         join(repo, '.git'),
         canary,
         'process',
       );
       plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-scratch'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-scratch'),
         adminEntryOf(tree),
         tree,
         fakeCommon,
@@ -145,7 +146,7 @@ describe('runScratchTree', () => {
       // alone makes it refuse for a reason unrelated to this one — the shape
       // that actually reaches its checkout is the pair.
       plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-wt'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-wt'),
         adminEntryOf(worktree),
         worktree,
         fakeCommon,
@@ -173,7 +174,7 @@ describe('runScratchTree', () => {
       // repository entirely — nor `filter.<x>.process`, which its regex does not
       // match and which also executes — so the pointer itself has to be checked.
       plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-git'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
         adminEntryOf(worktree),
         worktree,
         join(repo, '.git'),
@@ -1100,7 +1101,7 @@ describe('runScratchTree', () => {
       // that names contaminated paths beside a `sharedTreeResidue: []` field
       // tells a reader and a script two different things.
       writeFileSync(join(worktree, '__probe__.test.ts'), 'it("x", () => {});');
-      const parent = join(repo, '.qwen', 'tmp');
+      const parent = join(repo, '.mariadb-shell-agent', 'tmp');
       chmodSync(parent, 0o555); // `git worktree add` cannot create the directory
       try {
         const r = runScratchTree({
@@ -1311,8 +1312,8 @@ describe('runScratchTree --standalone', () => {
     git(repo, 'add', '-A');
     git(repo, 'commit', '-qm', 'head');
     headSha = git(repo, 'rev-parse', 'HEAD');
-    worktree = join(repo, '.qwen', 'tmp', 'review-pr-1');
-    mkdirSync(join(repo, '.qwen', 'tmp'), { recursive: true });
+    worktree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
+    mkdirSync(join(repo, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     git(repo, 'worktree', 'add', '--detach', '-q', worktree, headSha);
   });
 
@@ -1368,7 +1369,7 @@ describe('runScratchTree --standalone', () => {
       // in the tree the agent is told holds the commit under review — the
       // substitution the linked shape refuses at its rebuild gate.
       plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-wt'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-wt'),
         adminEntryOf(worktree),
         worktree,
         join(repo, '.git'),
@@ -1562,7 +1563,7 @@ describe('runScratchTree --standalone', () => {
   it.skipIf(!arePermissionBitsEnforced())(
     'reports a tree that could not be built — the shared tree still unmeasured',
     () => {
-      const parent = join(repo, '.qwen', 'tmp');
+      const parent = join(repo, '.mariadb-shell-agent', 'tmp');
       chmodSync(parent, 0o555);
       try {
         const r = run('prose-exec--round-1--abc123', { fetchedSha: headSha });
@@ -1611,8 +1612,10 @@ describe('runScratchTree --standalone', () => {
       git(repo256, 'commit', '-qm', 'head');
       const sha256 = git(repo256, 'rev-parse', 'HEAD');
       expect(sha256).toMatch(/^[0-9a-f]{64}$/);
-      const wt256 = join(repo256, '.qwen', 'tmp', 'review-pr-1');
-      mkdirSync(join(repo256, '.qwen', 'tmp'), { recursive: true });
+      const wt256 = join(repo256, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
+      mkdirSync(join(repo256, '.mariadb-shell-agent', 'tmp'), {
+        recursive: true,
+      });
       git(repo256, 'worktree', 'add', '--detach', '-q', wt256, sha256);
 
       const r = runScratchTree({

@@ -2,7 +2,7 @@
 
 ## Overview
 
-A `qwen serve` process hosts one Express HTTP server and one primary workspace by default. With `multi_workspace_sessions` enabled it may also host additional workspace runtimes for the live session closed loop; each registered workspace owns its own `@qwen-code/acp-bridge` / `qwen --acp` child pair. Multiple clients (CLI TUI, IDE companion, IM channel bots, web BFFs, custom scripts) connect over HTTP + SSE and either share one ACP session (`sessionScope: 'single'`, default) or split sessions by conversation thread (`sessionScope: 'thread'`).
+A `mariadb-shell-agent serve` process hosts one Express HTTP server and one primary workspace by default. With `multi_workspace_sessions` enabled it may also host additional workspace runtimes for the live session closed loop; each registered workspace owns its own `@qwen-code/acp-bridge` / `mariadb-shell-agent --acp` child pair. Multiple clients (CLI TUI, IDE companion, IM channel bots, web BFFs, custom scripts) connect over HTTP + SSE and either share one ACP session (`sessionScope: 'single'`, default) or split sessions by conversation thread (`sessionScope: 'thread'`).
 
 Inside the ACP child, MCP servers are shared workspace-wide through `McpTransportPool` (F2): a single (server-name + config-fingerprint) tuple maps to one MCP transport, regardless of how many sessions discover it. The bridge's `MultiClientPermissionMediator` (F3) coordinates permission votes across all connected clients under one of four policies.
 
@@ -20,7 +20,7 @@ flowchart LR
         SDK["Any SDK consumer<br/>(packages/sdk-typescript/src/daemon)"]
     end
 
-    subgraph daemon["qwen serve process (primary workspace plus optional session runtimes)"]
+    subgraph daemon["mariadb-shell-agent serve process (primary workspace plus optional session runtimes)"]
         EXP["Express app<br/>(packages/cli/src/serve/server.ts)"]
         BR["AcpBridge<br/>(packages/acp-bridge/src/bridge.ts)"]
         MED["MultiClientPermissionMediator<br/>(F3)"]
@@ -28,7 +28,7 @@ flowchart LR
         FS["WorkspaceFileSystem<br/>(cli/src/serve/fs/)"]
     end
 
-    subgraph child["ACP child process (qwen --acp)"]
+    subgraph child["ACP child process (mariadb-shell-agent --acp)"]
         AGT["QwenAgent runtime"]
         POOL["McpTransportPool<br/>(F2, core/src/tools)"]
         BDG["WorkspaceMcpBudget"]
@@ -306,7 +306,7 @@ sequenceDiagram
     participant BR as AcpBridge
     participant CH as ACP child
 
-    Op->>RQS: qwen serve --workspace … --token …
+    Op->>RQS: mariadb-shell-agent serve --workspace … --token …
     RQS->>RQS: validate flags + canonicalize workspace
     RQS->>RQS: allocate PermissionAuditRing
     RQS->>BR: createHttpAcpBridge(options)
@@ -347,8 +347,8 @@ The two-phase shutdown matters because in-flight HTTP requests, in-flight SSE su
 
 ## References
 
-- Design issues: [#3803](https://github.com/QwenLM/qwen-code/issues/3803) (daemon design), [#4175](https://github.com/QwenLM/qwen-code/issues/4175) (F-series milestones).
+- Design issues: [#3803](https://github.invalid/QwenLM/qwen-code/issues/3803) (daemon design), [#4175](https://github.invalid/QwenLM/qwen-code/issues/4175) (F-series milestones).
 - User guide: [`../../users/qwen-serve.md`](../../users/qwen-serve.md).
 - Wire protocol reference: [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md).
 - F2 design document: [`../../design/f2-mcp-transport-pool.md`](../../design/f2-mcp-transport-pool.md).
-- F2 design notes: issue [#4175](https://github.com/QwenLM/qwen-code/issues/4175) commits 4-6.
+- F2 design notes: issue [#4175](https://github.invalid/QwenLM/qwen-code/issues/4175) commits 4-6.

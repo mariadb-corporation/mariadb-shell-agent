@@ -61,9 +61,9 @@ service 继续是 `closed` 的唯一写入方，并持有两个 executor 和 pro
 
 ## 验证与验收
 
-遵循 `packages/managed-agent-server/AGENTS.md`，包括共享的 10 分钟本地验证预算、JDK 21、匹配源码构建的 SDK 和隔离 Maven 仓库。内部 Java 抽取没有有效的全局 CLI 行为探针：只记录已安装 `qwen --version` 作为环境证据，通过现有 Java fixture 建立基线。所选 fixture 不需要模型调用或 JavaScript 构建。
+遵循 `packages/managed-agent-server/AGENTS.md`，包括共享的 10 分钟本地验证预算、JDK 21、匹配源码构建的 SDK 和隔离 Maven 仓库。内部 Java 抽取没有有效的全局 CLI 行为探针：只记录已安装 `mariadb-shell-agent --version` 作为环境证据，通过现有 Java fixture 建立基线。所选 fixture 不需要模型调用或 JavaScript 构建。
 
-定向计划记录在 `.qwen/e2e-tests/runtime-execution-dispatcher.md`。固定预留去重、同步失败清理、在结算/UNKNOWN 之前移除 invocation，以及关闭时保留底层调用与借用资源。复用 `RuntimeBrokerServiceTest`、`RuntimeSshAcknowledgementTest`、`Issue13183RegressionTest` 和 `RuntimeBrokerHttpServerTest` 覆盖取消/fencing、v3/私有 CSI、回执及 HTTP 集成行为。执行编译、两组 Checkstyle 和选定测试，检查实际报告数量及跳过情况。
+定向计划记录在 `.mariadb-shell-agent/e2e-tests/runtime-execution-dispatcher.md`。固定预留去重、同步失败清理、在结算/UNKNOWN 之前移除 invocation，以及关闭时保留底层调用与借用资源。复用 `RuntimeBrokerServiceTest`、`RuntimeSshAcknowledgementTest`、`Issue13183RegressionTest` 和 `RuntimeBrokerHttpServerTest` 覆盖取消/fencing、v3/私有 CSI、回执及 HTTP 集成行为。执行编译、两组 Checkstyle 和选定测试，检查实际报告数量及跳过情况。
 
 基线选定的 280 个测试通过。抽取后，同一批测试加上五个分发器用例，共 285 个测试通过，无失败、错误或跳过；两组 Checkstyle 均通过。验证在 macOS 上使用 JDK 21、匹配源码的 SDK 和隔离 Maven 仓库。环境准备、首次无用 import 的 Checkstyle 失败及修正后验证共使用本地共享预算 252.587 秒。取消用例证明实际调用及借用资源得到保留；包装 future 的准确取消动作通过源码等价核对确认，不新增访问私有状态的测试入口。
 

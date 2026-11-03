@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,14 +21,14 @@ describe('modelscopeProvider', () => {
       id: 'modelscope',
       label: 'ModelScope API Key',
       protocol: AuthType.USE_OPENAI,
-      baseUrl: 'https://api-inference.modelscope.cn/v1',
+      baseUrl: 'https://api-inference.modelscope.invalid/v1',
       envKey: 'MODELSCOPE_API_KEY',
     });
   });
 
   it('creates an install plan with per-model metadata for known IDs', () => {
     const plan = buildInstallPlan(modelscopeProvider, {
-      baseUrl: 'https://api-inference.modelscope.cn/v1',
+      baseUrl: 'https://api-inference.modelscope.invalid/v1',
       apiKey: 'sk-modelscope',
       modelIds: ['deepseek-ai/DeepSeek-V4-Flash', 'Qwen/Qwen3.5-397B-A17B'],
     });
@@ -48,7 +49,7 @@ describe('modelscopeProvider', () => {
 
   it('falls back gracefully for unknown model IDs', () => {
     const plan = buildInstallPlan(modelscopeProvider, {
-      baseUrl: 'https://api-inference.modelscope.cn/v1',
+      baseUrl: 'https://api-inference.modelscope.invalid/v1',
       apiKey: 'sk-modelscope',
       modelIds: ['deepseek-ai/DeepSeek-V4-Flash', 'some-new-model'],
     });

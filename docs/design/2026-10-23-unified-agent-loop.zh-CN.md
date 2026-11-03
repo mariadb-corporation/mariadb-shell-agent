@@ -12,7 +12,7 @@
 
 ## 问题
 
-agent loop 指这样一个循环：发送提示、流式接收回复、执行模型请求的工具、把工具结果发回模型，直到模型不再调用工具为止。Qwen Code 里这个循环有七份实现，每个入口至少一份。
+agent loop 指这样一个循环：发送提示、流式接收回复、执行模型请求的工具、把工具结果发回模型，直到模型不再调用工具为止。MariaDB Shell Agent 里这个循环有七份实现，每个入口至少一份。
 
 `LlmClient.sendMessageStream` 只负责一次模型请求，外加它自己处理的几种续发：Stop hook、模型边界处的 steering，以及 next-speaker 检查。它从不执行工具。因此每个入口都要自己实现“执行工具、发回结果、继续下一轮”这部分，其中三个入口完全绕过了 `LlmClient`。
 
@@ -31,15 +31,15 @@ agent loop 指这样一个循环：发送提示、流式接收回复、执行模
 
 ### 现有的 loop
 
-| 入口                                                            | loop 位置                                                                                             | 模型调用                                    | 工具执行                                                                                            |
-| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Ink TUI                                                         | `packages/cli/src/ui/hooks/use-llm-stream.ts`                                                         | `LlmClient`                                 | 基于 `CoreToolScheduler` 的 `InteractiveModToolScheduler`；完成回调里调用 `submitQuery(ToolResult)` |
-| OpenTUI                                                         | `packages/cli/src/ui/opentui/live-session.ts`                                                         | `LlmClient`                                 | 每批新建一个 `InteractiveModToolScheduler`                                                          |
-| Headless `-p` 与 stream-json SDK 传输                           | `packages/cli/src/nonInteractiveCli.ts`，drain turn 中还有一份副本（`:2888-3066`）                    | `LlmClient`                                 | 每个调用走一次 `executeToolCall`，另外自行实现分批、并发上限和按序收尾                              |
-| ACP：Zed、VS Code companion、`qwen serve` / Web Shell、channels | `packages/cli/src/acp-integration/session/Session.ts`，内含四份 loop（主循环、Stop 续发、cron、通知） | 直接调用 `LlmChat`                          | 自带执行器 `runToolCalls` / `runTool`                                                               |
-| Hosted Harness                                                  | `packages/cli/src/serve/hosted-harness-model.ts:828-1143`                                             | `LlmClient`，但 13 种 hook 事件由它自己触发 | 写日志的串行调度（`hosted-workspace-tool-turn.ts`）                                                 |
-| Subagent、后台与 fork agent、workflow、进程内 team              | `packages/core/src/agents/runtime/agent-core.ts`                                                      | 直接调用 `LlmChat`，并自行解析 chunk        | 每轮一个 `CoreToolScheduler`                                                                        |
-| Speculation                                                     | `packages/core/src/followup/speculation.ts`                                                           | 直接调用 `LlmChat`                          | 直接执行工具，不经过 scheduler                                                                      |
+| 入口                                                                           | loop 位置                                                                                             | 模型调用                                    | 工具执行                                                                                            |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ink TUI                                                                        | `packages/cli/src/ui/hooks/use-llm-stream.ts`                                                         | `LlmClient`                                 | 基于 `CoreToolScheduler` 的 `InteractiveModToolScheduler`；完成回调里调用 `submitQuery(ToolResult)` |
+| OpenTUI                                                                        | `packages/cli/src/ui/opentui/live-session.ts`                                                         | `LlmClient`                                 | 每批新建一个 `InteractiveModToolScheduler`                                                          |
+| Headless `-p` 与 stream-json SDK 传输                                          | `packages/cli/src/nonInteractiveCli.ts`，drain turn 中还有一份副本（`:2888-3066`）                    | `LlmClient`                                 | 每个调用走一次 `executeToolCall`，另外自行实现分批、并发上限和按序收尾                              |
+| ACP：Zed、VS Code companion、`mariadb-shell-agent serve` / Web Shell、channels | `packages/cli/src/acp-integration/session/Session.ts`，内含四份 loop（主循环、Stop 续发、cron、通知） | 直接调用 `LlmChat`                          | 自带执行器 `runToolCalls` / `runTool`                                                               |
+| Hosted Harness                                                                 | `packages/cli/src/serve/hosted-harness-model.ts:828-1143`                                             | `LlmClient`，但 13 种 hook 事件由它自己触发 | 写日志的串行调度（`hosted-workspace-tool-turn.ts`）                                                 |
+| Subagent、后台与 fork agent、workflow、进程内 team                             | `packages/core/src/agents/runtime/agent-core.ts`                                                      | 直接调用 `LlmChat`，并自行解析 chunk        | 每轮一个 `CoreToolScheduler`                                                                        |
+| Speculation                                                                    | `packages/core/src/followup/speculation.ts`                                                           | 直接调用 `LlmChat`                          | 直接执行工具，不经过 scheduler                                                                      |
 
 以下不是 loop，不在本设计范围内：fork agent 的缓存路径（一次请求，没有工具）、Omni 固定策略编排器（不调用模型）、ACP bridge、SDK 与 channel 包（它们是传输层）。
 
@@ -213,7 +213,7 @@ if (config.isUnifiedAgentLoopEnabled()) {
 // 现有 loop，保持不变
 ```
 
-现有 loop 作为 `else` 分支保留，在该设置存在期间不做重构。尚未迁移的入口忽略这个设置，设置的说明会列出它覆盖的入口。`qwen serve` 启动的 ACP 子进程读取同一份设置，所以对已迁移的 ACP 轮次，daemon 和 Web Shell 也会遵循这个设置。从 PR 2a 起，Web Shell 设置面板会列出这个设置。
+现有 loop 作为 `else` 分支保留，在该设置存在期间不做重构。尚未迁移的入口忽略这个设置，设置的说明会列出它覆盖的入口。`mariadb-shell-agent serve` 启动的 ACP 子进程读取同一份设置，所以对已迁移的 ACP 轮次，daemon 和 Web Shell 也会遵循这个设置。从 PR 2a 起，Web Shell 设置面板会列出这个设置。
 
 各入口分别修改默认值之后，这个设置不再有 schema 默认值。`Config.isUnifiedAgentLoopEnabled(surface)` 在设置有值时返回该值，否则返回该入口自己的默认值。环境变量仍然优先于两者。
 

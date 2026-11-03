@@ -4,7 +4,7 @@
 
 ## 问题
 
-`qwen serve --max-sessions` 只能从命令行传入。因此每次重启 daemon 都要重复这个
+`mariadb-shell-agent serve --max-sessions` 只能从命令行传入。因此每次重启 daemon 都要重复这个
 flag；没有启动脚本的部署（一次性的 `nohup` 命令行、手工拼装的容器 entrypoint）
 会悄悄退回内置上限 32。`serve` 设置区块已经能持久化 `serve.channels`、
 `serve.tokenQr` 和子会话并发上限，却唯独没有运维最常需要调整的单 workspace
@@ -88,10 +88,10 @@ src/config/settingsSchema.test.ts`
 
 ## 验收标准
 
-- 用户 settings 设置 `serve.maxSessions: 64` 且不传 flag 时，`qwen serve`
+- 用户 settings 设置 `serve.maxSessions: 64` 且不传 flag 时，`mariadb-shell-agent serve`
   对外声明并执行 64。
 - flag 与 setting 同时存在时，flag 生效。
-- 只有 workspace `.qwen/settings.json` 设置该项时，daemon 使用默认 32，并记录
+- 只有 workspace `.mariadb-shell-agent/settings.json` 设置该项时，daemon 使用默认 32，并记录
   被忽略的键。
 - 设置 `serve.maxSessions: -1` 时，daemon 以默认值启动并警告。
 - Web Shell 设置面板在“高级”分类下显示该行，保存后显示重启徽标；workspace

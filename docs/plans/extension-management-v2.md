@@ -42,7 +42,7 @@ two-slot preparation, preparation-ready commit ordering, queued abort,
 same-artifact conflicts, watcher polling, SDK paths, and operation polling.
 Repository completion gates are package builds, typecheck, lint, integration
 daemon route tests, and the E2E plan in
-`.qwen/e2e-tests/extension-management-v2.md`.
+`.mariadb-shell-agent/e2e-tests/extension-management-v2.md`.
 
 Before completion, audit architecture boundaries, crash/error paths,
 compatibility, concurrency, redaction, tests, maintainability, and simpler

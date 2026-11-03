@@ -10,4 +10,4 @@ The core and ACP dispatchers expose completed native responses to exec via an op
 
 A goal proposal forms an execution barrier: previous nested tools finish before it and later tools wait for it. Ordinary calls still execute concurrently. A terminal proposal triggers a host termination message, which completes the QuickJS call with accumulated output and disposes the runtime without allowing script code to catch the termination. Tests cover sequential and concurrent dispatch, nonterminal proposals, native media, skill restoration, cancellation, partial errors, and agent restrictions.
 
-Build, typecheck, bundle, run focused core and ACP tests and the mock CLI plan in .qwen/e2e-tests/code-mode-10377-port.md. Push the migrated branch before removing the old branch locally and on its fork remote. Preserve any unrelated worktree files.
+Build, typecheck, bundle, run focused core and ACP tests and the mock CLI plan in .mariadb-shell-agent/e2e-tests/code-mode-10377-port.md. Push the migrated branch before removing the old branch locally and on its fork remote. Preserve any unrelated worktree files.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -870,7 +871,7 @@ describe('WebTerminalRegistry', () => {
   it('survives an EventEmitter-shaped error subscription on release', async () => {
     // The real Bun backend is an EventEmitter: `on('error')` returns the
     // emitter itself, not a Disposable. Storing it made release() call
-    // `.dispose()` on the emitter and crash the host (real `qwen serve` under
+    // `.dispose()` on the emitter and crash the host (real `mariadb-shell-agent serve` under
     // Bun exited 1 with the WS closing 1006). Detach must go through `off`.
     const registered: Array<(err: Error) => void> = [];
     const emitter = {

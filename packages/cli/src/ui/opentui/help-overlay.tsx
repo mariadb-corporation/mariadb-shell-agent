@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -81,7 +82,7 @@ function GeneralHelp(props: { layout: HelpWidthLayout }) {
       <box marginBottom={1} width={layout.bodyWidth}>
         <text fg={C.text}>
           {t(
-            'Qwen Code understands your codebase, makes edits with your permission, and executes commands right from your terminal.',
+            'MariaDB Shell Agent understands your codebase, makes edits with your permission, and executes commands right from your terminal.',
           )}
         </text>
       </box>
@@ -223,7 +224,7 @@ export function HelpOverlay(props: {
         >
           <box flexDirection="row">
             <text fg={C.accent} attributes={1}>
-              Qwen Code
+              MariaDB Shell Agent
             </text>
             <text fg={C.dim}> </text>
             {HELP_TABS.map(({ tab: tabId, label }) => {

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -98,7 +99,7 @@ describe.skipIf(process.platform === 'win32')(
       async (variable) => {
         const projectDir = await mkdtemp(join(tmpdir(), 'qwen hook project-'));
         try {
-          const hooksDir = join(projectDir, '.qwen', 'hooks');
+          const hooksDir = join(projectDir, '.mariadb-shell-agent', 'hooks');
           await mkdir(hooksDir, { recursive: true });
           const scriptPath = join(hooksDir, 'check.sh');
           await writeFile(scriptPath, '#!/bin/sh\necho project-dir-hook-ran\n');
@@ -107,7 +108,7 @@ describe.skipIf(process.platform === 'win32')(
           const result = await new HookRunner().executeHook(
             {
               type: HookType.Command,
-              command: `"$${variable}/.qwen/hooks/check.sh"`,
+              command: `"$${variable}/.mariadb-shell-agent/hooks/check.sh"`,
               source: HooksConfigSource.Project,
             },
             HookEventName.PreToolUse,

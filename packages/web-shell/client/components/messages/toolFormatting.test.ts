@@ -290,11 +290,14 @@ describe('toolFormatting', () => {
       getToolDescription(
         tool({
           toolName: 'glob',
-          args: { pattern: '**/*.ts', path: '/Users/ytahdn/.qwen' },
+          args: {
+            pattern: '**/*.ts',
+            path: '/Users/ytahdn/.mariadb-shell-agent',
+          },
         }),
         '/workspace/project',
       ),
-    ).toBe("'**/*.ts' in path '/Users/ytahdn/.qwen'");
+    ).toBe("'**/*.ts' in path '/Users/ytahdn/.mariadb-shell-agent'");
   });
 
   it('matches CLI-style glob result summaries', () => {
@@ -302,7 +305,7 @@ describe('toolFormatting', () => {
       getToolResultSummary(
         tool({
           toolName: 'glob',
-          rawOutput: '/Users/ytahdn/.qwen/settings.json\n',
+          rawOutput: '/Users/ytahdn/.mariadb-shell-agent/settings.json\n',
         }),
       ),
     ).toBe('Found 1 matching file(s)');
@@ -423,12 +426,14 @@ describe('toolFormatting', () => {
         tool({
           toolName: 'run_shell_command',
           args: {
-            command: 'cat ~/.qwen/settings.json',
-            description: '查看 ~/.qwen/settings.json 文件内容',
+            command: 'cat ~/.mariadb-shell-agent/settings.json',
+            description: '查看 ~/.mariadb-shell-agent/settings.json 文件内容',
           },
         }),
       ),
-    ).toBe('cat ~/.qwen/settings.json (查看 ~/.qwen/settings.json 文件内容)');
+    ).toBe(
+      'cat ~/.mariadb-shell-agent/settings.json (查看 ~/.mariadb-shell-agent/settings.json 文件内容)',
+    );
   });
 
   it('ignores blank or non-string file descriptions', () => {

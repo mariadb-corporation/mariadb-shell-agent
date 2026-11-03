@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -325,8 +326,6 @@ import {
   decideNotificationAdmission,
   DroppedNotificationTally,
   MAX_BACKGROUND_NOTIFICATION_QUEUE,
-  getExtractNoopSkipTurns,
-  isBelowCompactionWarn,
 } from '@qwen-code/qwen-code-core';
 import {
   MANAGED_RUNTIME_OUTCOME_UNKNOWN,
@@ -6912,7 +6911,7 @@ export class Session implements SessionContext {
         // Bind the prompt ID for the remainder of this turn, mirroring the
         // sessionIdContext.run wrapper in #executePrompt. Shell subprocesses
         // read it via getShellContextEnvVars (QWEN_CODE_PROMPT_ID) — without
-        // it, `qwen review fetch-pr` cannot record its worktree lease and an
+        // it, `mariadb-shell-agent review fetch-pr` cannot record its worktree lease and an
         // interrupted /review leaves the review worktree behind. TUI and
         // headless enter this context at their prompt entry points
         // (use-llm-stream.ts / nonInteractiveCli.ts); ACP had no equivalent.
@@ -7304,6 +7303,10 @@ export class Session implements SessionContext {
               !isContinue &&
               !isRestoreAskUserQuestion &&
               !isRuntimeContinuation;
+            if (isFreshUserTurn) {
+              // A new question while extraction waits for an idle session.
+              this.config.getLlmClient().clearPendingManagedMemoryRun?.();
+            }
             const strippedPromptIds = (
               isRetry ? strippedRetryEntries : (strippedOrphanEntries ?? [])
             )
@@ -8836,12 +8839,12 @@ export class Session implements SessionContext {
               );
               // Remove review worktrees leased during this prompt and not
               // released by the skill's own cleanup step — a cancelled or
-              // errored /review otherwise leaves `.qwen/tmp/review-pr-<n>`
+              // errored /review otherwise leaves `.mariadb-shell-agent/tmp/review-pr-<n>`
               // and its branch behind. Unconditional like the headless
               // finally (nonInteractiveCli.ts): the ACP turn loop runs
               // whole turns, so unlike the TUI's per-continuation
               // submitQuery this can never fire mid-review. No-op when the
-              // lease was already cleared by `qwen review cleanup`.
+              // lease was already cleared by `mariadb-shell-agent review cleanup`.
               cleanupReviewWorktreeLeases({
                 sessionId: this.config.getSessionId(),
                 promptId,
@@ -10981,10 +10984,10 @@ export class Session implements SessionContext {
     if (!this.config.getManagedAutoMemoryEnabled()) {
       return;
     }
-    this.config.getLlmClient().captureCacheSafeParams();
+    const llmClient = this.config.getLlmClient();
+    llmClient.captureCacheSafeParams();
     const memoryManager = this.config.getMemoryManager();
     const projectRoot = this.config.getProjectRoot();
-    const history = this.#getCurrentChat().getHistoryShallow();
     for (const scope of ['project', 'user'] as const) {
       void memoryManager
         .scheduleMetadataMigration({
@@ -10999,39 +11002,10 @@ export class Session implements SessionContext {
           );
         });
     }
-    void memoryManager
-      .scheduleExtract({
-        projectRoot,
-        sessionId: this.config.getSessionId(),
-        history,
-        config: this.config,
-        ...(getExtractNoopSkipTurns() > 0 && {
-          // The next prompt's known base; see isBelowCompactionWarn.
-          belowCompactionWarn: isBelowCompactionWarn(
-            this.config,
-            this.#getCurrentChat().getLastPromptTokenCount() +
-              this.#getCurrentChat().getLastOutputTokenCount(),
-          ),
-        }),
-      })
-      .catch((error: unknown) => {
-        debugLogger.warn(
-          'Failed to schedule ACP managed auto-memory extraction.',
-          error,
-        );
-      });
-    void memoryManager
-      .scheduleDream({
-        projectRoot,
-        sessionId: this.config.getSessionId(),
-        config: this.config,
-      })
-      .catch((error: unknown) => {
-        debugLogger.warn(
-          'Failed to schedule ACP managed auto-memory dream.',
-          error,
-        );
-      });
+    // Extraction and dream wait for an idle session, like the CLI's; the
+    // client holds the one pending start a new prompt cancels.
+    llmClient.scheduleManagedMemoryRun();
+    void llmClient.consumePendingMemoryTaskPromises();
   }
 
   async #buildNextMessageAfterToolRun(
@@ -11951,7 +11925,7 @@ export class Session implements SessionContext {
     // checking for work before the load completes would skip start() and
     // leave durable jobs dormant until the next prompt. Missed one-shots
     // are delivered as late fires through the start() callback below.
-    // Durable tasks live under ~/.qwen (user-owned, not in the working
+    // Durable tasks live under ~/.mariadb-shell-agent (user-owned, not in the working
     // tree), so no folder-trust gate is needed here.
     if (!this.requiresManagedConversationBinding) {
       try {
@@ -12298,16 +12272,16 @@ export class Session implements SessionContext {
     // the current project; a fresh resolver also correctly re-delivers full.
     if (!this.loopTickResolver || this.loopTickResolverRoot !== root) {
       // Resolve the home/global loop.md from the QWEN_HOME-aware global dir (the
-      // rest of Qwen honors QWEN_HOME for `.qwen`); reading raw os.homedir() here
-      // would always hit the real `~/.qwen` and ignore a relocated config home.
+      // rest of Qwen honors QWEN_HOME for `.mariadb-shell-agent`); reading raw os.homedir() here
+      // would always hit the real `~/.mariadb-shell-agent` and ignore a relocated config home.
       const { homeConfineRoot, homeQwenDir } = resolveHomeLoopResolverRoots();
       this.loopTickResolver = new LoopTickResolver({
         projectRoot: root,
         homeDir: homeConfineRoot,
         homeQwenDir,
-        // The project `.qwen/loop.md` is repo-controlled, so an untrusted folder
+        // The project `.mariadb-shell-agent/loop.md` is repo-controlled, so an untrusted folder
         // must not read it and feed it to the model (mirrors getProjectHooks()'s
-        // trust gate). The home/global `~/.qwen/loop.md` is user-owned and stays
+        // trust gate). The home/global `~/.mariadb-shell-agent/loop.md` is user-owned and stays
         // allowed. Pass a getter, not a snapshot: isTrustedFolder() can flip
         // mid-session on an IDE workspace-trust update, and the resolver outlives
         // a single tick — re-read it on every resolve() so a trusted→untrusted
@@ -12394,7 +12368,7 @@ export class Session implements SessionContext {
                 try {
                   loopTick = await resolver.resolve(loopMode, trustedAtResolve);
                 } catch (resolveErr) {
-                  // resolve() reads .qwen/loop.md (project or home/global); an
+                  // resolve() reads .mariadb-shell-agent/loop.md (project or home/global); an
                   // EACCES/EIO here is a sentinel-RESOLUTION failure, not a
                   // model-call failure — tag it so the two are distinguishable
                   // in logs.
@@ -12404,7 +12378,7 @@ export class Session implements SessionContext {
                   // path (OS username + dir layout) — stays in this LOCAL debug
                   // log only; debug logs are never sent to the ACP client.
                   debugLogger.warn(
-                    `loop.md sentinel resolution failed (mode=${loopMode}, code=${code}) — check .qwen/loop.md permissions/IO`,
+                    `loop.md sentinel resolution failed (mode=${loopMode}, code=${code}) — check .mariadb-shell-agent/loop.md permissions/IO`,
                     resolveErr,
                   );
                   if (
@@ -12439,7 +12413,7 @@ export class Session implements SessionContext {
                     // so re-throwing the raw fs error would leak that absolute
                     // path. Surface only the candidate labels + errno code via the
                     // shared absentLocations() — reusing the QWEN_HOME-aware home
-                    // label (never a hardcoded `~/.qwen`) and naming the project
+                    // label (never a hardcoded `~/.mariadb-shell-agent`) and naming the project
                     // candidate only when it was actually read (the captured trust
                     // matches the resolve() probe, so an untrusted folder can't
                     // falsely claim `(project)`).
@@ -17872,7 +17846,7 @@ export class Session implements SessionContext {
               if (hooksEnabled && messageBus) {
                 this.fireNotificationHookWithTerminalSequence(
                   messageBus,
-                  `Qwen Code needs your permission to use ${toolName}`,
+                  `MariaDB Shell Agent needs your permission to use ${toolName}`,
                   NotificationType.PermissionPrompt,
                   'Permission needed',
                   hookOwner,
@@ -18386,7 +18360,7 @@ export class Session implements SessionContext {
           let settledPersistedOutputFiles: string[] | undefined;
           const sleepInhibitorHandle = acquireSleepInhibitor(
             this.config,
-            `Qwen Code is executing tool ${toolName}`,
+            `MariaDB Shell Agent is executing tool ${toolName}`,
           );
           try {
             try {
@@ -19740,7 +19714,7 @@ export class Session implements SessionContext {
     // placed AFTER this content — mirroring the interactive path, which keeps
     // the prompt prominent by merging IDE editor context in FRONT of the
     // prompt via prependToFirstTextPart (client.ts), leaving the instruction
-    // last. Recency-biased providers (e.g. local Ollama qwen models) otherwise
+    // last. Recency-biased providers (e.g. local Ollama mariadb-shell-agent models) otherwise
     // latch onto trailing file content and answer as if it were the task,
     // ignoring a prompt buried before it. The model correlates each @reference
     // with its content block by the "@path" token left in the prompt text and

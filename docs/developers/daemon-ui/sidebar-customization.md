@@ -37,12 +37,12 @@ interface WebShellSidebarBranding {
 }
 ```
 
-| Value                            | Effect                                                                                     |
-| -------------------------------- | ------------------------------------------------------------------------------------------ |
-| `undefined` (default)            | Resolved brand: `brand` prop → daemon `GET /brand` → built-in Qwen logo + "Qwen Code" text |
-| `false`                          | Branding row hidden entirely                                                               |
-| `{ render: () => <MyHeader /> }` | Full replacement with custom content                                                       |
-| `{ hideWhenCompact: false }`     | Keep branding visible in the compact drawer (the default)                                  |
+| Value                            | Effect                                                                                               |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `undefined` (default)            | Resolved brand: `brand` prop → daemon `GET /brand` → built-in Qwen logo + "MariaDB Shell Agent" text |
+| `false`                          | Branding row hidden entirely                                                                         |
+| `{ render: () => <MyHeader /> }` | Full replacement with custom content                                                                 |
+| `{ hideWhenCompact: false }`     | Keep branding visible in the compact drawer (the default)                                            |
 
 The default row is data-driven, not fixed: a daemon that serves a `ui.brand`
 configuration renames the text and swaps the mark, and an embedding host can

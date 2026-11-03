@@ -10,8 +10,8 @@ Workflow 工具默认关闭。开启模式前，先在设置中启用 `tools.wor
 或设置 `QWEN_CODE_ENABLE_WORKFLOWS=1`：
 
 ```sh
-QWEN_CODE_ENABLE_WORKFLOWS=1 qwen --workflow-mode on
-qwen --resume <session-id> --workflow-mode off
+QWEN_CODE_ENABLE_WORKFLOWS=1 mariadb-shell-agent --workflow-mode on
+mariadb-shell-agent --resume <session-id> --workflow-mode off
 ```
 
 工具不可用时使用 `--workflow-mode on` 启动会导致初始化失败。

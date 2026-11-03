@@ -1,6 +1,6 @@
 # @qwen-code/channel-base
 
-Base infrastructure for building Qwen Code channel adapters. Provides the abstract base class, access control, session routing, and the adapter-facing bridge interface used to communicate with the agent.
+Base infrastructure for building MariaDB Shell Agent channel adapters. Provides the abstract base class, access control, session routing, and the adapter-facing bridge interface used to communicate with the agent.
 
 If you're building a channel plugin, this is your only dependency.
 
@@ -65,14 +65,14 @@ export const plugin: ChannelPlugin = {
 
 For a complete working example, see [`@qwen-code/channel-plugin-example`](../plugin-example/).
 
-Migration note for existing TypeScript plugins: if your adapter constructor or factory explicitly types `bridge` as `AcpBridge`, change that annotation to `ChannelAgentBridge` and keep using only the methods exposed by that contract. JavaScript plugins are unaffected at runtime, and standalone `qwen channel start` still passes the current `AcpBridge` implementation.
+Migration note for existing TypeScript plugins: if your adapter constructor or factory explicitly types `bridge` as `AcpBridge`, change that annotation to `ChannelAgentBridge` and keep using only the methods exposed by that contract. JavaScript plugins are unaffected at runtime, and standalone `mariadb-shell-agent channel start` still passes the current `AcpBridge` implementation.
 
 ## Runtime modes
 
 Channel adapters can run in two host modes:
 
-- `qwen channel start [name]` is the standalone service. It uses `AcpBridge` over a `qwen-code --acp` child process and remains the default channel command.
-- `qwen serve --channel <name>` and `qwen serve --channel all` are experimental daemon-managed modes. Named channels are grouped by owning workspace and `qwen serve` starts one out-of-process worker per owning runtime. Each worker connects back to the daemon through the SDK, and adapters receive a `DaemonChannelBridge`-backed `ChannelAgentBridge` facade. `--channel all` stays primary-only.
+- `mariadb-shell-agent channel start [name]` is the standalone service. It uses `AcpBridge` over a `qwen-code --acp` child process and remains the default channel command.
+- `mariadb-shell-agent serve --channel <name>` and `mariadb-shell-agent serve --channel all` are experimental daemon-managed modes. Named channels are grouped by owning workspace and `mariadb-shell-agent serve` starts one out-of-process worker per owning runtime. Each worker connects back to the daemon through the SDK, and adapters receive a `DaemonChannelBridge`-backed `ChannelAgentBridge` facade. `--channel all` stays primary-only.
 
 In daemon-managed mode, every named channel's `cwd` must resolve to exactly one registered, trusted workspace. Its worker receives that runtime's cwd and environment overlay; an ambiguous or untrusted selection fails instead of using primary. The optional `btw` and `shellCommand` methods are exposed to adapters only when the daemon advertises the `session_btw` and `session_shell_command` capabilities, respectively.
 
@@ -99,14 +99,14 @@ Everything between `handleInbound()` and `sendMessage()` is handled by the base 
 
 ### Classes
 
-| Class           | Purpose                                                                              |
-| --------------- | ------------------------------------------------------------------------------------ |
-| `ChannelBase`   | Abstract base class — extend this to build a channel adapter                         |
-| `AcpBridge`     | Current standalone `qwen channel start` bridge implementation over `qwen-code --acp` |
-| `SessionRouter` | Maps senders to agent sessions with configurable scoping                             |
-| `SenderGate`    | Sender access control (allowlist / pairing / open), one axis per side                |
-| `GroupGate`     | Group chat policy and @mention gating                                                |
-| `PairingStore`  | Pairing code generation, approval, and allowlist persistence                         |
+| Class           | Purpose                                                                                             |
+| --------------- | --------------------------------------------------------------------------------------------------- |
+| `ChannelBase`   | Abstract base class — extend this to build a channel adapter                                        |
+| `AcpBridge`     | Current standalone `mariadb-shell-agent channel start` bridge implementation over `qwen-code --acp` |
+| `SessionRouter` | Maps senders to agent sessions with configurable scoping                                            |
+| `SenderGate`    | Sender access control (allowlist / pairing / open), one axis per side                               |
+| `GroupGate`     | Group chat policy and @mention gating                                                               |
+| `PairingStore`  | Pairing code generation, approval, and allowlist persistence                                        |
 
 ### Types
 
@@ -220,7 +220,7 @@ interface ChannelAgentBridge {
 
 ### AcpBridge
 
-`AcpBridge` is the current implementation used by standalone `qwen channel start`. It manages the `qwen-code --acp` child process and implements `ChannelAgentBridge`.
+`AcpBridge` is the current implementation used by standalone `mariadb-shell-agent channel start`. It manages the `qwen-code --acp` child process and implements `ChannelAgentBridge`.
 
 ```typescript
 constructor(options: { cliEntryPath: string; cwd: string; model?: string })
@@ -332,7 +332,7 @@ When `requireMention` is `true` (default), group messages are only processed if 
 constructor(channelName: string, workspaceCwd?: string)
 ```
 
-Persists pending pairing state to `{channelName}-pairing.json`, user approvals to `{channelName}-allowlist.json`, and group approvals to `{channelName}-groups.json`. With `workspaceCwd` (what `ChannelBase` passes — the channel's `cwd`), the files live under the workspace-scoped directory `~/.qwen/channels/<workspace-scope>/` so two workspaces reusing the same channel name never share pairing requests or allowlist entries. Without it, the legacy global `~/.qwen/channels/` layout is used. The first time a given (workspace, channel) pair is constructed, existing legacy global files are copied in once (grandfathering) so already-approved senders stay approved; a per-channel `<channel>.migrated` sentinel in the scope directory marks that decision, after which legacy files are never consulted again for that channel. Channel names are URI-encoded in file names, so a name containing path separators cannot escape the scope directory. `revoke(senderId)` removes the sender only from this store's allowlist and never mutates the legacy global baseline.
+Persists pending pairing state to `{channelName}-pairing.json`, user approvals to `{channelName}-allowlist.json`, and group approvals to `{channelName}-groups.json`. With `workspaceCwd` (what `ChannelBase` passes — the channel's `cwd`), the files live under the workspace-scoped directory `~/.mariadb-shell-agent/channels/<workspace-scope>/` so two workspaces reusing the same channel name never share pairing requests or allowlist entries. Without it, the legacy global `~/.mariadb-shell-agent/channels/` layout is used. The first time a given (workspace, channel) pair is constructed, existing legacy global files are copied in once (grandfathering) so already-approved senders stay approved; a per-channel `<channel>.migrated` sentinel in the scope directory marks that decision, after which legacy files are never consulted again for that channel. Channel names are URI-encoded in file names, so a name containing path separators cannot escape the scope directory. `revoke(senderId)` removes the sender only from this store's allowlist and never mutates the legacy global baseline.
 
 | Method                                | Description                                                                                                                                                                                                       |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

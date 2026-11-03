@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -286,7 +287,7 @@ describe('ToolCallTool', () => {
       // Deferred tools rebuild their description on every `schema` access
       // (WebSearchTool: current month/year, web-search.ts:997-1004;
       // ReadFileTool: CURRENT input modalities, read-file.ts:628-637) so a
-      // long-lived `qwen serve`/ACP process is not stale. Prose drift across a
+      // long-lived `mariadb-shell-agent serve`/ACP process is not stale. Prose drift across a
       // month boundary or a `/model` switch must not arm a false "changed"
       // refusal against an identical parameter contract.
       const sameContractNewProse = lookup(

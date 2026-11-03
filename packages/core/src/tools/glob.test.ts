@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -499,12 +500,12 @@ describe('GlobTool', () => {
       expect(result.llmContent).not.toContain('a.ignored.txt');
     });
 
-    it('should respect .qwenignore files by default', async () => {
-      await put('.qwenignore', '*.qwenignored.txt');
+    it('should respect .mariadb-shell-agentignore files by default', async () => {
+      await put('.mariadb-shell-agentignore', '*.qwenignored.txt');
       await put('a.qwenignored.txt', 'ignored content');
       await put('b.notignored.txt', 'not ignored content');
 
-      // Recreate the tool to pick up the new .qwenignore file
+      // Recreate the tool to pick up the new .mariadb-shell-agentignore file
       globTool = new GlobTool(mockConfig);
 
       const result = await run({ pattern: '*.txt' });
@@ -565,12 +566,12 @@ describe('GlobTool', () => {
       expect(result.llmContent).not.toContain('hidden.secret');
     });
 
-    it('should respect .qwenignore when searching a subdirectory (path option)', async () => {
-      await put('.qwenignore', '*.secret');
+    it('should respect .mariadb-shell-agentignore when searching a subdirectory (path option)', async () => {
+      await put('.mariadb-shell-agentignore', '*.secret');
       await put('sub/visible.txt', 'ok');
       await put('sub/hidden.secret', 'should be ignored');
 
-      // Recreate to pick up .qwenignore
+      // Recreate to pick up .mariadb-shell-agentignore
       const result = await runFresh({ pattern: '*', path: 'sub' });
 
       expect(result.llmContent).toContain('visible.txt');

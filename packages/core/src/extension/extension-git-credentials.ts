@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,7 +20,8 @@ import {
 export const EXTENSION_GIT_CREDENTIAL_SELECTOR_FILENAME =
   '.qwen-extension-git-credentials.json';
 
-const GIT_CREDENTIAL_SERVICE_NAME = 'Qwen Code Extension Git Credentials';
+const GIT_CREDENTIAL_SERVICE_NAME =
+  'MariaDB Shell Agent Extension Git Credentials';
 const GIT_CREDENTIAL_KEY_PREFIX = '$qwen:extension-git:v1:';
 
 export type ExtensionCredentialPersistence = 'stored' | 'one_time';

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -66,7 +67,10 @@ export function selectAttachRecord(
       : { error: `No daemon is registered on port ${port}.` };
   }
   if (candidates.length === 0) {
-    return { error: 'no daemon is registered. Start one with `qwen serve`.' };
+    return {
+      error:
+        'no daemon is registered. Start one with `mariadb-shell-agent serve`.',
+    };
   }
   if (candidates.length > 1) {
     return {

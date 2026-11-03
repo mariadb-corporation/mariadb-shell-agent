@@ -1,6 +1,6 @@
 /**
  * Functional parity matrix (M5-②): build a REAL Config from the user's
- * ~/.qwen/settings.json (loadSettings + loadCliConfig), load the interactive
+ * ~/.mariadb-shell-agent/settings.json (loadSettings + loadCliConfig), load the interactive
  * command registry exactly as the OpenTUI dispatcher does, and assert the key
  * slash commands are present. This is the functional (command-surface) parity
  * guard. Run: bun packages/cli/scripts/opentui-command-parity.ts

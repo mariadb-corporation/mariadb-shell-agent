@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,7 +17,7 @@
  *
  * This guard checks those prerequisites up front and fails with a message
  * that names both the missing pieces and the command that creates them.
- * See https://github.com/QwenLM/qwen-code/issues/9149.
+ * See https://github.invalid/QwenLM/qwen-code/issues/9149.
  */
 
 import { existsSync, readFileSync, realpathSync } from 'node:fs';

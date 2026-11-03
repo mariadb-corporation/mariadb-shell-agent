@@ -6,7 +6,7 @@
 
 本计划验证[恢复设计](../design/2026-10-22-managed-recovery-continuation.zh-CN.md)（[English](../design/2026-10-22-managed-recovery-continuation.md)），覆盖 Hosted Workspace 失败取消、原输入结算、清理和后续使用，以及 WebShell 恢复与可编辑文字交接。跨主机 HA、完整历史克隆和新增 MCP/Hook 续跑不属于本次交付。
 
-实施前记录 `qwen --version`，先用全局 CLI 在隔离运行目录尝试相关行为。Java 协调器属于独立控制平面：全局入口无法触达时，应记录限制，并在准确的基准提交上使用聚焦 Java/Hosted 测试替代。首次调查基于 `21337f0e5131`；修改实现前保留失败断言。不得构建新二进制并用它替代基线。
+实施前记录 `mariadb-shell-agent --version`，先用全局 CLI 在隔离运行目录尝试相关行为。Java 协调器属于独立控制平面：全局入口无法触达时，应记录限制，并在准确的基准提交上使用聚焦 Java/Hosted 测试替代。首次调查基于 `21337f0e5131`；修改实现前保留失败断言。不得构建新二进制并用它替代基线。
 
 ## 隔离前提
 
@@ -16,7 +16,7 @@ MySQL 必须开启 `performance_schema`。并发检查前，使用真实阻塞�
 
 正向 `recovery-settlement` fixture 保持独立 Broker 进程及其原 worker 存活，仅杀死 Java 协调器。两者使用真实 JDBC 权限和 Workspace mount；协调器通过仅作用于本实例的测试接线关闭可选本地预热，原生 acquire 和工具执行仍走常驻 Broker。断言 Broker 和同一 worker 始终存活，协调器没有创建替代 worker。持久 worker 的私有运行状态位于 Workspace 根目录之外，可信整机重启恢复始终关闭。内嵌 Broker 自身丢失后的恢复属于另一个仅限 Linux 的边界，需要既有可信重启授权；缺少授权时保留 marker 并保持受阻属于预期负向结果。
 
-记录工具版本、提交、所选测试、数据库引擎和进程身份。凭据和机器路径保留在被忽略的工作产物中。本次详细报告位于 `.qwen/e2e-tests/managed-recovery-continuation.md`；提交的计划不代表所有场景已经通过。
+记录工具版本、提交、所选测试、数据库引擎和进程身份。凭据和机器路径保留在被忽略的工作产物中。本次详细报告位于 `.mariadb-shell-agent/e2e-tests/managed-recovery-continuation.md`；提交的计划不代表所有场景已经通过。
 
 ## 行为矩阵
 

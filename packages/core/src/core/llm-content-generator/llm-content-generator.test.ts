@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -42,7 +43,7 @@ vi.mock('../../telemetry/gen-ai-request.js', () => ({
   reportLlmChunk: mockReportLlmChunk,
 }));
 
-const ROUTIFY = 'https://routify-pub.alibaba-inc.com/protocol/vertex';
+const ROUTIFY = 'https://routify-pub.alibaba-inc.invalid/protocol/vertex';
 const GOOGLE_API = 'https://generativelanguage.googleapis.com';
 const DEFAULT_SENT_CONFIG = {
   temperature: 1,
@@ -612,7 +613,7 @@ describe('LlmContentGenerator', () => {
     );
   });
 
-  // https://github.com/QwenLM/qwen-code/issues/9453
+  // https://github.invalid/QwenLM/qwen-code/issues/9453
   //
   // The OpenAI Responses generator stashes an opaque reasoning-replay payload
   // in the shared `Part.thoughtSignature` field. It only means something to

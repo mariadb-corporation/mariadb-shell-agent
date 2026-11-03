@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1605,7 +1606,7 @@ export async function settleCrashedWakeTurnAftermath(params: {
             // user Turn's same park would get a typed terminal verdict.
             if (!(cause instanceof RecoveryDeclined)) throw cause;
             writeStderrLineSafe(
-              `qwen serve: Hosted wake turn ${turnId} park is deterministically unrecoverable by the Broker; its cancelled tool results and run are settled anyway, and the wake session's lease stays the system's re-admitted kind: ${String(cause)}`,
+              `mariadb-shell-agent serve: Hosted wake turn ${turnId} park is deterministically unrecoverable by the Broker; its cancelled tool results and run are settled anyway, and the wake session's lease stays the system's re-admitted kind: ${String(cause)}`,
             );
           }
           // The cancelled tool results journal like every route write: a
@@ -1685,7 +1686,7 @@ export async function settleCrashedWakeTurnAftermath(params: {
               session.heldRuntimeTurns.add(turnId);
             } else if (cause instanceof RecoveryDeclined) {
               writeStderrLineSafe(
-                `qwen serve: Hosted wake turn ${turnId} could not derive its wake session's Broker identity; its lease stays the system's re-admitted kind: ${String(cause)}`,
+                `mariadb-shell-agent serve: Hosted wake turn ${turnId} could not derive its wake session's Broker identity; its lease stays the system's re-admitted kind: ${String(cause)}`,
               );
             } else {
               throw cause;
@@ -1754,12 +1755,12 @@ export async function settleCrashedWakeTurnAftermath(params: {
     // the journal and the carry has no more work.
     session.recoveryUnobserved?.delete(turnId);
     writeStderrLineSafe(
-      `qwen serve: Hosted wake turn ${turnId} crash aftermath settled${continuationId === undefined ? '.' : `; continuation ${continuationId} is durable.`}`,
+      `mariadb-shell-agent serve: Hosted wake turn ${turnId} crash aftermath settled${continuationId === undefined ? '.' : `; continuation ${continuationId} is durable.`}`,
     );
     return 'settled';
   } catch (cause) {
     writeStderrLineSafe(
-      `qwen serve: Hosted wake turn ${turnId} aftermath could not be settled: ${String(cause)}`,
+      `mariadb-shell-agent serve: Hosted wake turn ${turnId} aftermath could not be settled: ${String(cause)}`,
     );
     return 'pending';
   }
@@ -2130,7 +2131,7 @@ async function retireOwedFileHistory(
     if (session.fileHistoryOwed === owed) session.fileHistoryOwed = undefined;
   } catch (cause) {
     writeStderrLineSafe(
-      `qwen serve: Hosted Harness file-history retirement of settled Turn ${owed} failed ${where}: ${String(cause)}`,
+      `mariadb-shell-agent serve: Hosted Harness file-history retirement of settled Turn ${owed} failed ${where}: ${String(cause)}`,
     );
   }
 }
@@ -2527,7 +2528,7 @@ function runSettleProjection(
       // leaves it unnamed (#13800 R2-14).
       blockRecovery(session, namedStoreFailure(cause));
       writeStderrLineSafe(
-        'qwen serve: Hosted Harness final settlement remained blocked: ' +
+        'mariadb-shell-agent serve: Hosted Harness final settlement remained blocked: ' +
           sanitizeDaemonLogLine(String(cause)),
       );
     })
@@ -3147,7 +3148,8 @@ async function recoverShellReceipts(
       });
     } catch (cause) {
       writeStderrLineSafe(
-        'qwen serve: Tool v3 ACK failed during recovery: ' + String(cause),
+        'mariadb-shell-agent serve: Tool v3 ACK failed during recovery: ' +
+          String(cause),
       );
     }
   }
@@ -3488,7 +3490,7 @@ async function startHostedRecoveredTurn(
             : undefined),
       );
       writeStderrLineSafe(
-        'qwen serve: Hosted Harness recovery remained blocked: ' +
+        'mariadb-shell-agent serve: Hosted Harness recovery remained blocked: ' +
           describeManagedError(cause),
       );
     })
@@ -4028,7 +4030,7 @@ async function executeHostedTurn(
             // rejects into the enclosing catch and settles the Turn instead.
             crashBeforeCommitFired = true;
             writeStderrLineSafe(
-              `qwen serve: E2E holding finished turn before assistant commit for Session ${sessionId} prompt ${promptId}`,
+              `mariadb-shell-agent serve: E2E holding finished turn before assistant commit for Session ${sessionId} prompt ${promptId}`,
             );
             await new Promise<never>((_resolve, reject) => {
               const release = (): void =>
@@ -4087,8 +4089,8 @@ async function executeHostedTurn(
             // deadline expiry names the deadline, not the thrown cause.
             writeStderrLineSafe(
               stopReason === 'deadline_exceeded'
-                ? `qwen serve: Hosted Harness turn ${promptId} exceeded its deadline.`
-                : 'qwen serve: Hosted Harness turn ' +
+                ? `mariadb-shell-agent serve: Hosted Harness turn ${promptId} exceeded its deadline.`
+                : 'mariadb-shell-agent serve: Hosted Harness turn ' +
                     promptId +
                     ' failed: ' +
                     String(cause),
@@ -4114,7 +4116,7 @@ async function executeHostedTurn(
             session.monitorWake?.kick();
           }
           writeStderrLineSafe(
-            'qwen serve: Turn completed with cleanup still owed: ' +
+            'mariadb-shell-agent serve: Turn completed with cleanup still owed: ' +
               String(cause),
           );
           // The owed cleanup keeps retrying its full release; the mount
@@ -4146,7 +4148,7 @@ async function executeHostedTurn(
             }
           } catch (cause) {
             writeStderrLineSafe(
-              'qwen serve: Hosted acceptance consumption faltered (owed ids kept): ' +
+              'mariadb-shell-agent serve: Hosted acceptance consumption faltered (owed ids kept): ' +
                 String(cause),
             );
           }
@@ -4162,7 +4164,8 @@ async function executeHostedTurn(
       void toolTurn?.close().catch((cause: unknown) => {
         session.blocked = true;
         writeStderrLineSafe(
-          'qwen serve: Hosted Shell publisher cleanup failed: ' + String(cause),
+          'mariadb-shell-agent serve: Hosted Shell publisher cleanup failed: ' +
+            String(cause),
         );
       });
     });
@@ -4397,7 +4400,7 @@ export function registerHostedHarnessSessionRoutes(
     } catch (cause) {
       release.result = undefined;
       writeStderrLineSafe(
-        `qwen serve: Hosted ownership release requires reconciliation: ${String(cause)}`,
+        `mariadb-shell-agent serve: Hosted ownership release requires reconciliation: ${String(cause)}`,
       );
       throw cause;
     }
@@ -4444,7 +4447,7 @@ export function registerHostedHarnessSessionRoutes(
     if (dropLoadReplySession === sessionId && !loadReplyDropped) {
       loadReplyDropped = true;
       writeStderrLineSafe(
-        `qwen serve: E2E dropping first load reply for Session ${sessionId}`,
+        `mariadb-shell-agent serve: E2E dropping first load reply for Session ${sessionId}`,
       );
       res.destroy();
       return;
@@ -4489,7 +4492,7 @@ export function registerHostedHarnessSessionRoutes(
     if (!approvalPending && settle === null) {
       noteOwedAdoption(resident, sessionId);
       writeStderrLineSafe(
-        `qwen serve: Hosted Session ${sessionId} redrive refused (takeover_inapplicable_unpayable): prompt=${promptId}`,
+        `mariadb-shell-agent serve: Hosted Session ${sessionId} redrive refused (takeover_inapplicable_unpayable): prompt=${promptId}`,
       );
       error(res, 409, 'hosted_turn_recovery_required', 'takeover_unrecovered');
       return;
@@ -5269,7 +5272,7 @@ export function registerHostedHarnessSessionRoutes(
           await retryHostedCleanup(resident, brokerOptions);
         } catch (cause) {
           writeStderrLineSafe(
-            'qwen serve: Cleanup remains owed: ' + String(cause),
+            'mariadb-shell-agent serve: Cleanup remains owed: ' + String(cause),
           );
         }
       }
@@ -5332,7 +5335,7 @@ export function registerHostedHarnessSessionRoutes(
               return;
             }
             writeStderrLineSafe(
-              `qwen serve: Hosted Session ${sessionId} settles the cancelled park on the redriven load: prompt=${parkedForCancellation}`,
+              `mariadb-shell-agent serve: Hosted Session ${sessionId} settles the cancelled park on the redriven load: prompt=${parkedForCancellation}`,
             );
             // The settle discharged the parked Turn, so the undriven
             // marker an earlier load's lost reply armed has nothing left
@@ -5348,7 +5351,7 @@ export function registerHostedHarnessSessionRoutes(
             return;
           } catch (cause) {
             writeStderrLineSafe(
-              `qwen serve: Hosted Session ${sessionId} redrive refused (takeover_failed): profile=${resident.toolProfile ?? 'none'} broker=${brokerOptions ? 'ready' : 'none'} settle=${sanitizeDaemonLogLine(String(cause))}`,
+              `mariadb-shell-agent serve: Hosted Session ${sessionId} redrive refused (takeover_failed): profile=${resident.toolProfile ?? 'none'} broker=${brokerOptions ? 'ready' : 'none'} settle=${sanitizeDaemonLogLine(String(cause))}`,
             );
             error(res, 409, 'hosted_turn_recovery_required', 'takeover_failed');
             return;
@@ -5495,7 +5498,8 @@ export function registerHostedHarnessSessionRoutes(
           }
           blockRecovery(resident, namedStoreFailure(cause));
           writeStderrLineSafe(
-            'qwen serve: Hosted recovery redrive failed: ' + String(cause),
+            'mariadb-shell-agent serve: Hosted recovery redrive failed: ' +
+              String(cause),
           );
           error(res, 409, 'hosted_turn_recovery_required');
           return;
@@ -5551,7 +5555,7 @@ export function registerHostedHarnessSessionRoutes(
         }
       } catch (cause) {
         writeStderrLineSafe(
-          `qwen serve: Hosted Harness recovery re-answer of session ${sessionId} failed: ${sanitizeDaemonLogLine(String(cause))}`,
+          `mariadb-shell-agent serve: Hosted Harness recovery re-answer of session ${sessionId} failed: ${sanitizeDaemonLogLine(String(cause))}`,
         );
         if (
           cause instanceof HostedRecoveryQuiescingError &&
@@ -6520,7 +6524,7 @@ export function registerHostedHarnessSessionRoutes(
                 if (!deferredWakeRecovery.has(turn.turnId)) {
                   deferredWakeRecovery.add(turn.turnId);
                   writeStderrLineSafe(
-                    'qwen serve: Interrupted channel wake turn ' +
+                    'mariadb-shell-agent serve: Interrupted channel wake turn ' +
                       turn.turnId +
                       ' defers its recovery to the next wake attempt: ' +
                       String(cause),
@@ -6530,7 +6534,7 @@ export function registerHostedHarnessSessionRoutes(
               }
             }
             writeStderrLineSafe(
-              'qwen serve: Interrupted channel wake turn ' +
+              'mariadb-shell-agent serve: Interrupted channel wake turn ' +
                 turn.turnId +
                 ' keeps its durable wait for the recovery fleet: ' +
                 String(cause),
@@ -6573,7 +6577,7 @@ export function registerHostedHarnessSessionRoutes(
               )
                 return;
               writeStderrLineSafe(
-                'qwen serve: Interrupted channel wake turn ' +
+                'mariadb-shell-agent serve: Interrupted channel wake turn ' +
                   turn.turnId +
                   ' could not hand back its recovered Runtime: ' +
                   String(cause),
@@ -6738,7 +6742,7 @@ export function registerHostedHarnessSessionRoutes(
                 await session.automations?.settleRun(turnId);
               } catch (cause) {
                 writeStderrLineSafe(
-                  `qwen serve: Hosted automation run of turn ${turnId} could not be settled: ${String(cause)}`,
+                  `mariadb-shell-agent serve: Hosted automation run of turn ${turnId} could not be settled: ${String(cause)}`,
                 );
               }
             };
@@ -6772,7 +6776,7 @@ export function registerHostedHarnessSessionRoutes(
                 replyPlanRetries.delete(turnId);
                 void session.channels?.planReply(turnId).catch((cause) => {
                   writeStderrLineSafe(
-                    `qwen serve: Hosted channel reply of turn ${turnId} could not be planned: ${String(cause)}`,
+                    `mariadb-shell-agent serve: Hosted channel reply of turn ${turnId} could not be planned: ${String(cause)}`,
                   );
                   // A sealed Session is nobody else's planner: the
                   // open-path reconcile owns the reply from the next
@@ -6845,7 +6849,7 @@ export function registerHostedHarnessSessionRoutes(
                   }
                 } catch (cause) {
                   writeStderrLineSafe(
-                    `qwen serve: Hosted channel reply of turn ${turn.turnId} could not be planned: ${String(cause)}`,
+                    `mariadb-shell-agent serve: Hosted channel reply of turn ${turn.turnId} could not be planned: ${String(cause)}`,
                   );
                   scheduleReplyPlanRetry(turn.turnId, 1_000);
                 }
@@ -6876,7 +6880,7 @@ export function registerHostedHarnessSessionRoutes(
           failed: (cause) => {
             session.blocked = true;
             writeStderrLineSafe(
-              'qwen serve: Monitor wake pump of session ' +
+              'mariadb-shell-agent serve: Monitor wake pump of session ' +
                 sessionId +
                 ' failed: ' +
                 String(cause),
@@ -6927,7 +6931,7 @@ export function registerHostedHarnessSessionRoutes(
           });
         } catch (cause) {
           writeStderrLineSafe(
-            `qwen serve: Hosted Session ${sessionId} could not answer the interrupted calls of ${unsettled}: ${String(cause)}`,
+            `mariadb-shell-agent serve: Hosted Session ${sessionId} could not answer the interrupted calls of ${unsettled}: ${String(cause)}`,
           );
         }
       }
@@ -6956,7 +6960,7 @@ export function registerHostedHarnessSessionRoutes(
           // The drop stays durable-owed: the gate below refuses as before
           // and the next load retries the retirement.
           writeStderrLineSafe(
-            `qwen serve: Hosted Harness file-history retirement of settled Turn ${owedMarker} failed at load: ${String(cause)}`,
+            `mariadb-shell-agent serve: Hosted Harness file-history retirement of settled Turn ${owedMarker} failed at load: ${String(cause)}`,
           );
         }
       }
@@ -6988,7 +6992,7 @@ export function registerHostedHarnessSessionRoutes(
         const tagField = (value: string | null | undefined): string | null =>
           value == null ? null : sanitizeDaemonLogLine(value);
         writeStderrLineSafe(
-          `qwen serve: Hosted Session ${sessionId} load refused (file_history_pending): ${JSON.stringify({ pendingTurn: tagField(fileHistory?.pendingTurn), pendingUndo: fileHistory?.pendingUndo ? { requestId: sanitizeDaemonLogLine(fileHistory.pendingUndo.requestId), promptId: sanitizeDaemonLogLine(fileHistory.pendingUndo.promptId) } : null, unsettled: tagField(unsettled), takeover, ground: settle?.blocker ?? null, groundDetail: settle?.detail ?? null })}`,
+          `mariadb-shell-agent serve: Hosted Session ${sessionId} load refused (file_history_pending): ${JSON.stringify({ pendingTurn: tagField(fileHistory?.pendingTurn), pendingUndo: fileHistory?.pendingUndo ? { requestId: sanitizeDaemonLogLine(fileHistory.pendingUndo.requestId), promptId: sanitizeDaemonLogLine(fileHistory.pendingUndo.promptId) } : null, unsettled: tagField(unsettled), takeover, ground: settle?.blocker ?? null, groundDetail: settle?.detail ?? null })}`,
         );
         await managed.close();
         const pendingUndo = fileHistory?.pendingUndo != null;
@@ -7029,7 +7033,7 @@ export function registerHostedHarnessSessionRoutes(
                 : '')
             : '';
         writeStderrLineSafe(
-          `qwen serve: Hosted Session ${sessionId} load refused (restore_${restore.recoveryStatus}): basis=${String(restore.restoreBasis)} through=${restore.throughSequence}${blocked}`,
+          `mariadb-shell-agent serve: Hosted Session ${sessionId} load refused (restore_${restore.recoveryStatus}): basis=${String(restore.restoreBasis)} through=${restore.throughSequence}${blocked}`,
         );
         await managed.close();
         if (
@@ -7060,7 +7064,7 @@ export function registerHostedHarnessSessionRoutes(
           );
         } catch (cause) {
           writeStderrLineSafe(
-            `qwen serve: Hosted Session ${sessionId} load refused (workspace_verify): ${sanitizeDaemonLogLine(String(cause))}`,
+            `mariadb-shell-agent serve: Hosted Session ${sessionId} load refused (workspace_verify): ${sanitizeDaemonLogLine(String(cause))}`,
           );
           await managed.close();
           error(
@@ -7075,7 +7079,7 @@ export function registerHostedHarnessSessionRoutes(
           await stores.assertWritable();
         } catch (cause) {
           writeStderrLineSafe(
-            `qwen serve: Hosted Session ${sessionId} load refused (workspace_writable): ${sanitizeDaemonLogLine(String(cause))}`,
+            `mariadb-shell-agent serve: Hosted Session ${sessionId} load refused (workspace_writable): ${sanitizeDaemonLogLine(String(cause))}`,
           );
           await managed.close();
           error(
@@ -7278,7 +7282,7 @@ export function registerHostedHarnessSessionRoutes(
               unsettled,
             );
             writeStderrLineSafe(
-              `qwen serve: Hosted Session ${sessionId} settles the cancelled park on load: prompt=${unsettled}`,
+              `mariadb-shell-agent serve: Hosted Session ${sessionId} settles the cancelled park on load: prompt=${unsettled}`,
             );
             // The journal owes nothing more: the cancelled record is
             // the plain attach's whole answer, replayed home from the
@@ -7287,7 +7291,7 @@ export function registerHostedHarnessSessionRoutes(
             cancellationSettled = true;
           } catch (cause) {
             writeStderrLineSafe(
-              `qwen serve: Hosted Session ${sessionId} load refused (takeover_failed): profile=${toolProfile ?? 'none'} broker=${brokerOptions ? 'ready' : 'none'} settle=${sanitizeDaemonLogLine(String(cause))}`,
+              `mariadb-shell-agent serve: Hosted Session ${sessionId} load refused (takeover_failed): profile=${toolProfile ?? 'none'} broker=${brokerOptions ? 'ready' : 'none'} settle=${sanitizeDaemonLogLine(String(cause))}`,
             );
             await managed.close();
             error(res, 409, 'hosted_turn_recovery_required', 'takeover_failed');
@@ -7297,7 +7301,7 @@ export function registerHostedHarnessSessionRoutes(
         if (toolProfile === undefined || !brokerOptions) {
           if (!cancellationSettled) {
             writeStderrLineSafe(
-              `qwen serve: Hosted Session ${sessionId} load refused (takeover_unsupported): profile=${toolProfile ?? 'none'} broker=${brokerOptions ? 'ready' : 'none'}`,
+              `mariadb-shell-agent serve: Hosted Session ${sessionId} load refused (takeover_unsupported): profile=${toolProfile ?? 'none'} broker=${brokerOptions ? 'ready' : 'none'}`,
             );
             await managed.close();
             if (body?.['passiveManagedRuntimeRecovery'] === true)
@@ -7361,7 +7365,7 @@ export function registerHostedHarnessSessionRoutes(
                   noteOwedAdoption(session, sessionId);
                   await managed.close();
                   writeStderrLineSafe(
-                    `qwen serve: Hosted Session ${sessionId} load refused (takeover_inapplicable_unpayable): prompt=${unsettled}`,
+                    `mariadb-shell-agent serve: Hosted Session ${sessionId} load refused (takeover_inapplicable_unpayable): prompt=${unsettled}`,
                   );
                   error(
                     res,
@@ -7376,7 +7380,7 @@ export function registerHostedHarnessSessionRoutes(
               }
             } else if (outcome.kind === 'declined') {
               writeStderrLineSafe(
-                `qwen serve: Hosted Session ${sessionId} load refused (takeover_unrecovered): prompt=${unsettled} reason=${outcome.reason}`,
+                `mariadb-shell-agent serve: Hosted Session ${sessionId} load refused (takeover_unrecovered): prompt=${unsettled} reason=${outcome.reason}`,
               );
               await managed.close();
               recoveryDeclined(res, outcome.reason);
@@ -7402,7 +7406,7 @@ export function registerHostedHarnessSessionRoutes(
             noteOwedAdoption(session, sessionId);
             await managed.close();
             writeStderrLineSafe(
-              `qwen serve: Hosted Harness recovery of session ${sessionId} failed: ${sanitizeDaemonLogLine(String(cause))}`,
+              `mariadb-shell-agent serve: Hosted Harness recovery of session ${sessionId} failed: ${sanitizeDaemonLogLine(String(cause))}`,
             );
             if (cause instanceof HostedRecoveryQuiescingError) {
               error(res, 409, 'hosted_harness_quiescing');
@@ -7546,7 +7550,7 @@ export function registerHostedHarnessSessionRoutes(
         // strand is silent until retirement.
         noteOwedAdoption(session, sessionId);
         writeStderrLineSafe(
-          `qwen serve: Hosted Session ${sessionId} load refused (unsettled_input): ${JSON.stringify({ incompletePublication: !create && workspaceProfile ? incompletePublication : null, unsettled: [...unsettledInputsThrough(session, unsettledThrough)], resume: resume?.promptId ?? null, settle: settlePromptId ?? null, through: unsettledThrough })}`,
+          `mariadb-shell-agent serve: Hosted Session ${sessionId} load refused (unsettled_input): ${JSON.stringify({ incompletePublication: !create && workspaceProfile ? incompletePublication : null, unsettled: [...unsettledInputsThrough(session, unsettledThrough)], resume: resume?.promptId ?? null, settle: settlePromptId ?? null, through: unsettledThrough })}`,
         );
         await managed.close();
         error(
@@ -7564,7 +7568,7 @@ export function registerHostedHarnessSessionRoutes(
           // Same owed-lease discipline as the refusal above.
           noteOwedAdoption(session, sessionId);
           writeStderrLineSafe(
-            `qwen serve: Hosted Session ${sessionId} load refused (workspace_writable): ${sanitizeDaemonLogLine(String(cause))}`,
+            `mariadb-shell-agent serve: Hosted Session ${sessionId} load refused (workspace_writable): ${sanitizeDaemonLogLine(String(cause))}`,
           );
           await managed.close();
           error(
@@ -7612,7 +7616,7 @@ export function registerHostedHarnessSessionRoutes(
         } catch (cause) {
           session.blocked = true;
           writeStderrLineSafe(
-            'qwen serve: Cleanup remains owed: ' + String(cause),
+            'mariadb-shell-agent serve: Cleanup remains owed: ' + String(cause),
           );
         }
       }
@@ -7643,7 +7647,7 @@ export function registerHostedHarnessSessionRoutes(
             session.heldRuntimeTurns.add(runtimeSessionId);
         } catch (cause) {
           writeStderrLineSafe(
-            `qwen serve: Hosted Session ${sessionId} could not restore its held Runtimes: ${sanitizeDaemonLogLine(String(cause))}`,
+            `mariadb-shell-agent serve: Hosted Session ${sessionId} could not restore its held Runtimes: ${sanitizeDaemonLogLine(String(cause))}`,
           );
         }
       }
@@ -7659,7 +7663,7 @@ export function registerHostedHarnessSessionRoutes(
             ?.reconcileRuns()
             .catch((cause: unknown) =>
               writeStderrLineSafe(
-                `qwen serve: Hosted automation runs of session ${sessionId} could not be reconciled: ${String(cause)}`,
+                `mariadb-shell-agent serve: Hosted automation runs of session ${sessionId} could not be reconciled: ${String(cause)}`,
               ),
             ),
           // H5c: a settle → plan crash window closes here, before the pump
@@ -7668,7 +7672,7 @@ export function registerHostedHarnessSessionRoutes(
             ?.reconcileReplies()
             .catch((cause: unknown) =>
               writeStderrLineSafe(
-                `qwen serve: Hosted channel replies of session ${sessionId} could not be reconciled: ${String(cause)}`,
+                `mariadb-shell-agent serve: Hosted channel replies of session ${sessionId} could not be reconciled: ${String(cause)}`,
               ),
             ),
         ]).finally(() => {
@@ -7697,7 +7701,7 @@ export function registerHostedHarnessSessionRoutes(
       // writer must still answer its self-healing 409, not the generic 503.
       if (thrown instanceof ManagedSessionCloseError) {
         writeStderrLineSafe(
-          `qwen serve: Hosted Session ${sessionId} close failed during open: ${sanitizeDaemonLogLine(String(thrown))}`,
+          `mariadb-shell-agent serve: Hosted Session ${sessionId} close failed during open: ${sanitizeDaemonLogLine(String(thrown))}`,
         );
       }
       const cause =
@@ -7723,7 +7727,7 @@ export function registerHostedHarnessSessionRoutes(
         // history drift, runnable-checkpoint classification) is otherwise
         // invisible to anyone diagnosing why the restore was refused.
         writeStderrLineSafe(
-          'qwen serve: Hosted Session open failed: ' +
+          'mariadb-shell-agent serve: Hosted Session open failed: ' +
             String(
               cause instanceof Error && cause.cause !== undefined
                 ? cause.cause
@@ -7955,7 +7959,7 @@ export function registerHostedHarnessSessionRoutes(
       if (cause instanceof ManagedSessionConflictError)
         return error(res, 409, 'session_context_busy');
       writeStderrLineSafe(
-        `qwen serve: Hosted context compression admission failed: ${String(cause)}`,
+        `mariadb-shell-agent serve: Hosted context compression admission failed: ${String(cause)}`,
       );
       return error(res, 503, 'context_compression_unavailable');
     }
@@ -8132,7 +8136,7 @@ export function registerHostedHarnessSessionRoutes(
       });
     } catch (cause) {
       writeStderrLineSafe(
-        `qwen serve: Hosted lifecycle requires recovery: ${String(cause)}`,
+        `mariadb-shell-agent serve: Hosted lifecycle requires recovery: ${String(cause)}`,
       );
       const code =
         cause instanceof ManagedSessionStoreHttpError
@@ -8380,7 +8384,7 @@ export function registerHostedHarnessSessionRoutes(
           await settleCancelledHookTurn(session, reconcileAbort.signal);
         } catch (cause) {
           writeStderrLineSafe(
-            `qwen serve: Hosted Session ${req.params['id']} Hook reconciliation failed: ${String(cause)}`,
+            `mariadb-shell-agent serve: Hosted Session ${req.params['id']} Hook reconciliation failed: ${String(cause)}`,
           );
         } finally {
           clearTimeout(budget);
@@ -8507,7 +8511,7 @@ export function registerHostedHarnessSessionRoutes(
     // that never receives continue/cancel is otherwise invisible to oncall.
     if (session.recoveredTurn !== undefined) {
       writeStderrLineSafe(
-        `qwen serve: Hosted Harness refused a fresh prompt while recovered Turn ${session.recoveredTurn} is undriven.`,
+        `mariadb-shell-agent serve: Hosted Harness refused a fresh prompt while recovered Turn ${session.recoveredTurn} is undriven.`,
       );
       return error(res, 409, 'hosted_turn_active');
     }
@@ -8547,7 +8551,7 @@ export function registerHostedHarnessSessionRoutes(
         // The probe could not prove the checkpoint free: refuse retriably
         // rather than admit against a park it read nothing about.
         writeStderrLineSafe(
-          `qwen serve: Hosted prompt of session ${req.params['id']} could not probe a wake park: ${String(cause)}`,
+          `mariadb-shell-agent serve: Hosted prompt of session ${req.params['id']} could not probe a wake park: ${String(cause)}`,
         );
         return error(res, 409, 'hosted_turn_recovery_in_progress');
       }
@@ -8677,13 +8681,13 @@ export function registerHostedHarnessSessionRoutes(
           else if (!res.headersSent)
             error(res, 503, 'hosted_mcp_recovery_required');
           writeStderrLineSafe(
-            `qwen serve: Hosted Harness turn ${promptId} is recovery blocked: ${String(cause.cause)}`,
+            `mariadb-shell-agent serve: Hosted Harness turn ${promptId} is recovery blocked: ${String(cause.cause)}`,
           );
           return;
         }
         if (admitted && !settled) {
           writeStderrLineSafe(
-            `qwen serve: Hosted Harness turn ${promptId} could not finish after admission; retrying settlement: ${String(cause)}`,
+            `mariadb-shell-agent serve: Hosted Harness turn ${promptId} could not finish after admission; retrying settlement: ${String(cause)}`,
           );
           const outcome = settledTurnOutcome(abort);
           const storeFailure =
@@ -8717,7 +8721,7 @@ export function registerHostedHarnessSessionRoutes(
                   : undefined),
             );
             writeStderrLineSafe(
-              `qwen serve: Hosted Harness turn ${promptId} could not settle: ${String(settleCause)}`,
+              `mariadb-shell-agent serve: Hosted Harness turn ${promptId} could not settle: ${String(settleCause)}`,
             );
           }
         }
@@ -8744,7 +8748,7 @@ export function registerHostedHarnessSessionRoutes(
               session.fileHistoryOwed = undefined;
           } catch (cause) {
             writeStderrLineSafe(
-              `qwen serve: Hosted Harness file-history retirement of settled Turn ${owed} failed; it stays owed: ${String(cause)}`,
+              `mariadb-shell-agent serve: Hosted Harness file-history retirement of settled Turn ${owed} failed; it stays owed: ${String(cause)}`,
             );
           }
         }
@@ -8849,8 +8853,8 @@ export function registerHostedHarnessSessionRoutes(
             return error(res, 409, 'hosted_hook_operation_conflict');
           writeStderrLineSafe(
             cause instanceof HostedHookRecoveryRequiredError
-              ? `qwen serve: Hosted Hook operation ${operationId} is recovery blocked: ${String(cause)}`
-              : `qwen serve: Hosted Hook operation ${operationId} failed: ${String(cause)}`,
+              ? `mariadb-shell-agent serve: Hosted Hook operation ${operationId} is recovery blocked: ${String(cause)}`
+              : `mariadb-shell-agent serve: Hosted Hook operation ${operationId} failed: ${String(cause)}`,
           );
           error(res, 503, 'hosted_hook_operation_failed');
         },
@@ -9588,7 +9592,7 @@ export function registerHostedHarnessSessionRoutes(
     const { runtimeSessionId } = lease;
     refusedAdoptions.set(sessionId, runtimeSessionId);
     writeStderrLineSafe(
-      `qwen serve: Hosted Harness takeover of session ${sessionId} adopted Runtime Session ${runtimeSessionId} but refuses the load: the lease stays owed until this session loads successfully or retires.`,
+      `mariadb-shell-agent serve: Hosted Harness takeover of session ${sessionId} adopted Runtime Session ${runtimeSessionId} but refuses the load: the lease stays owed until this session loads successfully or retires.`,
     );
   };
 
@@ -9673,7 +9677,7 @@ export function registerHostedHarnessSessionRoutes(
         if (session.runtimeLeaseHeld === lease)
           session.runtimeLeaseOwedByTerminalRoute = true;
         writeStderrLineSafe(
-          `qwen serve: Hosted Harness release of recovered Runtime ${lease.runtimeSessionId} failed: ${String(cause)}`,
+          `mariadb-shell-agent serve: Hosted Harness release of recovered Runtime ${lease.runtimeSessionId} failed: ${String(cause)}`,
         );
       },
     );
@@ -9710,7 +9714,7 @@ export function registerHostedHarnessSessionRoutes(
       },
       (cause: unknown) => {
         writeStderrLineSafe(
-          `qwen serve: Hosted Harness release of recovered Runtime ${lease.runtimeSessionId} failed: ${String(cause)}`,
+          `mariadb-shell-agent serve: Hosted Harness release of recovered Runtime ${lease.runtimeSessionId} failed: ${String(cause)}`,
         );
       },
     );
@@ -9982,7 +9986,7 @@ export function registerHostedHarnessSessionRoutes(
           cause instanceof ManagedSessionJournalFencedError
         ) {
           writeStderrLineSafe(
-            `qwen serve: Hosted child operation ${kind} of session ${req.params['id']} has an unknown store outcome: ${message}`,
+            `mariadb-shell-agent serve: Hosted child operation ${kind} of session ${req.params['id']} has an unknown store outcome: ${message}`,
           );
           return error(res, 503, 'child_operation_failed', undefined, message);
         }
@@ -9999,7 +10003,7 @@ export function registerHostedHarnessSessionRoutes(
           return error(res, 409, 'child_operation_record', undefined, message);
         }
         writeStderrLineSafe(
-          `qwen serve: Hosted child operation ${kind} of session ${req.params['id']} failed: ${message}`,
+          `mariadb-shell-agent serve: Hosted child operation ${kind} of session ${req.params['id']} failed: ${message}`,
         );
         return error(res, 503, 'child_operation_failed', undefined, message);
       }
@@ -10108,7 +10112,7 @@ export function registerHostedHarnessSessionRoutes(
         await stopSessionMessageTurns(session, req.params['id']);
       } catch (cause) {
         writeStderrLineSafe(
-          `qwen serve: Hosted message turns of session ${req.params['id']} could not be stopped: ${String(cause)}`,
+          `mariadb-shell-agent serve: Hosted message turns of session ${req.params['id']} could not be stopped: ${String(cause)}`,
         );
         return error(
           res,
@@ -10212,7 +10216,7 @@ export function registerHostedHarnessSessionRoutes(
         cause instanceof ManagedSessionJournalFencedError
       ) {
         writeStderrLineSafe(
-          `qwen serve: Hosted message operation ${kind} of session ${req.params['id']} failed in its store: ${message}`,
+          `mariadb-shell-agent serve: Hosted message operation ${kind} of session ${req.params['id']} failed in its store: ${message}`,
         );
         return error(res, 503, 'session_message_failed', undefined, message);
       }
@@ -10223,7 +10227,7 @@ export function registerHostedHarnessSessionRoutes(
         return error(res, 409, 'session_message_record', undefined, message);
       }
       writeStderrLineSafe(
-        `qwen serve: Hosted message operation ${kind} of session ${req.params['id']} failed: ${message}`,
+        `mariadb-shell-agent serve: Hosted message operation ${kind} of session ${req.params['id']} failed: ${message}`,
       );
       return error(res, 503, 'session_message_failed', undefined, message);
     }
@@ -10396,7 +10400,7 @@ export function registerHostedHarnessSessionRoutes(
         cause instanceof ManagedSessionJournalFencedError
       ) {
         writeStderrLineSafe(
-          `qwen serve: Hosted command operation ${kind} of session ${req.params['id']} failed in its store: ${message}`,
+          `mariadb-shell-agent serve: Hosted command operation ${kind} of session ${req.params['id']} failed in its store: ${message}`,
         );
         return error(res, 503, 'session_command_failed', undefined, message);
       }
@@ -10407,7 +10411,7 @@ export function registerHostedHarnessSessionRoutes(
         return error(res, 409, 'session_command_record', undefined, message);
       }
       writeStderrLineSafe(
-        `qwen serve: Hosted command operation ${kind} of session ${req.params['id']} failed: ${message}`,
+        `mariadb-shell-agent serve: Hosted command operation ${kind} of session ${req.params['id']} failed: ${message}`,
       );
       return error(res, 503, 'session_command_failed', undefined, message);
     }
@@ -10638,7 +10642,7 @@ export function registerHostedHarnessSessionRoutes(
         );
       }
       writeStderrLineSafe(
-        `qwen serve: Hosted channel operation ${String(kind)} of session ${req.params['id']} failed: ${message}`,
+        `mariadb-shell-agent serve: Hosted channel operation ${String(kind)} of session ${req.params['id']} failed: ${message}`,
       );
       return error(res, 503, 'channel_operation_failed', undefined, message);
     }
@@ -10732,7 +10736,7 @@ export function registerHostedHarnessSessionRoutes(
     if (!continueAuthorization.ok) {
       releaseRecoveredRuntime(session);
       writeStderrLineSafe(
-        `qwen serve: Hosted Session ${req.params['id']} continue: run authorization could not be read: ${sanitizeDaemonLogLine(String(continueAuthorization.cause))}`,
+        `mariadb-shell-agent serve: Hosted Session ${req.params['id']} continue: run authorization could not be read: ${sanitizeDaemonLogLine(String(continueAuthorization.cause))}`,
       );
       return error(
         res,
@@ -10745,7 +10749,7 @@ export function registerHostedHarnessSessionRoutes(
       releaseRecoveredRuntime(session);
       const unusable = continueAuthorization.authorization;
       writeStderrLineSafe(
-        `qwen serve: Hosted Session ${req.params['id']} continue: run authorization not runnable: ${harnessAuthorizationDetail(unusable)}`,
+        `mariadb-shell-agent serve: Hosted Session ${req.params['id']} continue: run authorization not runnable: ${harnessAuthorizationDetail(unusable)}`,
       );
       return error(res, 409, 'hosted_turn_recovery_required', 'not_runnable');
     }
@@ -10766,7 +10770,7 @@ export function registerHostedHarnessSessionRoutes(
     ) {
       releaseRecoveredRuntime(session);
       writeStderrLineSafe(
-        `qwen serve: Hosted Session ${req.params['id']} continue: continuation not ready: phase=${continueAuthorization.authorization.checkpoint.continuation.phase}`,
+        `mariadb-shell-agent serve: Hosted Session ${req.params['id']} continue: continuation not ready: phase=${continueAuthorization.authorization.checkpoint.continuation.phase}`,
       );
       return error(
         res,
@@ -11250,7 +11254,7 @@ export function registerHostedHarnessSessionRoutes(
             const storeFailure = namedStoreFailure(cause);
             if (storeFailure !== undefined) failureReason = storeFailure;
             writeStderrLineSafe(
-              `qwen serve: Hosted Harness turn ${promptId} failed: ${describeManagedError(cause)}`,
+              `mariadb-shell-agent serve: Hosted Harness turn ${promptId} failed: ${describeManagedError(cause)}`,
             );
           }
         }
@@ -11285,7 +11289,7 @@ export function registerHostedHarnessSessionRoutes(
                 : namedStoreFailure(foldCause),
             );
             writeStderrLineSafe(
-              `qwen serve: Hosted Harness turn ${promptId} could not answer its committed calls: ${String(foldCause)}`,
+              `mariadb-shell-agent serve: Hosted Harness turn ${promptId} could not answer its committed calls: ${String(foldCause)}`,
             );
             return;
           }
@@ -11303,7 +11307,7 @@ export function registerHostedHarnessSessionRoutes(
           } catch (cause) {
             session.fileHistoryOwed = promptId;
             writeStderrLineSafe(
-              `qwen serve: Hosted Harness file-history retirement of settled Turn ${promptId} failed; it stays owed: ${String(cause)}`,
+              `mariadb-shell-agent serve: Hosted Harness file-history retirement of settled Turn ${promptId} failed; it stays owed: ${String(cause)}`,
             );
           }
         }
@@ -11327,7 +11331,7 @@ export function registerHostedHarnessSessionRoutes(
             }
           } catch (cause) {
             writeStderrLineSafe(
-              'qwen serve: Hosted acceptance consumption faltered (owed ids kept): ' +
+              'mariadb-shell-agent serve: Hosted acceptance consumption faltered (owed ids kept): ' +
                 String(cause),
             );
           }
@@ -11343,7 +11347,7 @@ export function registerHostedHarnessSessionRoutes(
             session.admissions.delete(promptId);
           session.blocked = true;
           writeStderrLineSafe(
-            `qwen serve: Hosted Harness turn ${promptId} is recovery blocked: ${String(cause.cause)}`,
+            `mariadb-shell-agent serve: Hosted Harness turn ${promptId} is recovery blocked: ${String(cause.cause)}`,
           );
           return;
         }
@@ -11376,7 +11380,7 @@ export function registerHostedHarnessSessionRoutes(
         } catch (foldCause) {
           blockRecovery(session, blockStoreFailure(foldCause));
           writeStderrLineSafe(
-            `qwen serve: Hosted Harness turn ${promptId} could not answer its committed calls: ${String(foldCause)}`,
+            `mariadb-shell-agent serve: Hosted Harness turn ${promptId} could not answer its committed calls: ${String(foldCause)}`,
           );
           return;
         }
@@ -11390,7 +11394,7 @@ export function registerHostedHarnessSessionRoutes(
           } catch (dropCause) {
             session.fileHistoryOwed = promptId;
             writeStderrLineSafe(
-              `qwen serve: Hosted Harness file-history retirement of settled Turn ${promptId} failed; it stays owed: ${String(dropCause)}`,
+              `mariadb-shell-agent serve: Hosted Harness file-history retirement of settled Turn ${promptId} failed; it stays owed: ${String(dropCause)}`,
             );
           }
         } catch (settleCause) {
@@ -11399,7 +11403,7 @@ export function registerHostedHarnessSessionRoutes(
           // of the turn, its outer cause or the settlement met the store.
           blockRecovery(session, blockStoreFailure(settleCause));
           writeStderrLineSafe(
-            `qwen serve: Hosted Harness turn ${promptId} could not settle: ${String(settleCause)}`,
+            `mariadb-shell-agent serve: Hosted Harness turn ${promptId} could not settle: ${String(settleCause)}`,
           );
         }
       } finally {
@@ -11416,7 +11420,7 @@ export function registerHostedHarnessSessionRoutes(
         void toolTurn?.close().catch((cause: unknown) => {
           session.blocked = true;
           writeStderrLineSafe(
-            `qwen serve: Hosted Shell publisher cleanup failed: ${String(cause)}`,
+            `mariadb-shell-agent serve: Hosted Shell publisher cleanup failed: ${String(cause)}`,
           );
         });
       }
@@ -11519,7 +11523,7 @@ export function registerHostedHarnessSessionRoutes(
     if (session.active) return error(res, 409, 'hosted_turn_active');
     if (!cancelAuthorization.ok) {
       writeStderrLineSafe(
-        `qwen serve: Hosted Session ${sessionId} cancel: run authorization could not be read: ${sanitizeDaemonLogLine(String(cancelAuthorization.cause))}`,
+        `mariadb-shell-agent serve: Hosted Session ${sessionId} cancel: run authorization could not be read: ${sanitizeDaemonLogLine(String(cancelAuthorization.cause))}`,
       );
       // Retry-inviting refusal: keep the adopted lease owed (see the
       // blocked refusal above).
@@ -11533,7 +11537,7 @@ export function registerHostedHarnessSessionRoutes(
     if (cancelAuthorization.authorization.status !== 'runnable') {
       const unusable = cancelAuthorization.authorization;
       writeStderrLineSafe(
-        `qwen serve: Hosted Session ${sessionId} cancel: run authorization not runnable: ${harnessAuthorizationDetail(unusable)}`,
+        `mariadb-shell-agent serve: Hosted Session ${sessionId} cancel: run authorization not runnable: ${harnessAuthorizationDetail(unusable)}`,
       );
       // Retry-inviting refusal: keep the adopted lease owed (see the
       // blocked refusal above).
@@ -11803,7 +11807,7 @@ export function registerHostedHarnessSessionRoutes(
                   // not refuse an answered cancellation. Leave the lease
                   // owed; later replays and the session close retry it.
                   writeStderrLineSafe(
-                    `qwen serve: Hosted Harness release of recovered Runtime ${releaseBroker.runtimeSessionId} failed after the cancellation settled: ${String(cause)}`,
+                    `mariadb-shell-agent serve: Hosted Harness release of recovered Runtime ${releaseBroker.runtimeSessionId} failed after the cancellation settled: ${String(cause)}`,
                   );
                   return false;
                 },
@@ -11833,7 +11837,7 @@ export function registerHostedHarnessSessionRoutes(
         });
       } catch (cause) {
         writeStderrLineSafe(
-          `qwen serve: Hosted Harness turn ${promptId} could not settle the cancellation: ${String(cause)}`,
+          `mariadb-shell-agent serve: Hosted Harness turn ${promptId} could not settle the cancellation: ${String(cause)}`,
         );
         if (settledDurable) {
           // The checkpoint already moved — on a clean settle or already
@@ -11894,7 +11898,7 @@ export function registerHostedHarnessSessionRoutes(
               landed = true;
             } catch (writeCause) {
               writeStderrLineSafe(
-                `qwen serve: Hosted Harness turn ${promptId} settled the cancellation but its terminal record was refused: ${String(writeCause)}`,
+                `mariadb-shell-agent serve: Hosted Harness turn ${promptId} settled the cancellation but its terminal record was refused: ${String(writeCause)}`,
               );
             }
             if (landed) {
@@ -12047,7 +12051,7 @@ export function registerHostedHarnessSessionRoutes(
         }
       } catch (cause) {
         writeStderrLineSafe(
-          `qwen serve: Hosted Harness event stream failed: ${String(cause)}`,
+          `mariadb-shell-agent serve: Hosted Harness event stream failed: ${String(cause)}`,
         );
         stop();
       } finally {
@@ -12349,7 +12353,7 @@ export function registerHostedHarnessSessionRoutes(
       (cause) => {
         // This answer recorded nothing, so a retry is safe.
         writeStderrLineSafe(
-          `qwen serve: Hosted Action ${requestId} could not be resolved: ${String(cause)}`,
+          `mariadb-shell-agent serve: Hosted Action ${requestId} could not be resolved: ${String(cause)}`,
         );
         error(res, 503, 'action_resolution_failed');
       },
@@ -12365,7 +12369,7 @@ export function registerHostedHarnessSessionRoutes(
         res.json({ sessionId: req.params['id'], history: history ?? null }),
       (cause: unknown) => {
         writeStderrLineSafe(
-          `qwen serve: Hosted file history read failed: ${String(cause)}`,
+          `mariadb-shell-agent serve: Hosted file history read failed: ${String(cause)}`,
         );
         error(res, 503, 'hosted_file_history_failed');
       },
@@ -12518,7 +12522,7 @@ export function registerHostedHarnessSessionRoutes(
       .catch((cause: unknown) => {
         session.blocked = true;
         writeStderrLineSafe(
-          `qwen serve: Hosted file undo requires recovery: ${sanitizeDaemonLogLine(String(cause))}`,
+          `mariadb-shell-agent serve: Hosted file undo requires recovery: ${sanitizeDaemonLogLine(String(cause))}`,
         );
         error(
           res,
@@ -12750,13 +12754,13 @@ export function registerHostedHarnessSessionRoutes(
                 session.heldRuntimeTurns.delete(heldTurn);
                 heldDrainUnproven = true;
                 writeStderrLineSafe(
-                  `qwen serve: Hosted Harness drain of held Runtime ${heldTurn} deferred to the Workspace cascade: ${String(cause)}`,
+                  `mariadb-shell-agent serve: Hosted Harness drain of held Runtime ${heldTurn} deferred to the Workspace cascade: ${String(cause)}`,
                 );
                 continue;
               }
               heldDrainFailed ??= cause;
               writeStderrLineSafe(
-                `qwen serve: Hosted Harness drain of held Runtime ${heldTurn} failed: ${String(cause)}`,
+                `mariadb-shell-agent serve: Hosted Harness drain of held Runtime ${heldTurn} failed: ${String(cause)}`,
               );
             }
           }
@@ -12824,7 +12828,7 @@ export function registerHostedHarnessSessionRoutes(
             ?.reconcileRuns()
             .catch((cause: unknown) =>
               writeStderrLineSafe(
-                `qwen serve: Hosted automation runs of session ${req.params['id']} could not be settled on close: ${String(cause)}`,
+                `mariadb-shell-agent serve: Hosted automation runs of session ${req.params['id']} could not be settled on close: ${String(cause)}`,
               ),
             );
         }
@@ -12836,7 +12840,7 @@ export function registerHostedHarnessSessionRoutes(
       res.sendStatus(204);
     } catch (cause) {
       writeStderrLineSafe(
-        `qwen serve: Hosted Session ${req.params['id']} close failed: ${String(cause)}`,
+        `mariadb-shell-agent serve: Hosted Session ${req.params['id']} close failed: ${String(cause)}`,
       );
       // A Hook Session that owns its Runtime owner and still holds unfinished
       // work keeps the Session attached; name that rather than reporting a
@@ -13120,7 +13124,7 @@ export function registerHostedHarnessSessionRoutes(
       // a plain record error is the request's shape.
       if (cause instanceof ManagedSessionWritesStoppedError) {
         writeStderrLineSafe(
-          `qwen serve: Hosted automation operation ${String(kind)} of session ${req.params['id']} found the journal dead: ${message}`,
+          `mariadb-shell-agent serve: Hosted automation operation ${String(kind)} of session ${req.params['id']} found the journal dead: ${message}`,
         );
         return error(
           res,
@@ -13140,7 +13144,7 @@ export function registerHostedHarnessSessionRoutes(
         cause instanceof ManagedSessionJournalFencedError
       ) {
         writeStderrLineSafe(
-          `qwen serve: Hosted automation operation ${String(kind)} of session ${req.params['id']} lost its store: ${message}`,
+          `mariadb-shell-agent serve: Hosted automation operation ${String(kind)} of session ${req.params['id']} lost its store: ${message}`,
         );
         return error(
           res,
@@ -13167,7 +13171,7 @@ export function registerHostedHarnessSessionRoutes(
           message,
         );
       writeStderrLineSafe(
-        `qwen serve: Hosted automation operation ${String(kind)} of session ${req.params['id']} failed: ${message}`,
+        `mariadb-shell-agent serve: Hosted automation operation ${String(kind)} of session ${req.params['id']} failed: ${message}`,
       );
       return error(res, 503, 'automation_operation_failed', undefined, message);
     }

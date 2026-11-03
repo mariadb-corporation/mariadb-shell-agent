@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Code
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -124,10 +125,12 @@ describe('ChatRecordingService - auto-title trigger', () => {
       storage: {
         getProjectTempDir: vi
           .fn()
-          .mockReturnValue('/test/project/root/.qwen/tmp/hash'),
+          .mockReturnValue('/test/project/root/.mariadb-shell-agent/tmp/hash'),
         getProjectDir: vi
           .fn()
-          .mockReturnValue('/test/project/root/.qwen/projects/test-project'),
+          .mockReturnValue(
+            '/test/project/root/.mariadb-shell-agent/projects/test-project',
+          ),
       },
       getModel: vi.fn().mockReturnValue('qwen-plus'),
       getAuthType: vi.fn().mockReturnValue(undefined),

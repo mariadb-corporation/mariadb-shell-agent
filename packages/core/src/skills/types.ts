@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,8 +9,8 @@ import type { HookDefinition, HookEventName } from '../hooks/types.js';
 
 /**
  * Represents the storage level for a skill configuration.
- * - 'project': Stored in `.qwen/skills/` within the project directory
- * - 'user': Stored in `~/.qwen/skills/` in the user's home directory
+ * - 'project': Stored in `.mariadb-shell-agent/skills/` within the project directory
+ * - 'user': Stored in `~/.mariadb-shell-agent/skills/` in the user's home directory
  * - 'extension': Provided by an installed extension
  * - 'bundled': Built-in skills shipped with qwen-code
  */

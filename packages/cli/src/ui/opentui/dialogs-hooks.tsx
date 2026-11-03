@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -379,7 +380,7 @@ export function OpenTuiHooksDialog({
   // is charged by the row, like the notice and the banner.
   const eventsNoteRows = wrappedRows(
     t(
-      'This menu is read-only. To add or modify hooks, edit settings.json directly or ask Qwen Code.',
+      'This menu is read-only. To add or modify hooks, edit settings.json directly or ask MariaDB Shell Agent.',
     ),
     contentWidth,
   );
@@ -542,7 +543,7 @@ export function OpenTuiHooksDialog({
       {!bodyLayout.compact ? (
         <text fg={C.dim}>
           {t(
-            'This menu is read-only. To add or modify hooks, edit settings.json directly or ask Qwen Code.',
+            'This menu is read-only. To add or modify hooks, edit settings.json directly or ask MariaDB Shell Agent.',
           )}
         </text>
       ) : null}
@@ -602,7 +603,9 @@ export function OpenTuiHooksDialog({
     >
       <DetailText value={message} width={Math.max(1, contentWidth - 1)} dim />
       <DetailText
-        value={t('To add hooks, edit settings.json directly or ask Qwen.')}
+        value={t(
+          'To add hooks, edit settings.json directly or ask MariaDB Shell Agent.',
+        )}
         width={Math.max(1, contentWidth - 1)}
         dim
       />
@@ -765,7 +768,7 @@ export function OpenTuiHooksDialog({
         <box marginTop={1}>
           <DetailText
             value={t(
-              'To modify or remove this hook, edit settings.json directly or ask Qwen to help.',
+              'To modify or remove this hook, edit settings.json directly or ask MariaDB Shell Agent to help.',
             )}
             width={scrollContentWidth}
             dim

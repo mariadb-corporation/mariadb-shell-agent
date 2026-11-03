@@ -21,7 +21,7 @@ operator deployment choice.
 
 ## Goals and scope
 
-Managed local runs `qwen serve --managed --open` without MySQL, Docker, systemd,
+Managed local runs `mariadb-shell-agent serve --managed --open` without MySQL, Docker, systemd,
 Maven, or a source checkout. The default first-use installer downloads only the
 matching server JAR and requires local Java 21. A separately installed managed-runtime
 archive can supply both the matching Java server JAR and Java 21 runtime. It reuses
@@ -161,7 +161,7 @@ The separate `qwen-code-managed-runtime-<target>.tar.gz` contains only
 `managed-runtime/<cli-version>/<target>/manifest.json`, `server.jar`, and
 `jre/`. It includes Java licenses and contains no Node, CLI, Hosted Harness,
 worker copy, or WebShell assets. Extract it into the user's Qwen home; the
-installed `qwen serve --managed --open` discovers its exact version/target
+installed `mariadb-shell-agent serve --managed --open` discovers its exact version/target
 directory. Users still configure their model through the installed CLI.
 
 The lightweight `qwen-code-managed-runtime-lite-<target>.tar.gz` contains only
@@ -203,7 +203,7 @@ a separate release operation.
 
 ### First-use download and publication
 
-Ordinary CLI packages contain no Java payload. Only `qwen serve --managed`
+Ordinary CLI packages contain no Java payload. Only `mariadb-shell-agent serve --managed`
 downloads a missing default runtime. The versioned release asset is
 `qwen-managed-agent-server-<cli-version>.jar` with a matching `.sha256` file.
 The installer tries the existing official Aliyun OSS release prefix first and
@@ -271,7 +271,7 @@ the offline installation option.
 
 ## Validation and acceptance
 
-Baseline the globally installed `qwen` before edits. Verify the local bundle
+Baseline the globally installed `mariadb-shell-agent` before edits. Verify the local bundle
 after implementation, including a packaged layout outside the repository.
 Acceptance requires parameter handling, absent/mismatched runtime refusal,
 single-directory locking, secret permissions and persistence, private listener

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -119,11 +120,7 @@ describe('ide-installer', () => {
 
         expect(child_process.spawnSync).toHaveBeenCalledWith(
           expectedCommand,
-          [
-            '--install-extension',
-            'qwenlm.qwen-code-vscode-ide-companion',
-            '--force',
-          ],
+          ['--install-extension', 'MariaDB.mariadb-shell-agent', '--force'],
           { stdio: 'pipe', shell: isActuallyWindows },
         );
       });

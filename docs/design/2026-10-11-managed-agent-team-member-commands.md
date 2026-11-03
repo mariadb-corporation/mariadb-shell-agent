@@ -2,7 +2,7 @@
 
 [English](2026-10-11-managed-agent-team-member-commands.md) | [简体中文](2026-10-11-managed-agent-team-member-commands.zh-CN.md)
 
-Status: design. This is the third and last runtime slice of **H4e** of [#12827](https://github.com/QwenLM/qwen-code/issues/12827), stage H of the Managed Agent proposal [#12380](https://github.com/QwenLM/qwen-code/issues/12380), tracked by [#13745](https://github.com/QwenLM/qwen-code/issues/13745).
+Status: design. This is the third and last runtime slice of **H4e** of [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827), stage H of the Managed Agent proposal [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380), tracked by [#13745](https://github.invalid/QwenLM/qwen-code/issues/13745).
 
 It builds on:
 
@@ -304,7 +304,7 @@ A `board_read` commits nothing at step 3. A `member_message` commits, at step 3,
   - `hosted-harness-session.ts`: the `execute` and `answered` verbs on the message operations route, `execute`'s own error code for a record refusal, and the reopen whitelist;
   - `hosted-tool-approval.ts`: the pre-approved lists.
 - **Tests that flip:** the preamble wording tests, `team_delete`'s refusal text, and the member `send_message` refusal of a member name.
-- **Designs:** this document, its Chinese twin, and pointers in the H4e-a, H4e-b1, H4e-b2 and H4d-b designs and in the H4a and H4b delivery maps; an E2E plan under `.qwen/e2e-tests/` per physical pass.
+- **Designs:** this document, its Chinese twin, and pointers in the H4e-a, H4e-b1, H4e-b2 and H4d-b designs and in the H4a and H4b delivery maps; an E2E plan under `.mariadb-shell-agent/e2e-tests/` per physical pass.
 
 No Flyway migration: the relay's ledger and index are reused.
 

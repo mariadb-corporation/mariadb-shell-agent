@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -29,7 +30,7 @@ export interface NotificationOptions {
   title?: string;
 }
 
-const DEFAULT_TITLE = 'Qwen Code';
+const DEFAULT_TITLE = 'MariaDB Shell Agent';
 
 /**
  * Send a notification through the auto-detected channel.

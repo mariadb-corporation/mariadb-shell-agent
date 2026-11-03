@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * BackendAdaptor implementation that drives a running `qwen serve` daemon
+ * BackendAdaptor implementation that drives a running `mariadb-shell-agent serve` daemon
  * over its REST/SSE surface via the official `@qwen-code/sdk` DaemonClient.
  *
  * Notes anchored to daemon behavior this adaptor relies on:
@@ -131,7 +132,7 @@ export interface DaemonClientLike {
 }
 
 export interface QwenCodeAdaptorOptions {
-  /** qwen serve base URL, e.g. `http://127.0.0.1:4170`. */
+  /** mariadb-shell-agent serve base URL, e.g. `http://127.0.0.1:4170`. */
   baseUrl: string;
   token?: string;
   /** Default cwd for new sessions; falls back to the daemon's workspaceCwd. */
@@ -176,7 +177,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 /**
  * Map one wire permission option to the adaptor's kind + escalation.
  *
- * qwen serve stamps every option with the ACP structured `kind`
+ * mariadb-shell-agent serve stamps every option with the ACP structured `kind`
  * (`allow_once` | `allow_always` | `reject_once` | `reject_always` — see
  * `toPermissionOptions` in packages/cli acp-integration/permissionUtils.ts);
  * that is authoritative when present. An unknown structured kind fails
@@ -376,22 +377,22 @@ export class QwenCodeAdaptor implements BackendAdaptor {
         // A "start it" hint would send the operator hunting for a daemon
         // that already exists.
         throw new Error(
-          `qwen serve at ${this.options.baseUrl} responded with HTTP ` +
+          `mariadb-shell-agent serve at ${this.options.baseUrl} responded with HTTP ` +
             `${status} and refused the request: ${detail}. ` +
             'Check the auth token and base URL.',
         );
       }
       throw new Error(
-        `qwen serve is not reachable at ${this.options.baseUrl}: ` +
+        `mariadb-shell-agent serve is not reachable at ${this.options.baseUrl}: ` +
           `${detail}. ` +
-          'Start it with `qwen serve` before launching qwen-live.',
+          'Start it with `mariadb-shell-agent serve` before launching qwen-live.',
       );
     }
     const features = new Set(caps.features ?? []);
     const missing = REQUIRED_FEATURES.filter((f) => !features.has(f));
     if (missing.length > 0) {
       throw new Error(
-        `qwen serve at ${this.options.baseUrl} is missing required ` +
+        `mariadb-shell-agent serve at ${this.options.baseUrl} is missing required ` +
           `capabilities: ${missing.join(', ')}. Upgrade qwen-code.`,
       );
     }

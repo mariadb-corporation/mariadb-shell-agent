@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -444,7 +445,7 @@ describe('registerMcpHotReload', () => {
   // input for it — unlike `cliAllowedMcpServerNames` on the allow side above.
   // Pinned so the gap stays visible; the durable fix is #14009.
   it('CHARACTERIZATION: a settings edit drops a boot --disable-mcp-server exclusion', async () => {
-    // Pre-image gating mimics `qwen --disable-mcp-server a`: boot populated the
+    // Pre-image gating mimics `mariadb-shell-agent --disable-mcp-server a`: boot populated the
     // exclude set while settings carry no `mcp.excluded` at all.
     const fc = makeFakeConfig(cwd, {
       settingsMcp: { a: { command: 'a' } },

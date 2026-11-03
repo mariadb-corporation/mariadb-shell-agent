@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -50,7 +51,7 @@ describe('rememberCommand', () => {
     expect(result).not.toHaveProperty('refreshContextFilesOnWrite');
   });
 
-  it('falls back to QWEN.md in bare mode', () => {
+  it('falls back to MARIADB-SHELL-AGENT.md in bare mode', () => {
     const context = createMockCommandContext({
       services: {
         config: {
@@ -64,7 +65,9 @@ describe('rememberCommand', () => {
       type: 'submit_prompt',
       content: expect.stringContaining('some fact'),
     });
-    expect((result as { content: string }).content).toContain('QWEN.md');
+    expect((result as { content: string }).content).toContain(
+      'MARIADB-SHELL-AGENT.md',
+    );
     expect(result).toHaveProperty('refreshContextFilesOnWrite', true);
   });
 

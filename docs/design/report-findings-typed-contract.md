@@ -2,8 +2,8 @@
 
 ## Context
 
-`/review` already canonicalizes its findings as data twice: `qwen review
-findings` writes the typed artifact under `.qwen/tmp/`, and Step 8's
+`/review` already canonicalizes its findings as data twice: `mariadb-shell-agent review
+findings` writes the typed artifact under `.mariadb-shell-agent/tmp/`, and Step 8's
 `save-artifact` + `record_artifact` publish a durable copy the Web Shell
 renders (`CodeReviewArtifactDetail`). But both are files registered after the
 fact. Every client rendering the session live — the terminal UI, the Web Shell

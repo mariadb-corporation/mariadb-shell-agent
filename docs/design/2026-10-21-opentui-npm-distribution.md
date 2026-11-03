@@ -2,7 +2,7 @@
 
 [English](2026-10-21-opentui-npm-distribution.md) | [简体中文](2026-10-21-opentui-npm-distribution.zh-CN.md)
 
-**Runtime follow-up after merged [#14959](https://github.com/QwenLM/qwen-code/pull/14959).** This batch makes OpenTUI Bun-only and updates the shipped private npm and standalone-preview Bun pin to **1.4.4**, keeping OpenTUI **0.5.10**. It addresses the upstream Brotli decoder error-propagation fix without changing the direct-runtime compatibility floor or the default renderer. The current proposal integrates main `949a71e2` from the original `249ab50d` baseline; its own installed-artifact and platform acceptance is pending.
+**Runtime follow-up after merged [#14959](https://github.invalid/QwenLM/qwen-code/pull/14959).** This batch makes OpenTUI Bun-only and updates the shipped private npm and standalone-preview Bun pin to **1.4.4**, keeping OpenTUI **0.5.10**. It addresses the upstream Brotli decoder error-propagation fix without changing the direct-runtime compatibility floor or the default renderer. The current proposal integrates main `949a71e2` from the original `249ab50d` baseline; its own installed-artifact and platform acceptance is pending.
 
 Historical evidence belongs to its original artifact: main `32b4234b` plus the earlier runtime changes passed normal build/typecheck/bundle, 87 CLI and 46 packaging/workflow tests. Actual Node 26.4.0/npm 11.17.0 pack and owned `--ignore-scripts` installation verified 1,355 published files and executable modes (152,316,775 unpacked bytes, below 160 MiB). One macOS arm64 strict installed smoke observed the Node launcher, same-installation private Bun 1.4.4, native library, one model HTTP request, syntax colors and natural `/quit` exit 0. Six refusal controls for disabled relaunch, missing private Bun and an inherited FFI flag subsequently passed fallback/strict behavior. These are not acceptance of this newly integrated artifact, other installation layouts, npm subprocess identity or other platforms.
 
@@ -10,7 +10,7 @@ The earlier normal standalone updater matrix passed 152 synthetic scenario rows 
 
 ## Status and problem
 
-The source checkpoint `0d353777bb054b9d5c9925f134dd63db7c316614` normally merges main `19d3289f4818617efdf31ca46d4db0522da36f95`, including the accepted input/output batch #15067 and Bun PTY #14046. It preserves all 49 distribution changes and the existing dependency inputs. Fresh macOS arm64 build and typecheck passed at this checkpoint. Affected consumer, native, bundle and installed-product gates are recorded separately in [#14959](https://github.com/QwenLM/qwen-code/pull/14959); a successful source build is not installed-artifact acceptance.
+The source checkpoint `0d353777bb054b9d5c9925f134dd63db7c316614` normally merges main `19d3289f4818617efdf31ca46d4db0522da36f95`, including the accepted input/output batch #15067 and Bun PTY #14046. It preserves all 49 distribution changes and the existing dependency inputs. Fresh macOS arm64 build and typecheck passed at this checkpoint. Affected consumer, native, bundle and installed-product gates are recorded separately in [#14959](https://github.invalid/QwenLM/qwen-code/pull/14959); a successful source build is not installed-artifact acceptance.
 
 Earlier evidence remains bound to its source and artifact. Candidate `e8192c18` passed five installation layouts and 41 distinct actual-product cases, plus three separate synthetic protocol cases. Update fixtures used owned 0.0.0 clones and a candidate tarball, not two published releases. Later `7368b97` installation coverage recorded 20 functional passes and two characterized Ink deny gaps across 22 cases; `61f4e5be` source/runtime gates preceded this main integration. None proves the final combined artifact. Original failures, platform skips and corrected harness runs remain recorded separately; the final tarball must remeasure the 160 MiB unpacked-size gate.
 
@@ -25,11 +25,11 @@ a global Bun installation or changing the default renderer.
 
 Related work:
 
-- [Runtime umbrella #11607](https://github.com/QwenLM/qwen-code/issues/11607).
-- [Bun PTY #14046](https://github.com/QwenLM/qwen-code/pull/14046), merged at
+- [Runtime umbrella #11607](https://github.invalid/QwenLM/qwen-code/issues/11607).
+- [Bun PTY #14046](https://github.invalid/QwenLM/qwen-code/pull/14046), merged at
   reviewed `2972234e`; combined-artifact shell fidelity remains unverified.
-- [R1 standalone updates #14934](https://github.com/QwenLM/qwen-code/pull/14934).
-- [Publish executable bits #14907](https://github.com/QwenLM/qwen-code/pull/14907).
+- [R1 standalone updates #14934](https://github.invalid/QwenLM/qwen-code/pull/14934).
+- [Publish executable bits #14907](https://github.invalid/QwenLM/qwen-code/pull/14907).
 
 ## Goals and boundaries
 
@@ -48,8 +48,8 @@ Bun standalone preview and source invocations on supported Bun may select OpenTU
 Standalone runtime packaging and update interpreter boundaries remain intact.
 
 The direct `process.execPath` audit also identifies a bounded remainder from
-[#14134 at c807de17](https://github.com/QwenLM/qwen-code/pull/14134) and
-[#14187 at d14b2ad1](https://github.com/QwenLM/qwen-code/pull/14187), consolidated
+[#14134 at c807de17](https://github.invalid/QwenLM/qwen-code/pull/14134) and
+[#14187 at d14b2ad1](https://github.invalid/QwenLM/qwen-code/pull/14187), consolidated
 in this existing R3 delivery. The sandbox diagnostic, Mem0 MCP spawn and bundled
 hook identity, cgroup launcher, and bwrap/landlock relay and protected-root pairs
 reuse `getJsInterpreterCommand`. Keep the original payload, environment,
@@ -231,7 +231,7 @@ either CLI loading or native renderer startup.
 ## Validation and acceptance
 
 Use the global CLI to establish the mode/runtime baseline before product E2E.
-The detailed plan and results live in `.qwen/e2e-tests/`. All tests use owned
+The detailed plan and results live in `.mariadb-shell-agent/e2e-tests/`. All tests use owned
 temporary HOME, QWEN_HOME, npm prefix/cache, and shell configuration paths.
 
 1. Unit tests cover the complete mode table, settings precedence, runtime flags,

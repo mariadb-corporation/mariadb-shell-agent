@@ -4,8 +4,8 @@
 
 状态：D6a（Hosted Harness）与 D6b（Java 服务端）均已实现。
 日期：2026-09-30
-Issue：[#12867](https://github.com/QwenLM/qwen-code/issues/12867)，属于 [#12380](https://github.com/QwenLM/qwen-code/issues/12380)
-决定：[#12867 评论](https://github.com/QwenLM/qwen-code/issues/12867#issuecomment-5895205811)
+Issue：[#12867](https://github.invalid/QwenLM/qwen-code/issues/12867)，属于 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380)
+决定：[#12867 评论](https://github.invalid/QwenLM/qwen-code/issues/12867#issuecomment-5895205811)
 基于：[API 契约（D1）](2026-09-27-managed-agent-api-contract.zh-CN.md)、[持久生命周期（D4）](2026-09-28-managed-agent-durable-lifecycle.zh-CN.md)、[Hosted Workspace 工具回合](2026-09-27-hosted-workspace-tool-turn.zh-CN.md) 与 [Hosted 公开 Workspace 受理（G0）](2026-09-29-hosted-public-workspace-admission.zh-CN.md)
 
 ## 1. 问题

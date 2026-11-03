@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 // @vitest-environment jsdom
@@ -1451,7 +1452,7 @@ describe('<ModelDialog />', () => {
             id: 'qwen3.7-plus',
             label: '[ModelStudio Standard] qwen3.7-plus',
             authType: AuthType.USE_OPENAI,
-            baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+            baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
             modalities: { image: true, video: true },
           },
           {
@@ -1465,7 +1466,7 @@ describe('<ModelDialog />', () => {
         getContentGeneratorConfig: vi.fn(() => ({
           authType: AuthType.USE_OPENAI,
           model: 'qwen3.7-max',
-          baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+          baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
         })),
         isCurrentPrimaryModel: (m: { id: string }) => m.id === 'qwen3.7-max',
         setVisionModel,
@@ -1762,7 +1763,7 @@ describe('<ModelDialog />', () => {
         label: '[ModelStudio Standard] qwen3.7-plus',
         description: '',
         authType: AuthType.USE_OPENAI,
-        baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       },
       {
         id: 'qwen3.7-plus',
@@ -1784,11 +1785,13 @@ describe('<ModelDialog />', () => {
               getContentGeneratorConfig: vi.fn(() => ({
                 authType: AuthType.USE_OPENAI,
                 model: 'qwen3.7-max',
-                baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+                baseUrl:
+                  'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
               })),
               getModelsConfig: vi.fn(() => ({
                 getGenerationConfig: vi.fn(() => ({
-                  baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+                  baseUrl:
+                    'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
                 })),
               })),
               getActiveRuntimeModelSnapshot: vi.fn(() => undefined),
@@ -2539,7 +2542,7 @@ describe('<ModelDialog />', () => {
 
   // These five mirror the policy already pinned one layer down in
   // ui/opentui/dialog-data.test.ts. Workspace settings land in the committed
-  // <project>/.qwen/settings.json, so `shareableAuxSelector` at the fast and
+  // <project>/.mariadb-shell-agent/settings.json, so `shareableAuxSelector` at the fast and
   // compaction call sites is what decides whether a credential endpoint
   // reaches disk. Nested here rather than at module scope so this suite's
   // clearAllMocks/cleanup hooks apply — `mockedSelect.mock.calls[0]` is only
@@ -2580,7 +2583,7 @@ describe('<ModelDialog />', () => {
         `${AuthType.USE_OPENAI}::shared-fast\0https://user:tok3n@proxy.corp.example/v1`,
       );
 
-      // The shareable .qwen/settings.json only gets the bare selector.
+      // The shareable .mariadb-shell-agent/settings.json only gets the bare selector.
       expect(mockSettings.setValue).toHaveBeenCalledWith(
         SettingScope.Workspace,
         'fastModel',

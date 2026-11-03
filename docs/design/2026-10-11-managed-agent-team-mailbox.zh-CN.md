@@ -2,7 +2,7 @@
 
 [English](2026-10-11-managed-agent-team-mailbox.md) | [简体中文](2026-10-11-managed-agent-team-mailbox.zh-CN.md)
 
-状态:已实现,但在真实 Hosted 环境上的实机验收(决策 10)尚待进行,将在本变更合入前完成。这是 [#12827](https://github.com/QwenLM/qwen-code/issues/12827) 的 **H4e** 中第二个运行时切片,即 Managed Agent 提案 [#12380](https://github.com/QwenLM/qwen-code/issues/12380) 的 H 阶段,由 [#13745](https://github.com/QwenLM/qwen-code/issues/13745) 跟踪。它建立在 H4e-a([团队记录契约](2026-10-10-managed-agent-teams.zh-CN.md),#13811)、H4e-b1([lead 一侧的团队运行时](2026-10-10-managed-agent-team-lead-runtime.zh-CN.md),#13824,由 #13846 启用)与 H4d-b([Session 消息运行时](2026-10-10-managed-session-message-runtime.zh-CN.md),#13822)之上。它回答 H4e-a 的开放问题 1、2 与 4,以及 H4e-b1 的开放问题 3。它还调整了 H4e-b1 设计中 H4e-b2 与 H4e-b3 的范围:见下文决策 1、7 与 8。
+状态:已实现,但在真实 Hosted 环境上的实机验收(决策 10)尚待进行,将在本变更合入前完成。这是 [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827) 的 **H4e** 中第二个运行时切片,即 Managed Agent 提案 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380) 的 H 阶段,由 [#13745](https://github.invalid/QwenLM/qwen-code/issues/13745) 跟踪。它建立在 H4e-a([团队记录契约](2026-10-10-managed-agent-teams.zh-CN.md),#13811)、H4e-b1([lead 一侧的团队运行时](2026-10-10-managed-agent-team-lead-runtime.zh-CN.md),#13824,由 #13846 启用)与 H4d-b([Session 消息运行时](2026-10-10-managed-session-message-runtime.zh-CN.md),#13822)之上。它回答 H4e-a 的开放问题 1、2 与 4,以及 H4e-b1 的开放问题 3。它还调整了 H4e-b1 设计中 H4e-b2 与 H4e-b3 的范围:见下文决策 1、7 与 8。
 
 ## 问题与范围
 
@@ -320,7 +320,7 @@ lead 发给成员 `alpha` 的消息,`alpha` 的第一个 run `r1` 已完成:
   - "was not notified" 的文本与 owner 拒绝文本(`hosted-team-session.test.ts`);
   - 只为运行中成员显示 task id 的名册(`hosted-team-session.test.ts`,以及 `hosted-workspace-tool-turn.team.test.ts` 中的名册断言);
   - 团队 `send_message` 的声明、其描述与 H4d-b schema(`hosted-workspace-tool-turn.team.test.ts`)。
-- `.qwen/e2e-tests/` 中的 E2E 计划。
+- `.mariadb-shell-agent/e2e-tests/` 中的 E2E 计划。
 - 本设计的两种语言版本,以及 H4e-a、H4e-b1 与 H4d-b 设计中的指引。
 
 ## 验证计划

@@ -12,7 +12,7 @@ macOS 上，`app.paste(text, { format: 'text' | 'md' | 'html' })` 向 App 当前
 
 ## 原生行为
 
-参考是已安装的官方 SkyComputerUseService，SHA-256 为 `25e9141499b94c396f39afbdb7b19ed8f49e45dc8c61be61028ceab8f3807ce6`。反汇编定位到 `ComputerUseAppController.selectText`（`0x100077cf4`）、`sourceTextRange`（`0x10072e0a0`）和支持重叠、上下文约束的唯一匹配搜索（`0x10072e338`）。本地详细证据保留在 `.qwen/e2e-tests/paste-select/`。
+参考是已安装的官方 SkyComputerUseService，SHA-256 为 `25e9141499b94c396f39afbdb7b19ed8f49e45dc8c61be61028ceab8f3807ce6`。反汇编定位到 `ComputerUseAppController.selectText`（`0x100077cf4`）、`sourceTextRange`（`0x10072e0a0`）和支持重叠、上下文约束的唯一匹配搜索（`0x10072e338`）。本地详细证据保留在 `.mariadb-shell-agent/e2e-tests/paste-select/`。
 
 选择首先检查被保留的精确 AX 元素是否支持可写 `AXSelectedTextRange`。它将可见格式文本映射为原文偏移，找不到时回退到元素纯文本。匹配区分大小写、计入重叠出现、要求可选 prefix/suffix 紧邻目标，只接受一个结果。AX 范围使用 UTF-16 偏移。光标定位将范围变为相应边界上的零长度选区。设置选区前在必要时聚焦字段；AX 写入失败会传递错误，不使用键盘重放选择。读回决定动作效果是否可确认。
 

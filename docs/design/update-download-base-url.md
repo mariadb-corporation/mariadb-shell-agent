@@ -4,7 +4,7 @@ Issue: #11149
 
 ## Problem and current behavior
 
-The standalone updater uses fixed release download sources. The installer has its own base URL option, but it selects a final version directory; reusing that variable in the updater would introduce different path semantics. All standalone update entrypoints share performStandaloneUpdate, including qwen update, /update, background updates, and update-and-relaunch.
+The standalone updater uses fixed release download sources. The installer has its own base URL option, but it selects a final version directory; reusing that variable in the updater would introduce different path semantics. All standalone update entrypoints share performStandaloneUpdate, including mariadb-shell-agent update, /update, background updates, and update-and-relaunch.
 
 ## Proposed behavior
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,8 +31,8 @@ import { t } from '../i18n/index.js';
 const debugLogger = createDebugLogger('STANDALONE_UPDATE');
 
 const OSS_BASE =
-  'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code';
-const GITHUB_BASE = 'https://github.com/QwenLM/qwen-code/releases/download';
+  'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/releases/qwen-code';
+const GITHUB_BASE = 'https://github.invalid/QwenLM/qwen-code/releases/download';
 const FETCH_TIMEOUT_MS = 30_000;
 const ARCHIVE_TIMEOUT_MS = 300_000; // 5 min — archives are 50–150 MB
 
@@ -888,7 +889,7 @@ function atomicReplace(
     //    move #1 so the user is never left without a working install.
     // 3. Log success/failure to qwen-update.log for post-mortem (the bat
     //    runs with stdio:ignore — the log is the only diagnostic surface).
-    // 4. Delete the .deferred marker so future `qwen update` calls know the
+    // 4. Delete the .deferred marker so future `mariadb-shell-agent update` calls know the
     //    swap is complete (the lock file alone is insufficient because
     //    acquireLock falls through when the Node PID is dead).
     const script = [
@@ -950,7 +951,7 @@ function atomicReplace(
         'Failed to spawn deferred update script. Update was not applied.',
       );
     }
-    // Write .deferred marker with the bat script PID so future `qwen update`
+    // Write .deferred marker with the bat script PID so future `mariadb-shell-agent update`
     // calls can detect the in-flight swap via isProcessProvablyGone(batPid).
     // acquireLock checks this marker before allowing lock theft.
     fs.writeFileSync(deferredMarker, String(child.pid));
@@ -1146,9 +1147,9 @@ export function ensurePathInShellRc(binDir: string): ShellPathUpdate {
     // Use begin/end block markers matching install-qwen-standalone.sh's
     // maybe_update_shell_path, so the update codepath is idempotent with the
     // install script and does not produce duplicate PATH entries.
-    const beginMarker = '# Qwen Code PATH block begin';
-    const endMarker = '# Qwen Code PATH block end';
-    const legacyMarker = '# Added by Qwen Code standalone installer';
+    const beginMarker = '# MariaDB Shell Agent PATH block begin';
+    const endMarker = '# MariaDB Shell Agent PATH block end';
+    const legacyMarker = '# Added by MariaDB Shell Agent standalone installer';
     if (content.includes(beginMarker) && content.includes(endMarker)) {
       return { rcFile, blockAdded: false };
     }
@@ -1196,7 +1197,7 @@ function cleanupShellPathBlock(rcFile: string): void {
     if (!fs.existsSync(rcFile)) return;
     const content = fs.readFileSync(rcFile, 'utf-8');
     const blockPattern =
-      /\n?# Qwen Code PATH block begin\n(?:.|\n)*?\n# Qwen Code PATH block end\n?/;
+      /\n?# MariaDB Shell Agent PATH block begin\n(?:.|\n)*?\n# MariaDB Shell Agent PATH block end\n?/;
     const nextContent = content.replace(blockPattern, '');
     if (nextContent !== content) {
       fs.writeFileSync(rcFile, nextContent);
@@ -1287,7 +1288,7 @@ function standaloneUpdateTarget(standaloneDir: string): {
     // Directory exists but has no manifest — not a managed Qwen install.
     // Refuse to overwrite to avoid data loss.
     throw new Error(
-      `${standaloneDir} exists but is not a Qwen Code standalone install. Remove it manually to proceed.`,
+      `${standaloneDir} exists but is not a MariaDB Shell Agent standalone install. Remove it manually to proceed.`,
     );
   } else {
     // First-time migration from npm — directory will be created after lock

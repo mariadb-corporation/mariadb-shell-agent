@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -195,7 +196,7 @@ function buildBanner(config: Config, settings: LoadedSettings, width: number) {
     >
       <box flexDirection="row">
         <text fg={C.accent} attributes={1}>
-          {custom.title ?? '>_ Qwen Code'}
+          {custom.title ?? '>_ MariaDB Shell Agent'}
         </text>
         <text fg={C.dim}>{` (${versionLabel})`}</text>
       </box>

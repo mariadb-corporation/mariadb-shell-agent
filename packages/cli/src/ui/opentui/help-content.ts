@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,7 +29,7 @@ import {
 export const HELP_DEFAULT_WIDTH = 100;
 export const HELP_KEY_COL_WIDTH = 20;
 export const HELP_COMMAND_LIST_VISIBLE_LINES = 18;
-export const HELP_DOCS_URL = 'https://qwenlm.github.io/qwen-code-docs/';
+export const HELP_DOCS_URL = 'https://qwenlm.github.invalid/qwen-code-docs/';
 
 /**
  * Row budget that keeps the whole overlay on screen. `regionHeight` is the
@@ -294,12 +295,12 @@ export function formatHelpText(
   const tabLabels = HELP_TABS.map(({ tab, label }) =>
     tab === 'general' ? `[${t(label)}]` : ` ${t(label)} `,
   );
-  out.push(`Qwen Code ${tabLabels.join('')}`);
+  out.push(`MariaDB Shell Agent ${tabLabels.join('')}`);
 
   out.push('');
   out.push(
     t(
-      'Qwen Code understands your codebase, makes edits with your permission, and executes commands right from your terminal.',
+      'MariaDB Shell Agent understands your codebase, makes edits with your permission, and executes commands right from your terminal.',
     ),
   );
   out.push('');

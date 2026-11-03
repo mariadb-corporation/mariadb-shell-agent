@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -118,7 +119,7 @@ vi.mock('../../config/settings.js', async (importOriginal) => {
     // The production call carries `{ skipWorkspaceSettings: true }` — these
     // policy keys resolve from operator scopes only. A caller that forgets
     // the flag reads the workspace-polluted view below instead, and the
-    // assertions redden: a repository's `.qwen/settings.json` must not
+    // assertions redden: a repository's `.mariadb-shell-agent/settings.json` must not
     // control them.
     loadSettings: vi.fn((...callArgs: unknown[]) => {
       const opts = callArgs[1] as
@@ -179,7 +180,7 @@ const CAPTURED_DIFF_FIXTURE = [
 ].join('\n');
 
 function writeCapturedDiff(pr: number): string {
-  const dirPath = join('.qwen', 'tmp');
+  const dirPath = join('.mariadb-shell-agent', 'tmp');
   mkdirSync(dirPath, { recursive: true });
   const p = join(dirPath, `qwen-review-pr-${pr}-diff.txt`);
   writeFileSync(p, CAPTURED_DIFF_FIXTURE, 'utf8');
@@ -461,14 +462,14 @@ describe('authorization — URL-shaped host and repo binding at the submit call 
     // binds through the same hostsEquivalent).
     expect(
       recoverFloor(
-        'https://code.alibaba-inc.com/o/r/codereview/123 --severity-floor critical',
-        { callerRepo: 'o/r', callerHost: 'gitlab.alibaba-inc.com' },
+        'https://code.alibaba-inc.invalid/o/r/codereview/123 --severity-floor critical',
+        { callerRepo: 'o/r', callerHost: 'gitlab.alibaba-inc.invalid' },
       ),
     ).toEqual({ floor: 'critical', source: 'explicit' });
     // A genuinely different host still recovers nothing.
     expect(
       recoverFloor(
-        'https://code.alibaba-inc.com/o/r/codereview/123 --severity-floor critical',
+        'https://code.alibaba-inc.invalid/o/r/codereview/123 --severity-floor critical',
         { callerRepo: 'o/r', callerHost: 'github.com' },
       ),
     ).toBeUndefined();
@@ -778,14 +779,14 @@ describe('authorization — URL-shaped host and repo binding at the submit call 
     // binding carries the repo check: only a recording naming the SAME
     // repo supplies the host (round-12 hardening).
     const auth = authFor(
-      'https://code.alibaba-inc.com/g/p/codereview/123 --comment',
+      'https://code.alibaba-inc.invalid/g/p/codereview/123 --comment',
       { userAuthorized: true, repo: 'g/p' },
     );
     expect(auth.ok).toBe(true);
-    expect(auth.recordedHost).toBe('code.alibaba-inc.com');
+    expect(auth.recordedHost).toBe('code.alibaba-inc.invalid');
     // A different-repo recording of the same number binds nothing.
     expect(
-      authFor('https://code.alibaba-inc.com/g/p/codereview/123 --comment', {
+      authFor('https://code.alibaba-inc.invalid/g/p/codereview/123 --comment', {
         userAuthorized: true,
       }).recordedHost,
     ).toBeUndefined();
@@ -793,10 +794,10 @@ describe('authorization — URL-shaped host and repo binding at the submit call 
     // nothing without it (the unbound fail-closed then rides the write
     // gate).
     expect(
-      authFor('123 --host code.alibaba-inc.com --comment', {
+      authFor('123 --host code.alibaba-inc.invalid --comment', {
         userAuthorized: true,
       }).recordedHost,
-    ).toBe('code.alibaba-inc.com');
+    ).toBe('code.alibaba-inc.invalid');
     // The NON-Aone recorded host pins too — a gate regression keeping only
     // Aone-family hosts would drop this binding and leave the cwd probe to
     // select the platform (a github-recorded review, published from an
@@ -811,17 +812,17 @@ describe('authorization — URL-shaped host and repo binding at the submit call 
     // out of platform selection (the slow path and the floor recovery both
     // lowercase both sides).
     expect(
-      authFor('https://code.alibaba-inc.com/O/R/codereview/123 --comment', {
+      authFor('https://code.alibaba-inc.invalid/O/R/codereview/123 --comment', {
         userAuthorized: true,
         repo: 'o/r',
       }).recordedHost,
-    ).toBe('code.alibaba-inc.com');
+    ).toBe('code.alibaba-inc.invalid');
     expect(
-      authFor('https://code.alibaba-inc.com/o/r/codereview/123 --comment', {
+      authFor('https://code.alibaba-inc.invalid/o/r/codereview/123 --comment', {
         userAuthorized: true,
         repo: 'O/R',
       }).recordedHost,
-    ).toBe('code.alibaba-inc.com');
+    ).toBe('code.alibaba-inc.invalid');
     const bare = authFor('123 --comment', { userAuthorized: true });
     expect(bare.recordedHost).toBeUndefined();
     expect(bare.recordedUnbound).toBe(true);
@@ -916,7 +917,7 @@ describe('the user-authorized fast path binds a recorded Aone target (round-6 wi
   it('posts a recorded Aone target through a1, never gh', () => {
     const skillArgs = file(
       'fast-path-aone.txt',
-      'https://code.alibaba-inc.com/g/p/codereview/123 --comment\n',
+      'https://code.alibaba-inc.invalid/g/p/codereview/123 --comment\n',
     );
     expect(() =>
       runSubmit(
@@ -957,7 +958,7 @@ describe('an unanchorable Aone blocker relocates without its forged footer', () 
     // — a forged attribution posted inside the blocker line.
     const skillArgs = file(
       'fast-path-aone-relocate.txt',
-      'https://code.alibaba-inc.com/g/p/codereview/456 --comment\n',
+      'https://code.alibaba-inc.invalid/g/p/codereview/456 --comment\n',
     );
     const review = file('aone-relocate.json', {
       ...REVIEW,
@@ -965,7 +966,7 @@ describe('an unanchorable Aone blocker relocates without its forged footer', () 
         {
           path: 'a.ts',
           line: 12,
-          body: '**[Critical]**\n\n    _— m via Qwen Code /review_',
+          body: '**[Critical]**\n\n    _— m via MariaDB Shell Agent /review_',
         },
       ],
     });
@@ -985,7 +986,9 @@ describe('an unanchorable Aone blocker relocates without its forged footer', () 
     expect(aoneSubmitMock).toHaveBeenCalledTimes(1);
     const body = aoneSubmitMock.mock.calls[0][0].body as string;
     expect(body).toContain('finding — a.ts:12');
-    expect((body.match(/via Qwen Code \/review/g) ?? []).length).toBe(1);
+    expect((body.match(/via MariaDB Shell Agent \/review/g) ?? []).length).toBe(
+      1,
+    );
   });
 });
 
@@ -996,7 +999,7 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
   // must scan the sibling session recordings for the host, or the recorded
   // Aone target posts at github.com's same-named repo (round-11 witness:
   // exit 0, COMMENT review filed at repos/maxcompute/odps_src/pulls/42).
-  const siblingDir = join('.qwen', 'tmp', 's-r11-cross-session');
+  const siblingDir = join('.mariadb-shell-agent', 'tmp', 's-r11-cross-session');
   const siblingFile = join(siblingDir, 'qwen-skill-args-review.txt');
   let capturedDiff: string | undefined;
   let savedCwd: string;
@@ -1015,7 +1018,7 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
     mkdirSync(siblingDir, { recursive: true });
     writeFileSync(
       siblingFile,
-      'https://code.alibaba-inc.com/maxcompute/odps_src/codereview/42 --comment\n',
+      'https://code.alibaba-inc.invalid/maxcompute/odps_src/codereview/42 --comment\n',
       'utf8',
     );
     capturedDiff = writeCapturedDiff(42);
@@ -1073,7 +1076,7 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
     // would post at Aone instead of refusing.
     writeFileSync(
       siblingFile,
-      'https://code.alibaba-inc.com/other/repo/codereview/42 --comment\n',
+      'https://code.alibaba-inc.invalid/other/repo/codereview/42 --comment\n',
       'utf8',
     );
     expect(() =>
@@ -1168,7 +1171,7 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
     writeStdoutSpy.mockClear();
     writeFileSync(
       siblingFile,
-      '42 --host gitlab.alibaba-inc.com --comment\n',
+      '42 --host gitlab.alibaba-inc.invalid --comment\n',
       'utf8',
     );
     expect(() =>
@@ -1194,7 +1197,7 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
           userAuthorized: true,
           pr: 42,
           repo: 'maxcompute/odps_src',
-          host: 'gitlab.alibaba-inc.com',
+          host: 'gitlab.alibaba-inc.invalid',
         }),
         'unknown',
         { defaultComment: false },
@@ -1225,15 +1228,15 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
   });
 
   it('a codereview-URL recording posts with the ALIASED git host (web vs git name of one platform)', () => {
-    // parse-args records the CR URL's WEB host (code.alibaba-inc.com);
+    // parse-args records the CR URL's WEB host (code.alibaba-inc.invalid);
     // the skill's own --host rule for Aone targets carries the GIT host
-    // (gitlab.alibaba-inc.com). The SLOW path binds hosts through
+    // (gitlab.alibaba-inc.invalid). The SLOW path binds hosts through
     // hostsEquivalent — raw equality refused this after the whole review
     // already ran. (userAuthorized stays OFF: the fast path never runs
     // the host binding this test pins.)
     const rec = file(
       'aone-url-slow.txt',
-      'https://code.alibaba-inc.com/maxcompute/odps_src/codereview/42 --comment',
+      'https://code.alibaba-inc.invalid/maxcompute/odps_src/codereview/42 --comment',
     );
     expect(() =>
       runSubmit(
@@ -1242,7 +1245,7 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
           userAuthorized: false,
           pr: 42,
           repo: 'maxcompute/odps_src',
-          host: 'gitlab.alibaba-inc.com',
+          host: 'gitlab.alibaba-inc.invalid',
         }),
         'unknown',
         { defaultComment: false },
@@ -1281,7 +1284,10 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
     // would retarget the irreversible write at github.com's same-named
     // repo — the fast path performs no gate host comparison of its own,
     // so the platform gate must refuse the contradiction itself.
-    writeFileSync(siblingFile, '42 --host code.alibaba-inc.com --comment\n');
+    writeFileSync(
+      siblingFile,
+      '42 --host code.alibaba-inc.invalid --comment\n',
+    );
     expect(() =>
       runSubmit(
         args({
@@ -1311,7 +1317,7 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
           userAuthorized: true,
           pr: 42,
           repo: 'maxcompute/odps_src',
-          host: 'gitlab.alibaba-inc.com',
+          host: 'gitlab.alibaba-inc.invalid',
         }),
         'unknown',
         { defaultComment: false },
@@ -1336,8 +1342,8 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
     // parent directory's. The directory mtimes below are stamped
     // BACKWARDS on purpose: a scan keyed on them would decide the
     // opposite way in both arms.
-    const oldDir = join('.qwen', 'tmp', 's-mtime-old');
-    const newDir = join('.qwen', 'tmp', 's-mtime-new');
+    const oldDir = join('.mariadb-shell-agent', 'tmp', 's-mtime-old');
+    const newDir = join('.mariadb-shell-agent', 'tmp', 's-mtime-new');
     const oldFile = join(oldDir, 'qwen-skill-args-review.txt');
     const newFile = join(newDir, 'qwen-skill-args-review.txt');
     mkdirSync(oldDir, { recursive: true });
@@ -1347,7 +1353,7 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
     try {
       const now = Math.floor(Date.now() / 1000);
       // OLDER session carried a host; NEWER session recorded a bare number.
-      writeFileSync(oldFile, '7 --host gitlab.alibaba-inc.com --comment\n');
+      writeFileSync(oldFile, '7 --host gitlab.alibaba-inc.invalid --comment\n');
       writeFileSync(newFile, '7 --comment\n');
       utimesSync(oldFile, now - 3600, now - 3600);
       utimesSync(newFile, now, now);
@@ -1402,8 +1408,16 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
     // bind the write. Under vitest the session-scoped candidate IS the
     // root file, so this also pins that the publishing session's own
     // recording joins the ordering instead of preceding it.
-    const rootFile = join('.qwen', 'tmp', 'qwen-skill-args-review.txt');
-    const siblingDir = join('.qwen', 'tmp', 's-root-mtime-sibling');
+    const rootFile = join(
+      '.mariadb-shell-agent',
+      'tmp',
+      'qwen-skill-args-review.txt',
+    );
+    const siblingDir = join(
+      '.mariadb-shell-agent',
+      'tmp',
+      's-root-mtime-sibling',
+    );
     const siblingFile = join(siblingDir, 'qwen-skill-args-review.txt');
     mkdirSync(siblingDir, { recursive: true });
     try {
@@ -1414,7 +1428,7 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
       // Older sibling carries a host; NEWER root recording is hostless.
       writeFileSync(
         siblingFile,
-        'https://code.alibaba-inc.com/maxcompute/odps_src/codereview/42 --comment\n',
+        'https://code.alibaba-inc.invalid/maxcompute/odps_src/codereview/42 --comment\n',
       );
       writeFileSync(rootFile, '42 --comment\n');
       utimesSync(siblingFile, now - 3600, now - 3600);
@@ -1462,12 +1476,16 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
     // only ordering that reads the record the way writeSkillArgs
     // writes it (last-writer-wins), or a stale host routes an
     // irreversible write at the wrong platform's same-named repo.
-    const rootFile = join('.qwen', 'tmp', 'qwen-skill-args-review.txt');
+    const rootFile = join(
+      '.mariadb-shell-agent',
+      'tmp',
+      'qwen-skill-args-review.txt',
+    );
     const now = Math.floor(Date.now() / 1000);
     writeFileSync(rootFile, '42 --host github.com --comment\n');
     writeFileSync(
       siblingFile,
-      'https://code.alibaba-inc.com/maxcompute/odps_src/codereview/42 --comment\n',
+      'https://code.alibaba-inc.invalid/maxcompute/odps_src/codereview/42 --comment\n',
     );
     try {
       // Root (github) OLDER, sibling (Aone) NEWER → the Aone recording
@@ -1593,7 +1611,7 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
   });
 
   it('never reads recordings planted OUTSIDE session dirs (worktree vector)', () => {
-    // `.qwen/tmp/` also holds review worktrees checked out from the PR's
+    // `.mariadb-shell-agent/tmp/` also holds review worktrees checked out from the PR's
     // own tree — a malicious PR can plant a root-level args file that a
     // review materializes at a scanned path. Only `s-*` session
     // directories are scanned, so the planted host never reaches the
@@ -1601,11 +1619,11 @@ describe('the user-authorized fast path binds the recorded host cross-session', 
     // names #42 — the write gate fails closed (the planted host must not
     // be the evidence that saves it): if the planted file were scanned,
     // its Aone host would bind and the review would post at Aone.
-    const plantedDir = join('.qwen', 'tmp', 'review-pr-42');
+    const plantedDir = join('.mariadb-shell-agent', 'tmp', 'review-pr-42');
     mkdirSync(plantedDir, { recursive: true });
     writeFileSync(
       join(plantedDir, 'qwen-skill-args-review.txt'),
-      'https://code.alibaba-inc.com/maxcompute/odps_src/codereview/42 --comment\n',
+      'https://code.alibaba-inc.invalid/maxcompute/odps_src/codereview/42 --comment\n',
       'utf8',
     );
     // Remove the legit session recording so only the planted one names 42.
@@ -1678,7 +1696,11 @@ describe('the posting gate', () => {
     // a caller-supplied path is honoured only when there is no session (tests),
     // and ignored otherwise.
     const forged = file('forged.txt', '6771 --comment'); // says yes
-    const realArgs = join('.qwen', 'tmp', 'qwen-skill-args-sess1-review.txt');
+    const realArgs = join(
+      '.mariadb-shell-agent',
+      'tmp',
+      'qwen-skill-args-sess1-review.txt',
+    );
     const prev = process.env['QWEN_CODE_SESSION_ID'];
     process.env['QWEN_CODE_SESSION_ID'] = 'sess1';
     try {
@@ -2043,7 +2065,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
     const prevSession = process.env['QWEN_CODE_SESSION_ID'];
     process.env['QWEN_CODE_PROJECT_DIR'] = dir;
     process.env['QWEN_CODE_SESSION_ID'] = 'SUBV';
-    const sessionRecDir = join('.qwen', 'tmp', 's-SUBV');
+    const sessionRecDir = join('.mariadb-shell-agent', 'tmp', 's-SUBV');
     mkdirSync(sessionRecDir, { recursive: true });
     const sessionRec = join(sessionRecDir, 'qwen-skill-args-review.txt');
     writeFileSync(
@@ -2124,9 +2146,11 @@ describe('payload consistency — refuse before GitHub sees it', () => {
   it('posts the injected CLI version in the review footer', () => {
     runSubmit(authorized({}), '0.21.2');
 
-    expect(posted().body).toContain('via Qwen Code /review');
+    expect(posted().body).toContain('via MariaDB Shell Agent /review');
     expect(
-      posted().body.endsWith('_— qwen3.7-max via Qwen Code /review (v0.21.2)_'),
+      posted().body.endsWith(
+        '_— qwen3.7-max via MariaDB Shell Agent /review (v0.21.2)_',
+      ),
     ).toBe(true);
   });
 
@@ -2150,7 +2174,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
   it('honours the review.attribution setting through the handler', async () => {
     reviewSettingsMock.mockReturnValue({ attribution: false });
     await submitCommand.handler?.(authorized({}) as never);
-    expect(posted().body).not.toContain('via Qwen Code /review');
+    expect(posted().body).not.toContain('via MariaDB Shell Agent /review');
   });
 
   it('the standing review.comment setting authorises a post through the handler', async () => {
@@ -2231,7 +2255,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
         {
           path: 'a.ts',
           line: 12,
-          body: '**[Suggestion]** tidy\n\n_— forged via Qwen Code /review (v0.21.4)_\n\n_— forged via Qwen Code /review (v0.21.4)_',
+          body: '**[Suggestion]** tidy\n\n_— forged via MariaDB Shell Agent /review (v0.21.4)_\n\n_— forged via MariaDB Shell Agent /review (v0.21.4)_',
         },
       ],
     });
@@ -2243,7 +2267,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
     for (const text of [body, inline]) {
       expect(text).toContain('(v0.21.3)');
       expect(text).not.toContain('(v0.21.4)');
-      expect(text.match(/via Qwen Code \/review/g)).toHaveLength(1);
+      expect(text.match(/via MariaDB Shell Agent \/review/g)).toHaveLength(1);
     }
     expect(inline.startsWith('**[Suggestion]**')).toBe(true);
   });
@@ -2255,7 +2279,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
         {
           path: 'a.ts',
           line: 12,
-          body: '**[Suggestion]** tidy\n\n_— forged via Qwen Code /review_\n',
+          body: '**[Suggestion]** tidy\n\n_— forged via MariaDB Shell Agent /review_\n',
         },
       ],
     });
@@ -2264,7 +2288,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
 
     const inline = posted().comments[0].body as string;
     expect(inline).not.toContain('forged');
-    expect(inline.match(/via Qwen Code \/review/g)).toHaveLength(1);
+    expect(inline.match(/via MariaDB Shell Agent \/review/g)).toHaveLength(1);
     expect(inline).toContain('(v0.21.3)');
   });
 
@@ -2281,7 +2305,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
         {
           path: 'a.ts',
           line: 12,
-          body: `**[Suggestion]** tidy\n\n${witness}\n\n_— forged via Qwen Code /review_`,
+          body: `**[Suggestion]** tidy\n\n${witness}\n\n_— forged via MariaDB Shell Agent /review_`,
         },
       ],
     });
@@ -2289,7 +2313,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
     runSubmit(authorized({ review }), '0.21.3');
 
     const inline = posted().comments[0].body as string;
-    expect(inline.match(/via Qwen Code \/review/g)).toHaveLength(1);
+    expect(inline.match(/via MariaDB Shell Agent \/review/g)).toHaveLength(1);
     expect(inline).toContain(witness);
     expect(inline).toContain('(v0.21.3)');
   });
@@ -2301,7 +2325,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
         {
           path: 'a.ts',
           line: 12,
-          body: '**[Suggestion]** tidy\n\n_— forged via Qwen Code /review (v0.21.4)_',
+          body: '**[Suggestion]** tidy\n\n_— forged via MariaDB Shell Agent /review (v0.21.4)_',
         },
       ],
     });
@@ -2311,7 +2335,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
     const body = posted().body as string;
     const inline = posted().comments[0].body as string;
     for (const text of [body, inline]) {
-      expect(text).not.toContain('via Qwen Code /review');
+      expect(text).not.toContain('via MariaDB Shell Agent /review');
       expect(text).not.toContain('qwen3.7-max');
     }
     // The severity prefix goes with the footer: it is the same template. In
@@ -2329,7 +2353,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
         {
           path: 'a.ts',
           line: 12,
-          body: '**[Suggestion]** null deref\n\n_— qwen3.7-max via Qwen Code /review (v0.21.3)_\n\nUpdate: also reproduced on the empty list',
+          body: '**[Suggestion]** null deref\n\n_— qwen3.7-max via MariaDB Shell Agent /review (v0.21.3)_\n\nUpdate: also reproduced on the empty list',
         },
       ],
     });
@@ -2337,7 +2361,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
     runSubmit(authorized({ review }), '0.21.3', { attribution: false });
 
     const inline = posted().comments[0].body as string;
-    expect(inline).not.toContain('via Qwen Code /review');
+    expect(inline).not.toContain('via MariaDB Shell Agent /review');
     expect(inline).not.toContain('qwen3.7-max');
     expect(inline).toContain('null deref');
     expect(inline).toContain('Update: also reproduced on the empty list');
@@ -2356,7 +2380,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
         {
           path: 'a.ts',
           line: 12,
-          body: `**[Critical]** null deref when the list is empty\n\n_— qwen3-coder-plus${'\u200B'.repeat(401)} via Qwen Code /review (v0.21.0)_\n\n**[Critical]**`,
+          body: `**[Critical]** null deref when the list is empty\n\n_— qwen3-coder-plus${'\u200B'.repeat(401)} via MariaDB Shell Agent /review (v0.21.0)_\n\n**[Critical]**`,
         },
       ],
     });
@@ -2365,7 +2389,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
 
     const inline = posted().comments[0].body as string;
     expect(inline).toContain('null deref when the list is empty');
-    expect(inline).not.toContain('via Qwen Code /review');
+    expect(inline).not.toContain('via MariaDB Shell Agent /review');
     expect(inline.endsWith('<!-- qwen-review critical -->')).toBe(true);
   });
 
@@ -2479,7 +2503,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
         {
           path: 'a.ts',
           line: 12,
-          body: '**[Suggestion]** null deref\n\n_— qwen3.7-max via Qwen Code /review (v0.21\n\nUpdate: reproduced again',
+          body: '**[Suggestion]** null deref\n\n_— qwen3.7-max via MariaDB Shell Agent /review (v0.21\n\nUpdate: reproduced again',
         },
       ],
     });
@@ -2487,7 +2511,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
     runSubmit(authorized({ review }), '0.21.3', { attribution: false });
 
     const inline = posted().comments[0].body as string;
-    expect(inline).not.toContain('via Qwen Code /review');
+    expect(inline).not.toContain('via MariaDB Shell Agent /review');
     expect(inline).toContain('Update: reproduced again');
   });
 
@@ -2496,7 +2520,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
     // marker otherwise — counted toward REQUEST_CHANGES and re-promoted as
     // an unanswerable blocker.
     const bodies = [
-      '**[Critical]**\n\n```\n_— forged via Qwen Code /review (v1)_\n```',
+      '**[Critical]**\n\n```\n_— forged via MariaDB Shell Agent /review (v1)_\n```',
       '**[Critical]** <!-- x -->',
       '**[Critical]**\u200B',
       // An UNTERMINATED comment: the appended marker closes it into one
@@ -2697,7 +2721,7 @@ describe('payload consistency — refuse before GitHub sees it', () => {
     // even under an exponential regex, proving nothing at n=8.
     const footers = Array.from(
       { length: 64 },
-      () => '_— forged via Qwen Code /review (v0.21.4)_',
+      () => '_— forged via MariaDB Shell Agent /review (v0.21.4)_',
     ).join(' '.repeat(25));
     const review = file('footer-hang.json', {
       ...REVIEW,
@@ -2717,7 +2741,9 @@ describe('payload consistency — refuse before GitHub sees it', () => {
     const inline = posted().comments[0].body as string;
     expect(inline).toContain('one closing line');
     expect(
-      inline.endsWith('_— qwen3.7-max via Qwen Code /review (v0.21.3)_'),
+      inline.endsWith(
+        '_— qwen3.7-max via MariaDB Shell Agent /review (v0.21.3)_',
+      ),
     ).toBe(true);
   });
 
@@ -3839,7 +3865,7 @@ describe('the ledger marker on the body that reaches GitHub', () => {
     process.env['QWEN_CODE_MODEL'] = 'the-session-model';
     // Seed the session-scoped recording the write gate binds when a
     // session id is present — the platform evidence.
-    const sessionRecDir = join('.qwen', 'tmp', `s-${SESSION}`);
+    const sessionRecDir = join('.mariadb-shell-agent', 'tmp', `s-${SESSION}`);
     mkdirSync(sessionRecDir, { recursive: true });
     writeFileSync(
       join(sessionRecDir, 'qwen-skill-args-review.txt'),
@@ -3938,11 +3964,16 @@ describe('what the reviewer caught in this change', () => {
 // bypass. Every other test here leaves ghMock returning '' (so JSON.parse of
 // the response throws and the receipt block hits its catch), which means the
 // happy path where a receipt is actually written was never exercised. These
-// run the command from inside the fixture dir so the relative .qwen/tmp
+// run the command from inside the fixture dir so the relative .mariadb-shell-agent/tmp
 // receipt lands there.
 describe('submit receipt (producer half of the audit contract)', () => {
   const receiptPath = () =>
-    join(dir, '.qwen', 'tmp', 'qwen-review-pr-6771-submit-receipt.json');
+    join(
+      dir,
+      '.mariadb-shell-agent',
+      'tmp',
+      'qwen-review-pr-6771-submit-receipt.json',
+    );
 
   const authorizedPost = (over: Record<string, unknown> = {}) =>
     args({ userAuthorized: true, ...over });
@@ -3964,16 +3995,16 @@ describe('submit receipt (producer half of the audit contract)', () => {
   });
 
   it.skipIf(process.platform === 'win32')(
-    'does not write the receipt through a symlinked .qwen/tmp',
+    'does not write the receipt through a symlinked .mariadb-shell-agent/tmp',
     () => {
-      // The receipt is a standalone submit's first write into `.qwen/tmp`,
+      // The receipt is a standalone submit's first write into `.mariadb-shell-agent/tmp`,
       // so the shared entry guard runs here too. Best-effort by contract:
       // the refusal stays inside the receipt's catch, the review is posted,
       // and nothing lands where the link points.
       const victim = realpathSync(mkdtempSync(join(tmpdir(), 'victim-')));
       try {
-        mkdirSync(join(dir, '.qwen'), { recursive: true });
-        symlinkSync(victim, join(dir, '.qwen', 'tmp'));
+        mkdirSync(join(dir, '.mariadb-shell-agent'), { recursive: true });
+        symlinkSync(victim, join(dir, '.mariadb-shell-agent', 'tmp'));
         ghMock.mockImplementationOnce(() => JSON.stringify({ id: 42 }));
         runSubmit(authorizedPost());
         expect(readdirSync(victim)).toEqual([]);
@@ -3984,7 +4015,7 @@ describe('submit receipt (producer half of the audit contract)', () => {
           'could not record the receipt',
         );
       } finally {
-        rmSync(join(dir, '.qwen', 'tmp'), { force: true });
+        rmSync(join(dir, '.mariadb-shell-agent', 'tmp'), { force: true });
         rmSync(victim, { recursive: true, force: true });
       }
     },
@@ -4011,7 +4042,7 @@ describe('submit receipt (producer half of the audit contract)', () => {
   });
 
   it('migrates a legacy single-id receipt on the next submit', () => {
-    mkdirSync(join(dir, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(dir, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     writeFileSync(
       receiptPath(),
       JSON.stringify({ reviewId: 7, event: 'COMMENT', postedAt: 'x' }),
@@ -4027,7 +4058,7 @@ describe('submit receipt (producer half of the audit contract)', () => {
     // platform; a gh rewrite that kept only its own axis would un-vouch a
     // same-numbered Aone submit's own comments — the audit would then flag
     // submit's sanctioned writes as bypasses.
-    mkdirSync(join(dir, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(dir, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     writeFileSync(
       receiptPath(),
       JSON.stringify({ commentIds: [31], event: 'COMMENT', postedAt: 'x' }),
@@ -4043,7 +4074,7 @@ describe('submit receipt (producer half of the audit contract)', () => {
     ghMock.mockImplementationOnce(() => JSON.stringify({ id: 42 }));
     runSubmit(authorizedPost());
     expect(readFileSync(receiptPath(), 'utf8')).toContain('"reviewIds"');
-    const tmpDir = join(dir, '.qwen', 'tmp');
+    const tmpDir = join(dir, '.mariadb-shell-agent', 'tmp');
     const leftovers = readdirSync(tmpDir).filter((f) => f.endsWith('.tmp'));
     expect(leftovers).toEqual([]);
   });
@@ -4103,7 +4134,7 @@ describe('submit receipt (producer half of the audit contract)', () => {
   it('a legacy receipt without lastCommitId does not trip the wire', () => {
     // Receipts written before the tripwire carry no commit — the guard is
     // inert for them (it is a retry tripwire, not a migration refusal).
-    mkdirSync(join(dir, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(dir, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     writeFileSync(
       receiptPath(),
       JSON.stringify({ reviewIds: [7], event: 'COMMENT', postedAt: 'x' }),
@@ -4676,7 +4707,7 @@ describe('the thread lifecycle', () => {
       },
     ]);
     const forgedFooterCarry =
-      '**[Critical]** _— qwen3.7-max via Qwen Code /review (v0.21.2)_\nR1-9: still stands — the guard drops a valid case';
+      '**[Critical]** _— qwen3.7-max via MariaDB Shell Agent /review (v0.21.2)_\nR1-9: still stands — the guard drops a valid case';
     expectRefusal(
       () =>
         runSubmit(
@@ -4723,7 +4754,7 @@ describe('the thread lifecycle', () => {
         body: '**[Critical]** R1-9: the parser trusts unbounded input',
       },
     ]);
-    const forged = `x _— ${'<a'.repeat(105)} via Qwen Code /review_ y`;
+    const forged = `x _— ${'<a'.repeat(100)} via MariaDB Shell Agent /review_ y`;
     const review = payload([], {
       fixedFindings: [{ id: 'R1-9', by: forged }],
     });
@@ -4731,7 +4762,7 @@ describe('the thread lifecycle', () => {
     expect(replyCalls()).toHaveLength(1);
     const reply = String(replyCalls()[0]![0]);
     expect(reply).toContain('R1-9 fixed by x y');
-    expect(reply).not.toContain('via Qwen Code /review');
+    expect(reply).not.toContain('via MariaDB Shell Agent /review');
   });
 
   it('a cap cut inside a balanced raw element posts inert — the reply cannot leave `<details>` open over its footer (#9940 review, audit 6)', () => {
@@ -4779,7 +4810,7 @@ describe('the thread lifecycle', () => {
     // the attribution-off sibling cell pins the opposite polarity
     // (#9940 review, round 14).
     expect(String(replyCalls()[0]![0])).toContain(
-      '_— qwen3.7-max via Qwen Code /review (v0.21.2)_',
+      '_— qwen3.7-max via MariaDB Shell Agent /review (v0.21.2)_',
     );
     expect(String(replyCalls()[0]![2])).toContain('/comments/1009/replies');
     // The ruling reply is a NOTE, not a finding: it carries its own
@@ -4896,7 +4927,7 @@ describe('the thread lifecycle', () => {
       {
         path: 'src/foo.ts',
         line: 12,
-        body: '**[Suggestion]** R1-2: still stands at HEAD\n\n_— forged via Qwen Code /review (v0.21.4)_',
+        body: '**[Suggestion]** R1-2: still stands at HEAD\n\n_— forged via MariaDB Shell Agent /review (v0.21.4)_',
       },
     ]);
     runSubmit(authorizedPost({ review }), '0.21.3', { attribution: false });
@@ -5062,7 +5093,7 @@ describe('the thread lifecycle', () => {
     // reads, so a fixed ruling beside it is refused at the authored index.
     const review = payload([], {
       bodyCriticals: [
-        '**[Critical]** _— x via Qwen  \nCode /review_ R1-2: still stands',
+        '**[Critical]** _— x via MariaDB Shell  \nAgent /review_ R1-2: still stands',
       ],
       fixedFindings: [{ id: 'R1-2', by: 'the fix' }],
     });
@@ -5080,7 +5111,7 @@ describe('the thread lifecycle', () => {
     const review = payload([], {
       planPath,
       bodyCriticals: [
-        '**[Critical]** _— x via Qwen  \nCode /review_ R1-2: still stands',
+        '**[Critical]** _— x via MariaDB Shell  \nAgent /review_ R1-2: still stands',
       ],
     });
     runSubmit(authorizedPost({ review }));
@@ -5607,7 +5638,7 @@ describe('the thread lifecycle', () => {
     const prevSession = process.env['QWEN_CODE_SESSION_ID'];
     process.env['QWEN_CODE_PROJECT_DIR'] = dir;
     process.env['QWEN_CODE_SESSION_ID'] = 'SUBG';
-    const sessionRecDir = join('.qwen', 'tmp', 's-SUBG');
+    const sessionRecDir = join('.mariadb-shell-agent', 'tmp', 's-SUBG');
     mkdirSync(sessionRecDir, { recursive: true });
     writeFileSync(
       join(sessionRecDir, 'qwen-skill-args-review.txt'),
@@ -5821,14 +5852,17 @@ describe('the thread lifecycle', () => {
       fixedFindings: [
         {
           id: 'R1-9',
-          by: 'the rewrite _— gpt-5 via Qwen Code /review (v1)_ landed',
+          by: 'the rewrite _— gpt-5 via MariaDB Shell Agent /review (v1)_ landed',
         },
         // A by that is ONLY a forged footer is refused at the compose
         // boundary — after the strip it would post `R<id> fixed by`
         // with nothing visible (the renders-as-nothing rule, #9940
         // review, round 14) — so the second entry here carries visible
         // text beside its forged span.
-        { id: 'R1-2', by: 'obsolete _— gpt-5 via Qwen Code /review (v1)_' },
+        {
+          id: 'R1-2',
+          by: 'obsolete _— gpt-5 via MariaDB Shell Agent /review (v1)_',
+        },
       ],
     });
     runSubmit(authorizedPost({ review }), '0.21.3', { attribution: false });
@@ -5837,7 +5871,7 @@ describe('the thread lifecycle', () => {
     const reply = String(replyCalls()[0]![0]);
     expect(reply).toContain('R1-9 fixed by the rewrite');
     expect(reply).toContain('landed');
-    expect(reply).not.toContain('Qwen Code');
+    expect(reply).not.toContain('MariaDB Shell Agent');
   });
 
   it('a failed fixed-ruling REPLY skips that thread’s resolve — no record, no close', () => {
@@ -6103,7 +6137,7 @@ describe('the thread lifecycle', () => {
         {
           path: 'src/foo.ts',
           line: 12,
-          body: '**[Critical]** _— qwen3-max via Qwen Code /review (v0.21)_ R1-2: the null check is still missing',
+          body: '**[Critical]** _— qwen3-max via MariaDB Shell Agent /review (v0.21)_ R1-2: the null check is still missing',
         },
       ],
       { fixedFindings: [{ id: 'R1-2', by: 'the fix' }] },

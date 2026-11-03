@@ -288,7 +288,7 @@ PR 2 (follow-up) — semantic copy fidelity, as described above.
 - **Unit** — PR 1 coordinate/mouse coverage plus semantic extraction over exact-width, empty, whitespace-only, joiner, endpoint, clipped, overlapping, and conflicting-flow boundaries.
 - **Producer fixtures** — direct `MaxSizedBox` wrapping plus code, diff, tool, ANSI, Markdown, and table Before/After copy snapshots.
 - **Patch guard** — asserts the exposed cell and boundary grids, direct Ink hard/soft wrapping, and compositing behavior so an Ink upgrade breaks loudly.
-- **E2E** — interactive tmux harness: drag-select across wrapped visual lines and multiple items, confirm clipboard/OSC 52 payload. Follows the `.qwen/e2e-tests/` workflow.
+- **E2E** — interactive tmux harness: drag-select across wrapped visual lines and multiple items, confirm clipboard/OSC 52 payload. Follows the `.mariadb-shell-agent/e2e-tests/` workflow.
 
 ## Rollout
 

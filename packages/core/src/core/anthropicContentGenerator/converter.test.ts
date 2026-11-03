@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -251,7 +252,7 @@ describe('AnthropicContentConverter', () => {
       // no `signature` field at all, which strict Anthropic-compatible
       // backends (SGLang, llama.cpp, vLLM) reject with HTTP 400. With the
       // option on, it must replay as an empty signature instead.
-      // https://github.com/QwenLM/qwen-code/issues/11772
+      // https://github.invalid/QwenLM/qwen-code/issues/11772
       const { messages } = convert(
         [content('model', thought('internal'), { text: 'visible' })],
         { fillUnsignedThinkingSignature: true },
@@ -1242,7 +1243,7 @@ describe('AnthropicContentConverter', () => {
     });
   });
 
-  // https://github.com/QwenLM/qwen-code/issues/3786 — DeepSeek's
+  // https://github.invalid/QwenLM/qwen-code/issues/3786 — DeepSeek's
   // anthropic-compatible API rejects requests in thinking mode when a prior
   // assistant turn carrying `tool_use` omits a thinking block. Plain-text
   // assistant turns without thinking are accepted unchanged, so the converter
@@ -2038,7 +2039,7 @@ describe('AnthropicContentConverter', () => {
     });
   });
 
-  // https://github.com/QwenLM/qwen-code/issues/9453
+  // https://github.invalid/QwenLM/qwen-code/issues/9453
   //
   // The OpenAI Responses generator stashes an opaque reasoning-replay payload
   // in the shared `Part.thoughtSignature` field (responses-converter.ts:

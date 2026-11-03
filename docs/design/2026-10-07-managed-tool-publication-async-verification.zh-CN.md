@@ -2,7 +2,7 @@
 
 [English](2026-10-07-managed-tool-publication-async-verification.md) | [简体中文](2026-10-07-managed-tool-publication-async-verification.zh-CN.md)
 
-状态：实现 issue [#13242](https://github.com/QwenLM/qwen-code/issues/13242)。
+状态：实现 issue [#13242](https://github.invalid/QwenLM/qwen-code/issues/13242)。
 
 ## 问题与范围
 
@@ -109,7 +109,7 @@ GC 配额核算。
 稳定性和错误分类。验证新旧客户端/服务端组合、关闭接收后任务继续处理、历史成功
 重放后实际读取仍发现损坏，以及健康 head 下心跳/状态轮询不读取 journal 正文。
 运行定向 Java/CLI 测试、真实 MySQL 恢复/竞争测试、build、typecheck、bundle 和完整
-diff 自审。E2E 计划与结果存放在 `.qwen/e2e-tests/`。
+diff 自审。E2E 计划与结果存放在 `.mariadb-shell-agent/e2e-tests/`。
 
 ## 涉及组件与决策
 

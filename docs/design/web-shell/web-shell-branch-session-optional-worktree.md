@@ -3,8 +3,8 @@
 ## 文档状态
 
 - 状态：目标态设计
-- 对应 Issue：[QwenLM/qwen-code#8271](https://github.com/QwenLM/qwen-code/issues/8271) 的 Part 2
-- 依赖：Part 1 已由 [#8817](https://github.com/QwenLM/qwen-code/pull/8817) 合入 `main`（`9f8f65dde0`）
+- 对应 Issue：[QwenLM/qwen-code#8271](https://github.invalid/QwenLM/qwen-code/issues/8271) 的 Part 2
+- 依赖：Part 1 已由 [#8817](https://github.invalid/QwenLM/qwen-code/pull/8817) 合入 `main`（`9f8f65dde0`）
 - 相关设计：
   - [从已完成 Assistant 回复创建会话分支](./assistant-response-session-branching.md)
   - [Web Shell worktree 隔离会话](./2026-07-19-webshell-worktree-sessions.md)
@@ -61,7 +61,7 @@ worktree；会话的 `workspaceCwd`、transcript、列表归属和持久化位�
 - 已知失败安全回收自己创建且尚未发布、且仍能证明身份未变化的资源；源
   session、源 transcript、HEAD、tracked files 以及用户已有的 staged、unstaged、
   untracked 内容始终不变。沿用现有 worktree 语义时，允许幂等创建 daemon 管理的
-  `<repoTop>/.qwen/` 目录和 `.qwen/.gitignore`；这些管理元数据不是用户工作内容，
+  `<repoTop>/.mariadb-shell-agent/` 目录和 `.mariadb-shell-agent/.gitignore`；这些管理元数据不是用户工作内容，
   失败时不回滚。
 - 新 client 与旧 daemon 组合时不显示新选项，也不静默降级成 Current
   workspace。
@@ -206,14 +206,14 @@ validator，因此这项保留规则由用户路由显式执行。
 该路由仍是 **legacy primary-runtime scoped**，不是 process-global 或任意
 workspace fallback：
 
-| 数据/操作                            | Owner                          | 目标位置                           |
-| ------------------------------------ | ------------------------------ | ---------------------------------- |
-| source/target transcript             | source primary runtime storage | 原 `workspaceCwd` 的 chats dir     |
-| target session listing/archiving     | source primary runtime         | 原 workspace                       |
-| worktree Git ref 和 checkout         | source workspace repo          | `<repoTop>/.qwen/worktrees/<slug>` |
-| target live process routing          | source primary runtime bridge  | `workspaceCwd` 不变                |
-| agent file/tool execution            | target session                 | `effectiveCwd = worktree.path`     |
-| Git status/diff/log/branch/commit UI | source workspace route         | session-bound `cwd=worktree.path`  |
+| 数据/操作                            | Owner                          | 目标位置                                          |
+| ------------------------------------ | ------------------------------ | ------------------------------------------------- |
+| source/target transcript             | source primary runtime storage | 原 `workspaceCwd` 的 chats dir                    |
+| target session listing/archiving     | source primary runtime         | 原 workspace                                      |
+| worktree Git ref 和 checkout         | source workspace repo          | `<repoTop>/.mariadb-shell-agent/worktrees/<slug>` |
+| target live process routing          | source primary runtime bridge  | `workspaceCwd` 不变                               |
+| agent file/tool execution            | target session                 | `effectiveCwd = worktree.path`                    |
+| Git status/diff/log/branch/commit UI | source workspace route         | session-bound `cwd=worktree.path`                 |
 
 `worktree.path` 永远不能成为 runtime lookup key。加载 target session 时必须先用
 原 `workspaceCwd` 找到 runtime，再在该 runtime 内验证 sidecar containment 并
@@ -232,7 +232,7 @@ top。SDK 的 workspace Git 请求在传 `cwd=worktree.path` 时同时传 target
 3. 读取该 session 的 durable sidecar，要求 sidecar path 与请求 cwd
    canonical-equal，worktree 内 regular ownership marker 的内容等于 session id；
 4. 从当前 runtime workspace 重新推导 canonical repo top，要求 cwd realpath
-   containment 于 `<repoTop>/.qwen/worktrees`，不能使用 client 或 sidecar 自报的
+   containment 于 `<repoTop>/.mariadb-shell-agent/worktrees`，不能使用 client 或 sidecar 自报的
    repo top 扩大边界；
 5. 任一读取、identity 或 containment 校验失败时，read route 和 mutation route
    都明确拒绝；显式非法 cwd 不能静默 fallback 到 `workspaceCwd`。
@@ -353,7 +353,7 @@ Route 在调用 branch mutation 前完成：
 5. 调用现有 `createUserWorktree()`。若它返回 failure 且预期 worktree path 不存在，
    清除 planned journal；若 path 已出现但尚无 strict marker，无法证明该 path 不是
    并发外部创建的同名资源，因此保留 journal/path 并告警，不做推测性删除。该调用
-   可能幂等创建 `<repoTop>/.qwen/.gitignore` 和 managed directories；journal 不
+   可能幂等创建 `<repoTop>/.mariadb-shell-agent/.gitignore` 和 managed directories；journal 不
    删除这些 repo-scoped daemon 元数据，错误合约也不声称 checkout 字节级零变化。
 6. 安全写入 worktree 内 `.qwen-session = targetSessionId`。写入前拒绝 HEAD 已跟踪
    的同名路径；创建时使用 no-follow、exclusive create、`0600`、handle-based
@@ -638,7 +638,7 @@ transcript replay schema 或 session catalog schema。Core 只拆分两种 marke
 ### 11.2 文件系统与安全测试
 
 - worktree path 必须 realpath containment 于 server 推导的
-  `<repoTop>/.qwen/worktrees`；sidecar symlink escape 被拒绝。
+  `<repoTop>/.mariadb-shell-agent/worktrees`；sidecar symlink escape 被拒绝。
 - containment 接受 `...`、`..cache` 等合法 root 内目录段，同时继续拒绝真正的
   `..`/absolute escape。
 - 在 daemon 继承 `GIT_DIR`、`GIT_WORK_TREE`、`GIT_COMMON_DIR` 或 `GIT_CONFIG_*`
@@ -671,7 +671,7 @@ transcript replay schema 或 session catalog schema。Core 只拆分两种 marke
   marker；fresh create 不能覆盖它。模拟 owner 在 read 与 replace 之间变化时，
   adoption 必须中止且不能覆盖 previous sidecar。
 - success 和每个 create failure 注入点都断言：用户已有 tracked/staged/unstaged/
-  untracked 内容不变；允许保留幂等 daemon-managed `.qwen/.gitignore` 和目录。
+  untracked 内容不变；允许保留幂等 daemon-managed `.mariadb-shell-agent/.gitignore` 和目录。
 - 错误响应不泄露绝对路径或 Git stderr。
 
 ### 11.3 WebUI/Web Shell 测试

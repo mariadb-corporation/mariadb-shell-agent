@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -889,16 +890,16 @@ describe('runAutoMemoryExtractionByAgent', () => {
     // per extraction (prompt builder + touched-topics classifier). Restored
     // below to keep later tests on the suite's POSIX defaults.
     vi.mocked(getAutoMemoryRoot).mockReturnValue(
-      'C:\\Users\\foo\\.qwen\\projects\\proj\\memory',
+      'C:\\Users\\foo\\.mariadb-shell-agent\\projects\\proj\\memory',
     );
     vi.mocked(getUserAutoMemoryRoot).mockReturnValue(
-      'C:\\Users\\foo\\.qwen\\memories',
+      'C:\\Users\\foo\\.mariadb-shell-agent\\memories',
     );
 
     try {
       const result = await extract([
-        'C:/Users/foo/.qwen/projects/proj/memory/project/release.md',
-        'C:/Users/foo/.qwen/memories/user/role.md',
+        'C:/Users/foo/.mariadb-shell-agent/projects/proj/memory/project/release.md',
+        'C:/Users/foo/.mariadb-shell-agent/memories/user/role.md',
       ]);
       expectScopes(result, ['project', 'user'], { project: true, user: true });
     } finally {

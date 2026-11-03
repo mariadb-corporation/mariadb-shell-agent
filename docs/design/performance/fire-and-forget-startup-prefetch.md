@@ -42,7 +42,7 @@ flowchart TD
 Current state assessment:
 
 - `initializeApp()` still executes i18n, auth, theme validation, and IDE client connection serially before first paint.
-- Auth and i18n must remain before first paint; IDE connection is not a hard dependency for the first paint of a plain TUI without an initial prompt, and can be deferred on the plain TUI path. However, for paths like `qwen -i "prompt"`, `qwen -p`, stream-json, and ACP/Zed — which have no safe post-render window or whose first request needs IDE context/status — IDE connection must continue to be awaited before the first request.
+- Auth and i18n must remain before first paint; IDE connection is not a hard dependency for the first paint of a plain TUI without an initial prompt, and can be deferred on the plain TUI path. However, for paths like `mariadb-shell-agent -i "prompt"`, `mariadb-shell-agent -p`, stream-json, and ACP/Zed — which have no safe post-render window or whose first request needs IDE context/status — IDE connection must continue to be awaited before the first request.
 - `checkForUpdates()` is already fire-and-forget after render in `startInteractiveUI()`, but the logic is scattered within the UI startup function.
 - `preconnectApi()` is already fire-and-forget and should be kept triggering as early as possible, but brought under unified scheduling.
 - Telemetry SDK init previously occurred synchronously during `Config` construction; for plain interactive TUI it can be deferred to after render, while non-interactive paths retain the pre-first-request initialization semantics.
@@ -158,7 +158,7 @@ This adds no new configuration options. Preconnect failures only write debug log
 First batch includes:
 
 - Update check: migrate the existing `checkForUpdates().then(handleAutoUpdate)` logic, preserving the `settings.merged.general?.enableAutoUpdate !== false` gate.
-- IDE client connection: moved to post-render prefetch only on the plain interactive TUI path without an initial prompt. Callers must explicitly pass `connectIde: true`, and the scheduler internally still checks `config.getIdeMode()`. `qwen -i "prompt"`, non-interactive, stream-json, and ACP/Zed do not defer IDE connection through this entry point.
+- IDE client connection: moved to post-render prefetch only on the plain interactive TUI path without an initial prompt. Callers must explicitly pass `connectIde: true`, and the scheduler internally still checks `config.getIdeMode()`. `mariadb-shell-agent -i "prompt"`, non-interactive, stream-json, and ACP/Zed do not defer IDE connection through this entry point.
 - Telemetry SDK init: moved to post-render prefetch only on the interactive TUI path. `Config` still retains telemetry settings, but skips the construction-time SDK side effect via `deferTelemetryInitialization`; post-render prefetch launches the SDK via `initializeTelemetry(config)`. Non-interactive, stream-json, and ACP/Zed do not defer.
 - Background housekeeping: can be migrated from `gemini.tsx` to post-render prefetch, giving all background startup tasks a unified entry point; still limited to interactive, still uses dynamic import and error swallowing.
 
@@ -213,8 +213,8 @@ Subsequently, only when `deferIdeConnection === true`, `startInteractiveUI()` fi
 This split addresses the compatibility risk flagged in review:
 
 - Plain interactive TUI: IDE socket/IPC connection no longer blocks first paint.
-- `qwen -i "prompt"`: continues to await IDE connection before the first auto-submitted request, and post-render does not reconnect.
-- `qwen -p` / piped stdin: continues to await IDE connection before the first model request.
+- `mariadb-shell-agent -i "prompt"`: continues to await IDE connection before the first auto-submitted request, and post-render does not reconnect.
+- `mariadb-shell-agent -p` / piped stdin: continues to await IDE connection before the first model request.
 - stream-json: continues to complete IDE connection before session/control request handling.
 - ACP/Zed: continues to retain awaited IDE startup, avoiding missing IDE context/status on the first request.
 
@@ -329,7 +329,7 @@ Adjustments and additions:
 
 - Plain interactive TUI calls `initializeApp(config, settings, { deferIdeConnection: true })`, and connects IDE in post-render prefetch.
 - Prompt-interactive calls `initializeApp(config, settings, { deferIdeConnection: false })`, and post-render prefetch does not reconnect IDE.
-- `qwen -p` / piped stdin / stream-json calls `initializeApp(config, settings, { deferIdeConnection: false })` or uses defaults, ensuring IDE is connected before the first request.
+- `mariadb-shell-agent -p` / piped stdin / stream-json calls `initializeApp(config, settings, { deferIdeConnection: false })` or uses defaults, ensuring IDE is connected before the first request.
 - ACP/Zed path does not enable IDE deferred prefetch, continues through awaited IDE startup.
 
 ### `packages/core/src/config/config.test.ts`

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -244,8 +245,11 @@ describe('<ToolGroupMessage />', () => {
         createToolCall({
           callId: 'm1',
           name: 'WriteFile',
-          description: 'QWEN.md',
-          args: { file_path: 'QWEN.md', content: 'remember this' },
+          description: 'MARIADB-SHELL-AGENT.md',
+          args: {
+            file_path: 'MARIADB-SHELL-AGENT.md',
+            content: 'remember this',
+          },
           isMemoryOp: 'write',
         }),
       ];
@@ -267,8 +271,8 @@ describe('<ToolGroupMessage />', () => {
         createToolCall({
           callId: 'm1',
           name: 'WriteFile',
-          description: 'QWEN.md',
-          args: { file_path: 'QWEN.md' },
+          description: 'MARIADB-SHELL-AGENT.md',
+          args: { file_path: 'MARIADB-SHELL-AGENT.md' },
           isMemoryOp: 'write',
         }),
       ];

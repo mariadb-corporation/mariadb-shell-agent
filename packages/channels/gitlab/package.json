@@ -2,7 +2,7 @@
   "name": "@qwen-code/channel-gitlab",
   "private": true,
   "version": "0.26.5",
-  "description": "GitLab polling channel adapter for Qwen Code",
+  "description": "GitLab polling channel adapter for MariaDB Shell Agent",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

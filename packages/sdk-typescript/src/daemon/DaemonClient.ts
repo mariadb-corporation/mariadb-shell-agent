@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -397,9 +398,9 @@ function parseSessionGenerationEvent(
 }
 
 /**
- * SDK-side HTTP client for the `qwen serve` daemon. Sibling to
+ * SDK-side HTTP client for the `mariadb-shell-agent serve` daemon. Sibling to
  * `ProcessTransport`: ProcessTransport drives a stdio child running
- * `qwen --input-format stream-json`; DaemonClient hits the daemon's HTTP
+ * `mariadb-shell-agent --input-format stream-json`; DaemonClient hits the daemon's HTTP
  * routes (POST /session, POST /session/:id/prompt, GET /session/:id/events,
  * etc.) and yields ACP-flavored events.
  *
@@ -709,7 +710,7 @@ export interface CreateSessionRequest {
   sourceId?: string;
   /**
    * Create the session in an isolated git worktree. The daemon creates
-   * a worktree under `<repoRoot>/.qwen/worktrees/<slug>` and relocates
+   * a worktree under `<repoRoot>/.mariadb-shell-agent/worktrees/<slug>` and relocates
    * the session's working directory into it. Pass `{}` for an
    * auto-generated slug, or `{ slug: 'my-task' }` for a named one.
    * Requires the workspace to be a git repository. Worktree sessions
@@ -2714,14 +2715,14 @@ export class DaemonClient {
   // -- Workspace memory (workspace memory/agents) ------------------------------
 
   /**
-   * Fetch the daemon's `QWEN.md` / `AGENTS.md` snapshot. Read-only;
+   * Fetch the daemon's `MARIADB-SHELL-AGENT.md` / `AGENTS.md` snapshot. Read-only;
    * pre-flight `caps.features.workspace_memory` before calling
    * against an unknown daemon. Returns `initialized: false` and an
    * empty `files` array when no memory files exist at the bound
-   * workspace root or `~/.qwen`.
+   * workspace root or `~/.mariadb-shell-agent`.
    *
    * v1 discovers files at the bound workspace ROOT only, plus the
-   * user's global `~/.qwen` directory — it does NOT walk parent
+   * user's global `~/.mariadb-shell-agent` directory — it does NOT walk parent
    * directories or recurse into the workspace tree. The route's
    * companion helper `walkWorkspaceForMemory` keeps a guarded
    * upward-walk loop body for a future hierarchical mode but breaks
@@ -2749,7 +2750,7 @@ export class DaemonClient {
   }
 
   /**
-   * Append to or replace `QWEN.md` at workspace or global scope.
+   * Append to or replace `MARIADB-SHELL-AGENT.md` at workspace or global scope.
    * The strict mutation gate accepts trusted-loopback callers without a token;
    * older daemons and non-trusted embeds can still return `token_required`.
    * When the daemon advertises `workspace_memory`, expect 200 with
@@ -6497,7 +6498,7 @@ export class DaemonClient {
   }
 
   /**
-   * Scaffold a `QWEN.md` at the daemon's bound
+   * Scaffold a `MARIADB-SHELL-AGENT.md` at the daemon's bound
    * workspace root. Mechanical only — does NOT invoke the LLM. The
    * daemon writes an empty file; clients that want AI-driven content
    * fill should follow up with `POST /session/:id/prompt`.

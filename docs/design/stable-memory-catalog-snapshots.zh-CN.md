@@ -90,7 +90,7 @@ fork 窗口的用户轮次；混合真实用户提示和快照的条目仍算作
 advisor 和非缓存 follow-up 输入，以及响应溢出后仅含快照的重新注入与用户/fork 轮次分类。
 还覆盖原始浅拷贝索引和写回，以及实际 summary、recap 和标题请求。
 现有单次请求辅助函数测试继续适用。真实运行时
-目录测试必须使用当前有效的项目路径 `.qwen/memory`，不能误用 `.qwen/memories`。
+目录测试必须使用当前有效的项目路径 `.mariadb-shell-agent/memory`，不能误用 `.mariadb-shell-agent/memories`。
 
 在 `packages/core` 中运行：
 

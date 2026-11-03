@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review watch-repo`: the reviewer's probe behind a scheduled task's
+// `mariadb-shell-agent review watch-repo`: the reviewer's probe behind a scheduled task's
 // gate (docs/design/2026-10-21-scheduled-task-gate.md). It reads the open
 // pull requests of one repository, compares their heads with the cursor of
 // the previous run and prints the pull requests that were opened, pushed or
@@ -262,7 +263,7 @@ export function watchRepoCursorPath(
   const key = filters ? filterKey(filters) : null;
   return join(
     root,
-    '.qwen',
+    '.mariadb-shell-agent',
     'tmp',
     'review-watch',
     normalizeGhHostForUrl(host).replace(':', '_'),

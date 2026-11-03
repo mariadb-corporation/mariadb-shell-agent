@@ -34,7 +34,7 @@ the store.
 The layout is:
 
 ```text
-~/.qwen/
+~/.mariadb-shell-agent/
 ├── extensions/
 └── extension-store/
     ├── lock

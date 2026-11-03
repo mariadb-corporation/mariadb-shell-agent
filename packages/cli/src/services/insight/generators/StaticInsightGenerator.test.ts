@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Code
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -64,7 +65,7 @@ describe('StaticInsightGenerator', () => {
     const projectsDir = path.resolve(
       'workspace',
       'project-a',
-      '.qwen',
+      '.mariadb-shell-agent',
       'projects',
     );
     const outputDir = path.join(Storage.getRuntimeBaseDir(), 'insights');

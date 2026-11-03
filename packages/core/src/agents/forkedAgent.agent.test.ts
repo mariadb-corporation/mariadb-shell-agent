@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -58,7 +59,7 @@ function makeRuntimeView(model: string): RuntimeContentGeneratorView {
   };
 }
 
-const PROJECT_MD = '/repo/.qwen/memories/project.md';
+const PROJECT_MD = '/repo/.mariadb-shell-agent/memories/project.md';
 
 /**
  * Regression: `runForkedAgent` (AgentHeadless path) used to produce its
@@ -436,8 +437,18 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     let abortedMidBatch: boolean | undefined;
     const restore = stubExecute(async (emitter, signal) => {
       executeSignal = signal;
-      toolCall(emitter, 'write-a', 'write', '/repo/.qwen/memories/a.md');
-      toolCall(emitter, 'write-b', 'write', '/repo/.qwen/memories/b.md');
+      toolCall(
+        emitter,
+        'write-a',
+        'write',
+        '/repo/.mariadb-shell-agent/memories/a.md',
+      );
+      toolCall(
+        emitter,
+        'write-b',
+        'write',
+        '/repo/.mariadb-shell-agent/memories/b.md',
+      );
       toolResult(emitter, 'write-a', 'write', true);
       abortedMidBatch = signal.aborted;
       toolResult(emitter, 'write-b', 'write', true);
@@ -455,8 +466,8 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     expect(result.status).toBe('completed');
     expect(result.terminateReason).toBe(AgentTerminateMode.GOAL);
     expect(result.filesWritten).toEqual([
-      '/repo/.qwen/memories/a.md',
-      '/repo/.qwen/memories/b.md',
+      '/repo/.mariadb-shell-agent/memories/a.md',
+      '/repo/.mariadb-shell-agent/memories/b.md',
     ]);
   });
 
@@ -547,7 +558,12 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     let abortedAfterEntryWrite: boolean | undefined;
     const restore = stubExecute(async (emitter, signal) => {
       executeSignal = signal;
-      tool(emitter, 'write-index', 'write', '/repo/.qwen/memories/MEMORY.md');
+      tool(
+        emitter,
+        'write-index',
+        'write',
+        '/repo/.mariadb-shell-agent/memories/MEMORY.md',
+      );
       // The early-completion abort is deferred to a macrotask
       // (`setImmediate` in forkedAgent.ts), so a synchronous read here
       // is `false` no matter what the predicate decided. Flush first,
@@ -578,7 +594,7 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     expect(result.status).toBe('completed');
     expect(result.terminateReason).toBe(AgentTerminateMode.GOAL);
     expect(result.filesWritten).toEqual([
-      '/repo/.qwen/memories/MEMORY.md',
+      '/repo/.mariadb-shell-agent/memories/MEMORY.md',
       PROJECT_MD,
     ]);
   });

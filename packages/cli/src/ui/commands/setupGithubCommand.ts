@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -32,7 +33,7 @@ function getOpenUrlsCommands(readmeUrl: string, secretsUrl?: string): string[] {
   return commands;
 }
 
-// Add Qwen Code specific entries to .gitignore file
+// Add MariaDB Shell Agent specific entries to .gitignore file
 export async function updateGitignore(gitRepoRoot: string): Promise<void> {
   await updateGitignoreWithStatus(gitRepoRoot);
 }

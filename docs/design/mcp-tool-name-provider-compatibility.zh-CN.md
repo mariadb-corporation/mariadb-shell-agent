@@ -4,7 +4,7 @@
 
 ## 问题
 
-Qwen Code 目前按 Gemini 的字符集接受 MCP 工具名。诸如 `literature.search_pubmed` 这样的名字会变成 `mcp__server__literature.search_pubmed`，Gemini 能接受，但更严格的 OpenAI 兼容与 Anthropic 兼容端点可能在工具运行前就拒绝它。
+MariaDB Shell Agent 目前按 Gemini 的字符集接受 MCP 工具名。诸如 `literature.search_pubmed` 这样的名字会变成 `mcp__server__literature.search_pubmed`，Gemini 能接受，但更严格的 OpenAI 兼容与 Anthropic 兼容端点可能在工具运行前就拒绝它。
 
 同一个原始名会在注册、权限持久化、重连查找、输出截断和恢复的历史记录中被各自独立地重建。如果只改 provider 请求，模型可见的名字就会与注册表键不一致。
 

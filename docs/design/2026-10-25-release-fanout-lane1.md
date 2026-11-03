@@ -4,7 +4,7 @@
 
 ## Problem and scope
 
-[#15465](https://github.com/QwenLM/qwen-code/issues/15465) records release metadata jobs waiting 37–42 minutes for GitHub-hosted capacity. This implements only Lane 1 of that issue, following the credential boundary in [Release Jobs Off the Hosted Pool](2026-10-16-release-jobs-off-hosted-pool.md). It does not complete the issue or activate Lane 2.
+[#15465](https://github.invalid/QwenLM/qwen-code/issues/15465) records release metadata jobs waiting 37–42 minutes for GitHub-hosted capacity. This implements only Lane 1 of that issue, following the credential boundary in [Release Jobs Off the Hosted Pool](2026-10-16-release-jobs-off-hosted-pool.md). It does not complete the issue or activate Lane 2.
 
 The inspected jobs have no `secrets` references or deployment environment. Their token permission is `contents: read`; “credential-free” here means no publishing, signing, model API, or OSS credentials, not absence of the ephemeral GitHub token.
 

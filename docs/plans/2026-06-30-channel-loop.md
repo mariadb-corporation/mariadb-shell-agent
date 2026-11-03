@@ -8,7 +8,7 @@
 
 **Tech Stack:** TypeScript ESM, Vitest, `@qwen-code/qwen-code-core` cron utilities, channel packages, CLI channel start command.
 
-**Issue:** https://github.com/QwenLM/qwen-code/issues/6068
+**Issue:** https://github.invalid/QwenLM/qwen-code/issues/6068
 
 ---
 
@@ -814,7 +814,7 @@ Expected: all CLI start tests pass.
 
 **Files:**
 
-- Modify: `.qwen/pr-drafts/channel-loop.md`
+- Modify: `.mariadb-shell-agent/pr-drafts/channel-loop.md`
 
 - [ ] **Step 1: Run focused verification**
 
@@ -849,7 +849,7 @@ Each reviewer returns Critical/Important/Minor findings. Fix Critical and Import
 
 - [ ] **Step 3: Create PR draft**
 
-Create `.qwen/pr-drafts/channel-loop.md` using the repository PR template. Include:
+Create `.mariadb-shell-agent/pr-drafts/channel-loop.md` using the repository PR template. Include:
 
 - Motivation: channel recurring work should be `/loop`, not `/schedule`.
 - Changes: channel loop store, scheduler, command surface, lifecycle inspectability, Feishu/Telegram opt-in.
@@ -861,10 +861,10 @@ Create `.qwen/pr-drafts/channel-loop.md` using the repository PR template. Inclu
 Run:
 
 ```bash
-git add packages/channels/base packages/channels/telegram packages/channels/feishu packages/cli packages/core .qwen/pr-drafts docs/superpowers/plans/2026-06-30-channel-loop.md
+git add packages/channels/base packages/channels/telegram packages/channels/feishu packages/cli packages/core .mariadb-shell-agent/pr-drafts docs/superpowers/plans/2026-06-30-channel-loop.md
 git commit -m "feat(channel): add channel loop support"
 git push -u origin feat/channel-loop
-gh pr create --repo QwenLM/qwen-code --draft --title "feat(channel): add channel loop support" --body-file .qwen/pr-drafts/channel-loop.md
+gh pr create --repo QwenLM/qwen-code --draft --title "feat(channel): add channel loop support" --body-file .mariadb-shell-agent/pr-drafts/channel-loop.md
 ```
 
 Expected: draft PR opened against `QwenLM/qwen-code:main`.

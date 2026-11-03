@@ -15,7 +15,7 @@ For writable global npm installations, the post-render update check installs
 the exact resolved version under a directory derived from the global launcher:
 
 ```text
-~/.qwen/updates/npm/<launcher-id>/versions/<version>/
+~/.mariadb-shell-agent/updates/npm/<launcher-id>/versions/<version>/
 ```
 
 The version check runs npm in its global context and the staged install uses an
@@ -36,7 +36,7 @@ starts remain pinned to their original build. On the next invocation, the
 stable launcher reads the pointer and starts the verified version directory.
 
 Each global npm launcher has its own pointer and version payloads, so
-installations under different npm or nvm prefixes can share `~/.qwen` without
+installations under different npm or nvm prefixes can share `~/.mariadb-shell-agent` without
 overriding one another or sharing dependencies. A slower concurrent update
 cannot replace a newer active version.
 

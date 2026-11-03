@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -138,7 +139,7 @@ describe('syncTeamMemory', () => {
     const bob = makeWorkingClone(bare, 'bob');
     cleanup.push(path.dirname(bob));
     writeTeamMemory(bob, 'reference/grafana.md', 'oncall dashboard');
-    git(bob, 'add', '--', '.qwen/team-memory');
+    git(bob, 'add', '--', '.mariadb-shell-agent/team-memory');
     git(bob, 'commit', '-m', 'bob adds reference');
     git(bob, 'push');
 
@@ -158,7 +159,7 @@ describe('syncTeamMemory', () => {
     const bob = makeWorkingClone(bare, 'bob');
     cleanup.push(path.dirname(bob));
     writeTeamMemory(bob, 'reference/grafana.md', 'oncall dashboard');
-    git(bob, 'add', '--', '.qwen/team-memory');
+    git(bob, 'add', '--', '.mariadb-shell-agent/team-memory');
     git(bob, 'commit', '-m', 'bob adds reference');
     git(bob, 'push');
 
@@ -190,7 +191,7 @@ describe('syncTeamMemory', () => {
     const bob = makeWorkingClone(bare, 'bob');
     cleanup.push(path.dirname(bob));
     writeTeamMemory(bob, 'reference/grafana.md', 'oncall dashboard');
-    git(bob, 'add', '--', '.qwen/team-memory');
+    git(bob, 'add', '--', '.mariadb-shell-agent/team-memory');
     git(bob, 'commit', '-m', 'bob adds reference');
     git(bob, 'push');
 
@@ -304,7 +305,7 @@ describe('syncTeamMemory', () => {
       git(repo, 'config', 'user.email', 'solo@example.com');
       git(repo, 'config', 'user.name', 'solo');
       writeTeamMemory(repo, 'feedback/seeded.md', 'seeded');
-      git(repo, 'add', '--', '.qwen/team-memory');
+      git(repo, 'add', '--', '.mariadb-shell-agent/team-memory');
       git(repo, 'commit', '-m', 'seed');
 
       const canary = path.join(repo, 'PWNED');
@@ -340,7 +341,9 @@ describe('syncTeamMemory', () => {
     // The rollback must leave the working tree and index as they were.
     expect(git(repo, 'diff', '--cached', '--name-only').trim()).toBe('');
     expect(
-      fs.existsSync(path.join(repo, '.qwen/team-memory/feedback/x.md')),
+      fs.existsSync(
+        path.join(repo, '.mariadb-shell-agent/team-memory/feedback/x.md'),
+      ),
     ).toBe(true);
 
     // A second sync must not read a stale ahead state (which would wedge

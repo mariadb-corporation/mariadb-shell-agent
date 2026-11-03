@@ -12,8 +12,8 @@ Workflow tools are opt-in. Enable `tools.workflowsEnabled` in settings or set
 `QWEN_CODE_ENABLE_WORKFLOWS=1` before turning the mode on:
 
 ```sh
-QWEN_CODE_ENABLE_WORKFLOWS=1 qwen --workflow-mode on
-qwen --resume <session-id> --workflow-mode off
+QWEN_CODE_ENABLE_WORKFLOWS=1 mariadb-shell-agent --workflow-mode on
+mariadb-shell-agent --resume <session-id> --workflow-mode off
 ```
 
 Starting with `--workflow-mode on` while the tools are unavailable fails

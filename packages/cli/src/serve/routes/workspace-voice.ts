@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -138,7 +139,7 @@ function broadcastVoiceWrite(
     );
   } catch (err) {
     writeStderrLine(
-      `qwen serve: POST /workspace/voice broadcast error (key=${write.key}, scope=${voiceSettingsScopeToWire(write.scope)}): ${
+      `mariadb-shell-agent serve: POST /workspace/voice broadcast error (key=${write.key}, scope=${voiceSettingsScopeToWire(write.scope)}): ${
         err instanceof Error ? err.message : String(err)
       }`,
     );
@@ -275,7 +276,7 @@ async function persistVoiceUpdate(
       } catch (err) {
         if (isGenerationClosedError(err)) throw err;
         writeStderrLine(
-          `qwen serve: POST /workspace/voice partial persist error (workspace=${deps.boundWorkspace}, committed=${committed.length}/${writes.length}, failedKey=${write.key}, failedScope=${voiceSettingsScopeToWire(write.scope)}): ${
+          `mariadb-shell-agent serve: POST /workspace/voice partial persist error (workspace=${deps.boundWorkspace}, committed=${committed.length}/${writes.length}, failedKey=${write.key}, failedScope=${voiceSettingsScopeToWire(write.scope)}): ${
             err instanceof Error ? err.message : String(err)
           }`,
         );
@@ -449,7 +450,7 @@ function handleVoiceStatus(
   } catch (err) {
     if (sendGenerationClosedError(res, err)) return;
     writeStderrLine(
-      `qwen serve: ${route} error: ${
+      `mariadb-shell-agent serve: ${route} error: ${
         err instanceof Error ? err.message : String(err)
       }`,
     );
@@ -505,7 +506,7 @@ async function handleVoiceUpdate(
   } catch (err) {
     if (sendGenerationClosedError(res, err)) return;
     writeStderrLine(
-      `qwen serve: ${route} persist error (workspace=${deps.boundWorkspace}): ${
+      `mariadb-shell-agent serve: ${route} persist error (workspace=${deps.boundWorkspace}): ${
         err instanceof Error ? err.message : String(err)
       }`,
     );
@@ -525,7 +526,7 @@ async function handleVoiceUpdate(
   } catch (err) {
     if (sendGenerationClosedError(res, err)) return;
     writeStderrLine(
-      `qwen serve: ${route} reload error after persist (workspace=${deps.boundWorkspace}): ${
+      `mariadb-shell-agent serve: ${route} reload error after persist (workspace=${deps.boundWorkspace}): ${
         err instanceof Error ? err.message : String(err)
       }`,
     );
@@ -628,7 +629,7 @@ async function handleVoiceTranscription(
       err instanceof Error ? err.message : String(err),
     );
     writeStderrLine(
-      `qwen serve: ${route} error (workspace=${deps.boundWorkspace}): ${message}`,
+      `mariadb-shell-agent serve: ${route} error (workspace=${deps.boundWorkspace}): ${message}`,
     );
     res.status(502).json({
       error: 'Voice transcription failed',

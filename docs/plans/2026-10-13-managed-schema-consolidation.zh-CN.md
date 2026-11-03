@@ -36,7 +36,7 @@ LOCAL 工具和 child Git 执行必须在 Linux 上开启 `QWEN_MANAGED_AGENT_RU
 
 ## 证据状态
 
-设计与代码属于本地实施交付物。`.qwen/e2e-tests/managed-schema-32.md` 记录实际运行的测试及环境。正式生产切换是独立的运维结果，需要回读证据；本地通过或服务启动成功不等于生产验收。
+设计与代码属于本地实施交付物。`.mariadb-shell-agent/e2e-tests/managed-schema-32.md` 记录实际运行的测试及环境。正式生产切换是独立的运维结果，需要回读证据；本地通过或服务启动成功不等于生产验收。
 
 ## 2026-10-13 首轮实施验收（审查修复前）
 
@@ -52,7 +52,7 @@ Server 全量单测2372项：0失败、0错误，5项按环境跳过。最后一
 
 最终jar已运行在 独立 Linux 验收主机的 loopback `127.0.0.1:18084`，连接 MySQL33384 上任务专用的全新数据库，健康状态UP。真实HTTP创建/提交/读取/幂等重放/seal/删除闭环通过；SQL回读为32张业务表加Flyway history version1、原journal revision1/writer generation1，以及永久删除墓碑。Server进程10562停止后重启为12123，同一Session及已完成删除操作保持不变。这项服务验收关闭Harness/Broker dispatch；真实原生工具/worker行为由上述原有独立夹具覆盖。未配置模型凭据或正式流量网关，未迁移或修改旧应用数据库。生产关闭准入、路由和切换仍是独立运维步骤；回滚时保留本新库及Session记录。
 
-完整命令、失败及回读输出保存在本地 `.qwen/e2e-tests/managed-schema-32.md` 和独立test-engineer报告。验收制品、部署脚本及 `native-volume/fixture` 原生卷夹具保留在该主机的任务专用验收目录。本次仅配置任务专用MySQL33384和这些验收资源。
+完整命令、失败及回读输出保存在本地 `.mariadb-shell-agent/e2e-tests/managed-schema-32.md` 和独立test-engineer报告。验收制品、部署脚本及 `native-volume/fixture` 原生卷夹具保留在该主机的任务专用验收目录。本次仅配置任务专用MySQL33384和这些验收资源。
 
 ## 2026-10-13 审查修复
 
@@ -60,7 +60,7 @@ Server 全量单测2372项：0失败、0错误，5项按环境跳过。最后一
 
 本轮为本地代码及验收结果。上述 Linux 部署和重启使用修复前制品，保留为历史证据；本轮没有替换该服务或改变它的数据库。更新后的新库 baseline 不用于升级该既有验收数据库。
 
-独立复现脚本及另外 15 项真实 MySQL 保护/事务用例通过。Server 的 114 项 MySQL 8.4.11 回归和 5 项 MySQL/子 JVM PUT 故障用例通过，均无失败或跳过。最后 24 项回归重新覆盖全部 21 项 MySQL 快照用例，且原小消息查询预算保持不变。Broker verify 通过 828 项单测（2 项按环境跳过）、真实 MySQL 目录校验及静态分析。Node build/typecheck/bundle 通过。PUT 故障存储为受控文件/内存适配器，本轮不声称真实 OSS 验收。完整日志及最终制品检查记录于 `.qwen/e2e-tests/managed-schema-32.md` 和独立报告 `.qwen/pr-reviews/managed-schema32-review/fix-verification.md`。
+独立复现脚本及另外 15 项真实 MySQL 保护/事务用例通过。Server 的 114 项 MySQL 8.4.11 回归和 5 项 MySQL/子 JVM PUT 故障用例通过，均无失败或跳过。最后 24 项回归重新覆盖全部 21 项 MySQL 快照用例，且原小消息查询预算保持不变。Broker verify 通过 828 项单测（2 项按环境跳过）、真实 MySQL 目录校验及静态分析。Node build/typecheck/bundle 通过。PUT 故障存储为受控文件/内存适配器，本轮不声称真实 OSS 验收。完整日志及最终制品检查记录于 `.mariadb-shell-agent/e2e-tests/managed-schema-32.md` 和独立报告 `.mariadb-shell-agent/pr-reviews/managed-schema32-review/fix-verification.md`。
 
 最终 Server 全量单测 2391 项，0 失败、0 错误、6 项按环境跳过。移除一处末尾空行后 Checkstyle 与 SpotBugs 均通过；重新打包后的全部 549 个生产 class 摘要与全量测试产物完全一致。最终本地 Server 制品 SHA256 为 `f98551840d147cf2fde7ca7535e7e3df055a15abc870c622e35e66924445478e`；回读确认内嵌上述共享 DDL，且不含旧应用迁移。独立工程师在最终源码上的 15 项 MySQL 保护/事务用例再次全部通过。
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -50,7 +51,8 @@ vi.mock('./lib/git.js', () => ({
 // one value the fixtures choose.
 vi.mock('./lib/paths.js', async (importOriginal) => ({
   ...(await importOriginal<typeof import('./lib/paths.js')>()),
-  worktreePath: (n: string | number) => `/repo/.qwen/tmp/review-pr-${n}`,
+  worktreePath: (n: string | number) =>
+    `/repo/.mariadb-shell-agent/tmp/review-pr-${n}`,
 }));
 
 vi.mock('node:fs', async (importOriginal) => {
@@ -83,8 +85,8 @@ async function run(args?: Record<string, unknown>) {
     $0: 'qwen',
     pr_number: '29295886',
     owner_repo: 'maxcompute/odps_src',
-    out: '/repo/.qwen/tmp/qwen-review-pr-29295886-comment-status.json',
-    host: 'gitlab.alibaba-inc.com',
+    out: '/repo/.mariadb-shell-agent/tmp/qwen-review-pr-29295886-comment-status.json',
+    host: 'gitlab.alibaba-inc.invalid',
     ...args,
   } as unknown as Parameters<typeof handler>[0]);
 }

@@ -2,7 +2,7 @@
 
 [English](mobile-android-shell.md) | [简体中文](mobile-android-shell.zh-CN.md)
 
-状态：遵循 [issue #11704](https://github.com/QwenLM/qwen-code/issues/11704) 的开发用途技术验证，正在评审。它不是生产级移动客户端。
+状态：遵循 [issue #11704](https://github.invalid/QwenLM/qwen-code/issues/11704) 的开发用途技术验证，正在评审。它不是生产级移动客户端。
 
 本文记录 Phase 1 基线。[Phase 2 连接配置设计](mobile-connection-profiles.zh-CN.md) 取代下文关于单配置和原生明文存储的说明，其他生产前置条件仍然适用。
 
@@ -24,11 +24,11 @@
 
 ## 设计决策
 
-WebView 直接导航到 daemon origin，因此沿用同源 API 行为，直接同源 HTTP API 无需 `--allow-origin`。反向代理和远程 terminal/voice WebSocket 连接仍须遵守 [qwen serve](../users/qwen-serve.md) 的 origin 要求。Chrome/WebView 111 是基于 Tailwind v4 的 CSS 最低版本，与 ES2021 JavaScript target 独立。
+WebView 直接导航到 daemon origin，因此沿用同源 API 行为，直接同源 HTTP API 无需 `--allow-origin`。反向代理和远程 terminal/voice WebSocket 连接仍须遵守 [mariadb-shell-agent serve](../users/qwen-serve.md) 的 origin 要求。Chrome/WebView 111 是基于 Tailwind v4 的 CSS 最低版本，与 ES2021 JavaScript target 独立。
 
 开发时静态 daemon 令牌（`--token` 或 `QWEN_SERVER_TOKEN`）避免重启后失效。SharedPreferences 只是临时开发方案，并不具备 Keystore 支持的生产凭据保护。远程连接应使用 HTTPS；额外的 HTTP 局域网主机需要显式网络安全配置。
 
-`adb reverse` 会让宿主机的回环 daemon 可从设备回环端口访问。绝不能把无 token 的 daemon 转发到真机：设备上的任何 app 都可以连接该端口，并以 daemon 用户身份执行操作。真机测试必须使用 `--require-auth`，并把 bearer token 保存为 `daemon_token`；例如：`QWEN_SERVER_TOKEN=$(openssl rand -hex 32) qwen serve --require-auth`。
+`adb reverse` 会让宿主机的回环 daemon 可从设备回环端口访问。绝不能把无 token 的 daemon 转发到真机：设备上的任何 app 都可以连接该端口，并以 daemon 用户身份执行操作。真机测试必须使用 `--require-auth`，并把 bearer token 保存为 `daemon_token`；例如：`QWEN_SERVER_TOKEN=$(openssl rand -hex 32) mariadb-shell-agent serve --require-auth`。
 
 本技术验证不启动前台服务。没有 SSE 连接的服务只会消耗资源并显示误导性的持续通知，因此占位服务及其权限推迟到后续阶段。
 

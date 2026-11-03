@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -196,9 +197,12 @@ async function writeWorkspaceVoiceEnabled(
   h: Harness,
   enabled: boolean,
 ): Promise<void> {
-  await writeJson(path.join(h.workspace, '.qwen', 'settings.json'), {
-    general: { voice: { enabled } },
-  });
+  await writeJson(
+    path.join(h.workspace, '.mariadb-shell-agent', 'settings.json'),
+    {
+      general: { voice: { enabled } },
+    },
+  );
 }
 
 describe('workspace voice routes', () => {
@@ -820,21 +824,24 @@ describe('workspace voice routes', () => {
     // A cloned repo must not be able to self-grant HTTP/private-network voice
     // egress: security.allowedInsecureVoiceBaseUrls is stripped from workspace
     // scope, so the resolver still rejects the cleartext endpoint.
-    await writeJson(path.join(h.workspace, '.qwen', 'settings.json'), {
-      modelProviders: {
-        openai: [
-          {
-            id: 'qwen3-asr-flash',
-            label: 'Private Qwen ASR',
-            baseUrl,
-            envKey: 'PRIVATE_ASR_KEY',
-          },
-        ],
+    await writeJson(
+      path.join(h.workspace, '.mariadb-shell-agent', 'settings.json'),
+      {
+        modelProviders: {
+          openai: [
+            {
+              id: 'qwen3-asr-flash',
+              label: 'Private Qwen ASR',
+              baseUrl,
+              envKey: 'PRIVATE_ASR_KEY',
+            },
+          ],
+        },
+        env: { PRIVATE_ASR_KEY: 'sk-secret' },
+        security: { allowedInsecureVoiceBaseUrls: [baseUrl] },
+        voiceModel: 'qwen3-asr-flash',
       },
-      env: { PRIVATE_ASR_KEY: 'sk-secret' },
-      security: { allowedInsecureVoiceBaseUrls: [baseUrl] },
-      voiceModel: 'qwen3-asr-flash',
-    });
+    );
 
     const res = await request(h.app)
       .post('/workspace/voice')

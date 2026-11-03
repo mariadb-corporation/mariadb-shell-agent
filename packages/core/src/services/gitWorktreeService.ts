@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -58,7 +59,7 @@ export class WorktreeSessionMarkerOwnerChangedError extends Error {
  * dependency output. They are exempt from the ignored-content check in
  * {@link worktreeHasWork} so a checkout where an agent ran `npm install`
  * or a build stays cleanable; every other ignored entry (agent artifacts
- * like `.qwen/pr-drafts/`) still counts as work. An entry matches when
+ * like `.mariadb-shell-agent/pr-drafts/`) still counts as work. An entry matches when
  * its first path segment is in the set (root output, `node_modules/…`)
  * or when it is an ignored directory whose last segment is in the set
  * (a monorepo's `packages/app/node_modules/`); a nested ignored file
@@ -922,7 +923,7 @@ export const BASELINE_COMMIT_MESSAGE = 'baseline (dirty state overlay)';
 
 /**
  * Default directory and branch-prefix name used for worktrees.
- * Changing this value affects the on-disk layout (`~/.qwen/<WORKTREES_DIR>/`)
+ * Changing this value affects the on-disk layout (`~/.mariadb-shell-agent/<WORKTREES_DIR>/`)
  * **and** the default git branch prefix (`<WORKTREES_DIR>/<sessionId>/…`).
  */
 export const WORKTREES_DIR = 'worktrees';
@@ -1109,8 +1110,8 @@ export class GitWorktreeService {
    * Resolves the absolute path of the enclosing git repository's top
    * directory. Used by callers that need to anchor general-purpose
    * worktrees at the *repo* root rather than the cwd they were invoked
-   * from — otherwise running `qwen` from a monorepo subdirectory would
-   * scatter `.qwen/worktrees/` under each subdirectory instead of
+   * from — otherwise running `mariadb-shell-agent` from a monorepo subdirectory would
+   * scatter `.mariadb-shell-agent/worktrees/` under each subdirectory instead of
    * gathering them under the repo root.
    *
    * Returns the canonical top-level path on success, or `null` when the
@@ -1925,16 +1926,20 @@ export class GitWorktreeService {
   // ──────────────────────────────────────────────────────────────────────
   // User-facing worktree APIs (used by EnterWorktree / ExitWorktree tools
   // and AgentTool `isolation: 'worktree'`). These create worktrees under
-  // `<projectRoot>/.qwen/worktrees/<slug>` rather than under the
+  // `<projectRoot>/.mariadb-shell-agent/worktrees/<slug>` rather than under the
   // session-scoped Arena baseDir.
   // ──────────────────────────────────────────────────────────────────────
 
   /**
    * Returns the directory holding all general-purpose worktrees for this
-   * repo: `<projectRoot>/.qwen/worktrees`.
+   * repo: `<projectRoot>/.mariadb-shell-agent/worktrees`.
    */
   getUserWorktreesDir(): string {
-    return path.join(this.sourceRepoPath, '.qwen', WORKTREES_DIR);
+    return path.join(
+      this.sourceRepoPath,
+      '.mariadb-shell-agent',
+      WORKTREES_DIR,
+    );
   }
 
   /**
@@ -2023,7 +2028,7 @@ export class GitWorktreeService {
    * repo.
    *
    * Used by Phase D-1's re-attach path: when `--worktree foo` is passed
-   * and `<repoRoot>/.qwen/worktrees/foo` already exists on disk, we
+   * and `<repoRoot>/.mariadb-shell-agent/worktrees/foo` already exists on disk, we
    * verify it really IS a Qwen-managed worktree of the current repo (not
    * a standalone `git init` someone dropped at that path) before
    * assuming it's safe to chdir into. Returning the HEAD SHA in the
@@ -2044,7 +2049,7 @@ export class GitWorktreeService {
    * 4. `--show-toplevel` → git's idea of the worktree top. For a real
    *    linked worktree this equals `worktreePath`; for a plain
    *    directory living UNDER the main repo (e.g. `mkdir
-   *    <repo>/.qwen/worktrees/foo`) git walks up to the outer `.git`
+   *    <repo>/.mariadb-shell-agent/worktrees/foo`) git walks up to the outer `.git`
    *    and returns the OUTER repo's root — which would otherwise pass
    *    the common-dir check and let us "re-attach" to a non-worktree
    *    directory. Compare paths to reject this.
@@ -2436,7 +2441,7 @@ export class GitWorktreeService {
   }
 
   /**
-   * Creates a general-purpose worktree at `<projectRoot>/.qwen/worktrees/<slug>`
+   * Creates a general-purpose worktree at `<projectRoot>/.mariadb-shell-agent/worktrees/<slug>`
    * with branch `worktree-<slug>`. Used by `EnterWorktreeTool` and
    * `AgentTool isolation:'worktree'`.
    *
@@ -2480,7 +2485,7 @@ export class GitWorktreeService {
       // Keep the worktrees directory and its contents out of the parent
       // repo's `git status` and any subsequent glob/grep that walks from
       // the parent root. Only writes when the file is missing — never
-      // touches an existing user-managed `.qwen/.gitignore`.
+      // touches an existing user-managed `.mariadb-shell-agent/.gitignore`.
       await this.ensureWorktreesGitignored();
 
       const base = baseBranch || (await this.getCurrentBranch());
@@ -2689,7 +2694,7 @@ export class GitWorktreeService {
       return;
     }
     const gitDirAbs = path.join(repoRootAbs, '.git');
-    const qwenDirAbs = path.join(repoRootAbs, '.qwen');
+    const qwenDirAbs = path.join(repoRootAbs, '.mariadb-shell-agent');
     // Same canonical-vs-canonical requirement for the dest side. The
     // worktree was just created by `git worktree add`, so the path
     // should exist; fall back to the input path on realpath error so a
@@ -2746,12 +2751,12 @@ export class GitWorktreeService {
       // Refuse to symlink git-internal paths into the worktree. `.git`
       // would silently break commits / status / diff inside the
       // worktree (the worktree's own gitlink file points at the parent
-      // common-dir, and a symlink would shadow it). The whole `.qwen`
-      // tree is also off-limits: linking `.qwen` (parent) would
-      // recursively pull `.qwen/worktrees` into the new worktree,
-      // recreating the loop; linking `.qwen/worktrees` directly
-      // creates the same loop more obviously; and `.qwen/projects`
-      // / `.qwen/tmp` are CLI metadata users have no legitimate
+      // common-dir, and a symlink would shadow it). The whole `.mariadb-shell-agent`
+      // tree is also off-limits: linking `.mariadb-shell-agent` (parent) would
+      // recursively pull `.mariadb-shell-agent/worktrees` into the new worktree,
+      // recreating the loop; linking `.mariadb-shell-agent/worktrees` directly
+      // creates the same loop more obviously; and `.mariadb-shell-agent/projects`
+      // / `.mariadb-shell-agent/tmp` are CLI metadata users have no legitimate
       // reason to share across worktrees.
       // `gitDirAbs` / `qwenDirAbs` are canonical (derived from the
       // realpath'd `repoRootAbs` hoisted above the loop), so these
@@ -2765,7 +2770,7 @@ export class GitWorktreeService {
       if (isWithinRoot(sourceAbs, qwenDirAbs)) {
         debugLogger.warn(
           `symlinkConfiguredDirectories: refusing path "${raw}" — ` +
-            `the .qwen tree is CLI-managed; symlinking any of it could ` +
+            `the .mariadb-shell-agent tree is CLI-managed; symlinking any of it could ` +
             `create a worktrees-inside-worktrees loop or alias CLI metadata.`,
         );
         continue;
@@ -2795,7 +2800,7 @@ export class GitWorktreeService {
       // containment + blocklist checks against the realpath. The lexical
       // checks above only see `path.resolve(repoRoot, raw)` — they can't
       // tell that `<repo>/node_modules` is actually a symlink chaining
-      // into `.git`, an outside dir, or `.qwen`. Without this step a
+      // into `.git`, an outside dir, or `.mariadb-shell-agent`. Without this step a
       // committed-or-out-of-band source symlink bypasses every guard the
       // lexical loop set up. Use the realpath as the symlink target so
       // the new link points canonically rather than preserving the chain.
@@ -2822,7 +2827,7 @@ export class GitWorktreeService {
       }
       if (isWithinRoot(realSource, qwenDirAbs)) {
         debugLogger.warn(
-          `symlinkConfiguredDirectories: refusing path "${raw}" — real source ${realSource} resolves inside .qwen`,
+          `symlinkConfiguredDirectories: refusing path "${raw}" — real source ${realSource} resolves inside .mariadb-shell-agent`,
         );
         continue;
       }
@@ -2942,14 +2947,14 @@ export class GitWorktreeService {
   }
 
   /**
-   * Ensures `<projectRoot>/.qwen/.gitignore` ignores the worktrees
+   * Ensures `<projectRoot>/.mariadb-shell-agent/.gitignore` ignores the worktrees
    * directory. Idempotent: writes only when the file is missing. If the
    * file exists (user may have curated it), this method is a no-op so
    * we never disturb intentional configuration.
    */
   private async ensureWorktreesGitignored(): Promise<void> {
     try {
-      const qwenDir = path.join(this.sourceRepoPath, '.qwen');
+      const qwenDir = path.join(this.sourceRepoPath, '.mariadb-shell-agent');
       await fs.mkdir(qwenDir, { recursive: true });
       const gitignorePath = path.join(qwenDir, '.gitignore');
       // `flag: 'wx'` is "open for write, fail if exists" — one atomic
@@ -3064,7 +3069,7 @@ export class GitWorktreeService {
       const canonicalRepo = await fs.realpath(this.sourceRepoPath);
       const canonicalExpectedPath = path.join(
         canonicalRepo,
-        '.qwen',
+        '.mariadb-shell-agent',
         WORKTREES_DIR,
         slug,
       );

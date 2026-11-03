@@ -5,7 +5,7 @@ into one PR on 2026-09-04 (author call, recorded in the ledger): U-33 and U-34
 both fill the `item-projection.ts` null arm and U-32/U-11 both touch the
 steering drain path, so a seam split would open the same file to two reviews.
 One item per commit keeps each round readable. Plan paragraph in the
-[#8662 ledger](https://github.com/QwenLM/qwen-code/issues/8662).
+[#8662 ledger](https://github.invalid/QwenLM/qwen-code/issues/8662).
 
 ## Problem
 
@@ -149,7 +149,7 @@ JSON (core `mcp-tool.ts` returns `safeJsonStringify(this.params)` — ink
 renders the same through ToolMessage), which wrapped to ~50 physical rows and
 pushed the content-confirmation dialog off the 38-row viewport. Three root
 layers, each discriminated by a progressively richer failure dump
-(`.qwen/u31-opentui-fix{8,9,10,11*}-scenario5.log`):
+(`.mariadb-shell-agent/u31-opentui-fix{8,9,10,11*}-scenario5.log`):
 
 1. **The confirm transcript event never fired on the real path.**
    `livePromptEvents` never emitted `type: 'confirm'` — only event-adapter's
@@ -497,7 +497,7 @@ opentui-app-shell 35).
 Verified on the final state (both legs, `QWEN_CODE_LANG=en`):
 
 - `interactive/external-context-mem0-write.test.ts` — **5/5 on OpenTUI and
-  5/5 on ink** (`.qwen/u31-opentui-final.log`, `.qwen/u31-ink-final.log`).
+  5/5 on ink** (`.mariadb-shell-agent/u31-opentui-final.log`, `.mariadb-shell-agent/u31-ink-final.log`).
   Scenario 5 exercises the whole Decision 7 chain on the OpenTUI leg:
   collapsed head + literal markdown + `lines hidden` + ctrl-s → expanded tail
   with `CONFIRM_TAIL` and no indicator → approval → turn completes. Each

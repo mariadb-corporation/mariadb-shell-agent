@@ -74,7 +74,7 @@ Gate output. The task's gate command printed this at <ISO instant> (`<gate>`, ex
 
 ### 4.4 用 PR 监视探针做闸门
 
-[`/autofix-pr` 设计](2026-10-21-autofix-pr-command.zh-CN.md)里的 PR 监视探针本身就是闸门命令：`qwen autofix-pr snapshot <n> --gate --repo <owner>/<repo>` 盯一个 PR，`qwen review watch-repo --repo <owner>/<repo>` 盯一个仓库。它们各自维护游标，只输出游标上次写入以来的变化，所以 Managed 定义可以原样使用：
+[`/autofix-pr` 设计](2026-10-21-autofix-pr-command.zh-CN.md)里的 PR 监视探针本身就是闸门命令：`qwen autofix-pr snapshot <n> --gate --repo <owner>/<repo>` 盯一个 PR，`mariadb-shell-agent review watch-repo --repo <owner>/<repo>` 盯一个仓库。它们各自维护游标，只输出游标上次写入以来的变化，所以 Managed 定义可以原样使用：
 
 ```
 POST /v1/agent-automations
@@ -94,12 +94,12 @@ Session 的审批模式同样约束闸门唤醒的回合。在 `default` 和 `au
 
 用这些探针做闸门，还需要：
 
-- **git 仓库。** 两个探针都把游标放在包含 Session 目录的仓库的主 worktree 下（`<主 worktree>/.qwen/tmp/`），通过 `git worktree list` 找到它。一个空的 `git init` 就够。不在仓库里时探针以退出码 1 结束，每次触发都结算为 `gate_failed`。
+- **git 仓库。** 两个探针都把游标放在包含 Session 目录的仓库的主 worktree 下（`<主 worktree>/.mariadb-shell-agent/tmp/`），通过 `git worktree list` 找到它。一个空的 `git init` 就够。不在仓库里时探针以退出码 1 结束，每次触发都结算为 `gate_failed`。
 - **跨触发保留的游标，一个游标只给一个监视用。** 下一次触发靠游标判断哪些是新的。那个主 worktree 被重建的话，`snapshot` 会把所有尚未处理的内容再报一遍，`watch-repo` 会重新静默记录。游标是主 worktree 里的文件，不按 Session 区分：`snapshot` 的游标只按 PR 号命名，`watch-repo` 的按被盯的仓库和过滤项命名。所以两个定义所在的 Session 共用一个目录（或一个主 worktree）时，如果盯的是同一个 PR，或者是同一个仓库且过滤项相同，就会各拿到一部分事件。在同一个主 worktree 里，另一个仓库里号码相同的 PR 的 `snapshot` 闸门每次触发都会失败（`gate_failed`），先写下游标的那个闸门则不受影响。
-- **探针运行处要有 `git`、`gh`、`node` 和 `qwen`。** Workspace Shell 要求 Broker 配置为 `local-process` provisioner。它的 worker 运行在服务端所在主机上；SSH Workspace 的 worker 则通过 Broker 的 `ssh-process` provisioner 运行在 SSH 节点上；探针在 worker 的环境变量下通过 `gh api graphql` 读 GitHub。
+- **探针运行处要有 `git`、`gh`、`node` 和 `mariadb-shell-agent`。** Workspace Shell 要求 Broker 配置为 `local-process` provisioner。它的 worker 运行在服务端所在主机上；SSH Workspace 的 worker 则通过 Broker 的 `ssh-process` provisioner 运行在 SSH 节点上；探针在 worker 的环境变量下通过 `gh api graphql` 读 GitHub。
   - 在服务端所在主机上，worker 继承服务端的环境变量，只去掉控制面变量（`QWEN_MANAGED_AGENT_*`、`QWEN_MANAGEDAGENT_*`、`SPRING_*`、`OSS_*`）。所以 `gh` 会像服务端用户那样登录：读取 `GH_TOKEN` 或 `GITHUB_TOKEN`（Enterprise 主机用 `GH_ENTERPRISE_TOKEN`），或 `GH_CONFIG_DIR`、`XDG_CONFIG_HOME` 或 `HOME` 下的配置。只存在桌面钥匙串里的 token，服务进程可能拿不到。不论 `gh` 在那里找到什么凭据，该主机上每个由模型发起的 shell 调用也都能读到：服务端的环境变量会进入 Broker 在该主机上启动的每个 worker（服务端 README，[Broker deployment](../../packages/managed-agent-server/README.md#broker-deployment)）。所以请给它一个只读、只限被盯仓库的 token。闸门唤醒的回合看到的也是同一个凭据，所以用只读 token 时，回合同样不能借它 push 或回复；但服务账号持有的其他凭据（SSH key、git 凭据助手）仍会被回合拿到。worker 只在启动时复制一次环境变量，所以轮换 `GH_TOKEN` 需要重启服务，并且只对之后启动的 worker 生效；被 Broker 接管的常驻 worker 仍保留启动时的值。
   - 在 SSH 节点上，worker 只保留节点上的 `PATH`、`HOME`、`USER`、`LOGNAME`、`SHELL`、`LANG`、`LC_ALL`、`TMPDIR`、`TMP`、`TEMP` 和 `TZ`。其中 `PATH` 是非交互 SSH 命令的 `PATH`，没有登录 shell 额外加的部分。所以 `gh` 必须在那个 `HOME` 下登录；任何 `GH_*` 变量、`GITHUB_TOKEN` 和 `XDG_CONFIG_HOME` 都传不过去。
-  - 两种情况下，`git` 和 `gh` 都必须在那个 `PATH` 上，因为探针按名字调用它们。`qwen` 也要在上面，npm 安装时还包括它启动所用的 `node`，除非闸门用绝对路径写出它们（`/path/to/node /path/to/cli.js …`）。
+  - 两种情况下，`git` 和 `gh` 都必须在那个 `PATH` 上，因为探针按名字调用它们。`mariadb-shell-agent` 也要在上面，npm 安装时还包括它启动所用的 `node`，除非闸门用绝对路径写出它们（`/path/to/node /path/to/cli.js …`）。
 - **在命令行上写明目标。** `watch-repo` 总是要 `--repo`。`snapshot` 也需要：仓库里没有准备好的监视，它的第一次触发没有游标可以提供目标。非 github.com 实例两者都用 `--host`；`GH_HOST` 只在 worker 的环境变量带着它时才有效。
 - **20 秒。** 探针必须在 Managed 闸门的 20 秒上限内结束（§5.2），只有定时任务闸门 60 秒的三分之一。第一次 GraphQL 查询约 3 秒，之后每页约 1.5 秒。`snapshot` 对 check context 和 review 线程各最多读十页、check suite 最多五页，并对最多 20 条开启线程的机器人评论做 REST 查询，但 15 秒后不再发起新的读取：来不及读完的 PR 改为只盯一部分，而不是失败，没读到的部分留给之后的触发（[`/autofix-pr` 设计](2026-10-21-autofix-pr-command.zh-CN.md)第 6.2 节）。已经在进行的读取仍可能让一次运行超过 20 秒；这次触发会在写游标之前失败，下一次重新读取。这些耗时取决于 Runtime 主机到 GitHub 的网络路径：另一次在工作机上的核对中，下面那个已合入 PR 的静默运行走代理为 9–10 秒，直连为 21–29 秒，超过了上限。
 - **输出分多次触发排空。** 探针把每次运行限制在 12 KiB 的预算内，在 16 KiB 上限之内（§4.3），放不下的留给下一次触发。这些触发每一次都是一个回合。对一个 PR 的第一次触发会报出探针所能判断的尚未处理的内容：失败的 check、冲突，以及其他人在未解决线程里的评论、review 正文和最近的对话评论，不论是否已经回复过。下面那个 open PR 总共约需 35 次触发，这是按 `deferred` 每次约减少 13 估算的。Managed 的上限在净化之后才应用（§5.5），净化把每个 `<` 写成四个字节；探针的预算同样把每个 `<` 按四个字节计数，所以净化不会让它们的输出超过上限。

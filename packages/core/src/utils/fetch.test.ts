@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -209,13 +210,15 @@ describe('formatFetchErrorForUser', () => {
 
   it('includes troubleshooting hints for TLS errors', () => {
     const message = formatFetchErrorForUser(makeTlsError(), {
-      url: 'https://chat.qwen.ai',
+      url: 'https://chat.qwen.invalid',
     });
 
     expect(message).toContain('fetch failed');
     expect(message).toContain('UNABLE_TO_VERIFY_LEAF_SIGNATURE');
     expect(message).toContain('Troubleshooting:');
-    expect(message).toContain('Confirm you can reach https://chat.qwen.ai');
+    expect(message).toContain(
+      'Confirm you can reach https://chat.qwen.invalid',
+    );
     expect(message).toContain('--proxy');
     expect(message).toContain('NODE_EXTRA_CA_CERTS');
     expect(message).toContain('--insecure');
@@ -735,8 +738,11 @@ describe('fetchWithPolicy same-host redirects', () => {
         : new Response('landed', { status: 200 }),
     ) as typeof fetch;
 
-    const result = await fetchResponse('https://github.com/QwenLM/old', opts);
-    expect(result.finalUrl).toBe('https://github.com/QwenLM/new');
+    const result = await fetchResponse(
+      'https://github.invalid/QwenLM/old',
+      opts,
+    );
+    expect(result.finalUrl).toBe('https://github.invalid/QwenLM/new');
     expect(result.body.toString()).toBe('landed');
   });
 });

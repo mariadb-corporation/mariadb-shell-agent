@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -481,7 +482,9 @@ describe('GitWorktreeService', () => {
     });
 
     it('recognises full GitHub PR URLs (any host)', () => {
-      expect(parse('https://github.com/QwenLM/qwen-code/pull/4174')).toBe(4174);
+      expect(parse('https://github.invalid/QwenLM/qwen-code/pull/4174')).toBe(
+        4174,
+      );
       expect(parse('http://gh.enterprise.example.com/team/repo/pull/9')).toBe(
         9,
       );
@@ -526,12 +529,18 @@ describe('GitWorktreeService', () => {
 
     it('parses the first porcelain entry as the main worktree path', async () => {
       const porcelain =
-        entry('/repo') + '\n' + entry('/repo/.qwen/worktrees/wt', 'wt');
+        entry('/repo') +
+        '\n' +
+        entry('/repo/.mariadb-shell-agent/worktrees/wt', 'wt');
       // Round-trip validation: `--git-common-dir` answers absolute from a
       // linked worktree and relative from the main tree; both resolve to the
       // same common dir.
       await expect(
-        mainPath('/repo/.qwen/worktrees/wt', [porcelain, '/repo/.git', '.git']),
+        mainPath('/repo/.mariadb-shell-agent/worktrees/wt', [
+          porcelain,
+          '/repo/.git',
+          '.git',
+        ]),
       ).resolves.toBe('/repo');
       expect(git.raw).toHaveBeenCalledWith(['worktree', 'list', '--porcelain']);
     });

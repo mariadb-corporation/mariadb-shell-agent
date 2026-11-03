@@ -6,13 +6,13 @@
 
 ## 问题与现状
 
-Token Weather 是 #13749 第一个里程碑的样例。它在输入框正上方画一行上下文窗口的"天气预报"：图标、一个词、占用百分比、token 数，以及最近几轮的走势图。它需要三样 Qwen Code 还没有的东西：
+Token Weather 是 #13749 第一个里程碑的样例。它在输入框正上方画一行上下文窗口的"天气预报"：图标、一个词、占用百分比、token 数，以及最近几轮的走势图。它需要三样 MariaDB Shell Agent 还没有的东西：
 
 - `AbovePrompt` 组件上的 `ui.render` hook，返回由 `Box` 和 `Text` 元素组成的树；
 - `$.ui.resolve(e)`，把这些元素构造函数交给 hook；
 - `$.ui.invalidate("ui.render")`，它的 `turn.complete` hook 每读一次数就调用一次，让横带重画。
 
-它用到的其他部分，`session.start`、`turn.complete` 和 `$.session.usage()`，都已经能运行。现在 Qwen Code 在加载时跳过 `ui.render` hook，并提示 `Hooks for unsupported events will not run: ui.render`；`$.ui.resolve` 和 `$.ui.invalidate` 会抛出 `Mod API not supported`。宿主端也没有任何代码能画出 Mod 返回的树。
+它用到的其他部分，`session.start`、`turn.complete` 和 `$.session.usage()`，都已经能运行。现在 MariaDB Shell Agent 在加载时跳过 `ui.render` hook，并提示 `Hooks for unsupported events will not run: ui.render`；`$.ui.resolve` 和 `$.ui.invalidate` 会抛出 `Mod API not supported`。宿主端也没有任何代码能画出 Mod 返回的树。
 
 ## 目标与非目标
 
@@ -39,7 +39,7 @@ Token Weather 是 #13749 第一个里程碑的样例。它在输入框正上方�
 
 hook 收到 Claude Code 为横带定义的输入：
 
-| 字段                | Qwen Code 中的值                                                                                                            |
+| 字段                | MariaDB Shell Agent 中的值                                                                                                  |
 | ------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `surface`           | `"terminal"`                                                                                                                |
 | `component`         | `"AbovePrompt"`                                                                                                             |
@@ -60,7 +60,7 @@ hook 收到 Claude Code 为横带定义的输入：
 
 - **输入键**由视口的 `columns` 和 `isFullscreen` 以及 props 组成，按稳定的 JSON 比较。只改高度不会触发渲染，除非它改变了 `maxRows`。宽度或 `maxRows` 变化后要稳定 150 毫秒才运行，所以拖动调整窗口大小只跑一次渲染。
 - **第一次渲染**在 `session.start` 之后运行；切换会话（`/clear`、`/resume`、`/branch`）之后也会再跑一次，因为横带依据的信息可能变了。
-- **`$.ui.invalidate("ui.render")`** 请求重画调用方插件的 `ui.render` 注册可能选中的每个位置，并立即返回。Qwen Code 的 Mod 还没有定时器，所以这个调用总是来自其他某次调度，例如 `turn.complete`，渲染在那次调度结束后运行。多次调用会合并：一连串调用只跑一次渲染。渲染最多每 34 毫秒一次，即 Claude Code 对展开横带的频率。与 Claude Code 相同，某个插件的一次渲染超过这个时长时，它在随后一秒内降为常规频率，即每 100 毫秒最多一次，所以每次渲染都请求重画自己的 hook 不会一直占住调度队列。Claude Code 也允许对 `prompt.section` 等缓存事件调用 `$.ui.invalidate`；Qwen Code 里没有可丢弃的缓存，这类调用什么也不做。
+- **`$.ui.invalidate("ui.render")`** 请求重画调用方插件的 `ui.render` 注册可能选中的每个位置，并立即返回。MariaDB Shell Agent 的 Mod 还没有定时器，所以这个调用总是来自其他某次调度，例如 `turn.complete`，渲染在那次调度结束后运行。多次调用会合并：一连串调用只跑一次渲染。渲染最多每 34 毫秒一次，即 Claude Code 对展开横带的频率。与 Claude Code 相同，某个插件的一次渲染超过这个时长时，它在随后一秒内降为常规频率，即每 100 毫秒最多一次，所以每次渲染都请求重画自己的 hook 不会一直占住调度队列。Claude Code 也允许对 `prompt.section` 等缓存事件调用 `$.ui.invalidate`；MariaDB Shell Agent 里没有可丢弃的缓存，这类调用什么也不做。
 
 渲染与命令、工具中间件和回合事件共用会话的调度队列，因为 Mod worker 一次只跑一个根调度：
 
@@ -71,7 +71,7 @@ hook 收到 Claude Code 为横带定义的输入：
 
 ### 3. 元素、`h` 和 `Fragment`
 
-`$.ui.resolve(e)` 不经调度，直接读取 `e.surface` 的元素表。这张表是一个冻结、无原型的对象。终端的表包含 Claude Code 声明的全部十一个构造函数，所以解构出 `Button` 的 Mod 也能加载。本阶段只画 `Box` 和 `Text`；含其他元素的树判为不合格，原因是 `<Element> is not drawn by Qwen Code yet`。参数不是 surface 已知的 `ui.render` 输入时，调用抛错。
+`$.ui.resolve(e)` 不经调度，直接读取 `e.surface` 的元素表。这张表是一个冻结、无原型的对象。终端的表包含 Claude Code 声明的全部十一个构造函数，所以解构出 `Button` 的 Mod 也能加载。本阶段只画 `Box` 和 `Text`；含其他元素的树判为不合格，原因是 `<Element> is not drawn by MariaDB Shell Agent yet`。参数不是 surface 已知的 `ui.render` 输入时，调用抛错。
 
 构造函数接受 props（其中包括 `children`），返回一个深度冻结的纯数据元素，与 Claude Code 一致：
 
@@ -98,7 +98,7 @@ hook 收到 Claude Code 为横带定义的输入：
 - 终端没有的 `borderStyle` 画成无边框；
 - 文本总量超过 100,000 个字符时截断，结尾写 `… <n> more characters, not drawn`；截断不会拆开代理对。
 
-调试日志用 Claude Code 的原话记录每次拒绝和调整，例如 `<plugin>: ui.render hook skipped: returned the wrong shape (a tree AbovePrompt refuses: <reason>)` 和 `<plugin>: ui.render (AbovePrompt) refused: <reason>; nothing was drawn`。拒绝按原因每次加载记一次，调整按位置和类别每次加载记一次，所以每次渲染长度都在变的文本截断只记一次。Claude Code 也会把这些行显示在对话记录里，但只在热重载插件目录时。Qwen Code 还没有热重载，所以这些行只进调试日志。
+调试日志用 Claude Code 的原话记录每次拒绝和调整，例如 `<plugin>: ui.render hook skipped: returned the wrong shape (a tree AbovePrompt refuses: <reason>)` 和 `<plugin>: ui.render (AbovePrompt) refused: <reason>; nothing was drawn`。拒绝按原因每次加载记一次，调整按位置和类别每次加载记一次，所以每次渲染长度都在变的文本截断只记一次。Claude Code 也会把这些行显示在对话记录里，但只在热重载插件目录时。MariaDB Shell Agent 还没有热重载，所以这些行只进调试日志。
 
 ### 5. 在 Ink 中绘制
 
@@ -109,7 +109,7 @@ hook 收到 Claude Code 为横带定义的输入：
   - 文本换行值 `end` 和 `middle` 分别转换为 `truncate-end` 和 `truncate-middle`；
   - 间距档位换算成单元格：`xs` 和 `sm` 为横 1、竖 0，`md` 为 2 和 1，`lg` 为 3 和 1，`xl` 为 4 和 2；
   - `weight: "semibold"` 或 `"bold"` 画成粗体；`size`、`mono`、`tabular` 和 `dir` 丢弃，与 Claude Code 的终端一致；
-  - 属于 Claude Code 主题键的颜色映射到当前 Qwen Code 主题：`text` 对应主文本色，`subtle` 和 `inactive` 对应次文本色，`success`、`error` 和 `warning` 对应状态色，`claude` 和 `suggestion` 对应强调色；
+  - 属于 Claude Code 主题键的颜色映射到当前 MariaDB Shell Agent 主题：`text` 对应主文本色，`subtle` 和 `inactive` 对应次文本色，`success`、`error` 和 `warning` 对应状态色，`claude` 和 `suggestion` 对应强调色；
   - Claude Code 的其他主题键，例如 `permission` 或 `diffAdded`，本阶段画成默认颜色；
   - 其他颜色在 Ink 能接受时（颜色名或十六进制值）照常绘制，否则画成默认颜色；
   - 所有文本都做终端清洗，与 Mod 的对话记录行相同；制表符展开为空格，补到下一个 8 列制表位，与 Claude Code 的 Ink 相同。
@@ -131,8 +131,8 @@ hook 收到 Claude Code 为横带定义的输入：
 
 - **先做一个位置。** `AbovePrompt` 是 Token Weather 绘制的位置，而且引擎在这里什么都不画，`next(e)` 很简单。整条链路都在它上面搭起来并测试：调度、元素模型、校验、排程和绘制。之后的位置只需增加 props 和引擎节点。
 - **数据树，由宿主绘制。** Mod 从不接触 Ink。它的答复以 JSON 形式跨过 worker 边界，受现有的大小和深度限制约束；之后 OpenTUI 也能画同一棵树。
-- **不靠取消来替换渲染。** Claude Code 会中止过期的渲染。在 Qwen Code 里，取消可能终止 worker，结束本会话的所有 Mod，所以渲染改为合并和等待。
-- **完整沿用 Claude Code 的校验，包括本阶段不绘制的部分。** 对 `Box` 和 `Text` 而言，Qwen Code 接受的树 Claude Code 也接受，反之亦然。在这里测过的 Mod 到 Claude Code 里不会出错，`hover` 以后开始绘制时也照样能通过校验。
+- **不靠取消来替换渲染。** Claude Code 会中止过期的渲染。在 MariaDB Shell Agent 里，取消可能终止 worker，结束本会话的所有 Mod，所以渲染改为合并和等待。
+- **完整沿用 Claude Code 的校验，包括本阶段不绘制的部分。** 对 `Box` 和 `Text` 而言，MariaDB Shell Agent 接受的树 Claude Code 也接受，反之亦然。在这里测过的 Mod 到 Claude Code 里不会出错，`hover` 以后开始绘制时也照样能通过校验。
 - **由宿主提供位置。** Ink 和 OpenTUI 报告的 surface 都是 `terminal`，所以支持与否不能由 surface 名决定。`load` 请求里的能力字段让每个宿主提供它能绘制的位置。
 
 ## 与 Claude Code 的差异
@@ -141,13 +141,13 @@ hook 收到 Claude Code 为横带定义的输入：
 
 - 只触发 `AbovePrompt` 位置，且只在 Ink 中。`Box` 和 `Text` 以外的元素会使整棵树不合格。
 - 横带没有折叠标记、焦点、滚动和 `n more` 行。高于 `maxRows` 的树会被裁掉。`maxRows` 取终端行数的三分之一；Claude Code 在全屏时给出底部槽剩余的行数，否则给出终端高度。`bodyColumns` 保留 Claude Code 的五列预留。
-- `$.ui.invalidate` 在调用它的那次调度结束后才生效，因为 Qwen Code 的 Mod 没有定时器。
+- `$.ui.invalidate` 在调用它的那次调度结束后才生效，因为 MariaDB Shell Agent 的 Mod 没有定时器。
 - 渲染可能要排在工具调用及其审批之后，期间横带保持上一棵树。排在正在运行的渲染后面的工具调用、命令或回合事件也要等待该渲染完成，最长为链上每个 `ui.render` hook 各 10 秒。
 - `ui.resolve` hook 作为不支持的事件被跳过。`hover` 会校验，但不绘制。
-- 拒绝信息只进调试日志，因为 Qwen Code 没有热重载。
+- 拒绝信息只进调试日志，因为 MariaDB Shell Agent 没有热重载。
 - 虽然有 `h` 和 `Fragment`，但还不编译 JSX。
 
-Token Weather 样例读取的是 `e.hasSurvey` 和 `e.bodyColumns`，但 Claude Code 把这两个字段都声明在 `e.props` 下。所以无论在 Claude Code 还是 Qwen Code 里，这个样例都从不给调查让位，并且总按 80 列布局。Qwen Code 保持 Claude Code 的输入结构，不加别名。
+Token Weather 样例读取的是 `e.hasSurvey` 和 `e.bodyColumns`，但 Claude Code 把这两个字段都声明在 `e.props` 下。所以无论在 Claude Code 还是 MariaDB Shell Agent 里，这个样例都从不给调查让位，并且总按 80 列布局。MariaDB Shell Agent 保持 Claude Code 的输入结构，不加别名。
 
 ## PR 计划
 

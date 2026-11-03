@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -111,7 +112,7 @@ describe('carriedFindingOf — the id a comment body leads with', () => {
     // on which id a draft carries (#9940 review).
     expect(
       carriedFindingOf(
-        '**[Critical]** _— qwen3-max via Qwen Code /review (v0.21)_ R1-2: the null check is still missing',
+        '**[Critical]** _— qwen3-max via MariaDB Shell Agent /review (v0.21)_ R1-2: the null check is still missing',
       ),
     ).toEqual({ id: 'R1-2', fixInduced: false });
   });
@@ -1259,7 +1260,7 @@ describe('stampCarriedId — the write side of the readback', () => {
 
   it('a four-column line under an HTML-block marker line takes the id-less degradation — no shape serves both projections (#9940 review, audit 6)', () => {
     for (const draft of [
-      '<!-- c -->**[Critical]**\n    _— x via Qwen Code /review_ claim',
+      '<!-- c -->**[Critical]**\n    _— x via MariaDB Shell Agent /review_ claim',
       '<!-- c -->**[Critical]**\n\t**[Suggestion]** other\nclaim',
     ]) {
       expect(stampCarriedId(draft, 'R9-9')).toBe(draft);
@@ -1338,7 +1339,7 @@ describe('stampCarriedId — the write side of the readback', () => {
 
   it('a `(fix-induced)` marking only the attribution-off exit reveals on a model-carried id reads on both legs (#9940 review, audit 5)', () => {
     const body =
-      '**[Critical]** R1-2: _— foo\nbar via Qwen Code /review_ (fix-induced) the claim';
+      '**[Critical]** R1-2: _— foo\nbar via MariaDB Shell Agent /review_ (fix-induced) the claim';
     expect(carriedFindingOf(body)).toEqual({ id: 'R1-2', fixInduced: true });
     expect(carriedFindingOf(stripForUnattributedPost(body))).toEqual({
       id: 'R1-2',
@@ -1418,10 +1419,10 @@ describe('stampCarriedId — the write side of the readback', () => {
 
   it('a `(fix-induced)` token behind a soft-wrapped footer span is a marking on the bare leg — the stamp degrades rather than post it (#9940 review, audit 3)', () => {
     const draft =
-      '**[Critical]** _— x via Qwen\nCode /review_ (fix-induced) foo';
+      '**[Critical]** _— x via MariaDB Shell\nAgent /review_ (fix-induced) foo';
     expect(stampCarriedId(draft, 'R7-9')).toBe(draft);
     // Many tokens strip in one pass — the loop is not a pass per token.
-    const many = `**[Critical]** _— x via Qwen Code /review_ ${'(fix-induced) '.repeat(4000)}foo`;
+    const many = `**[Critical]** _— x via MariaDB Shell Agent /review_ ${'(fix-induced) '.repeat(4000)}foo`;
     const t0 = performance.now();
     const out = stampCarriedId(many, 'R7-9');
     expect(performance.now() - t0).toBeLessThan(2000);
@@ -1550,7 +1551,7 @@ describe('stampCarriedId — the write side of the readback', () => {
 
   it('strips a marking the slot read did not reach behind a forged footer span — the readback stays the arbiter (#9940 review, audit 2)', () => {
     const out = stampCarriedId(
-      '**[Critical]** _— x via Qwen Code /review_ (fix-induced) the claim',
+      '**[Critical]** _— x via MariaDB Shell Agent /review_ (fix-induced) the claim',
       'R1-5',
     );
     expect(out).not.toContain('(fix-induced)');

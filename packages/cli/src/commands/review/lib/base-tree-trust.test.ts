@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -80,10 +81,15 @@ describe('base-tree trust store', () => {
     home = mkdtempSync(join(tmpdir(), 'qwen-base-tree-home-'));
     vi.stubEnv('QWEN_HOME', home);
     repo = mkdtempSync(join(tmpdir(), 'qwen-base-tree-trust-'));
-    worktree = join(repo, '.qwen', 'tmp', 'review-pr-1');
+    worktree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     mkdirSync(worktree, { recursive: true });
     // Production geometry: the plan lives INSIDE the mounted tmp dir.
-    plan = join(repo, '.qwen', 'tmp', 'qwen-review-pr-1-fetch.json');
+    plan = join(
+      repo,
+      '.mariadb-shell-agent',
+      'tmp',
+      'qwen-review-pr-1-fetch.json',
+    );
     writeFileSync(plan, '{}');
   });
 
@@ -104,7 +110,12 @@ describe('base-tree trust store', () => {
       promptId,
       target,
       repositoryRoot: repo,
-      worktreePath: join(repo, '.qwen', 'tmp', `review-${target}`),
+      worktreePath: join(
+        repo,
+        '.mariadb-shell-agent',
+        'tmp',
+        `review-${target}`,
+      ),
       branch: `qwen-review/${target}`,
     });
   };
@@ -115,17 +126,17 @@ describe('base-tree trust store', () => {
 
   it('keys the trust file under the OUTERMOST repository in the nested geometry', () => {
     // A review launched from inside another review's worktree: the inner
-    // review's own `.qwen` sits inside the OUTER review's read-write mount,
+    // review's own `.mariadb-shell-agent` sits inside the OUTER review's read-write mount,
     // and a trust file there is the outer reviewed code's to read and
     // forge. The root is the outermost enclosing repository's — the same
     // path the lease module re-roots to — derived lexically, so no planted
     // pointer or link gets a say.
     const innerWt = join(
       repo,
-      '.qwen',
+      '.mariadb-shell-agent',
       'tmp',
       'review-pr-9',
-      '.qwen',
+      '.mariadb-shell-agent',
       'tmp',
       'review-pr-1',
     );
@@ -137,8 +148,10 @@ describe('base-tree trust store', () => {
     // Against the mounted directory itself, not a bare `tmp` segment: the
     // fixture repository is created under `tmpdir()`, which on Linux IS
     // `/tmp`, so a segment test rejects the whole fixture. The `+ sep` keeps
-    // a sibling named `.qwen/tmp-foo` from satisfying `startsWith`.
-    expect(p.startsWith(join(repo, '.qwen', 'tmp') + sep)).toBe(false);
+    // a sibling named `.mariadb-shell-agent/tmp-foo` from satisfying `startsWith`.
+    expect(p.startsWith(join(repo, '.mariadb-shell-agent', 'tmp') + sep)).toBe(
+      false,
+    );
   });
 
   it('lives beside the leases — outside the mounted tmp dir — one file per plan', () => {
@@ -146,7 +159,9 @@ describe('base-tree trust store', () => {
     expect(p.startsWith(dirname(reviewLeasePath(repo, 'pr-1')) + sep)).toBe(
       true,
     );
-    expect(p.startsWith(join(repo, '.qwen', 'tmp') + sep)).toBe(false);
+    expect(p.startsWith(join(repo, '.mariadb-shell-agent', 'tmp') + sep)).toBe(
+      false,
+    );
     // The name is the plan's PATH, never its stamps: a re-captured plan
     // rotates the file's CONTENT in place, so there is no earlier run's
     // sibling file left for a pinned timestamp to land on.
@@ -156,7 +171,7 @@ describe('base-tree trust store', () => {
     expect(baseTreeTrustPath(worktree, plan)).toBe(p);
   });
 
-  it('refuses a worktree outside the <root>/.qwen/tmp/<name> geometry', () => {
+  it('refuses a worktree outside the <root>/.mariadb-shell-agent/tmp/<name> geometry', () => {
     // A hand-passed `--worktree /tmp/wt` walks two directories up from it and
     // would otherwise key the trust file THERE — outside the repository,
     // where nothing ever sweeps it. The refusal names the geometry it
@@ -169,7 +184,7 @@ describe('base-tree trust store', () => {
     const orphan = join(repo, 'wt');
     mkdirSync(orphan, { recursive: true });
     expect(() => baseTreeTrustPath(orphan, plan)).toThrow(
-      /not shaped like <root>\/\.qwen\/tmp\/<name>/,
+      /not shaped like <root>\/\.mariadb-shell-agent\/tmp\/<name>/,
     );
   });
 
@@ -179,8 +194,13 @@ describe('base-tree trust store', () => {
     // re-roots to the outermost enclosing repository, and `runIdentity` must
     // read exactly there. Driven through the real writer, so the value
     // compared is the one production mints rather than a fixture's guess.
-    const innerRepo = join(repo, '.qwen', 'tmp', 'review-pr-9');
-    const innerWt = join(innerRepo, '.qwen', 'tmp', 'review-pr-1');
+    const innerRepo = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-9');
+    const innerWt = join(
+      innerRepo,
+      '.mariadb-shell-agent',
+      'tmp',
+      'review-pr-1',
+    );
     mkdirSync(innerWt, { recursive: true });
     createReviewWorktreeLease({
       sessionId: 's',
@@ -197,7 +217,7 @@ describe('base-tree trust store', () => {
       existsSync(
         join(
           innerRepo,
-          '.qwen',
+          '.mariadb-shell-agent',
           'review-leases',
           'qwen-review-lease-pr-1.json',
         ),
@@ -225,7 +245,12 @@ describe('base-tree trust store', () => {
       promptId: 'p',
       target: 'pr-1',
       repositoryRoot: repo,
-      worktreePath: join(repo, '.qwen', 'tmp', 'review-pr-1-elsewhere'),
+      worktreePath: join(
+        repo,
+        '.mariadb-shell-agent',
+        'tmp',
+        'review-pr-1-elsewhere',
+      ),
       branch: 'qwen-review/pr-1',
     });
     expect(() => runIdentity(worktree)).toThrow(/does not name/);
@@ -234,7 +259,7 @@ describe('base-tree trust store', () => {
   it('never reads a planted identity from the retired workspace directory', () => {
     const retired = join(
       repo,
-      '.qwen',
+      '.mariadb-shell-agent',
       'review-leases',
       'qwen-review-lease-pr-1.json',
     );
@@ -281,7 +306,7 @@ describe('base-tree trust store', () => {
     // carries the marker, so the geometry check there does not cover a
     // scratch tree sitting beside the review worktree. This does: no lease
     // names it, and an identity minted from anywhere else is a shared key.
-    const scratch = join(repo, '.qwen', 'tmp', 'scratch-x');
+    const scratch = join(repo, '.mariadb-shell-agent', 'tmp', 'scratch-x');
     mkdirSync(scratch, { recursive: true });
     acquireLease();
     expect(() => runIdentity(scratch)).toThrow(/not a review worktree/);

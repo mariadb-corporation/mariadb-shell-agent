@@ -34,9 +34,9 @@ These are illustrative single runs, not an acceptance benchmark. They show that 
 ```mermaid
 sequenceDiagram
     participant Client
-    participant Daemon as qwen serve
+    participant Daemon as mariadb-shell-agent serve
     participant Bridge as ACP bridge
-    participant Child as qwen --acp
+    participant Child as mariadb-shell-agent --acp
 
     Client->>Daemon: GET /health
     Daemon-->>Client: 200 listener ready

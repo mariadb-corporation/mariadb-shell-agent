@@ -33,7 +33,7 @@ export interface ServiceInfo {
   /** Start-time token guarding against PID reuse; absent in legacy files. */
   procStart?: string | null;
   /**
-   * PID-namespace inode of the writer. One `~/.qwen` can be shared across
+   * PID-namespace inode of the writer. One `~/.mariadb-shell-agent` can be shared across
    * namespaces and machines, where a PID number resolves to a different
    * process, so a reader needs this to recognise a record that is not its
    * own; absent in legacy files.
@@ -44,7 +44,7 @@ export interface ServiceInfo {
   servePid?: number;
   workerPid?: number;
   /**
-   * Per-workspace channel workers for a multi-workspace `qwen serve`. Additive
+   * Per-workspace channel workers for a multi-workspace `mariadb-shell-agent serve`. Additive
    * to the single-worker `channels` / `workerPid` fields, which stay populated
    * (union of channels; primary worker pid) for older readers.
    */

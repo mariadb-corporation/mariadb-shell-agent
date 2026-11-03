@@ -2,7 +2,7 @@
 
 [English](browser-use-concurrent-sessions.md) | [简体中文](browser-use-concurrent-sessions.zh-CN.md)
 
-Status: implemented, validation in progress, 2026-09-18. Tracks [#11609](https://github.com/QwenLM/qwen-code/issues/11609).
+Status: implemented, validation in progress, 2026-09-18. Tracks [#11609](https://github.invalid/QwenLM/qwen-code/issues/11609).
 
 ## Goal and current state
 
@@ -164,18 +164,18 @@ it a Host fix would never reach a user who already installed one. A usable Host
 of the same protocol and at least the bundled revision is reused; the SDK only
 adds missing browser registrations and never repoints the launcher at its own
 bundled copy, so CLIs from different checkouts do not take turns replacing it.
-A Host installed by a newer Qwen Code is never downgraded; the
-older CLI reports that Qwen Code must be updated.
+A Host installed by a newer MariaDB Shell Agent is never downgraded; the
+older CLI reports that MariaDB Shell Agent must be updated.
 
 Protocol 3 registers as `com.qwen.browser_use` with the launcher
-`~/.qwen/browser-use/host.sh`. Released protocol 2 CLIs re-register
-`com.qwen.browser` and `~/.qwen/browser-use/native-host.sh` on every first use.
+`~/.mariadb-shell-agent/browser-use/host.sh`. Released protocol 2 CLIs re-register
+`com.qwen.browser` and `~/.mariadb-shell-agent/browser-use/native-host.sh` on every first use.
 Sharing that name would let any older CLI point Chrome back at a protocol 2
 Host. Separate names keep the two registrations independent; the protocol 3
 installer never reads, rewrites or removes the protocol 2 files.
 
 Installation copies the bundled Host into a content-addressed file at
-`~/.qwen/browser-use/hosts/<sha256>/native-host.mjs`, then atomically updates
+`~/.mariadb-shell-agent/browser-use/hosts/<sha256>/native-host.mjs`, then atomically updates
 the launcher. The launcher records the protocol version, Host revision and chosen Node
 executable, whose path must remain available. Existing Host files and processes
 remain in place. An update takes effect on the next Host launch; installation
@@ -232,7 +232,7 @@ a live process keeps its files.
 Protocol 2 CLIs listen on `bridge.sock` in that socket base and wait for their
 own Native Host, which a protocol 3 extension never launches. Once per new
 listener, a protocol 3 Host connects to such a user-owned socket and sends its
-`hello`. The older CLI then reports that Qwen Code must be updated instead of
+`hello`. The older CLI then reports that MariaDB Shell Agent must be updated instead of
 a generic connection timeout. A Host serving an older extension does not send
 it.
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -52,7 +53,7 @@ function isEphemeralSlug(slug: string): boolean {
 }
 
 /**
- * Removes stale ephemeral worktrees under `<projectRoot>/.qwen/worktrees/`.
+ * Removes stale ephemeral worktrees under `<projectRoot>/.mariadb-shell-agent/worktrees/`.
  *
  * Safety guarantees (fail-closed):
  * - Only touches slugs matching {@link EPHEMERAL_WORKTREE_PATTERNS}.
@@ -135,7 +136,7 @@ export async function cleanupStaleAgentWorktrees(
       // A deliberately preserved entry needs its own breadcrumb. The caller
       // logs "nothing to remove" at debug when the sweep returns 0, so
       // without this line an operator chasing growth under
-      // `.qwen/worktrees/` cannot tell "the sweep never saw it" from "the
+      // `.mariadb-shell-agent/worktrees/` cannot tell "the sweep never saw it" from "the
       // sweep saw it and refused" — and now that any untracked file
       // preserves an entry, refusing is a common outcome. Stays at `debug`
       // for the reason recorded at the call site in config.ts: `info` on

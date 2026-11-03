@@ -4,7 +4,7 @@
 
 ## 背景
 
-提出这套基础设施时，Qwen Code 没有设置文件变更检测机制，用户修改 `settings.json` 后必须重启会话才能生效。本设计描述 #3696 热重载系统的基础设施层：自动检测设置文件变更并分发事件。
+提出这套基础设施时，MariaDB Shell Agent 没有设置文件变更检测机制，用户修改 `settings.json` 后必须重启会话才能生效。本设计描述 #3696 热重载系统的基础设施层：自动检测设置文件变更并分发事件。
 
 **范围**：本子任务只负责“检测文件变更 → 重载 → 通知监听器”。`Config` 在构造时复制了许多设置字段（`approvalMode`、`mcpServers`、`telemetry` 等），本子任务不会自动更新这些快照。只有实时读取 `LoadedSettings.merged` 的调用方（如 `useSettings()` hook、`disabledSkillNamesProvider`）会立即看到变更。其他子任务（MCP 重连、`/reload` 命令）负责把更新传递到 Config 内部状态。
 
@@ -21,19 +21,19 @@
 
 `writeWithBackupSync` 在本次调用独占的 `settings.json.write-*` 目录中暂存完整字节并复制旧设置，再通过一次替换 rename 发布。已有目标始终存在，但发布会替换其 inode。监听父目录（`depth: 0`）可检测替换以及后续文件创建或删除，不把监听绑定到旧 inode。按**精确 basename 匹配**过滤，只响应 `settings.json` 文件事件，忽略 `settings.json.write-*` 目录及其子文件、历史 `.tmp`/`.orig` 和编辑器临时文件。发布成功后尽力清理私有辅助文件；保存失败、进程中断或清理失败可能留下它们，watcher 必须忽略这些残留。发布与恢复契约参见[原子保存设置设计](../2026-09-30-atomic-settings-save.zh-CN.md)。
 
-### 延迟目录处理：启动时不创建 `.qwen/`
+### 延迟目录处理：启动时不创建 `.mariadb-shell-agent/`
 
-> **明确避免启动时的文件系统副作用。** watcher 绝不能仅为了监听而创建 `<project>/.qwen/`（或 `~/.qwen/`）。早期实现对缺失设置目录调用 `mkdirSync({ recursive: true })`，导致普通非 bare 启动在从未使用 Qwen 设置的项目中也悄悄创建 `<project>/.qwen/`，污染工作区和 git status。目录创建只由设置持久化负责；用户实际写入设置时，`saveSettings()` 自行调用 `mkdirSync`。
+> **明确避免启动时的文件系统副作用。** watcher 绝不能仅为了监听而创建 `<project>/.mariadb-shell-agent/`（或 `~/.mariadb-shell-agent/`）。早期实现对缺失设置目录调用 `mkdirSync({ recursive: true })`，导致普通非 bare 启动在从未使用 Qwen 设置的项目中也悄悄创建 `<project>/.mariadb-shell-agent/`，污染工作区和 git status。目录创建只由设置持久化负责；用户实际写入设置时，`saveSettings()` 自行调用 `mkdirSync`。
 
 为了在不创建目录、不递归项目树的前提下，检测会话期间新增的 `settings.json`，watcher 按每个 scope 的**目录**是否存在采用两阶段策略：
 
-- **启动时 `.qwen` 已存在** → 直接监听该目录（`watchTargetDir`，即上述策略）。
-- **`.qwen` 缺失** → **先监听父目录以引导建立监听**（`watchParentForDir`）：`chokidar.watch(parentDir, { depth: 0, ignoreInitial: true, ignored })`，其中 `ignored` 谓词 `(p) => p !== parentDir && basename(p) !== '.qwen'` 只允许 `.qwen` 条目通过，抑制其他顶层变动且从不递归。`.qwen` 出现后 watcher **提升**：关闭引导 watcher，在 `.qwen` 上创建目标 watcher，并安排一次刷新以读取其中可能已存在的 `settings.json`。
+- **启动时 `.mariadb-shell-agent` 已存在** → 直接监听该目录（`watchTargetDir`，即上述策略）。
+- **`.mariadb-shell-agent` 缺失** → **先监听父目录以引导建立监听**（`watchParentForDir`）：`chokidar.watch(parentDir, { depth: 0, ignoreInitial: true, ignored })`，其中 `ignored` 谓词 `(p) => p !== parentDir && basename(p) !== '.mariadb-shell-agent'` 只允许 `.mariadb-shell-agent` 条目通过，抑制其他顶层变动且从不递归。`.mariadb-shell-agent` 出现后 watcher **提升**：关闭引导 watcher，在 `.mariadb-shell-agent` 上创建目标 watcher，并安排一次刷新以读取其中可能已存在的 `settings.json`。
 
 健壮性细节：
 
-- **TOCTOU 守卫**：设置引导 watcher（使用 `ignoreInitial`）后再次检查 `existsSync(dir)`；若 `.qwen` 在间隙中已创建，立即提升。
-- **删除时降级**：若 `.qwen` 目录本身被删除（`unlinkDir`），目标 watcher 降级为父目录上的引导 watcher，以便捕获后续重建。
+- **TOCTOU 守卫**：设置引导 watcher（使用 `ignoreInitial`）后再次检查 `existsSync(dir)`；若 `.mariadb-shell-agent` 在间隙中已创建，立即提升。
+- **删除时降级**：若 `.mariadb-shell-agent` 目录本身被删除（`unlinkDir`），目标 watcher 降级为父目录上的引导 watcher，以便捕获后续重建。
 - **代次守卫**：chokidar 的 `close()` 是异步的，正在关闭的 watcher 所遗留的 `'all'` 回调可能重新触发提升，叠加 watcher。每个 scope 使用单调递增的代次标记，在每次提升、降级和 `stopWatching` 时递增，使过期回调成为空操作，保证每个 scope 最多一个活动 watcher。
 
 ### 变更检测：以语义差异作为主要去重机制
@@ -71,7 +71,7 @@ export type SettingsChangeListener = (
 export class SettingsWatcher {
   private readonly settings: LoadedSettings;
   private readonly watchers: Map<SettingScope, FSWatcher> = new Map();
-  // 'bootstrap' = watching parent for `.qwen`; 'target' = watching `.qwen`
+  // 'bootstrap' = watching parent for `.mariadb-shell-agent`; 'target' = watching `.mariadb-shell-agent`
   private readonly watchStage: Map<SettingScope, 'bootstrap' | 'target'> =
     new Map();
   // Monotonic token per scope; bumped on promote/demote to void stale callbacks
@@ -92,7 +92,7 @@ export class SettingsWatcher {
 #### `startWatching()`
 
 - 遍历 User 和 Workspace 两个 scope。
-- 按**目录**是否存在分支：`.qwen` 存在则直接监听，否则先监听父目录（参见[延迟目录处理](#延迟目录处理启动时不创建-qwen)）。
+- 按**目录**是否存在分支：`.mariadb-shell-agent` 存在则直接监听，否则先监听父目录（参见[延迟目录处理](#延迟目录处理启动时不创建-qwen)）。
 - **从不**创建目录，不调用 `mkdirSync`。
 - 全程使用 `ignoreInitial: true`、`depth: 0`。
 - bare mode 中不调用。
@@ -115,13 +115,13 @@ startWatching(): void {
 }
 ```
 
-`watchTargetDir` 是上述父目录与严格 basename 监听器；`.qwen` 本身被移除时也会降级为引导 watcher。`watchParentForDir` 设置仅关注 `.qwen` 的引导 watcher，并在 `.qwen` 出现后提升：
+`watchTargetDir` 是上述父目录与严格 basename 监听器；`.mariadb-shell-agent` 本身被移除时也会降级为引导 watcher。`watchParentForDir` 设置仅关注 `.mariadb-shell-agent` 的引导 watcher，并在 `.mariadb-shell-agent` 出现后提升：
 
 ```typescript
 private watchParentForDir(scope: SettingScope, settingsPath: string): void {
   const dir = path.dirname(settingsPath);
   const parentDir = path.dirname(dir);
-  const dirBasename = path.basename(dir); // ".qwen"
+  const dirBasename = path.basename(dir); // ".mariadb-shell-agent"
   const gen = this.bumpGeneration(scope);
 
   const watcher = watchFs(parentDir, {
@@ -142,7 +142,7 @@ private watchParentForDir(scope: SettingScope, settingsPath: string): void {
   this.watchers.set(scope, watcher);
   this.watchStage.set(scope, 'bootstrap');
 
-  // TOCTOU guard: `.qwen` may have appeared between the existence check and here.
+  // TOCTOU guard: `.mariadb-shell-agent` may have appeared between the existence check and here.
   if (fs.existsSync(dir)) void this.promoteScope(scope, settingsPath);
 }
 
@@ -151,7 +151,7 @@ private async promoteScope(scope: SettingScope, settingsPath: string): Promise<v
   await this.replaceWatcher(scope); // bumps generation + awaits async close()
   if (!this.started) return;
   this.watchTargetDir(scope, settingsPath);
-  this.scheduleRefresh(scope); // pick up a settings.json already inside .qwen
+  this.scheduleRefresh(scope); // pick up a settings.json already inside .mariadb-shell-agent
 }
 ```
 
@@ -312,28 +312,28 @@ settingsWatcher?.addChangeListener(async (events) => {
 
 ## 边界情况处理
 
-| 场景                                  | 处理方式                                                                       |
-| ------------------------------------- | ------------------------------------------------------------------------------ |
-| `.qwen` 目录不存在                    | **从不创建。** 先监听父目录（`depth: 0`、仅允许 `.qwen` 的过滤），出现后提升   |
-| 启动后创建 `.qwen`                    | 引导 watcher 捕获 `addDir`，提升为目标 watcher 并安排刷新                      |
-| 提升后删除 `.qwen`                    | 目标 watcher 捕获 `unlinkDir`，降级为父目录上的引导 watcher                    |
-| 删除文件                              | `reloadScopeFromDisk` 检测 `!existsSync`，重置为 `{}`，差异触发 `deleted` 事件 |
-| 启动后创建文件（目录已存在）          | 目录 watcher 捕获 `add`，`reloadScopeFromDisk` 读取新文件                      |
-| 提升/降级期间的过期回调               | 每个 scope 的代次标记使正在关闭的 watcher 回调成为空操作，不叠加 watcher       |
-| 编辑器原子写入                        | 监听目录、严格 basename 过滤（排除 `.tmp`/`.orig`），并以 300ms 防抖合并       |
-| 保存辅助文件及 `.tmp`/`.orig` 事件    | basename 过滤精确匹配 `settings.json`，忽略其他名称和私有目录内的文件          |
-| 自写入（`setValue` → `saveSettings`） | 语义比较：重载内容与内存快照相同，不通知                                       |
-| 自写入与外部编辑并发                  | 外部编辑改变内容，比较检测差异并正确通知                                       |
-| 仅格式/注释变化                       | `reloadScopeFromDisk` 解析后的设置不含注释，比较相同，不通知                   |
-| 重复 chokidar 事件                    | 防抖合并与语义比较提供双重保护                                                 |
-| `QWEN_HOME` 重定向                    | `getUserSettingsPath()` 已解析路径，watcher 使用解析后的路径                   |
-| bare mode                             | 从不调用 `startWatching()`，零开销                                             |
-| watcher 创建失败                      | 捕获异常并记录警告；该 scope 无实时检测，但其他功能不受影响                    |
-| `reloadScopeFromDisk` 解析失败        | 内部 try/catch（`settings.ts:501`）保留旧状态，前后比较相同，不通知            |
-| 键顺序变化但值未变                    | `JSON.stringify` 对顺序敏感，可能产生一次无害的额外通知                        |
-| Config 初始化失败                     | `shutdown()` 在 `initialized` 检查前停止 watcher，避免泄漏                     |
-| 重入（监听器仍在运行）                | `processing` 与 `drainPendingChanges` 循环使处理串行化                         |
-| 无效 JSON                             | `reloadScopeFromDisk` 内部 try/catch 保留旧状态                                |
+| 场景                                  | 处理方式                                                                                    |
+| ------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `.mariadb-shell-agent` 目录不存在     | **从不创建。** 先监听父目录（`depth: 0`、仅允许 `.mariadb-shell-agent` 的过滤），出现后提升 |
+| 启动后创建 `.mariadb-shell-agent`     | 引导 watcher 捕获 `addDir`，提升为目标 watcher 并安排刷新                                   |
+| 提升后删除 `.mariadb-shell-agent`     | 目标 watcher 捕获 `unlinkDir`，降级为父目录上的引导 watcher                                 |
+| 删除文件                              | `reloadScopeFromDisk` 检测 `!existsSync`，重置为 `{}`，差异触发 `deleted` 事件              |
+| 启动后创建文件（目录已存在）          | 目录 watcher 捕获 `add`，`reloadScopeFromDisk` 读取新文件                                   |
+| 提升/降级期间的过期回调               | 每个 scope 的代次标记使正在关闭的 watcher 回调成为空操作，不叠加 watcher                    |
+| 编辑器原子写入                        | 监听目录、严格 basename 过滤（排除 `.tmp`/`.orig`），并以 300ms 防抖合并                    |
+| 保存辅助文件及 `.tmp`/`.orig` 事件    | basename 过滤精确匹配 `settings.json`，忽略其他名称和私有目录内的文件                       |
+| 自写入（`setValue` → `saveSettings`） | 语义比较：重载内容与内存快照相同，不通知                                                    |
+| 自写入与外部编辑并发                  | 外部编辑改变内容，比较检测差异并正确通知                                                    |
+| 仅格式/注释变化                       | `reloadScopeFromDisk` 解析后的设置不含注释，比较相同，不通知                                |
+| 重复 chokidar 事件                    | 防抖合并与语义比较提供双重保护                                                              |
+| `QWEN_HOME` 重定向                    | `getUserSettingsPath()` 已解析路径，watcher 使用解析后的路径                                |
+| bare mode                             | 从不调用 `startWatching()`，零开销                                                          |
+| watcher 创建失败                      | 捕获异常并记录警告；该 scope 无实时检测，但其他功能不受影响                                 |
+| `reloadScopeFromDisk` 解析失败        | 内部 try/catch（`settings.ts:501`）保留旧状态，前后比较相同，不通知                         |
+| 键顺序变化但值未变                    | `JSON.stringify` 对顺序敏感，可能产生一次无害的额外通知                                     |
+| Config 初始化失败                     | `shutdown()` 在 `initialized` 检查前停止 watcher，避免泄漏                                  |
+| 重入（监听器仍在运行）                | `processing` 与 `drainPendingChanges` 循环使处理串行化                                      |
+| 无效 JSON                             | `reloadScopeFromDisk` 内部 try/catch 保留旧状态                                             |
 
 ## 性能分析
 
@@ -374,9 +374,9 @@ mock chokidar，复用 `skill-manager.test.ts` 的模式：
 6. **串行化**：`handleChange` 期间出现的新事件累积，并在处理后排空。
 7. **错误隔离**：chokidar 错误、监听器异常不会引起崩溃或影响其他监听器；捕获 `reloadScopeFromDisk` 失败。
 8. **监听器超时**：30s 超时保护。
-9. **延迟监听目录**：`.qwen` 缺失时不调用 `mkdirSync`；在父目录设置引导 watcher，`ignored` 谓词仅允许 `.qwen` 条目。
-10. **提升/TOCTOU**：`.qwen` 出现（`addDir` 或设置监听后的复查）时关闭引导 watcher，在 `.qwen` 上打开目标 watcher 并安排刷新。
-11. **降级/重建**：删除 `.qwen`（`unlinkDir`）后重新引导监听父目录；后续重建再次提升。
+9. **延迟监听目录**：`.mariadb-shell-agent` 缺失时不调用 `mkdirSync`；在父目录设置引导 watcher，`ignored` 谓词仅允许 `.mariadb-shell-agent` 条目。
+10. **提升/TOCTOU**：`.mariadb-shell-agent` 出现（`addDir` 或设置监听后的复查）时关闭引导 watcher，在 `.mariadb-shell-agent` 上打开目标 watcher 并安排刷新。
+11. **降级/重建**：删除 `.mariadb-shell-agent`（`unlinkDir`）后重新引导监听父目录；后续重建再次提升。
 12. **代次守卫**：已关闭的引导 watcher 的过期回调不创建第二个目标 watcher。
 
 ### 回归验证
@@ -390,7 +390,7 @@ cd packages/core && npx vitest run src/config/
 
 ### 人工验证
 
-在会话运行期间编辑 `~/.qwen/settings.json`，观察 debug 日志中的变更事件。
+在会话运行期间编辑 `~/.mariadb-shell-agent/settings.json`，观察 debug 日志中的变更事件。
 
 ---
 

@@ -4,7 +4,7 @@ Issue: #11484
 
 [English](explicit-update-version.md) | [简体中文](explicit-update-version.zh-CN.md)
 
-`qwen update` 目前会先通过 npm 发现版本，再下载对应的发布制品。如果运营者已经选定了某个确切版本，在无法访问 registry 的环境下就无法安装它，即使发布制品本身可以正常下载。
+`mariadb-shell-agent update` 目前会先通过 npm 发现版本，再下载对应的发布制品。如果运营者已经选定了某个确切版本，在无法访问 registry 的环境下就无法安装它，即使发布制品本身可以正常下载。
 
 为 CLI 更新命令添加 `--target-version`。在本地校验并规范化所给的具体版本，跳过版本发现，并以该版本为目标复用独立安装更新器。不提供该选项时，保留现有的版本发现逻辑与安装指引。现有的 `--version` 选项保持仅展示版本的含义不变。
 

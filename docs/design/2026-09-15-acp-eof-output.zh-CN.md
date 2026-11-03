@@ -34,7 +34,7 @@ abort。操作结束后释放定时器和 writer 锁。
 在读端关闭时记录 EPIPE 但仍退出 0；`cc0f7c6949` 则分别携带排空超时或原始
 EPIPE 退出 1。这是失败报告的改善，不是保留基线退出码。通过关闭读管道断开的
 IDE 或嵌入式客户端可能观察到新的退出码 1。
-[Linux A/B 报告](https://github.com/QwenLM/qwen-code/pull/11916#issuecomment-5677832569)
+[Linux A/B 报告](https://github.invalid/QwenLM/qwen-code/pull/11916#issuecomment-5677832569)
 记录了这些测量；本次文档修正没有重跑。
 
 排空期间保留信号处理器。现有 SIGTERM/SIGINT 的 destroy-and-exit 路径继续
@@ -45,7 +45,7 @@ IDE 或嵌入式客户端可能观察到新的退出码 1。
 仍在 SDK、NDJSON 或带准入检查的 Web stream 中排队的调用尚未跨过这个边界，
 即使调用方在 EOF 前已经发出。它们之后可能被 `ACP output is closed` 拒绝，
 由 SDK 记录错误并丢弃，而 ACP 仍退出 0。
-[沙箱报告](https://github.com/QwenLM/qwen-code/pull/11916#issuecomment-5691411334)
+[沙箱报告](https://github.invalid/QwenLM/qwen-code/pull/11916#issuecomment-5691411334)
 在 `b8124075c6` 测得该残余行为：200 帧积压仅交付 93 个完整帧（已发出的
 431,090 字节中收到 200,405 字节，46.5%），退出 0；其基线没有交付字节，
 也退出 0。这是单个测试脚本的观察，不是交付比例保证。上游队列排空继续延后。
@@ -62,7 +62,7 @@ IDE 或嵌入式客户端可能观察到新的退出码 1。
 
 执行受影响测试、build、typecheck、bundle、lint，随后进行两轮无问题自审及
 独立审查。原始复现和其他失败观察保留在
-`.qwen/issues/issue-11866-acp-eof-output.md`。
+`.mariadb-shell-agent/issues/issue-11866-acp-eof-output.md`。
 
 ## 最终验证结果
 

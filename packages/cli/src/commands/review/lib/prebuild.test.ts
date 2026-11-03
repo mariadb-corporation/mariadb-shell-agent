@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -72,7 +73,7 @@ describe('prebuildRequested', () => {
   });
 
   it('ignores a value sourced from a .env file', () => {
-    // The reviewed checkout's `.qwen/.env` reaches process.env through the
+    // The reviewed checkout's `.mariadb-shell-agent/.env` reaches process.env through the
     // environment loader; a repository must not decide to prebuild its own
     // review. Same rule as QWEN_REVIEW_SANDBOX.
     expect(
@@ -400,7 +401,7 @@ describe('prebuildCovered', () => {
       workspace = realpathSync(
         mkdtempSync(join(tmpdir(), 'qwen-cover-workspace-')),
       );
-      mkdirSync(join(workspace, '.qwen'), { recursive: true });
+      mkdirSync(join(workspace, '.mariadb-shell-agent'), { recursive: true });
       cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue(workspace);
     });
 
@@ -411,7 +412,7 @@ describe('prebuildCovered', () => {
 
     function weldWorkspace(value: unknown): void {
       writeFileSync(
-        join(workspace, '.qwen', 'settings.json'),
+        join(workspace, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({ tools: { shell: { defaultTimeoutMs: value } } }),
       );
     }

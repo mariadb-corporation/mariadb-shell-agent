@@ -122,7 +122,7 @@
 
 - Mem0 Platform V3 基于官方[搜索 API](https://docs.mem0.ai/api-reference/memory/search-memories)及 [V2 到 V3 迁移契约](https://docs.mem0.ai/migration/platform-v2-to-v3)。
 - Mem0 OSS REST 固定在上游提交 [`39bc023`](https://github.com/mem0ai/mem0/tree/39bc02330563764e7d4465f1ecff5f002d94da1a)，具体参考 [`server/main.py`](https://github.com/mem0ai/mem0/blob/39bc02330563764e7d4465f1ecff5f002d94da1a/server/main.py) 与 [`server/auth.py`](https://github.com/mem0ai/mem0/blob/39bc02330563764e7d4465f1ecff5f002d94da1a/server/auth.py)。
-- PolarDB 预设基于官方 [PolarDB for MySQL Mem0 契约](https://help.aliyun.com/en/polardb/polardb-for-mysql/use-polardb-mem0)及[该 PR 记录的真实端到端证据](https://github.com/QwenLM/qwen-code/pull/9952#issuecomment-5407141853)。公开文档涵盖地址、认证和作用域字段位置；真实实例还验证了直接导入时会遵守 `infer: false`。
+- PolarDB 预设基于官方 [PolarDB for MySQL Mem0 契约](https://help.aliyun.invalid/en/polardb/polardb-for-mysql/use-polardb-mem0)及[该 PR 记录的真实端到端证据](https://github.invalid/QwenLM/qwen-code/pull/9952#issuecomment-5407141853)。公开文档涵盖地址、认证和作用域字段位置；真实实例还验证了直接导入时会遵守 `infer: false`。
 
 测试必须持续固定这些确切的请求与响应形状。上游协议若发生不兼容变化，应添加新预设标识，而不是原地修改已有映射。
 

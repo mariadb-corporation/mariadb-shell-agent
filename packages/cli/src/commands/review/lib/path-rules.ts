@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +22,7 @@
 //
 // So: a small table of path → checklist, appended to the brief of every agent whose
 // territory actually contains a matching file. It is additive to the project's own
-// rules (`.qwen/review-rules.md` and friends), never a replacement: a project that
+// rules (`.mariadb-shell-agent/review-rules.md` and friends), never a replacement: a project that
 // says nothing about workflows still gets these, and a project that says something
 // gets both.
 //
@@ -216,11 +217,11 @@ const NON_CONTRACT_STEM = new RegExp(
 /**
  * Repository-meta and agent-context documents, matched whole. Unlike a genre
  * this is a CLOSED set of conventional filenames — the reason it can be
- * enumerated at all, and the reason it is exact-match: `qwen` excludes an
+ * enumerated at all, and the reason it is exact-match: `mariadb-shell-agent` excludes an
  * agent-context file without touching `qwen-serve-protocol`.
  */
 const NON_CONTRACT_FILE =
-  /^(?:contributing|roadmap|code[-_]of[-_]conduct|license|licence|authors|governance|support|qwen|agents|claude)$/i;
+  /^(?:contributing|roadmap|code[-_]of[-_]conduct|license|licence|authors|governance|support|mariadb-shell-agent|agents|claude)$/i;
 /**
  * Trees whose prose the author of a diff does not own. A vendored library or a
  * doc-shaped fixture can carry a whole reference section, and the location
@@ -248,7 +249,7 @@ const CONTRACT_DOCS: PathRule = {
   // its wire reference outside a documentation or SDK tree (`PROTOCOL.md` at the
   // root, `spec/wire.md`) is not governed. That is the precision side of the
   // trade this file already takes everywhere else, and a project that wants the
-  // checklist anyway has `.qwen/review-rules.md`.
+  // checklist anyway has `.mariadb-shell-agent/review-rules.md`.
   //
   // The reverse cost — non-contract prose inside a governed section — is
   // answered only where it can be answered by a closed set (the genres above,

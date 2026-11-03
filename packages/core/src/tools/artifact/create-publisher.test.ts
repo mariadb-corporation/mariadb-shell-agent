@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +22,7 @@ const cfg = (
     getArtifactHostConfig: () => host,
     getArtifactOssConfig: () => ({
       bucket: 'artifact-bucket',
-      endpoint: 'oss-cn-hangzhou.aliyuncs.com',
+      endpoint: 'oss-cn-hangzhou.aliyuncs.invalid',
     }),
   }) as unknown as Config;
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -44,28 +45,28 @@ describe('static documentation navigation profile', () => {
 
   it('accepts the quoted keys and separators from #11426', () => {
     const base = `export default {
-  'Contribute to Qwen Code': {
-    title: 'Contribute to Qwen Code',
+  'Contribute to MariaDB Shell Agent': {
+    title: 'Contribute to MariaDB Shell Agent',
     type: 'separator',
   },
   architecture: 'Architecture',
   roadmap: 'Roadmap',
   contributing: 'Contributing Guide',
-  'Qwen Code SDK': {
+  'MariaDB Shell Agent SDK': {
     title: 'Agent SDK',
     type: 'separator',
   },
   'sdk-typescript': 'TypeScript SDK',
   'sdk-python': 'Python SDK (alpha)',
   'sdk-java': 'Java SDK (alpha)',
-  'Dive Into Qwen Code': {
-    title: 'Dive Into Qwen Code',
+  'Dive Into MariaDB Shell Agent': {
+    title: 'Dive Into MariaDB Shell Agent',
     type: 'separator',
   },
 
   'channel-plugins': 'Channel Plugin Guide',
   tools: 'Tools',
-  'qwen-serve-protocol': 'qwen serve HTTP protocol',
+  'qwen-serve-protocol': 'mariadb-shell-agent serve HTTP protocol',
   daemon: 'Daemon Mode (Developer Deep Dive)',
 
   examples: {

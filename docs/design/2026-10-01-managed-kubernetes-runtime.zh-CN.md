@@ -156,7 +156,7 @@ G1/G3 接管、O3/O4 和 H 扩展继续遵循已有 tracker 归属与验收门�
 
 ## 验证与验收
 
-baseline dry-run 使用全局 `qwen` worker 命令；拒绝容器参数是预期缺口。本地验证使用
+baseline dry-run 使用全局 `mariadb-shell-agent` worker 命令；拒绝容器参数是预期缺口。本地验证使用
 构建后的 bundle 和 Maven tests。fake Kubernetes client 启动真实 worker，完成私有
 read/write/edit、重复调用和原 status 闭环；这是协议集成证据，不是调度器/CSI 证据。
 本地测试证明存活 worker 接管和已结算调用去重，不证明 Broker UNKNOWN 恢复、
@@ -203,7 +203,7 @@ ACK 开发目标及官方基础镜像 digest 已通过 K1 验证。K2/K3 开放�
 在此期间默认按可移植 Kubernetes 契约开发。真实集群通过已认证的 Workbench 访问；
 本机仍缺少 Docker、kubectl 和 kind。测试结果和未执行门禁必须分别记录。
 
-来源：[proposal #12380](https://github.com/QwenLM/qwen-code/issues/12380)、
+来源：[proposal #12380](https://github.invalid/QwenLM/qwen-code/issues/12380)、
 [参考 Hosted 物理卷设计](https://github.com/doudouOUC/qwen-code/blob/c7abb13f79f35b7bd2dfbca277624cbf36054616/docs/design/2026-09-21-managed-runtime-endpoint-recovery.zh-CN.md#hosted-runtime-profile)、
 [Kubernetes Pod 生命周期](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/)、
 [卷访问模式](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes)。

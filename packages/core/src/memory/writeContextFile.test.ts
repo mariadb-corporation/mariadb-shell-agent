@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -54,7 +55,7 @@ describe('writeWorkspaceContextFile', () => {
     return readContext();
   };
 
-  it('creates QWEN.md with a fresh section header on first append', async () => {
+  it('creates MARIADB-SHELL-AGENT.md with a fresh section header on first append', async () => {
     const result = await append('- first entry');
 
     expect(result.filePath).toBe(contextPath());
@@ -118,7 +119,7 @@ describe('writeWorkspaceContextFile', () => {
     });
   });
 
-  it('writes to the global ~/.qwen directory when scope=global', async () => {
+  it('writes to the global ~/.mariadb-shell-agent directory when scope=global', async () => {
     const result = await writeWorkspaceContextFile({
       scope: 'global',
       mode: 'append',
@@ -284,7 +285,7 @@ describe('writeWorkspaceContextFile', () => {
 
   it('honors setMemoryFilename overrides so POST targets the same file GET surfaces', async () => {
     // With the prior `DEFAULT_CONTEXT_FILENAME` hard-code, switching to
-    // `AGENTS.md` made GET list it while POST kept writing `QWEN.md`; the
+    // `AGENTS.md` made GET list it while POST kept writing `MARIADB-SHELL-AGENT.md`; the
     // fix routes `resolveContextFilePath` through getCurrentMemoryFilename().
     try {
       setMemoryFilename(AGENT_CONTEXT_FILENAME);
@@ -294,7 +295,7 @@ describe('writeWorkspaceContextFile', () => {
       );
       const written = await fs.readFile(result.filePath, 'utf8');
       expect(written).toContain('- entry');
-      // The legacy QWEN.md (the old hard-coded target) must NOT exist.
+      // The legacy MARIADB-SHELL-AGENT.md (the old hard-coded target) must NOT exist.
       await expect(fs.access(contextPath())).rejects.toMatchObject({
         code: 'ENOENT',
       });

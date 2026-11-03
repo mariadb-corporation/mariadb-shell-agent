@@ -27,7 +27,7 @@ Native Host 继续只转发消息。这些标识用于区分兼容的实例，�
 
 发现连接时，不兼容的 Qwen 扩展不会阻止兼容 profile 在正常连接超时窗口内接入。
 如果没有兼容连接，请求以 `EXTENSION_VERSION_MISMATCH` 失败，其消息会明确指出
-需要更新扩展还是 Qwen Code。浏览器发现会直接报告该错误，而不是返回空的浏览器
+需要更新扩展还是 MariaDB Shell Agent。浏览器发现会直接报告该错误，而不是返回空的浏览器
 列表；只有普通的 `BROWSER_DISCONNECTED` 才会被报告为空列表。选定 profile 后，
 只有该 profile 断线后的握手可以提供这一诊断，其他 profile 不能覆盖它。
 兼容连接建立或停止 transport 时会清除诊断。
@@ -63,7 +63,7 @@ Native Host 继续只转发消息。这些标识用于区分兼容的实例，�
 
 ## 并发 session 后续工作
 
-由 [#11609](https://github.com/QwenLM/qwen-code/issues/11609) 跟进。
+由 [#11609](https://github.invalid/QwenLM/qwen-code/issues/11609) 跟进。
 
 [并发会话设计](browser-use-concurrent-sessions.zh-CN.md)（已实现，验证进行中）定义共享 Native Host 拓扑与会话归属边界。
 

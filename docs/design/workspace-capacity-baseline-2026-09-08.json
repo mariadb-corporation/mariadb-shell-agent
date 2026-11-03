@@ -10,7 +10,7 @@
   },
   "artifact": {
     "head": "1a73f5bff6201473f237c5106367e944ba2d092b",
-    "changedFile": ".qwen/experiments/11386/cap256/dist/chunks/chunk-RJYXLKEL.js",
+    "changedFile": ".mariadb-shell-agent/experiments/11386/cap256/dist/chunks/chunk-RJYXLKEL.js",
     "before": "var MAX_REGISTERED_WORKSPACES = MAX_DAEMON_WORKSPACES;",
     "after": "var MAX_REGISTERED_WORKSPACES = 256;",
     "originalSha256": "0298fc2d87007bb73ed663b3a10a698092362afa7f222f5fa0c046c7a4c9a229",

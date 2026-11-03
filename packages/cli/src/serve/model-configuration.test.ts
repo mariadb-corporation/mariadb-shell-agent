@@ -336,8 +336,8 @@ describe('persisted model configuration', () => {
   it.each([{}, { gemini: [{ id: 'gem' }] }])(
     'edits inherited provider buckets in their own scope (%j)',
     (workspaceProviders) => {
-      fs.mkdirSync(path.join(temp, '.qwen'));
-      const filename = path.join(temp, '.qwen/settings.json');
+      fs.mkdirSync(path.join(temp, '.mariadb-shell-agent'));
+      const filename = path.join(temp, '.mariadb-shell-agent/settings.json');
       fs.writeFileSync(
         filename,
         JSON.stringify({ modelProviders: workspaceProviders }),
@@ -370,7 +370,7 @@ describe('persisted model configuration', () => {
       const filename =
         scope === 'user'
           ? path.join(temp, 'settings.json')
-          : path.join(temp, '.qwen/settings.json');
+          : path.join(temp, '.mariadb-shell-agent/settings.json');
       fs.mkdirSync(path.dirname(filename), { recursive: true });
       const model = {
         id: 'private',
@@ -461,8 +461,8 @@ describe('persisted model configuration', () => {
   });
   it('rejects stale scope and duplicate identities without writes', () => {
     const key = listModelConfigurations(load())[0]!.key;
-    fs.mkdirSync(path.join(temp, '.qwen'));
-    const filename = path.join(temp, '.qwen/settings.json');
+    fs.mkdirSync(path.join(temp, '.mariadb-shell-agent'));
+    const filename = path.join(temp, '.mariadb-shell-agent/settings.json');
     fs.writeFileSync(
       filename,
       JSON.stringify({ modelProviders: { openai: [models[0], models[0]] } }),
@@ -475,9 +475,9 @@ describe('persisted model configuration', () => {
     expect(fs.readFileSync(filename, 'utf8')).toBe(before);
   });
   it('does not load untrusted workspace providers or write after generation closes', () => {
-    fs.mkdirSync(path.join(temp, '.qwen'));
+    fs.mkdirSync(path.join(temp, '.mariadb-shell-agent'));
     fs.writeFileSync(
-      path.join(temp, '.qwen/settings.json'),
+      path.join(temp, '.mariadb-shell-agent/settings.json'),
       JSON.stringify({ modelProviders: { openai: [{ id: 'untrusted' }] } }),
     );
     const configs = listModelConfigurations(load(false));

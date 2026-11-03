@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +10,7 @@ import * as path from 'node:path';
 
 // Keep this literal in sync with core's QWEN_DIR. This lite module must not
 // import @qwen-code/qwen-code-core because it runs before serve listener ready.
-export const SETTINGS_DIRECTORY_NAME = '.qwen';
+export const SETTINGS_DIRECTORY_NAME = '.mariadb-shell-agent';
 
 /**
  * Whether a `QWEN_HOME` value expands against the home directory: `~`, or a
@@ -179,12 +180,12 @@ export function getSystemSettingsPath(
     return configured;
   }
   if (os.platform() === 'darwin') {
-    return '/Library/Application Support/QwenCode/settings.json';
+    return '/Library/Application Support/MariaDBShellAgent/settings.json';
   }
   if (os.platform() === 'win32') {
-    return 'C:\\ProgramData\\qwen-code\\settings.json';
+    return 'C:\\ProgramData\\mariadb-shell-agent\\settings.json';
   }
-  return '/etc/qwen-code/settings.json';
+  return '/etc/mariadb-shell-agent/settings.json';
 }
 
 export function getSystemDefaultsPath(

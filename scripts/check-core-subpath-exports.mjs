@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,7 +17,7 @@
  * and Node resolves it against core's `exports` map.
  *
  * Nothing else exercises that entry. Remove it, rename the `dist/src` root, or
- * add a pattern that shadows it, and every suite stays green while `qwen` dies
+ * add a pattern that shadows it, and every suite stays green while `mariadb-shell-agent` dies
  * on its first core subpath import. This runs Node's real resolver against the
  * built package so that failure lands in CI instead. It also rejects targets
  * outside core's published `dist/`, so a specifier the `./src/*` exports entry
@@ -114,7 +115,7 @@ for (const specifier of specifiers) {
 if (failed) {
   console.error(
     `\n${failed} of ${specifiers.size} core subpath specifiers do not resolve through the package exports map.\n` +
-      'The published CLI resolves them this way and nothing else does, so this breaks `qwen` at startup\n' +
+      'The published CLI resolves them this way and nothing else does, so this breaks `mariadb-shell-agent` at startup\n' +
       'while every in-repo suite stays green. Check the exports map in packages/core/package.json.',
   );
   process.exit(1);

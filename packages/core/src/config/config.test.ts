@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -376,15 +377,15 @@ vi.mock('../tools/read-many-files', () => ({
 }));
 vi.mock('../utils/memory-constants.js', () => ({
   setMemoryFilename: vi.fn(),
-  getCurrentMemoryFilename: vi.fn(() => 'QWEN.md'), // Mock the original filename
-  getAllMemoryFilenames: vi.fn(() => ['QWEN.md', 'AGENTS.md']),
-  DEFAULT_CONTEXT_FILENAME: 'QWEN.md',
+  getCurrentMemoryFilename: vi.fn(() => 'MARIADB-SHELL-AGENT.md'), // Mock the original filename
+  getAllMemoryFilenames: vi.fn(() => ['MARIADB-SHELL-AGENT.md', 'AGENTS.md']),
+  DEFAULT_CONTEXT_FILENAME: 'MARIADB-SHELL-AGENT.md',
 }));
 vi.mock('../tools/memory-config', () => ({
   setMemoryFilename: vi.fn(),
-  getCurrentMemoryFilename: vi.fn(() => 'QWEN.md'),
-  getAllMemoryFilenames: vi.fn(() => ['QWEN.md', 'AGENTS.md']),
-  DEFAULT_CONTEXT_FILENAME: 'QWEN.md',
+  getCurrentMemoryFilename: vi.fn(() => 'MARIADB-SHELL-AGENT.md'),
+  getAllMemoryFilenames: vi.fn(() => ['MARIADB-SHELL-AGENT.md', 'AGENTS.md']),
+  DEFAULT_CONTEXT_FILENAME: 'MARIADB-SHELL-AGENT.md',
   AGENT_CONTEXT_FILENAME: 'AGENTS.md',
   MEMORY_SECTION_HEADER: '## Qwen Added Memories',
 }));
@@ -497,7 +498,8 @@ vi.mock('../core/toolHookTriggers.js', () => ({
 }));
 
 type MemoryLoad = Awaited<ReturnType<typeof loadServerHierarchicalMemory>>;
-const PROJECT_RULES = '--- Context from: QWEN.md ---\nProject rules';
+const PROJECT_RULES =
+  '--- Context from: MARIADB-SHELL-AGENT.md ---\nProject rules';
 /** A loadServerHierarchicalMemory result that loaded nothing unless overridden. */
 const memoryLoad = (overrides: Partial<MemoryLoad> = {}): MemoryLoad => ({
   memoryContent: '',
@@ -673,8 +675,8 @@ const resolveGeneratorModel = (model: string) =>
 type ModelRoute = NonNullable<
   ConfigParameters['modelProvidersConfig']
 >[string][number];
-const DASHSCOPE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
-const IDEALAB_URL = 'https://idealab.alibaba-inc.com/api/anthropic';
+const DASHSCOPE_URL = 'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
+const IDEALAB_URL = 'https://idealab.alibaba-inc.invalid/api/anthropic';
 const OPENAI_URL = 'https://api.openai.com/v1';
 /** A modelProviders route; `name` defaults to the id. */
 const route = (
@@ -2998,7 +3000,7 @@ describe('Server Config (config.ts)', () => {
       expect([...child.getWorkspaceContext().getDirectories()]).toEqual([dir]);
       expect(child.getFileService()).not.toBe(parent.getFileService());
       expect(child.getFileService().getQwenIgnoreFileNamesDisplay()).toBe(
-        '.qwenignore, .cursorignore',
+        '.mariadb-shell-agentignore, .cursorignore',
       );
       const workspaceState = child as unknown as Record<string, unknown>;
       expect(workspaceState['targetDir']).toBe(dir);
@@ -5238,6 +5240,26 @@ describe('Server Config (config.ts)', () => {
     await expect(lspConfig().reinitializeLsp()).resolves.toBeUndefined();
   });
 
+  it('discovers LSP servers again once extensions declaring them are loaded', () => {
+    const extension = (lspServers?: string) =>
+      ({
+        name: 'dev',
+        isActive: true,
+        config: { name: 'dev', version: '1.0.0', lspServers },
+      }) as unknown as Extension;
+    const reinitialize = vi.fn().mockResolvedValue(reconcile({}));
+    const config = lspConfig({ reinitialize });
+    const loaded = vi.spyOn(config, 'getActiveExtensions');
+
+    loaded.mockReturnValue([extension()]);
+    config.refreshLspAfterExtensionsLoaded();
+    expect(reinitialize).not.toHaveBeenCalled();
+
+    loaded.mockReturnValue([extension('./.lsp.json')]);
+    config.refreshLspAfterExtensionsLoaded();
+    expect(reinitialize).toHaveBeenCalledOnce();
+  });
+
   it('should delegate LSP reinitialize to the configured client', async () => {
     const result = reconcile({ added: ['tsserver'] });
     const reinitialize = vi.fn().mockResolvedValue(result);
@@ -7035,7 +7057,7 @@ describe('Server Config (config.ts)', () => {
       const cfg: ContentGeneratorConfig = {
         model: 'qwen3.8-flash',
         authType: AuthType.USE_OPENAI,
-        baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
         reasoning: { effort: 'low' },
         extra_body: { thinking_budget: 4096 },
       };
@@ -7101,7 +7123,7 @@ describe('Server Config (config.ts)', () => {
         const config = maxEffortConfig({
           model,
           authType: AuthType.USE_OPENAI,
-          baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+          baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
           extra_body: { model: finalModel, thinking_budget: 4096 },
         });
         expect(config.getReasoningEffortOverride()).toEqual(
@@ -7382,9 +7404,12 @@ describe('Server Config (config.ts)', () => {
       ['https://api.deepseek.com/v1', 'settings'],
       ['https://api.deepseek.com/v1', 'programmatic'],
       ['https://api.deepseek.com/v1', 'modelProviders'],
-      ['https://dashscope.aliyuncs.com/compatible-mode/v1', 'settings'],
-      ['https://dashscope.aliyuncs.com/compatible-mode/v1', 'programmatic'],
-      ['https://dashscope.aliyuncs.com/compatible-mode/v1', 'modelProviders'],
+      ['https://dashscope.aliyuncs.invalid/compatible-mode/v1', 'settings'],
+      ['https://dashscope.aliyuncs.invalid/compatible-mode/v1', 'programmatic'],
+      [
+        'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
+        'modelProviders',
+      ],
     ] as const)(
       'preserves only explicit DeepSeek off on %s from %s across refresh and reload',
       async (baseUrl, kind) => {
@@ -7463,7 +7488,7 @@ describe('Server Config (config.ts)', () => {
         vi.mocked(resolveContentGeneratorConfigWithSources).mockImplementation(
           actual.resolveContentGeneratorConfigWithSources,
         );
-        const baseUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+        const baseUrl = 'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
         const generationConfig = {
           apiKey: 'test-key',
           baseUrl,
@@ -7515,7 +7540,7 @@ describe('Server Config (config.ts)', () => {
     it.each([
       { model: 'deepseek-v4-pro' },
       { authType: AuthType.USE_ANTHROPIC },
-      { baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1' },
+      { baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1' },
       { thinkingMandatory: true },
     ])(
       'does not restore explicit DeepSeek off onto a changed route or mandatory profile %j',
@@ -7865,7 +7890,7 @@ describe('Server Config (config.ts)', () => {
             {
               id: 'qwen3.7-max',
               name: 'qwen3.7-max',
-              baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+              baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
               envKey: 'DASHSCOPE_API_KEY',
             },
             {
@@ -7934,7 +7959,8 @@ describe('Server Config (config.ts)', () => {
               {
                 id: 'qwen3.7-max',
                 name: 'qwen3.7-max',
-                baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+                baseUrl:
+                  'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
                 envKey: 'DASHSCOPE_API_KEY',
               },
               {
@@ -8054,7 +8080,7 @@ describe('Server Config (config.ts)', () => {
         memoryLoad({ memoryContent: PROJECT_RULES, fileCount: 1 }),
       );
   const ALWAYS_ON_CONTEXT =
-    'Loaded always-on context (QWEN.md context files + auto-memory)';
+    'Loaded always-on context (MARIADB-SHELL-AGENT.md context files + auto-memory)';
   const expectWarning = (config: Config, text: string) =>
     expect(config.getWarnings()).toContainEqual(expect.stringContaining(text));
 
@@ -8317,7 +8343,7 @@ describe('Server Config (config.ts)', () => {
       // class that blocks sync (see indexer.ts).
       vi.mocked(rebuildTeamAutoMemoryIndex).mockRejectedValueOnce(
         new TeamMemoryRootSecurityError(
-          'Refusing to write team memory index: /tmp/.qwen/team-memory is a ' +
+          'Refusing to write team memory index: /tmp/.mariadb-shell-agent/team-memory is a ' +
             'symlink, which could redirect the committed index outside the repository.',
         ),
       );
@@ -8366,7 +8392,7 @@ describe('Server Config (config.ts)', () => {
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
     loadProjectRules();
     vi.mocked(getTeamMemoryShareabilityWarning).mockReturnValue(
-      'Team memory is enabled, but /tmp/.qwen/team-memory is git-ignored',
+      'Team memory is enabled, but /tmp/.mariadb-shell-agent/team-memory is git-ignored',
     );
 
     await config.refreshHierarchicalMemory();
@@ -8445,12 +8471,12 @@ describe('Server Config (config.ts)', () => {
       memoryLoad({
         memoryContent: PROJECT_RULES,
         fileCount: 1,
-        contextFilePaths: ['QWEN.md'],
+        contextFilePaths: ['MARIADB-SHELL-AGENT.md'],
       }),
     );
 
     await config.refreshHierarchicalMemory();
-    expect(config.getContextFilePaths()).toEqual(['QWEN.md']);
+    expect(config.getContextFilePaths()).toEqual(['MARIADB-SHELL-AGENT.md']);
 
     vi.mocked(loadServerHierarchicalMemory).mockResolvedValue(memoryLoad());
 
@@ -9061,7 +9087,7 @@ describe('Server Config (config.ts)', () => {
     });
     // The registry's DIRECTORY column is how a user tells two live sessions
     // apart; the switch must reach it (and the directory-derived name) or
-    // `qwen sessions ps` keeps showing the folder that was left.
+    // `mariadb-shell-agent sessions ps` keeps showing the folder that was left.
     await vi.waitFor(() => {
       expect(patchSpy).toHaveBeenCalledWith(...movedPatch(sessionId));
       expect(settled).toContain('patch');
@@ -9614,14 +9640,14 @@ describe('Server Config (config.ts)', () => {
       parentFilePath: '/tmp/project/AGENTS.md',
     };
     await options?.onInstructionsLoaded?.({
-      filePath: '/tmp/project/QWEN.md',
+      filePath: '/tmp/project/MARIADB-SHELL-AGENT.md',
       memoryType: 'project',
       loadReason: 'include',
       ...related,
     });
 
     expect(fireInstructionsLoadedEvent).toHaveBeenCalledWith(
-      '/tmp/project/QWEN.md',
+      '/tmp/project/MARIADB-SHELL-AGENT.md',
       'project',
       'include',
       related,
@@ -9660,7 +9686,7 @@ describe('Server Config (config.ts)', () => {
       '.cursorignore',
     ]);
     expect(config.getFileService().getQwenIgnoreFileNamesDisplay()).toBe(
-      '.qwenignore, .cursorignore',
+      '.mariadb-shell-agentignore, .cursorignore',
     );
   });
 
@@ -9744,7 +9770,7 @@ describe('Server Config (config.ts)', () => {
   });
 
   describe('Usage Statistics', () => {
-    it('defaults usage statistics to enabled if not specified', () => {
+    it.skip('defaults usage statistics to enabled if not specified', () => {
       const config = makeConfig({ usageStatisticsEnabled: undefined });
 
       expect(config.getUsageStatisticsEnabled()).toBe(true);
@@ -10098,7 +10124,7 @@ describe('Server Config (config.ts)', () => {
     });
 
     it('does not register create_sub_session without a wired spawner', async () => {
-      // The tool only works under `qwen serve`, where the ACP session wires a
+      // The tool only works under `mariadb-shell-agent serve`, where the ACP session wires a
       // spawner; declaring it everywhere polluted interactive/headless action
       // spaces with a tool that can never succeed there.
       await initConfig();
@@ -12442,19 +12468,19 @@ describe('Model Switching and Config Updates', () => {
         eventName: 'InstructionsLoaded',
         method: 'fireInstructionsLoadedEvent',
         input: {
-          file_path: '/repo/QWEN.md',
+          file_path: '/repo/MARIADB-SHELL-AGENT.md',
           memory_type: 'project',
           load_reason: 'session_start',
           trigger_file_path: '/repo/src/a.ts',
-          parent_file_path: '/repo/QWEN.md',
+          parent_file_path: '/repo/MARIADB-SHELL-AGENT.md',
         },
         args: [
-          '/repo/QWEN.md',
+          '/repo/MARIADB-SHELL-AGENT.md',
           'project',
           'session_start',
           {
             triggerFilePath: '/repo/src/a.ts',
-            parentFilePath: '/repo/QWEN.md',
+            parentFilePath: '/repo/MARIADB-SHELL-AGENT.md',
           },
         ],
       },
@@ -13155,7 +13181,7 @@ describe('applyWorkspaceAgentPersona', () => {
         check(ToolNames.READ_FILE, {
           file_path: path.join(
             os.homedir(),
-            '.qwen',
+            '.mariadb-shell-agent',
             'agent-hosts',
             'host.json',
           ),

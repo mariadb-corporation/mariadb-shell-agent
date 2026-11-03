@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -59,7 +60,7 @@ describe('resolveAoneWorkspaceRepo', () => {
 
   it('resolves the full group path of an scp-style Aone origin', async () => {
     execSync(
-      'git remote add origin git@gitlab.alibaba-inc.com:jspt/agentic_coding.git',
+      'git remote add origin git@gitlab.alibaba-inc.invalid:jspt/agentic_coding.git',
       { cwd: repo, stdio: 'pipe' },
     );
     const resolved = await resolveAoneWorkspaceRepo(repo);
@@ -69,7 +70,7 @@ describe('resolveAoneWorkspaceRepo', () => {
 
   it('keeps nested-group segments intact', async () => {
     execSync(
-      'git remote add origin https://gitlab.alibaba-inc.com/group/sub/project.git',
+      'git remote add origin https://gitlab.alibaba-inc.invalid/group/sub/project.git',
       { cwd: repo, stdio: 'pipe' },
     );
     const resolved = await resolveAoneWorkspaceRepo(repo);
@@ -77,20 +78,23 @@ describe('resolveAoneWorkspaceRepo', () => {
   });
 
   it('keeps a GHE-shaped family host on the GitHub path', async () => {
-    // `*.alibaba-inc.com` also names GitHub Enterprise instances; detection
+    // `*.alibaba-inc.invalid` also names GitHub Enterprise instances; detection
     // is canonical-only so such a workspace keeps the gh path instead of
     // being displaced onto a1 (which authenticates against real Aone and
     // would either fail every read or serve an unrelated same-path repo).
-    execSync('git remote add origin git@ghe.alibaba-inc.com:team/project.git', {
-      cwd: repo,
-      stdio: 'pipe',
-    });
+    execSync(
+      'git remote add origin git@ghe.alibaba-inc.invalid:team/project.git',
+      {
+        cwd: repo,
+        stdio: 'pipe',
+      },
+    );
     expect(await resolveAoneWorkspaceRepo(repo)).toBeUndefined();
   });
 
   it('sanitizes the origin probe env like every sibling git spawn', async () => {
     execSync(
-      'git remote add origin git@gitlab.alibaba-inc.com:jspt/agentic_coding.git',
+      'git remote add origin git@gitlab.alibaba-inc.invalid:jspt/agentic_coding.git',
       { cwd: repo, stdio: 'pipe' },
     );
     // A second repo with a GitHub origin: an inherited GIT_DIR would
@@ -134,7 +138,7 @@ describe('resolveAoneWorkspaceRepo', () => {
 
   it('finds the repository root from a nested workspace cwd', async () => {
     execSync(
-      'git remote add origin git@gitlab.alibaba-inc.com:jspt/agentic_coding.git',
+      'git remote add origin git@gitlab.alibaba-inc.invalid:jspt/agentic_coding.git',
       { cwd: repo, stdio: 'pipe' },
     );
     const nested = path.join(repo, 'deep', 'workspace');
@@ -197,7 +201,7 @@ describe('parseAoneMrListPage', () => {
 
 describe('parseAoneMrView', () => {
   const DETAIL_URL =
-    'https://code.alibaba-inc.com/jspt/agentic_coding/codereview/26430560';
+    'https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/26430560';
 
   it('extracts the detailUrl and mapped state', () => {
     const view = parseAoneMrView(
@@ -234,7 +238,7 @@ describe('parseAoneMrView', () => {
     // or carries a control character, so persisting either from an a1
     // answer would lose the session ALL of its bindings. The view must
     // degrade to "unresolved this run" instead.
-    const oversized = `https://code.alibaba-inc.com/g/p/codereview/1${'x'.repeat(SESSION_PR_URL_MAX_LENGTH)}`;
+    const oversized = `https://code.alibaba-inc.invalid/g/p/codereview/1${'x'.repeat(SESSION_PR_URL_MAX_LENGTH)}`;
     expect(() =>
       parseAoneMrView(
         { mergeRequest: { state: 'opened', detailUrl: oversized } },
@@ -247,7 +251,7 @@ describe('parseAoneMrView', () => {
           mergeRequest: {
             state: 'opened',
             detailUrl:
-              'https://code.alibaba-inc.com/g/p/codereview/1\r\nforged: 1',
+              'https://code.alibaba-inc.invalid/g/p/codereview/1\r\nforged: 1',
           },
         },
         1,
@@ -389,7 +393,7 @@ describe('the a1 exec layer', () => {
             stdout: JSON.stringify({
               mergeRequest: {
                 state: 'merged',
-                detailUrl: 'https://code.alibaba-inc.com/g/p/codereview/7',
+                detailUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/7',
               },
             }),
           };
@@ -493,7 +497,7 @@ describe('the a1 exec layer', () => {
           mergeRequest: {
             state: 'merged',
             detailUrl:
-              'https://code.alibaba-inc.com/jspt/agentic_coding/codereview/77',
+              'https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/77',
           },
         }),
       };
@@ -503,7 +507,7 @@ describe('the a1 exec layer', () => {
 
     expect(view).toEqual({
       number: 77,
-      url: 'https://code.alibaba-inc.com/jspt/agentic_coding/codereview/77',
+      url: 'https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/77',
       state: 'merged',
     });
     expect(viewCalls).toEqual([
@@ -544,7 +548,7 @@ describe('the a1 exec layer', () => {
 describe('isAoneDetailUrlForRepo', () => {
   const repoPath = 'jspt/agentic_coding';
   const WEB =
-    'https://code.alibaba-inc.com/jspt/agentic_coding/codereview/26430560';
+    'https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/26430560';
 
   it('matches only the detailUrl shape a1 actually produces', () => {
     expect(isAoneDetailUrlForRepo(repoPath, 26430560, WEB)).toBe(true);
@@ -553,7 +557,7 @@ describe('isAoneDetailUrlForRepo', () => {
       isAoneDetailUrlForRepo(
         repoPath,
         26430560,
-        'https://CODE.ALIBABA-INC.COM/jspt/agentic_coding/codereview/26430560/?x=1',
+        'https://CODE.ALIBABA-INC.INVALID/jspt/agentic_coding/codereview/26430560/?x=1',
       ),
     ).toBe(true);
     // `:443` is the https default — WHATWG origin drops it.
@@ -561,7 +565,7 @@ describe('isAoneDetailUrlForRepo', () => {
       isAoneDetailUrlForRepo(
         repoPath,
         26430560,
-        'https://code.alibaba-inc.com:443/jspt/agentic_coding/codereview/26430560',
+        'https://code.alibaba-inc.invalid:443/jspt/agentic_coding/codereview/26430560',
       ),
     ).toBe(true);
   });
@@ -575,21 +579,21 @@ describe('isAoneDetailUrlForRepo', () => {
       isAoneDetailUrlForRepo(
         repoPath,
         26430560,
-        'https://gitlab.alibaba-inc.com/jspt/agentic_coding/codereview/26430560',
+        'https://gitlab.alibaba-inc.invalid/jspt/agentic_coding/codereview/26430560',
       ),
     ).toBe(false);
     expect(
       isAoneDetailUrlForRepo(
         repoPath,
         26430560,
-        'http://code.alibaba-inc.com/jspt/agentic_coding/codereview/26430560',
+        'http://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/26430560',
       ),
     ).toBe(false);
     expect(
       isAoneDetailUrlForRepo(
         repoPath,
         26430560,
-        'https://code.alibaba-inc.com:8443/jspt/agentic_coding/codereview/26430560',
+        'https://code.alibaba-inc.invalid:8443/jspt/agentic_coding/codereview/26430560',
       ),
     ).toBe(false);
   });
@@ -599,14 +603,14 @@ describe('isAoneDetailUrlForRepo', () => {
       isAoneDetailUrlForRepo(
         repoPath,
         26430560,
-        'https://code.alibaba-inc.com/other/repo/codereview/26430560',
+        'https://code.alibaba-inc.invalid/other/repo/codereview/26430560',
       ),
     ).toBe(false);
     expect(
       isAoneDetailUrlForRepo(
         repoPath,
         26430560,
-        'https://code.alibaba-inc.com/jspt/agentic_coding/codereview/99',
+        'https://code.alibaba-inc.invalid/jspt/agentic_coding/codereview/99',
       ),
     ).toBe(false);
     expect(
@@ -621,7 +625,7 @@ describe('isAoneDetailUrlForRepo', () => {
       isAoneDetailUrlForRepo(
         repoPath,
         26430560,
-        'https://gitlab.alibaba-inc.com/jspt/agentic_coding/pull/26430560',
+        'https://gitlab.alibaba-inc.invalid/jspt/agentic_coding/pull/26430560',
       ),
     ).toBe(false);
   });

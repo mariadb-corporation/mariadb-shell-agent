@@ -6,7 +6,7 @@ import type { DaemonTranscriptBlock } from '@qwen-code/sdk/daemon';
 // Transcript-only subpath: the package root also pulls in the interactive
 // shell (App, daemon providers, editor chrome), which a read-only export
 // never uses. Keep this import narrow so the inlined runtime stays small
-// (see https://github.com/QwenLM/qwen-code/issues/11031).
+// (see https://github.invalid/QwenLM/qwen-code/issues/11031).
 import { WebShellTranscript } from '@qwen-code/web-shell/transcript';
 
 declare const __EXPORT_TRANSCRIPT_RENDERER_VERSION__: string;
@@ -161,7 +161,7 @@ function DocumentMetadata({
         <dl>
           <MetadataItem
             label="Session"
-            value={metadata.title ?? 'Qwen Code Chat Export'}
+            value={metadata.title ?? 'MariaDB Shell Agent Chat Export'}
           />
           <MetadataItem
             label="Started"
@@ -240,7 +240,7 @@ function DocumentApp({ value }: { value: ExportTranscriptDocument }) {
   }, []);
 
   useEffect(() => {
-    document.title = value.metadata.title || 'Qwen Code Chat Export';
+    document.title = value.metadata.title || 'MariaDB Shell Agent Chat Export';
     requestAnimationFrame(() => {
       document.body.dataset.renderComplete = 'true';
     });
@@ -250,7 +250,7 @@ function DocumentApp({ value }: { value: ExportTranscriptDocument }) {
     <main className="document-shell">
       <header className="document-header">
         <div>
-          <h1>{value.metadata.title || 'Qwen Code Chat Export'}</h1>
+          <h1>{value.metadata.title || 'MariaDB Shell Agent Chat Export'}</h1>
           <p>
             {value.metadata.startedAt
               ? `Started ${value.metadata.startedAt}`

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -421,7 +422,7 @@ export interface SpawnChannelFactoryOptions {
 }
 
 /**
- * Creates a `ChannelFactory` that spawns `qwen --acp` child processes.
+ * Creates a `ChannelFactory` that spawns `mariadb-shell-agent --acp` child processes.
  * Accepts an optional `onDiagnosticLine` callback that receives every
  * child-stderr line (already prefixed) so callers can tee to a log file
  * or structured logger without intercepting process.stderr globally.
@@ -701,7 +702,7 @@ export function createSpawnChannelFactory(
 /**
  * Default channel factory: spawn the current Node executable running this
  * CLI's entry script in `--acp` mode. `process.argv[1]` resolves to the qwen
- * entry script when launched via the `qwen` bin shim.
+ * entry script when launched via the `mariadb-shell-agent` bin shim.
  *
  * Note on `cwd`: CodeQL flags the `workspaceCwd` flow into `spawn({cwd})`
  * as an "uncontrolled data used in path expression" finding. That's the
@@ -725,7 +726,7 @@ export const defaultSpawnChannelFactory: ChannelFactory =
   createSpawnChannelFactory();
 
 /**
- * Environment variables stripped from the spawned `qwen --acp` child's
+ * Environment variables stripped from the spawned `mariadb-shell-agent --acp` child's
  * environment. Everything else is passed through — see the
  * threat-model rationale at the call site in `defaultSpawnChannelFactory`.
  *
@@ -736,7 +737,7 @@ export const defaultSpawnChannelFactory: ChannelFactory =
  * doesn't otherwise have.
  *
  * `QWEN_CODE_SIMPLE`: an invocation-level bare-mode override. Letting a
- * daemon or IDE environment leak it into per-session `qwen --acp`
+ * daemon or IDE environment leak it into per-session `mariadb-shell-agent --acp`
  * children silently disables skills in those children.
  *
  * `QWEN_CODE_EXTERNAL_TOOL_GUARD_TOKEN`: daemon-local credential for the
@@ -767,7 +768,7 @@ const SCRUBBED_CHILD_ENV_KEYS: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * Build the env passed to the `qwen --acp` child. Pure function, exported
+ * Build the env passed to the `mariadb-shell-agent --acp` child. Pure function, exported
  * for unit-test access (the surrounding `defaultSpawnChannelFactory` is
  * unit-test-hostile because it actually spawns Node). Behavior:
  *

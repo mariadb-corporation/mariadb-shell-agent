@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -43,7 +44,7 @@
  * agent home's settings where it welds the variable; a local run has
  * neither, so a local opt-in warns and skips ({@link prebuildCovered})
  * instead of dying. As with `QWEN_REVIEW_SANDBOX`, a value sourced from a
- * `.env` file is ignored: the reviewed repository's own `.qwen/.env` reaches
+ * `.env` file is ignored: the reviewed repository's own `.mariadb-shell-agent/.env` reaches
  * `process.env`, and what a PR can toggle about its own review is the
  * operator's decision, not the PR's.
  *
@@ -165,7 +166,7 @@ export interface WorktreeDependencies {
  * about its own review belongs to the operator — and the property holds in
  * two tiers. The closing tier is the loader's: `QWEN_REVIEW_PREBUILD` sits
  * in `PROJECT_ENV_HARDCODED_EXCLUSIONS`, so a project `.env` (the reviewed
- * checkout's `.qwen/.env` included) never writes the key into the
+ * checkout's `.mariadb-shell-agent/.env` included) never writes the key into the
  * environment at all — necessary, because the registry consulted below is
  * per-process, and a CHILD process inherits a value with no provenance
  * attached. The check here stays as defence in depth for values this
@@ -194,7 +195,7 @@ export function prebuildRequested(
  * The gate reads BOTH settings merges, because the timer arms one and the
  * cover is welded where the other reads. Operator-controlled scopes only
  * (`skipWorkspaceSettings`): a repository must not GRANT its own review's
- * cover through `.qwen/settings.json`. And the full merge the shell tool
+ * cover through `.mariadb-shell-agent/settings.json`. And the full merge the shell tool
  * actually applies, where Workspace overrides User: a checkout carrying a
  * below-cover workspace value would otherwise REVOKE the welded cover under
  * the timer while this gate still certifies it. Both reads apply the

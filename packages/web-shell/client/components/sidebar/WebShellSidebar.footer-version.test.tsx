@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -126,7 +127,7 @@ if (!Element.prototype.scrollIntoView) {
 }
 
 const SIDEBAR_WIDTH_STORAGE_KEY = 'qwen-code-web-shell-sidebar-width';
-const VERSION_BADGE_TITLE = 'Qwen Code v1.2.3';
+const VERSION_BADGE_TITLE = 'MariaDB Shell Agent v1.2.3';
 const SETTINGS_LABEL = 'Settings';
 const COLLAPSE_LABEL = 'Collapse';
 const DAEMON_STATUS_LABEL = 'Daemon Status';

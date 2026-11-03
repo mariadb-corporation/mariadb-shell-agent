@@ -1009,7 +1009,7 @@ git commit -m "feat(channels): show feishu lifecycle card status"
 **Files:**
 
 - Read: `.github/pull_request_template.md`
-- Write if needed: `.qwen/pr-drafts/channel-lifecycle-status-adapters.md`
+- Write if needed: `.mariadb-shell-agent/pr-drafts/channel-lifecycle-status-adapters.md`
 
 **Interfaces:**
 

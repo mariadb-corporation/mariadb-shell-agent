@@ -1,6 +1,6 @@
 # Output Styles
 
-Output styles change how Qwen Code writes its responses — the tone, the amount of narration, how much it explains — without changing what it can do. A style is a named block of instructions layered onto the built-in system prompt, and the model is reminded of the active style on every turn so it holds up over long sessions.
+Output styles change how MariaDB Shell Agent writes its responses — the tone, the amount of narration, how much it explains — without changing what it can do. A style is a named block of instructions layered onto the built-in system prompt, and the model is reminded of the active style on every turn so it holds up over long sessions.
 
 ## Built-in styles
 
@@ -26,16 +26,16 @@ The change applies to the running session immediately — the system prompt is r
 You can also set the style without the command:
 
 - **Settings**: `"general": { "outputStyle": "Concise" }` in `settings.json` (user or project scope). The value is a built-in or [custom](#custom-styles) style name. A hand edit takes effect on the next start.
-- **One run**: `qwen -p "..." --output-style Concise` overrides the setting for that run. See [Headless Mode](./headless).
+- **One run**: `mariadb-shell-agent -p "..." --output-style Concise` overrides the setting for that run. See [Headless Mode](./headless).
 
 ## Custom styles
 
 A custom style is a Markdown file whose body is the style's instructions. Put it in one of two directories:
 
-| Location                             | Scope                                                         |
-| ------------------------------------ | ------------------------------------------------------------- |
-| `~/.qwen/output-styles/<name>.md`    | Your styles, available in every project                       |
-| `<project>/.qwen/output-styles/*.md` | The project's styles, read only when the workspace is trusted |
+| Location                                            | Scope                                                         |
+| --------------------------------------------------- | ------------------------------------------------------------- |
+| `~/.mariadb-shell-agent/output-styles/<name>.md`    | Your styles, available in every project                       |
+| `<project>/.mariadb-shell-agent/output-styles/*.md` | The project's styles, read only when the workspace is trusted |
 
 Trust is checked whenever the style is used, not only when the file is read, so revoking trust mid-session stops a project style from shaping the conversation.
 
@@ -68,4 +68,4 @@ Custom styles are ignored in `--bare` and `--safe-mode`, which keep the built-in
 - `--bare` and `--safe-mode` ignore the setting and do not allow `/output-style` changes.
 - Changing the style mid-session invalidates the cached prompt prefix once; after that, caching works as usual.
 
-Styles adjust tone and workflow, not knowledge or permissions. For project conventions the model should always know, use context files (`QWEN.md`); for a one-off addition to the prompt, use `--append-system-prompt`.
+Styles adjust tone and workflow, not knowledge or permissions. For project conventions the model should always know, use context files (`MARIADB-SHELL-AGENT.md`); for a one-off addition to the prompt, use `--append-system-prompt`.

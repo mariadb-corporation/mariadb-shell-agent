@@ -4,7 +4,7 @@
 
 ## 范围与现状
 
-这是 [#15512](https://github.com/QwenLM/qwen-code/issues/15512) 中继[阶段二设计](https://github.com/QwenLM/qwen-code/pull/15520)之后的 worker 侧步骤。容器模式此前接受 boot-v1 session worker 和专用 CSI profile，但拒绝普通 boot-v2。本次变更接受显式的 external-storage 扩展，并提供前台 publication。本地 boot-v2 和 CSI boot 文档仍使用各自独立的契约。broker、adapter、注册 HTTP API、provider probe 和 PUBLIC K8s 路径均不在本次范围内。
+这是 [#15512](https://github.invalid/QwenLM/qwen-code/issues/15512) 中继[阶段二设计](https://github.invalid/QwenLM/qwen-code/pull/15520)之后的 worker 侧步骤。容器模式此前接受 boot-v1 session worker 和专用 CSI profile，但拒绝普通 boot-v2。本次变更接受显式的 external-storage 扩展，并提供前台 publication。本地 boot-v2 和 CSI boot 文档仍使用各自独立的契约。broker、adapter、注册 HTTP API、provider probe 和 PUBLIC K8s 路径均不在本次范围内。
 
 worker 仍为 session 隔离，沿用现有 workspace capability digest、context 安装和 activation 检查。publication 覆盖前台进程管道（`stdout` 和 `stderr`）；此 external profile 不接受 PTY、后台 Shell、monitor、hook 和 MCP 执行。adapter 和 broker 消费端属于后续工作；只有它们提供注册描述符、安装并激活 context、为每次 capture 调用 begin 后，此表面才会执行实际工作。
 

@@ -49,4 +49,4 @@ Responses Freeform，切换到使用 Chat Completions 的 DashScope `qwen3.8-max
 接口兼容性由用户自行确认。
 
 状态：实现及双向真实 API 验证完成。详细结果记录在
-`.qwen/e2e-tests/freeform-original-task/`。
+`.mariadb-shell-agent/e2e-tests/freeform-original-task/`。

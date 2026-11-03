@@ -4,7 +4,7 @@
 
 ## 范围
 
-本修改是 [#13191](https://github.com/QwenLM/qwen-code/issues/13191) 的纯测试后续工作，已对照 main `5ddd43815b` 核对。不改变已存 digest、数据库迁移、API 响应或 [#13530](https://github.com/QwenLM/qwen-code/pull/13530) 的执行实现。
+本修改是 [#13191](https://github.invalid/QwenLM/qwen-code/issues/13191) 的纯测试后续工作，已对照 main `5ddd43815b` 核对。不改变已存 digest、数据库迁移、API 响应或 [#13530](https://github.invalid/QwenLM/qwen-code/pull/13530) 的执行实现。
 
 原 issue 含有历史判断。R1-4、R1-7、R1-11、R1-13 和 R2-3 已在 #13142 处理。其 R2-1 锁修改在真实 MySQL 测试发现死锁后撤销；报告的交错执行已被接受为合法串行历史。本修改不增加替代锁，也不加强并发保证。
 

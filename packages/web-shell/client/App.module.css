@@ -476,9 +476,11 @@
   --streaming-label-color: #b794f4;
   --agent-logo-gradient: linear-gradient(
     90deg,
-    #5b8def 0%,
-    #6d44e8 55%,
-    #a78bfa 100%
+    #51d9f7 0%,
+    25%,
+    #8ce786 50%,
+    75%,
+    #cdf70a 100%
   );
   --subtle-bg: rgba(255, 255, 255, 0.04);
   --subtle-bg-strong: rgba(255, 255, 255, 0.06);
@@ -550,9 +552,11 @@
   --streaming-label-color: #7b4ab8;
   --agent-logo-gradient: linear-gradient(
     90deg,
-    #2563eb 0%,
-    #6d44e8 55%,
-    #7c3aed 100%
+    #0093c4 0%,
+    25%,
+    #00a37a 50%,
+    75%,
+    #5c9f00 100%
   );
   --subtle-bg: rgba(32, 31, 25, 0.05);
   --subtle-bg-strong: rgba(32, 31, 25, 0.08);

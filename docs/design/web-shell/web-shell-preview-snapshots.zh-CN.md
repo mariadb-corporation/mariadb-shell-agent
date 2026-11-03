@@ -97,6 +97,6 @@ Artifact 工具历史记录。详见
 分叉。注入批次持久化失败、容量超限和引用同步失败，验证回滚释放新引用，同时保留已有
 所有者及删除尚未持久化的所有者。在发布后和快照写入期间取消，验证新快照被回收、早先
 版本保留且已发布 URL 仍可读。先运行全局 CLI 基线，再执行 build/typecheck/bundle、定向单元测试和本地 daemon
-上的浏览器场景。命令及结果见 `.qwen/e2e-tests/web-shell-preview-snapshots.md`。
+上的浏览器场景。命令及结果见 `.mariadb-shell-agent/e2e-tests/web-shell-preview-snapshots.md`。
 
 本次有限增量没有开放设计问题。

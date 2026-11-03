@@ -19,7 +19,7 @@ are complete. Part 4 will add worktree creation.
 ### Runtime and compatibility
 
 The mode is accepted only by daemon-managed Channel workers and only with
-`sessionScope: "user"`. Standalone `qwen channel start`, configured webhooks,
+`sessionScope: "user"`. Standalone `mariadb-shell-agent channel start`, configured webhooks,
 non-zero channel or group `groupHistoryLimit`, and Channel loops fail closed or
 remain unavailable. A daemon worker refuses to start a multi-session Channel
 that already owns an enabled persisted loop, and it does not expose loop

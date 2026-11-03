@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,7 +31,7 @@ import {
 
 const USAGE = `Usage: node-repl-mcp desktop-relay <command>
 
-Lets a remote Qwen Code session use this computer through node_repl.
+Lets a remote MariaDB Shell Agent session use this computer through node_repl.
 
 Commands:
   install [--home <dir>] [--package <spec>] [--cua-sdk-version <version>]

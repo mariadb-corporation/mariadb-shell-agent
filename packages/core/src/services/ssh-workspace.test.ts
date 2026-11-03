@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -151,11 +152,11 @@ describe('SSH workspace transport', () => {
   });
 
   it.each([
-    [undefined, ['.qwenignore', '.agentignore', '.aiignore']],
-    [[], ['.qwenignore']],
+    [undefined, ['.mariadb-shell-agentignore', '.agentignore', '.aiignore']],
+    [[], ['.mariadb-shell-agentignore']],
     [
       ['.config/ignore', '../outside'],
-      ['.qwenignore', '.config/ignore'],
+      ['.mariadb-shell-agentignore', '.config/ignore'],
     ],
   ])(
     'forwards effective ignore files for search: %j',

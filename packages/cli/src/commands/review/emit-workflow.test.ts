@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -87,7 +88,8 @@ beforeEach(() => {
  */
 function localPlan(over: Record<string, unknown> = {}): PlanReport {
   return {
-    diffPathAbsolute: '/abs/.qwen/tmp/qwen-review-local-diff.txt',
+    diffPathAbsolute:
+      '/abs/.mariadb-shell-agent/tmp/qwen-review-local-diff.txt',
     diffLines: 240,
     diffChars: 8000,
     srcDiffLines: 180,
@@ -307,7 +309,7 @@ describe('emit-workflow — what it refuses', () => {
   // generated script passes it.
   it('emits a worktree review rather than refusing it', () => {
     const agents = buildFanOutRoster(
-      localPlan({ worktreePath: '.qwen/tmp/review-pr-42' }),
+      localPlan({ worktreePath: '.mariadb-shell-agent/tmp/review-pr-42' }),
       planPath,
     );
     expect(agents.length).toBeGreaterThan(1);
@@ -411,7 +413,7 @@ describe('emit-workflow — where it writes', () => {
   // the loader trusts `storage.getGeneratedWorkflowsDir()` under it.
   it('lands inside the root the Workflow loader trusts', () => {
     const home = join(dir, 'home');
-    vi.stubEnv('QWEN_HOME', join(home, '.qwen'));
+    vi.stubEnv('QWEN_HOME', join(home, '.mariadb-shell-agent'));
     vi.stubEnv('QWEN_RUNTIME_DIR', '');
     const storage = new Storage(join(dir, 'workspace'));
     const env = {
@@ -503,12 +505,14 @@ describe('emit-workflow — where it writes', () => {
     const plan = join(dir, 'plan.json');
     writeFileSync(
       plan,
-      JSON.stringify(localPlan({ worktreePath: '.qwen/tmp/review-pr-42' })),
+      JSON.stringify(
+        localPlan({ worktreePath: '.mariadb-shell-agent/tmp/review-pr-42' }),
+      ),
       'utf8',
     );
     run(plan);
     expect(readFileSync(emittedScriptPath(), 'utf8')).toContain(
-      'const WORKING_DIR = ".qwen/tmp/review-pr-42";',
+      'const WORKING_DIR = ".mariadb-shell-agent/tmp/review-pr-42";',
     );
   });
 
@@ -883,7 +887,7 @@ describe('emit-workflow — residue parity with the hand-launched path', () => {
       cwd: repo,
       encoding: 'utf8',
     }).trim();
-    tree = join(repo, '.qwen', 'tmp', 'review-wt');
+    tree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-wt');
     mkdirSync(dirname(tree), { recursive: true });
     execFileSync('git', ['worktree', 'add', '--detach', '-q', tree, 'HEAD'], {
       cwd: repo,
@@ -987,7 +991,12 @@ describe('emit-workflow — residue parity with the hand-launched path', () => {
   // run, the common case, is silence. A regression that warned on every
   // worktree review would pass both of them and fail here.
   it('stays silent on a measured-clean worktree', () => {
-    const cleanTree = join(repo, '.qwen', 'tmp', 'review-wt-clean');
+    const cleanTree = join(
+      repo,
+      '.mariadb-shell-agent',
+      'tmp',
+      'review-wt-clean',
+    );
     mkdirSync(dirname(cleanTree), { recursive: true });
     execFileSync(
       'git',

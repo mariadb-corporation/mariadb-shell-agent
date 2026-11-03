@@ -12,7 +12,7 @@
 ## 问题
 
 Java Managed Agent 链路此前只有一个不依赖 daemon 的 Managed-only 入口。这个入口可以证明浏览器到
-Java 的协议闭环，但无法展示 Managed Session 如何与 `qwen serve` 使用的完整 WebShell 共存。
+Java 的协议闭环，但无法展示 Managed Session 如何与 `mariadb-shell-agent serve` 使用的完整 WebShell 共存。
 
 Java 不应为了复用完整 UI 而实现 daemon 协议。普通链路和 Managed 链路的 owner 不同，必须保持独立
 部署能力。

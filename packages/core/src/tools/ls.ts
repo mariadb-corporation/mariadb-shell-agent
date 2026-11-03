@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -330,7 +331,7 @@ export class LSTool extends BaseDeclarativeTool<LSToolParams, ToolResult> {
           },
           file_filtering_options: {
             description:
-              'Optional: Whether to respect ignore patterns from .gitignore, .qwenignore, and configured custom Qwen ignore files',
+              'Optional: Whether to respect ignore patterns from .gitignore, .mariadb-shell-agentignore, and configured custom Qwen ignore files',
             type: 'object',
             properties: {
               respect_git_ignore: {
@@ -340,7 +341,7 @@ export class LSTool extends BaseDeclarativeTool<LSToolParams, ToolResult> {
               },
               respect_qwen_ignore: {
                 description:
-                  'Optional: Whether to respect .qwenignore and configured custom Qwen ignore file patterns when listing files. Defaults to true.',
+                  'Optional: Whether to respect .mariadb-shell-agentignore and configured custom Qwen ignore file patterns when listing files. Defaults to true.',
                 type: 'boolean',
               },
             },

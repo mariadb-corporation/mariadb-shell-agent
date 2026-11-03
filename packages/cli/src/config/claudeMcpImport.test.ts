@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -53,10 +54,14 @@ describe('claude MCP import', () => {
         mcpServers: options.workspaceMcpServers,
       }),
     };
-    const userFile = path.join(homeDir, '.qwen', 'settings.json');
+    const userFile = path.join(
+      homeDir,
+      '.mariadb-shell-agent',
+      'settings.json',
+    );
     const workspaceFile = options?.inHome
       ? userFile
-      : path.join(projectDir, '.qwen', 'settings.json');
+      : path.join(projectDir, '.mariadb-shell-agent', 'settings.json');
     const mergedMcpServers =
       options?.mergedMcpServers ??
       (options?.userMcpServers || options?.workspaceMcpServers

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -79,7 +80,7 @@ describe('StandaloneDeletionJournal', () => {
 
   beforeEach(async () => {
     homeDir = await fs.mkdtemp(path.join(tmpdir(), 'qwen-deletion-journal-'));
-    stableBaseDir = path.join(homeDir, '.qwen');
+    stableBaseDir = path.join(homeDir, '.mariadb-shell-agent');
     ownerDirectory = path.join(stableBaseDir, 'conversations');
     await fs.mkdir(ownerDirectory, { recursive: true, mode: 0o700 });
     if (process.platform !== 'win32') {
@@ -326,7 +327,7 @@ describe('StandaloneDeletionJournal', () => {
       const root = await workspace.getRoot();
       const parent = path.join(homeDir, 'journal-parent');
       const redirectedJournal = new StandaloneDeletionJournal(
-        path.join(parent, '.qwen'),
+        path.join(parent, '.mariadb-shell-agent'),
       );
       await redirectedJournal.writePrepared(await makeRecord('prepared'), root);
       await fs.rename(parent, `${parent}.saved`);

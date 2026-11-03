@@ -83,7 +83,7 @@ The diagram below is the full data flow of one settings change from "disk file" 
 takes effect" (`[CLI]` = Part B, `[Core]` = Part A, `[sub-task 1]` = the merged watcher):
 
 ```text
-① User edits .qwen/settings.json (add/remove/edit mcpServers, or mcp.excluded / mcp.allowed)
+① User edits .mariadb-shell-agent/settings.json (add/remove/edit mcpServers, or mcp.excluded / mcp.allowed)
        │
        ▼
 ② [sub-task 1] SettingsWatcher detects the file change
@@ -300,7 +300,7 @@ without major changes.
 
 #### Background: the approval modal was computed only once at startup
 
-A gated-source server (`project`'s `.mcp.json` and `workspace`'s `.qwen/settings.json`, see
+A gated-source server (`project`'s `.mcp.json` and `workspace`'s `.mariadb-shell-agent/settings.json`, see
 `isGatedMcpScope`) has its user approval **bound to the config hash** (`mcpApprovals.ts`'s
 `getState`: no record, or a record whose hash differs from the current config → `pending`). So if a
 hot-reload changes a gated server's config (even just `httpUrl`), its hash change invalidates the

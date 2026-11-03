@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -220,7 +221,7 @@ describe('getInstallationInfo', () => {
 
     expect(disabledInfo.updateMessage).toBe(
       'Standalone install detected. Please rerun the standalone installer to update: ' +
-        'curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash',
+        'curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/installation/install-qwen-standalone.sh | bash',
     );
 
     // Compose the real detector output with the real formatter: the guidance
@@ -228,7 +229,7 @@ describe('getInstallationInfo', () => {
     // transcribed by hand.
     expect(formatUpdateInstructions(disabledInfo, '1.2.3')).toEqual([
       'Standalone install detected. Please rerun the standalone installer to update:',
-      ' curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash',
+      ' curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/installation/install-qwen-standalone.sh | bash',
     ]);
   });
 
@@ -732,7 +733,7 @@ describe('formatUpdateInstructions', () => {
     standaloneDir: '/Users/test/.local/lib/qwen-code',
     updateMessage:
       'Standalone install detected. Please rerun the standalone installer to update: ' +
-      'curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash',
+      'curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/installation/install-qwen-standalone.sh | bash',
   };
 
   it('formats package-manager update commands', () => {
@@ -784,7 +785,7 @@ describe('formatUpdateInstructions', () => {
   it('splits standalone guidance into a translatable prefix line and the installer command', () => {
     expect(formatUpdateInstructions(standaloneDisabledInfo, '1.2.3')).toEqual([
       'Standalone install detected. Please rerun the standalone installer to update:',
-      ' curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash',
+      ' curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/installation/install-qwen-standalone.sh | bash',
     ]);
   });
 

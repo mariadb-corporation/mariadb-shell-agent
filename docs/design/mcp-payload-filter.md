@@ -10,7 +10,7 @@ Filtering is opt-in and disabled by default. Set
 `MCP_MODEL_PAYLOAD_FILTER=1` in the MCP server environment for API routes that
 reject these terms. Users on other routes retain the original payloads.
 
-The initial case-insensitive ASCII terms are `qwen`, `dashscope`, `alibaba`,
+The initial case-insensitive ASCII terms are `mariadb-shell-agent`, `dashscope`, `alibaba`,
 `aliyun`, `aliyuncs`, `alicloud`, `tongyi`, `qianwen`, `antgroup`, `bailian`,
 `modelscope`, `damo`, `lingma`, `wanx`, `alipay`, `antfin`, `yuque`,
 `dingtalk`, `taobao`, `tmall`, `qoder`, and `maxcompute`. Chinese terms are

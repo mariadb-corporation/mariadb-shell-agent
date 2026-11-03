@@ -171,8 +171,8 @@ const BUILTIN_COMMAND_DESCRIPTION_KEYS: Record<string, string> = {
 };
 
 /**
- * Skills whose author-written descriptions ship in English — the Qwen Code
- * bundled skills plus this repo's `.qwen/skills` project skills. We re-localize
+ * Skills whose author-written descriptions ship in English — the MariaDB Shell Agent
+ * bundled skills plus this repo's `.mariadb-shell-agent/skills` project skills. We re-localize
  * their menu descriptions by name so a zh-CN slash menu isn't a mix of languages.
  * Keyed by skill name because a skill only carries a reliable `source` once a
  * session exists; the skill-tagging step keys off `connection.skills` instead, so
@@ -181,7 +181,7 @@ const BUILTIN_COMMAND_DESCRIPTION_KEYS: Record<string, string> = {
  * own skills, newly added ones) fall back to their authored description.
  */
 const SKILL_DESCRIPTION_KEYS: Record<string, string> = {
-  // Bundled with Qwen Code (packages/core/src/skills/bundled).
+  // Bundled with MariaDB Shell Agent (packages/core/src/skills/bundled).
   'autofix-pr': 'skilldesc.autofixPr',
   batch: 'skilldesc.batch',
   dataviz: 'skilldesc.dataviz',
@@ -193,7 +193,7 @@ const SKILL_DESCRIPTION_KEYS: Record<string, string> = {
   review: 'skilldesc.review',
   simplify: 'skilldesc.simplify',
   stuck: 'skilldesc.stuck',
-  // This repo's project skills (.qwen/skills).
+  // This repo's project skills (.mariadb-shell-agent/skills).
   'agent-reproduce-align': 'skilldesc.agentReproduceAlign',
   'agent-reproduce-feature': 'skilldesc.agentReproduceFeature',
   autofix: 'skilldesc.autofix',

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -330,7 +331,7 @@ describe('scanWorkflowScriptShape — nested workflow calls', () => {
     const shape = scanWorkflowScriptShape(
       script(
         "await workflow('audit')",
-        "await workflow({ scriptPath: '.qwen/workflows/x.js' })",
+        "await workflow({ scriptPath: '.mariadb-shell-agent/workflows/x.js' })",
         'const noun = workflow',
       ),
     );

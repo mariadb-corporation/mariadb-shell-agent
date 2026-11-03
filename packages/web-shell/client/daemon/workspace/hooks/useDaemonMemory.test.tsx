@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,7 +27,7 @@ vi.mock('../../session/DaemonSessionProvider.js', () => ({
 
 const { useDaemonMemory } = await import('./useDaemonMemory.js');
 
-const GLOBAL_PATH = '/home/u/.qwen/QWEN.md';
+const GLOBAL_PATH = '/home/u/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md';
 
 function captureReadMemoryFile() {
   let read: ReturnType<typeof useDaemonMemory>['readMemoryFile'] | undefined;

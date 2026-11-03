@@ -1,6 +1,6 @@
 # Observability with OpenTelemetry
 
-Learn how to enable and setup OpenTelemetry for Qwen Code.
+Learn how to enable and setup OpenTelemetry for MariaDB Shell Agent.
 
 - [Observability with OpenTelemetry](#observability-with-opentelemetry)
   - [Key Benefits](#key-benefits)
@@ -43,7 +43,7 @@ Learn how to enable and setup OpenTelemetry for Qwen Code.
 ## OpenTelemetry Integration
 
 Built on **[OpenTelemetry]** — the vendor-neutral, industry-standard
-observability framework — Qwen Code's observability system provides:
+observability framework — MariaDB Shell Agent's observability system provides:
 
 - **Universal Compatibility**: Export to any OpenTelemetry backend (Aliyun,
   Jaeger, Prometheus, Datadog, etc.)
@@ -55,15 +55,15 @@ observability framework — Qwen Code's observability system provides:
   instrumentation
 
 [OpenTelemetry]: https://opentelemetry.io/
-[aliyun-opentelemetry-overview]: https://www.alibabacloud.com/help/en/arms/tracing-analysis/product-overview/what-is-tracing-analysis
-[aliyun-opentelemetry-get-started]: https://www.alibabacloud.com/help/en/arms/tracing-analysis/before-you-begin
-[aliyun-opentelemetry-console-cn]: https://trace.console.aliyun.com
-[aliyun-opentelemetry-console-cn-legacy]: https://tracing.console.aliyun.com
-[aliyun-opentelemetry-console-intl]: https://arms.console.alibabacloud.com
+[aliyun-opentelemetry-overview]: https://www.alibabacloud.invalid/help/en/arms/tracing-analysis/product-overview/what-is-tracing-analysis
+[aliyun-opentelemetry-get-started]: https://www.alibabacloud.invalid/help/en/arms/tracing-analysis/before-you-begin
+[aliyun-opentelemetry-console-cn]: https://trace.console.aliyun.invalid
+[aliyun-opentelemetry-console-cn-legacy]: https://tracing.console.aliyun.invalid
+[aliyun-opentelemetry-console-intl]: https://arms.console.alibabacloud.invalid
 
 ## Configuration
 
-All telemetry behavior is controlled through your `.qwen/settings.json` file.
+All telemetry behavior is controlled through your `.mariadb-shell-agent/settings.json` file.
 These settings can be overridden by environment variables or CLI flags.
 
 | Setting                           | Environment Variable                                 | CLI Flag                                                 | Description                                                                                                                            | Values            | Default                 |
@@ -138,7 +138,7 @@ secrets in env vars or arguments), and model responses to the configured OTLP
 backend. Treat the backend as a privileged data sink. The flag defaults to
 `false`.
 
-**Cost / payload size:** At the default limit, one LLM span can carry at most about 4 MiB across input, output, system instructions, and tool definitions; one Tool span can carry about 2 MiB across arguments and result; and one interaction can carry about 3 MiB across Agent input, Agent output, and compatibility `new_context`. This is Qwen Code's application-side cap, not a guarantee that every collector or backend accepts a single attribute that large. If spans are rejected or dropped, lower `sensitiveSpanAttributeMaxLength` (for example, to `61440`) and monitor exporter throughput.
+**Cost / payload size:** At the default limit, one LLM span can carry at most about 4 MiB across input, output, system instructions, and tool definitions; one Tool span can carry about 2 MiB across arguments and result; and one interaction can carry about 3 MiB across Agent input, Agent output, and compatibility `new_context`. This is MariaDB Shell Agent's application-side cap, not a guarantee that every collector or backend accepts a single attribute that large. If spans are rejected or dropped, lower `sensitiveSpanAttributeMaxLength` (for example, to `61440`) and monitor exporter throughput.
 
 This setting does not disable sensitive data in OTel logs or other telemetry
 sinks; non-internal API response telemetry can populate `response_text`, so
@@ -151,7 +151,7 @@ or receiver that supports OTLP/HTTP JSON. The `http` value does not select
 OTLP/HTTP protobuf encoding.
 
 **HTTP OTLP signal routing:** When using HTTP protocol (`otlpProtocol: "http"`),
-Qwen Code automatically appends signal-specific paths (`/v1/traces`, `/v1/logs`,
+MariaDB Shell Agent automatically appends signal-specific paths (`/v1/traces`, `/v1/logs`,
 `/v1/metrics`) to the base `otlpEndpoint`. For example, `http://collector:4318`
 becomes `http://collector:4318/v1/traces` for traces. If the URL already ends
 with a signal path, it is used as-is. Per-signal endpoint overrides
@@ -186,7 +186,7 @@ deployment region, or any other dimension your backend cares about.
 Two sources, merged in priority order (lowest → highest):
 
 1. The standard `OTEL_RESOURCE_ATTRIBUTES` env var
-2. `telemetry.resourceAttributes` in `.qwen/settings.json` (overrides env on
+2. `telemetry.resourceAttributes` in `.mariadb-shell-agent/settings.json` (overrides env on
    key conflict)
 
 `OTEL_SERVICE_NAME` is a separate escape hatch — when set, it overrides
@@ -206,7 +206,7 @@ export OTEL_RESOURCE_ATTRIBUTES="team=platform,env=prod,cost_center=eng-123"
 export OTEL_SERVICE_NAME=qwen-code-ci
 ```
 
-**Fleet baseline (`~/.qwen/settings.json`) + per-host override:**
+**Fleet baseline (`~/.mariadb-shell-agent/settings.json`) + per-host override:**
 
 ```json
 {
@@ -251,12 +251,12 @@ pairs are skipped with a warning rather than failing telemetry startup.
 Reserved keys (`service.version`, `session.id`), malformed pairs, non-string
 settings values, and invalid percent-encoding are all silently dropped with a
 warning logged via the OpenTelemetry diagnostics channel. That channel routes
-to the debug log file (`~/.qwen/log/otel-*.log`), **not** the console, so the
+to the debug log file (`~/.mariadb-shell-agent/log/otel-*.log`), **not** the console, so the
 behavior can look like silent failure.
 
 If a custom resource attribute isn't appearing on exported telemetry:
 
-1. Check `~/.qwen/log/otel-*.log` for lines matching `cannot override` (reserved
+1. Check `~/.mariadb-shell-agent/log/otel-*.log` for lines matching `cannot override` (reserved
    key dropped), `Skipping malformed` (bad env var pair), or `must be a string`
    (non-string settings value).
 2. Verify the env var is set in the qwen-code process's environment (not just
@@ -271,7 +271,7 @@ high-cardinality field like `session.id` to a metric causes time-series fan-out
 proportional to the number of sessions, which quickly exhausts metric backend
 storage.
 
-To prevent this, Qwen Code keeps high-cardinality attributes off metric data
+To prevent this, MariaDB Shell Agent keeps high-cardinality attributes off metric data
 points by default. Spans and logs are per-event and unaffected, so they
 continue to carry `session.id` for trace and log correlation.
 
@@ -314,7 +314,7 @@ cardinality pressure.
 
 ### Client-side HTTP span on outbound fetch
 
-When telemetry is enabled, Qwen Code registers `UndiciInstrumentation`
+When telemetry is enabled, MariaDB Shell Agent registers `UndiciInstrumentation`
 which creates a client-side HTTP span for every outbound `fetch()`
 request originated by the process — including the LLM SDKs (`openai`,
 `@google/genai`, `@anthropic-ai/sdk`), the MCP StreamableHTTP client, the
@@ -332,7 +332,7 @@ also written into the outgoing request stream is controlled by a
 
 **Feedback-loop avoidance.** OTel SDK uses `fetch` internally to upload OTLP
 data. Without protection, instrumenting `fetch` would trace those uploads,
-which would themselves be uploaded, causing an infinite loop. Qwen Code's
+which would themselves be uploaded, causing an infinite loop. MariaDB Shell Agent's
 undici instrumentation is configured with an `ignoreRequestHook` that skips
 URLs matching the configured `telemetry.otlpEndpoint` /
 `telemetry.otlpTracesEndpoint` / `telemetry.otlpLogsEndpoint` /
@@ -358,7 +358,7 @@ discussion for the framing rationale.
 }
 ```
 
-When `false` (default), Qwen Code installs a no-op `TextMapPropagator` on
+When `false` (default), MariaDB Shell Agent installs a no-op `TextMapPropagator` on
 the OTel SDK. UndiciInstrumentation still creates client HTTP spans for
 your OTLP collector, but `propagation.inject()` is a no-op so **no
 `traceparent` is written onto outbound requests**. Trace IDs stay
@@ -401,22 +401,22 @@ Verify both flags when wiring an ARMS+DashScope correlation setup:
 
 ### Routify session affinity
 
-Qwen Code's LLM requests through the OpenAI-compatible, DashScope, Anthropic,
-Gemini, and Vertex provider paths include the current Qwen Code session ID in
-the `session_id` header when addressed over HTTPS directly to `routify.alibaba-inc.com`,
-`routify-online.alibaba-inc.com`, or `routify-pub.alibaba-inc.com`. Routify's
+MariaDB Shell Agent's LLM requests through the OpenAI-compatible, DashScope, Anthropic,
+Gemini, and Vertex provider paths include the current MariaDB Shell Agent session ID in
+the `session_id` header when addressed over HTTPS directly to `routify.alibaba-inc.invalid`,
+`routify-online.alibaba-inc.invalid`, or `routify-pub.alibaba-inc.invalid`. Routify's
 ModelRouter uses this value for session affinity and traffic marking. This
 behavior is not controlled by `telemetry.enabled` or
 `outboundCorrelation.*`.
 
-The initial destination match is deliberately narrow: Qwen Code does not
-attach the header to subdomains, other `alibaba-inc.com` hosts, or other LLM
+The initial destination match is deliberately narrow: MariaDB Shell Agent does not
+attach the header to subdomains, other `alibaba-inc.invalid` hosts, or other LLM
 endpoints. The standard fetch redirect behavior still applies after that
 match, so a Routify response can forward the header by redirecting the request.
 
 The session ID is read for every request, so a new session created by
 `/clear` gets a new affinity value without rebuilding the SDK client. Gemini
-requires an explicit Routify `baseUrl` so Qwen Code can verify the
+requires an explicit Routify `baseUrl` so MariaDB Shell Agent can verify the
 destination.
 
 `X-Qwen-Code-Request-Id` is not implemented.
@@ -464,17 +464,17 @@ fresh header per request.
 
 ### Manual OTLP Export
 
-To view Qwen Code telemetry in Alibaba Cloud Managed Service for
-OpenTelemetry, configure Qwen Code to export to the OTLP endpoint
+To view MariaDB Shell Agent telemetry in Alibaba Cloud Managed Service for
+OpenTelemetry, configure MariaDB Shell Agent to export to the OTLP endpoint
 provided by ARMS.
 
 Setting `"target": "gcp"` alone does not configure the export
-destination. If `otlpEndpoint` is not set, Qwen Code still defaults to
+destination. If `otlpEndpoint` is not set, MariaDB Shell Agent still defaults to
 `http://localhost:4317`. If `outfile` is set, it overrides
 `otlpEndpoint` and telemetry is written to the file instead of being
 sent to Alibaba Cloud.
 
-1. Enable telemetry in your `.qwen/settings.json` and set the OTLP
+1. Enable telemetry in your `.mariadb-shell-agent/settings.json` and set the OTLP
    endpoint:
 
    **Option A: gRPC protocol** (standard OTLP endpoint):
@@ -507,7 +507,7 @@ sent to Alibaba Cloud.
    ```
 
    > **Note:** When using HTTP protocol with only `otlpEndpoint` (no
-   > per-signal overrides), Qwen Code appends standard OTLP paths
+   > per-signal overrides), MariaDB Shell Agent appends standard OTLP paths
    > (`/v1/traces`, `/v1/logs`, `/v1/metrics`) to the base URL. If your
    > backend uses different paths, use per-signal endpoint overrides as
    > shown in Option B.
@@ -536,8 +536,8 @@ sent to Alibaba Cloud.
    headers through standard OpenTelemetry environment variables such as
    `OTEL_EXPORTER_OTLP_HEADERS` (or the signal-specific variants). Qwen
    Code does not currently expose OTLP auth headers directly in
-   `.qwen/settings.json`.
-3. Run Qwen Code and send prompts.
+   `.mariadb-shell-agent/settings.json`.
+3. Run MariaDB Shell Agent and send prompts.
 4. View telemetry in Managed Service for OpenTelemetry:
    - Product overview:
      [What is Managed Service for OpenTelemetry?][aliyun-opentelemetry-overview]
@@ -545,17 +545,17 @@ sent to Alibaba Cloud.
      [Get started with Managed Service for OpenTelemetry][aliyun-opentelemetry-get-started]
    - Console entry points:
      - China mainland:
-       [trace.console.aliyun.com][aliyun-opentelemetry-console-cn]
+       [trace.console.aliyun.invalid][aliyun-opentelemetry-console-cn]
        (legacy console:
-       [tracing.console.aliyun.com][aliyun-opentelemetry-console-cn-legacy])
+       [tracing.console.aliyun.invalid][aliyun-opentelemetry-console-cn-legacy])
      - International:
-       [arms.console.alibabacloud.com][aliyun-opentelemetry-console-intl]
+       [arms.console.alibabacloud.invalid][aliyun-opentelemetry-console-intl]
    - In the console, use `Applications` to inspect traces and service
      topology.
    - To locate the OTLP endpoint and access information:
-     - **New console** (`trace.console.aliyun.com` or international):
+     - **New console** (`trace.console.aliyun.invalid` or international):
        navigate to `Integration Center`.
-     - **Legacy console** (`tracing.console.aliyun.com`): navigate to
+     - **Legacy console** (`tracing.console.aliyun.invalid`): navigate to
        `Cluster Configurations` → `Access point information`.
 
 ## Local Telemetry
@@ -564,13 +564,13 @@ For local development and debugging, you can capture telemetry data locally:
 
 ### File-based Output (Recommended)
 
-1. Enable telemetry in your `.qwen/settings.json`:
+1. Enable telemetry in your `.mariadb-shell-agent/settings.json`:
 
    ```json
    {
      "telemetry": {
        "enabled": true,
-       "outfile": ".qwen/telemetry.log"
+       "outfile": ".mariadb-shell-agent/telemetry.log"
      }
    }
    ```
@@ -579,8 +579,8 @@ For local development and debugging, you can capture telemetry data locally:
    > The `target` and `otlpEndpoint` settings are not needed for file-only
    > output and can be safely omitted from your config.
 
-2. Run Qwen Code and send prompts.
-3. View logs and metrics in the specified file (e.g., `.qwen/telemetry.log`).
+2. Run MariaDB Shell Agent and send prompts.
+3. View logs and metrics in the specified file (e.g., `.mariadb-shell-agent/telemetry.log`).
 
 ### Collector-Based Export (Advanced)
 
@@ -592,16 +592,16 @@ For local development and debugging, you can capture telemetry data locally:
    - Download and start Jaeger and OTEL collector
    - Configure your workspace for local telemetry
    - Provide a Jaeger UI at http://localhost:16686
-   - Save logs/metrics to `~/.qwen/tmp/<projectHash>/otel/collector.log`
+   - Save logs/metrics to `~/.mariadb-shell-agent/tmp/<projectHash>/otel/collector.log`
    - Stop collector on exit (e.g. `Ctrl+C`)
-2. Run Qwen Code and send prompts.
+2. Run MariaDB Shell Agent and send prompts.
 3. View traces at http://localhost:16686 and logs/metrics in the collector log
    file.
 
 ## Logs and Metrics
 
 The following section describes the structure of logs, metrics, and spans
-generated for Qwen Code.
+generated for MariaDB Shell Agent.
 
 - A `sessionId` is included as a common attribute on all logs and metrics.
 
@@ -946,7 +946,7 @@ The daemon process (long-running HTTP server mode) exposes its own metrics.
 Distributed tracing spans form a tree rooted at `qwen-code.interaction`. In the CLI, each interaction is a trace root with its own `traceId`; ACP and daemon paths may inherit an inbound parent context. Cross-prompt correlation uses the `session.id` attribute.
 
 Session lifecycle is also exported through the OpenTelemetry General Session
-semantic conventions. When the OTel logs pipeline is enabled, Qwen Code emits
+semantic conventions. When the OTel logs pipeline is enabled, MariaDB Shell Agent emits
 `session.start` and `session.end` log events with the required `session.id`
 attribute (cataloged under Core Session Events above). A resumed persisted
 conversation includes `session.previous_id` on its `session.start` event only
@@ -969,7 +969,7 @@ spans continue to use `gen_ai.conversation.id` for the same owning session ID.
   - **GenAI attributes**: `gen_ai.operation.name`, `gen_ai.provider.name`, `gen_ai.conversation.id`, optional ARMS extension `gen_ai.user.id`, `gen_ai.request.model`, `gen_ai.request.stream`, `gen_ai.request.choice.count`, `gen_ai.request.max_tokens`, `gen_ai.request.temperature`, `gen_ai.request.top_p`, `gen_ai.request.frequency_penalty`, `gen_ai.request.presence_penalty`, `gen_ai.request.stop_sequences`, `gen_ai.request.reasoning.level`, optional `gen_ai.output.type`, `gen_ai.response.id`, `gen_ai.response.model`, `gen_ai.response.finish_reasons`, `gen_ai.response.time_to_first_chunk`, `gen_ai.usage.input_tokens`, `gen_ai.usage.output_tokens`, `gen_ai.usage.cache_read.input_tokens`, `gen_ai.usage.cache_creation.input_tokens`
   - **Compatibility attributes**: `session.id`, `qwen-code.prompt_id`, `llm_request.context` ("subagent"/"interaction"/"standalone"), `duration_ms`, `ttft_ms`, `request_setup_ms`, `attempt`, `retry_total_delay_ms`, `sampling_ms`, `output_tokens_per_second`, `success`, `error`, `finish_reason`, `thoughts_token_count`, `subagent_name`, `error_type`, `error_status_code`
   - Standard response fields come from the provider response. Standard token fields are emitted only for provider-reported non-negative safe integers. If the provider reports only a total token count, input/output usage is omitted rather than estimated.
-  - Standard request-parameter fields come from the first provider-final SDK request object after adapter defaults, overrides, unsupported-field removal, and output-window clamps. Qwen Code does not infer SDK or server defaults.
+  - Standard request-parameter fields come from the first provider-final SDK request object after adapter defaults, overrides, unsupported-field removal, and output-window clamps. MariaDB Shell Agent does not infer SDK or server defaults.
   - `gen_ai.request.reasoning.level` preserves the exact non-empty `reasoning_effort` string from the first final OpenAI-compatible request, including provider-specific tiers and `none` when sent. It is omitted when absent or invalid, including when the adapter removes it; nested provider-specific reasoning fields are not mapped. This request parameter does not require sensitive-content capture.
   - Streaming requests emit `gen_ai.request.stream=true`. `gen_ai.response.time_to_first_chunk` measures seconds from the provider call to the first normalized response yielded by the provider adapter, which may differ from the first raw network frame. Non-streaming requests omit both standard streaming attributes because an absent `gen_ai.request.stream` means non-streaming in the semantic convention.
 
@@ -1006,7 +1006,7 @@ To make ARMS recognize exported spans as a GenAI application, configure its reso
 }
 ```
 
-Qwen Code does not inject this ARMS-specific resource attribute or `gen_ai.span.kind`. ARMS can infer LLM, Tool, and Agent roles from `gen_ai.operation.name`.
+MariaDB Shell Agent does not inject this ARMS-specific resource attribute or `gen_ai.span.kind`. ARMS can infer LLM, Tool, and Agent roles from `gen_ai.operation.name`.
 
 - `qwen-code.daemon.request`: Wraps a daemon HTTP request.
   - **Attributes**: `http.request.method`, `http.route`, `qwen-code.daemon.operation`, `session.id`, `http.response.status_code`

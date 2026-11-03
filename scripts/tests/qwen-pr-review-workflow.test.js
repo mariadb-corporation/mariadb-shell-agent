@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -722,7 +723,7 @@ describe('qwen pr review workflow-command containment', () => {
     const r = runScenario('success', {
       logPath: join(sep, 'nonexistent-qwen-review-dir', 'log'),
     });
-    expect(r.line).toContain('Failed to write qwen review log');
+    expect(r.line).toContain('Failed to write mariadb-shell-agent review log');
     const { token, resumeAt } = bracketOf(r.raw);
     expect(token).toBeTruthy();
     expect(resumeAt).toBeGreaterThan(-1);
@@ -4107,7 +4108,8 @@ describe('fallback comment resilience (PR #8894 incident class)', () => {
               GITHUB_EVENT_NAME: eventName,
               GITHUB_STEP_SUMMARY: summary,
               PR_NUMBER: '42',
-              RUN_URL: 'https://github.com/QwenLM/qwen-code/actions/runs/12345',
+              RUN_URL:
+                'https://github.invalid/QwenLM/qwen-code/actions/runs/12345',
               EXPECTED_HEAD_SHA: '',
               FAILURE_KIND: '',
               FAILURE_REASON:
@@ -4320,7 +4322,7 @@ describe('fallback comment resilience (PR #8894 incident class)', () => {
     // Mirrors a prior fallback comment's rendered shape: the run URL is a
     // markdown link, so the run id is always immediately followed by ')'.
     const r = runFallbackStep('already', {
-      comments: `${marker}\n\nSee [workflow logs](https://github.com/QwenLM/qwen-code/actions/runs/12345).`,
+      comments: `${marker}\n\nSee [workflow logs](https://github.invalid/QwenLM/qwen-code/actions/runs/12345).`,
     });
     expect(r.status).toBe(0);
     expect(r.posted).toBe('');
@@ -4332,7 +4334,7 @@ describe('fallback comment resilience (PR #8894 incident class)', () => {
     // this run's (12345) as a substring — the match must stay anchored to
     // this run's URL or a distinct run's death is silently suppressed.
     const r = runFallbackStep('other_run', {
-      comments: `${marker}\n\nSee [workflow logs](https://github.com/QwenLM/qwen-code/actions/runs/123450).`,
+      comments: `${marker}\n\nSee [workflow logs](https://github.invalid/QwenLM/qwen-code/actions/runs/123450).`,
     });
     expect(r.status).toBe(0);
     expect(r.posted).not.toBe('');
@@ -4472,11 +4474,12 @@ describe('fallback comment resilience (PR #8894 incident class)', () => {
   ];
 
   // What the guard recognizes a review THIS pipeline composed by: every
-  // composed body carries the "via Qwen Code /review" attribution footer or
+  // composed body carries the "via MariaDB Shell Agent /review" attribution footer or
   // the invisible qwen-review-ledger marker — at least one, never neither —
   // and no foreign approval carries either. Matching on that evidence is how
   // the guard stays closed to a producer set no exclusion list can finish.
-  const REVIEW_FOOTER = '_— qwen3.8-max via Qwen Code /review (v0.21.14)_';
+  const REVIEW_FOOTER =
+    '_— qwen3.8-max via MariaDB Shell Agent /review (v0.21.14)_';
   const REVIEW_LEDGER = '<!-- qwen-review-ledger {"v":1,"round":2} -->';
   const COMPOSED_REVIEW_BODIES = [
     // Attribution on: the footer and the ledger marker both ride the body.
@@ -4716,7 +4719,7 @@ describe('fallback comment resilience (PR #8894 incident class)', () => {
     // this run, so the in-job step must not add a second comment.
     const r = runFallbackStep('already', {
       useInJobStep: true,
-      comments: `${marker}\n\nSee [workflow logs](https://github.com/QwenLM/qwen-code/actions/runs/12345).`,
+      comments: `${marker}\n\nSee [workflow logs](https://github.invalid/QwenLM/qwen-code/actions/runs/12345).`,
     });
     expect(r.status).toBe(0);
     expect(r.posted).toBe('');
@@ -6718,7 +6721,7 @@ describe('review supersede salvage (#10110)', () => {
     // renames, this cross-pin fails instead of the signal silently dying
     // (the elapsed threshold would still salvage, but later than intended).
     expect(run).toContain(
-      'COMPOSED_ARTIFACT="${GITHUB_WORKSPACE}/.qwen/tmp/qwen-review-pr-${PR_NUMBER}-composed.json"',
+      'COMPOSED_ARTIFACT="${GITHUB_WORKSPACE}/.mariadb-shell-agent/tmp/qwen-review-pr-${PR_NUMBER}-composed.json"',
     );
     const cli = readFileSync('packages/cli/src/commands/review/run.ts', 'utf8');
     expect(cli).toContain('`qwen-review-pr-${cls.number}-composed.json`');

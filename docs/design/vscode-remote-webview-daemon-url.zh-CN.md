@@ -4,7 +4,7 @@
 
 ## 问题
 
-在远程窗口（Remote-SSH、Dev Containers、WSL）下，companion 扩展以扩展宿主子进程的方式启动 `qwen serve`，因此 daemon 绑定的是**远端**机器 loopback 上的随机端口（`packages/vscode-ide-companion/src/services/qwenDaemonProcess.ts`：`--hostname 127.0.0.1 --port 0`，地址从 stdout 抓取）。而 webview 的渲染进程在本地桌面客户端里。`WebViewProvider` 把抓到的 `runtime.baseUrl` 原样展开进 `webShellBootstrap` 载荷，于是内嵌的 Web Shell 拿着 `http://127.0.0.1:<port>/capabilities` 去请求客户端自己的 loopback，所有请求都以 `ERR_CONNECTION_REFUSED` 失败，界面上表现为 "Failed to load workspace"。在 VS Code 的 PORTS 面板里手动转发端口可以临时救活，但扩展宿主一重启就会分配新端口，随即再次失效（#11976）。
+在远程窗口（Remote-SSH、Dev Containers、WSL）下，companion 扩展以扩展宿主子进程的方式启动 `mariadb-shell-agent serve`，因此 daemon 绑定的是**远端**机器 loopback 上的随机端口（`packages/vscode-ide-companion/src/services/qwenDaemonProcess.ts`：`--hostname 127.0.0.1 --port 0`，地址从 stdout 抓取）。而 webview 的渲染进程在本地桌面客户端里。`WebViewProvider` 把抓到的 `runtime.baseUrl` 原样展开进 `webShellBootstrap` 载荷，于是内嵌的 Web Shell 拿着 `http://127.0.0.1:<port>/capabilities` 去请求客户端自己的 loopback，所有请求都以 `ERR_CONNECTION_REFUSED` 失败，界面上表现为 "Failed to load workspace"。在 VS Code 的 PORTS 面板里手动转发端口可以临时救活，但扩展宿主一重启就会分配新端口，随即再次失效（#11976）。
 
 另有两道门使得单纯调用 `vscode.env.asExternalUri()` 并不足够：
 

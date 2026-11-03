@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -79,7 +80,7 @@ export function resetRecoveryLatchForTests(): void {
  * directory it descends into — downloads/, the objects root, and each
  * shard — must be a genuine directory inside the omni root: a symlinked
  * intermediate directory would redirect readdir+rm at arbitrary paths
- * outside `.qwen/omni`. The store's own symlink guard (putFile) runs later
+ * outside `.mariadb-shell-agent/omni`. The store's own symlink guard (putFile) runs later
  * and does not protect this pre-delivery scan.
  */
 async function isRealDirectory(p: string): Promise<boolean> {

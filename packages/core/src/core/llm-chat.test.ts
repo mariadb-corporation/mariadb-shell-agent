@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1601,7 +1602,7 @@ describe('LlmChat', async () => {
       await sendDrain('test message', 'prompt-id-sleep-inhibitor');
       expect(mockAcquireSleepInhibitor).toHaveBeenCalledWith(
         mockConfig,
-        'Qwen Code is streaming a model response',
+        'MariaDB Shell Agent is streaming a model response',
       );
       expect(mockSleepInhibitorRelease).toHaveBeenCalledTimes(1);
     });
@@ -14530,7 +14531,7 @@ describe('LlmChat', async () => {
     /** A per-tool-layer spill envelope whose recovery pointer sits at the front. */
     const spillEnvelope = (
       n: number,
-      base = '/home/runner/.qwen/tmp/project-temp-dir',
+      base = '/home/runner/.mariadb-shell-agent/tmp/project-temp-dir',
     ) =>
       `<persisted-output>\nOutput too large (512 KB). Full output saved to: ${base}/shell_${'a'.repeat(12)}${n}.log\nFull output sha256: ${'f'.repeat(64)}\nNote: this file may be cleaned up after 24 hours.\n\nPreview (up to 2100 chars):\n${'p'.repeat(1_900)}\n</persisted-output>`;
     const reportUsage = async (promptTokenCount: number, target = chat) => {

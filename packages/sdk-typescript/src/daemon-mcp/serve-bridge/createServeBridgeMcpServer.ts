@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Factory: wraps `qwen serve` HTTP API as an MCP server.
+ * Factory: wraps `mariadb-shell-agent serve` HTTP API as an MCP server.
  */
 
 import { DaemonClient } from '../../daemon/DaemonClient.js';
@@ -23,7 +24,7 @@ function stripTrailingSlashes(url: string): string {
 }
 
 /**
- * Create an MCP server that proxies `qwen serve` HTTP endpoints as MCP tools.
+ * Create an MCP server that proxies `mariadb-shell-agent serve` HTTP endpoints as MCP tools.
  *
  * @example
  * ```typescript

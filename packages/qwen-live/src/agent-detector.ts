@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -50,7 +51,7 @@ const AGENT_SPECS: ReadonlyArray<{
     native: true,
   },
   {
-    label: 'Qwen Code',
+    label: 'MariaDB Shell Agent',
     name: 'qwen',
     binary: 'qwen',
     acpArgs: ['--acp'],

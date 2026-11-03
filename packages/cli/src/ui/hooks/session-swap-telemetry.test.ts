@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Code
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 // @vitest-environment jsdom
@@ -295,7 +296,7 @@ describe('session swap telemetry accounting (#9833)', () => {
     });
     const { config, client, sessionService } = makeFakeEnv();
 
-    // Process-startup resume of A (`qwen --resume`): Config hands the client
+    // Process-startup resume of A (`mariadb-shell-agent --resume`): Config hands the client
     // the resumed session data, then initialize() replays it. Replay is
     // legitimate here and must survive everything that follows.
     config.startNewSession(SESSION_A, {

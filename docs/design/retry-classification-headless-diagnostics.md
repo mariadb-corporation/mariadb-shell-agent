@@ -13,7 +13,7 @@ classification (`errorKind` / `classificationReason` / `transportCode` /
 `statusCode`) is written only to the debug log file, which is off unless
 `QWEN_DEBUG_LOG_FILE` is set. During the v0.26.1 release this silence cost
 three bounded diagnostic rounds to attribute a 6-hour SDK release stall to an
-intermittently unresponsive model endpoint ([#15498](https://github.com/QwenLM/qwen-code/issues/15498)).
+intermittently unresponsive model endpoint ([#15498](https://github.invalid/QwenLM/qwen-code/issues/15498)).
 
 Scope: emit an allowlisted scalar classification with retry decisions that
 otherwise surface no reason, visible on the headless stderr channel. Interactive

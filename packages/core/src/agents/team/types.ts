@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,7 +19,7 @@ import type { PermissionMode } from '../../hooks/types.js';
 // ─── Team File ──────────────────────────────────────────────
 
 /**
- * Persisted at `~/.qwen/teams/{team-name}/config.json`.
+ * Persisted at `~/.mariadb-shell-agent/teams/{team-name}/config.json`.
  */
 export interface TeamFile {
   /** Team name (sanitized, used as directory name). */
@@ -105,7 +106,7 @@ export type SwarmTaskStatus = 'pending' | 'in_progress' | 'completed';
 
 /**
  * A single task in the distributed task system.
- * Persisted as `~/.qwen/tasks/{teamName}/{id}.json`.
+ * Persisted as `~/.mariadb-shell-agent/tasks/{teamName}/{id}.json`.
  */
 export interface SwarmTask {
   /** Auto-incremented task ID. */
@@ -182,10 +183,10 @@ export const MAX_TEAMMATES = 10;
 /** Reserved name for the team leader (case-insensitive in messaging). */
 export const LEADER_NAME = 'leader';
 
-/** Directory name under ~/.qwen for team configs. */
+/** Directory name under ~/.mariadb-shell-agent for team configs. */
 export const TEAMS_DIR = 'teams';
 
-/** Directory name under ~/.qwen for task files. */
+/** Directory name under ~/.mariadb-shell-agent for task files. */
 export const TASKS_DIR = 'tasks';
 
 /** Filename for the team config within a team directory. */

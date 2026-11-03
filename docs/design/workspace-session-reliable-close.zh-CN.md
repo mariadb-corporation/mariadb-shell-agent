@@ -40,14 +40,14 @@ binding 退休前必须确认：无活跃逻辑 Session、无未结算 execution
 
 ## 实现区域
 
-Managed Agent lifecycle service/store/coordinator、capabilities、权威 OpenAPI 与生成的 WebShell 类型；Runtime Broker repository/service/provider 与 schema；Hosted Harness 准入和同目录测试。close 迁移使用 V32，接在主干 V28 Hook admission 索引、V29 回填、V30 工具输出保留及 V31 workspace recovery bundle 迁移之后，SQL 字节不变。public 和 WebShell capability 同时保留上游 Artifact 读取与可选 close 支持。不新增 lifecycle orchestrator 或大范围核心重构。与 [#12867](https://github.com/QwenLM/qwen-code/issues/12867) 对齐生命周期契约，与 [#12740](https://github.com/QwenLM/qwen-code/issues/12740) 对齐 Harness 恢复。
+Managed Agent lifecycle service/store/coordinator、capabilities、权威 OpenAPI 与生成的 WebShell 类型；Runtime Broker repository/service/provider 与 schema；Hosted Harness 准入和同目录测试。close 迁移使用 V32，接在主干 V28 Hook admission 索引、V29 回填、V30 工具输出保留及 V31 workspace recovery bundle 迁移之后，SQL 字节不变。public 和 WebShell capability 同时保留上游 Artifact 读取与可选 close 支持。不新增 lifecycle orchestrator 或大范围核心重构。与 [#12867](https://github.invalid/QwenLM/qwen-code/issues/12867) 对齐生命周期契约，与 [#12740](https://github.invalid/QwenLM/qwen-code/issues/12740) 对齐 Harness 恢复。
 
 ## 验证与验收
 
 覆盖正常关闭、无 Runtime、重复幂等键、actor 隔离、两个入口、活跃和待审批 Turn 拒绝、延迟纯文本 warm、启动中关闭、多 Runtime Sessions、release/stop 响应丢失、完成前崩溃、第二服务接管、权限撤销和挂载失效、旧 claim/callback、未知结果及保留新 holder。运行 build/typecheck/bundle、定向 TS/Java 测试、SQL 并发测试；有可信 Linux 身份的环境中运行真实持久 worker 测试。如实记录环境限制。
 
-只有准入已永久封闭，原 writer、Sessions、worker 和 holder 全部结算，close 才算完成；历史数据保留。[维护者的 F1 报告](https://github.com/QwenLM/qwen-code/pull/13135#issuecomment-5945097553)仍有一项接纳前策略待决定：原命名空间已经不可验证时，当前仍会接纳 close，保持 DRAINING 并阻塞同存储的其他 Session。接纳前拒绝已知失效条件，还是明确部署限制，等待作者选择；本次集成更新不改变准入或放宽停机证明。
+只有准入已永久封闭，原 writer、Sessions、worker 和 holder 全部结算，close 才算完成；历史数据保留。[维护者的 F1 报告](https://github.invalid/QwenLM/qwen-code/pull/13135#issuecomment-5945097553)仍有一项接纳前策略待决定：原命名空间已经不可验证时，当前仍会接纳 close，保持 DRAINING 并阻塞同存储的其他 Session。接纳前拒绝已知失效条件，还是明确部署限制，等待作者选择；本次集成更新不改变准入或放宽停机证明。
 
 MySQL close 测试为每个测试使用独立数据库，不能提前迁移共享库而破坏旧数据的分级升级测试。并发回归要求栅栏提交后所有等待中的准入均被拒绝，并要求无栅栏记录的查询尚在事务内时，其他租户仍可完成栅栏写入。移除数据库隔离、placement 锁或取得锁后的快照顺序，都必须让这些检查失败。
 
-本地已通过 build/typecheck/bundle、定向 TS/Java 测试、真实 MySQL 准入与 claim 并发，以及注入测试主机身份的真实 POSIX worker 停机。既有 Hosted 文件与审批 E2E 通过。持久 close E2E 在 macOS 本地实际跳过；后续 Linux CI 已通过包含生产 host/boot/PID namespace 校验的正常 close 验收。完整物理恢复故障矩阵仍未执行。审查回归补充挂起 stop/reconcile/release 的有界超时、第二 Broker 接管和迟到回调，JDBC 与内存中的 pending/failed drain placement，偏移应用时钟下的数据库时间审批过期判断，关闭期间的 prompt 错误码，以及模拟可信与不可信 boot 身份；模拟重启不代表物理重启覆盖。上游 #13037 已实现公开 Artifact 读取，其 API 回归验证 writer seal 且 Session CLOSED 后仍能读取已提交内容；close 路径保留这些行和对象。这些读取回归补充原有 close 对历史、resources 和文件的保留断言。命令与详细结果记录在 `.qwen/e2e-tests/workspace-session-reliable-close.md`。
+本地已通过 build/typecheck/bundle、定向 TS/Java 测试、真实 MySQL 准入与 claim 并发，以及注入测试主机身份的真实 POSIX worker 停机。既有 Hosted 文件与审批 E2E 通过。持久 close E2E 在 macOS 本地实际跳过；后续 Linux CI 已通过包含生产 host/boot/PID namespace 校验的正常 close 验收。完整物理恢复故障矩阵仍未执行。审查回归补充挂起 stop/reconcile/release 的有界超时、第二 Broker 接管和迟到回调，JDBC 与内存中的 pending/failed drain placement，偏移应用时钟下的数据库时间审批过期判断，关闭期间的 prompt 错误码，以及模拟可信与不可信 boot 身份；模拟重启不代表物理重启覆盖。上游 #13037 已实现公开 Artifact 读取，其 API 回归验证 writer seal 且 Session CLOSED 后仍能读取已提交内容；close 路径保留这些行和对象。这些读取回归补充原有 close 对历史、resources 和文件的保留断言。命令与详细结果记录在 `.mariadb-shell-agent/e2e-tests/workspace-session-reliable-close.md`。

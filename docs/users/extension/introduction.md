@@ -1,12 +1,12 @@
-# Qwen Code Extensions
+# MariaDB Shell Agent Extensions
 
-Qwen Code extensions package prompts, MCP servers, subagents, skills and custom commands into a familiar and user-friendly format. With extensions, you can expand the capabilities of Qwen Code and share those capabilities with others. They are designed to be easily installable and shareable.
+MariaDB Shell Agent extensions package prompts, MCP servers, subagents, skills and custom commands into a familiar and user-friendly format. With extensions, you can expand the capabilities of MariaDB Shell Agent and share those capabilities with others. They are designed to be easily installable and shareable.
 
-Extensions and plugins from [Gemini CLI Extensions Gallery](https://geminicli.com/extensions/), [Claude Code Marketplace](https://claudemarketplaces.com/), Qoder, and the portable [Agent Plugins v1](./agent-plugins.md) format can be directly installed into Qwen Code. This cross-platform compatibility gives you access to a rich ecosystem of extensions and plugins, dramatically expanding Qwen Code's capabilities without requiring extension authors to maintain separate versions.
+Extensions and plugins from [Gemini CLI Extensions Gallery](https://geminicli.com/extensions/), [Claude Code Marketplace](https://claudemarketplaces.com/), Qoder, and the portable [Agent Plugins v1](./agent-plugins.md) format can be directly installed into MariaDB Shell Agent. This cross-platform compatibility gives you access to a rich ecosystem of extensions and plugins, dramatically expanding MariaDB Shell Agent's capabilities without requiring extension authors to maintain separate versions.
 
 ## Extension management
 
-We offer a suite of extension management tools using both `qwen extensions` CLI commands and `/extensions` slash commands within the interactive CLI.
+We offer a suite of extension management tools using both `mariadb-shell-agent extensions` CLI commands and `/extensions` slash commands within the interactive CLI.
 
 ### Runtime Extension Management (Slash Commands)
 
@@ -24,45 +24,45 @@ Running `/extensions` (or `/extensions manage`) opens an interactive manager wit
 
 - **Discover** — browse plugins from your configured marketplace sources. Type to search, `Enter` to view a plugin's details, and install it (you'll be asked to choose an install scope). Press `Ctrl+R` to re-fetch the listings, and `Esc` to go back.
 - **Installed** — your installed extensions, grouped by scope (**User level**, **Project level**, and favorites). Use `↑`/`↓` to navigate, `Space` to enable/disable an extension, `f` to favorite it, and `Enter` to open its details. MCP servers bundled by an extension appear nested under their parent extension with live connection status; you can enable or disable each server individually from there.
-- **Sources** — manage the marketplace sources that feed the Discover tab. Use `↑`/`↓` to navigate, `Enter` to select a source, and `d` to remove one. These are the same sources managed by the `qwen extensions sources` CLI commands described below.
+- **Sources** — manage the marketplace sources that feed the Discover tab. Use `↑`/`↓` to navigate, `Enter` to select a source, and `d` to remove one. These are the same sources managed by the `mariadb-shell-agent extensions sources` CLI commands described below.
 
-Changes made here hot-reload immediately, without restarting Qwen Code.
+Changes made here hot-reload immediately, without restarting MariaDB Shell Agent.
 
 ### CLI Extension Management
 
-You can also manage extensions using `qwen extensions` CLI commands. Note that changes made via CLI commands will be reflected in active CLI sessions on restart.
+You can also manage extensions using `mariadb-shell-agent extensions` CLI commands. Note that changes made via CLI commands will be reflected in active CLI sessions on restart.
 
 ### Installing an extension
 
-You can install an extension using `qwen extensions install` from multiple sources:
+You can install an extension using `mariadb-shell-agent extensions install` from multiple sources:
 
 #### From Claude Code Marketplace
 
-Qwen Code also supports plugins from the [Claude Code Marketplace](https://claudemarketplaces.com/). Install from a marketplace and choose a plugin:
+MariaDB Shell Agent also supports plugins from the [Claude Code Marketplace](https://claudemarketplaces.com/). Install from a marketplace and choose a plugin:
 
 ```bash
-qwen extensions install <marketplace-name>
+mariadb-shell-agent extensions install <marketplace-name>
 # or
-qwen extensions install <marketplace-github-url>
+mariadb-shell-agent extensions install <marketplace-github-url>
 ```
 
 If you want to install a specific plugin, you can use the format with plugin name:
 
 ```bash
-qwen extensions install <marketplace-name>:<plugin-name>
+mariadb-shell-agent extensions install <marketplace-name>:<plugin-name>
 # or
-qwen extensions install <marketplace-github-url>:<plugin-name>
+mariadb-shell-agent extensions install <marketplace-github-url>:<plugin-name>
 ```
 
 For example, to install the `prompts.chat` plugin from the [f/awesome-chatgpt-prompts](https://claudemarketplaces.com/plugins/f-prompts.chat) marketplace:
 
 ```bash
-qwen extensions install f/awesome-chatgpt-prompts:prompts.chat
+mariadb-shell-agent extensions install f/awesome-chatgpt-prompts:prompts.chat
 # or
-qwen extensions install https://github.com/f/awesome-chatgpt-prompts:prompts.chat
+mariadb-shell-agent extensions install https://github.com/f/awesome-chatgpt-prompts:prompts.chat
 ```
 
-Claude plugins are automatically converted to Qwen Code format during installation:
+Claude plugins are automatically converted to MariaDB Shell Agent format during installation:
 
 - `claude-plugin.json` is converted to `qwen-extension.json`
 - Agent configurations are converted to Qwen subagent format
@@ -79,21 +79,21 @@ You can quickly browse available extensions from different marketplaces using th
 /extensions explore ClaudeCode
 ```
 
-This command opens the respective marketplace in your default browser, allowing you to discover new extensions to enhance your Qwen Code experience.
+This command opens the respective marketplace in your default browser, allowing you to discover new extensions to enhance your MariaDB Shell Agent experience.
 
-> **Cross-Platform Compatibility**: This allows you to leverage the rich extension ecosystems from both Gemini CLI and Claude Code, dramatically expanding the available functionality for Qwen Code users.
+> **Cross-Platform Compatibility**: This allows you to leverage the rich extension ecosystems from both Gemini CLI and Claude Code, dramatically expanding the available functionality for MariaDB Shell Agent users.
 
 #### From Gemini CLI Extensions
 
-Qwen Code fully supports extensions from the [Gemini CLI Extensions Gallery](https://geminicli.com/extensions/). Simply install them using the git URL:
+MariaDB Shell Agent fully supports extensions from the [Gemini CLI Extensions Gallery](https://geminicli.com/extensions/). Simply install them using the git URL:
 
 ```bash
-qwen extensions install <gemini-cli-extension-github-url>
+mariadb-shell-agent extensions install <gemini-cli-extension-github-url>
 # or
-qwen extensions install <owner>/<repo>
+mariadb-shell-agent extensions install <owner>/<repo>
 ```
 
-Gemini extensions are automatically converted to Qwen Code format during installation:
+Gemini extensions are automatically converted to MariaDB Shell Agent format during installation:
 
 - `gemini-extension.json` is converted to `qwen-extension.json`
 - TOML command files are automatically migrated to Markdown format
@@ -101,46 +101,46 @@ Gemini extensions are automatically converted to Qwen Code format during install
 
 #### From Qoder Plugins
 
-Qwen Code supports [Qoder plugins](https://docs.qoder.com/en/cli/sdk/plugins) that contain a `.qoder-plugin/plugin.json` manifest. Install a local directory, archive, Git repository, archive URL, or npm package with the existing `qwen extensions install` command:
+MariaDB Shell Agent supports [Qoder plugins](https://docs.qoder.com/en/cli/sdk/plugins) that contain a `.qoder-plugin/plugin.json` manifest. Install a local directory, archive, Git repository, archive URL, or npm package with the existing `mariadb-shell-agent extensions install` command:
 
 ```bash
-qwen extensions install ./sample-qoder-plugin
-qwen extensions install ./sample-qoder-plugin.zip
-qwen extensions install owner/sample-qoder-plugin
+mariadb-shell-agent extensions install ./sample-qoder-plugin
+mariadb-shell-agent extensions install ./sample-qoder-plugin.zip
+mariadb-shell-agent extensions install owner/sample-qoder-plugin
 ```
 
 The installer converts the Qoder manifest to `qwen-extension.json` and preserves standard `commands/`, `agents/`, and `skills/` directories. MCP servers declared in a root `.mcp.json` file are included as extension MCP servers.
 
-When a Qoder plugin contains `system-prompt.md` at its root, Qwen Code loads it as extension context. If the plugin also contains `QWEN.md` or declares other context files, all context files are retained and deduplicated.
+When a Qoder plugin contains `system-prompt.md` at its root, MariaDB Shell Agent loads it as extension context. If the plugin also contains `MARIADB-SHELL-AGENT.md` or declares other context files, all context files are retained and deduplicated.
 
 #### From Agent Plugins v1
 
-Qwen Code natively loads portable Agent Plugins v1 packages without converting or rewriting `plugin.json`, `mcp.json`, or `SKILL.md` files:
+MariaDB Shell Agent natively loads portable Agent Plugins v1 packages without converting or rewriting `plugin.json`, `mcp.json`, or `SKILL.md` files:
 
 ```bash
-qwen extensions install ./my-agent-plugin
-qwen extensions link ./my-agent-plugin
-qwen extensions install owner/my-agent-plugin
+mariadb-shell-agent extensions install ./my-agent-plugin
+mariadb-shell-agent extensions link ./my-agent-plugin
+mariadb-shell-agent extensions install owner/my-agent-plugin
 ```
 
 The portable runtime supports Agent Skills plus stdio and Streamable HTTP MCP servers. Commands, agents, hooks, client namespaces, and legacy SSE MCP are not activated. See [Agent Plugins v1](./agent-plugins.md) for the complete support matrix.
 
 #### From npm Registry
 
-Qwen Code supports installing extensions from npm registries using scoped or unscoped package names. This is ideal for teams with private registries that already have auth, versioning, and publishing infrastructure in place.
+MariaDB Shell Agent supports installing extensions from npm registries using scoped or unscoped package names. This is ideal for teams with private registries that already have auth, versioning, and publishing infrastructure in place.
 
 ```bash
 # Install the latest version
-qwen extensions install @scope/my-extension
+mariadb-shell-agent extensions install @scope/my-extension
 
 # Install an unscoped package
-qwen extensions install my-extension
+mariadb-shell-agent extensions install my-extension
 
 # Install a specific version
-qwen extensions install my-extension@1.2.0
+mariadb-shell-agent extensions install my-extension@1.2.0
 
 # Install from a custom registry
-qwen extensions install @scope/my-extension --registry https://your-registry.com
+mariadb-shell-agent extensions install @scope/my-extension --registry https://your-registry.com
 ```
 
 Both `package-name` and `@scope/package-name` are supported, with optional `@version` or `@tag` suffixes. Existing local files and directories take precedence; use an explicit path such as `./my-extension` when a local source is intended. The `owner/repo` form remains a GitHub shorthand.
@@ -158,12 +158,12 @@ Both `package-name` and `@scope/package-name` are supported, with optional `@ver
 
 #### From Git Repository
 
-Git 2.37 or newer is required for credentialed, non-GitHub, nested marketplace, submodule, and Git LFS sources because Qwen Code uses `http.curloptResolve` to pin Git connections to validated DNS results. On older Git versions, Qwen Code supports only anonymous public `https://github.com/{owner}/{repo}[.git]` root repositories by resolving the requested ref to a commit and downloading GitHub's source archive with the same public-network and archive-safety checks.
+Git 2.37 or newer is required for credentialed, non-GitHub, nested marketplace, submodule, and Git LFS sources because MariaDB Shell Agent uses `http.curloptResolve` to pin Git connections to validated DNS results. On older Git versions, MariaDB Shell Agent supports only anonymous public `https://github.com/{owner}/{repo}[.git]` root repositories by resolving the requested ref to a commit and downloading GitHub's source archive with the same public-network and archive-safety checks.
 
 Because the older-Git fallback installs from a source archive rather than a clone, it cannot install repositories that rely on submodules or Git LFS, and it caps downloads at 100 MiB compressed and archives at 100,000 entries / 1 GiB expanded / 8 MiB path metadata, including files materialized from at most 100 symlinks. Symlinks directly targeting regular files in the repository are supported on systems that permit symlink creation; Windows may require Developer Mode or elevated privileges. The fallback rejects directory, chained, dangling, absolute, escaping, hard, and POSIX literal-backslash-target links. Other Agent Plugin install paths continue to omit symlinks. Release-based installs are still preferred when a repository publishes releases.
 
 ```bash
-qwen extensions install https://github.com/github/github-mcp-server
+mariadb-shell-agent extensions install https://github.com/github/github-mcp-server
 ```
 
 This will install the github mcp server extension.
@@ -171,25 +171,25 @@ This will install the github mcp server extension.
 #### From Local Path
 
 ```bash
-qwen extensions install /path/to/your/extension
+mariadb-shell-agent extensions install /path/to/your/extension
 ```
 
 Local `.zip` and `.tar.gz` archives are also supported:
 
 ```bash
-qwen extensions install /path/to/your/extension.zip
-qwen extensions install /path/to/your/extension.tar.gz
+mariadb-shell-agent extensions install /path/to/your/extension.zip
+mariadb-shell-agent extensions install /path/to/your/extension.tar.gz
 ```
 
 The archive must contain a complete extension at its root, or a single top-level directory containing the extension.
 
-Note that we create a copy of the installed extension, so you will need to run `qwen extensions update` to pull in changes from both locally-defined extensions and those on GitHub.
+Note that we create a copy of the installed extension, so you will need to run `mariadb-shell-agent extensions update` to pull in changes from both locally-defined extensions and those on GitHub.
 
 #### From Archive URL
 
 ```bash
-qwen extensions install https://example.com/your/extension.zip
-qwen extensions install https://example.com/your/extension.tar.gz
+mariadb-shell-agent extensions install https://example.com/your/extension.zip
+mariadb-shell-agent extensions install https://example.com/your/extension.tar.gz
 ```
 
 Archive URLs can be updated later as long as the URL continues to point at a newer archive for the same extension.
@@ -199,7 +199,7 @@ Archive URLs can be updated later as long as the URL continues to point at a new
 By default, an installed extension is enabled globally (user scope). Pass `--scope project` to enable it only for the current workspace:
 
 ```bash
-qwen extensions install <source> --scope project
+mariadb-shell-agent extensions install <source> --scope project
 ```
 
 `--scope workspace` is accepted as an alias of `--scope project`. This matches the scope choice offered when installing from the `/extensions manage` Discover tab.
@@ -210,57 +210,57 @@ Marketplace sources (Claude plugin marketplaces) power the Discover tab in `/ext
 
 ```bash
 # Add a marketplace (owner/repo, git URL, https URL to marketplace.json, or local path)
-qwen extensions sources add <source>
+mariadb-shell-agent extensions sources add <source>
 
 # List configured marketplaces
-qwen extensions sources list
+mariadb-shell-agent extensions sources list
 
 # Re-fetch a marketplace's plugin listing
-qwen extensions sources update <name>
+mariadb-shell-agent extensions sources update <name>
 
 # Remove a marketplace
-qwen extensions sources remove <name>
+mariadb-shell-agent extensions sources remove <name>
 ```
 
 ### Uninstalling an extension
 
-To uninstall, run `qwen extensions uninstall extension-name`, so, in the case of the install example:
+To uninstall, run `mariadb-shell-agent extensions uninstall extension-name`, so, in the case of the install example:
 
 ```
-qwen extensions uninstall qwen-cli-security
+mariadb-shell-agent extensions uninstall qwen-cli-security
 ```
 
 ### Disabling an extension
 
 Extensions are, by default, enabled across all workspaces. You can disable an extension entirely or for specific workspace.
 
-For example, `qwen extensions disable extension-name` will disable the extension at the user level, so it will be disabled everywhere. `qwen extensions disable extension-name --scope=workspace` will only disable the extension in the current workspace.
+For example, `mariadb-shell-agent extensions disable extension-name` will disable the extension at the user level, so it will be disabled everywhere. `mariadb-shell-agent extensions disable extension-name --scope=workspace` will only disable the extension in the current workspace.
 
 ### Enabling an extension
 
-You can enable extensions using `qwen extensions enable extension-name`. You can also enable an extension for a specific workspace using `qwen extensions enable extension-name --scope=workspace` from within that workspace.
+You can enable extensions using `mariadb-shell-agent extensions enable extension-name`. You can also enable an extension for a specific workspace using `mariadb-shell-agent extensions enable extension-name --scope=workspace` from within that workspace.
 
 This is useful if you have an extension disabled at the top-level and only enabled in specific places.
 
 ### Updating an extension
 
-For extensions installed from a local path or archive, an archive URL, a git repository, or an npm registry, you can explicitly update to the latest version with `qwen extensions update extension-name`. For npm extensions installed without a version pin (e.g. `@scope/pkg`), updates check the `latest` dist-tag. For those installed with a specific dist-tag (e.g. `@scope/pkg@beta`), updates track that tag. Extensions pinned to an exact version (e.g. `@scope/pkg@1.2.0`) are always considered up-to-date.
+For extensions installed from a local path or archive, an archive URL, a git repository, or an npm registry, you can explicitly update to the latest version with `mariadb-shell-agent extensions update extension-name`. For npm extensions installed without a version pin (e.g. `@scope/pkg`), updates check the `latest` dist-tag. For those installed with a specific dist-tag (e.g. `@scope/pkg@beta`), updates track that tag. Extensions pinned to an exact version (e.g. `@scope/pkg@1.2.0`) are always considered up-to-date.
 
 You can update all extensions with:
 
 ```
-qwen extensions update --all
+mariadb-shell-agent extensions update --all
 ```
 
 ## How it works
 
-On startup, Qwen Code looks for extensions in `<home>/.qwen/extensions`
+On startup, MariaDB Shell Agent looks for extensions in `<home>/.mariadb-shell-agent/extensions`
 
 Native Qwen extensions exist as a directory that contains a `qwen-extension.json` file. Agent Plugins v1 packages instead retain their root `plugin.json`; see [Agent Plugins v1](./agent-plugins.md).
 
 For example, a native Qwen extension is stored at:
 
-`<home>/.qwen/extensions/my-extension/qwen-extension.json`
+`<home>/.mariadb-shell-agent/extensions/my-extension/qwen-extension.json`
 
 ### `qwen-extension.json`
 
@@ -281,7 +281,7 @@ The `qwen-extension.json` file contains the configuration for the extension. The
       "displayName": "My Platform Channel"
     }
   },
-  "contextFileName": "QWEN.md",
+  "contextFileName": "MARIADB-SHELL-AGENT.md",
   "commands": "commands",
   "skills": "skills",
   "agents": "agents",
@@ -302,7 +302,7 @@ The `qwen-extension.json` file contains the configuration for the extension. The
 - `mcpServers`: A map of MCP servers to configure. The key is the name of the server, and the value is the server configuration. These servers will be loaded on startup just like MCP servers configured in a [`settings.json` file](../configuration/settings.md). If both an extension and a `settings.json` file configure an MCP server with the same name, the server defined in the `settings.json` file takes precedence.
   - Note that all MCP server configuration options are supported except for `trust`.
 - `channels`: A map of custom channel adapters. The key is the channel type name, and the value has an `entry` (path to compiled JS entry point) and optional `displayName`. The entry point must export a `plugin` object conforming to the `ChannelPlugin` interface. See [Channel Plugins](../features/channels/plugins) for a full guide.
-- `contextFileName`: The name of the file that contains the context for the extension. This will be used to load the context from the extension directory. If this property is not used but a `QWEN.md` file is present in your extension directory, then that file will be loaded.
+- `contextFileName`: The name of the file that contains the context for the extension. This will be used to load the context from the extension directory. If this property is not used but a `MARIADB-SHELL-AGENT.md` file is present in your extension directory, then that file will be loaded.
 - `commands`: The directory containing custom commands (default: `commands`). Commands are `.md` files that define prompts.
 - `skills`: The directory containing custom skills (default: `skills`). Skills are discovered automatically and become available via the `/skills` command.
 - `agents`: The directory containing custom subagents (default: `agents`). Subagents are `.yaml` or `.md` files that define specialized AI assistants.
@@ -316,28 +316,28 @@ The `qwen-extension.json` file contains the configuration for the extension. The
 
 ### Managing Extension Settings
 
-Extensions can require configuration through settings (such as API keys or credentials). These settings can be managed using the `qwen extensions settings` CLI command:
+Extensions can require configuration through settings (such as API keys or credentials). These settings can be managed using the `mariadb-shell-agent extensions settings` CLI command:
 
 **Set a setting value:**
 
 ```bash
-qwen extensions settings set <extension-name> <setting-name> [--scope user|workspace]
+mariadb-shell-agent extensions settings set <extension-name> <setting-name> [--scope user|workspace]
 ```
 
 **List all settings and current values for an extension:**
 
 ```bash
-qwen extensions settings list <extension-name>
+mariadb-shell-agent extensions settings list <extension-name>
 ```
 
 Settings can be configured at two levels:
 
-- **User level** (default): Settings apply across all projects (`~/.qwen/.env`)
-- **Workspace level**: Settings apply only to the current project (`.qwen/.env`)
+- **User level** (default): Settings apply across all projects (`~/.mariadb-shell-agent/.env`)
+- **Workspace level**: Settings apply only to the current project (`.mariadb-shell-agent/.env`)
 
 Workspace settings take precedence over user settings. Sensitive settings are stored securely and never displayed in plain text.
 
-When Qwen Code starts, it loads all the extensions and merges their configurations. If there are any conflicts, the workspace configuration takes precedence.
+When MariaDB Shell Agent starts, it loads all the extensions and merges their configurations. If there are any conflicts, the workspace configuration takes precedence.
 
 ### Custom commands
 
@@ -350,7 +350,7 @@ Extensions can provide [custom commands](../features/commands.md#4-custom-comman
 An extension named `gcp` with the following structure:
 
 ```
-.qwen/extensions/gcp/
+.mariadb-shell-agent/extensions/gcp/
 ├── qwen-extension.json
 └── commands/
     ├── deploy.md
@@ -372,7 +372,7 @@ Extensions can provide custom skills by placing skill files in a `skills/` subdi
 An extension named `gcp` with the following structure:
 
 ```
-.qwen/extensions/gcp/
+.mariadb-shell-agent/extensions/gcp/
 ├── qwen-extension.json
 └── skills/
     └── pdf-processor/
@@ -392,7 +392,7 @@ Extensions can provide custom subagents by placing agent configuration files in 
 **Example**
 
 ```
-.qwen/extensions/my-extension/
+.mariadb-shell-agent/extensions/my-extension/
 ├── qwen-extension.json
 └── agents/
     └── testing-expert.yaml
@@ -409,7 +409,7 @@ Extensions can ship workflow scripts by placing `.js` files in a `workflows/` su
 An extension named `gcp` with the following structure:
 
 ```
-.qwen/extensions/gcp/
+.mariadb-shell-agent/extensions/gcp/
 ├── qwen-extension.json
 └── workflows/
     └── deep-research.js
@@ -440,7 +440,7 @@ Discovery is deliberately narrow:
 
 - Only `.js` files directly inside each directory are read; subdirectories are ignored.
 - `meta.name` must use lower-case letters, digits, and hyphens, start with a letter, and contain at most 41 characters.
-- Every declared path must stay inside the extension directory. A linked extension (`qwen extensions link`) skips symlinked workflow files and directories; an installed extension is a copy in which each symlink has already been replaced by the file it points to.
+- Every declared path must stay inside the extension directory. A linked extension (`mariadb-shell-agent extensions link`) skips symlinked workflow files and directories; an installed extension is a copy in which each symlink has already been replaced by the file it points to.
 - Scripts larger than 256 KiB, or without a valid `meta` block, are skipped with a warning.
 
 Installing an extension lists its workflows in the consent prompt. An update asks again when it adds or removes a workflow, changes a workflow's name or description, or changes a script's code; when only code changed, the prompt names the changed scripts. Extension workflows follow the same rules as your own saved workflows: they are hidden in untrusted folders and in bare mode, and each run goes through the usual workflow approval, which shows the start of the script. An "always allow" for a workflow run by name or path is saved as a rule pinned to the script's content, such as `Workflow(name:gcp:deep-research,sha256:3f2a9c1d0b4e5f67)`, so it stops applying once the script changes. A rule you write without `sha256`, such as `Workflow(name:gcp:deep-research)`, allows every version of the script.
@@ -463,12 +463,12 @@ For example, if both a user and the `gcp` extension define a `deploy` command:
 
 ## Variables
 
-Qwen Code extensions allow variable substitution in `qwen-extension.json`. This can be useful if e.g., you need the current directory to run an MCP server using `"cwd": "${extensionPath}${/}run.ts"`.
+MariaDB Shell Agent extensions allow variable substitution in `qwen-extension.json`. This can be useful if e.g., you need the current directory to run an MCP server using `"cwd": "${extensionPath}${/}run.ts"`.
 
 **Supported variables:**
 
-| variable                   | description                                                                                                                                                   |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `${extensionPath}`         | The fully-qualified path of the extension in the user's filesystem e.g., '/Users/username/.qwen/extensions/example-extension'. This will not unwrap symlinks. |
-| `${workspacePath}`         | The fully-qualified path of the current workspace.                                                                                                            |
-| `${/} or ${pathSeparator}` | The path separator (differs per OS).                                                                                                                          |
+| variable                   | description                                                                                                                                                                  |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `${extensionPath}`         | The fully-qualified path of the extension in the user's filesystem e.g., '/Users/username/.mariadb-shell-agent/extensions/example-extension'. This will not unwrap symlinks. |
+| `${workspacePath}`         | The fully-qualified path of the current workspace.                                                                                                                           |
+| `${/} or ${pathSeparator}` | The path separator (differs per OS).                                                                                                                                         |

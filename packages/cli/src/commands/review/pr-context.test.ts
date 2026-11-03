@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -309,9 +310,9 @@ describe('fullCommentBody', () => {
 });
 
 describe('isReviewWorthShowing', () => {
-  const LEGACY_FOOTER = '_— qwen3.7-max via Qwen Code /review_';
+  const LEGACY_FOOTER = '_— qwen3.7-max via MariaDB Shell Agent /review_';
   const VERSIONED_FOOTER =
-    '_— qwen3.8-max-preview via Qwen Code /review (v0.21.2)_';
+    '_— qwen3.8-max-preview via MariaDB Shell Agent /review (v0.21.2)_';
 
   it('filters the exact canonical LGTM template, with or without either footer', () => {
     expect(isReviewWorthShowing('No issues found. LGTM! ✅')).toBe(false);
@@ -4600,7 +4601,7 @@ describe('prContextCommand handler — Aone routing', () => {
     kind: 'aone',
     ensureAuthenticated: vi.fn(),
     resolveRepo: () => ({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'g',
       repo: 'p',
       groupPath: 'g/p',
@@ -4663,13 +4664,13 @@ describe('prContextCommand handler — Aone routing', () => {
 
   it('renders the Aone context and never touches gh', async () => {
     const written = await runHandler({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
     });
     // The routing hint is FORWARDED, not discarded: an Aone MR reviewed from
     // a cwd whose origin is not Aone must not fall through cwd detection to
     // githubReader (gh would then read github.com's same-named owner/repo).
     expect(getPlatformReaderMock).toHaveBeenCalledWith({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
     });
     expect(ghMock).not.toHaveBeenCalled();
     expect(ghApiAllMock).not.toHaveBeenCalled();
@@ -4690,7 +4691,7 @@ describe('prContextCommand handler — Aone routing', () => {
 
   it('recovers the machine ledger from a posted summary comment', async () => {
     const written = await runHandler({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
     });
     expect(written).toContain('## Previous /review round (machine ledger)');
     expect(written).toContain('Round 3');
@@ -4723,7 +4724,7 @@ describe('prContextCommand handler — Aone routing', () => {
       },
     );
     const written = await runHandler({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
     });
     expect(aoneStub.getCurrentUser).toHaveBeenCalled();
     expect(written).toContain('## Previous /review round (machine ledger)');
@@ -4732,26 +4733,26 @@ describe('prContextCommand handler — Aone routing', () => {
 
   it('bakes --pr and --host into EVERY emitted refetch command', async () => {
     const written = await runHandler({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
     });
     const refs = [...written.matchAll(/comment-body \d+ --kind \w+[^\n)]*/g)];
     expect(refs.length).toBeGreaterThan(0);
     for (const ref of refs) {
       expect(ref[0]).toContain('--pr 7');
-      expect(ref[0]).toContain('--host gitlab.alibaba-inc.com');
+      expect(ref[0]).toContain('--host gitlab.alibaba-inc.invalid');
     }
     // The issue-channel branch explicitly: Aone issue-comment ids are
     // MR-scoped too, so a truncation there carries the same addressing. A
     // mutant restoring the GitHub assumption (issue ids are global) emits
     // this refetch without --pr and dies here.
     expect(written).toContain(
-      'comment-body 26 --kind issue --pr 7 --repo g/p --host gitlab.alibaba-inc.com',
+      'comment-body 26 --kind issue --pr 7 --repo g/p --host gitlab.alibaba-inc.invalid',
     );
   });
 
   it("never promotes this pipeline's own Critical-bearing summary into the re-check section or the blocker count", async () => {
     const written = await runHandler({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
     });
     // The round-3 summary carries a visible `**[Critical]**` line AND the
     // ledger marker; its findings are owned by the ledger section and the

@@ -1,8 +1,8 @@
-# `qwen serve` Daemon File Logger — Implementation Plan
+# `mariadb-shell-agent serve` Daemon File Logger — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a daemon-scoped file logger to `qwen serve` so route errors, lifecycle messages, and ACP child stderr land in `~/.qwen/debug/daemon/<id>.log` in addition to stderr — eliminating the manual `2>serve.log` workaround for issue #4548.
+**Goal:** Add a daemon-scoped file logger to `mariadb-shell-agent serve` so route errors, lifecycle messages, and ACP child stderr land in `~/.mariadb-shell-agent/debug/daemon/<id>.log` in addition to stderr — eliminating the manual `2>serve.log` workaround for issue #4548.
 
 **Architecture:** New cli-local module `daemonLogger.ts` exposes `initDaemonLogger(opts) → DaemonLogger`. `info/warn/error` tee to file + stderr; `raw` is file-only. `acp-bridge` gets a new optional `BridgeOptions.onDiagnosticLine` callback and `createSpawnChannelFactory({ onDiagnosticLine })` helper so the cli can route `writeServeDebugLine` and ACP child stderr lines into the daemon log without acp-bridge taking a cli dependency. No global singleton — logger is constructed per `runQwenServe` invocation.
 
@@ -489,7 +489,7 @@ export function initDaemonLogger(opts: InitDaemonLoggerOptions): DaemonLogger {
     nodeFs.appendFileSync(logPath, firstLine, { flag: 'a' });
   } catch (err) {
     stderr(
-      `qwen serve: daemon log disabled — init failed: ${
+      `mariadb-shell-agent serve: daemon log disabled — init failed: ${
         err instanceof Error ? err.message : String(err)
       }`,
     );
@@ -639,7 +639,7 @@ const enqueueAppend = (line: string): void => {
       if (!degraded) {
         degraded = true;
         stderr(
-          `qwen serve: daemon log write failed — entering degraded mode: ${
+          `mariadb-shell-agent serve: daemon log write failed — entering degraded mode: ${
             err instanceof Error ? err.message : String(err)
           }`,
         );
@@ -921,9 +921,11 @@ describe('onDiagnosticLine', () => {
     // Trigger writeServeDebugLine via [copy harness from the closest
     // existing test that exercises one of the 6 call sites above].
     // ... trigger code here ...
-    expect(captured.some((e) => e.line.includes('qwen serve debug: '))).toBe(
-      true,
-    );
+    expect(
+      captured.some((e) =>
+        e.line.includes('mariadb-shell-agent serve debug: '),
+      ),
+    ).toBe(true);
     expect(
       captured.every((e) => e.level === undefined || e.level === 'info'),
     ).toBe(true);
@@ -947,7 +949,10 @@ In `packages/acp-bridge/src/bridge.ts`, near the top of `createHttpAcpBridge` (a
 const teeServeDebugLine = (message: string): void => {
   writeServeDebugLine(message);
   if (opts.onDiagnosticLine && isServeDebugLoggingEnabled()) {
-    opts.onDiagnosticLine(`qwen serve debug: ${message}`, 'info');
+    opts.onDiagnosticLine(
+      `mariadb-shell-agent serve debug: ${message}`,
+      'info',
+    );
   }
 };
 ```
@@ -1184,7 +1189,7 @@ if (daemonLog) {
   // Legacy stderr-only path. Keep behavior intact for embedders that
   // construct createServeApp without daemonLog (tests, direct integrations).
   writeStderrLine(
-    `qwen serve: ${ctx?.route ?? 'unknown route'}: ${
+    `mariadb-shell-agent serve: ${ctx?.route ?? 'unknown route'}: ${
       err instanceof Error ? (err.stack ?? err.message) : String(err)
     }${ctx?.sessionId ? ` sessionId=${ctx.sessionId}` : ''}`,
   );
@@ -1280,7 +1285,7 @@ import { createSpawnChannelFactory } from '@qwen-code/acp-bridge/spawnChannel';
 ```ts
 const daemonLog: DaemonLogger = initDaemonLogger({ boundWorkspace });
 writeStderrLine(
-  `qwen serve: daemon log → ${daemonLog.getLogPath() || '(disabled)'}`,
+  `mariadb-shell-agent serve: daemon log → ${daemonLog.getLogPath() || '(disabled)'}`,
 );
 ```
 
@@ -1315,7 +1320,7 @@ const app = createServeApp(opts, () => actualPort, {
 5. Replace **lifecycle-only** `writeStderrLine(...)` calls (the ones inside `onSignal`, the `bridge.shutdown` error path, the server `error` listener, the device-flow dispose error, the "received signal, draining" line) with `daemonLog.warn(...)` / `daemonLog.error(..., err)` — daemonLog tees to stderr so operator-visible output is preserved. Do NOT touch:
    - Boot banner about "listening on URL" (that one is stdout, not stderr — `writeStdoutLine`).
    - CLI usage/argparse errors before `daemonLog` is constructed.
-   - The lone "qwen serve: daemon log → ..." banner added in step 2 (avoid logging a line about itself).
+   - The lone "mariadb-shell-agent serve: daemon log → ..." banner added in step 2 (avoid logging a line about itself).
 
    To be concrete, the **mechanical** rule for this step: every `writeStderrLine` call **after** the `daemonLog` is constructed and **before** `process.exit` is candidate; if its content reads like a daemon diagnostic (not a one-shot startup banner), switch it.
 
@@ -1368,7 +1373,7 @@ find docs -iname '*serve*' -type f
 ls docs/cli/ 2>/dev/null
 ```
 
-Pick the most natural home — likely `docs/cli/serve.md`. If none exists for `qwen serve`, create `docs/cli/serve-daemon-log.md`.
+Pick the most natural home — likely `docs/cli/serve.md`. If none exists for `mariadb-shell-agent serve`, create `docs/cli/serve-daemon-log.md`.
 
 - [ ] **Step 2: Write the section**
 
@@ -1377,15 +1382,15 @@ Add (or create) a "Daemon log file" section:
 ```markdown
 ## Daemon log file
 
-`qwen serve` writes a per-process diagnostic log to:
+`mariadb-shell-agent serve` writes a per-process diagnostic log to:
 ```
 
-${QWEN_RUNTIME_DIR or ~/.qwen}/debug/daemon/serve-<pid>-<workspaceHash>.log
+${QWEN_RUNTIME_DIR or ~/.mariadb-shell-agent}/debug/daemon/serve-<pid>-<workspaceHash>.log
 
 ```
 
 A `latest` symlink in the same directory always points at the current
-process's log, so `tail -f ~/.qwen/debug/daemon/latest` will follow whichever
+process's log, so `tail -f ~/.mariadb-shell-agent/debug/daemon/latest` will follow whichever
 daemon is running.
 
 The log captures lifecycle messages, route errors (with `route=` and
@@ -1400,8 +1405,8 @@ entirely. Stderr output is unaffected.
 
 ### Relation to session debug logs
 
-Session-scoped debug logs (`~/.qwen/debug/<sessionId>.txt` and the
-`~/.qwen/debug/latest` symlink) are independent. The daemon log lives
+Session-scoped debug logs (`~/.mariadb-shell-agent/debug/<sessionId>.txt` and the
+`~/.mariadb-shell-agent/debug/latest` symlink) are independent. The daemon log lives
 in a sibling `daemon/` subdirectory; per-session debug semantics are
 unchanged by this feature.
 
@@ -1465,7 +1470,7 @@ If `packages/cli/dist/index.js` doesn't exist, build first: `npm run build --wor
 git push -u origin HEAD
 gh pr create --title "feat(serve): add daemon file logger (#4548)" --body "$(cat <<'EOF'
 ## Summary
-- Adds a per-process daemon file logger at `~/.qwen/debug/daemon/serve-<pid>-<workspaceHash>.log` (configurable via `QWEN_RUNTIME_DIR`, opt-out via `QWEN_DAEMON_LOG_FILE=0`).
+- Adds a per-process daemon file logger at `~/.mariadb-shell-agent/debug/daemon/serve-<pid>-<workspaceHash>.log` (configurable via `QWEN_RUNTIME_DIR`, opt-out via `QWEN_DAEMON_LOG_FILE=0`).
 - Routes `runQwenServe` lifecycle messages, `sendBridgeError` route errors, `writeServeDebugLine` debug breadcrumbs, and ACP child stderr into the daemon log without removing existing stderr output.
 - Adds `BridgeOptions.onDiagnosticLine` and `createSpawnChannelFactory({ onDiagnosticLine })` to keep `acp-bridge` ignorant of cli.
 
@@ -1479,7 +1484,7 @@ Closes #4548.
 - [x] `packages/cli/src/serve/runQwenServe.test.ts` covers boot banner + flush on shutdown.
 - [x] Manual smoke: log file created at boot, contains shutdown line on SIGTERM.
 
-🤖 Generated with [Qwen Code](https://github.com/QwenLM/qwen-code)
+🤖 Generated with [MariaDB Shell Agent](https://github.invalid/QwenLM/qwen-code)
 EOF
 )"
 ```

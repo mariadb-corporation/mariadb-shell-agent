@@ -2,7 +2,7 @@
 
 ## Problem
 
-Qwen Code can extract reusable project skills from tool-heavy conversations,
+MariaDB Shell Agent can extract reusable project skills from tool-heavy conversations,
 but accepted auto-skills only accumulate. The existing review agent can create
 or update `source: auto-skill` skills and is explicitly forbidden from deleting
 them. Path gating and `skills.disabled` reduce prompt noise but do not maintain
@@ -16,7 +16,7 @@ Add a small, deterministic lifecycle manager for project auto-skills:
   `auto-skill-` and whose frontmatter contains `source: auto-skill`.
 - Mark a managed skill stale after 30 days without activity.
 - Archive it after 90 days without activity by moving its whole directory out
-  of `.qwen/skills/` into `.qwen/archived-skills/`.
+  of `.mariadb-shell-agent/skills/` into `.mariadb-shell-agent/archived-skills/`.
 - Allow individual managed skills to be pinned out of automatic transitions.
 - Run the deterministic pass at most once every 7 days during configuration
   initialization when Auto Skill is enabled and the workspace is trusted.
@@ -31,8 +31,8 @@ anything, or introduce configurable thresholds.
 ## Ownership and persistence
 
 The curator is resolved only from `Config.getProjectRoot()`. Its state lives at
-`<project>/.qwen/skill-curator.json`, and archived packages live at
-`<project>/.qwen/archived-skills/`. There is no fallback to the process's
+`<project>/.mariadb-shell-agent/skill-curator.json`, and archived packages live at
+`<project>/.mariadb-shell-agent/archived-skills/`. There is no fallback to the process's
 primary workspace, home directory, or another active session. This keeps
 daemon and multi-workspace sessions isolated.
 

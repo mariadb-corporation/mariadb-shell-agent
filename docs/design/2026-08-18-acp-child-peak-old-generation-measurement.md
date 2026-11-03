@@ -49,7 +49,7 @@ garbage against a limit that never sees it.
 ## Evidence
 
 Measured on Node v24.12.0, 48 GB host. The probe scripts live under
-git-ignored `.qwen/scripts/`, so each result below states the method it came
+git-ignored `.mariadb-shell-agent/scripts/`, so each result below states the method it came
 from and is reproducible from that description alone.
 
 ### 1. `old_space` alone is not the bound, and reporting it would be dangerous

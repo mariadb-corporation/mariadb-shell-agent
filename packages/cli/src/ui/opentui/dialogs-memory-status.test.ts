@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -60,7 +61,7 @@ describe('resolvePreferredMemoryFile', () => {
   });
 
   it('picks the first configured filename that exists', () => {
-    // Default configured names include QWEN.md and AGENTS.md.
+    // Default configured names include MARIADB-SHELL-AGENT.md and AGENTS.md.
     const filenames = getAllGeminiMdFilenames();
     const present = filenames.at(-1) ?? 'AGENTS.md';
     fs.writeFileSync(path.join(dir, present), '# memory');
@@ -69,7 +70,7 @@ describe('resolvePreferredMemoryFile', () => {
 
   it('falls back to the primary configured filename when none exist', () => {
     expect(resolvePreferredMemoryFile(dir)).toBe(
-      path.join(dir, getAllGeminiMdFilenames()[0] ?? 'QWEN.md'),
+      path.join(dir, getAllGeminiMdFilenames()[0] ?? 'MARIADB-SHELL-AGENT.md'),
     );
   });
 
@@ -80,7 +81,7 @@ describe('resolvePreferredMemoryFile', () => {
       expect(resolvePreferredMemoryFile(dir)).toBe(path.join(dir, 'CUSTOM.md'));
     } finally {
       // Restore the default list for other tests.
-      setGeminiMdFilename(['QWEN.md', 'AGENTS.md']);
+      setGeminiMdFilename(['MARIADB-SHELL-AGENT.md', 'AGENTS.md']);
     }
   });
 });

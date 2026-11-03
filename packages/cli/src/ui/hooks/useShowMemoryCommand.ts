@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -72,8 +73,8 @@ export function createShowMemoryAction(
         type: MessageType.INFO,
         content:
           fileCount > 0
-            ? 'Hierarchical memory (QWEN.md or other context files) is loaded but content is empty.'
-            : 'No hierarchical memory (QWEN.md or other context files) is currently loaded.',
+            ? 'Hierarchical memory (MARIADB-SHELL-AGENT.md or other context files) is loaded but content is empty.'
+            : 'No hierarchical memory (MARIADB-SHELL-AGENT.md or other context files) is currently loaded.',
         timestamp: new Date(),
       });
     }

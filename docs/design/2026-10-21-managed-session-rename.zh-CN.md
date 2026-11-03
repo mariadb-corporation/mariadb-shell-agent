@@ -60,11 +60,11 @@ Session ID、Workspace 名称、提示词草稿、执行中的 Turn、凭据或 
 
 ## 验证与验收标准
 
-E2E 计划位于 `.qwen/e2e-tests/managed-session-rename.md`。基线使用全局安装的
+E2E 计划位于 `.mariadb-shell-agent/e2e-tests/managed-session-rename.md`。基线使用全局安装的
 CLI 及隔离的旧轻量发行包。修改后使用匹配的新 CLI 和 Java runtime，在隔离的
 本地存储上验证，并包含真实浏览器 UI。
 
-侧栏入口调整使用 `.qwen/e2e-tests/managed-sidebar-rename/plan.md`，以用户要求的正在运行的 main 产物作为基线，在独立工作树构建新版前端。
+侧栏入口调整使用 `.mariadb-shell-agent/e2e-tests/managed-sidebar-rename/plan.md`，以用户要求的正在运行的 main 产物作为基线，在独立工作树构建新版前端。
 
 - 新建空 Session 和存在活动 Turn 的 Session 均可改名；确认的名称出现在标题、
   导航和后续 API 查询中。

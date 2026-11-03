@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,7 +17,7 @@ import { DEFAULT_COMMAND_OPTIONS } from './top-level-options.js';
 // the bootstrap entry never pulls the core barrel into its import closure. Its
 // `satisfies` checks and Record witnesses catch a member core adds or removes,
 // but not a member whose VALUE or description core rewords — that would ship a
-// silently stale `qwen --help`. Tests carry no bootstrap cost, so they can
+// silently stale `mariadb-shell-agent --help`. Tests carry no bootstrap cost, so they can
 // import core directly and pin the copies against the real thing.
 describe('shared option definitions stay in sync with core', () => {
   it('mirrors core ApprovalMode values in the --approval-mode choices', () => {

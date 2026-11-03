@@ -1,6 +1,6 @@
 # @qwen-code/web-shell
 
-Qwen Code Web Shell 是面向浏览器的 daemon 会话终端 UI，可以作为 React
+MariaDB Shell Agent Web Shell 是面向浏览器的 daemon 会话终端 UI，可以作为 React
 组件嵌入到其他项目中。
 
 ## Managed 工作区与模型
@@ -204,7 +204,7 @@ const html = await highlightCode({
 - React：`^18.0.0 || ^19.0.0`
 - React DOM：`^18.0.0 || ^19.0.0`
 - `@qwen-code/sdk`：`>=0.1.8`
-- 浏览器环境需要能访问 Qwen Code daemon serve 的 HTTP 接口。
+- 浏览器环境需要能访问 MariaDB Shell Agent daemon serve 的 HTTP 接口。
 
 组件包会自动注入自身的 CSS（包括 Tailwind 编译产物），接入方不需要配置
 Tailwind 或额外引入全局 CSS。
@@ -227,12 +227,12 @@ Tailwind 或额外引入全局 CSS。
 
 ## 浏览器任务通知
 
-通过 `qwen serve` 打开的独立 Web Shell 可在 **Settings → UI → 任务通知**
+通过 `mariadb-shell-agent serve` 打开的独立 Web Shell 可在 **Settings → UI → 任务通知**
 管理提醒。内置 `main.tsx` 显式设置默认开启；用户已保存的关闭选择优先。可在设置或审批／提问面板右上角的通知图标中授权；偏好保存在当前浏览器站点，
 不写入 daemon 或 workspace 设置，同源标签页之间同步。
 
 页面在后台或窗口失焦时，当前聊天及 Split View 中仍挂载的聊天在回合结束、失败、需要工具审批或等待 AskUserQuestion 回答时可以发送系统通知。取消回合、初次加载历史和前台已处理的回合或请求保持静默。工具审批和提问提醒只显示会话标题与待处理状态，不展示命令、路径、问题、选项或部分回复；同一请求只提醒一次，不影响后续回合结束提醒。快照重放不补发权限或提问提醒，包括断线期间错过的请求。回合结束通知显示会话标题（最多 60 个 Unicode 码点）、回合状态，以及带“提问 / 回复”标签的本轮提问（最多 80 个码点）和回复（最多 120 个码点）纯文本摘录。
-标题显示 QwenCode · 会话名；回合结束通知在会话名尚未生成时使用本轮问题首行，两者均缺失时显示 QwenCode。审批或提问提醒缺少会话名时只显示 QwenCode。业务文案不额外添加地址。通知携带 Qwen Code 图标，实际显示位置由浏览器和操作系统决定，不能替换 macOS 上 Chrome 自身的标志。摘要直接截取文本，不额外调用模型；提问或回复缺失时省略对应行，两者均缺失时只显示状态。失败时可显示本轮提问，不展示错误详情或部分回复。系统可能进一步截短通知正文。
+标题显示 QwenCode · 会话名；回合结束通知在会话名尚未生成时使用本轮问题首行，两者均缺失时显示 QwenCode。审批或提问提醒缺少会话名时只显示 QwenCode。业务文案不额外添加地址。通知携带 MariaDB Shell Agent 图标，实际显示位置由浏览器和操作系统决定，不能替换 macOS 上 Chrome 自身的标志。摘要直接截取文本，不额外调用模型；提问或回复缺失时省略对应行，两者均缺失时只显示状态。失败时可显示本轮提问，不展示错误详情或部分回复。系统可能进一步截短通知正文。
 通知内容可能显示在系统通知中心或锁屏上，遵循系统的预览设置；点击通知尝试聚焦原窗口并在主聊天中打开对应会话，退出设置页或分屏；已在目标会话时不会重新加载。点击审批或提问提醒不会自动批准请求或提交答案。
 
 需要支持 Notifications API 的桌面浏览器以及 HTTPS 或可信的 localhost 环境。
@@ -258,7 +258,7 @@ Tailwind 或额外引入全局 CSS。
 
 `defaultEnabled` 默认 `false`；设为 `true` 时仅对没有保存通知偏好的浏览器站点默认开启。用户明确开启或关闭的选择优先，刷新后也保留；挂载后修改默认值不会覆盖当前选择。不传 `browserNotifications` 时保持嵌入入口原有行为，不接入通知。仅挂载不会申请权限；首次出现审批或提问面板时，若权限尚未决定且没有明确保存关闭选择，会为此浏览器站点自动尝试一次授权。浏览器可能拦截没有用户手势的申请；面板右上角的通知图标可悬停或点击查看状态、手动授权，以及 macOS／Windows 系统设置指引。不会重复自动申请，刷新后也保留尝试记录；存储不可用时只在当前挂载实例内去重。网页无法检测系统通知是否开启。修改品牌值不会重新加载当前会话。通知点击只导航所属实例，并遵守其当前锁定工作区。
 
-低层 `WebShell` 的 daemon providers 由宿主管理，不支持这个配置属性；qwen serve 内置页面继续使用默认品牌。本配置仅影响通知，不改变侧边栏品牌、Chrome 来源地址或浏览器标志。
+低层 `WebShell` 的 daemon providers 由宿主管理，不支持这个配置属性；mariadb-shell-agent serve 内置页面继续使用默认品牌。本配置仅影响通知，不改变侧边栏品牌、Chrome 来源地址或浏览器标志。
 
 ## Tailwind 与 shadcn/ui
 
@@ -696,7 +696,7 @@ daemon 参数的完整含义和配置方式见
 | `unavailableModels`            | `readonly WebShellUnavailableModel[]`                                                                                                 | 可选。在输入框模型选择器中追加禁用模型；见 [不可用模型目录](#不可用模型目录)。                                                                                               |
 | `mountUnavailableModelTooltip` | `WebShellUnavailableModelTooltipMount`                                                                                                | 可选。为禁用模型挂载自定义提示层，Solid/原生 DOM 宿主可写入传入的 `HTMLElement`。                                                                                            |
 
-移动访问二维码入口由 `header.showMobileAccess?: boolean` 控制，默认隐藏，适用于主聊天和分屏页头。独立入口 `main.tsx` 显式设为 `true`，保留本地 Qwen Code 用户的入口。
+移动访问二维码入口由 `header.showMobileAccess?: boolean` 控制，默认隐藏，适用于主聊天和分屏页头。独立入口 `main.tsx` 显式设为 `true`，保留本地 MariaDB Shell Agent 用户的入口。
 
 宿主可以通过 `onContextUsageOpen?: (sessionId: string) => void` 接管上下文
 详情的打开操作：
@@ -803,7 +803,7 @@ load/catch-up 结束；同 Session 短暂断线保留去重基线并主动对账
 
 ### 品牌（白标）
 
-独立部署（`qwen serve` 打开的 Web Shell）用 `settings.json` 换名换 Logo，嵌入宿主用
+独立部署（`mariadb-shell-agent serve` 打开的 Web Shell）用 `settings.json` 换名换 Logo，嵌入宿主用
 `brand` 属性覆盖：
 
 ```json
@@ -811,7 +811,7 @@ load/catch-up 结束；同 Session 短暂断线保留去重基线并主动对账
   "ui": {
     "brand": {
       "name": "QiuQiu Code",
-      "logoPath": "~/.qwen/brand/logo.svg"
+      "logoPath": "~/.mariadb-shell-agent/brand/logo.svg"
     }
   }
 }
@@ -820,11 +820,11 @@ load/catch-up 结束；同 Session 短暂断线保留去重基线并主动对账
 daemon 把该 SVG 读成 `data:image/svg+xml` URI，通过 `GET /brand` 下发。客户端始终以
 `<img>` 渲染它，绝不作为 markup 注入：作为图片加载的 SVG 不能执行脚本，注入的可以，而
 daemon 不净化它读到的文件。该配置只从 User / System / SystemDefaults 三层读取，工作区的
-`.qwen/settings.json` 无法改写品牌 —— 那份文件通常来自打开 shell 的人并未撰写的仓库。
+`.mariadb-shell-agent/settings.json` 无法改写品牌 —— 那份文件通常来自打开 shell 的人并未撰写的仓库。
 
 品牌名会替换 Sidebar 品牌行、Sidebar 底部版本 tooltip、欢迎页标题、About 面板的版本行
 标签，以及独立部署下的 `document.title`；Logo 会替换 Sidebar 标记与 favicon。它不会替换
-正文文案：本地化字符串里仍有若干处提到 Qwen Code，auth provider 标签也仍是 `Qwen OAuth`
+正文文案：本地化字符串里仍有若干处提到 MariaDB Shell Agent，auth provider 标签也仍是 `Qwen OAuth`
 （那是身份提供方的名字，不是产品名）。
 
 嵌入宿主传 `brand` 时整体接管名称与 Logo。`logo` 可以是任意 React 节点，因为宿主拥有自己
@@ -840,7 +840,7 @@ daemon 不净化它读到的文件。该配置只从 User / System / SystemDefau
 <WebShellWithProviders
   brand={{ name: 'QiuQiu Code', logo: <MyLogo /> }}
   onBrandResolved={(brand) => {
-    document.title = `${brand.name || 'Qwen Code'} — My Host`;
+    document.title = `${brand.name || 'MariaDB Shell Agent'} — My Host`;
   }}
 />
 ```
@@ -1019,10 +1019,10 @@ mount 成功则使用宿主内容；省略、返回 `null`/`undefined` 或同步
 
 `WebShell` 已内置 `markdown-chart` renderer 和 ECharts 运行时。宿主只需将
 [`markdown-chart` skill](https://github.com/datafe/markdown-chart/tree/main/skills/markdown-chart)
-安装到 Qwen Code 的项目级或用户级 skills 目录；例如项目级安装结果为：
+安装到 MariaDB Shell Agent 的项目级或用户级 skills 目录；例如项目级安装结果为：
 
 ```text
-.qwen/skills/markdown-chart/SKILL.md
+.mariadb-shell-agent/skills/markdown-chart/SKILL.md
 ```
 
 安装 skill 后按原方式使用 WebShell，不需要额外安装或导入 ECharts，也不需要传入
@@ -1081,45 +1081,45 @@ Chart/Data 控件、无数据提示和错误提示默认跟随 WebShell 语言�
 - **本地实现**：web-shell 前端直接打开弹窗、调用 daemon REST API，或切换本地状态。
 - **ACP 透传**：web-shell 将命令发送给 daemon，由 daemon/ACP 执行。
 
-| 命令             | 支持方式            | 说明                                                                                                                    |
-| ---------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `/help`          | 本地实现            | 打开帮助弹窗，支持键盘浏览命令和快捷键。                                                                                |
-| `/theme`         | 本地实现            | 打开主题选择弹窗；支持 `/theme light`、`/theme dark`。                                                                  |
-| `/settings`      | 本地实现            | 打开设置面板，管理工作区与用户级（`~/.qwen/settings.json`）配置；两个作用域均可编辑并写回对应的 settings.json。         |
-| `/language`      | 本地实现 + ACP 透传 | `/language ui <lang>` 会切换 web-shell UI 语言并同步给 daemon；其他语言能力由 daemon 执行。包含 `ui`、`output` 子命令。 |
-| `/model`         | 本地实现 + 部分透传 | 无参数打开模型弹窗；普通参数直接切换模型；`/model --fast <model>` 透传给 daemon。                                       |
-| `/plan`          | 本地实现            | 切换到 `plan` approval mode，并可继续发送后续 prompt。                                                                  |
-| `/approval-mode` | 本地实现            | 打开审批模式弹窗或直接切换审批模式。                                                                                    |
-| `/mode`          | 本地实现            | web-shell 本地别名，用于切换审批模式。                                                                                  |
-| `/mcp`           | 本地实现            | 打开 MCP 管理弹窗。                                                                                                     |
-| `/skills`        | 本地实现 + ACP 透传 | 无参数或 `detail`/`details` 打开 skills 弹窗；其他参数转换为直接 skill 命令（`/skills review` → `/review`）。           |
-| `/tools`         | 本地实现            | 打开 tools 弹窗，列表展示工具名称、启用状态和 `description`。                                                           |
-| `/memory`        | 本地实现            | 打开 memory 弹窗，支持 `show`、`refresh`、`add user`、`add project` 等分支。                                            |
-| `/agents`        | 本地实现            | 打开 agents 弹窗，支持 `manage`、`create user`、`create project` 等分支。                                               |
-| `/copy`          | 本地实现            | 复制最后一条 assistant 输出；支持 `code`、语言名、LaTeX、inline LaTeX 等选择器。                                        |
-| `/release`       | 本地实现            | 释放 live session 连接，不删除历史会话记录。                                                                            |
-| `/clear`         | 本地实现            | 清空当前 web-shell transcript store。                                                                                   |
-| `/new`           | 本地实现            | 创建新的 daemon session。                                                                                               |
-| `/reset`         | 本地实现            | 与 `/new` 一样创建新的 daemon session。                                                                                 |
-| `/rename <name>` | 本地实现            | 修改当前 daemon session 的展示名称。                                                                                    |
-| `/resume`        | 本地实现            | 无参数打开恢复会话弹窗；带 session id 时直接加载。                                                                      |
-| `/status`        | ACP 透传            | daemon 支持，包含 `paths` 子命令。                                                                                      |
-| `/auth`          | ACP 透传            | 连接 LLM provider。                                                                                                     |
-| `/bug`           | ACP 透传            | 提交错误报告。                                                                                                          |
-| `/compress`      | ACP 透传            | 通过摘要替换来压缩上下文。                                                                                              |
-| `/context`       | ACP 透传            | 显示上下文窗口使用情况，包含 `detail` 子命令。                                                                          |
-| `/diff`          | ACP 透传            | 显示工作区相对 `HEAD` 的变更统计。                                                                                      |
-| `/docs`          | ACP 透传            | 打开 Qwen Code 文档。                                                                                                   |
-| `/doctor`        | ACP 透传            | 执行安装与环境诊断，包含 `memory` 子命令。                                                                              |
-| `/export`        | ACP 透传            | 导出当前会话记录，包含 `html`、`md`、`json`、`jsonl` 子命令。                                                           |
-| `/goal`          | ACP 透传            | 设置目标，并持续工作直到条件满足。                                                                                      |
-| `/init`          | ACP 透传            | 分析项目并创建定制的 `QWEN.md`。                                                                                        |
-| `/stats`         | ACP 透传            | 显示统计信息，包含 `model`、`tools` 子命令。                                                                            |
-| `/summary`       | ACP 透传            | 生成当前会话摘要。                                                                                                      |
-| `/tasks`         | 本地实现            | 打开环境信息面板并刷新后台任务。                                                                                        |
-| `/btw`           | 本地实现 + ACP 透传 | daemon 支持侧边任务时新建侧边任务；否则发送一个不影响主对话的侧边问题。                                                 |
-| `/fork`          | 本地实现 + ACP 透传 | 启动共享当前上下文的后台智能体。                                                                                        |
-| `/insight`       | ACP 透传            | 查看 insight 相关信息。                                                                                                 |
+| 命令             | 支持方式            | 说明                                                                                                                           |
+| ---------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `/help`          | 本地实现            | 打开帮助弹窗，支持键盘浏览命令和快捷键。                                                                                       |
+| `/theme`         | 本地实现            | 打开主题选择弹窗；支持 `/theme light`、`/theme dark`。                                                                         |
+| `/settings`      | 本地实现            | 打开设置面板，管理工作区与用户级（`~/.mariadb-shell-agent/settings.json`）配置；两个作用域均可编辑并写回对应的 settings.json。 |
+| `/language`      | 本地实现 + ACP 透传 | `/language ui <lang>` 会切换 web-shell UI 语言并同步给 daemon；其他语言能力由 daemon 执行。包含 `ui`、`output` 子命令。        |
+| `/model`         | 本地实现 + 部分透传 | 无参数打开模型弹窗；普通参数直接切换模型；`/model --fast <model>` 透传给 daemon。                                              |
+| `/plan`          | 本地实现            | 切换到 `plan` approval mode，并可继续发送后续 prompt。                                                                         |
+| `/approval-mode` | 本地实现            | 打开审批模式弹窗或直接切换审批模式。                                                                                           |
+| `/mode`          | 本地实现            | web-shell 本地别名，用于切换审批模式。                                                                                         |
+| `/mcp`           | 本地实现            | 打开 MCP 管理弹窗。                                                                                                            |
+| `/skills`        | 本地实现 + ACP 透传 | 无参数或 `detail`/`details` 打开 skills 弹窗；其他参数转换为直接 skill 命令（`/skills review` → `/review`）。                  |
+| `/tools`         | 本地实现            | 打开 tools 弹窗，列表展示工具名称、启用状态和 `description`。                                                                  |
+| `/memory`        | 本地实现            | 打开 memory 弹窗，支持 `show`、`refresh`、`add user`、`add project` 等分支。                                                   |
+| `/agents`        | 本地实现            | 打开 agents 弹窗，支持 `manage`、`create user`、`create project` 等分支。                                                      |
+| `/copy`          | 本地实现            | 复制最后一条 assistant 输出；支持 `code`、语言名、LaTeX、inline LaTeX 等选择器。                                               |
+| `/release`       | 本地实现            | 释放 live session 连接，不删除历史会话记录。                                                                                   |
+| `/clear`         | 本地实现            | 清空当前 web-shell transcript store。                                                                                          |
+| `/new`           | 本地实现            | 创建新的 daemon session。                                                                                                      |
+| `/reset`         | 本地实现            | 与 `/new` 一样创建新的 daemon session。                                                                                        |
+| `/rename <name>` | 本地实现            | 修改当前 daemon session 的展示名称。                                                                                           |
+| `/resume`        | 本地实现            | 无参数打开恢复会话弹窗；带 session id 时直接加载。                                                                             |
+| `/status`        | ACP 透传            | daemon 支持，包含 `paths` 子命令。                                                                                             |
+| `/auth`          | ACP 透传            | 连接 LLM provider。                                                                                                            |
+| `/bug`           | ACP 透传            | 提交错误报告。                                                                                                                 |
+| `/compress`      | ACP 透传            | 通过摘要替换来压缩上下文。                                                                                                     |
+| `/context`       | ACP 透传            | 显示上下文窗口使用情况，包含 `detail` 子命令。                                                                                 |
+| `/diff`          | ACP 透传            | 显示工作区相对 `HEAD` 的变更统计。                                                                                             |
+| `/docs`          | ACP 透传            | 打开 MariaDB Shell Agent 文档。                                                                                                |
+| `/doctor`        | ACP 透传            | 执行安装与环境诊断，包含 `memory` 子命令。                                                                                     |
+| `/export`        | ACP 透传            | 导出当前会话记录，包含 `html`、`md`、`json`、`jsonl` 子命令。                                                                  |
+| `/goal`          | ACP 透传            | 设置目标，并持续工作直到条件满足。                                                                                             |
+| `/init`          | ACP 透传            | 分析项目并创建定制的 `MARIADB-SHELL-AGENT.md`。                                                                                |
+| `/stats`         | ACP 透传            | 显示统计信息，包含 `model`、`tools` 子命令。                                                                                   |
+| `/summary`       | ACP 透传            | 生成当前会话摘要。                                                                                                             |
+| `/tasks`         | 本地实现            | 打开环境信息面板并刷新后台任务。                                                                                               |
+| `/btw`           | 本地实现 + ACP 透传 | daemon 支持侧边任务时新建侧边任务；否则发送一个不影响主对话的侧边问题。                                                        |
+| `/fork`          | 本地实现 + ACP 透传 | 启动共享当前上下文的后台智能体。                                                                                               |
+| `/insight`       | ACP 透传            | 查看 insight 相关信息。                                                                                                        |
 
 ## 当前会话内容搜索
 

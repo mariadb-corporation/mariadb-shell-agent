@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -297,7 +298,7 @@ describe('LocalControlService', () => {
           expect(writeStderrLineSafeMock).not.toHaveBeenCalled();
         } else {
           expect(writeStderrLineSafeMock).toHaveBeenCalledWith(
-            `qwen serve: ${diagnostic}`,
+            `mariadb-shell-agent serve: ${diagnostic}`,
           );
         }
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -49,7 +50,7 @@ export function installFinalErrorHandler(app: Application): void {
       return;
     }
     writeStderrLine(
-      `qwen serve: unhandled error: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`,
+      `mariadb-shell-agent serve: unhandled error: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`,
     );
     if (!res.headersSent) {
       res.status(500).json({ error: 'Internal server error' });

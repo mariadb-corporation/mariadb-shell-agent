@@ -16,7 +16,7 @@ event. The extra tool round therefore adds latency and tokens without providing
 the interactive progress experience that originally justified the tool.
 
 Newer models can maintain and revise a working approach without a mandatory
-checklist. Qwen Code also has shared task tools for the separate agent-team use
+checklist. MariaDB Shell Agent also has shared task tools for the separate agent-team use
 case. Removing Todo from the default tool surface avoids steering ordinary
 sessions toward bookkeeping while preserving it for users and integrations
 that deliberately depend on it.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 import { createHash, randomUUID } from 'node:crypto';
@@ -168,7 +169,11 @@ export class ReportStore {
 
   private async cacheDirectory(create: boolean): Promise<string> {
     let directory = this.workspaceRoot;
-    for (const part of ['.qwen', 'test-failure-explorer', 'reports']) {
+    for (const part of [
+      '.mariadb-shell-agent',
+      'test-failure-explorer',
+      'reports',
+    ]) {
       directory = join(directory, part);
       if (create)
         await mkdir(directory, { mode: 0o700 }).catch((error: unknown) => {

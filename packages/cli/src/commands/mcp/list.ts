@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// File for 'qwen mcp list' command
+// File for 'mariadb-shell-agent mcp list' command
 import type { CommandModule } from 'yargs';
 import { loadSettings } from '../../config/settings.js';
 import { writeStdoutLine } from '../../utils/stdioHelpers.js';
@@ -149,7 +150,7 @@ export async function listMcpServers(): Promise<void> {
       serverInfo += `${server.command} ${server.args?.join(' ') || ''} (stdio)`;
     }
 
-    // Gated (project `.mcp.json` / workspace `.qwen/settings.json`) servers that
+    // Gated (project `.mcp.json` / workspace `.mariadb-shell-agent/settings.json`) servers that
     // are not approved are listed WITHOUT connecting — inspecting an untrusted
     // config must stay side-effect-free (#4615). Only approved / non-gated
     // servers get a live connection test.

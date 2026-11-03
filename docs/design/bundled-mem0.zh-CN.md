@@ -6,13 +6,13 @@
 
 ## 问题与范围
 
-[#12596](https://github.com/QwenLM/qwen-code/issues/12596) 要求普通 Qwen Code 安装即可使用 Mem0。额外依赖未发布的包、单独的 MCP 配置和手工安装的写入确认 Hook 不符合目标。[#9964](https://github.com/QwenLM/qwen-code/issues/9964) 还要求 OSS 交互写入覆盖。
+[#12596](https://github.invalid/QwenLM/qwen-code/issues/12596) 要求普通 MariaDB Shell Agent 安装即可使用 Mem0。额外依赖未发布的包、单独的 MCP 配置和手工安装的写入确认 Hook 不符合目标。[#9964](https://github.invalid/QwenLM/qwen-code/issues/9964) 还要求 OSS 交互写入覆盖。
 
 主 CLI 提供可配置搜索和主动启用的写入。不实现任意 REST 方言、未知协议版本、自动召回或新的服务。保留现有高级配置。对这条主动启用的内置路径，本设计替代此前 direct-external-context 设计中“仅管理员配置、单独安装”的交付要求。
 
 ## 配置与协议合同
 
-在用户设置（`~/.qwen/settings.json`）中加入并重启 Qwen Code。与 `modelProviders` 一样，顶层 `env` 字段可定义凭证值，`envKey` 选择变量名：
+在用户设置（`~/.mariadb-shell-agent/settings.json`）中加入并重启 MariaDB Shell Agent。与 `modelProviders` 一样，顶层 `env` 字段可定义凭证值，`envKey` 选择变量名：
 
 ```json
 {
@@ -29,7 +29,7 @@
 }
 ```
 
-`envKey` 默认为 `MEM0_API_KEY`。历史字段 `credentialEnv` 保留为别名；两者同时指定不同变量名时报错。两个字段都不存储密钥值。复用现有环境加载器：非空进程环境优先于 `.env`，再优先于 `settings.env`。MCP 子进程继承解析后的环境；生成的绑定配置仅包含变量引用，不含凭证值。不新增凭证存储或加载器。单文件配置无需 shell export，但 JSON 会明文存储凭证，应使用用户设置且不能提交或公开。shell export 和 `~/.qwen/.env` 仍可使用。
+`envKey` 默认为 `MEM0_API_KEY`。历史字段 `credentialEnv` 保留为别名；两者同时指定不同变量名时报错。两个字段都不存储密钥值。复用现有环境加载器：非空进程环境优先于 `.env`，再优先于 `settings.env`。MCP 子进程继承解析后的环境；生成的绑定配置仅包含变量引用，不含凭证值。不新增凭证存储或加载器。单文件配置无需 shell export，但 JSON 会明文存储凭证，应使用用户设置且不能提交或公开。shell export 和 `~/.mariadb-shell-agent/.env` 仍可使用。
 
 `baseUrl` 是 origin 加可选的反向代理前缀，不是完整操作地址。不允许凭证、query、fragment、空白和反斜杠。除回环 HTTP 外必须使用 HTTPS；可信的纯 HTTP PolarDB 地址需要 `"allowInsecureHttp": true`。该开关不绕过网络路由或服务白名单。
 

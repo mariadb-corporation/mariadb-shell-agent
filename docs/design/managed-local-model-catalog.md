@@ -4,7 +4,7 @@
 
 ## Problem and scope
 
-The local `qwen serve --managed` adapter inherits the user's model configuration for Hosted Harness execution, but neither configures the Java model catalog nor supplies new-task model presets. The UI therefore shows only the server default despite configured local models. Main supplies the Session model catalog and approval contracts. This change connects the local launcher to them and adds optional initial model selection to WebShell creation, as detailed in [the creation design](2026-10-22-managed-initial-model-selection.md). It adds no provider credential transport, remote provisioning behavior, or changes to existing Sessions.
+The local `mariadb-shell-agent serve --managed` adapter inherits the user's model configuration for Hosted Harness execution, but neither configures the Java model catalog nor supplies new-task model presets. The UI therefore shows only the server default despite configured local models. Main supplies the Session model catalog and approval contracts. This change connects the local launcher to them and adds optional initial model selection to WebShell creation, as detailed in [the creation design](2026-10-22-managed-initial-model-selection.md). It adds no provider credential transport, remote provisioning behavior, or changes to existing Sessions.
 
 ## Design
 

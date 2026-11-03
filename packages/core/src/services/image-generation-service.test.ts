@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -120,7 +121,7 @@ describe('generateImage', () => {
     );
 
     const result = await run(fetchFn, {
-      prompt: 'A Qwen Code poster',
+      prompt: 'A MariaDB Shell Agent poster',
       size: '1536*864',
     });
 
@@ -145,7 +146,9 @@ describe('generateImage', () => {
     expect(JSON.parse(String(requestInit?.body))).toEqual({
       model: 'qwen-image-2.0',
       input: {
-        messages: [{ role: 'user', content: [{ text: 'A Qwen Code poster' }] }],
+        messages: [
+          { role: 'user', content: [{ text: 'A MariaDB Shell Agent poster' }] },
+        ],
       },
       parameters: {
         n: 1,

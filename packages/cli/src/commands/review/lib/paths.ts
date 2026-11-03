@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Centralised path constants and helpers for the `qwen review` subcommands.
+// Centralised path constants and helpers for the `mariadb-shell-agent review` subcommands.
 // Review artifacts are relative to the project root; host-trusted state and
 // user-private runtime preferences resolve through Storage. Use `path.join`
 // rather than string concatenation so Windows backslashes are produced.
@@ -59,16 +60,19 @@ export function assertWritableOutPath(out: unknown): asserts out is string {
   }
 }
 
-export const REVIEW_TMP_DIR = join('.qwen', 'tmp');
+export const REVIEW_TMP_DIR = join('.mariadb-shell-agent', 'tmp');
 
 /**
  * The retired in-workspace lease directory. New code never reads authority
  * from here, but local-diff still excludes residue left by an older build.
  */
-export const RETIRED_REVIEW_LEASE_DIR = join('.qwen', 'review-leases');
+export const RETIRED_REVIEW_LEASE_DIR = join(
+  '.mariadb-shell-agent',
+  'review-leases',
+);
 export const REVIEW_TRUST_STATE_DIR = 'review-state';
-export const REVIEWS_DIR = join('.qwen', 'reviews');
-export const REVIEW_CACHE_DIR = join('.qwen', 'review-cache');
+export const REVIEWS_DIR = join('.mariadb-shell-agent', 'reviews');
+export const REVIEW_CACHE_DIR = join('.mariadb-shell-agent', 'review-cache');
 
 function outermostReviewRepositoryRoot(repositoryRoot: string): string {
   const resolved = resolve(repositoryRoot);
@@ -88,7 +92,7 @@ function canonicalReviewRepositoryRoot(repositoryRoot: string): string {
     // operation report the real filesystem error.
   }
   // A caller may have reached a nested review worktree through a symlink
-  // whose lexical spelling contains no `.qwen/tmp` segment. Re-apply the
+  // whose lexical spelling contains no `.mariadb-shell-agent/tmp` segment. Re-apply the
   // boundary rule after canonicalization so that spelling still shares the
   // outer review's namespace.
   canonical = outermostReviewRepositoryRoot(canonical);
@@ -112,7 +116,7 @@ export function reviewRepositoryRootForWorktree(worktree: string): string {
   if (at < 0) {
     throw new Error(
       `cannot place the base-tree trust artifact for ${worktree}: the ` +
-        'worktree is not shaped like <root>/.qwen/tmp/<name>, so there is ' +
+        'worktree is not shaped like <root>/.mariadb-shell-agent/tmp/<name>, so there is ' +
         'no host-side review directory to key it under',
     );
   }
@@ -155,7 +159,7 @@ function projectDirFromEnv(env: NodeJS.ProcessEnv): string {
     throw new GeneratedWorkflowDirUnavailableError(
       'the CLI did not export QWEN_CODE_PROJECT_DIR, so there is no directory ' +
         'the Workflow tool would load a generated script from. Run this ' +
-        'command from inside a qwen session.',
+        'command from inside a mariadb-shell-agent session.',
     );
   }
   return projectDir;
@@ -287,7 +291,7 @@ export function reviewWorkflowScriptPath(
 export const LEASE_PREFIX = 'qwen-review-lease-';
 
 /**
- * Where `qwen review parse-args --out` writes its verdict (SKILL Step 0). A fixed,
+ * Where `mariadb-shell-agent review parse-args --out` writes its verdict (SKILL Step 0). A fixed,
  * conventional name so a capture command can read back the effort the parser
  * already resolved without the orchestrator threading the `--effort` value through
  * by hand — see `resolveEffort`.
@@ -444,7 +448,7 @@ export function reviewBranch(prNumber: string | number): string {
 /**
  * Per-target side-file path (review JSON, PR context, presubmit report).
  *
- * Files live under `.qwen/tmp/` rather than the OS temp dir so the path is
+ * Files live under `.mariadb-shell-agent/tmp/` rather than the OS temp dir so the path is
  * stable across platforms (macOS's `os.tmpdir()` returns `/var/folders/...`,
  * not `/tmp` — using the project-local dir avoids that mismatch entirely)
  * and so they're scoped to the project rather than the user's whole machine.
@@ -459,12 +463,12 @@ export function tmpPrefix(target: string): string {
 }
 
 /**
- * Create `.qwen/tmp` for a review round, refusing to run through a link.
+ * Create `.mariadb-shell-agent/tmp` for a review round, refusing to run through a link.
  *
  * Every side file a round writes lands there under a deterministic name —
  * the plan, the diff, the stop sidecar, the candidate, the worktree — and
- * the directory is in-repo, so a contributor branch can commit `.qwen` or
- * `.qwen/tmp` as a symlink (gitignore does not stop `git add -f`) and have
+ * the directory is in-repo, so a contributor branch can commit `.mariadb-shell-agent` or
+ * `.mariadb-shell-agent/tmp` as a symlink (gitignore does not stop `git add -f`) and have
  * all of them land wherever it points, with the plan then read back from
  * there to orchestrate the round. Guarding the writers one at a time
  * re-created that class every round; the directory is where the round's own
@@ -513,7 +517,7 @@ export function ensureReviewTmpDir(command: string): void {
   }
   // `-s` carries the mode; `120000` is a symlink entry. Filtered here rather
   // than by a pathspec: on a case-insensitive filesystem the plain write to
-  // `.qwen/tmp/<name>` resolves through `.QWEN/tmp/<name>`, and a pathspec
+  // `.mariadb-shell-agent/tmp/<name>` resolves through `.MARIADB-SHELL-AGENT/tmp/<name>`, and a pathspec
   // spelt the way the review writes would miss the entry the write reaches
   // (pathspec magic that could fold case is switched off by an environment
   // this process does not control). The listing is git's own cwd subtree —
@@ -522,7 +526,7 @@ export function ensureReviewTmpDir(command: string): void {
   // Raw and fail-closed: a listing sized past a buffer, or a git that could
   // not answer, must not read as "tracks nothing" — only a directory outside
   // any repository may pass, and every capture needs git for the diff.
-  // A `160000` gitlink AT the scratch directory — or at `.qwen` — is refused
+  // A `160000` gitlink AT the scratch directory — or at `.mariadb-shell-agent` — is refused
   // like a link: a committed submodule there is a real directory to `lstat`,
   // and the planted link then lives in the submodule's own tree, which this
   // index never lists, so the gitlink itself is the plant and no recursion
@@ -530,7 +534,7 @@ export function ensureReviewTmpDir(command: string): void {
   //
   // Below it, a gitlink is refused too — EXCEPT at the names the review
   // creates worktrees under, because `git add -A` in a checkout that does
-  // not ignore `.qwen/tmp` records one of those as a gitlink with only a
+  // not ignore `.mariadb-shell-agent/tmp` records one of those as a gitlink with only a
   // hint. Refusing on that blocked every review in the checkout,
   // `parse-args` included, over the round's own scratch worktree — and
   // removing the worktree leaves the index entry behind, so the obvious
@@ -607,7 +611,7 @@ export function ensureReviewTmpDir(command: string): void {
  * its own remedy for a tracked link used to be "untrack it", and
  * `git rm --cached` removes only the index entry, so following it passed
  * the sweep while the link stayed where every plain `writeFileSync` of the
- * round follows it (R10-3). `.qwen/*` is gitignored, so nothing else ever
+ * round follows it (R10-3). `.mariadb-shell-agent/*` is gitignored, so nothing else ever
  * shows the surviving link to anyone.
  *
  * Keyed on `isSymbolicLink()`, never on mere existence: the round's side
@@ -690,9 +694,9 @@ export function commandPrefixed(command: string, message: string): string {
  * predicates would drift with nothing to catch it.
  *
  * Case-folded, like the guard's own index sweep and for its reason: on a
- * case-insensitive filesystem `--out .QWEN/tmp/x` reaches the very directory
+ * case-insensitive filesystem `--out .MARIADB-SHELL-AGENT/tmp/x` reaches the very directory
  * the guard is about to check. That over-matches on a case-sensitive one,
- * where `.QWEN/tmp` is a different directory — in the safe direction, since
+ * where `.MARIADB-SHELL-AGENT/tmp` is a different directory — in the safe direction, since
  * the answer only decides whether to CHECK.
  */
 export function writesIntoReviewTmp(out: string): boolean {
@@ -798,7 +802,7 @@ function canonicalise(abs: string): string {
  * Where a user-supplied path sits relative to the repository root — the ONE
  * answer both the parent's artifact pin and the child's capture must read.
  *
- * `qwen review run <file>` pins the artifact name it polls for from this, and
+ * `mariadb-shell-agent review run <file>` pins the artifact name it polls for from this, and
  * `capture-local --file` scopes the diff from it. When the two spell the same
  * file differently the parent polls a name no child ever writes: the review
  * runs, posts, and then reports "no composed verdict was produced". They drifted
@@ -855,16 +859,16 @@ export function repoRelativeOf(
  * `noFollow` protects the final path element only, and the threat these
  * commands police — a contributor branch committing a symlink at a
  * deterministic in-repo path — is satisfied one layer up just as well: plant
- * `.qwen/tmp` or `.qwen/review-cache` itself as a link (gitignore does not
+ * `.mariadb-shell-agent/tmp` or `.mariadb-shell-agent/review-cache` itself as a link (gitignore does not
  * stop `git add -f`), and `mkdirSync(…, {recursive:true})` succeeds through
  * it while the atomic tmp+rename lands the file in the attacker's directory,
  * over whatever of that name lives there. Comparing the resolved parent
  * against its lexical form catches a link ANYWHERE in the chain, which is
  * what the final-element guard cannot do.
  *
- * Kept for the promoted cache under `.qwen/review-cache`, which no entry
+ * Kept for the promoted cache under `.mariadb-shell-agent/review-cache`, which no entry
  * guard covers. The captures' side files no longer need it: `ensureReviewTmpDir`
- * refuses a redirected `.qwen/tmp` before the round writes anything, for
+ * refuses a redirected `.mariadb-shell-agent/tmp` before the round writes anything, for
  * every writer at once.
  */
 export function assertUnredirectedParent(

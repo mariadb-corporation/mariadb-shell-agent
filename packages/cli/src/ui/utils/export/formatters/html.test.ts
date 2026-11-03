@@ -71,7 +71,9 @@ describe('HTML export formatter', () => {
     // The JS renderer and the CSS stylesheet each carry their own SRI digest.
     expect(html.match(/integrity="sha384-[A-Za-z0-9+/]{64}"/g)).toHaveLength(2);
     expect(html).toContain('crossorigin="anonymous"');
-    expect(html).not.toContain('qwen-code-assets.oss-cn-hangzhou.aliyuncs.com');
+    expect(html).not.toContain(
+      'qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid',
+    );
     expect(html).not.toContain('type="importmap"');
     expect(html).not.toContain('type="module"');
     expect(html.length).toBeLessThan(500_000);

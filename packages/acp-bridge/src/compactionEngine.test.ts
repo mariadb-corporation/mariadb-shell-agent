@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -3024,7 +3025,7 @@ describe('EventBus + CompactionEngine integration', () => {
       });
       expect(stderrSpy).toHaveBeenCalledWith(
         expect.stringContaining(
-          'qwen serve: EventBus event sizing failed {"type":"seeded_misc"}',
+          'mariadb-shell-agent serve: EventBus event sizing failed {"type":"seeded_misc"}',
         ),
       );
     } finally {

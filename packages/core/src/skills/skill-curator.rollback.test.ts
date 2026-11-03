@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -47,9 +48,14 @@ describe('auto-skill curator rollback', () => {
   });
 
   const liveDir = (directoryName: string) =>
-    path.join(projectRoot, '.qwen', 'skills', directoryName);
+    path.join(projectRoot, '.mariadb-shell-agent', 'skills', directoryName);
   const archivedDir = (directoryName: string) =>
-    path.join(projectRoot, '.qwen', 'archived-skills', directoryName);
+    path.join(
+      projectRoot,
+      '.mariadb-shell-agent',
+      'archived-skills',
+      directoryName,
+    );
 
   /** Writes an auto-skill last modified at OLD and records its usage then. */
   async function seedSkill(directoryName: string): Promise<string> {

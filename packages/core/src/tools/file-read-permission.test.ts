@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -82,7 +83,12 @@ beforeAll(() => {
     userSkillsDir: path.join(base, 'runtime', 'skills'),
     userExtensionsDir: path.join(base, 'runtime', 'extensions'),
     plansDir: path.join(base, 'runtime', 'plans'),
-    userWorkflowsDir: path.join(base, 'home', '.qwen', 'workflows'),
+    userWorkflowsDir: path.join(
+      base,
+      'home',
+      '.mariadb-shell-agent',
+      'workflows',
+    ),
     workflowRunsDir: path.join(base, 'runtime', 'workflow-runs-sentinel'),
     memoryBaseDir: path.join(base, 'runtime', 'memory-base'),
     secretsDir: path.join(base, 'secrets'),
@@ -107,7 +113,7 @@ beforeAll(() => {
   fs.writeFileSync(layout.secretFile, 'SENTINEL-SECRET', 'utf8');
 
   // Keep the auto-memory branch hermetic: point it at an empty temp base so no
-  // candidate below can accidentally land inside a real ~/.qwen/memories.
+  // candidate below can accidentally land inside a real ~/.mariadb-shell-agent/memories.
   originalMemoryBaseDir = process.env['QWEN_CODE_MEMORY_BASE_DIR'];
   process.env['QWEN_CODE_MEMORY_BASE_DIR'] = layout.memoryBaseDir;
   clearAutoMemoryRootCache();

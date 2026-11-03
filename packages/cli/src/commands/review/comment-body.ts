@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review comment-body`: fetch one comment's body. The pr-context file
+// `mariadb-shell-agent review comment-body`: fetch one comment's body. The pr-context file
 // caps long bodies and names this command in its truncation note — the model
 // used to be handed a raw `gh api repos/…` route, which coupled the skill
 // prose to GitHub's URL scheme and dropped the Enterprise host on the floor
@@ -121,7 +122,7 @@ export const commentBodyCommand: CommandModule = {
       .option('host', {
         type: 'string',
         describe:
-          "The host the target lives on. The canonical Aone hosts (code.alibaba-inc.com / gitlab.alibaba-inc.com) select the a1 backend — a non-canonical *.alibaba-inc.com host is a GitHub Enterprise instance and stays on gh; omitted: detected from the clone's origin, else GitHub (GH_HOST, then github.com).",
+          "The host the target lives on. The canonical Aone hosts (code.alibaba-inc.invalid / gitlab.alibaba-inc.invalid) select the a1 backend — a non-canonical *.alibaba-inc.invalid host is a GitHub Enterprise instance and stays on gh; omitted: detected from the clone's origin, else GitHub (GH_HOST, then github.com).",
       })
       .option('out', {
         type: 'string',

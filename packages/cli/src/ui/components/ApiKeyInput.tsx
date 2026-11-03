@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,13 +28,13 @@ interface ApiKeyInputProps {
 }
 
 export const CODING_PLAN_API_KEY_URL =
-  'https://bailian.console.aliyun.com/?tab=model#/efm/coding_plan';
+  'https://bailian.console.aliyun.invalid/?tab=model#/efm/coding_plan';
 
 export const CODING_PLAN_INTL_API_KEY_URL =
-  'https://modelstudio.console.alibabacloud.com/?tab=dashboard#/efm/coding_plan';
+  'https://modelstudio.console.alibabacloud.invalid/?tab=dashboard#/efm/coding_plan';
 
 export const TOKEN_PLAN_API_KEY_URL =
-  'https://bailian.console.aliyun.com/cn-beijing?tab=doc#/doc/?type=model&url=3028856';
+  'https://bailian.console.aliyun.invalid/cn-beijing?tab=doc#/doc/?type=model&url=3028856';
 
 export function ApiKeyInput({
   onSubmit,

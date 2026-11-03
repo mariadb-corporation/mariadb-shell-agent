@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -78,7 +79,7 @@ function isApprovalRecordMap(
 /**
  * A win32 absolute path — drive-letter (`D:\...`) or UNC (`\\server\share`).
  * These are the only stored keys whose case is folded at load time: folding
- * every key would corrupt foreign POSIX paths (e.g. a `~/.qwen` synced from a
+ * every key would corrupt foreign POSIX paths (e.g. a `~/.mariadb-shell-agent` synced from a
  * Linux machine), whose case is significant on the filesystem they belong to.
  */
 function isWin32AbsolutePath(p: string): boolean {
@@ -256,7 +257,7 @@ export function loadMcpApprovals(): LoadedMcpApprovals {
 /**
  * Names of gated servers in `mcpServers` that are NOT approved (pending or
  * rejected) for `projectRoot`. Only checked-in / shareable scopes are gated —
- * project `.mcp.json` and workspace `.qwen/settings.json` (see
+ * project `.mcp.json` and workspace `.mariadb-shell-agent/settings.json` (see
  * {@link isGatedMcpScope}); user/system/extension servers are ignored. The
  * returned list is what the discovery layer skips
  * (`Config.isMcpServerPendingApproval`). See issue #4615.

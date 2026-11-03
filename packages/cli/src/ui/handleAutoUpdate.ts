@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -44,7 +45,7 @@ export async function handleAutoUpdate(
   // enableAutoUpdate is checked in llm.tsx before calling this function,
   // so if we get here, auto-update is enabled (or undefined, which defaults to enabled).
   const isAutoUpdateEnabled =
-    settings.merged.general?.enableAutoUpdate !== false;
+    settings.merged.general?.enableAutoUpdate === true;
 
   const installationInfo = getInstallationInfo(
     projectRoot,

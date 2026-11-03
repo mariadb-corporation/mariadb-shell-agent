@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1125,7 +1126,7 @@ describe('serve rate limit env parsing', () => {
     expect(process.env['QWEN_MANAGED_RUNTIME_BROKER_TOKEN']).toBeUndefined();
     const stderr = stderrWrites.join('');
     expect(stderr).toContain(
-      'qwen serve: --managed-runtime-broker-token is visible in the process command line; prefer the QWEN_MANAGED_RUNTIME_BROKER_TOKEN env var.',
+      'mariadb-shell-agent serve: --managed-runtime-broker-token is visible in the process command line; prefer the QWEN_MANAGED_RUNTIME_BROKER_TOKEN env var.',
     );
     expect(stderr).not.toContain('flag-broker-secret');
   });
@@ -1232,7 +1233,7 @@ describe('maybeOpenWebShellBrowser', () => {
 
     expect(mockOpenBrowserSecurely).not.toHaveBeenCalled();
     expect(stderrWrites.join('')).toContain(
-      'qwen serve: Web Shell runtime not ready; skipping --open: runtime boom',
+      'mariadb-shell-agent serve: Web Shell runtime not ready; skipping --open: runtime boom',
     );
   });
 
@@ -1413,7 +1414,7 @@ describe('serve startup import boundary', () => {
 
             child.stdout.on('data', (chunk: Buffer) => {
               stdout += chunk.toString('utf8');
-              if (stdout.includes('qwen serve listening on')) {
+              if (stdout.includes('mariadb-shell-agent serve listening on')) {
                 clearTimeout(timeout);
                 void cleanup();
                 resolve(true);
@@ -1436,7 +1437,8 @@ describe('serve startup import boundary', () => {
               reject(err);
             });
             child.on('exit', (code, signal) => {
-              if (stdout.includes('qwen serve listening on')) return;
+              if (stdout.includes('mariadb-shell-agent serve listening on'))
+                return;
               clearTimeout(timeout);
               reject(
                 new Error(

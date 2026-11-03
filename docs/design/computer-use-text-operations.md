@@ -12,7 +12,7 @@ On macOS, `app.paste(text, { format: 'text' | 'md' | 'html' })` pastes into the 
 
 ## Native behavior
 
-The reference is the installed official SkyComputerUseService, SHA-256 `25e9141499b94c396f39afbdb7b19ed8f49e45dc8c61be61028ceab8f3807ce6`. Disassembly identifies `ComputerUseAppController.selectText` at `0x100077cf4`, `sourceTextRange` at `0x10072e0a0`, and the overlapping, context-constrained unique-match search at `0x10072e338`. Detailed local evidence is retained under `.qwen/e2e-tests/paste-select/`.
+The reference is the installed official SkyComputerUseService, SHA-256 `25e9141499b94c396f39afbdb7b19ed8f49e45dc8c61be61028ceab8f3807ce6`. Disassembly identifies `ComputerUseAppController.selectText` at `0x100077cf4`, `sourceTextRange` at `0x10072e0a0`, and the overlapping, context-constrained unique-match search at `0x10072e338`. Detailed local evidence is retained under `.mariadb-shell-agent/e2e-tests/paste-select/`.
 
 Selection first checks whether the exact retained AX element supports a settable `AXSelectedTextRange`. It resolves visible formatted text to source offsets, falling back to the element's plain text. Matching is case-sensitive, counts overlapping occurrences, uses immediately adjacent optional prefix/suffix, and accepts exactly one result. AX ranges use UTF-16 offsets. Cursor placement changes the selected range to zero length at the corresponding boundary. The field is focused when necessary before setting the range; failed AX writes propagate instead of replaying a selection with keys. Read-back determines whether the action effect can be confirmed.
 

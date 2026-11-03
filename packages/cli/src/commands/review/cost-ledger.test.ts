@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1129,7 +1130,7 @@ describe('cost-ledger command boundary — informational, never a failure', () =
     return { plan, project };
   }
 
-  /** Drive the real yargs handler, as `qwen review cost-ledger` does. */
+  /** Drive the real yargs handler, as `mariadb-shell-agent review cost-ledger` does. */
   function run(args: Record<string, unknown>): {
     stdout: string;
     stderr: string;

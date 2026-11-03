@@ -2,7 +2,7 @@
 
 [English](2026-09-26-managed-workspace-output-next-slices.md) | [简体中文](2026-09-26-managed-workspace-output-next-slices.zh-CN.md)
 
-Status: implementation in draft PR #12730. Baseline: `main` at `342ba1bcd`, 2026-09-26. This completes the Broker slice of [W0c #12724](https://github.com/QwenLM/qwen-code/issues/12724), under [proposal #12380](https://github.com/QwenLM/qwen-code/issues/12380).
+Status: implementation in draft PR #12730. Baseline: `main` at `342ba1bcd`, 2026-09-26. This completes the Broker slice of [W0c #12724](https://github.invalid/QwenLM/qwen-code/issues/12724), under [proposal #12380](https://github.invalid/QwenLM/qwen-code/issues/12380).
 
 ## 1. Current state and scope
 
@@ -54,7 +54,7 @@ Changes are limited to Java Runtime Broker request/provisioner, local worker boo
 - Refuse installation for a Session record that is not ACQUIRING or READY, on a binding other than the one the Session record names, on another placement's Runtime or on a binding that is not READY or has a drain requested, and ill-formed Session or reference IDs, before sending; tolerate a concurrent schema upgrade.
 - Run focused tests, Java Checkstyle, and two clean self-audit passes before pushing.
 
-The E2E plan and observations are maintained in `.qwen/e2e-tests/managed-context-broker.md`. Baseline tests use the global CLI first; final tests use the local bundle. No model credentials or external model calls are needed.
+The E2E plan and observations are maintained in `.mariadb-shell-agent/e2e-tests/managed-context-broker.md`. Baseline tests use the global CLI first; final tests use the local bundle. No model credentials or external model calls are needed.
 
 ## 7. Follow-up dependencies and open questions
 
@@ -62,6 +62,6 @@ W0c-3 joins W0b and W0c-1/2: resolve original Session binding plus frozen config
 
 Worker installation/receipt capacity is follow-up work; W0c-1 currently retains evidence for the incarnation without the finite capacity proposed in the earlier draft. W0c-2 does not claim capacity retirement is implemented. Arbitrary Shell confinement still requires restricted mounts or equivalent isolation, not only realpath checks.
 
-O1a is being defined independently in [#12729](https://github.com/QwenLM/qwen-code/pull/12729): tool v3 execute/status/cancel/acknowledge, a separate streaming store, and complete-required foreground Shell capture. It supersedes this draft's earlier suggestion of a separate capability-probe route. O1b follows that reviewed contract; O1c follows O1a/O1b and W0c-1 Worker integration. Hosted enablement additionally needs W0c-3 and O2. This PR contains no O1 implementation.
+O1a is being defined independently in [#12729](https://github.invalid/QwenLM/qwen-code/pull/12729): tool v3 execute/status/cancel/acknowledge, a separate streaming store, and complete-required foreground Shell capture. It supersedes this draft's earlier suggestion of a separate capability-probe route. O1b follows that reviewed contract; O1c follows O1a/O1b and W0c-1 Worker integration. Hosted enablement additionally needs W0c-3 and O2. This PR contains no O1 implementation.
 
-[#12713](https://github.com/QwenLM/qwen-code/pull/12713) is a no-tool Hosted Harness step. The [#12358 preview](https://github.com/QwenLM/qwen-code/pull/12358) is integration research, not evidence that product gates passed. No unresolved design question blocks the scoped Broker implementation; rollout and capacity remain explicit follow-ups.
+[#12713](https://github.invalid/QwenLM/qwen-code/pull/12713) is a no-tool Hosted Harness step. The [#12358 preview](https://github.invalid/QwenLM/qwen-code/pull/12358) is integration research, not evidence that product gates passed. No unresolved design question blocks the scoped Broker implementation; rollout and capacity remain explicit follow-ups.

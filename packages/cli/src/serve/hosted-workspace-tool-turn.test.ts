@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -364,7 +365,7 @@ const publishedSkills = () =>
       name: 'review',
       description: 'Review code changes.',
       body: 'Consult scripts/review.js before reviewing.',
-      base_directory: '.qwen/skills/review',
+      base_directory: '.mariadb-shell-agent/skills/review',
     },
   ]);
 
@@ -2632,7 +2633,7 @@ it('assembles two instruction files as two sections, separated and in order', as
   // a single section makes `.join()` a no-op.
   const slot = contextSlot();
   broker.workspaceContext.mockResolvedValue([
-    { name: 'QWEN.md', text: '# Project Rules\n' },
+    { name: 'MARIADB-SHELL-AGENT.md', text: '# Project Rules\n' },
     { name: 'AGENTS.md', text: 'never touch prod' },
   ]);
   turn = turnWithContext(slot);
@@ -2643,7 +2644,7 @@ it('assembles two instruction files as two sections, separated and in order', as
     new AbortController().signal,
   );
   expect(slot.value).toBe(
-    '--- Context from: QWEN.md ---\n# Project Rules\n--- End of Context from: QWEN.md ---\n\n--- Context from: AGENTS.md ---\nnever touch prod\n--- End of Context from: AGENTS.md ---',
+    '--- Context from: MARIADB-SHELL-AGENT.md ---\n# Project Rules\n--- End of Context from: MARIADB-SHELL-AGENT.md ---\n\n--- Context from: AGENTS.md ---\nnever touch prod\n--- End of Context from: AGENTS.md ---',
   );
   await turn.consumeResults();
   await turn.finish();
@@ -2652,7 +2653,7 @@ it('assembles two instruction files as two sections, separated and in order', as
 it('reads Workspace instructions once, outside the execution ledger', async () => {
   const slot = contextSlot();
   broker.workspaceContext.mockResolvedValue([
-    { name: 'QWEN.md', text: '# Project Rules\nAlways test.\n' },
+    { name: 'MARIADB-SHELL-AGENT.md', text: '# Project Rules\nAlways test.\n' },
     { name: 'AGENTS.md', text: '   ' },
   ]);
   turn = turnWithContext(slot);
@@ -2663,7 +2664,7 @@ it('reads Workspace instructions once, outside the execution ledger', async () =
     new AbortController().signal,
   );
   expect(slot.value).toBe(
-    '--- Context from: QWEN.md ---\n# Project Rules\nAlways test.\n--- End of Context from: QWEN.md ---',
+    '--- Context from: MARIADB-SHELL-AGENT.md ---\n# Project Rules\nAlways test.\n--- End of Context from: MARIADB-SHELL-AGENT.md ---',
   );
   expect(broker.workspaceContext).toHaveBeenCalledOnce();
   // The context read reserves no execution: only the model's call does.
@@ -2772,9 +2773,9 @@ it('cancels a turn without waiting for a stalled Workspace context read', async 
 });
 
 it.each([
-  ['QWEN.md', true],
+  ['MARIADB-SHELL-AGENT.md', true],
   ['AGENTS.md', true],
-  ['docs/QWEN.md', false],
+  ['docs/MARIADB-SHELL-AGENT.md', false],
   ['file.txt', false],
 ] as const)(
   'an edit of %s invalidates the cached Workspace context: %s',
@@ -11424,7 +11425,7 @@ it('settles an in-turn dispatch with no publication and no durable process row',
     'shell-execution',
   );
   expect(stderr).toHaveBeenCalledWith(
-    'qwen serve: Settled never-started background child run shell-execution from durable process-ledger absence.',
+    'mariadb-shell-agent serve: Settled never-started background child run shell-execution from durable process-ledger absence.',
   );
   stderr.mockRestore();
 });
@@ -12471,10 +12472,10 @@ it('settles only the binding whose own probe proves absence in a mixed fan-out',
       ],
     ]);
     expect(stderr).toHaveBeenCalledWith(
-      'qwen serve: Background process absence could not be confirmed for shell-execution-1 (ambiguous_state (executing)).',
+      'mariadb-shell-agent serve: Background process absence could not be confirmed for shell-execution-1 (ambiguous_state (executing)).',
     );
     expect(stderr).toHaveBeenCalledWith(
-      'qwen serve: Settled never-started background child run shell-execution-2 from durable process-ledger absence.',
+      'mariadb-shell-agent serve: Settled never-started background child run shell-execution-2 from durable process-ledger absence.',
     );
   } finally {
     stderr.mockRestore();
@@ -12535,8 +12536,8 @@ it.each(['present', 'unavailable'] as const)(
     ]);
     expect(stderr).toHaveBeenCalledWith(
       proof === 'present'
-        ? 'qwen serve: Background process absence could not be confirmed for shell-execution (ambiguous_state (executing)).'
-        : 'qwen serve: Background process absence could not be confirmed for shell-execution (probe_rejected (status 503, code store_unavailable)).',
+        ? 'mariadb-shell-agent serve: Background process absence could not be confirmed for shell-execution (ambiguous_state (executing)).'
+        : 'mariadb-shell-agent serve: Background process absence could not be confirmed for shell-execution (probe_rejected (status 503, code store_unavailable)).',
     );
     stderr.mockRestore();
   },

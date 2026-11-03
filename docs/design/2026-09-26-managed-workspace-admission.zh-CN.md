@@ -2,7 +2,7 @@
 
 [English](2026-09-26-managed-workspace-admission.md) | [简体中文](2026-09-26-managed-workspace-admission.zh-CN.md)
 
-状态：基于分阶段 Spring 控制面 [#12692](https://github.com/QwenLM/qwen-code/pull/12692) 开发中。本切片依赖 W0a 的 [Workspace 绑定契约](2026-09-25-managed-workspace-binding-contract.zh-CN.md)，不启用绑定 Session 的 Turn 执行。
+状态：基于分阶段 Spring 控制面 [#12692](https://github.invalid/QwenLM/qwen-code/pull/12692) 开发中。本切片依赖 W0a 的 [Workspace 绑定契约](2026-09-25-managed-workspace-binding-contract.zh-CN.md)，不启用绑定 Session 的 Turn 执行。
 
 ## 决策与边界
 

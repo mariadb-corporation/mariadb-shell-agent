@@ -523,7 +523,7 @@ session ID when known and never include managed filesystem paths.
    - Prove partial/direct embeds omit both route and feature.
 6. **Integration/E2E**
    - Add real-daemon integration coverage after build/bundle.
-   - Execute `.qwen/e2e-tests/2026-08-25-standalone-pr3-daemon-api.md`.
+   - Execute `.mariadb-shell-agent/e2e-tests/2026-08-25-standalone-pr3-daemon-api.md`.
 
 Keep the implementation as one logical publication PR with ordered commits for
 the layers above. Re-estimate after tasks 1-3 compile. If the production diff is

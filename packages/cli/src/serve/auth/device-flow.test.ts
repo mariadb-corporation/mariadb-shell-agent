@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -758,7 +759,7 @@ describe('DeviceFlowRegistry — authoritative timeouts (fold-in 7)', () => {
       expect(provider.lastPollSignal?.aborted).toBe(true);
       const reason = provider.lastPollSignal?.reason as unknown;
       expect(reason).toBeInstanceOf(DeviceFlowPollTimeoutError);
-      // PR #4291 follow-up review (Qwen Code review summary):
+      // PR #4291 follow-up review (MariaDB Shell Agent review summary):
       // poll-tick must NOT reschedule itself after a timeout-driven
       // upstream_error (the entry has already transitioned to error
       // state; another poll would be a `entry.status !== 'pending'`

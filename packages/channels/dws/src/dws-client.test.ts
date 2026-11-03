@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -800,13 +801,13 @@ describe('DwsClient', () => {
           conversation_id: 'cid-1',
           content: '@QwenBot help with this',
           quoted_message: {
-            content: 'Qwen Code is slow after connecting over SSH.',
+            content: 'MariaDB Shell Agent is slow after connecting over SSH.',
           },
           sender_open_dingtalk_id: 'open-alice',
         }),
       ),
     ).toMatchObject({
-      referencedText: 'Qwen Code is slow after connecting over SSH.',
+      referencedText: 'MariaDB Shell Agent is slow after connecting over SSH.',
     });
   });
 
@@ -1030,7 +1031,8 @@ describe('DwsClient', () => {
                   openConversationId: 'external-group',
                   openMessageId: 'mention-1',
                   quotedMessage: {
-                    content: 'Qwen Code is slow after connecting over SSH.',
+                    content:
+                      'MariaDB Shell Agent is slow after connecting over SSH.',
                   },
                   sender: 'Alice',
                   senderOpenDingTalkId: 'open-alice',
@@ -1063,7 +1065,8 @@ describe('DwsClient', () => {
           content: '@QwenBot hi',
           senderId: 'open-alice',
           senderName: 'Alice',
-          referencedText: 'Qwen Code is slow after connecting over SSH.',
+          referencedText:
+            'MariaDB Shell Agent is slow after connecting over SSH.',
           eventTime: new Date(2026, 7, 17, 12, 56, 28).getTime(),
         },
       ],

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -198,11 +199,11 @@ describe('pathRulesFor — scoped, or it is noise', () => {
     ['docs/api/RELEASE-NOTES.md', false],
     ['docs/api/release/2026-08.md', false],
     // Repository-meta and agent-context files, matched whole — the exact match
-    // is what lets `qwen` exclude an agent-context file without touching
+    // is what lets `mariadb-shell-agent` exclude an agent-context file without touching
     // `qwen-serve-protocol.md` two rows up.
     ['docs/developers/contributing.md', false],
     ['docs/developers/roadmap.md', false],
-    ['packages/sdk-java/client/QWEN.md', false],
+    ['packages/sdk-java/client/MARIADB-SHELL-AGENT.md', false],
     ['docs/api/AGENTS.md', false],
     // Accepted residue, pinned so the decision is visible rather than assumed:
     // non-contract prose inside a reference tree that no closed set describes.
@@ -1075,16 +1076,16 @@ describe('pathRulesFor — the consumer-facing contract documentation rule', () 
   });
 
   it('strips the extension before matching a whole-stem meta filename', () => {
-    // `NON_CONTRACT_FILE` matches a stem exactly, which is what lets `qwen`
+    // `NON_CONTRACT_FILE` matches a stem exactly, which is what lets `mariadb-shell-agent`
     // exclude an agent-context file without touching `qwen-serve-protocol`.
     // Exact matching only works on a stripped stem, so the strip decides these
     // — a review found the clause decision-dead before this exclusion existed,
     // and it is load-bearing now, so it gets a pin rather than a comment.
     const governed = 'Consumer-facing contract documentation';
     expect(pathRulesFor(['docs/api/CONTRIBUTING.md'])).not.toContain(governed);
-    expect(pathRulesFor(['packages/sdk-java/client/QWEN.md'])).not.toContain(
-      governed,
-    );
+    expect(
+      pathRulesFor(['packages/sdk-java/client/MARIADB-SHELL-AGENT.md']),
+    ).not.toContain(governed);
     // The control that makes the exactness meaningful: a longer name that
     // merely begins with a meta word is still governed.
     expect(pathRulesFor(['docs/developers/qwen-serve-protocol.md'])).toContain(

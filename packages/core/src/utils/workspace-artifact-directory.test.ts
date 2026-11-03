@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -76,14 +77,18 @@ describe('collectRecordableWorkspaceFiles', () => {
 
   it('does not treat a worktree-prefixed subdirectory as skipped', () => {
     expect(
-      pathHasSkippedDirectoryComponent('.qwen/worktrees/my-feature/reports'),
+      pathHasSkippedDirectoryComponent(
+        '.mariadb-shell-agent/worktrees/my-feature/reports',
+      ),
     ).toBe(false);
     expect(
       pathHasSkippedDirectoryComponent(
-        '.qwen/worktrees/my-feature/node_modules',
+        '.mariadb-shell-agent/worktrees/my-feature/node_modules',
       ),
     ).toBe(true);
-    expect(pathHasSkippedDirectoryComponent('.qwen/skills')).toBe(true);
+    expect(
+      pathHasSkippedDirectoryComponent('.mariadb-shell-agent/skills'),
+    ).toBe(true);
   });
 
   it('records a regular file named after a skipped directory', async () => {

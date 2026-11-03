@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Verifies the OpenTUI resume path replays a real session (ChatRecord shapes
- * as persisted under ~/.qwen/projects/<dir>/chats/<id>.jsonl) through the
+ * as persisted under ~/.mariadb-shell-agent/projects/<dir>/chats/<id>.jsonl) through the
  * transcript adapter into the neutral model: user / assistant / tool /
  * thought all surface, tool results pair with their calls, and the replay
  * ends with `done` so the composer returns to the ready state.

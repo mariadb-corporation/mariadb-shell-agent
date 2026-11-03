@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -556,7 +557,10 @@ const sdkMocks = vi.hoisted(() => {
         files: [],
       });
       readWorkspaceFile.mockReset();
-      readWorkspaceFile.mockResolvedValue({ path: 'QWEN.md', text: '' });
+      readWorkspaceFile.mockResolvedValue({
+        path: 'MARIADB-SHELL-AGENT.md',
+        text: '',
+      });
       writeWorkspaceMemory.mockReset();
       writeWorkspaceMemory.mockResolvedValue({ ok: true });
       listWorkspaceAgents.mockReset();
@@ -6924,7 +6928,7 @@ describe('DaemonSessionProvider', () => {
           type: 'memory_changed',
           data: {
             scope: 'workspace',
-            filePath: '/mock-workspace/QWEN.md',
+            filePath: '/mock-workspace/MARIADB-SHELL-AGENT.md',
             mode: 'append',
             bytesWritten: 12,
           },
@@ -7058,7 +7062,7 @@ describe('DaemonSessionProvider', () => {
               type: 'memory_changed',
               data: {
                 scope: 'workspace',
-                filePath: `${workspaceCwd}/QWEN.md`,
+                filePath: `${workspaceCwd}/MARIADB-SHELL-AGENT.md`,
                 mode: 'append',
                 bytesWritten: 12,
               },
@@ -9465,7 +9469,7 @@ describe('DaemonSessionProvider', () => {
               promptId: 'prompt-live',
               data: {
                 scope: 'workspace',
-                filePath: '/mock-workspace/QWEN.md',
+                filePath: '/mock-workspace/MARIADB-SHELL-AGENT.md',
                 mode: 'append',
                 bytesWritten: 12,
               },
@@ -9553,7 +9557,7 @@ describe('DaemonSessionProvider', () => {
           promptId: 'prompt-live',
           data: {
             scope: 'workspace',
-            filePath: '/mock-workspace/QWEN.md',
+            filePath: '/mock-workspace/MARIADB-SHELL-AGENT.md',
             mode: 'append',
             bytesWritten: 12,
           },
@@ -12797,7 +12801,7 @@ describe('DaemonSessionProvider', () => {
             type: 'memory_changed',
             data: {
               scope: 'workspace',
-              filePath: '/mock-workspace/QWEN.md',
+              filePath: '/mock-workspace/MARIADB-SHELL-AGENT.md',
               mode: 'append',
               bytesWritten: 12,
             },

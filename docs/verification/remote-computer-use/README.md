@@ -31,7 +31,7 @@ node packages/node-repl/dist/index.js desktop-relay install \
   --package "$(ls -t "$PWD"/packages/node-repl/qwen-code-node-repl-mcp-*.tgz | head -1)"
 ```
 
-预期：npm 把两个包装到 `~/.qwen/desktop-relay`；打印 “registered on 127.0.0.1:47821”。然后：
+预期：npm 把两个包装到 `~/.mariadb-shell-agent/desktop-relay`；打印 “registered on 127.0.0.1:47821”。然后：
 
 ```bash
 launchctl print gui/$(id -u)/com.qwencode.desktop-relay | head -20   # 预期：能看到这个 job
@@ -63,11 +63,11 @@ curl -s -i -X OPTIONS -H 'Origin: https://example.com' http://127.0.0.1:47821/co
 # 5. 有 Origin 的 /connect 弹框；点“Deny”
 curl -s -X POST -H 'Origin: https://example.com' -H 'Content-Type: application/json' \
   -d '{"daemonUrl":"https://devbox.example/","sessionId":"s"}' http://127.0.0.1:47821/connect
-# 预期：桌面上弹出“Qwen Code”对话框，写明来源、daemon 主机和“can run code on this computer”；
+# 预期：桌面上弹出“MariaDB Shell Agent”对话框，写明来源、daemon 主机和“can run code on this computer”；
 #       点 Deny 后返回 {"ok":false,"code":"denied"}
 ```
 
-记录：每个请求的耗时（`curl -w '%{time_total}'`）——每个请求都会拉起一个新进程；对话框是否在最前面、能否点击；`~/.qwen/desktop-relay/agent.log` 里有无报错。
+记录：每个请求的耗时（`curl -w '%{time_total}'`）——每个请求都会拉起一个新进程；对话框是否在最前面、能否点击；`~/.mariadb-shell-agent/desktop-relay/agent.log` 里有无报错。
 
 ## C. Web Shell 路径
 
@@ -88,7 +88,7 @@ Mac：`ssh -N -L 4170:127.0.0.1:<端口> devbox`，然后在 Chrome 打开 `http
 
    > 用 computer use 在我的 Mac 上打开“文本编辑”，新建一个不保存的测试文稿，内容写 hello from remote。不要打开已有文稿或访问私人内容。每一步操作之后都重新读取界面状态，确认结果。
 
-   记录：模型是否执行了 bootstrap（`qwen mcp add … node-repl` 或 `npm install @qwen-code/cua-sdk`，出现就拒绝并记录）；`getPlatform()` 是否返回 `macos`；读参考文档走的是哪条路；macOS 的授权提示弹给了谁（预期是 `node`）；授权后是否需要重新连接；任务是否完成；3 次 `node_repl` 调用的耗时。
+   记录：模型是否执行了 bootstrap（`mariadb-shell-agent mcp add … node-repl` 或 `npm install @qwen-code/cua-sdk`，出现就拒绝并记录）；`getPlatform()` 是否返回 `macos`；读参考文档走的是哪条路；macOS 的授权提示弹给了谁（预期是 `node`）；授权后是否需要重新连接；任务是否完成；3 次 `node_repl` 调用的耗时。
 
    **取消（2026-09-23 的修复，必须验证）**：再让模型跑一个持续操作屏幕的单元，例如：
 
@@ -99,7 +99,7 @@ Mac：`ssh -N -L 4170:127.0.0.1:<端口> devbox`，然后在 Chrome 打开 `http
 4. 先确认测试窗口和透明、半透明区域后面没有私人内容，再通过 desktop MCP 获取仅包含测试窗口的截图。不要默认截全屏；如接口只能截全屏，先由用户整理桌面再采集。检查图片不含账号、令牌、私人聊天或其他窗口后才展示，未经用户同意不公开上传。记录截图尺寸及是否触发大小限制。
 5. 在同一 workspace 的另一个会话里打开面板。预期：In use by another session。
 6. 回到原会话点 **Disconnect**。预期：状态回到 Not connected；再让模型调用 `node_repl` 时得到明确错误；`pgrep -fl desktop-relay` 无输出。
-7. 再连一次后，在开发机上重启 `qwen serve`。预期：中继结束（不重连），面板显示连接已关闭。
+7. 再连一次后，在开发机上重启 `mariadb-shell-agent serve`。预期：中继结束（不重连），面板显示连接已关闭。
 8. 用 Safari 重复第 1–2 步，记录差异。
 
 ## E. 清理
@@ -116,27 +116,27 @@ lsof -nP -iTCP:47821 -sTCP:LISTEN   # 预期：无输出
 **常用观察点**
 
 ```bash
-cat ~/.qwen/desktop-relay/agent.log                                  # relay 进程的 stderr（launchd 写入）
-cat ~/.qwen/desktop-relay/active.json                                # 当前/上一次连接的状态记录（不含 token）
+cat ~/.mariadb-shell-agent/desktop-relay/agent.log                                  # relay 进程的 stderr（launchd 写入）
+cat ~/.mariadb-shell-agent/desktop-relay/active.json                                # 当前/上一次连接的状态记录（不含 token）
 node packages/node-repl/dist/index.js desktop-relay status
 launchctl print gui/$(id -u)/com.qwencode.desktop-relay | grep -iE 'state|last exit|runs|path'
 pgrep -fl 'desktop-relay agent'                                      # 连接存在时应有一个进程
 log show --last 5m --predicate 'process == "osascript"' | tail -20  # 确认框/通知
 ```
 
-| #   | 现象                                                       | 先查                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| --- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | 面板显示 Relay not detected                                | 在 Mac 终端执行 B.1 的 `curl`。`curl` 正常而浏览器失败，是浏览器拦截：看开发者工具的 Console 和 Network 里 `127.0.0.1:47821/status` 的错误；Chrome 检查站点设置里的“本地网络访问”权限；Safari 记录具体报错（混合内容或 CORS）。`curl` 也失败，看 #2。                                                                                                                                                                         |
-| 2   | `curl` 连接被拒绝或卡住                                    | `lsof -nP -iTCP:47821 -sTCP:LISTEN` 没有输出：launchd 没有注册，重新 install 并看 `launchctl bootstrap` 的报错。有监听但连接立刻断开：看 `agent.log` 和 `launchctl print` 里的 last exit code，常见原因是 plist 里的 node 路径失效（nvm 切换或删除了该版本，重新 install 即可）。有监听但卡住：说明 `net.Socket({ fd: 0 })` 在 inetd 模式下有问题，用 #8 的方法绕开 launchd 对比。                                            |
-| 3   | `/connect` 之后没有对话框                                  | 在终端直接执行 `osascript -e 'display dialog "test"'`：终端里能弹出，而 relay 弹不出，说明是 LaunchAgent 的会话问题，记下 `agent.log` 和 `log show` 的输出。对话框在其他窗口后面也算问题，一并记录。                                                                                                                                                                                                                          |
-| 4   | 允许后一直停在 Connecting / Registering，或显示 failed     | `active.json` 的 `message` 字段写着原因。`unsupported-daemon` 或注册被拒：确认远端 daemon 启动时带了 `QWEN_SERVE_CLIENT_MCP_OVER_WS=1`（main 上默认关闭）。鉴权失败：检查 token。`register_failed` 且带 `already_registered`：同一会话已有旧注册，重启会话后再试。远端 daemon 日志里搜 `mcp_register`。                                                                                                                       |
-| 5   | 已连接，但模型没用 `desktop-node-repl`，或去执行 bootstrap | 在会话里让模型列出可用工具，看有没有 `mcp__desktop-node-repl__*`。没有：注册没成功，回到 #4。有但没用：记录模型读到的 skill 内容，这是 `SKILL.md` 的问题，不是中继的问题。                                                                                                                                                                                                                                                    |
-| 6   | 点停止后桌面还在动                                         | 在远端 daemon 上打开 MCP 调试日志，确认 `notifications/cancelled` 有没有通过 `mcp_message` 发出。发出了但桌面没停：确认中继包含 2026-09-25 之后的修复——同一 id 有多个在途请求时取消会转发给所有匹配项，停在确认框上的调用被取消后也不再执行（见 `mcp-child-relay.ts` 的 `matchingRelayIds` 与 `agent.ts` 的确认门）。仍复现时记录当时有几个会话连着这个中继。                                                                 |
-| 7   | 截图或操作报授权错误                                       | 系统设置 → 隐私与安全性 → 辅助功能 / 屏幕录制，找名为 `node` 的条目（路径应是 install 时打印的那个）。改授权后要断开再连接一次。要从头重测授权流程：先按应用限定范围，例如 `tccutil reset ScreenCapture <bundle-id>`。不限定范围的 `tccutil reset ScreenCapture` / `tccutil reset Accessibility` 会撤销这台 Mac 上**所有**应用（浏览器、IDE、会议软件等）的对应授权，只能在 Mac 主人明确同意后执行——验证 agent 不得自行运行。 |
-| 8   | 怀疑是 launchd 的问题                                      | 绕开 launchd 对比：`launchctl bootout gui/$(id -u)/com.qwencode.desktop-relay`，然后 `brew install socat` 并执行 `socat TCP-LISTEN:47821,bind=127.0.0.1,reuseaddr,fork EXEC:"$(which node) $HOME/.qwen/desktop-relay/node_modules/@qwen-code/node-repl-mcp/dist/index.js desktop-relay agent --home $HOME/.qwen/desktop-relay"`，重跑 B 节。socat 下正常而 launchd 下不正常，就说明问题在 launchd 这一层。测完重新 install。  |
-| 9   | 报 “above the … byte limit”                                | 截图超过了 daemon 10 MB 的帧上限。记录屏幕分辨率和截图参数；这是已知限制，还没有自动压缩。                                                                                                                                                                                                                                                                                                                                    |
+| #   | 现象                                                       | 先查                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| --- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | 面板显示 Relay not detected                                | 在 Mac 终端执行 B.1 的 `curl`。`curl` 正常而浏览器失败，是浏览器拦截：看开发者工具的 Console 和 Network 里 `127.0.0.1:47821/status` 的错误；Chrome 检查站点设置里的“本地网络访问”权限；Safari 记录具体报错（混合内容或 CORS）。`curl` 也失败，看 #2。                                                                                                                                                                                                      |
+| 2   | `curl` 连接被拒绝或卡住                                    | `lsof -nP -iTCP:47821 -sTCP:LISTEN` 没有输出：launchd 没有注册，重新 install 并看 `launchctl bootstrap` 的报错。有监听但连接立刻断开：看 `agent.log` 和 `launchctl print` 里的 last exit code，常见原因是 plist 里的 node 路径失效（nvm 切换或删除了该版本，重新 install 即可）。有监听但卡住：说明 `net.Socket({ fd: 0 })` 在 inetd 模式下有问题，用 #8 的方法绕开 launchd 对比。                                                                         |
+| 3   | `/connect` 之后没有对话框                                  | 在终端直接执行 `osascript -e 'display dialog "test"'`：终端里能弹出，而 relay 弹不出，说明是 LaunchAgent 的会话问题，记下 `agent.log` 和 `log show` 的输出。对话框在其他窗口后面也算问题，一并记录。                                                                                                                                                                                                                                                       |
+| 4   | 允许后一直停在 Connecting / Registering，或显示 failed     | `active.json` 的 `message` 字段写着原因。`unsupported-daemon` 或注册被拒：确认远端 daemon 启动时带了 `QWEN_SERVE_CLIENT_MCP_OVER_WS=1`（main 上默认关闭）。鉴权失败：检查 token。`register_failed` 且带 `already_registered`：同一会话已有旧注册，重启会话后再试。远端 daemon 日志里搜 `mcp_register`。                                                                                                                                                    |
+| 5   | 已连接，但模型没用 `desktop-node-repl`，或去执行 bootstrap | 在会话里让模型列出可用工具，看有没有 `mcp__desktop-node-repl__*`。没有：注册没成功，回到 #4。有但没用：记录模型读到的 skill 内容，这是 `SKILL.md` 的问题，不是中继的问题。                                                                                                                                                                                                                                                                                 |
+| 6   | 点停止后桌面还在动                                         | 在远端 daemon 上打开 MCP 调试日志，确认 `notifications/cancelled` 有没有通过 `mcp_message` 发出。发出了但桌面没停：确认中继包含 2026-09-25 之后的修复——同一 id 有多个在途请求时取消会转发给所有匹配项，停在确认框上的调用被取消后也不再执行（见 `mcp-child-relay.ts` 的 `matchingRelayIds` 与 `agent.ts` 的确认门）。仍复现时记录当时有几个会话连着这个中继。                                                                                              |
+| 7   | 截图或操作报授权错误                                       | 系统设置 → 隐私与安全性 → 辅助功能 / 屏幕录制，找名为 `node` 的条目（路径应是 install 时打印的那个）。改授权后要断开再连接一次。要从头重测授权流程：先按应用限定范围，例如 `tccutil reset ScreenCapture <bundle-id>`。不限定范围的 `tccutil reset ScreenCapture` / `tccutil reset Accessibility` 会撤销这台 Mac 上**所有**应用（浏览器、IDE、会议软件等）的对应授权，只能在 Mac 主人明确同意后执行——验证 agent 不得自行运行。                              |
+| 8   | 怀疑是 launchd 的问题                                      | 绕开 launchd 对比：`launchctl bootout gui/$(id -u)/com.qwencode.desktop-relay`，然后 `brew install socat` 并执行 `socat TCP-LISTEN:47821,bind=127.0.0.1,reuseaddr,fork EXEC:"$(which node) $HOME/.mariadb-shell-agent/desktop-relay/node_modules/@qwen-code/node-repl-mcp/dist/index.js desktop-relay agent --home $HOME/.mariadb-shell-agent/desktop-relay"`，重跑 B 节。socat 下正常而 launchd 下不正常，就说明问题在 launchd 这一层。测完重新 install。 |
+| 9   | 报 “above the … byte limit”                                | 截图超过了 daemon 10 MB 的帧上限。记录屏幕分辨率和截图参数；这是已知限制，还没有自动压缩。                                                                                                                                                                                                                                                                                                                                                                 |
 
-修了代码之后：在 Mac 上重新 `npm run build` 并 `npm pack`，然后重新 install（`--package` 指向新 tarball），否则 launchd 拉起的还是 `~/.qwen/desktop-relay` 里的旧版本。
+修了代码之后：在 Mac 上重新 `npm run build` 并 `npm pack`，然后重新 install（`--package` 指向新 tarball），否则 launchd 拉起的还是 `~/.mariadb-shell-agent/desktop-relay` 里的旧版本。
 
 ## 需要回报的内容
 

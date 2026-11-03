@@ -4,7 +4,7 @@
 
 状态：接续设计，尚未实现。2026-09-09。协作部分已被取代：这里描述的 thread 模型（thread、`thread_*` 工具、调度器和 Host v1 租约）已由[会话多 Agent 设计](2026-10-05-session-multi-agent.zh-CN.md)替换并删除；A2A 契约见 [2026-09-09-a2a-frozen-contract.zh-CN.md](2026-09-09-a2a-frozen-contract.zh-CN.md)。
 
-核心目标：Qwen Code 既能开放本地 Agent 给外部授权调用，也能联系本地或远程的已有 Agent；用户仍从原有对话入口发起工作，在同一工作界面查看分工、插话和验收。独立身份不要求永久运行一个进程，外部 Agent 不要求成为 Qwen subagent 或 Team 成员。
+核心目标：MariaDB Shell Agent 既能开放本地 Agent 给外部授权调用，也能联系本地或远程的已有 Agent；用户仍从原有对话入口发起工作，在同一工作界面查看分工、插话和验收。独立身份不要求永久运行一个进程，外部 Agent 不要求成为 Qwen subagent 或 Team 成员。
 
 ## 1. 范围与证据
 
@@ -14,8 +14,8 @@
 
 参考资料：
 
-- [原设计](https://github.com/QwenLM/qwen-code/blob/6a69c0b5bbf1232644a297b567bb36350eb58ff4/docs/plans/2026-09-06-multi-agent-board-collaboration.md)，先读 §0.2；已有身份、任务、会话和投递基础可复用，历史运行证据不自动适用于新协议。
-- [当前差距计划](https://github.com/QwenLM/qwen-code/blob/6a69c0b5bbf1232644a297b567bb36350eb58ff4/docs/plans/2026-09-08-workspace-agents-vs-multica-gap-and-plan.md)：顶层 ACP 会话按 `(agent, thread)` 隔离；Host H1 有注册和心跳，H2/H3 不是已实现的远程服务。
+- [原设计](https://github.invalid/QwenLM/qwen-code/blob/6a69c0b5bbf1232644a297b567bb36350eb58ff4/docs/plans/2026-09-06-multi-agent-board-collaboration.md)，先读 §0.2；已有身份、任务、会话和投递基础可复用，历史运行证据不自动适用于新协议。
+- [当前差距计划](https://github.invalid/QwenLM/qwen-code/blob/6a69c0b5bbf1232644a297b567bb36350eb58ff4/docs/plans/2026-09-08-workspace-agents-vs-multica-gap-and-plan.md)：顶层 ACP 会话按 `(agent, thread)` 隔离；Host H1 有注册和心跳，H2/H3 不是已实现的远程服务。
 - 用户提供的《CoCo bot-start 脚本与 aone-channel 远程 Agent 架构分析 — 会话记录》（`coco-aone-channel-session.md`）：本轮完整阅读，但没有独立复核其私有源码包或重做安装。仅吸收架构观察，不复制内部地址、凭证、安装脚本或供应商专用命令。
 - Multica 固定版本 `7a438bd5b8bf39afd54259a7eb0971390e50a8ef`：[runtime 存储](https://github.com/multica-ai/multica/blob/7a438bd5b8bf39afd54259a7eb0971390e50a8ef/server/migrations/004_agent_runtime_loop.up.sql)、[任务结构的 PriorSessionID](https://github.com/multica-ai/multica/blob/7a438bd5b8bf39afd54259a7eb0971390e50a8ef/server/internal/daemon/types.go)、[Qwen 执行适配](https://github.com/multica-ai/multica/blob/7a438bd5b8bf39afd54259a7eb0971390e50a8ef/server/pkg/agent/qwen.go)。持久身份、任务延续和执行进程生命周期应分开。
 - [A2A 规范](https://a2a-protocol.org/latest/specification/)与[Codex App Server](https://learn.chatgpt.com/docs/app-server)：官方页面于本轮讨论核对。具体版本、传输绑定和可选能力须在实施前冻结，不把滚动文档当成固定兼容承诺。
@@ -107,7 +107,7 @@ flowchart TB
 
 ## 5. Codex 与其他 runtime
 
-首个 Host 增量只交付 Qwen Code。Codex、Claude 及其他外部 provider 在启动路径能够排除用户环境配置与凭据、并证明读取范围限定在工作区之前继续延后。协议保留 provider 身份用于后续扩展，但内置 Host 不探测、也不广告这些程序。
+首个 Host 增量只交付 MariaDB Shell Agent。Codex、Claude 及其他外部 provider 在启动路径能够排除用户环境配置与凭据、并证明读取范围限定在工作区之前继续延后。协议保留 provider 身份用于后续扩展，但内置 Host 不探测、也不广告这些程序。
 
 Codex 适配器放在 Codex 执行机器上，负责本地任务映射到 `thread/start`、`thread/resume`、`turn/start`、`turn/steer`、`turn/interrupt` 和事件。按实际安装版本协商支持范围，不能把 App Server 全部管理能力直接暴露给调用方。
 

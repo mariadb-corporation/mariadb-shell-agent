@@ -1,6 +1,6 @@
 # WeCom Self-Built Application Callback
 
-Use `wecom-callback` to chat with Qwen Code through a WeCom self-built application
+Use `wecom-callback` to chat with MariaDB Shell Agent through a WeCom self-built application
 (企业微信自建应用). It receives encrypted HTTP callbacks and sends text replies
 through the application API. For intelligent robots with a Bot ID and Secret,
 use the separate [WeCom WebSocket channel](./wecom).
@@ -21,7 +21,7 @@ documentation for platform requirements.
 
 ## Configuration
 
-Add a named channel to `~/.qwen/settings.json`:
+Add a named channel to `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -45,7 +45,7 @@ Add a named channel to `~/.qwen/settings.json`:
 }
 ```
 
-Set the five environment variables in the process that starts Qwen Code. Agent
+Set the five environment variables in the process that starts MariaDB Shell Agent. Agent
 ID is a positive integer **string**, such as `"1000002"`. EncodingAESKey is the
 43-character key from the WeCom console. The callback Token is distinct from
 the application Secret and the API access token; Qwen obtains API access tokens
@@ -58,7 +58,7 @@ channel names and ports for multiple applications.
 
 ## Running and platform verification
 
-1. Run `qwen channel start my-wecom-app`.
+1. Run `mariadb-shell-agent channel start my-wecom-app`.
 2. In the self-built application's message receiving settings, enter the public
    HTTPS URL ending in `/wecom/callback`, Token, and EncodingAESKey. Save the
    settings; Qwen decrypts and returns the verification challenge.

@@ -14,7 +14,7 @@
 
 策略约束规范化准入工作区、受保护的安装/全局/runtime 目录及每次执行的 scratch。在受支持工具执行前进行固定真实 bwrap 探测；探测或实际设置失败都拒绝执行，不重放、不回退整 CLI。已有 Config 的策略保持不可变，需构造新 runtime 才改变；设置要求重启。报告请求的选择方式、实际 bwrap 后端、文件系统与命令网络策略。不增加 Landlock 占位值或环境开关。
 
-有效旧 `--sandbox bwrap`、`tools.sandbox: bwrap`、`QWEN_SANDBOX=bwrap`、等价编程式选择与继承 `SANDBOX=bwrap` 均在执行前报带迁移示例的错误。新工具策略不能与旧容器/Seatbelt 选择、旧网络/代理变量或继承的旧沙箱标记组合。删除 bwrap CLI 重启实现、根/状态授权及重入 helper，保持 Docker/Podman/Seatbelt 行为。保留 `qwen sandbox` 参数转发与失败非零退出；其原生报告、探测和命令运行使用新执行边界。检查报告明确说明宿主模型/认证/会话流量不受命令网络约束。
+有效旧 `--sandbox bwrap`、`tools.sandbox: bwrap`、`QWEN_SANDBOX=bwrap`、等价编程式选择与继承 `SANDBOX=bwrap` 均在执行前报带迁移示例的错误。新工具策略不能与旧容器/Seatbelt 选择、旧网络/代理变量或继承的旧沙箱标记组合。删除 bwrap CLI 重启实现、根/状态授权及重入 helper，保持 Docker/Podman/Seatbelt 行为。保留 `mariadb-shell-agent sandbox` 参数转发与失败非零退出；其原生报告、探测和命令运行使用新执行边界。检查报告明确说明宿主模型/认证/会话流量不受命令网络约束。
 
 ## 执行与前端边界
 
@@ -34,7 +34,7 @@ Core 覆盖策略准入、Config 初始化/registry、Monitor/嵌套调度及未
 
 真实 Linux 验证 headless、两套 TUI shell、提示词插值、Monitor 和受支持嵌套调用：工作区可写、兄弟目录写入/网络按策略拒绝、宿主模型/会话持久化成功、YOLO 仍受只读约束。测试操作者优先级、恶意 workspace 父值、bare/safe 保留策略、后端不可用、继承标记迁移、未支持启动和无 payload sentinel。保留仍适用的此前 31 组 runtime / 34 组 adapter 检查，有意更新历史断言。缺少内核前提应失败，不能跳过后绿色。
 
-要求 build、typecheck、bundle、定向包单测、lint/format、最终源码/产物检查及两轮干净自审。精确已测和未支持入口记录在 `.qwen/e2e-tests/bwrap-public-integration.md`。本 PR 不增加 Landlock、公开 Linux 验收 workflow 或可选 adapter 扩展。
+要求 build、typecheck、bundle、定向包单测、lint/format、最终源码/产物检查及两轮干净自审。精确已测和未支持入口记录在 `.mariadb-shell-agent/e2e-tests/bwrap-public-integration.md`。本 PR 不增加 Landlock、公开 Linux 验收 workflow 或可选 adapter 扩展。
 
 操作者设置文件解析失败（包括 JSON 损坏）时拒绝启动，不能将可能存在的沙箱策略重置为空。用户显式触发的 `/doctor` 等管理诊断、`/memory` 中主动打开/编辑的记忆文件或目录，以及 `/skills` 中的设置修改仍属于可信宿主操作。这些管理入口不向模型注册为可调用命令；在 `/skills` 选中技能只填入输入框。提交 `/技能名` 时明确拒绝当前模式，在此之前不应用 hooks/权限、不写入或清除参数文件、不更新项目使用记录。模型 Skill 工具也保持未注册。自动记忆/技能维护继续禁用，显式设置修改不能重新启用当前沙箱 runtime 中被禁用的自动执行路径。工作树/Arena 管理、文件恢复与宿主 Git diff 预览拒绝执行；仅对话历史回退继续可用。IDE 自动探测、提示与连接也禁用。sandbox 单命令子命令保留原始参数、转发重定向的标准输入，并逐字节保留标准输出与标准错误；交互式 PTY 命令使用终端 `!`。
 
@@ -42,4 +42,4 @@ Core 覆盖策略准入、Config 初始化/registry、Monitor/嵌套调度及未
 
 此前的合并原型在 Linux aarch64 7.0.0-31-generic、Node 22.22.1、bwrap 0.11.1 和 Bun 1.3.13 环境通过了公开 CLI 60 组、runtime 31 组及 adapter 34 组真实 Linux 测试。这些证据确定了拆分边界和预期行为，但属于较早的合并 head，不能替代本 PR 精确 head 的验证。
 
-本阶段要求当前叠加 head 在 macOS 上通过 core 与 CLI build、typecheck、定向测试、lint 和格式检查，并继续通过仓库 CI。精确 head 的 Linux x64/aarch64 强制约束留给第四阶段公开验收 workflow。Windows 尚未实测。详细历史证据和 fixture 哈希继续记录在 `.qwen/e2e-tests/bwrap-public-integration.md`。
+本阶段要求当前叠加 head 在 macOS 上通过 core 与 CLI build、typecheck、定向测试、lint 和格式检查，并继续通过仓库 CI。精确 head 的 Linux x64/aarch64 强制约束留给第四阶段公开验收 workflow。Windows 尚未实测。详细历史证据和 fixture 哈希继续记录在 `.mariadb-shell-agent/e2e-tests/bwrap-public-integration.md`。

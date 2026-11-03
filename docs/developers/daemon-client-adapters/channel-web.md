@@ -2,14 +2,14 @@
 
 ## Goal
 
-Let channel adapters and web chat backends consume `qwen serve` through
+Let channel adapters and web chat backends consume `mariadb-shell-agent serve` through
 `DaemonSessionClient` while keeping existing channel ACP subprocess behavior as
 the default.
 
 This draft covers server-side clients only:
 
-- Channel bot backend -> `qwen serve`
-- Web browser -> web backend / BFF -> `qwen serve`
+- Channel bot backend -> `mariadb-shell-agent serve`
+- Web browser -> web backend / BFF -> `mariadb-shell-agent serve`
 
 It explicitly does not allow browser JavaScript to call the daemon directly.
 The daemon currently rejects browser `Origin` requests by design.
@@ -19,7 +19,7 @@ The daemon currently rejects browser `Origin` requests by design.
 Channel backend:
 
 ```bash
-QWEN_CHANNEL_DAEMON_URL=http://127.0.0.1:4170 qwen channel start telegram
+QWEN_CHANNEL_DAEMON_URL=http://127.0.0.1:4170 mariadb-shell-agent channel start telegram
 ```
 
 Web backend:
@@ -85,7 +85,7 @@ Do not silently multiplex unrelated channel threads into one daemon session.
 
 Unknown daemon events must be ignored or forwarded as debug metadata, not fatal.
 
-The bridge is not wired into `qwen channel start` yet. Existing Telegram,
+The bridge is not wired into `mariadb-shell-agent channel start` yet. Existing Telegram,
 Weixin, Dingtalk, plugin channel, and browser behavior remains unchanged.
 
 ## Explicit Non-Goals
@@ -108,7 +108,7 @@ Weixin, Dingtalk, plugin channel, and browser behavior remains unchanged.
 - Unit-test channel session-key to daemon-session binding.
 - Unit-test daemon event to channel/web message mapping.
 - Unit-test prompt, cancel, model switch, and permission response forwarding.
-- Smoke-test one single-user channel backend against local `qwen serve`.
+- Smoke-test one single-user channel backend against local `mariadb-shell-agent serve`.
 - Smoke-test browser -> BFF -> daemon without exposing daemon token.
 
 ## Blockers Before Default Migration

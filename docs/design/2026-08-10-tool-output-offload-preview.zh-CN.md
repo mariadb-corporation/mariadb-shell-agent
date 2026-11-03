@@ -2,7 +2,7 @@
 
 [English](2026-08-10-tool-output-offload-preview.md) | [简体中文](2026-08-10-tool-output-offload-preview.zh-CN.md)
 
-> 本设计说明由 [#4184](https://github.com/QwenLM/qwen-code/issues/4184) 要求
+> 本设计说明由 [#4184](https://github.invalid/QwenLM/qwen-code/issues/4184) 要求
 > （验收标准："以一份设计说明记录落盘/预览的状态流转与隐私模型"）。
 > 缓解措施在 #4880 中实现；留存诊断随配套的 `/doctor memory` 改动加入。
 
@@ -60,7 +60,7 @@ graph TB
   持有无界载荷。
 - **可恢复，绝不丢弃。** 超大输出被持久化到会话临时目录的文件：闸门写入
   `tool-results/<callId>.txt`，而工具内截断（shell、MCP）写入
-  `~/.qwen/tmp/<project-hash>/<tool>_<hex>.output`。保留的预览携带指针，
+  `~/.mariadb-shell-agent/tmp/<project-hash>/<tool>_<hex>.output`。保留的预览携带指针，
   模型可以用 `read_file` 读回完整载荷。截断保留头尾（`keep: 'both'`），
   因为 shell 的失败摘要出现在结尾。
 - **可重入防护。** 已截断的结果携带哨兵——开头的

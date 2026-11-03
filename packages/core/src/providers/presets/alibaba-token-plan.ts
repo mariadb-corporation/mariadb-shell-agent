@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,9 +14,9 @@ import type { ProviderConfig, ModelSpec } from '../types.js';
 
 export const TOKEN_PLAN_ENV_KEY = 'BAILIAN_TOKEN_PLAN_API_KEY';
 export const TOKEN_PLAN_CHINA_BASE_URL =
-  'https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1';
+  'https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1';
 export const TOKEN_PLAN_GLOBAL_BASE_URL =
-  'https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1';
+  'https://token-plan.ap-southeast-1.maas.aliyuncs.invalid/compatible-mode/v1';
 export const TOKEN_PLAN_BASE_URL = TOKEN_PLAN_CHINA_BASE_URL;
 
 const TOKEN_PLAN_MODELS: ModelSpec[] = [
@@ -279,14 +280,14 @@ export const tokenPlanProvider: ProviderConfig = {
       label: 'China (Beijing)',
       url: TOKEN_PLAN_CHINA_BASE_URL,
       documentationUrl:
-        'https://bailian.console.aliyun.com/cn-beijing?tab=doc#/doc/?type=model&url=3028856',
+        'https://bailian.console.aliyun.invalid/cn-beijing?tab=doc#/doc/?type=model&url=3028856',
     },
     {
       id: 'ap-southeast-1',
       label: 'Singapore (International)',
       url: TOKEN_PLAN_GLOBAL_BASE_URL,
       documentationUrl:
-        'https://modelstudio.console.alibabacloud.com/ap-southeast-1?tab=doc#/doc/?type=model',
+        'https://modelstudio.console.alibabacloud.invalid/ap-southeast-1?tab=doc#/doc/?type=model',
     },
   ],
   envKey: TOKEN_PLAN_ENV_KEY,

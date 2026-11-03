@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -211,7 +212,7 @@ const AONE_RESULT = {
   // Verified stable — the ordinary success shape. The re-read-failure
   // (undefined) and moved (true) states have their own tests below.
   headMovedDuringPost: false,
-  webUrl: 'https://code.alibaba-inc.com/maxcompute/odps_src/codereview/1',
+  webUrl: 'https://code.alibaba-inc.invalid/maxcompute/odps_src/codereview/1',
 };
 
 interface PostedJson {
@@ -281,8 +282,13 @@ let diffPath: string;
 
 beforeAll(() => {
   tmp = mkdtempSync(join(tmpdir(), 'submit-aone-'));
-  mkdirSync(join(tmp, '.qwen', 'tmp'), { recursive: true });
-  diffPath = join(tmp, '.qwen', 'tmp', 'qwen-review-pr-1-diff.txt');
+  mkdirSync(join(tmp, '.mariadb-shell-agent', 'tmp'), { recursive: true });
+  diffPath = join(
+    tmp,
+    '.mariadb-shell-agent',
+    'tmp',
+    'qwen-review-pr-1-diff.txt',
+  );
   writeFileSync(diffPath, CAPTURED_DIFF, 'utf8');
   savedCwd = process.cwd();
   process.chdir(tmp);
@@ -306,7 +312,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     authMock.mockReturnValue({
       ok: true,
       why: 'the user asked for this review to be published',
-      recordedHost: 'gitlab.alibaba-inc.com',
+      recordedHost: 'gitlab.alibaba-inc.invalid',
     });
     getPlatformReaderMock.mockReturnValue({ kind: 'aone' });
     // Default cwd probe: no origin — the cwd arm yields nothing, so the
@@ -526,7 +532,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     authMock.mockReturnValue({
       ok: true,
       why: 'the user asked for this review to be published',
-      recordedHost: 'gitlab.alibaba-inc.com',
+      recordedHost: 'gitlab.alibaba-inc.invalid',
     });
     getPlatformReaderMock.mockReturnValue({ kind: 'aone' });
     submitAoneMock.mockReturnValue({ ...AONE_RESULT });
@@ -573,7 +579,7 @@ describe('submit posts an authorised Aone target through a1', () => {
   it('a padded Aone --host still routes to a1 (the flag is trimmed)', () => {
     getPlatformReaderMock.mockReturnValue({ kind: 'github' });
     expect(() =>
-      runSubmit(base({ host: ' gitlab.alibaba-inc.com ' }), 'unknown', {
+      runSubmit(base({ host: ' gitlab.alibaba-inc.invalid ' }), 'unknown', {
         defaultComment: false,
       }),
     ).not.toThrow();
@@ -592,7 +598,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     });
     gitOptMock.mockReturnValue('git@github.com:acme/web.git');
     ghWithInputMock.mockReturnValue('');
-    process.env['GH_HOST'] = 'gitlab.alibaba-inc.com';
+    process.env['GH_HOST'] = 'gitlab.alibaba-inc.invalid';
     expect(() =>
       runSubmit(base({ userAuthorized: false }), 'unknown', {
         defaultComment: false,
@@ -606,7 +612,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     expect(setGhHostMock).toHaveBeenCalledWith('github.com');
   });
 
-  it('a wildcard *.alibaba-inc.com GH_HOST (an org GHE, not Aone) never routes to a1', () => {
+  it('a wildcard *.alibaba-inc.invalid GH_HOST (an org GHE, not Aone) never routes to a1', () => {
     // The family suffix also names GitHub Enterprise instances; an
     // irreversible write must not take the a1 path on a family
     // resemblance. Same slow-path shape as above.
@@ -616,7 +622,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     });
     gitOptMock.mockReturnValue('git@github.com:acme/web.git');
     ghWithInputMock.mockReturnValue('');
-    process.env['GH_HOST'] = 'ghe.alibaba-inc.com';
+    process.env['GH_HOST'] = 'ghe.alibaba-inc.invalid';
     expect(() =>
       runSubmit(base({ userAuthorized: false }), 'unknown', {
         defaultComment: false,
@@ -639,13 +645,13 @@ describe('submit posts an authorised Aone target through a1', () => {
     });
     ghWithInputMock.mockReturnValue('');
     expect(() =>
-      runSubmit(base({ host: 'ghe.alibaba-inc.com' }), 'unknown', {
+      runSubmit(base({ host: 'ghe.alibaba-inc.invalid' }), 'unknown', {
         defaultComment: false,
       }),
     ).not.toThrow();
     expect(submitAoneMock).not.toHaveBeenCalled();
     expect(ghWithInputMock).toHaveBeenCalledTimes(1);
-    expect(setGhHostMock).toHaveBeenCalledWith('ghe.alibaba-inc.com');
+    expect(setGhHostMock).toHaveBeenCalledWith('ghe.alibaba-inc.invalid');
     // Ordering is the point of the bind: a late-binding refactor moving
     // setGhHost below the gh write leaves toHaveBeenCalledWith green
     // while gh runs with the module host unset and inherits the ambient
@@ -656,14 +662,14 @@ describe('submit posts an authorised Aone target through a1', () => {
   });
 
   it('a RECORDED family-but-non-canonical host binds the gh write at the recorded host', () => {
-    // A recorded `--host ghe.alibaba-inc.com` is family-but-NOT-canonical,
+    // A recorded `--host ghe.alibaba-inc.invalid` is family-but-NOT-canonical,
     // so it routes at gh — and with no explicit flag the gh write must
     // bind at the RECORDED host, not wherever the ambient env points
     // (github.com's same-named repo otherwise).
     authMock.mockReturnValue({
       ok: true,
       why: 'the user asked for this review to be published',
-      recordedHost: 'ghe.alibaba-inc.com',
+      recordedHost: 'ghe.alibaba-inc.invalid',
     });
     getPlatformReaderMock.mockReturnValue({ kind: 'github' });
     ghWithInputMock.mockReturnValue('');
@@ -672,7 +678,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     ).not.toThrow();
     expect(submitAoneMock).not.toHaveBeenCalled();
     expect(ghWithInputMock).toHaveBeenCalledTimes(1);
-    expect(setGhHostMock).toHaveBeenCalledWith('ghe.alibaba-inc.com');
+    expect(setGhHostMock).toHaveBeenCalledWith('ghe.alibaba-inc.invalid');
     expect(setGhHostMock.mock.invocationCallOrder[0]).toBeLessThan(
       ghWithInputMock.mock.invocationCallOrder[0],
     );
@@ -689,7 +695,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     authMock.mockReturnValue({
       ok: true,
       why: '`--comment` was in the review arguments for #1',
-      recordedHost: 'code.alibaba-inc.com',
+      recordedHost: 'code.alibaba-inc.invalid',
     });
     expect(() =>
       runSubmit(base({ host: 'github.com' }), 'unknown', {
@@ -718,7 +724,7 @@ describe('submit posts an authorised Aone target through a1', () => {
       recordedHost: 'github.com',
     });
     expect(() =>
-      runSubmit(base({ host: 'gitlab.alibaba-inc.com' }), 'unknown', {
+      runSubmit(base({ host: 'gitlab.alibaba-inc.invalid' }), 'unknown', {
         defaultComment: false,
       }),
     ).not.toThrow();
@@ -740,10 +746,10 @@ describe('submit posts an authorised Aone target through a1', () => {
     authMock.mockReturnValue({
       ok: true,
       why: '`--comment` was in the review arguments for #1',
-      recordedHost: 'code.alibaba-inc.com',
+      recordedHost: 'code.alibaba-inc.invalid',
     });
     expect(() =>
-      runSubmit(base({ host: 'gitlab.alibaba-inc.com' }), 'unknown', {
+      runSubmit(base({ host: 'gitlab.alibaba-inc.invalid' }), 'unknown', {
         defaultComment: false,
       }),
     ).not.toThrow();
@@ -760,7 +766,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     authMock.mockReturnValue({
       ok: true,
       why: '`--comment` was in the review arguments for #1',
-      recordedHost: 'code.alibaba-inc.com',
+      recordedHost: 'code.alibaba-inc.invalid',
     });
     getPlatformReaderMock.mockReturnValue({ kind: 'github' });
     process.env['GH_HOST'] = 'ghe.example.com';
@@ -784,7 +790,7 @@ describe('submit posts an authorised Aone target through a1', () => {
       why: '`--comment` was in the review arguments for #1',
       recordedHost: 'github.com',
     });
-    gitOptMock.mockReturnValue('git@gitlab.alibaba-inc.com:g/p.git');
+    gitOptMock.mockReturnValue('git@gitlab.alibaba-inc.invalid:g/p.git');
     ghWithInputMock.mockReturnValue('');
     expect(() =>
       runSubmit(base(), 'unknown', { defaultComment: false }),
@@ -816,7 +822,7 @@ describe('submit posts an authorised Aone target through a1', () => {
       ok: true,
       why: 'the user asked for this review to be published',
     });
-    gitOptMock.mockReturnValue('git@gitlab.alibaba-inc.com:g/p.git');
+    gitOptMock.mockReturnValue('git@gitlab.alibaba-inc.invalid:g/p.git');
     expect(() =>
       runSubmit(base(), 'unknown', { defaultComment: false }),
     ).not.toThrow();
@@ -841,7 +847,7 @@ describe('submit posts an authorised Aone target through a1', () => {
       ok: true,
       why: '`--comment` was in the review arguments for #1',
     });
-    gitOptMock.mockReturnValue('git@gitlab.alibaba-inc.com:g/p.git');
+    gitOptMock.mockReturnValue('git@gitlab.alibaba-inc.invalid:g/p.git');
     expect(() =>
       runSubmit(base({ userAuthorized: false }), 'unknown', {
         defaultComment: false,
@@ -863,7 +869,7 @@ describe('submit posts an authorised Aone target through a1', () => {
       ok: true,
       why: '`--comment` was in the review arguments for #1',
     });
-    gitOptMock.mockReturnValue('git@gitlab.alibaba-inc.com:g/p.git');
+    gitOptMock.mockReturnValue('git@gitlab.alibaba-inc.invalid:g/p.git');
     ghWithInputMock.mockReturnValue('');
     expect(() =>
       runSubmit(
@@ -890,7 +896,7 @@ describe('submit posts an authorised Aone target through a1', () => {
       why: 'the user asked for this review to be published',
       recordedUnbound: true,
     });
-    gitOptMock.mockReturnValue('git@gitlab.alibaba-inc.com:g/p.git');
+    gitOptMock.mockReturnValue('git@gitlab.alibaba-inc.invalid:g/p.git');
     expect(() =>
       runSubmit(base(), 'unknown', { defaultComment: false }),
     ).not.toThrow();
@@ -914,7 +920,7 @@ describe('submit posts an authorised Aone target through a1', () => {
       why: '`--comment` was in the review arguments for #1',
     });
     gitOptMock.mockReturnValue(null);
-    process.env['GH_HOST'] = 'gitlab.alibaba-inc.com';
+    process.env['GH_HOST'] = 'gitlab.alibaba-inc.invalid';
     expect(() =>
       runSubmit(base({ userAuthorized: false }), 'unknown', {
         defaultComment: false,
@@ -934,7 +940,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     process.exitCode = undefined;
     stdoutMock.mockClear();
     ghWithInputMock.mockClear();
-    process.env['GH_HOST'] = 'ghe.alibaba-inc.com';
+    process.env['GH_HOST'] = 'ghe.alibaba-inc.invalid';
     ghWithInputMock.mockReturnValue('');
     expect(() =>
       runSubmit(base({ userAuthorized: false }), 'unknown', {
@@ -987,13 +993,13 @@ describe('submit posts an authorised Aone target through a1', () => {
     authMock.mockReturnValue({
       ok: true,
       why: 'the user asked for this review to be published',
-      recordedHost: 'code.alibaba-inc.com',
+      recordedHost: 'code.alibaba-inc.invalid',
     });
     expect(() =>
       runSubmit(base(), 'unknown', { defaultComment: false }),
     ).not.toThrow();
     expect(floorMock).toHaveBeenCalledWith(
-      expect.objectContaining({ callerHost: 'code.alibaba-inc.com' }),
+      expect.objectContaining({ callerHost: 'code.alibaba-inc.invalid' }),
     );
   });
 
@@ -1091,7 +1097,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     authMock.mockReturnValue({
       ok: true,
       why: 'the user asked for this review to be published',
-      recordedHost: ' ghe.alibaba-inc.com ',
+      recordedHost: ' ghe.alibaba-inc.invalid ',
     });
     getPlatformReaderMock.mockReturnValue({ kind: 'github' });
     ghWithInputMock.mockReturnValue('');
@@ -1136,7 +1142,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     authMock.mockReturnValue({
       ok: true,
       why: 'the user asked for this review to be published',
-      recordedHost: ' code.alibaba-inc.com ',
+      recordedHost: ' code.alibaba-inc.invalid ',
     });
     expect(() =>
       runSubmit(base(), 'unknown', { defaultComment: false }),
@@ -1156,10 +1162,10 @@ describe('submit posts an authorised Aone target through a1', () => {
     authMock.mockReturnValue({
       ok: true,
       why: '`--comment` was in the review arguments for #1',
-      recordedHost: ' gitlab.alibaba-inc.com ',
+      recordedHost: ' gitlab.alibaba-inc.invalid ',
     });
     expect(() =>
-      runSubmit(base({ host: 'gitlab.alibaba-inc.com' }), 'unknown', {
+      runSubmit(base({ host: 'gitlab.alibaba-inc.invalid' }), 'unknown', {
         defaultComment: false,
       }),
     ).not.toThrow();
@@ -1283,7 +1289,7 @@ describe('submit posts an authorised Aone target through a1', () => {
       why: '`--comment` was in the review arguments for #1',
       viaSkillArgsOverride: true,
     });
-    gitOptMock.mockReturnValue('git@gitlab.alibaba-inc.com:g/p.git');
+    gitOptMock.mockReturnValue('git@gitlab.alibaba-inc.invalid:g/p.git');
     expect(() =>
       runSubmit(base({ userAuthorized: false }), 'unknown', {
         defaultComment: false,
@@ -1306,7 +1312,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     stdoutMock.mockClear();
     expect(() =>
       runSubmit(
-        base({ userAuthorized: false, host: 'gitlab.alibaba-inc.com' }),
+        base({ userAuthorized: false, host: 'gitlab.alibaba-inc.invalid' }),
         'unknown',
         { defaultComment: false },
       ),
@@ -1323,7 +1329,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     authMock.mockReturnValue({
       ok: true,
       why: '`--comment` was in the review arguments for #1',
-      recordedHost: 'gitlab.alibaba-inc.com',
+      recordedHost: 'gitlab.alibaba-inc.invalid',
       viaSkillArgsOverride: true,
     });
     gitOptMock.mockReturnValue('git@github.com:acme/web.git');
@@ -1339,15 +1345,17 @@ describe('submit posts an authorised Aone target through a1', () => {
 
   it('a cwd origin on a FAMILY-WILDCARD host (an org GHE) never takes the a1 path', () => {
     // The cwd arm probes the origin through the CANONICAL predicate, not
-    // the registry's family-wildcard detection: `ghe.alibaba-inc.com`
-    // matches `*.alibaba-inc.com` but is a GitHub Enterprise instance,
+    // the registry's family-wildcard detection: `ghe.alibaba-inc.invalid`
+    // matches `*.alibaba-inc.invalid` but is a GitHub Enterprise instance,
     // and an irreversible write must not ride a family resemblance. It
     // falls through to the gh path.
     authMock.mockReturnValue({
       ok: true,
       why: 'the user asked for this review to be published',
     });
-    gitOptMock.mockReturnValue('git@ghe.alibaba-inc.com:ghe-org/ghe-repo.git');
+    gitOptMock.mockReturnValue(
+      'git@ghe.alibaba-inc.invalid:ghe-org/ghe-repo.git',
+    );
     ghWithInputMock.mockReturnValue('');
     expect(() =>
       runSubmit(base({ userAuthorized: false }), 'unknown', {
@@ -1361,7 +1369,7 @@ describe('submit posts an authorised Aone target through a1', () => {
     // env inheritance and the write routed past the very clone that
     // chose the platform (github.com's same-named repo, or the ambient
     // GH_HOST).
-    expect(setGhHostMock).toHaveBeenCalledWith('ghe.alibaba-inc.com');
+    expect(setGhHostMock).toHaveBeenCalledWith('ghe.alibaba-inc.invalid');
   });
 
   it('a recorded-but-hostless target still refuses — a write must not guess the platform', () => {
@@ -1397,7 +1405,7 @@ describe('submit posts an authorised Aone target through a1', () => {
       recordedUnbound: true,
     });
     expect(() =>
-      runSubmit(base({ host: 'gitlab.alibaba-inc.com' }), 'unknown', {
+      runSubmit(base({ host: 'gitlab.alibaba-inc.invalid' }), 'unknown', {
         defaultComment: false,
       }),
     ).not.toThrow();
@@ -1745,7 +1753,7 @@ describe('the Aone anchor gate — the validation the platform does not perform'
     authMock.mockReturnValue({
       ok: true,
       why: 'the user asked for this review to be published',
-      recordedHost: 'gitlab.alibaba-inc.com',
+      recordedHost: 'gitlab.alibaba-inc.invalid',
     });
     getPlatformReaderMock.mockReturnValue({ kind: 'aone' });
     gitOptMock.mockReturnValue(null);
@@ -3130,7 +3138,12 @@ describe('the Aone anchor gate — the validation the platform does not perform'
 // sanctioned-vs-bypass ruling keys on the ids recorded here.
 describe('the Aone submit receipt (producer half of the audit contract)', () => {
   const receiptPath = () =>
-    join(tmp, '.qwen', 'tmp', 'qwen-review-pr-1-submit-receipt.json');
+    join(
+      tmp,
+      '.mariadb-shell-agent',
+      'tmp',
+      'qwen-review-pr-1-submit-receipt.json',
+    );
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -3140,13 +3153,13 @@ describe('the Aone submit receipt (producer half of the audit contract)', () => 
     // each receipt test from no receipt, or the accumulation assertions
     // read a prior test's ids. Remove ONLY the receipt: the anchor gate
     // refuses a post whose captured diff is missing, and wiping the whole
-    // `.qwen` tree deletes the diff the beforeAll seeded — the post then
+    // `.mariadb-shell-agent` tree deletes the diff the beforeAll seeded — the post then
     // dies at the gate and no receipt is ever written.
     rmSync(receiptPath(), { force: true });
     authMock.mockReturnValue({
       ok: true,
       why: 'the user asked for this review to be published',
-      recordedHost: 'gitlab.alibaba-inc.com',
+      recordedHost: 'gitlab.alibaba-inc.invalid',
     });
     getPlatformReaderMock.mockReturnValue({ kind: 'aone' });
     gitOptMock.mockReturnValue(null);
@@ -3165,9 +3178,9 @@ describe('the Aone submit receipt (producer half of the audit contract)', () => 
   });
 
   it.skipIf(process.platform === 'win32')(
-    'does not write the receipt through a symlinked `.qwen/tmp`, and says so',
+    'does not write the receipt through a symlinked `.mariadb-shell-agent/tmp`, and says so',
     () => {
-      // The receipt is a standalone submit's first write into `.qwen/tmp`,
+      // The receipt is a standalone submit's first write into `.mariadb-shell-agent/tmp`,
       // so the shared entry guard runs here too. Best-effort by contract:
       // the refusal stays inside the receipt's catch, the review is posted,
       // nothing lands where the link points — and the operator is told,
@@ -3177,8 +3190,8 @@ describe('the Aone submit receipt (producer half of the audit contract)', () => 
       // emptied: the anchor gate reads the captured diff this suite seeded
       // there, so a link to an empty directory would refuse the post and
       // the round would never reach the receipt at all.
-      const scratch = join(tmp, '.qwen', 'tmp');
-      const victim = join(tmp, '.qwen', 'tmp-victim');
+      const scratch = join(tmp, '.mariadb-shell-agent', 'tmp');
+      const victim = join(tmp, '.mariadb-shell-agent', 'tmp-victim');
       renameSync(scratch, victim);
       symlinkSync(victim, scratch);
       try {
@@ -3265,7 +3278,7 @@ describe('the Aone submit receipt (producer half of the audit contract)', () => 
     // platform; an Aone rewrite that kept only its own axis would un-vouch
     // a same-numbered gh submit's own reviews — the audit would then flag
     // submit's sanctioned writes as bypasses.
-    mkdirSync(join(tmp, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(tmp, '.mariadb-shell-agent', 'tmp'), { recursive: true });
     writeFileSync(
       receiptPath(),
       JSON.stringify({ reviewIds: [500], event: 'COMMENT', postedAt: 'x' }),

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,7 +15,7 @@
  *
  * Addressing is by **name**, not by path. A socket path is an
  * implementation detail that changes every restart; a name survives one,
- * reads back to the user, and is what `qwen sessions ps` already prints.
+ * reads back to the user, and is what `mariadb-shell-agent sessions ps` already prints.
  * Names are not unique, so each peer also carries a short `ref` derived
  * from its session id, and an ambiguous name is an error rather than a
  * guess — see {@link resolvePeerTarget}.
@@ -138,7 +139,7 @@ export async function listMessageablePeers(): Promise<PeerSessionInfo[]> {
  * Keep one peer per (session id, name), the most recently started.
  *
  * The registry is keyed by pid, so one session id can be live under two of
- * them: `qwen --resume <id>` in a second pane starts another process without
+ * them: `mariadb-shell-agent --resume <id>` in a second pane starts another process without
  * signalling the original, and no lease covers the interactive TUI. When
  * both panes sit in the same directory the records flatten to the same
  * name AND the same ref — every address in the grammar (`name`,

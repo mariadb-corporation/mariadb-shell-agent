@@ -26,7 +26,7 @@ Landlock 策略探测会在边界内执行 `/usr/bin/true`。缺少该可执行�
 
 ## 随包 helper
 
-Qwen Code 在 `packages/core/vendor/landlock-run/<arch>-linux/` 中为 Linux x64 和 arm64 发布 `qwen-landlock-run`。Apache-2.0 的 C11 源码直接使用稳定的 Landlock 原始 UAPI；发布二进制使用 musl 静态链接，因此没有运行时库依赖。
+MariaDB Shell Agent 在 `packages/core/vendor/landlock-run/<arch>-linux/` 中为 Linux x64 和 arm64 发布 `qwen-landlock-run`。Apache-2.0 的 C11 源码直接使用稳定的 Landlock 原始 UAPI；发布二进制使用 musl 静态链接，因此没有运行时库依赖。
 
 在探测或启动内置 helper 前，如果打包移除了全部执行权限位，宿主会将其权限恢复为 0755。这适用于全新安装和托管更新，无需 postinstall 脚本。只读或权限受限的安装若无法恢复权限，会在 payload 启动前失败，绝不替换为宿主命令。显式 helper 路径覆盖不会被 chmod。Helper 查找通过目录末尾的路径分量区分源码布局与 bundle 目录，因此安装位置的祖先目录名不会改变资源解析。
 
@@ -59,7 +59,7 @@ Landlock 不创建 PID namespace。宿主进程仍可见，而 Landlock 的 doma
 
 构建脚本使用原生 `musl-gcc` 或显式 Zig musl target，每次编译一个架构。两个提交的二进制由现有 core `vendor/` 包和 bundle 路径复制。专用 Linux x64/arm64 workflow 会重新构建 helper，与提交二进制逐字节比较，运行功能探测，并检查只读拒绝、workspace 写入允许、外部写入拒绝、后代继承及 launcher 失败归因。
 
-生产 bundle 验收覆盖只读与 workspace-write 策略、网络及 mask 拒绝、字面 argv 和 payload 环境隔离、stdin/stdout/stderr 逐字节传输、流式输入背压、慢速消费者、EPIPE 清理、负向控制及禁止非隔离重放。单元测试覆盖设置校验、精确后端选择顺序、不兼容网络拒绝、probe 解析、资源解析、helper argv、后端分发、状态 wire 解析、诊断以及公开 `qwen sandbox` 的验证差异。真实 Linux 验收必须在两个架构上运行精确提交的 helper。macOS 测试可以验证选择与 argv 构造，但不能证明内核执行。
+生产 bundle 验收覆盖只读与 workspace-write 策略、网络及 mask 拒绝、字面 argv 和 payload 环境隔离、stdin/stdout/stderr 逐字节传输、流式输入背压、慢速消费者、EPIPE 清理、负向控制及禁止非隔离重放。单元测试覆盖设置校验、精确后端选择顺序、不兼容网络拒绝、probe 解析、资源解析、helper argv、后端分发、状态 wire 解析、诊断以及公开 `mariadb-shell-agent sandbox` 的验证差异。真实 Linux 验收必须在两个架构上运行精确提交的 helper。macOS 测试可以验证选择与 argv 构造，但不能证明内核执行。
 
 ## 安全与兼容性
 

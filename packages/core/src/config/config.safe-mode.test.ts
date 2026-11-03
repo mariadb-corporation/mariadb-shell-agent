@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -272,7 +273,7 @@ describe('Config safe mode', () => {
             {
               id: 'test-model',
               envKey: 'DASHSCOPE_API_KEY',
-              baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+              baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
             },
           ],
         },
@@ -412,7 +413,7 @@ describe('Config safe mode', () => {
     // servers into bare mode's `mcpServers` just as into safe mode's
     // `topTierMcpServers` (packages/cli/src/config/config.ts: `bareMode ||
     // safeMode ? { ...topTierMcpServers } : assembleMcpServers(...)`) — found
-    // live-testing `qwen --bare --mcp-config`, same stranded-server symptom.
+    // live-testing `mariadb-shell-agent --bare --mcp-config`, same stranded-server symptom.
     // Bare mode has no `getMcpServers()`-level short-circuit: its "local
     // sources dropped" guarantee lives in that CLI assembly, so these tests
     // set `mcpServers` directly (what `loadCliConfig` produces before `Config`

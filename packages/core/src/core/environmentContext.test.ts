@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -420,6 +421,19 @@ describe('getInitialChatHistory', () => {
 
     expect(mockToolRegistry.warmAll).toHaveBeenCalled();
     expect(history).toEqual([]);
+  });
+
+  it('leads the prelude with the main session interaction-mode reminder', async () => {
+    const reminder =
+      'Interaction mode reminder: You are running as a non-interactive CLI agent.';
+    const [history] = await getInitialChatHistory(
+      mockConfig as Config,
+      undefined,
+      { interactionModeReminder: reminder },
+    );
+
+    const parts = history[0]?.parts ?? [];
+    expectContains(parts[0]?.text, '<system-reminder>', reminder);
   });
 
   it('places deferred-tools reminder last so stable prefix stays cacheable on KV-caching servers', async () => {

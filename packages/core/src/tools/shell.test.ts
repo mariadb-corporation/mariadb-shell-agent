@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -367,7 +368,9 @@ describe('ShellTool', () => {
         .fn()
         .mockReturnValue(createMockWorkspaceContext('/test/dir')),
       storage: {
-        getUserSkillsDirs: vi.fn().mockReturnValue(['/test/dir/.qwen/skills']),
+        getUserSkillsDirs: vi
+          .fn()
+          .mockReturnValue(['/test/dir/.mariadb-shell-agent/skills']),
         getProjectTempDir: vi.fn().mockReturnValue(outputDirectory),
         getProjectDir: vi.fn().mockReturnValue('/test/proj'),
       },
@@ -386,7 +389,7 @@ describe('ShellTool', () => {
         commit: true,
         pr: true,
         name: 'Qwen-Coder',
-        email: 'qwen-coder@alibabacloud.com',
+        email: 'qwen-coder@alibabacloud.invalid',
       }),
       setApprovalMode: vi.fn(),
       getShouldUseNodePtyShell: vi.fn().mockReturnValue(false),
@@ -1074,19 +1077,21 @@ describe('ShellTool', () => {
       [
         'should throw an error for a directory within the user skills directory',
         'ls',
-        { directory: '/test/dir/.qwen/skills/my-skill' },
+        { directory: '/test/dir/.mariadb-shell-agent/skills/my-skill' },
         SKILLS_DIR_ERROR,
       ],
       [
         'should throw an error for the user skills directory itself',
         'ls',
-        { directory: '/test/dir/.qwen/skills' },
+        { directory: '/test/dir/.mariadb-shell-agent/skills' },
         SKILLS_DIR_ERROR,
       ],
       [
         'should resolve directory path before checking user skills directory',
         'ls',
-        { directory: '/test/dir/.qwen/skills/../skills/my-skill' },
+        {
+          directory: '/test/dir/.mariadb-shell-agent/skills/../skills/my-skill',
+        },
         SKILLS_DIR_ERROR,
       ],
     ])('%s', async (_title, command, params, message) => {
@@ -3726,7 +3731,7 @@ describe('ShellTool', () => {
 
     describe('addCoAuthorToGitCommit', () => {
       const QWEN_TRAILER = expect.stringContaining(
-        'Co-authored-by: Qwen-Coder <qwen-coder@alibabacloud.com>',
+        'Co-authored-by: Qwen-Coder <qwen-coder@alibabacloud.invalid>',
       );
       const TRAILER = expect.stringContaining('Co-authored-by:');
       const NO_TRAILER = expect.not.stringContaining('Co-authored-by:');
@@ -3881,7 +3886,7 @@ describe('ShellTool', () => {
       ])('%s', async (_title, coAuthor, command, expected) => {
         (mockConfig.getGitCoAuthor as Mock).mockReturnValue({
           name: 'Qwen-Coder',
-          email: 'qwen-coder@alibabacloud.com',
+          email: 'qwen-coder@alibabacloud.invalid',
           ...coAuthor,
         });
         await spawnedCommand(command);
@@ -3977,7 +3982,7 @@ describe('ShellTool', () => {
         );
         // `Body line 1` and the trailer share the second `-m`'s closing quote.
         expect(observed).toMatch(
-          /-m\s+"Body line 1\s+Co-authored-by: Qwen-Coder <qwen-coder@alibabacloud\.com>"/s,
+          /-m\s+"Body line 1\s+Co-authored-by: Qwen-Coder <qwen-coder@alibabacloud\.invalid>"/s,
         );
         // And the first -m's title is unchanged.
         expect(observed).toMatch(/-m\s+"Title"\s/);
@@ -4069,7 +4074,7 @@ describe('ShellTool', () => {
     });
 
     describe('addAttributionToPR', () => {
-      const ATTRIBUTION = 'Generated with Qwen Code';
+      const ATTRIBUTION = 'Generated with MariaDB Shell Agent';
       const runPr = (command: string) =>
         spawnedCommand(command, { waitForSpawn: true });
       const lastSpawnedCommand = () => {
@@ -4147,7 +4152,7 @@ describe('ShellTool', () => {
         // curl's cookie is preserved; the trailer lands in gh's --body.
         expect(observed).toContain('curl -b "session=abc"');
         expect(observed).toMatch(
-          /gh pr create --title "x" --body "summary[\s\S]*Generated with Qwen Code"/,
+          /gh pr create --title "x" --body "summary[\s\S]*Generated with MariaDB Shell Agent"/,
         );
       });
 
@@ -4161,10 +4166,10 @@ describe('ShellTool', () => {
         const cmd = lastSpawnedCommand();
         // After the outer body's closing `"`, not between `flag` and `here`.
         expect(cmd).toMatch(
-          /--body "docs mention -b 'flag' here[\s\S]*Generated with Qwen Code"/,
+          /--body "docs mention -b 'flag' here[\s\S]*Generated with MariaDB Shell Agent"/,
         );
         expect(cmd).not.toMatch(
-          /-b 'flag[\s\S]*Generated with Qwen Code[\s\S]*' here"/,
+          /-b 'flag[\s\S]*Generated with MariaDB Shell Agent[\s\S]*' here"/,
         );
       });
 
@@ -4176,10 +4181,10 @@ describe('ShellTool', () => {
         );
         const cmd = lastSpawnedCommand();
         expect(cmd).toMatch(
-          /--body "ignored" --body "real summary[\s\S]*Generated with Qwen Code/,
+          /--body "ignored" --body "real summary[\s\S]*Generated with MariaDB Shell Agent/,
         );
         expect(cmd).not.toMatch(
-          /--body "ignored[\s\S]*Generated with Qwen Code[\s\S]*" --body/,
+          /--body "ignored[\s\S]*Generated with MariaDB Shell Agent[\s\S]*" --body/,
         );
       });
 
@@ -4189,7 +4194,7 @@ describe('ShellTool', () => {
           commit: true,
           pr: false,
           name: 'Qwen-Coder',
-          email: 'qwen-coder@alibabacloud.com',
+          email: 'qwen-coder@alibabacloud.invalid',
         });
 
         await runPr('gh pr create --title "x" --body "Summary"');
@@ -4233,7 +4238,7 @@ describe('ShellTool', () => {
         );
         expect(observed).toContain("don'\\''t break me");
         expect(observed).toMatch(
-          /don'\\''t break me[\s\S]*Generated with Qwen Code/,
+          /don'\\''t break me[\s\S]*Generated with MariaDB Shell Agent/,
         );
       });
     });

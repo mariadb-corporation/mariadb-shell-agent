@@ -1,12 +1,12 @@
 # Headless Mode
 
-Headless mode allows you to run Qwen Code programmatically from command line
+Headless mode allows you to run MariaDB Shell Agent programmatically from command line
 scripts and automation tools without any interactive UI. This is ideal for
 scripting, automation, CI/CD pipelines, and building AI-powered tools.
 
 ## Overview
 
-The headless mode provides a headless interface to Qwen Code that:
+The headless mode provides a headless interface to MariaDB Shell Agent that:
 
 - Accepts prompts via command line arguments or stdin
 - Returns structured output (text or JSON)
@@ -22,12 +22,12 @@ The headless mode provides a headless interface to Qwen Code that:
 Use the `--prompt` (or `-p`) flag to run in headless mode:
 
 ```bash
-qwen --prompt "What is machine learning?"
+mariadb-shell-agent --prompt "What is machine learning?"
 ```
 
 ### Stdin Input
 
-Pipe input to Qwen Code from your terminal:
+Pipe input to MariaDB Shell Agent from your terminal:
 
 ```bash
 echo "Explain this code" | qwen
@@ -35,10 +35,10 @@ echo "Explain this code" | qwen
 
 ### Combining with File Input
 
-Read from files and process with Qwen Code:
+Read from files and process with MariaDB Shell Agent:
 
 ```bash
-cat README.md | qwen --prompt "Summarize this documentation"
+cat README.md | mariadb-shell-agent --prompt "Summarize this documentation"
 ```
 
 ### Resume Previous Sessions (Headless)
@@ -47,15 +47,15 @@ Reuse conversation context from the current project in headless scripts:
 
 ```bash
 # Continue the most recent session for this project and run a new prompt
-qwen --continue -p "Run the tests again and summarize failures"
+mariadb-shell-agent --continue -p "Run the tests again and summarize failures"
 
 # Resume a specific session ID directly (no UI)
-qwen --resume 123e4567-e89b-12d3-a456-426614174000 -p "Apply the follow-up refactor"
+mariadb-shell-agent --resume 123e4567-e89b-12d3-a456-426614174000 -p "Apply the follow-up refactor"
 ```
 
 > [!note]
 >
-> - Session data is project-scoped JSONL under `~/.qwen/projects/<sanitized-cwd>/chats`.
+> - Session data is project-scoped JSONL under `~/.mariadb-shell-agent/projects/<sanitized-cwd>/chats`.
 > - Restores conversation history, tool outputs, and chat-compression checkpoints before sending the new prompt.
 
 ## Run a Persistent Goal
@@ -64,13 +64,13 @@ Headless mode accepts `/goal` as the entire prompt. Goal state is stored with th
 
 ```bash
 # Create a Goal and start its worker
-qwen -p "/goal Finish the release checklist"
+mariadb-shell-agent -p "/goal Finish the release checklist"
 
 # Inspect its saved state in the same session
-qwen --continue -p "/goal"
+mariadb-shell-agent --continue -p "/goal"
 ```
 
-Use the same `qwen --continue -p "<control>"` pattern for the other operations:
+Use the same `mariadb-shell-agent --continue -p "<control>"` pattern for the other operations:
 
 | Control                              | Behavior                                                                                 |
 | ------------------------------------ | ---------------------------------------------------------------------------------------- |
@@ -81,7 +81,7 @@ Use the same `qwen --continue -p "<control>"` pattern for the other operations:
 | `/goal resume`                       | Resume an eligible Goal and start headless Goal work.                                    |
 | `/goal clear`                        | Clear the Goal without confirmation or a model call.                                     |
 
-A Goal is only as good as its completion condition. See [Goals](./goals.md) for what the verifier can and cannot judge, and use `qwen -p "/goal-draft <intent>"` to have the objective drafted before you set it.
+A Goal is only as good as its completion condition. See [Goals](./goals.md) for what the verifier can and cannot judge, and use `mariadb-shell-agent -p "/goal-draft <intent>"` to have the objective drafted before you set it.
 
 Runtime-scheduled Goal continuation segments do not count against `--max-session-turns`, but real user prompts still do. Explicit `--max-wall-time` and `--max-tool-calls` budgets continue to apply; exceeding either pauses active Goal work before the run exits with the budget-specific error.
 
@@ -97,10 +97,10 @@ You can change the main session system prompt for a single CLI run without editi
 
 ### Override the Built-in System Prompt
 
-Use `--system-prompt` to replace Qwen Code's built-in main-session prompt for the current run:
+Use `--system-prompt` to replace MariaDB Shell Agent's built-in main-session prompt for the current run:
 
 ```bash
-qwen -p "Review this patch" --system-prompt "You are a terse release reviewer. Report only blocking issues."
+mariadb-shell-agent -p "Review this patch" --system-prompt "You are a terse release reviewer. Report only blocking issues."
 ```
 
 ### Append Extra Instructions
@@ -108,13 +108,13 @@ qwen -p "Review this patch" --system-prompt "You are a terse release reviewer. R
 Use `--append-system-prompt` to keep the built-in prompt and add extra instructions for this run:
 
 ```bash
-qwen -p "Review this patch" --append-system-prompt "Be terse and focus on concrete findings."
+mariadb-shell-agent -p "Review this patch" --append-system-prompt "Be terse and focus on concrete findings."
 ```
 
 You can combine both flags when you want a custom base prompt plus an extra run-specific instruction:
 
 ```bash
-qwen -p "Summarize this repository" \
+mariadb-shell-agent -p "Summarize this repository" \
   --system-prompt "You are a migration planner." \
   --append-system-prompt "Return exactly three bullets."
 ```
@@ -124,7 +124,7 @@ qwen -p "Summarize this repository" \
 Use `--output-style` to pick an [output style](./output-styles) — built-in or custom — for this run. A style is a named block of instructions layered onto the built-in prompt that changes how the answer is written — `Concise` leads with the result and drops preamble and narration, `Proactive` starts working instead of proposing, `Explanatory` adds short notes about the codebase along the way. It overrides the `general.outputStyle` setting; `default` selects no style.
 
 ```bash
-qwen -p "Why does the build fail on Windows?" --output-style Concise
+mariadb-shell-agent -p "Why does the build fail on Windows?" --output-style Concise
 ```
 
 > [!note]
@@ -136,19 +136,19 @@ qwen -p "Why does the build fail on Windows?" --output-style Concise
 > [!note]
 >
 > - `--system-prompt` applies only to the current run's main session.
-> - Loaded memory and context files such as `QWEN.md` are still appended after `--system-prompt`.
+> - Loaded memory and context files such as `MARIADB-SHELL-AGENT.md` are still appended after `--system-prompt`.
 > - `--append-system-prompt` is applied after the built-in prompt and loaded memory, and can be used together with `--system-prompt`.
 
 ## Output Formats
 
-Qwen Code supports multiple output formats for different use cases:
+MariaDB Shell Agent supports multiple output formats for different use cases:
 
 ### Text Output (Default)
 
 Standard human-readable output:
 
 ```bash
-qwen -p "What is the capital of France?"
+mariadb-shell-agent -p "What is the capital of France?"
 ```
 
 Response format:
@@ -166,7 +166,7 @@ The JSON output is an array of message objects. The output includes multiple mes
 #### Example Usage
 
 ```bash
-qwen -p "What is the capital of France?" --output-format json
+mariadb-shell-agent -p "What is the capital of France?" --output-format json
 ```
 
 Output (at end of execution):
@@ -218,7 +218,7 @@ Output (at end of execution):
 Stream-JSON format emits JSON messages immediately as they occur during execution, enabling real-time monitoring. This format uses line-delimited JSON where each message is a complete JSON object on a single line.
 
 ```bash
-qwen -p "Explain TypeScript" --output-format stream-json
+mariadb-shell-agent -p "Explain TypeScript" --output-format stream-json
 ```
 
 Output (streaming as events occur):
@@ -240,12 +240,12 @@ only the bounded preview internally. This limit does not cap an entire JSON
 session, JSONL event, tool input, or partial message.
 
 ```bash
-qwen -p "Write a Python script" --output-format stream-json --include-partial-messages
+mariadb-shell-agent -p "Write a Python script" --output-format stream-json --include-partial-messages
 ```
 
 ### Input Format
 
-The `--input-format` parameter controls how Qwen Code consumes input from standard input:
+The `--input-format` parameter controls how MariaDB Shell Agent consumes input from standard input:
 
 - **`text`** (default): Standard text input from stdin or command-line arguments
 - **`stream-json`**: JSON message protocol via stdin for bidirectional communication
@@ -258,46 +258,46 @@ Save output to files or pipe to other commands:
 
 ```bash
 # Save to file
-qwen -p "Explain Docker" > docker-explanation.txt
-qwen -p "Explain Docker" --output-format json > docker-explanation.json
+mariadb-shell-agent -p "Explain Docker" > docker-explanation.txt
+mariadb-shell-agent -p "Explain Docker" --output-format json > docker-explanation.json
 
 # Append to file
-qwen -p "Add more details" >> docker-explanation.txt
+mariadb-shell-agent -p "Add more details" >> docker-explanation.txt
 
 # Pipe to other tools
-qwen -p "What is Kubernetes?" --output-format json | jq -r '.[-1].result'
-qwen -p "Explain microservices" | wc -w
-qwen -p "List programming languages" | grep -i "python"
+mariadb-shell-agent -p "What is Kubernetes?" --output-format json | jq -r '.[-1].result'
+mariadb-shell-agent -p "Explain microservices" | wc -w
+mariadb-shell-agent -p "List programming languages" | grep -i "python"
 
 # Stream-JSON output for real-time processing
-qwen -p "Explain Docker" --output-format stream-json | jq '.type'
-qwen -p "Write code" --output-format stream-json --include-partial-messages | jq '.event.type'
+mariadb-shell-agent -p "Explain Docker" --output-format stream-json | jq '.type'
+mariadb-shell-agent -p "Write code" --output-format stream-json --include-partial-messages | jq '.event.type'
 ```
 
 ## Configuration Options
 
 Key command-line options for headless usage:
 
-| Option                       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                             | Example                                                                  |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `--prompt`, `-p`             | Run in headless mode                                                                                                                                                                                                                                                                                                                                                                                                                                    | `qwen -p "query"`                                                        |
-| `--output-format`, `-o`      | Specify output format (text, json, stream-json)                                                                                                                                                                                                                                                                                                                                                                                                         | `qwen -p "query" --output-format json`                                   |
-| `--input-format`             | Specify input format (text, stream-json)                                                                                                                                                                                                                                                                                                                                                                                                                | `qwen --input-format text --output-format stream-json`                   |
-| `--include-partial-messages` | Include partial messages in stream-json output                                                                                                                                                                                                                                                                                                                                                                                                          | `qwen -p "query" --output-format stream-json --include-partial-messages` |
-| `--system-prompt`            | Override the main session system prompt for this run                                                                                                                                                                                                                                                                                                                                                                                                    | `qwen -p "query" --system-prompt "You are a terse reviewer."`            |
-| `--append-system-prompt`     | Append extra instructions to the main session system prompt for this run                                                                                                                                                                                                                                                                                                                                                                                | `qwen -p "query" --append-system-prompt "Focus on concrete findings."`   |
-| `--output-style`             | Output style for this run (`Concise`, `Proactive`, `Explanatory`, `Learning`, a custom style's name, or `default` for none); overrides `general.outputStyle`                                                                                                                                                                                                                                                                                            | `qwen -p "query" --output-style Concise`                                 |
-| `--debug`, `-d`              | Enable debug mode                                                                                                                                                                                                                                                                                                                                                                                                                                       | `qwen -p "query" --debug`                                                |
-| `--safe-mode`                | Disable all customizations — context files, hooks, extensions, skills, MCP servers, custom subagents (only built-in subagents load), permission rules, settings-sourced approval mode overrides, memory features, cross-session messaging, and sandbox settings — to isolate problems; the CLI flags `--yolo` and `--approval-mode` still take effect. See [Troubleshooting](../support/troubleshooting). Also settable via `QWEN_CODE_SAFE_MODE=true`. | `qwen -p "query" --safe-mode`                                            |
-| `--model`, `-m`              | Model to use for this run                                                                                                                                                                                                                                                                                                                                                                                                                               | `qwen -p "query" --model qwen3-coder-plus`                               |
-| `--include-directories`      | Include additional directories                                                                                                                                                                                                                                                                                                                                                                                                                          | `qwen -p "query" --include-directories src,docs`                         |
-| `--yolo`, `-y`               | Auto-approve all actions                                                                                                                                                                                                                                                                                                                                                                                                                                | `qwen -p "query" --yolo`                                                 |
-| `--approval-mode`            | Set approval mode (`plan`, `default`, `auto-edit`, `auto`, `yolo`)                                                                                                                                                                                                                                                                                                                                                                                      | `qwen -p "query" --approval-mode auto-edit`                              |
-| `--continue`                 | Resume the most recent session for this project                                                                                                                                                                                                                                                                                                                                                                                                         | `qwen --continue -p "Pick up where we left off"`                         |
-| `--resume [sessionId]`       | Resume a specific session (or choose interactively)                                                                                                                                                                                                                                                                                                                                                                                                     | `qwen --resume 123e... -p "Finish the refactor"`                         |
-| `--max-session-turns`        | Cap the number of user/model/tool turns in the run                                                                                                                                                                                                                                                                                                                                                                                                      | `qwen -p "..." --max-session-turns 30`                                   |
-| `--max-wall-time`            | Wall-clock budget; accepts `90` (s), `30s`, `5m`, `1h`, `1.5h`                                                                                                                                                                                                                                                                                                                                                                                          | `qwen -p "..." --max-wall-time 10m`                                      |
-| `--max-tool-calls`           | Cumulative tool-call budget for the run                                                                                                                                                                                                                                                                                                                                                                                                                 | `qwen -p "..." --max-tool-calls 50`                                      |
+| Option                       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                             | Example                                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `--prompt`, `-p`             | Run in headless mode                                                                                                                                                                                                                                                                                                                                                                                                                                    | `mariadb-shell-agent -p "query"`                                                        |
+| `--output-format`, `-o`      | Specify output format (text, json, stream-json)                                                                                                                                                                                                                                                                                                                                                                                                         | `mariadb-shell-agent -p "query" --output-format json`                                   |
+| `--input-format`             | Specify input format (text, stream-json)                                                                                                                                                                                                                                                                                                                                                                                                                | `mariadb-shell-agent --input-format text --output-format stream-json`                   |
+| `--include-partial-messages` | Include partial messages in stream-json output                                                                                                                                                                                                                                                                                                                                                                                                          | `mariadb-shell-agent -p "query" --output-format stream-json --include-partial-messages` |
+| `--system-prompt`            | Override the main session system prompt for this run                                                                                                                                                                                                                                                                                                                                                                                                    | `mariadb-shell-agent -p "query" --system-prompt "You are a terse reviewer."`            |
+| `--append-system-prompt`     | Append extra instructions to the main session system prompt for this run                                                                                                                                                                                                                                                                                                                                                                                | `mariadb-shell-agent -p "query" --append-system-prompt "Focus on concrete findings."`   |
+| `--output-style`             | Output style for this run (`Concise`, `Proactive`, `Explanatory`, `Learning`, a custom style's name, or `default` for none); overrides `general.outputStyle`                                                                                                                                                                                                                                                                                            | `mariadb-shell-agent -p "query" --output-style Concise`                                 |
+| `--debug`, `-d`              | Enable debug mode                                                                                                                                                                                                                                                                                                                                                                                                                                       | `mariadb-shell-agent -p "query" --debug`                                                |
+| `--safe-mode`                | Disable all customizations — context files, hooks, extensions, skills, MCP servers, custom subagents (only built-in subagents load), permission rules, settings-sourced approval mode overrides, memory features, cross-session messaging, and sandbox settings — to isolate problems; the CLI flags `--yolo` and `--approval-mode` still take effect. See [Troubleshooting](../support/troubleshooting). Also settable via `QWEN_CODE_SAFE_MODE=true`. | `mariadb-shell-agent -p "query" --safe-mode`                                            |
+| `--model`, `-m`              | Model to use for this run                                                                                                                                                                                                                                                                                                                                                                                                                               | `mariadb-shell-agent -p "query" --model qwen3-coder-plus`                               |
+| `--include-directories`      | Include additional directories                                                                                                                                                                                                                                                                                                                                                                                                                          | `mariadb-shell-agent -p "query" --include-directories src,docs`                         |
+| `--yolo`, `-y`               | Auto-approve all actions                                                                                                                                                                                                                                                                                                                                                                                                                                | `mariadb-shell-agent -p "query" --yolo`                                                 |
+| `--approval-mode`            | Set approval mode (`plan`, `default`, `auto-edit`, `auto`, `yolo`)                                                                                                                                                                                                                                                                                                                                                                                      | `mariadb-shell-agent -p "query" --approval-mode auto-edit`                              |
+| `--continue`                 | Resume the most recent session for this project                                                                                                                                                                                                                                                                                                                                                                                                         | `mariadb-shell-agent --continue -p "Pick up where we left off"`                         |
+| `--resume [sessionId]`       | Resume a specific session (or choose interactively)                                                                                                                                                                                                                                                                                                                                                                                                     | `mariadb-shell-agent --resume 123e... -p "Finish the refactor"`                         |
+| `--max-session-turns`        | Cap the number of user/model/tool turns in the run                                                                                                                                                                                                                                                                                                                                                                                                      | `mariadb-shell-agent -p "..." --max-session-turns 30`                                   |
+| `--max-wall-time`            | Wall-clock budget; accepts `90` (s), `30s`, `5m`, `1h`, `1.5h`                                                                                                                                                                                                                                                                                                                                                                                          | `mariadb-shell-agent -p "..." --max-wall-time 10m`                                      |
+| `--max-tool-calls`           | Cumulative tool-call budget for the run                                                                                                                                                                                                                                                                                                                                                                                                                 | `mariadb-shell-agent -p "..." --max-tool-calls 50`                                      |
 
 For complete details on all available configuration options, settings files, and environment variables, see the [Configuration Guide](../configuration/settings).
 
@@ -323,11 +323,11 @@ establish compatibility with a provider's context limit.
 
 ## Safety in unattended runs
 
-Headless / CI runs combined with `--yolo` (or `--approval-mode=yolo`) auto-approve every tool call, including `shell`, `write`, and `edit`. **`--yolo` does not enable a sandbox** — those tools run at the host process's privilege level. When Qwen Code detects this combination with no sandbox configured, it prints a one-line warning to stderr at startup. Suppress the warning with `QWEN_CODE_SUPPRESS_YOLO_WARNING=1` once you've reviewed the trade-off.
+Headless / CI runs combined with `--yolo` (or `--approval-mode=yolo`) auto-approve every tool call, including `shell`, `write`, and `edit`. **`--yolo` does not enable a sandbox** — those tools run at the host process's privilege level. When MariaDB Shell Agent detects this combination with no sandbox configured, it prints a one-line warning to stderr at startup. Suppress the warning with `QWEN_CODE_SUPPRESS_YOLO_WARNING=1` once you've reviewed the trade-off.
 
 ### Run-level budgets
 
-Qwen Code can abort an unattended run when it crosses one of the following thresholds. Each is `-1` (unlimited) by default; setting any one is enough to bound runaway behavior. They are enforced cooperatively against the same `AbortController` that already carries SIGINT, so a budget abort emits a structured `FatalBudgetExceededError` (exit code **55**) — distinct from the turn-cap exit code 53 and SIGINT's 130 so CI scripts can branch on the reason.
+MariaDB Shell Agent can abort an unattended run when it crosses one of the following thresholds. Each is `-1` (unlimited) by default; setting any one is enough to bound runaway behavior. They are enforced cooperatively against the same `AbortController` that already carries SIGINT, so a budget abort emits a structured `FatalBudgetExceededError` (exit code **55**) — distinct from the turn-cap exit code 53 and SIGINT's 130 so CI scripts can branch on the reason.
 
 | Flag                  | Settings key               | What it bounds                                                                                                                                                                                                |
 | --------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -341,11 +341,11 @@ Qwen Code can abort an unattended run when it crosses one of the following thres
 - **`structured_output` is exempt from `--max-tool-calls`.** Under `--json-schema`, the model's terminal `structured_output` call is the "I'm done" contract, not real work — it doesn't count against `--max-tool-calls` so a budget-edge completion isn't aborted as a false positive. The exemption is unconditional (including failed Ajv validations), so a model stuck in a malformed-output retry loop is NOT bounded by `--max-tool-calls`; combine with `--max-session-turns` or `--max-wall-time` to cap retries.
 - **`structured_output` is NOT exempt from `--max-session-turns`.** That counter is pre-existing and bumps for every turn including the terminal contract. Size `--max-session-turns` to `N+1` if you want to allow `N` real-work turns under `--json-schema`.
 - **Single-shot vs `--input-format stream-json`:** in stream-json input mode the daemon resets the budget counters at the start of every user message; the budget is per-message, not per-process.
-- **`qwen serve` / ACP sessions:** the daemon ACP session path does NOT currently consult `--max-wall-time` / `--max-tool-calls` from settings.json. These budgets only apply to single-shot `qwen -p` runs and to `--input-format stream-json` sessions. (`qwen serve` does emit the YOLO-no-sandbox warning at boot if `tools.approvalMode: 'yolo'` is set in settings.)
+- **`mariadb-shell-agent serve` / ACP sessions:** the daemon ACP session path does NOT currently consult `--max-wall-time` / `--max-tool-calls` from settings.json. These budgets only apply to single-shot `mariadb-shell-agent -p` runs and to `--input-format stream-json` sessions. (`mariadb-shell-agent serve` does emit the YOLO-no-sandbox warning at boot if `tools.approvalMode: 'yolo'` is set in settings.)
 
 ### Recommended combinations
 
-- **Trusted, isolated environment (ephemeral CI runner, container):** `qwen -p "..." --yolo --max-session-turns N --max-wall-time 10m --output-format json`. Pin a turn budget and a wall-clock budget so a stuck agent can't burn through your CI minutes, and capture `--output-format json` for post-run usage / tool-call auditing.
+- **Trusted, isolated environment (ephemeral CI runner, container):** `mariadb-shell-agent -p "..." --yolo --max-session-turns N --max-wall-time 10m --output-format json`. Pin a turn budget and a wall-clock budget so a stuck agent can't burn through your CI minutes, and capture `--output-format json` for post-run usage / tool-call auditing.
 - **Local machine or shared infra:** also pass `--sandbox` (or set `QWEN_SANDBOX=1`) so shell / write / edit tools run inside the sandbox image.
 - **Long-running CI with retry-on-rate-limit:** combine `QWEN_CODE_UNATTENDED_RETRY=1` with `--max-wall-time`. The retry env keeps the run alive past transient 429 / 529 responses; the wall-clock budget ensures a persistently-failing provider can't extend the job indefinitely.
 - **Bounded auditing / exploration:** for read-only tasks, `--max-tool-calls 25` caps how aggressively the model can grep / read. Combine with `--exclude-tools shell,write,edit` to make the bound meaningful.
@@ -355,20 +355,20 @@ Qwen Code can abort an unattended run when it crosses one of the following thres
 ### Code review
 
 ```bash
-cat src/auth.py | qwen -p "Review this authentication code for security issues" > security-review.txt
+cat src/auth.py | mariadb-shell-agent -p "Review this authentication code for security issues" > security-review.txt
 ```
 
 ### Generate commit messages
 
 ```bash
-result=$(git diff --cached | qwen -p "Write a concise commit message for these changes" --output-format json)
+result=$(git diff --cached | mariadb-shell-agent -p "Write a concise commit message for these changes" --output-format json)
 echo "$result" | jq -r '.[-1].result'
 ```
 
 ### API documentation
 
 ```bash
-result=$(cat api/routes.js | qwen -p "Generate OpenAPI spec for these routes" --output-format json)
+result=$(cat api/routes.js | mariadb-shell-agent -p "Generate OpenAPI spec for these routes" --output-format json)
 echo "$result" | jq -r '.[-1].result' > openapi.json
 ```
 
@@ -377,7 +377,7 @@ echo "$result" | jq -r '.[-1].result' > openapi.json
 ```bash
 for file in src/*.py; do
     echo "Analyzing $file..."
-    result=$(cat "$file" | qwen -p "Find potential bugs and suggest improvements" --output-format json)
+    result=$(cat "$file" | mariadb-shell-agent -p "Find potential bugs and suggest improvements" --output-format json)
     echo "$result" | jq -r '.[-1].result' > "reports/$(basename "$file").analysis"
     echo "Completed analysis for $(basename "$file")" >> reports/progress.log
 done
@@ -386,20 +386,20 @@ done
 ### PR code review
 
 ```bash
-result=$(git diff origin/main...HEAD | qwen -p "Review these changes for bugs, security issues, and code quality" --output-format json)
+result=$(git diff origin/main...HEAD | mariadb-shell-agent -p "Review these changes for bugs, security issues, and code quality" --output-format json)
 echo "$result" | jq -r '.[-1].result' > pr-review.json
 ```
 
 ### Log analysis
 
 ```bash
-grep "ERROR" /var/log/app.log | tail -20 | qwen -p "Analyze these errors and suggest root cause and fixes" > error-analysis.txt
+grep "ERROR" /var/log/app.log | tail -20 | mariadb-shell-agent -p "Analyze these errors and suggest root cause and fixes" > error-analysis.txt
 ```
 
 ### Release notes generation
 
 ```bash
-result=$(git log --oneline v1.0.0..HEAD | qwen -p "Generate release notes from these commits" --output-format json)
+result=$(git log --oneline v1.0.0..HEAD | mariadb-shell-agent -p "Generate release notes from these commits" --output-format json)
 response=$(echo "$result" | jq -r '.[-1].result')
 echo "$response"
 echo "$response" >> CHANGELOG.md
@@ -408,7 +408,7 @@ echo "$response" >> CHANGELOG.md
 ### Model and tool usage tracking
 
 ```bash
-result=$(qwen -p "Explain this database schema" --include-directories db --output-format json)
+result=$(mariadb-shell-agent -p "Explain this database schema" --include-directories db --output-format json)
 total_tokens=$(echo "$result" | jq -r '.[-1].stats.models // {} | to_entries | map(.value.tokens.total) | add // 0')
 models_used=$(echo "$result" | jq -r '.[-1].stats.models // {} | keys | join(", ") | if . == "" then "none" else . end')
 tool_calls=$(echo "$result" | jq -r '.[-1].stats.tools.totalCalls // 0')
@@ -421,7 +421,7 @@ tail -5 usage.log
 
 ## Persistent Retry Mode
 
-When Qwen Code runs in CI/CD pipelines or as a background daemon, a brief API outage (rate limiting or overload) should not kill a multi-hour task. **Persistent retry mode** makes Qwen Code retry transient API errors indefinitely until the service recovers.
+When MariaDB Shell Agent runs in CI/CD pipelines or as a background daemon, a brief API outage (rate limiting or overload) should not kill a multi-hour task. **Persistent retry mode** makes MariaDB Shell Agent retry transient API errors indefinitely until the service recovers.
 
 ### How it works
 
@@ -450,7 +450,7 @@ export QWEN_CODE_UNATTENDED_RETRY=1
   env:
     QWEN_CODE_UNATTENDED_RETRY: '1'
   run: |
-    qwen -p "Review all files in src/ for security issues" \
+    mariadb-shell-agent -p "Review all files in src/ for security issues" \
       --output-format json \
       --yolo > review.json
 ```
@@ -459,13 +459,13 @@ export QWEN_CODE_UNATTENDED_RETRY=1
 
 ```bash
 export QWEN_CODE_UNATTENDED_RETRY=1
-qwen -p "Migrate all callback-style functions to async/await in src/" --yolo
+mariadb-shell-agent -p "Migrate all callback-style functions to async/await in src/" --yolo
 ```
 
 #### Background daemon
 
 ```bash
-QWEN_CODE_UNATTENDED_RETRY=1 nohup qwen -p "Audit all dependencies for known CVEs" \
+QWEN_CODE_UNATTENDED_RETRY=1 nohup mariadb-shell-agent -p "Audit all dependencies for known CVEs" \
   --output-format json > audit.json 2> audit.log &
 ```
 

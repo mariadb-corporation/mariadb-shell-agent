@@ -30,7 +30,7 @@ App 观察先采集结构树，再执行投影。投影保留可操作身份和�
 
 App 键盘动作先使用原生后台焦点准备和 PID 投递。facade 不再根据缓存的能力或角色启发式选择模式；只有原生预检以结构化结果证明尚未运行 actuator，并明确建议前台路径时，才执行一次受保护的前台尝试。缺少该证明或效果未确认时，返回错误或 unverifiable 回执，不重放动作。显式使用前台模式的精确窗口调用方保留该选项。原生修复覆盖文本控件未声明支持的 press，以及未验证的文本写入和确认，避免已知的无效果与重复输入路径。
 
-验证计划位于 `.qwen/e2e-tests/cua-native-alignment.md`：覆盖路径冲突和终止、堆叠顺序相反时的 AX 焦点选择、菜单和对话框上下文及过期 ID、full/diff/no-change、精确 Unicode 和标点输入，以及后台动作期间的前台归属采样。最终模型运行使用 MRKey GPT-6，并记录实际请求配置。本次不引入新的进程、传输或权限所有者。
+验证计划位于 `.mariadb-shell-agent/e2e-tests/cua-native-alignment.md`：覆盖路径冲突和终止、堆叠顺序相反时的 AX 焦点选择、菜单和对话框上下文及过期 ID、full/diff/no-change、精确 Unicode 和标点输入，以及后台动作期间的前台归属采样。最终模型运行使用 MRKey GPT-6，并记录实际请求配置。本次不引入新的进程、传输或权限所有者。
 
 ## 运行时与归属
 
@@ -60,7 +60,7 @@ App 拖拽携带内部 app-context 标记。投递前，原生驱动选择其支
 
 变更覆盖 facade、类型化契约和生成绑定、macOS 应用及窗口解析、原生 AX 采集、投影和修订渲染、输入路径、标准 Skill、包内容及 0.20.6 发布元数据。运行时拓扑、授权归属和精确窗口的平台支持保持不变。
 
-运行 SDK 测试和类型检查、相关原生测试和 core Skill 测试、build/typecheck/bundle、包验证及 `.qwen/e2e-tests/cua-native-alignment.md`。GUI 检查使用自有测试夹具，并通过独立 AX 和文件验证效果。最终 smoke 使用 MRKey GPT-6，记录实际请求参数和全部推理用量。字符数和一次 smoke 不能证明 20 个任务基准的整体收益。
+运行 SDK 测试和类型检查、相关原生测试和 core Skill 测试、build/typecheck/bundle、包验证及 `.mariadb-shell-agent/e2e-tests/cua-native-alignment.md`。GUI 检查使用自有测试夹具，并通过独立 AX 和文件验证效果。最终 smoke 使用 MRKey GPT-6，记录实际请求参数和全部推理用量。字符数和一次 smoke 不能证明 20 个任务基准的整体收益。
 
 ## 已审批补齐工作的验收
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -140,7 +141,7 @@ export type PermissionResolution =
     };
 
 /**
- * The contract `qwen serve`'s permission route layer talks to.
+ * The contract `mariadb-shell-agent serve`'s permission route layer talks to.
  * `MultiClientPermissionMediator` provides the implementation.
  */
 export interface PermissionMediator {

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +39,7 @@ export interface WebShellBrowserNotificationsOptions {
   defaultEnabled?: boolean;
   /** Application name prefixed to notification titles. Defaults to QwenCode. */
   appName?: string;
-  /** Image URL, including HTTPS CDN URLs. Defaults to the bundled Qwen Code icon. */
+  /** Image URL, including HTTPS CDN URLs. Defaults to the bundled MariaDB Shell Agent icon. */
   iconUrl?: string;
 }
 

@@ -2,8 +2,8 @@
 
 ## Status
 
-Phase 2A merged in [#11054](https://github.com/QwenLM/qwen-code/pull/11054);
-Phase 2B implemented in [#11208](https://github.com/QwenLM/qwen-code/pull/11208),
+Phase 2A merged in [#11054](https://github.invalid/QwenLM/qwen-code/pull/11054);
+Phase 2B implemented in [#11208](https://github.invalid/QwenLM/qwen-code/pull/11208),
 following the
 [historical viewport integration design](web-shell-global-turn-navigation-phase2b.md).
 The same open PR also implements the agreed Phase 3 rail and scoped frontend

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -147,7 +148,7 @@ export class AcpFileSystemService implements FileSystemService {
     }
 
     // Everything below — including the localReadRoots retry in the catch — is
-    // unreachable under `qwen serve`, which advertises this capability as
+    // unreachable under `mariadb-shell-agent serve`, which advertises this capability as
     // false. It guards only generic ACP hosts that keep delegation on. Do not
     // read the retry as a live backstop for daemon reads.
     let response: ReadTextFileResponse;

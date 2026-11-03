@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -63,7 +64,7 @@ function makeSettings(workspaceDir: string): LoadedSettings {
   return {
     isTrusted: true,
     workspace: {
-      path: path.join(workspaceDir, '.qwen', 'settings.json'),
+      path: path.join(workspaceDir, '.mariadb-shell-agent', 'settings.json'),
       settings: {},
     },
     merged: {},
@@ -91,7 +92,7 @@ describe('buildVoiceKeyterms race checks', () => {
 
   it('does not read a keyterms file swapped in before open', () => {
     workspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'voice-keyterms-'));
-    const qwenDir = path.join(workspaceDir, '.qwen');
+    const qwenDir = path.join(workspaceDir, '.mariadb-shell-agent');
     fs.mkdirSync(qwenDir, { recursive: true });
     const target = path.join(qwenDir, 'voice-keyterms.txt');
     fs.writeFileSync(target, 'SafeTerm\n');
@@ -109,7 +110,7 @@ describe('buildVoiceKeyterms race checks', () => {
 
   it('does not read a keyterms file rewritten in place before open', () => {
     workspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'voice-keyterms-'));
-    const qwenDir = path.join(workspaceDir, '.qwen');
+    const qwenDir = path.join(workspaceDir, '.mariadb-shell-agent');
     fs.mkdirSync(qwenDir, { recursive: true });
     const target = path.join(qwenDir, 'voice-keyterms.txt');
     fs.writeFileSync(target, 'SafeTerm\n');
@@ -129,7 +130,7 @@ describe('buildVoiceKeyterms race checks', () => {
 
   it('does not read content larger than the file size cap after open', () => {
     workspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'voice-keyterms-'));
-    const qwenDir = path.join(workspaceDir, '.qwen');
+    const qwenDir = path.join(workspaceDir, '.mariadb-shell-agent');
     fs.mkdirSync(qwenDir, { recursive: true });
     const target = path.join(qwenDir, 'voice-keyterms.txt');
     fs.writeFileSync(target, 'Small\n');

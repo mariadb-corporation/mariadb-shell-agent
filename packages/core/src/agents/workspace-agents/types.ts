@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,8 +31,8 @@ export interface AgentHost {
   workspaceCwd: string;
   /**
    * Programs the Host offers. A protocol-v2 Host reports program ids
-   * (`qwen` / `claude` / `codex`); records written by a v1 Host hold display
-   * labels (`Qwen Code ACP`). Readers go through {@link hostOffersProgram},
+   * (`mariadb-shell-agent` / `claude` / `codex`); records written by a v1 Host hold display
+   * labels (`MariaDB Shell Agent ACP`). Readers go through {@link hostOffersProgram},
    * which accepts both.
    */
   providers: string[];
@@ -95,7 +96,7 @@ export type AgentProgram = 'qwen' | 'codex' | 'claude';
  * the host, the daemon's validation and pickup all read.
  */
 export const AGENT_PROGRAM_LABELS: Readonly<Record<AgentProgram, string>> = {
-  qwen: 'Qwen Code ACP',
+  qwen: 'MariaDB Shell Agent ACP',
   codex: 'Codex CLI',
   claude: 'Claude Code ACP',
 };
@@ -150,7 +151,7 @@ export const AGENT_HOST_CREDENTIAL_REJECTED = 'Invalid Agent Host credential.';
 export type WorkspaceAgentExecution =
   | {
       mode: 'local';
-      /** Program on this machine; `qwen` when absent (session agents only). */
+      /** Program on this machine; `mariadb-shell-agent` when absent (session agents only). */
       provider?: AgentProgram;
     }
   | {

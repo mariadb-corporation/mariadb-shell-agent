@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Process-scoped registry pairing the (single) extension `/acp` reverse
@@ -64,7 +65,7 @@ export class CdpTunnelRegistry {
     const previous = this.active;
     if (previous && previous !== endpoint) {
       writeStderrLine(
-        `qwen serve: /cdp tunnel — extension bridge '${endpoint.connectionId}' ` +
+        `mariadb-shell-agent serve: /cdp tunnel — extension bridge '${endpoint.connectionId}' ` +
           `superseded the stale '${previous.connectionId}'`,
       );
       previous.onExtensionGone?.();

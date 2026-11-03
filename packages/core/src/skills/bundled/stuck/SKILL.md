@@ -1,19 +1,19 @@
 ---
 name: stuck
-description: Diagnose frozen, stuck, or slow Qwen Code sessions on this machine. Scans for problematic processes, high CPU/memory usage, hung subprocesses, and debug logs. Use /stuck or /stuck <PID> to focus on a specific process.
+description: Diagnose frozen, stuck, or slow MariaDB Shell Agent sessions on this machine. Scans for problematic processes, high CPU/memory usage, hung subprocesses, and debug logs. Use /stuck or /stuck <PID> to focus on a specific process.
 argument-hint: '[PID or symptom]'
 allowedTools:
   - run_shell_command
   - read_file
 ---
 
-# /stuck — diagnose frozen/slow Qwen Code sessions
+# /stuck — diagnose frozen/slow MariaDB Shell Agent sessions
 
-The user thinks another Qwen Code session on this machine is frozen, stuck, or very slow. Investigate and present a diagnostic report.
+The user thinks another MariaDB Shell Agent session on this machine is frozen, stuck, or very slow. Investigate and present a diagnostic report.
 
 ## What to look for
 
-Scan for other Qwen Code processes (excluding the current one — exclude the PID you see running this prompt). Since Qwen Code is a Node.js CLI (`#!/usr/bin/env node`), the process name (`comm` column) is always `node` (or `bun` if run with Bun). Identify Qwen Code sessions by looking at the `command` column for a script path inside a directory whose name starts with `qwen-code` (matches `qwen-code/`, `qwen-code-dev/`, worktree clones, etc.) — anchored to the start of the path or after `/` so unrelated names like `analyze-qwen-code/` don't false-match — or a bin invocation ending in `/qwen` (the global symlink). Avoid loose `qwen-code` substring matching: it false-positives on plugin brokers that merely pass a qwen-code path as `--cwd`.
+Scan for other MariaDB Shell Agent processes (excluding the current one — exclude the PID you see running this prompt). Since MariaDB Shell Agent is a Node.js CLI (`#!/usr/bin/env node`), the process name (`comm` column) is always `node` (or `bun` if run with Bun). Identify MariaDB Shell Agent sessions by looking at the `command` column for a script path inside a directory whose name starts with `qwen-code` (matches `qwen-code/`, `qwen-code-dev/`, worktree clones, etc.) — anchored to the start of the path or after `/` so unrelated names like `analyze-qwen-code/` don't false-match — or a bin invocation ending in `/qwen` (the global symlink). Avoid loose `qwen-code` substring matching: it false-positives on plugin brokers that merely pass a qwen-code path as `--cwd`.
 
 Signs of a stuck session:
 
@@ -31,24 +31,24 @@ If the user gave an argument, treat it as a PID **only if it consists entirely o
 
 ## Investigation steps
 
-**Preamble — resolve the runtime base directory.** Required for both paths below (sidecar enumeration in step 1, debug log lookup in step 3, and the PID fast path). The base directory is taken from (in priority order): `QWEN_RUNTIME_DIR` env var, the `advanced.runtimeOutputDir` setting, `QWEN_HOME` env var, and finally `~/.qwen`.
+**Preamble — resolve the runtime base directory.** Required for both paths below (sidecar enumeration in step 1, debug log lookup in step 3, and the PID fast path). The base directory is taken from (in priority order): `QWEN_RUNTIME_DIR` env var, the `advanced.runtimeOutputDir` setting, `QWEN_HOME` env var, and finally `~/.mariadb-shell-agent`.
 
 ```
 RUNTIME_DIR="${QWEN_RUNTIME_DIR:-}"
-[ -z "$RUNTIME_DIR" ] && command -v jq >/dev/null && RUNTIME_DIR=$(jq -r '.advanced.runtimeOutputDir // empty' "${QWEN_HOME:-$HOME/.qwen}/settings.json" 2>/dev/null)
+[ -z "$RUNTIME_DIR" ] && command -v jq >/dev/null && RUNTIME_DIR=$(jq -r '.advanced.runtimeOutputDir // empty' "${QWEN_HOME:-$HOME/.mariadb-shell-agent}/settings.json" 2>/dev/null)
 # `advanced.runtimeOutputDir` may be `~/...` or relative; mirror Storage.resolvePath() before using in globs
 [ -n "$RUNTIME_DIR" ] && RUNTIME_DIR="${RUNTIME_DIR/#\~/$HOME}"
 [ -n "$RUNTIME_DIR" ] && case "$RUNTIME_DIR" in /*) ;; *) RUNTIME_DIR="$(cd "$RUNTIME_DIR" 2>/dev/null && pwd)" || RUNTIME_DIR="" ;; esac
-RUNTIME_DIR="${RUNTIME_DIR:-${QWEN_HOME:-$HOME/.qwen}}"
+RUNTIME_DIR="${RUNTIME_DIR:-${QWEN_HOME:-$HOME/.mariadb-shell-agent}}"
 ```
 
 (If `jq` isn't installed, the settings layer is silently skipped — the env-var / default fallback covers the common case.)
 
-**Fast path for targeted diagnosis** — if a digit-only PID argument was given, skip step 1 enumeration. Validate that the PID is a live current-user Qwen Code process before dumping any details:
+**Fast path for targeted diagnosis** — if a digit-only PID argument was given, skip step 1 enumeration. Validate that the PID is a live current-user MariaDB Shell Agent process before dumping any details:
 
 ```
 kill -0 <pid> 2>/dev/null || { echo "PID <pid> is dead, or owned by another user"; exit 0; }
-ps -p <pid> -o command= -ww 2>/dev/null | grep -qE '((^|/)qwen-code[^ /]*/[^ ]*\.(js|ts|mjs|cjs)( |$)|/qwen( |$))' || { echo "PID <pid> is yours but is not a Qwen Code process — refusing to dump details"; exit 0; }
+ps -p <pid> -o command= -ww 2>/dev/null | grep -qE '((^|/)qwen-code[^ /]*/[^ ]*\.(js|ts|mjs|cjs)( |$)|/qwen( |$))' || { echo "PID <pid> is yours but is not a MariaDB Shell Agent process — refusing to dump details"; exit 0; }
 ```
 
 If either guard prints, stop the diagnostic and surface the message verbatim. Otherwise, gather stats and the sidecar mapping, then jump to step 3:
@@ -66,7 +66,7 @@ Otherwise (no arg, or symptom-only arg), run the general path below:
 
 1. **Enumerate live sessions via the runtime sidecar** (preferred, reliable):
 
-   Qwen Code writes a `runtime.json` sidecar for each interactive session at `"$RUNTIME_DIR"/projects/<sanitized-cwd>/chats/<sessionId>.runtime.json`. Each file contains `{schema_version, pid, session_id, work_dir, hostname, started_at, qwen_version}` — the authoritative source of `(pid, session_id, work_dir)` mappings.
+   MariaDB Shell Agent writes a `runtime.json` sidecar for each interactive session at `"$RUNTIME_DIR"/projects/<sanitized-cwd>/chats/<sessionId>.runtime.json`. Each file contains `{schema_version, pid, session_id, work_dir, hostname, started_at, qwen_version}` — the authoritative source of `(pid, session_id, work_dir)` mappings.
 
    Filter to live `(pid, sidecar-path)` pairs in one shot. Use Node (guaranteed available — qwen-code requires it) instead of `jq` (often missing on default macOS / minimal Linux) so this path doesn't silently degrade:
 
@@ -74,17 +74,17 @@ Otherwise (no arg, or symptom-only arg), run the general path below:
    node -e 'const fs=require("fs"); for (const f of process.argv.slice(1)) { try { const p=JSON.parse(fs.readFileSync(f,"utf8")).pid; if (p) { try { process.kill(p,0); console.log(p+" "+f); } catch {} } } catch {} }' "$RUNTIME_DIR"/projects/*/chats/*.runtime.json 2>/dev/null
    ```
 
-   PID reuse is rare but possible — when you cross-reference with `ps` in step 2, skip pairs whose live PID's command line no longer looks like a Qwen Code process.
+   PID reuse is rare but possible — when you cross-reference with `ps` in step 2, skip pairs whose live PID's command line no longer looks like a MariaDB Shell Agent process.
 
    **If the command emits nothing** (no sidecars, or no live PIDs), fall through to step 2 — `ps` is the working fallback.
 
-2. **List Qwen Code processes via `ps`** (macOS/Linux) — used to enrich each live session with CPU/RSS/state/uptime, and to catch sessions that may have started before the sidecar feature existed:
+2. **List MariaDB Shell Agent processes via `ps`** (macOS/Linux) — used to enrich each live session with CPU/RSS/state/uptime, and to catch sessions that may have started before the sidecar feature existed:
 
    ```
    ps -xo pid=,pcpu=,rss=,etime=,state=,comm=,command= -u "$(id -u)" -ww | grep -E '((^|/)qwen-code[^ /]*/[^ ]*\.(js|ts|mjs|cjs)( |$)|/qwen( |$))' | grep -v grep
    ```
 
-   `-u "$(id -u)"` restricts the scan to the current user — on shared hosts this avoids exposing other users' Qwen process paths/arguments into the chat. `-ww` disables column truncation so long "qwen" paths aren't cut off. The `comm` column will be `node` or `bun`, not `qwen`; filter to rows where the `command` column contains a qwen path (e.g., `qwen-code/dist/cli.js`, or a bin symlink ending in `/qwen`). Cross-reference with the PIDs from step 1.
+   `-u "$(id -u)"` restricts the scan to the current user — on shared hosts this avoids exposing other users' Qwen process paths/arguments into the chat. `-ww` disables column truncation so long "qwen" paths aren't cut off. The `comm` column will be `node` or `bun`, not `mariadb-shell-agent`; filter to rows where the `command` column contains a qwen path (e.g., `qwen-code/dist/cli.js`, or a bin symlink ending in `/qwen`). Cross-reference with the PIDs from step 1.
 
    Note: `ps` reports `rss` in **kilobytes** on both macOS and Linux. To report in MB, divide by 1024; to report in GB, divide by 1048576. The 4GB threshold is `4194304` KB — compare the raw `rss` value against that, or compare the GB value against 4. Do not divide once and then compare against 4; that would flag every process >4MB as "very high RSS".
 

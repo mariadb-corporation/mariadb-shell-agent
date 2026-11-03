@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,7 +25,8 @@ vi.mock('@qwen-code/qwen-code-core', () => ({
   addPeerController: (...args: unknown[]) => addPeerController(...args),
   listPeerControllers: (...args: unknown[]) => listPeerControllers(...args),
   removePeerController: (...args: unknown[]) => removePeerController(...args),
-  getPeerControllerRegistryPath: () => '/home/u/.qwen/peer-controllers.json',
+  getPeerControllerRegistryPath: () =>
+    '/home/u/.mariadb-shell-agent/peer-controllers.json',
   MAX_CONTROLLER_LABEL_CHARS: 40,
   PeerControllerError: FakePeerControllerError,
 }));
@@ -51,7 +53,7 @@ const { MAX_CONTROLLER_LABEL_CHARS } = await import(
 
 const TOKEN = `qpc_${'a'.repeat(64)}`;
 const REGISTRY_CHANGED =
-  '/home/u/.qwen/peer-controllers.json kept changing while this write was in progress; nothing was saved. Try again.';
+  '/home/u/.mariadb-shell-agent/peer-controllers.json kept changing while this write was in progress; nothing was saved. Try again.';
 
 function record(over: Record<string, unknown> = {}) {
   return {
@@ -173,7 +175,9 @@ describe('controllers add', () => {
 
     await handleAdd({ label: 'voice bridge' });
 
-    expect(stderr.join('\n')).toContain('/home/u/.qwen/peer-controllers.json');
+    expect(stderr.join('\n')).toContain(
+      '/home/u/.mariadb-shell-agent/peer-controllers.json',
+    );
     expect(stderr.join('\n')).toContain('EROFS');
     expect(exitCode).toBe(1);
   });
@@ -184,7 +188,7 @@ describe('controllers list', () => {
     listPeerControllers.mockResolvedValue([]);
     await handleControllerList({});
     expect(stdout.join('\n')).toBe(
-      'No trusted controllers. Add one with: qwen sessions controllers add --label <name>',
+      'No trusted controllers. Add one with: mariadb-shell-agent sessions controllers add --label <name>',
     );
   });
 
@@ -281,13 +285,13 @@ describe('controllers list', () => {
   it('does not duplicate the path in a structured read error', async () => {
     listPeerControllers.mockRejectedValue(
       new FakePeerControllerError(
-        'Cannot read /home/u/.qwen/peer-controllers.json: it is not valid JSON.',
+        'Cannot read /home/u/.mariadb-shell-agent/peer-controllers.json: it is not valid JSON.',
         'invalid-registry',
       ),
     );
     await handleControllerList({});
     expect(stderr).toEqual([
-      'Error: Cannot read /home/u/.qwen/peer-controllers.json: it is not valid JSON.',
+      'Error: Cannot read /home/u/.mariadb-shell-agent/peer-controllers.json: it is not valid JSON.',
     ]);
     expect(exitCode).toBe(1);
   });
@@ -324,7 +328,9 @@ describe('controllers remove', () => {
   it('reports a failed write', async () => {
     removePeerController.mockRejectedValue(new Error('EROFS'));
     await handleRemove({ id: 'c_0123abcd' });
-    expect(stderr.join('\n')).toContain('/home/u/.qwen/peer-controllers.json');
+    expect(stderr.join('\n')).toContain(
+      '/home/u/.mariadb-shell-agent/peer-controllers.json',
+    );
     expect(stderr.join('\n')).toContain('EROFS');
     expect(exitCode).toBe(1);
   });

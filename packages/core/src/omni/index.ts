@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -375,7 +376,7 @@ function evaluateTransportLimits(
  * — an oversized original that a policy shrank must pass, and a policy
  * failure leaves the guard as the backstop. Successful uploads are
  * remembered in the persistent upload cache
- * (`.qwen/omni/upload-cache.json`, keyed by sha256 + model + endpoint
+ * (`.mariadb-shell-agent/omni/upload-cache.json`, keyed by sha256 + model + endpoint
  * scope) for the oss URL validity window, so a re-read of unchanged
  * content skips both the store copy and the network transfer. Throws
  * OmniDeliveryError / OmniTransportGuardError on failure; user aborts

@@ -62,7 +62,7 @@ TypeScript driver and Java probe, and this bilingual design. The existing Hosted
 MySQL profile discovers the entry; no additional CI job or product route is
 needed. Scenarios can be selected independently for mutation checks.
 
-Write the exact E2E commands and evidence under `.qwen/e2e-tests/`. Try the global
+Write the exact E2E commands and evidence under `.mariadb-shell-agent/e2e-tests/`. Try the global
 CLI first; a missing private worker capability is an unavailable baseline, not
 a reproduced defect. Build, typecheck and bundle the local CLI, compile and
 Checkstyle the Java tests, run focused provider tests and the full Hosted family

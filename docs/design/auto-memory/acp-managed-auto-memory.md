@@ -4,7 +4,7 @@
 
 **Target baseline:** `QwenLM/qwen-code@43d46be912f41e797e6a5aaa34bfaf4a16e06efa` (`0.22.0`)
 
-**Issue:** [#9658](https://github.com/QwenLM/qwen-code/issues/9658)
+**Issue:** [#9658](https://github.invalid/QwenLM/qwen-code/issues/9658)
 
 **Related designs:** [Memory system](./memory-system.md), [Async memory recall](../2026-05-15-async-memory-recall-design.md)
 
@@ -500,7 +500,7 @@ Add focused tests for the following observable contracts:
 ### ACP integration test
 
 Add one deterministic case to the existing ACP integration suite using
-`startFakeOpenAIServer()` and the real bundled `qwen --acp` process:
+`startFakeOpenAIServer()` and the real bundled `mariadb-shell-agent --acp` process:
 
 1. Isolate `QWEN_HOME` and set `QWEN_CODE_MEMORY_LOCAL=1` for a transparent test
    path.
@@ -580,16 +580,16 @@ provider-send boundary is both later and shared by all ACP tool continuations.
 ### Hook or proxy implementation
 
 Rejected. It cannot preserve the existing fast/refined delivery, session dedup,
-abort propagation, and telemetry without rebuilding Qwen Code internals outside
+abort propagation, and telemetry without rebuilding MariaDB Shell Agent internals outside
 their owner.
 
 ## Downstream image and persistence work
 
-This upstream PR makes ACP memory behavior correct inside Qwen Code. It does not
+This upstream PR makes ACP memory behavior correct inside MariaDB Shell Agent. It does not
 make a container's filesystem durable. A `chrome-acp-v2` rollout still needs a
 separate, deployment-owned change:
 
-1. Build the image with the patched Qwen Code version.
+1. Build the image with the patched MariaDB Shell Agent version.
 2. Explicitly enable managed auto-memory and Dream in production settings if the
    image policy requires pinned defaults.
 3. Persist both project runtime state and the user-level `memories` directory.

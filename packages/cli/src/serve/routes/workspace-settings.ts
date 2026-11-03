@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -105,7 +106,7 @@ const LIVE_WEB_SHELL_SETTINGS = [
 const LIVE_MANAGED_SETTINGS = new Set<string>(LIVE_WEB_SHELL_SETTINGS);
 
 // The primary /workspace/settings route may write the global user scope
-// (~/.qwen/settings.json). The trust-gated workspace-qualified route stays
+// (~/.mariadb-shell-agent/settings.json). The trust-gated workspace-qualified route stays
 // workspace-only by design.
 const VALID_WRITE_SCOPES = new Set(['workspace', 'user']);
 const QUALIFIED_WRITE_SCOPES = new Set(['workspace']);
@@ -154,7 +155,7 @@ const WORKSPACE_RESTRICTED_KEYS = new Set<string>([
  *
  * R8-1: `stripWorkspaceRestrictedSettings` drops these before every merge, so
  * persisting one at workspace scope writes a committable dead entry into the
- * repo's `.qwen/settings.json` and answers 200 + `requiresRestart: true` while
+ * repo's `.mariadb-shell-agent/settings.json` and answers 200 + `requiresRestart: true` while
  * the feature never turns on — GET then reports `workspace: true` beside
  * `effective: false`, and the warnings channel carries only `corrupted`, so the
  * client never learns the write was inert. `tools.workflowsEnabled` is the
@@ -512,7 +513,7 @@ async function updateLiveSessionWorkflow(
   } catch (err) {
     if (err instanceof SessionNotFoundError) return true;
     writeStderrLine(
-      `qwen serve: failed to update the live Session Workflow setting for ${workspace}: ${err instanceof Error ? err.message : String(err)}`,
+      `mariadb-shell-agent serve: failed to update the live Session Workflow setting for ${workspace}: ${err instanceof Error ? err.message : String(err)}`,
     );
     res.status(500).json({
       error: 'Failed to update the live Session Workflow setting',
@@ -572,7 +573,7 @@ export function registerWorkspaceSettingsRoutes(
     } catch (err) {
       if (sendGenerationClosedError(res, err)) return;
       writeStderrLine(
-        `qwen serve: GET /workspace/settings error: ${
+        `mariadb-shell-agent serve: GET /workspace/settings error: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );
@@ -729,7 +730,7 @@ export function registerWorkspaceSettingsRoutes(
           } catch (err) {
             if (sendGenerationClosedError(res, err)) return 'unchanged_failure';
             writeStderrLine(
-              `qwen serve: POST /workspace/settings persist error (key=${key}, scope=${scope}, workspace=${boundWorkspace}): ${
+              `mariadb-shell-agent serve: POST /workspace/settings persist error (key=${key}, scope=${scope}, workspace=${boundWorkspace}): ${
                 err instanceof Error ? err.message : String(err)
               }`,
             );
@@ -799,7 +800,7 @@ export function registerWorkspaceSettingsRoutes(
         broadcastSettingsChanged(key, publicValue, scope, clientId);
       } catch (err) {
         writeStderrLine(
-          `qwen serve: POST /workspace/settings broadcast error (key=${key}, scope=${scope}): ${
+          `mariadb-shell-agent serve: POST /workspace/settings broadcast error (key=${key}, scope=${scope}): ${
             err instanceof Error ? err.message : String(err)
           }`,
         );
@@ -864,7 +865,7 @@ export function registerWorkspaceQualifiedSettingsRoutes(
       res.status(200).json(response);
     } catch (err) {
       writeStderrLine(
-        `qwen serve: GET /workspaces/:workspace/settings error: ${
+        `mariadb-shell-agent serve: GET /workspaces/:workspace/settings error: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );
@@ -1007,7 +1008,7 @@ export function registerWorkspaceQualifiedSettingsRoutes(
           } catch (err) {
             if (sendGenerationClosedError(res, err)) return 'unchanged_failure';
             writeStderrLine(
-              `qwen serve: POST /workspaces/:workspace/settings persist error (key=${key}, scope=${scope}, workspace=${runtime.workspaceCwd}): ${
+              `mariadb-shell-agent serve: POST /workspaces/:workspace/settings persist error (key=${key}, scope=${scope}, workspace=${runtime.workspaceCwd}): ${
                 err instanceof Error ? err.message : String(err)
               }`,
             );

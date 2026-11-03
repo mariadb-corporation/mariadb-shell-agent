@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -45,7 +46,7 @@ describe('workflow resume call', () => {
   it('names the workflow in a name-only session, and offers nothing without a name', () => {
     const target = {
       runId: 'wf_0123',
-      scriptPath: '/proj/.qwen/workflows/audit.js',
+      scriptPath: '/proj/.mariadb-shell-agent/workflows/audit.js',
       resumeName: 'gcp:audit',
       args: { scope: 'src' },
     };
@@ -59,7 +60,7 @@ describe('workflow resume call', () => {
     // Outside the lock the name is not used, even when the run has one: a
     // grant written for the path keeps matching the resume.
     expect(buildResumeCall(target)).toBe(
-      'Workflow({ scriptPath: "/proj/.qwen/workflows/audit.js", resumeFromRunId: "wf_0123", args: {"scope":"src"} })',
+      'Workflow({ scriptPath: "/proj/.mariadb-shell-agent/workflows/audit.js", resumeFromRunId: "wf_0123", args: {"scope":"src"} })',
     );
   });
 

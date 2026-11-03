@@ -3,7 +3,7 @@
 ## 状态
 
 - 状态：Draft
-- 范围：Qwen Code 实验分支中的图片、音频、视频 Harness 侧处理
+- 范围：MariaDB Shell Agent 实验分支中的图片、音频、视频 Harness 侧处理
 - Provider：仅支持 DashScope OpenAI-compatible 路径
 - 前置设计：
   [多模态文件识别与元数据提取架构设计](./2026-07-29-multimodal-file-recognition-and-metadata.md)
@@ -17,7 +17,7 @@
 
 本功能用于探索不同图片、音频和视频处理策略对多模态模型表现的影响，并为后续
 长短视频、音频处理和训练数据生产寻找稳定策略。它不是一个独立产品，也不新增
-Qwen Code 之外的平台或插件生命周期。
+MariaDB Shell Agent 之外的平台或插件生命周期。
 
 文件识别与 metadata 阶段已经把用户输入、工具结果、URL、base64 和 MCP 资源
 归一为本地 `MediaResource`。本文从该结果继续，设计 Harness 如何自动执行固定
@@ -25,14 +25,14 @@ policy、如何把同一 policy 暴露为模型可调用 Tool、如何选择模�
 如何经官方临时上传通道投递媒体并在投递前强制满足上传通道限制。
 
 本功能具有明确的实验属性：配置需要支持细粒度组合、消融和参数约束，并且每次
-执行必须能够记录完整实验条件。本文不以合入 Qwen Code 主分支和长期配置兼容为
+执行必须能够记录完整实验条件。本文不以合入 MariaDB Shell Agent 主分支和长期配置兼容为
 目标；分支、发布和最终交付方式留到整体 roadmap 阶段讨论。
 
 ## 2. 目标与非目标
 
 ### 2.1 目标
 
-- 每个媒体处理 policy 只实现一次，并以现有 Qwen Code Tool 形态注册；
+- 每个媒体处理 policy 只实现一次，并以现有 MariaDB Shell Agent Tool 形态注册；
 - 同一 Tool 同时支持 Harness 固定调用和 Agent 模型调用；
 - 所有用户 fixed policy 使用同一策略集合；省略 `when` 表示无条件执行，配置
   `when` 表示按资源 metadata、token 估算或 session context 条件执行；
@@ -43,7 +43,7 @@ policy、如何把同一 policy 暴露为模型可调用 Tool、如何选择模�
   （单文件 ≤ 1GB 及模型时长档位）；不保留 inline 投递模式；
 - 所有执行记录 policy ID、Tool、参数、资源 lineage 和 resolved Omni 配置哈希，支持
   实验复现及训练数据追溯；
-- 复用 Qwen Code 现有 Tool registry、scheduler、ToolSearch、settings、artifact
+- 复用 MariaDB Shell Agent 现有 Tool registry、scheduler、ToolSearch、settings、artifact
   和工具结果公共漏斗。
 
 ### 2.2 非目标
@@ -98,7 +98,7 @@ policy
    由 Tool 声明自己的 settings schema，启动时校验
    `omni.processing.policyTools.<tool>.settings`，运行时以只读形式注入 Tool。
 
-调用远端模型的 policy（ASR、VL describe 等）的 backend 凭证沿用 Qwen Code 现有
+调用远端模型的 policy（ASR、VL describe 等）的 backend 凭证沿用 MariaDB Shell Agent 现有
 model provider 凭证体系，`settings` 中只引用模型/endpoint 标识，不保存密钥。
 
 ### 3.2 处理披露是 Policy 输出的一部分
@@ -543,7 +543,7 @@ availableContextTokens = max(
 ```
 
 `contextWindowTokens` 来自当前 active model 的 context window；`promptTokenCount` 使用
-当前 chat 的 Provider usage 作为基线，再用 Qwen Code 现有 prompt estimator 计入
+当前 chat 的 Provider usage 作为基线，再用 MariaDB Shell Agent 现有 prompt estimator 计入
 本次尚未发送的内容；`reservedOutputTokens` 来自
 `processing.limits.reservedOutputTokens`。不能直接读取一个与当前 chat 无关的全局 UI
 计数。估算媒体 token 来自 metadata 文档定义的 versioned estimator。
@@ -1122,7 +1122,7 @@ normalizer，并用配置 snapshot 测试防止两处示例漂移。
             "origins": ["user", "tool", "policy"],
           },
           // 未配置 when，表示匹配资源后无条件执行。
-          // 实际执行该 policy 的 Qwen Code Tool 名。
+          // 实际执行该 policy 的 MariaDB Shell Agent Tool 名。
           "tool": "omni_extract_audio",
           // 固定调用时传给 Tool 的参数；输入 resourceId 由 Harness 注入。
           "arguments": {
@@ -1651,7 +1651,7 @@ condition 记录 `unavailable`，避免把“没有数据”错误解释为“�
 模型 history 不包含伪造固定 ToolCall，但 UI 可以显示简洁进度。结构化执行记录与
 模型 transcript 分离保存，为策略评测和训练数据过滤提供事实依据。
 
-## 16. 与当前 Qwen Code 源码的对应关系
+## 16. 与当前 MariaDB Shell Agent 源码的对应关系
 
 本设计在现有链路中增加最小增量：
 
@@ -1714,7 +1714,7 @@ packages/core/src/services/media-processing/
 ```
 
 目录内部可以包含 resolver、matcher、orchestrator、delivery planner、upload
-service 和 transport guard，但它们共同组成一个 Qwen Code 媒体处理服务，不拆成
+service 和 transport guard，但它们共同组成一个 MariaDB Shell Agent 媒体处理服务，不拆成
 多个平级项目。
 
 ## 17. 失败语义

@@ -32,10 +32,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/QwenLM/qwen-code.git"
+    "url": "git+https://github.com/mariadb-corporation/mariadb-shell-agent.git"
   },
   "config": {
-    "sandboxImageUri": "ghcr.io/qwenlm/qwen-code:0.26.5"
+    "sandboxImageUri": "ghcr.invalid/qwenlm/qwen-code:0.26.5"
   },
   "scripts": {
     "start": "node scripts/start.js",
@@ -162,7 +162,8 @@
     "react-markdown": "^9.0.0"
   },
   "bin": {
-    "qwen": "scripts/cli-entry.js"
+    "mariadb-shell-agent": "scripts/cli-entry.js",
+    "msa": "scripts/cli-entry.js"
   },
   "files": [
     "dist/",

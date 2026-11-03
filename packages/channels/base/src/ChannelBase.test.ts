@@ -6955,7 +6955,7 @@ describe('ChannelBase', () => {
       const help = ch.sent[0]!.text;
       expect(help.match(/^\/btw\b/gmu)).toHaveLength(1);
       expect(help).toContain(
-        'Agent commands (forwarded to Qwen Code):\n/compress — Compress context',
+        'Agent commands (forwarded to MariaDB Shell Agent):\n/compress — Compress context',
       );
       expect(help).not.toContain('/btw — Ask a side question');
     });
@@ -6989,7 +6989,7 @@ describe('ChannelBase', () => {
       const help = ch.sent[0]!.text;
       expect(help.match(/^\/btw\b/gmu)).toHaveLength(1);
       expect(help).toContain(
-        'Agent commands (forwarded to Qwen Code):\n/compress — Compress context',
+        'Agent commands (forwarded to MariaDB Shell Agent):\n/compress — Compress context',
       );
       expect(help).not.toContain('/btw — Ask a side question');
     });

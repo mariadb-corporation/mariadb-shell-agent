@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 import type { ChildProcess } from 'child_process';
@@ -60,9 +61,9 @@ export enum HookEventName {
   PermissionDenied = 'PermissionDenied',
   // StopFailure - When the turn ends due to an API error (instead of Stop)
   StopFailure = 'StopFailure',
-  // TodoCreated - When a new todo item is added to the list (Qwen Code specific)
+  // TodoCreated - When a new todo item is added to the list (MariaDB Shell Agent specific)
   TodoCreated = 'TodoCreated',
-  // TodoCompleted - When a todo item's status changes to 'completed' (Qwen Code specific)
+  // TodoCompleted - When a todo item's status changes to 'completed' (MariaDB Shell Agent specific)
   TodoCompleted = 'TodoCompleted',
   // InstructionsLoaded - When an instruction or context file is loaded
   InstructionsLoaded = 'InstructionsLoaded',

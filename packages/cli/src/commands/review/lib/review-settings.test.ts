@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -133,7 +134,9 @@ describe('operatorReviewSettings', () => {
     // read or parse, and this is now read while the plan is being captured —
     // the review's first step. A stray comma must not end the review.
     loadSettingsMock.mockImplementation(() => {
-      throw new Error('Error in /home/u/.qwen/settings.json: Unexpected token');
+      throw new Error(
+        'Error in /home/u/.mariadb-shell-agent/settings.json: Unexpected token',
+      );
     });
     expect(operatorReviewSettings()).toEqual({
       attribution: true,
@@ -157,7 +160,9 @@ describe('operatorReviewSettings', () => {
     // daemon redirects its stderr. Both failures at once is exactly the case
     // this path was written for.
     loadSettingsMock.mockImplementation(() => {
-      throw new Error('Error in /home/u/.qwen/settings.json: Unexpected token');
+      throw new Error(
+        'Error in /home/u/.mariadb-shell-agent/settings.json: Unexpected token',
+      );
     });
     stderr.mockImplementation(() => {
       throw Object.assign(new Error('write EPIPE'), { code: 'EPIPE' });

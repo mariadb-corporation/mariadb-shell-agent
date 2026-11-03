@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -172,7 +173,7 @@ describe('owned workspace runtime publication', () => {
       makeRuntime('/Users/test', { primary: true }),
     ]);
     const runtime = makeRuntime(
-      '/Users/test/Documents/Qwen Code/Conversations',
+      '/Users/test/Documents/MariaDB Shell Agent/Conversations',
       {
         provenance: 'live-conversation',
         removable: false,
@@ -221,12 +222,15 @@ describe('owned workspace runtime publication', () => {
 
   it('does not let the Live root contain an existing workspace', async () => {
     const registry = createMockRegistry([
-      makeRuntime('/Users/test/Documents/Qwen Code/Conversations/project', {
-        primary: true,
-      }),
+      makeRuntime(
+        '/Users/test/Documents/MariaDB Shell Agent/Conversations/project',
+        {
+          primary: true,
+        },
+      ),
     ]);
     const runtime = makeRuntime(
-      '/Users/test/Documents/Qwen Code/Conversations',
+      '/Users/test/Documents/MariaDB Shell Agent/Conversations',
       {
         provenance: 'live-conversation',
         removable: false,
@@ -1176,7 +1180,12 @@ describe('POST /workspaces', () => {
 
   it('does not expose the hidden Live runtime to workspace nesting checks', async () => {
     const parent = await mkdtemp(join(REAL_DIR, 'qws-live-parent-'));
-    const liveRoot = join(parent, 'Documents', 'Qwen Code', 'Conversations');
+    const liveRoot = join(
+      parent,
+      'Documents',
+      'MariaDB Shell Agent',
+      'Conversations',
+    );
     try {
       const { app } = createApp({
         workspaceRegistry: createMockRegistry([
@@ -1198,7 +1207,12 @@ describe('POST /workspaces', () => {
 
   it('still blocks a user workspace inside the hidden Live runtime', async () => {
     const parent = await mkdtemp(join(REAL_DIR, 'qws-live-parent-'));
-    const liveRoot = join(parent, 'Documents', 'Qwen Code', 'Conversations');
+    const liveRoot = join(
+      parent,
+      'Documents',
+      'MariaDB Shell Agent',
+      'Conversations',
+    );
     const child = join(liveRoot, 'conversation');
     try {
       await mkdir(child, { recursive: true });
@@ -1670,7 +1684,12 @@ describe('POST /workspaces', () => {
 
   it('promotes a workspace that contains the hidden Live runtime', async () => {
     const parent = await mkdtemp(join(REAL_DIR, 'qws-live-parent-'));
-    const liveRoot = join(parent, 'Documents', 'Qwen Code', 'Conversations');
+    const liveRoot = join(
+      parent,
+      'Documents',
+      'MariaDB Shell Agent',
+      'Conversations',
+    );
     const add = vi.fn().mockResolvedValue(true);
     try {
       const { app } = createApp({
@@ -1801,7 +1820,7 @@ describe('POST /workspaces', () => {
     expect(res.status).toBe(409);
     expect(res.body.code).toBe('workspace_registration_store_too_large');
     expect(writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: failed to persist existing workspace registration: Workspace registration store exceeds 8388608 bytes',
+      'mariadb-shell-agent serve: failed to persist existing workspace registration: Workspace registration store exceeds 8388608 bytes',
     );
   });
 
@@ -2100,7 +2119,9 @@ describe('PATCH /workspaces/:workspace', () => {
 
     expect(res.status).toBe(200);
     expect(runtime.displayName).toBe('New name');
-    expect(writeStderrLine).toHaveBeenCalledWith('qwen serve: release failed');
+    expect(writeStderrLine).toHaveBeenCalledWith(
+      'mariadb-shell-agent serve: release failed',
+    );
   });
 
   it('serializes removal and shutdown behind a pending update', async () => {
@@ -2622,7 +2643,7 @@ describe('DELETE /workspaces/:workspace', () => {
       registry.getManagedByWorkspaceId(runtime.workspaceId),
     ).toBeUndefined();
     expect(writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: failed to commit workspace registry drain: registry commit failed',
+      'mariadb-shell-agent serve: failed to commit workspace registry drain: registry commit failed',
     );
   });
 
@@ -3847,7 +3868,7 @@ describe('git clone target reservations', () => {
 
   it('rejects a clone target that contains a reserved root', async () => {
     const root = await mkdtemp(join(REAL_DIR, 'qwen-clone-reserved-parent-'));
-    const target = join(root, 'Qwen Code');
+    const target = join(root, 'MariaDB Shell Agent');
     const conversations = join(target, 'Conversations');
     const cloner = createWorkspaceGitCloner({ runner: blockingRunner });
     try {
@@ -3878,7 +3899,7 @@ describe('git clone target reservations', () => {
     const linkedDocuments = join(root, 'Documents');
     await mkdir(realDocuments);
     await symlink(realDocuments, linkedDocuments);
-    const target = join(linkedDocuments, 'Qwen Code');
+    const target = join(linkedDocuments, 'MariaDB Shell Agent');
     const conversations = join(target, 'Conversations');
     const cloner = createWorkspaceGitCloner({ runner: blockingRunner });
     try {
@@ -3897,7 +3918,7 @@ describe('git clone target reservations', () => {
       expect(res.status).toBe(409);
       expect(res.body.code).toBe('target_reserved');
       await expect(
-        stat(join(realDocuments, 'Qwen Code')),
+        stat(join(realDocuments, 'MariaDB Shell Agent')),
       ).rejects.toBeDefined();
     } finally {
       await cloner.sealAndWait().catch(() => undefined);
@@ -3909,8 +3930,12 @@ describe('git clone target reservations', () => {
     const root = await mkdtemp(join(REAL_DIR, 'qwen-clone-case-'));
     const documents = join(root, 'Documents');
     await mkdir(documents);
-    const target = join(documents, 'qwen code');
-    const conversations = join(documents, 'Qwen Code', 'Conversations');
+    const target = join(documents, 'mariadb shell agent');
+    const conversations = join(
+      documents,
+      'MariaDB Shell Agent',
+      'Conversations',
+    );
     const cloner = createWorkspaceGitCloner({ runner: blockingRunner });
     try {
       const { app } = createApp({
@@ -3939,7 +3964,11 @@ describe('git clone target reservations', () => {
     const target = join(root, 'missing-documents');
     const documents = join(root, 'Documents');
     await symlink(target, documents);
-    const conversations = join(documents, 'Qwen Code', 'Conversations');
+    const conversations = join(
+      documents,
+      'MariaDB Shell Agent',
+      'Conversations',
+    );
     const cloner = createWorkspaceGitCloner({ runner: blockingRunner });
     try {
       const { app } = createApp({
@@ -3975,7 +4004,7 @@ describe('git clone target reservations', () => {
     const conversations = join(
       logicalHome,
       'Documents',
-      'Qwen Code',
+      'MariaDB Shell Agent',
       'Conversations',
     );
     const cloner = createWorkspaceGitCloner({ runner: blockingRunner });
@@ -4003,7 +4032,7 @@ describe('git clone target reservations', () => {
 
   it('keeps the Live runtime outside an active clone target', async () => {
     const root = await mkdtemp(join(REAL_DIR, 'qwen-live-clone-'));
-    const target = join(root, 'Qwen Code');
+    const target = join(root, 'MariaDB Shell Agent');
     const conversations = join(target, 'Conversations');
     const cloner = createWorkspaceGitCloner({ runner: blockingRunner });
     const registry = createMockRegistry([

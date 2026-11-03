@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -266,7 +267,7 @@ export interface DaemonWorkspaceService {
     opts?: { refreshRuntime?: boolean },
   ): Promise<WorkspaceSkillMutationResult>;
 
-  /** Scaffold (init) a QWEN.md file in the workspace. */
+  /** Scaffold (init) a MARIADB-SHELL-AGENT.md file in the workspace. */
   initWorkspace(
     ctx: WorkspaceRequestContext,
     opts: { force?: boolean },
@@ -534,7 +535,7 @@ export interface DaemonWorkspaceServiceDeps {
   /** Rejects work after this runtime generation starts draining. */
   assertGenerationOpen?: () => void;
 
-  /** Context filename (e.g. 'QWEN.md') from workspace settings. */
+  /** Context filename (e.g. 'MARIADB-SHELL-AGENT.md') from workspace settings. */
   contextFilename: string;
 
   /**

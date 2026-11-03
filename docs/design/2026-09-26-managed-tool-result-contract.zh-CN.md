@@ -2,7 +2,7 @@
 
 [English](2026-09-26-managed-tool-result-contract.md) | [简体中文](2026-09-26-managed-tool-result-contract.zh-CN.md)
 
-状态:契约已定义;尚无 worker、存储或 Broker 使用它。更新日期:2026-09-26。本文是 [#12723](https://github.com/QwenLM/qwen-code/issues/12723) 的 O1a 切片,属于 Managed Agent 提案 [#12380](https://github.com/QwenLM/qwen-code/issues/12380) 的 O1 阶段。下文的"参考设计"指该提案的[工具结果与持久产物设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-tool-result-artifacts.zh-CN.md)第 11 节及其依赖的各节,版本为 #12723 固定的提交。
+状态:契约已定义;尚无 worker、存储或 Broker 使用它。更新日期:2026-09-26。本文是 [#12723](https://github.invalid/QwenLM/qwen-code/issues/12723) 的 O1a 切片,属于 Managed Agent 提案 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380) 的 O1 阶段。下文的"参考设计"指该提案的[工具结果与持久产物设计](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-tool-result-artifacts.zh-CN.md)第 11 节及其依赖的各节,版本为 #12723 固定的提交。
 
 ## 问题
 
@@ -238,7 +238,7 @@ schema 固定每种记录的结构以及它能清晰表达的规则,包括角色
 - `packages/core/src/managed-runtime/contracts/managed-tool-result-v1.schema.json` 和 `.fixtures.json`(新增)。
 - `packages/core/src/managed-runtime/managed-tool-result.ts` 及其测试(新增)。
 - `packages/cli/src/serve/managed-tool-result-admission.test.ts`(新增)。
-- `packages/managed-agent-server` 中的 `ManagedToolResultConformanceTest`(新增),以及该模块的 `README.md` 和 `QWEN.md`。
+- `packages/managed-agent-server` 中的 `ManagedToolResultConformanceTest`(新增),以及该模块的 `README.md` 和 `MARIADB-SHELL-AGENT.md`。
 - 本设计文档的两种语言版本(新增),以及 Tool v2 契约文档:其中关于产物交付通道的说明现在指向本文。
 
 worker、路由清单、存储、provisioner、transport 和 CI workflow 均不变。

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -699,7 +700,7 @@ describe('ModelsConfig', () => {
       {
         model: 'qwen3.5-plus',
         apiKey: 'settings-api-key',
-        baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       },
       settingsAuthSources(true),
     );
@@ -800,7 +801,7 @@ describe('ModelsConfig', () => {
         entry(
           'provider-a',
           'Provider A',
-          'https://dashscope.aliyuncs.com/compatible-mode/v1',
+          'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
           envKeyA,
         ),
         entry('provider-b', 'Provider B', OPENAI_URL, envKeyB),
@@ -808,7 +809,7 @@ describe('ModelsConfig', () => {
       {
         model: 'provider-a',
         apiKey: 'settings-api-key',
-        baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       },
       settingsAuthSources(true),
     );
@@ -1138,7 +1139,7 @@ describe('ModelsConfig', () => {
       entry(
         'qwen3.6-plus',
         'Qwen 3.6 Plus',
-        'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
         'DASHSCOPE_API_KEY',
         { contextWindowSize: 12345, modalities: { image: true, video: true } },
       ),

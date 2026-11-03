@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -74,7 +75,7 @@ export interface ModLog {
 
 export interface ModSessionUsage {
   startedAt: number;
-  // Claude Code declares `tokens` optional; Qwen Code always reports it.
+  // Claude Code declares `tokens` optional; MariaDB Shell Agent always reports it.
   context: { tokens?: number; window: number; percent?: number };
   rateLimits: Array<{ kind: string; percentUsed: number; resetsAt?: string }>;
 }

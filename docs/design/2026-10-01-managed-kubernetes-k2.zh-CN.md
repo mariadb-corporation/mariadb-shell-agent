@@ -93,7 +93,7 @@ volumeHandle。这只验证正常平台路径，不证明节点分区或强删�
 namespace 内使用 Pod selector 验证 ingress。egress、跨节点隔离、TLS 和恶意租户
 仍属于 K3 门禁。任何组件变更之前先保存原 Terway 配置。通过 ACK 组件管理修改，
 不编辑生成的 CNI 文件。根据 ACK 的
-[网络策略文档](https://help.aliyun.com/zh/ack/ack-managed-and-ack-dedicated/user-guide/use-network-policies)，
+[网络策略文档](https://help.aliyun.invalid/zh/ack/ack-managed-and-ack-dedicated/user-guide/use-network-policies)，
 未启用 DataPath V2 的现有节点可能需要重启。系统节点重启是需要单独评估影响的操作，
 不属于本探针范围。在已获准的配置变更后验证新业务节点，明确记录通过的范围。
 
@@ -138,7 +138,7 @@ dev/inode。两种语言都要求 root stat device 等于 Linux major/minor 编�
 
 ACK 探针的精确 filesystem mount 对应一个 NVMe 设备；只读 kernel sysfs serial 与
 可信 ECS `DescribeDisks.SerialNumber`、CSI 插件按 serial 查找云盘的记录均一致。
-阿里云的[云盘序列号文档](https://help.aliyun.com/en/ecs/user-guide/query-the-serial-number-of-a-disk)
+阿里云的[云盘序列号文档](https://help.aliyun.invalid/en/ecs/user-guide/query-the-serial-number-of-a-disk)
 说明了磁盘身份识别方式。由此得到一个具体候选契约：解析实际 mount 的设备，将其
 serial 与可信注册磁盘身份比较。不能仅凭设备名推断通用 CSI 映射，也不能未经可信
 backend 验证就去掉 handle 前缀。已观测的 CSI 日志还需要受限、版本化的 reader，以及

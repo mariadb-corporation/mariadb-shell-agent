@@ -9,7 +9,7 @@
 
 ## 1. 问题
 
-`/autofix-pr` 永远在专属 worktree（`.qwen/tmp/autofix-pr-<n>`，分支
+`/autofix-pr` 永远在专属 worktree（`.mariadb-shell-agent/tmp/autofix-pr-<n>`，分支
 `qwen-autofix/pr-<n>`）里修复 PR。这份隔离是无人值守 watch 安全的根基，但它
 不适合人机共驾——用户坐在会话里，与 agent 一起在 PR 分支上工作：
 
@@ -147,7 +147,7 @@ agent 的 `working_dir` 是用户的检出、它永远在会话的审批模式�
    分支副本"用的是同一条约定。
 6. **检出是干净的。** 采用 `checkoutHoldsWork` 的语义：带未跟踪文件的
    porcelain status，以 NUL 分隔（`-z`），使 C 转义的路径不会冒充用户
-   工作；其中 `.qwen/tmp` 下的未跟踪 watch 文件不算。
+   工作；其中 `.mariadb-shell-agent/tmp` 下的未跟踪 watch 文件不算。
 7. **没有未推的本地提交。** 先 fetch `refs/pull/<n>/head` 进 watch 的私有
    ref `refs/qwen-autofix/pr-<n>/head`（在 `refs/heads` 之外，不动任何
    分支——不用 `FETCH_HEAD`，用户的并发 fetch 会在共享检出里覆写它），
@@ -271,7 +271,7 @@ watch（透传该字段；徽章可选，实现时验证）。in-place watch 生
 
 `prepare` 增加 `in_place` 参数（像 `take_over` 一样进 allowlist）；
 confirmed-watch 记录从 prepare 报告增加 `inPlace`，reply plan 的位置检查
-据此推导 plan 目录：in-place watch 的 plan 在 `<检出>/.qwen/tmp` 里，而
+据此推导 plan 目录：in-place watch 的 plan 在 `<检出>/.mariadb-shell-agent/tmp` 里，而
 不在检出的旁边（其父目录）——后者是 worktree watch 的 plan 位置。
 `unattended` 拒绝 in-place watch（6.6）。
 
@@ -316,7 +316,7 @@ fix agent **在用户的检出里、在用户凭据可及之处**运行 PR 的�
   —— `in_place` 参数、`unattended` 拒绝。
 - `packages/core/src/skills/bundled/autofix-pr/SKILL.md` —— 第 4、6.8 节。
 - `packages/web-shell` 的 PR-watches 列表 —— 实现时验证透传。
-- 本设计双版；E2E 测试计划在 `.qwen/e2e-tests/` 下。
+- 本设计双版；E2E 测试计划在 `.mariadb-shell-agent/e2e-tests/` 下。
 
 ## 9. 约束与风险
 
@@ -351,7 +351,7 @@ fix agent **在用户的检出里、在用户凭据可及之处**运行 PR 的�
 - `schedule` / `fix-start` / `unattended`：拒绝 in-place watch。
 - 回归：现有 worktree 模式的全部测试原样通过。
 
-E2E（完整计划在 `.qwen/e2e-tests/autofix-pr-in-place-copilot.md`，
+E2E（完整计划在 `.mariadb-shell-agent/e2e-tests/autofix-pr-in-place-copilot.md`，
 Phase 3）：一个 head 分支已检出在真实 clone 里的 scratch PR；一次有人值守
 的 `--in-place` 轮次在用户检出里修好一个失败检查并 push；脏检出让轮次带着
 问题停下且原样幸存；`cleanup` 后检出与分支完好；随后对同一 PR 跑 worktree

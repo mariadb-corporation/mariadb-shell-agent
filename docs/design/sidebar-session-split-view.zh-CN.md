@@ -56,7 +56,7 @@ App 组合会话 ID，SplitView 渲染并管理面板焦点。
 
 运行定向单元测试和浏览器测试、构建、类型检查、打包，并在本地
 Docker Linux 中重跑相关测试。基线与验证结果保存在
-`.qwen/e2e-tests/14775/`。
+`.mariadb-shell-agent/e2e-tests/14775/`。
 
 ## 未决问题
 

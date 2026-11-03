@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -43,7 +44,11 @@ describe('LSTool', () => {
       tempSecondaryDir,
     ]);
 
-    const userSkillsBase = path.join(os.homedir(), '.qwen', 'skills');
+    const userSkillsBase = path.join(
+      os.homedir(),
+      '.mariadb-shell-agent',
+      'skills',
+    );
 
     mockConfig = {
       getTargetDir: () => tempRootDir,
@@ -168,7 +173,7 @@ describe('LSTool', () => {
       await writeFiles(tempRootDir, {
         'file1.txt': 'content1',
         'file2.log': 'content1',
-        '.qwenignore': '*.log',
+        '.mariadb-shell-agentignore': '*.log',
       });
       const result = await run({ path: tempRootDir });
 

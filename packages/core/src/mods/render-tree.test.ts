@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -41,9 +42,9 @@ describe('validateRenderTree', () => {
     ['a root string', 'hello', 'the root must be an element'],
     ['a root array', [box()], 'the root must be an element'],
     [
-      'an element the terminal has but Qwen Code does not draw yet',
+      'an element the terminal has but MariaDB Shell Agent does not draw yet',
       box({}, [{ type: 'Button', props: { key: 'go', label: 'Go' } }]),
-      'Button is not drawn by Qwen Code yet',
+      'Button is not drawn by MariaDB Shell Agent yet',
     ],
     [
       'an element the terminal lacks',

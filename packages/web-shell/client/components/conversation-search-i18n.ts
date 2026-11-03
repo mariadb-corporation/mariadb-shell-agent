@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,7 +17,7 @@ const EN_MESSAGES: Record<string, Message> = {
   'chat.searchConversationHint': 'Enter a keyword to find earlier content.',
   'chat.searchingConversation': 'Searching conversation history…',
   'chat.searchLoadedOnly':
-    'Only loaded messages are available. Update Qwen Code to search all history.',
+    'Only loaded messages are available. Update MariaDB Shell Agent to search all history.',
   'chat.searchResultPosition': (vars) =>
     `${vars?.['current']} / ${vars?.['total']} results`,
   'chat.searchNoResults': 'No matching messages.',
@@ -41,7 +42,7 @@ const messages: Record<WebShellLanguage, Record<string, Message>> = {
     'chat.searchConversationHint': '输入关键词，查找之前的内容。',
     'chat.searchingConversation': '正在搜索会话历史…',
     'chat.searchLoadedOnly':
-      '仅可搜索已加载消息，更新 Qwen Code 后可搜索完整历史。',
+      '仅可搜索已加载消息，更新 MariaDB Shell Agent 后可搜索完整历史。',
     'chat.searchResultPosition': (vars) =>
       `${vars?.['current']} / ${vars?.['total']} 条结果`,
     'chat.searchNoResults': '没有匹配的消息。',

@@ -5,7 +5,7 @@
   "source": {
     "commit": "df864bea6a930d31faf8b35fc5e57bac98a25e20",
     "fixtureCommit": "0e71c6deb6add388019fa5859963abe7d82ca5b3",
-    "trackingIssue": "https://github.com/QwenLM/qwen-code/issues/8182"
+    "trackingIssue": "https://github.invalid/QwenLM/qwen-code/issues/8182"
   },
   "environment": {
     "host": {

@@ -2,7 +2,7 @@
 
 [English](2026-10-09-file-read-source.md) | [简体中文](2026-10-09-file-read-source.zh-CN.md)
 
-状态：从 [PR #13526](https://github.com/QwenLM/qwen-code/pull/13526) 的普通读取源组件提取，供独立评审；来源提交为 `950950311f102a745556debc261009af677b125c`。本切片基于当前 main，不依赖单独的 CSI 挂载生命周期 PR #13772。
+状态：从 [PR #13526](https://github.invalid/QwenLM/qwen-code/pull/13526) 的普通读取源组件提取，供独立评审；来源提交为 `950950311f102a745556debc261009af677b125c`。本切片基于当前 main，不依赖单独的 CSI 挂载生命周期 PR #13772。
 
 ## 1. 问题与目标
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -370,7 +371,7 @@ async function buildWorkspaceSkillsStatus(
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     writeStderrLine(
-      `qwen serve: daemon-local skills enumeration failed for ${workspaceCwd}: ${message}`,
+      `mariadb-shell-agent serve: daemon-local skills enumeration failed for ${workspaceCwd}: ${message}`,
     );
     return {
       v: STATUS_SCHEMA_VERSION,

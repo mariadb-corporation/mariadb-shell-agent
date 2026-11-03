@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -148,7 +149,7 @@ describe('IDEServer', () => {
     const port = getPortFromMock(replaceMock);
     const expectedLockFile = path.join(
       '/home/test',
-      '.qwen',
+      '.mariadb-shell-agent',
       'ide',
       `${port}.lock`,
     );
@@ -180,7 +181,7 @@ describe('IDEServer', () => {
     const port = getPortFromMock(replaceMock);
     const expectedLockFile = path.join(
       '/home/test',
-      '.qwen',
+      '.mariadb-shell-agent',
       'ide',
       `${port}.lock`,
     );
@@ -228,7 +229,7 @@ describe('IDEServer', () => {
     const port = getPortFromMock(replaceMock);
     const expectedLockFile = path.join(
       '/home/test',
-      '.qwen',
+      '.mariadb-shell-agent',
       'ide',
       `${port}.lock`,
     );
@@ -276,7 +277,12 @@ describe('IDEServer', () => {
     );
 
     const port = getPortFromMock(replaceMock);
-    const lockFile = path.join('/home/test', '.qwen', 'ide', `${port}.lock`);
+    const lockFile = path.join(
+      '/home/test',
+      '.mariadb-shell-agent',
+      'ide',
+      `${port}.lock`,
+    );
     expect(fs.writeFile).toHaveBeenLastCalledWith(
       lockFile,
       JSON.stringify({
@@ -318,7 +324,7 @@ describe('IDEServer', () => {
     const port = getPortFromMock(replaceMock);
     const expectedLockFile = path.join(
       '/home/test',
-      '.qwen',
+      '.mariadb-shell-agent',
       'ide',
       `${port}.lock`,
     );
@@ -367,7 +373,7 @@ describe('IDEServer', () => {
     const port = getPortFromMock(replaceMock);
     const expectedLockFile = path.join(
       '/home/test',
-      '.qwen',
+      '.mariadb-shell-agent',
       'ide',
       `${port}.lock`,
     );
@@ -410,7 +416,12 @@ describe('IDEServer', () => {
     await ideServer.start(mockContext);
     const replaceMock = mockContext.environmentVariableCollection.replace;
     const port = getPortFromMock(replaceMock);
-    const lockFile = path.join('/home/test', '.qwen', 'ide', `${port}.lock`);
+    const lockFile = path.join(
+      '/home/test',
+      '.mariadb-shell-agent',
+      'ide',
+      `${port}.lock`,
+    );
     expect(fs.writeFile).toHaveBeenCalledWith(lockFile, expect.any(String));
 
     await ideServer.stop();
@@ -439,7 +450,7 @@ describe('IDEServer', () => {
       const port = getPortFromMock(replaceMock);
       const expectedLockFile = path.join(
         '/home/test',
-        '.qwen',
+        '.mariadb-shell-agent',
         'ide',
         `${port}.lock`,
       );

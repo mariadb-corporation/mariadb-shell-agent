@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -561,7 +562,7 @@ interface FinishOutcome {
 }
 
 /**
- * The program an agent runs with: `execution.provider`, default `qwen`.
+ * The program an agent runs with: `execution.provider`, default `mariadb-shell-agent`.
  * For a managed-host agent without `provider`, "the host's default" is taken
  * to be qwen when offered, else the first program the host advertises.
  */
@@ -687,7 +688,7 @@ function squadUnavailableError(
 }
 
 const PROGRAM_LABELS: Readonly<Record<SessionAgentProgram, string>> = {
-  qwen: 'Qwen Code',
+  qwen: 'MariaDB Shell Agent',
   claude: 'Claude Code',
   codex: 'Codex',
 };
@@ -863,7 +864,7 @@ export class SessionAgentOrchestrator {
     this.loadDefinition = options.loadDefinition ?? defaultLoadDefinition;
     this.recovered = this.recoverOnStartup().catch((error) => {
       writeStderrLine(
-        `qwen serve: session agent recovery failed in ${this.workspaceCwd}: ${getErrorMessage(error)}`,
+        `mariadb-shell-agent serve: session agent recovery failed in ${this.workspaceCwd}: ${getErrorMessage(error)}`,
       );
     });
     if (options.startTimers !== false) {
@@ -1974,7 +1975,7 @@ export class SessionAgentOrchestrator {
       );
       if (!leader || !isAgentAddressable(leader)) {
         writeStderrLine(
-          `qwen serve: squad ${squadId} in session ${state.sessionId} lost its leader across a restart; its pending wake was dropped.`,
+          `mariadb-shell-agent serve: squad ${squadId} in session ${state.sessionId} lost its leader across a restart; its pending wake was dropped.`,
         );
         continue;
       }
@@ -2007,7 +2008,7 @@ export class SessionAgentOrchestrator {
         file = await readSessionAgents(this.workspaceCwd, sessionId);
       } catch (error) {
         writeStderrLine(
-          `qwen serve: skipping unreadable session agents file for ${sessionId}: ${getErrorMessage(error)}`,
+          `mariadb-shell-agent serve: skipping unreadable session agents file for ${sessionId}: ${getErrorMessage(error)}`,
         );
         continue;
       }
@@ -2136,7 +2137,7 @@ export class SessionAgentOrchestrator {
       // await, so the count above sees it on the next iteration.
       void this.runLocal(state, live).catch((error) => {
         writeStderrLine(
-          `qwen serve: session agent run ${live.run.id} crashed: ${getErrorMessage(error)}`,
+          `mariadb-shell-agent serve: session agent run ${live.run.id} crashed: ${getErrorMessage(error)}`,
         );
       });
     }
@@ -2249,7 +2250,7 @@ export class SessionAgentOrchestrator {
       await this.persist(state);
       if (controller.signal.aborted) throw new Error('cancelled');
       // A Claude / Codex process lives for one turn: its `session_send`
-      // server gets a fresh token now. The hidden qwen session outlives the
+      // server gets a fresh token now. The hidden mariadb-shell-agent session outlives the
       // turn, so the adapter rotates the token only when it (re)creates it.
       const sessionSend: QwenSessionSendBinding = {
         isCurrent: () => this.sendTokenIsCurrent(state.sessionId, agent.id),
@@ -3361,7 +3362,7 @@ export class SessionAgentOrchestrator {
       return squads;
     } catch (error) {
       writeStderrLine(
-        `qwen serve: could not read squads in ${this.workspaceCwd}: ${getErrorMessage(error)}`,
+        `mariadb-shell-agent serve: could not read squads in ${this.workspaceCwd}: ${getErrorMessage(error)}`,
       );
       return [];
     }
@@ -3611,7 +3612,7 @@ export class SessionAgentOrchestrator {
     });
     state.writeChain = next.catch((error) => {
       writeStderrLine(
-        `qwen serve: could not save session agents for ${state.sessionId}: ${getErrorMessage(error)}`,
+        `mariadb-shell-agent serve: could not save session agents for ${state.sessionId}: ${getErrorMessage(error)}`,
       );
     });
     return next;

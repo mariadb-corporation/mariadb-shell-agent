@@ -107,7 +107,7 @@ Each eligible invocation starts a new Node process:
 
 The Hook never reads or falls back to the legacy `prompt` field. Eligibility
 depends on `submitted_prompt`, not the input transport: supported TUI
-submissions and headless CLI user turns supply it, including `qwen -p` and
+submissions and headless CLI user turns supply it, including `mariadb-shell-agent -p` and
 stream-json user messages from SDK clients. Events without this field, such as
 tool-result continuations, skip retrieval. Do not infer a TUI-only origin or
 exclude a transport merely from its name.

@@ -101,7 +101,7 @@ describe('extensionSettings', () => {
   });
 
   const ID = '12345';
-  const USER_SERVICE = 'Qwen Code Extensions test-ext 12345';
+  const USER_SERVICE = 'MariaDB Shell Agent Extensions test-ext 12345';
   const userKeychain = () => new KeychainTokenStorage(USER_SERVICE);
   const workspaceKeychain = () =>
     new KeychainTokenStorage(`${USER_SERVICE} ${tempWorkspaceDir}`);

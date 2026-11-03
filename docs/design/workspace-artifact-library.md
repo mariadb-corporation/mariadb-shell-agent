@@ -165,8 +165,8 @@ Also verify original creation times after resume, live and cold rename visibilit
 archive moves, source attribution/filtering, cross-route metadata cache reuse,
 fast-session delivery past a blocked first session, disconnect cleanup,
 backpressure, partial failures and exactly one stream completion.
-The E2E plans are `.qwen/e2e-tests/workspace-artifact-library.md` and
-`.qwen/e2e-tests/artifact-library-dac.md`.
+The E2E plans are `.mariadb-shell-agent/e2e-tests/workspace-artifact-library.md` and
+`.mariadb-shell-agent/e2e-tests/artifact-library-dac.md`.
 
 ## Decisions and limitations
 

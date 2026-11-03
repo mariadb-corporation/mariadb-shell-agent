@@ -17,14 +17,14 @@ Design for slice B2d of #12737, the Stage B host integration for #12380, based
 on upstream `663d98eac5`. Implemented in #12828 behind
 `--experimental-paired-engines`, with no Managed engine registered. It records
 in this repository the selection and scope rules decided in #12737
-([Q1/Q4](https://github.com/QwenLM/qwen-code/issues/12737#issuecomment-5846602143)),
+([Q1/Q4](https://github.invalid/QwenLM/qwen-code/issues/12737#issuecomment-5846602143)),
 so that B2d is reviewed against this document instead of the
 [external engine-selection design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-session-execution-engine.md).
 It follows [paired engine owner selection](./2026-09-26-paired-engine-owner-selection.md)
 (B2a). The slices that #12737 requires before ordinary hosts are paired have
 merged: workspace contracts (B2b, #12776 and #12807) and per-engine operations
 (B2c, #12795), which apply the
-[Q2/Q3 decisions](https://github.com/QwenLM/qwen-code/issues/12737#issuecomment-5846370487).
+[Q2/Q3 decisions](https://github.invalid/QwenLM/qwen-code/issues/12737#issuecomment-5846370487).
 The Managed engine itself is designed in
 [ordinary-host Managed engine](./2026-09-27-ordinary-host-managed-engine.md).
 Its slice M1 closes the Legacy refusal and purpose marking items of the
@@ -97,7 +97,7 @@ Managed branching, which stays rejected. No daemon route or REST shape changes.
 
 ### Opt-in and construction sites
 
-`qwen serve --experimental-paired-engines` sets
+`mariadb-shell-agent serve --experimental-paired-engines` sets
 `ServeOptions.experimentalPairedEngines`. Without it, every site keeps its
 current single-factory construction. With it, each site passes
 `executionEngines` instead of `channelFactory`, built from that runtime's own
@@ -126,7 +126,7 @@ B2d adds no operator setting for them.
   paired Bridge would extend to a Managed factory it can never use.
 - A Bridge injected through `deps.bridge` or an injected workspace registry
   stays under its caller's control; the opt-in neither wraps nor replaces it.
-  `qwen serve` itself injects its workspace registry into the serve app, so
+  `mariadb-shell-agent serve` itself injects its workspace registry into the serve app, so
   there the three `runQwenServe` sites do the work; the embedded default is
   paired when an embedder that injects neither sets the option.
 - The embedded default reads owners from the embedding process's runtime
@@ -291,7 +291,7 @@ fixed owner and no cross-engine fallback.
 
 The external design's statement that WebShell does not select Managed through
 the four ordinary daemon factories refers to the Java-backed Managed WebShell
-product path. It does not remove pairing for ordinary local `qwen serve` hosts.
+product path. It does not remove pairing for ordinary local `mariadb-shell-agent serve` hosts.
 
 ### Switching the opt-in
 

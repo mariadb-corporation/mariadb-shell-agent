@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -78,7 +79,7 @@ async function launch() {
   await import(launcher);
 }
 
-it('hands qwen serve only Broker variables that serve removes from its environment', async () => {
+it('hands mariadb-shell-agent serve only Broker variables that serve removes from its environment', async () => {
   await launch();
 
   expect(state.errors).toEqual([]);
@@ -170,7 +171,7 @@ it.each([
   ]);
 });
 
-it('refuses a Broker URL with a path, which qwen serve refuses at boot', async () => {
+it('refuses a Broker URL with a path, which mariadb-shell-agent serve refuses at boot', async () => {
   state.process.env.QWEN_MANAGED_RUNTIME_BROKER_URL = `${brokerUrl}/broker`;
   await launch();
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -330,7 +331,7 @@ describe('existing-node deployment rendering', () => {
       { protocol: 'TCP', port: 8443 },
     ]);
     for (const item of resources)
-      expect(item.metadata.labels['qwen.ai/qualification-run']).toBe(
+      expect(item.metadata.labels['qwen.invalid/qualification-run']).toBe(
         config.runId,
       );
   });
@@ -351,7 +352,7 @@ describe('existing-node deployment rendering', () => {
 
   it.each([
     (node) => {
-      node.metadata.labels = { 'alibabacloud.com/system-nodepool': 'true' };
+      node.metadata.labels = { 'alibabacloud.invalid/system-nodepool': 'true' };
     },
     (node) => {
       node.spec.taints = [
@@ -397,7 +398,7 @@ function preflightFixture() {
     namespace: {
       metadata: {
         uid: 'namespace-current',
-        labels: { 'qwen.ai/qualification-run': config.runId },
+        labels: { 'qwen.invalid/qualification-run': config.runId },
       },
     },
     deployment,
@@ -424,7 +425,7 @@ function preflightFixture() {
         metadata: {
           uid: `pod-${id}`,
           name: `harness-${id}`,
-          annotations: { 'qwen.ai/source-sha': sha },
+          annotations: { 'qwen.invalid/source-sha': sha },
           ownerReferences: [
             { kind: 'ReplicaSet', uid: 'replicaset-current', controller: true },
           ],
@@ -508,8 +509,9 @@ describe.skipIf(process.platform === 'win32')(
       [
         'foreign priority class owner',
         (fixture) => {
-          fixture.priorityclass.metadata.labels['qwen.ai/qualification-run'] =
-            'foreign';
+          fixture.priorityclass.metadata.labels[
+            'qwen.invalid/qualification-run'
+          ] = 'foreign';
         },
         false,
       ],

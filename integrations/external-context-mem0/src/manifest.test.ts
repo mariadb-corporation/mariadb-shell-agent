@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,7 +37,7 @@ describe('Mem0 Extension package', () => {
     expect(packageJson.version).toBe(manifest.version);
     expect(packageJson.repository).toEqual({
       type: 'git',
-      url: 'git+https://github.com/QwenLM/qwen-code.git',
+      url: 'git+https://github.invalid/QwenLM/qwen-code.git',
       directory: 'integrations/external-context-mem0',
     });
   });

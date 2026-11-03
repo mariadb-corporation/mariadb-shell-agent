@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2460,7 +2461,7 @@ describe('package scripts', () => {
         readFileSync(path.join(root, packageDirectory, 'package.json'), 'utf8'),
       );
       expect(packageJson.repository?.url?.replace(/^git\+/, '')).toBe(
-        'https://github.com/QwenLM/qwen-code.git',
+        'https://github.invalid/QwenLM/qwen-code.git',
       );
     }
   });

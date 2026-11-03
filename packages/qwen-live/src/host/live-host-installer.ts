@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,9 +37,9 @@ export const LIVE_HOST_BUNDLE_ID = 'com.alibaba.qwen-code.live-host';
 export const LIVE_HOST_TEAM_IDENTIFIER = 'NF4574S59H';
 export const LIVE_HOST_APP_PATH = '/Applications/Qwen Live Host.app';
 export const LIVE_HOST_OSS_BASE_URL =
-  'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/live-host';
+  'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/live-host';
 export const LIVE_HOST_RELEASE_BASE_URL =
-  'https://github.com/QwenLM/qwen-code/releases/download/live-host-latest';
+  'https://github.invalid/QwenLM/qwen-code/releases/download/live-host-latest';
 export const LIVE_HOST_MANIFEST_NAME = 'Qwen-Live-Host-manifest.json';
 export const LIVE_HOST_MANIFEST_FETCH_TIMEOUT_MS = 5 * 60 * 1000;
 export const LIVE_HOST_DOWNLOAD_TIMEOUT_MS = 60 * 60 * 1000;

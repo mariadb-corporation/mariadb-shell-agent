@@ -115,7 +115,7 @@ describe('ModelManagementSection', () => {
         runtimeSync: { status: 'failed' as const },
       },
       notice:
-        'The change was saved, but running sessions could not be refreshed. Restart qwen serve before using the updated model list.',
+        'The change was saved, but running sessions could not be refreshed. Restart mariadb-shell-agent serve before using the updated model list.',
     },
   ])(
     'reports the context-window save result ($result)',

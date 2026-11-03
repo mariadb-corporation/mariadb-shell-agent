@@ -658,14 +658,14 @@ export class EmailChannel extends ChannelBase {
     try {
       await this.smtp.sendMail({
         from: {
-          name: `Qwen Code Agent (${this.identity.displayName})`,
+          name: `MariaDB Shell Agent Agent (${this.identity.displayName})`,
           address: this.settings.address,
         },
         to: recipient,
         envelope: { from: this.settings.address, to: [recipient] },
         subject: route
           ? `Re: ${route.subject.replace(/^Re:\s*/i, '')}`
-          : 'Qwen Code Agent update',
+          : 'MariaDB Shell Agent Agent update',
         text,
         messageId,
         ...(route

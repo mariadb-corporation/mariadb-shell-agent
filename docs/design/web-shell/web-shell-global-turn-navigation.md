@@ -4,7 +4,7 @@
 
 Phases 1 and 2A merged in #10751 and #11054. Phase 2B and the agreed Phase 3
 global rail are implemented in
-[#11208](https://github.com/QwenLM/qwen-code/pull/11208), which is still open.
+[#11208](https://github.invalid/QwenLM/qwen-code/pull/11208), which is still open.
 Status updated 2026-09-07 against implementation commit `02e975e9fa`.
 
 Phase 3 functionality and scoped frontend verification are complete. The rail
@@ -603,9 +603,9 @@ provisional reconciliation, and canonical locator map — belong to this phase,
 leaving Phase 3 as the rail UI. The detailed design lives in
 `web-shell-global-turn-navigation-phase2.md`.)
 
-Phase 2A (merged in [#11054](https://github.com/QwenLM/qwen-code/pull/11054))
+Phase 2A (merged in [#11054](https://github.invalid/QwenLM/qwen-code/pull/11054))
 delivers steps 1–3. Phase 2B is implemented in
-[#11208](https://github.com/QwenLM/qwen-code/pull/11208), following the
+[#11208](https://github.invalid/QwenLM/qwen-code/pull/11208), following the
 [historical viewport design](web-shell-global-turn-navigation-phase2b.md),
 and delivers step 4. The
 [implementation plan](../../plans/2026-09-04-web-shell-global-turn-navigation-phase2.md)

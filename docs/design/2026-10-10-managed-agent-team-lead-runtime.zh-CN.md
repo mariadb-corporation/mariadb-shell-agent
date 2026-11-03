@@ -2,7 +2,7 @@
 
 [English](2026-10-10-managed-agent-team-lead-runtime.md) | [简体中文](2026-10-10-managed-agent-team-lead-runtime.zh-CN.md)
 
-状态:已实现并已启用。#13824 落地了 lead 的团队写入漏斗、Hosted 路径上的五个团队工具与 Agent 工具的 `name`、`<teammate>` 标签、`task_list` 的预批准与输入预览,以及重开白名单,当时两个 domain 仍关闭。启用变更在验证计划所记录的实机验收之后,把 `team_state` 与 `team_task` 加入启用列表,并带上这次验收改动的 owner 规则(决策 5:已完成的成员可以成为已完成任务的 owner,但绝不会落到未完成的工作上)。`team_message` 与 `team_plan` 保持关闭。这是 [#12827](https://github.com/QwenLM/qwen-code/issues/12827) 的 **H4e** 的第一个运行时切片,即 Managed Agent 提案 [#12380](https://github.com/QwenLM/qwen-code/issues/12380) 的 H 阶段,由 [#13745](https://github.com/QwenLM/qwen-code/issues/13745) 跟踪。它建立在 H4b([child Session 运行时](2026-10-07-managed-child-session-runtime.zh-CN.md),#13550)与 H4e-a([团队记录契约](2026-10-10-managed-agent-teams.zh-CN.md),#13811)之上,首次生产后者的四个团队记录体与 lead Session 规则。
+状态:已实现并已启用。#13824 落地了 lead 的团队写入漏斗、Hosted 路径上的五个团队工具与 Agent 工具的 `name`、`<teammate>` 标签、`task_list` 的预批准与输入预览,以及重开白名单,当时两个 domain 仍关闭。启用变更在验证计划所记录的实机验收之后,把 `team_state` 与 `team_task` 加入启用列表,并带上这次验收改动的 owner 规则(决策 5:已完成的成员可以成为已完成任务的 owner,但绝不会落到未完成的工作上)。`team_message` 与 `team_plan` 保持关闭。这是 [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827) 的 **H4e** 的第一个运行时切片,即 Managed Agent 提案 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380) 的 H 阶段,由 [#13745](https://github.invalid/QwenLM/qwen-code/issues/13745) 跟踪。它建立在 H4b([child Session 运行时](2026-10-07-managed-child-session-runtime.zh-CN.md),#13550)与 H4e-a([团队记录契约](2026-10-10-managed-agent-teams.zh-CN.md),#13811)之上,首次生产后者的四个团队记录体与 lead Session 规则。
 
 ## 问题与范围
 
@@ -102,7 +102,7 @@ H4e-b1 不需要任何尚未落地的东西。它的成员就是 H4b 的 child a
   - `hosted-harness-session.ts`:漏斗接线与重开白名单。
   - `hosted-tool-approval.ts`:`task_list` 预批准。
 - `packages/managed-agent-server`:`ManagedActionService.PREVIEW_TOOLS`,一个协调器测试,证明带开启团队的 lead 关闭会取消其成员且不写任何团队记录,以及一个生命周期门禁测试,确保关闭声明下团队记录仍被拒绝。
-- 各文件旁的测试,以及 `.qwen/e2e-tests/` 中的 E2E 计划。
+- 各文件旁的测试,以及 `.mariadb-shell-agent/e2e-tests/` 中的 E2E 计划。
 
 ## 验证计划
 
@@ -114,7 +114,7 @@ H4e-b1 不需要任何尚未落地的东西。它的成员就是 H4b 的 child a
   - lead 创建团队,按名字拉起两个成员,分配任务板任务,收到两个带名字的汇报,把任务标记为完成并删除团队;
   - lead 在仍有成员运行时关闭,该成员被取消,而团队记录保持不变;
   - 在成员启动与加入之间杀掉 Harness:child 作为普通后台 child 继续运行,恰好只有一个 `child_run`,也永远不会出现第二个名册条目。
-- **实机验收结果**(2026-10-10,aarch64 Linux 主机;打包的 Spring 服务端(含 Store、Broker、relay 与协调器)、打包的 Hosted Harness、持久本地 worker、MariaDB,以及真实模型 `qwen3.8-max`,审批模式为 `default`;计划与各项结果见 `.qwen/e2e-tests/h4e-b1-team-lead-runtime.md`):
+- **实机验收结果**(2026-10-10,aarch64 Linux 主机;打包的 Spring 服务端(含 Store、Broker、relay 与协调器)、打包的 Hosted Harness、持久本地 worker、MariaDB,以及真实模型 `qwen3.8-max`,审批模式为 `default`;计划与各项结果见 `.mariadb-shell-agent/e2e-tests/h4e-b1-team-lead-runtime.md`):
   - 完整的团队流程已观察到。`team_state` 链为开启、两次加入、`closing`、`deleted`。两份汇报都带着 `<teammate>` 标签到达 lead:一次运行中在进行中的 Turn 内被消费,另一次作为唤醒 Turn 到达。第一次运行发现,两个成员都在 lead 用 `task_update` 分配之前就已完成,任务板因此拒绝把它们设为 owner。决策 5 的已完成成员规则解决了这一点,带上修复后的复跑把每个成员记为其已完成任务的 owner。验收之后的评审轮次收紧了重新打开任务的规则,并调整了部分回答文案;这些改动由单元测试覆盖,没有经过实机验收。验收在 #13841 之前进行,所用环境不提供 child Workspace,因此以 `isolation: "worktree"` 启动的成员只有单元测试覆盖;除非部署显式启用,child Workspace 保持关闭。验收也早于 #13822,因此给运行中成员的消息与对已结束成员续跑的拒绝同样只有单元测试覆盖。
   - lead 在仍有成员运行时关闭,会取消该成员:它的 `child_run` 带着停止请求以 `cancelled` 结束,它的 Session 关闭,团队记录不变,lead 也从未被复活。关闭会等待成员的 Turn 结束(决策 8),这也包括成员正在等待的审批。
   - 在加入提交之前杀掉 Harness,留下一个 `child_run`、没有名册条目;在加入提交之后杀掉,留下一个 `child_run`、一个名册条目。两种情况下成员 Session 都会运行,但 lead 的 Turn 以 `managed_runtime_recovery_blocked` 失败,因此成员的结果永远到不了 lead(开放问题 5)。不建团队、改用不带名字的后台启动做同样的运行,结局相同。channel 收尾的回答(决策 11)没有覆盖到,因为该环境没有 channel 适配器。

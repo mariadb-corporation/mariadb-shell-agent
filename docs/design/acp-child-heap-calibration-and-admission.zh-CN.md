@@ -10,13 +10,13 @@
 
 精简的[机器可读汇总](acp-child-heap-node24-calibration-summary.json)保留环境标识、协议与下载清单哈希、有效运行指标、排除尝试的来源和决策。逐回合及完整原始派生证据继续单独归档，不提交到 `docs/design/`。
 
-前置容量阶段均已交付：[#11911](https://github.com/QwenLM/qwen-code/pull/11911) 通过显式开启的 `admit` 模式实现仅按数量准入，[#11940](https://github.com/QwenLM/qwen-code/pull/11940) 在容量满时回收符合条件的空闲 ACP，[#12008](https://github.com/QwenLM/qwen-code/pull/12008) 允许用户查看并停止 workspace runtime。这些阶段都没有应用固定子进程堆上限，剩余工作由 [#8182](https://github.com/QwenLM/qwen-code/issues/8182) 跟踪。
+前置容量阶段均已交付：[#11911](https://github.invalid/QwenLM/qwen-code/pull/11911) 通过显式开启的 `admit` 模式实现仅按数量准入，[#11940](https://github.invalid/QwenLM/qwen-code/pull/11940) 在容量满时回收符合条件的空闲 ACP，[#12008](https://github.invalid/QwenLM/qwen-code/pull/12008) 允许用户查看并停止 workspace runtime。这些阶段都没有应用固定子进程堆上限，剩余工作由 [#8182](https://github.invalid/QwenLM/qwen-code/issues/8182) 跟踪。
 
 ## 2. 证据
 
 ### 2.1 为什么需要重新测量
 
-较早的[注册与恢复报告](https://github.com/QwenLM/qwen-code/issues/11386#issuecomment-5621875474)、[真实模型并发阶梯](https://github.com/QwenLM/qwen-code/issues/11386#issuecomment-5628271115)、[较重的读取与搜索负载](https://github.com/QwenLM/qwen-code/issues/11386#issuecomment-5628813819)和[受限宿主探针](https://github.com/QwenLM/qwen-code/issues/8182#issuecomment-5622379643)确认了注册成本、实测 RSS 和子进程参数。归档采集器没有记录子进程老生代峰值、major GC 后 live-set、major GC 次数或覆盖率，因此不能通过 RSS 推导安全的 V8 old-space 上限。
+较早的[注册与恢复报告](https://github.invalid/QwenLM/qwen-code/issues/11386#issuecomment-5621875474)、[真实模型并发阶梯](https://github.invalid/QwenLM/qwen-code/issues/11386#issuecomment-5628271115)、[较重的读取与搜索负载](https://github.invalid/QwenLM/qwen-code/issues/11386#issuecomment-5628813819)和[受限宿主探针](https://github.invalid/QwenLM/qwen-code/issues/8182#issuecomment-5622379643)确认了注册成本、实测 RSS 和子进程参数。归档采集器没有记录子进程老生代峰值、major GC 后 live-set、major GC 次数或覆盖率，因此不能通过 RSS 推导安全的 V8 old-space 上限。
 
 新实验在同一源码构建、Linux 宿主、provider、fixture 和隔离 Node 24 运行时上，对比当前基线与实验性 544 MiB 参数。实验验证了实际子进程参数、精确工具正文送达、每个代次的新鲜堆覆盖、major GC 观测、OOM 计数和清理结果，没有修改生产模式或默认值。
 

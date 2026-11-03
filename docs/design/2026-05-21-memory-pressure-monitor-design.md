@@ -10,7 +10,7 @@ status: 'implemented'
 
 ## Problem
 
-Long-running Qwen Code sessions can accumulate memory through large tool
+Long-running MariaDB Shell Agent sessions can accumulate memory through large tool
 results, repeated file reads, chat history, and native/external allocations.
 Before this change, the core package had diagnostics and session-reset cleanup,
 but no runtime response when memory pressure rises during normal tool
@@ -79,7 +79,7 @@ or container OOM killer does:
 `enableExplicitGC` only has an effect when Node exposes `global.gc`. For this
 reason the production entry `scripts/cli-entry.js` relaunches the interactive
 CLI with `--expose-gc` (its bootstrap fast paths run without it);
-`scripts/start.js` and `scripts/dev.js` also pass the flag, and `qwen review`
+`scripts/start.js` and `scripts/dev.js` also pass the flag, and `mariadb-shell-agent review`
 forwards it to the subprocess it spawns.
 
 Environment overrides:

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,7 +11,7 @@ import ignore from 'ignore';
 import { createDebugLogger } from './debugLogger.js';
 import { isPathWithinRoot } from './workspaceContext.js';
 
-const QWEN_IGNORE_FILE_NAME = '.qwenignore';
+const QWEN_IGNORE_FILE_NAME = '.mariadb-shell-agentignore';
 const debugLogger = createDebugLogger('QWEN_IGNORE');
 
 export const DEFAULT_QWEN_CUSTOM_IGNORE_FILE_NAMES = [
@@ -57,7 +58,7 @@ function getCustomIgnoreFileNameSkipReason(candidate: string): string | null {
     return 'null bytes are not allowed';
   }
   if (candidate === QWEN_IGNORE_FILE_NAME) {
-    return '.qwenignore is always included';
+    return '.mariadb-shell-agentignore is always included';
   }
   if (candidate.split('/').includes('..')) {
     return 'parent directory segments are not allowed';

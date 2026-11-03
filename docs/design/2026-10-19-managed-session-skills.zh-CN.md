@@ -73,7 +73,7 @@ provider、Session 输入框和目录 Hook；Hosted Skill 目录、模型循环�
 6. 切换 Session、变更 provider、请求失败及迟到响应都不能显示上个 Session 的
    Skills。
 
-可执行计划和结果存放于 `.qwen/e2e-tests/managed-session-skills.md`。执行定向
+可执行计划和结果存放于 `.mariadb-shell-agent/e2e-tests/managed-session-skills.md`。执行定向
 Java 和 TypeScript 测试、API 生成、Java 验证、根目录 build/typecheck/bundle、
 改动文件 lint/格式检查和两轮完整 diff 自审。区分环境及进程测试限制与已验证行为。
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,7 +15,7 @@
 // SHA), never a path or a timestamp: input that changed re-runs, by
 // construction rather than by invalidation logic.
 //
-// Resume is a LOCAL convenience: a developer whose `qwen review` was
+// Resume is a LOCAL convenience: a developer whose `mariadb-shell-agent review` was
 // interrupted re-runs it with `--resume`. The on-disk state was written by
 // the trusted CLI and the developer — there is no adversarial attempt-1 code
 // racing the same disk (CI does not resume; its trigger runs fresh), so the

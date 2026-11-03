@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -236,7 +237,7 @@ describe('user-level auto-memory', () => {
   describe('system prompt rendering', () => {
     it('renders both index sections when a user section is provided', () => {
       const prompt = buildManagedAutoMemoryPrompt(
-        '/tmp/project/.qwen/memory',
+        '/tmp/project/.mariadb-shell-agent/memory',
         '- [Release](project/release.md) — Release Friday.',
         {
           memoryDir: '/tmp/global/memories',
@@ -247,9 +248,11 @@ describe('user-level auto-memory', () => {
       expect(prompt).toContain('USER memory');
       expect(prompt).toContain('PROJECT memory');
       expect(prompt).toContain('/tmp/global/memories');
-      expect(prompt).toContain('/tmp/project/.qwen/memory');
+      expect(prompt).toContain('/tmp/project/.mariadb-shell-agent/memory');
       expect(prompt).toContain('## /tmp/global/memories/MEMORY.md');
-      expect(prompt).toContain('## /tmp/project/.qwen/memory/MEMORY.md');
+      expect(prompt).toContain(
+        '## /tmp/project/.mariadb-shell-agent/memory/MEMORY.md',
+      );
       expect(prompt).toContain(
         '- [Role](user/role.md) — User is a Go engineer.',
       );
@@ -267,7 +270,7 @@ describe('user-level auto-memory', () => {
 
     it('renders user section FIRST (background) then project section (more specific)', () => {
       const prompt = buildManagedAutoMemoryPrompt(
-        '/tmp/project/.qwen/memory',
+        '/tmp/project/.mariadb-shell-agent/memory',
         '- [Release](project/release.md) — Release Friday.',
         {
           memoryDir: '/tmp/global/memories',
@@ -277,7 +280,7 @@ describe('user-level auto-memory', () => {
 
       const userIdx = prompt.indexOf('## /tmp/global/memories/MEMORY.md');
       const projectIdx = prompt.indexOf(
-        '## /tmp/project/.qwen/memory/MEMORY.md',
+        '## /tmp/project/.mariadb-shell-agent/memory/MEMORY.md',
       );
       expect(userIdx).toBeGreaterThan(-1);
       expect(projectIdx).toBeGreaterThan(-1);
@@ -286,19 +289,21 @@ describe('user-level auto-memory', () => {
 
     it('falls back to single-dir wording when no user section is provided', () => {
       const prompt = buildManagedAutoMemoryPrompt(
-        '/tmp/project/.qwen/memory',
+        '/tmp/project/.mariadb-shell-agent/memory',
         '- [Release](project/release.md) — Release Friday.',
       );
 
       expect(prompt).toContain('persistent, file-based memory system');
       expect(prompt).not.toContain('USER memory');
       expect(prompt).not.toContain('PROJECT memory');
-      expect(prompt).toContain('## /tmp/project/.qwen/memory/MEMORY.md');
+      expect(prompt).toContain(
+        '## /tmp/project/.mariadb-shell-agent/memory/MEMORY.md',
+      );
     });
 
     it('buildManagedAutoMemoryPrompt passes the user section through', () => {
       const result = buildManagedAutoMemoryPrompt(
-        '/tmp/project/.qwen/memory',
+        '/tmp/project/.mariadb-shell-agent/memory',
         '- [Release](project/release.md) — Release Friday.',
         {
           memoryDir: '/tmp/global/memories',

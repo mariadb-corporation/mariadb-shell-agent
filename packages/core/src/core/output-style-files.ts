@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,7 +28,7 @@ import {
 
 const debugLogger = createDebugLogger('OUTPUT_STYLE_FILES');
 
-/** Directory name, under `~/.qwen` and a project's `.qwen`, that holds style files. */
+/** Directory name, under `~/.mariadb-shell-agent` and a project's `.mariadb-shell-agent`, that holds style files. */
 export const OUTPUT_STYLES_DIR_NAME = 'output-styles';
 
 /**
@@ -106,7 +107,7 @@ export function parseOutputStyleFile(
   const match = fence && isFrontmatterBlock(fence[1]) ? fence : null;
   const frontmatter: Record<string, unknown> = match ? parseYaml(match[1]) : {};
   // HTML comments are a note to the reader, not an instruction to the model,
-  // and the sibling `.qwen/rules/` loader already drops them from the same
+  // and the sibling `.mariadb-shell-agent/rules/` loader already drops them from the same
   // sink. Stripping where the body is cut covers the prompt, the derived
   // description and the empty-body rejection at once.
   const body = stripHtmlComments(match ? match[2] : normalized).trim();
@@ -252,18 +253,18 @@ function deriveDescription(body: string): string {
  * returns the path to read it from.
  *
  * A style file's body goes into the system prompt verbatim, so a link is an
- * exfiltration vector: `.qwen/output-styles/notes.md -> ~/.aws/credentials`
+ * exfiltration vector: `.mariadb-shell-agent/output-styles/notes.md -> ~/.aws/credentials`
  * is committable, survives `git clone`, and needs no user action beyond
  * starting the CLI. This mirrors `readLoopTaskFile`, which guards the
  * identical sink.
  *
  * A project file must not be a link at all -- the repo author does not own
  * the machine's files, and a link naming one is never something they need.
- * A user file may be a link, because `~/.qwen/output-styles/x.md ->
+ * A user file may be a link, because `~/.mariadb-shell-agent/output-styles/x.md ->
  * ~/dotfiles/x.md` is an ordinary setup, but its target has to stay inside
  * the user's own root. Both refuse `nlink > 1`, which is how a hard link to
  * a sensitive file looks like an ordinary regular file, and both confine the
- * canonical path so a symlinked *ancestor* (a checked-in `.qwen -> /outside`,
+ * canonical path so a symlinked *ancestor* (a checked-in `.mariadb-shell-agent -> /outside`,
  * which a final-component `lstat` cannot see) is caught too.
  */
 async function resolveStyleFileToRead(
@@ -336,7 +337,7 @@ async function readBoundedStyleFile(readPath: string): Promise<Buffer> {
  * order, and a later file that repeats an earlier file's name is skipped.
  *
  * `confineTo` is the root a style file must resolve inside: the project root
- * for project styles, the user's `~/.qwen` root for user styles.
+ * for project styles, the user's `~/.mariadb-shell-agent` root for user styles.
  */
 export async function loadOutputStylesFromDir(
   dir: string,
@@ -411,7 +412,7 @@ export function getUserOutputStylesDir(): string {
 
 /**
  * The root a user style file must resolve inside. It is the home directory
- * rather than `~/.qwen`, because `~/.qwen/output-styles/x.md ->
+ * rather than `~/.mariadb-shell-agent`, because `~/.mariadb-shell-agent/output-styles/x.md ->
  * ~/dotfiles/x.md` is an ordinary dotfiles setup and has to keep working;
  * an explicit `QWEN_HOME` relocates the root with it.
  */
@@ -429,7 +430,7 @@ export function getProjectOutputStylesDir(projectRoot: string): string {
 
 export interface OutputStyleCatalogOptions {
   /**
-   * Project whose `.qwen/output-styles` is included. Leave unset for an
+   * Project whose `.mariadb-shell-agent/output-styles` is included. Leave unset for an
    * untrusted workspace: a checked-in style file is a prompt, so it is only
    * read from a project the user has trusted. A project whose style directory
    * is the user's own is skipped, since it would only repeat the user level.

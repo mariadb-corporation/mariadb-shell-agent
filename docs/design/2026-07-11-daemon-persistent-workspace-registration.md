@@ -2,7 +2,7 @@
 
 ## Goal
 
-Workspaces added from the Web Shell survive a `qwen serve` process restart
+Workspaces added from the Web Shell survive a `mariadb-shell-agent serve` process restart
 when the daemon is relaunched with the same primary workspace and `QWEN_HOME`.
 
 ## State ownership
@@ -12,7 +12,7 @@ project configuration and not disposable runtime output. Registrations are
 stored under:
 
 ```text
-${QWEN_HOME:-~/.qwen}/daemon/workspaces/<primary-scope-sha256>.json
+${QWEN_HOME:-~/.mariadb-shell-agent}/daemon/workspaces/<primary-scope-sha256>.json
 ```
 
 The scope hash is the full SHA-256 of the canonical primary workspace path

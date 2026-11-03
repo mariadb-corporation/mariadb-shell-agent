@@ -45,7 +45,7 @@ default 与 auto-edit 策略下按只读操作预批准。仅前台执行的传�
 单测通过不能证明 Linux 进程故障或部署验收已经完成。
 
 执行针对性的 CLI 与 Java 调用方检查、根目录构建与类型检查，以及
-`.qwen/e2e-tests/managed-shell-profile.md` 中记录的 Hosted 执行探测。无法执行的检查与成功结果分别记录。
+`.mariadb-shell-agent/e2e-tests/managed-shell-profile.md` 中记录的 Hosted 执行探测。无法执行的检查与成功结果分别记录。
 
 ## 发布与待决问题
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -86,9 +87,11 @@ function makeApp(
 }
 
 async function writeWorkspaceSettings(directories: string[]): Promise<void> {
-  await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+  await fsp.mkdir(path.join(workspace, '.mariadb-shell-agent'), {
+    recursive: true,
+  });
   await fsp.writeFile(
-    path.join(workspace, '.qwen', 'settings.json'),
+    path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
     JSON.stringify({ context: { includeDirectories: directories } }),
   );
 }

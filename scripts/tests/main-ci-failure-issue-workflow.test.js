@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -45,7 +46,7 @@ describe('main CI failure issue workflow', () => {
       'Managed Agent gate': 'managed-agent-gate',
       'SDK Java': 'sdk-java',
       'SDK Python': 'sdk-python',
-      'Qwen Code CI': 'ci',
+      'MariaDB Shell Agent CI': 'ci',
       'Desktop Checks': 'desktop-packaging-check',
       'tui-parity': 'tui-parity',
     };
@@ -84,7 +85,7 @@ describe('main CI failure issue workflow', () => {
         "((github.event.workflow_run.head_branch == 'main' && " +
         "(github.event.workflow_run.event == 'push' || " +
         "(github.event.workflow_run.event == 'schedule' && " +
-        'contains(fromJSON(\'["Qwen Code CI","SDK Java","Desktop Checks","tui-parity"]\'), github.event.workflow.name)))) || ' +
+        'contains(fromJSON(\'["MariaDB Shell Agent CI","SDK Java","Desktop Checks","tui-parity"]\'), github.event.workflow.name)))) || ' +
         "(github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow.name == 'SDK Java') || " +
         "(github.event.workflow.name == 'Managed Agent gate' && " +
         'contains(fromJSON(\'["pull_request","pull_request_review"]\'), github.event.workflow_run.event))) }}',
@@ -116,7 +117,7 @@ describe('main CI failure issue workflow', () => {
     ['Managed Agent gate', 'push', 'main', 'failure', true],
     ['Managed Agent gate', 'pull_request_review', 'feature', 'failure', true],
     ['Managed Agent gate', 'pull_request', 'feature', 'failure', true],
-    ['Qwen Code CI', 'pull_request', 'feature', 'failure', false],
+    ['MariaDB Shell Agent CI', 'pull_request', 'feature', 'failure', false],
     ['Managed Agent gate', 'pull_request_review', 'feature', 'success', false],
   ])(
     'routes %s / %s / %s / %s to reporting: %s',
@@ -924,7 +925,7 @@ elif [[ "$1 $2" == 'issue create' ]]; then
   [[ "\${FAIL_CREATE_ONCE:-0}" != '1' || "$c" -gt 1 ]] || exit 1
   # Label churn must not prevent creation of the failure record.
   [[ "$*" != *'--label'* ]] || exit 1
-  echo 'https://github.com/QwenLM/qwen-code/issues/999'
+  echo 'https://github.invalid/QwenLM/qwen-code/issues/999'
 elif [[ "$1 $2" == 'issue view' ]]; then
   [[ "$*" == *'--json body'* ]] || exit 2
   ${failBodyRead ? 'exit 1' : ':'}
@@ -1004,7 +1005,7 @@ fi
         expect(result.status, result.stderr).toBe(0);
         expect(result.calls).toContain('issue comment 42');
         expect(result.output).toContain(
-          'issue_url=https://github.com/QwenLM/qwen-code/issues/42',
+          'issue_url=https://github.invalid/QwenLM/qwen-code/issues/42',
         );
         expect(result.calls).not.toContain('issue create');
         // The dated retitle keeps the shared issue fresh in the issue list,
@@ -1212,7 +1213,7 @@ fi
         'issue edit 999 --repo QwenLM/qwen-code --add-label scope/ci-cd --add-label status/needs-triage',
       );
       expect(result.output).toContain(
-        'issue_url=https://github.com/QwenLM/qwen-code/issues/999',
+        'issue_url=https://github.invalid/QwenLM/qwen-code/issues/999',
       );
       expect(result.body).toContain('<!-- main-ci-failure-aggregate:1234 -->');
       expect(result.calls).not.toMatch(
@@ -1313,7 +1314,7 @@ fi
         expect(result.status, result.stderr).toBe(0);
         expect(result.calls).toContain('issue comment 42');
         expect(result.output).toContain(
-          'issue_url=https://github.com/QwenLM/qwen-code/issues/42',
+          'issue_url=https://github.invalid/QwenLM/qwen-code/issues/42',
         );
         expect(result.stdout).toContain('::warning::');
       },
@@ -1326,7 +1327,7 @@ fi
       const result = run([botIssue(50), botIssue(42, ' on abc123')]);
       expect(result.calls).toContain('issue comment 50');
       expect(result.output).toContain(
-        'issue_url=https://github.com/QwenLM/qwen-code/issues/50',
+        'issue_url=https://github.invalid/QwenLM/qwen-code/issues/50',
       );
     });
 
@@ -1361,7 +1362,7 @@ fi
       expect(result.status, result.stderr).toBe(0);
       expect(result.calls.match(/issue comment 42/g)).toHaveLength(2);
       expect(result.output).toContain(
-        'issue_url=https://github.com/QwenLM/qwen-code/issues/42',
+        'issue_url=https://github.invalid/QwenLM/qwen-code/issues/42',
       );
     });
 
@@ -1384,7 +1385,7 @@ fi
       expect(result.status, result.stderr).toBe(0);
       expect(result.calls.match(/issue create/g)).toHaveLength(2);
       expect(result.output).toContain(
-        'issue_url=https://github.com/QwenLM/qwen-code/issues/999',
+        'issue_url=https://github.invalid/QwenLM/qwen-code/issues/999',
       );
     });
 
@@ -1405,7 +1406,7 @@ fi
       });
       expect(result.status).not.toBe(0);
       expect(result.output).toContain(
-        'issue_url=https://github.com/QwenLM/qwen-code/issues/42',
+        'issue_url=https://github.invalid/QwenLM/qwen-code/issues/42',
       );
       expect(result.calls.indexOf('issue comment 42')).toBeLessThan(
         result.calls.indexOf('issue edit 42'),
@@ -1416,7 +1417,7 @@ fi
       const result = run([], { failEdit: true });
       expect(result.status, result.stderr).toBe(0);
       expect(result.output).toContain(
-        'issue_url=https://github.com/QwenLM/qwen-code/issues/999',
+        'issue_url=https://github.invalid/QwenLM/qwen-code/issues/999',
       );
       expect(result.calls).toContain('issue create');
       expect(result.calls).toContain('issue edit 999');
@@ -1550,7 +1551,7 @@ fi
           'issue edit 999 --repo QwenLM/qwen-code --add-label type/bug --add-label status/needs-triage',
         );
         expect(result.output).toContain(
-          'issue_url=https://github.com/QwenLM/qwen-code/issues/999',
+          'issue_url=https://github.invalid/QwenLM/qwen-code/issues/999',
         );
         expect(result.body).toContain('Run 123 failed at commit abcdef123456');
         expect(result.body).toContain(`<!-- ${markerA} -->`);
@@ -1605,7 +1606,7 @@ fi
         expect(result.calls).toContain('issue comment 7');
         expect(result.calls).not.toContain('issue create');
         expect(result.output).toContain(
-          'issue_url=https://github.com/QwenLM/qwen-code/issues/7',
+          'issue_url=https://github.invalid/QwenLM/qwen-code/issues/7',
         );
         // The recurrence is recorded before the marker accretion edit, and a
         // per-signature match never retires the issue's labels.
@@ -1671,7 +1672,7 @@ fi
         expect(result.status, result.stderr).toBe(0);
         expect(result.calls).toContain('issue comment 7');
         expect(result.output).toContain(
-          'issue_url=https://github.com/QwenLM/qwen-code/issues/7',
+          'issue_url=https://github.invalid/QwenLM/qwen-code/issues/7',
         );
         expect(result.stdout).toContain('::warning::');
       });
@@ -1747,7 +1748,7 @@ fi
         expect(result.calls).not.toContain('issue create');
         expect(result.calls).not.toContain('issue edit');
         expect(result.output).toContain(
-          'issue_url=https://github.com/QwenLM/qwen-code/issues/9',
+          'issue_url=https://github.invalid/QwenLM/qwen-code/issues/9',
         );
       });
 
@@ -1805,7 +1806,7 @@ fi
           '<!-- main-ci-failure-scope:1234 -->',
         );
         expect(result.output).toContain(
-          'issue_url=https://github.com/QwenLM/qwen-code/issues/7',
+          'issue_url=https://github.invalid/QwenLM/qwen-code/issues/7',
         );
       });
 
@@ -2273,7 +2274,7 @@ printf '%s\\n' '{"jobs":[]}'
     const failedJob = (id, checkId, steps) => ({
       id,
       conclusion: 'failure',
-      check_run_url: `https://api.github.com/repos/QwenLM/qwen-code/check-runs/${checkId}`,
+      check_run_url: `https://api.github.invalid/repos/QwenLM/qwen-code/check-runs/${checkId}`,
       steps,
     });
     const REPORTER_STEP = 'Report the tier result';
@@ -2549,7 +2550,7 @@ printf '%s\\n' '{"jobs":[]}'
         WORKFLOW_NAME: 'Managed Agent gate',
         WORKFLOW_RUN_ID: '39045740099',
         WORKFLOW_RUN_URL:
-          'https://github.com/QwenLM/qwen-code/actions/runs/39045740099',
+          'https://github.invalid/QwenLM/qwen-code/actions/runs/39045740099',
         WORKFLOW_RUN_AT: '2026-10-18T00:00:00Z',
         HEAD_SHA: 'abc123456789',
       };
@@ -2631,7 +2632,7 @@ printf '%s\\n' '{"jobs":[]}'
             WORKFLOW_NAME: 'Managed Agent gate',
             WORKFLOW_RUN_ID: '39045740099',
             WORKFLOW_RUN_URL:
-              'https://github.com/QwenLM/qwen-code/actions/runs/39045740099',
+              'https://github.invalid/QwenLM/qwen-code/actions/runs/39045740099',
             HEAD_SHA: 'abc123456789',
           },
           encoding: 'utf8',
@@ -2658,7 +2659,7 @@ printf '%s\\n' '{"jobs":[]}'
       'github-actions[bot]',
       'PATCH',
       'issues/comments/456',
-      'https://github.com/QwenLM/qwen-code/issues/14500',
+      'https://github.invalid/QwenLM/qwen-code/issues/14500',
       0,
       false,
     ],
@@ -2669,7 +2670,7 @@ printf '%s\\n' '{"jobs":[]}'
       'contributor',
       'POST',
       'issues/14472/comments',
-      'https://github.com/QwenLM/qwen-code/issues/14500',
+      'https://github.invalid/QwenLM/qwen-code/issues/14500',
       0,
       false,
     ],
@@ -2686,7 +2687,7 @@ printf '%s\\n' '{"jobs":[]}'
       'github-actions[bot]',
       'PATCH',
       'issues/comments/456',
-      'https://github.com/QwenLM/qwen-code/issues/14500',
+      'https://github.invalid/QwenLM/qwen-code/issues/14500',
       0,
       true,
       0,
@@ -2712,11 +2713,11 @@ printf '%s\\n' '{"jobs":[]}'
             sha: 'abc123456789',
             runId: '39045740099',
             runUrl:
-              'https://github.com/QwenLM/qwen-code/actions/runs/39045740099',
+              'https://github.invalid/QwenLM/qwen-code/actions/runs/39045740099',
           },
         });
         const existingBody = existingTracking
-          ? `${comment}\n[Tracking issue](https://github.com/QwenLM/qwen-code/issues/15240)\n`
+          ? `${comment}\n[Tracking issue](https://github.invalid/QwenLM/qwen-code/issues/15240)\n`
           : comment;
         writeFileSync(
           join(tmp, 'comments.json'),
@@ -2785,7 +2786,7 @@ fi
           const expectedTracking =
             issueUrl ||
             (existingTracking
-              ? 'https://github.com/QwenLM/qwen-code/issues/15240'
+              ? 'https://github.invalid/QwenLM/qwen-code/issues/15240'
               : '');
           if (expectedTracking) {
             expect(publishedBody).toContain(

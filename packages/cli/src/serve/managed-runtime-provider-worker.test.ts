@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1197,7 +1198,10 @@ describe('Managed Runtime provider worker', () => {
           workspaceCwd: linkedWorkspace,
         });
       }
-      fs.writeFileSync(path.join(workspace, 'QWEN.md'), 'project rules');
+      fs.writeFileSync(
+        path.join(workspace, 'MARIADB-SHELL-AGENT.md'),
+        'project rules',
+      );
       const outside = fs.mkdtempSync(
         path.join(os.tmpdir(), 'qwen-provider-outside-'),
       );
@@ -1210,7 +1214,7 @@ describe('Managed Runtime provider worker', () => {
           path.join(workspace, 'AGENTS.md'),
         );
         expect(await control({ kind: 'workspace-context' })).toEqual({
-          files: [{ name: 'QWEN.md', text: 'project rules' }],
+          files: [{ name: 'MARIADB-SHELL-AGENT.md', text: 'project rules' }],
         });
 
         fs.rmSync(path.join(workspace, 'AGENTS.md'));
@@ -1222,7 +1226,7 @@ describe('Managed Runtime provider worker', () => {
           files: Array<{ name: string; text: string }>;
         }>({ kind: 'workspace-context' });
         expect(files.map((file) => file.name)).toEqual([
-          'QWEN.md',
+          'MARIADB-SHELL-AGENT.md',
           'AGENTS.md',
         ]);
         expect(files[1].text).toHaveLength(
@@ -1248,9 +1252,12 @@ describe('Managed Runtime provider worker', () => {
 
         // One file under both names is injected once.
         fs.rmSync(path.join(workspace, 'AGENTS.md'));
-        fs.symlinkSync('QWEN.md', path.join(workspace, 'AGENTS.md'));
+        fs.symlinkSync(
+          'MARIADB-SHELL-AGENT.md',
+          path.join(workspace, 'AGENTS.md'),
+        );
         expect(await control({ kind: 'workspace-context' })).toEqual({
-          files: [{ name: 'QWEN.md', text: 'project rules' }],
+          files: [{ name: 'MARIADB-SHELL-AGENT.md', text: 'project rules' }],
         });
       } finally {
         fs.rmSync(outside, { recursive: true, force: true });
@@ -1266,11 +1273,14 @@ describe('Managed Runtime provider worker', () => {
     // 409 managed_runtime_identity_conflict, which the best-effort catch
     // swallowed — every Hosted turn ran without instructions and looked
     // healthy.
-    fs.writeFileSync(path.join(workspace, 'QWEN.md'), 'project rules');
+    fs.writeFileSync(
+      path.join(workspace, 'MARIADB-SHELL-AGENT.md'),
+      'project rules',
+    );
     await acquire();
 
     expect(await control({ kind: 'workspace-context' })).toEqual({
-      files: [{ name: 'QWEN.md', text: 'project rules' }],
+      files: [{ name: 'MARIADB-SHELL-AGENT.md', text: 'project rules' }],
     });
   });
 

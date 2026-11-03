@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -196,7 +197,7 @@ export const DEFAULT_REPLAY_BUDGET_BYTES = 4 * DEFAULT_MAX_QUEUED_BYTES;
  * thought streams pile up). 1000 was the original default and could
  * be exhausted by a moderate turn before the client reconnected.
  * 8000 is the current daemon design target; operators with very
- * long agentic turns can raise it via `qwen serve --event-ring-size <n>`.
+ * long agentic turns can raise it via `mariadb-shell-agent serve --event-ring-size <n>`.
  */
 export const DEFAULT_RING_SIZE = 8_000;
 /**
@@ -311,7 +312,7 @@ export function mcpAppTextFallback(
 export function logEventSizingFailed(type: string): void {
   try {
     process.stderr.write(
-      `qwen serve: EventBus event sizing failed ${JSON.stringify({ type })}\n`,
+      `mariadb-shell-agent serve: EventBus event sizing failed ${JSON.stringify({ type })}\n`,
     );
   } catch {
     // Best-effort diagnostic; logging must not break publish()'s never-throws contract.
@@ -321,7 +322,7 @@ export function logEventSizingFailed(type: string): void {
 function logSubscriberEvicted(data: Record<string, unknown>): void {
   try {
     process.stderr.write(
-      `qwen serve: EventBus subscriber evicted ${JSON.stringify(data)}\n`,
+      `mariadb-shell-agent serve: EventBus subscriber evicted ${JSON.stringify(data)}\n`,
     );
   } catch {
     // Best-effort diagnostic; logging must not break publish()'s never-throws contract.
@@ -333,7 +334,7 @@ export type QueueWarningThreshold = 'frames' | 'bytes' | 'frames_and_bytes';
 function logSlowClientWarning(data: Record<string, unknown>): void {
   try {
     process.stderr.write(
-      `qwen serve: EventBus slow_client_warning ${JSON.stringify(data)}\n`,
+      `mariadb-shell-agent serve: EventBus slow_client_warning ${JSON.stringify(data)}\n`,
     );
   } catch {
     // Best-effort diagnostic; logging must not break publish()'s never-throws contract.
@@ -420,7 +421,7 @@ export class SubscriberLimitExceededError extends Error {
 // of running parallel event streams. The `BridgeEvent` shape is
 // already close to what's needed; what's missing is the bus being
 // publicly addressable. Reference:
-// https://github.com/QwenLM/qwen-code/pull/3889#issuecomment-4427773706
+// https://github.invalid/QwenLM/qwen-code/pull/3889#issuecomment-4427773706
 export class EventBus {
   private nextId = 1;
   /**

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -113,7 +114,12 @@ describe('branch worktree preparation journal', () => {
       journalPath,
       targetSessionId,
       slug: 'branch-a',
-      worktreePath: path.join(root, '.qwen', 'worktrees', 'branch-a'),
+      worktreePath: path.join(
+        root,
+        '.mariadb-shell-agent',
+        'worktrees',
+        'branch-a',
+      ),
       worktreeBranch: 'worktree-branch-a',
       repoTop: root,
       baseCommit,
@@ -149,7 +155,12 @@ describe('branch worktree preparation journal', () => {
       journalPath,
       targetSessionId,
       slug: 'branch-linked',
-      worktreePath: path.join(root, '.qwen', 'worktrees', 'branch-linked'),
+      worktreePath: path.join(
+        root,
+        '.mariadb-shell-agent',
+        'worktrees',
+        'branch-linked',
+      ),
       worktreeBranch: 'worktree-branch-linked',
       repoTop: root,
       baseCommit,
@@ -190,7 +201,12 @@ describe('branch worktree preparation journal', () => {
         journalPath,
         targetSessionId,
         slug: 'branch-symlink',
-        worktreePath: path.join(root, '.qwen', 'worktrees', 'branch-symlink'),
+        worktreePath: path.join(
+          root,
+          '.mariadb-shell-agent',
+          'worktrees',
+          'branch-symlink',
+        ),
         worktreeBranch: 'worktree-branch-symlink',
         repoTop: root,
         baseCommit,
@@ -222,7 +238,12 @@ describe('branch worktree preparation journal', () => {
       journalPath,
       targetSessionId,
       slug: 'branch-a',
-      worktreePath: path.join(root, '.qwen', 'worktrees', 'branch-a'),
+      worktreePath: path.join(
+        root,
+        '.mariadb-shell-agent',
+        'worktrees',
+        'branch-a',
+      ),
       worktreeBranch: 'worktree-branch-a',
       repoTop: root,
       baseCommit,
@@ -648,7 +669,7 @@ describe('isBranchWorktreeCreationSupported', () => {
     async () => {
       const outside = path.join(root, 'outside-qwen');
       await fs.mkdir(outside);
-      await fs.symlink(outside, path.join(root, '.qwen'));
+      await fs.symlink(outside, path.join(root, '.mariadb-shell-agent'));
 
       await expect(
         isBranchWorktreeCreationSupported({

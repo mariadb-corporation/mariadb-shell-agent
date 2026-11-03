@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1005,7 +1006,7 @@ export class HookEventHandler {
               )
           : [];
       // The second side of the project-skill trust gate: a hook registered
-      // from a repository's `.qwen/skills/` frontmatter (`trustGated`) runs
+      // from a repository's `.mariadb-shell-agent/skills/` frontmatter (`trustGated`) runs
       // only while the folder is STILL trusted. `Config.isTrustedFolder()`
       // is live under an IDE connection, so a revocation mid-session
       // silences the hook at its next event without a restart or any

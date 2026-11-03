@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -184,9 +185,11 @@ describe('capture-local — the re-captures\u2019 skipped lists ride the guard',
 
     const plan = JSON.parse(readFileSync(join(dir, 'plan.json'), 'utf8'));
     expect(plan.nothingToReview).toBeUndefined();
-    expect(existsSync(join(dir, '.qwen/tmp/qwen-review-local-stop.json'))).toBe(
-      false,
-    );
+    expect(
+      existsSync(
+        join(dir, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+      ),
+    ).toBe(false);
     expect(errs.join('')).toContain(
       'the working tree changed while the capture was being hashed',
     );
@@ -213,18 +216,18 @@ describe('capture-local (command boundary)', () => {
   });
 
   it.skipIf(process.platform === 'win32')(
-    'refuses the round on a symlinked `.qwen/tmp`, before writing anything',
+    'refuses the round on a symlinked `.mariadb-shell-agent/tmp`, before writing anything',
     () => {
       // The scratch directory is deterministic and in-repo: a contributor
-      // branch can commit `.qwen/tmp` (or `.qwen`) as a link — gitignore
+      // branch can commit `.mariadb-shell-agent/tmp` (or `.mariadb-shell-agent`) as a link — gitignore
       // does not stop `git add -f` — and every side file of the round (the
       // diff, the plan, the stop sidecar, the candidate) would land wherever
       // it points, with the plan then read back from there. Guarding the
       // writers one at a time re-found the class every round; the round is
       // refused at the directory instead, and nothing reaches the victim.
       const elsewhere = realpathSync(mkdtempSync(join(tmpdir(), 'victim-')));
-      mkdirSync(join(dir, '.qwen'), { recursive: true });
-      symlinkSync(elsewhere, join(dir, '.qwen', 'tmp'));
+      mkdirSync(join(dir, '.mariadb-shell-agent'), { recursive: true });
+      symlinkSync(elsewhere, join(dir, '.mariadb-shell-agent', 'tmp'));
       try {
         capture();
         // Reported, not thrown: the handler prints one line and exits 1 — a
@@ -233,22 +236,25 @@ describe('capture-local (command boundary)', () => {
         expect(() => run(join(dir, 'plan.json'))).not.toThrow();
         expect(process.exitCode).toBe(1);
         expect(errs.join('')).toMatch(
-          /^capture-local: \.qwen[/\\]tmp is a symbolic link/,
+          /^capture-local: \.mariadb-shell-agent[/\\]tmp is a symbolic link/,
         );
         expect(errs.join('')).not.toContain('capture-local: capture-local:');
         expect(existsSync(join(dir, 'plan.json'))).toBe(false);
         expect(readdirSync(elsewhere)).toEqual([]);
 
-        // `.qwen` itself as the link: same refusal, same empty victim.
-        rmSync(join(dir, '.qwen'), { recursive: true, force: true });
-        symlinkSync(elsewhere, join(dir, '.qwen'));
+        // `.mariadb-shell-agent` itself as the link: same refusal, same empty victim.
+        rmSync(join(dir, '.mariadb-shell-agent'), {
+          recursive: true,
+          force: true,
+        });
+        symlinkSync(elsewhere, join(dir, '.mariadb-shell-agent'));
         capture();
         process.exitCode = undefined;
         errs = [];
         expect(() => run(join(dir, 'plan.json'))).not.toThrow();
         expect(process.exitCode).toBe(1);
         expect(errs.join('')).toMatch(
-          /^capture-local: \.qwen is a symbolic link/,
+          /^capture-local: \.mariadb-shell-agent is a symbolic link/,
         );
         expect(readdirSync(elsewhere)).toEqual([]);
       } finally {
@@ -277,7 +283,10 @@ describe('capture-local (command boundary)', () => {
       expect(typeof plan['cacheCandidateStateId']).toBe('string');
       const candidate = JSON.parse(
         readFileSync(
-          join(dir, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+          join(
+            dir,
+            '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+          ),
           'utf8',
         ),
       ) as Record<string, unknown>;
@@ -290,7 +299,7 @@ describe('capture-local (command boundary)', () => {
   });
 
   it('creates the output directory the caller chose', () => {
-    // It created `.qwen/tmp` — its own — and then wrote to the caller's path,
+    // It created `.mariadb-shell-agent/tmp` — its own — and then wrote to the caller's path,
     // which may be elsewhere. `--out reports/plan.json` answered with ENOENT.
     capture();
     run(join('reports', 'nested', 'plan.json'));
@@ -412,14 +421,20 @@ describe('capture-local (command boundary)', () => {
     run('plan.json');
     expect(
       isLedgerOnlyCandidate(
-        join(dir, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+        join(
+          dir,
+          '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+        ),
       ),
     ).toBe(true);
     expect(errs.join('')).toContain('could not be enumerated');
     expect(
       JSON.parse(
         readFileSync(
-          join(dir, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+          join(
+            dir,
+            '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+          ),
           'utf8',
         ),
       )['ledgerOnly'],
@@ -435,14 +450,20 @@ describe('capture-local (command boundary)', () => {
     run('plan.json');
     expect(
       isLedgerOnlyCandidate(
-        join(dir, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+        join(
+          dir,
+          '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+        ),
       ),
     ).toBe(true);
     expect(errs.join('')).toContain('findings ledger only, no anchor');
     expect(
       JSON.parse(
         readFileSync(
-          join(dir, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+          join(
+            dir,
+            '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+          ),
           'utf8',
         ),
       )['ledgerOnly'],

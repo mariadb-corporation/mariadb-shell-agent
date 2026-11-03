@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -55,20 +56,20 @@ describe('getTeamMemoryShareabilityWarning', () => {
   it('warns when a directory-form .gitignore swallows the team dir', () => {
     const repo = initRepo('ignored');
     cleanup.push(repo);
-    // The common pitfall: ignoring `.qwen/` (directory form) makes git skip the
+    // The common pitfall: ignoring `.mariadb-shell-agent/` (directory form) makes git skip the
     // folder entirely, so memories are silently never tracked.
-    fs.writeFileSync(path.join(repo, '.gitignore'), '.qwen/\n');
+    fs.writeFileSync(path.join(repo, '.gitignore'), '.mariadb-shell-agent/\n');
     const warning = getTeamMemoryShareabilityWarning(repo);
     expect(warning).toContain('git-ignored');
   });
 
-  it('returns null when .qwen/* re-includes the team dir', () => {
+  it('returns null when .mariadb-shell-agent/* re-includes the team dir', () => {
     const repo = initRepo('reinclude');
     cleanup.push(repo);
     // The file-glob form CAN be escaped by a re-include below it.
     fs.writeFileSync(
       path.join(repo, '.gitignore'),
-      '.qwen/*\n!.qwen/team-memory/\n!.qwen/team-memory/**\n',
+      '.mariadb-shell-agent/*\n!.mariadb-shell-agent/team-memory/\n!.mariadb-shell-agent/team-memory/**\n',
     );
     expect(getTeamMemoryShareabilityWarning(repo)).toBeNull();
   });
@@ -81,7 +82,7 @@ describe('getTeamMemoryShareabilityWarning', () => {
     // alone (pre-fix) would wrongly report this as shareable.
     fs.writeFileSync(
       path.join(repo, '.gitignore'),
-      '.qwen/team-memory/*.md\n!.qwen/team-memory/MEMORY.md\n',
+      '.mariadb-shell-agent/team-memory/*.md\n!.mariadb-shell-agent/team-memory/MEMORY.md\n',
     );
     const warning = getTeamMemoryShareabilityWarning(repo);
     expect(warning).toContain('git-ignored');

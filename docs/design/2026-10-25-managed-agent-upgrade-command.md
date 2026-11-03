@@ -30,7 +30,7 @@ Three other problems show up only on a real host:
 ## Non-goals
 
 - Layouts other than the systemd one. The guide keeps the manual steps for them.
-- Stopping ingress, installing Qwen Code, or editing environment or unit files. The command prints these steps where they fall.
+- Stopping ingress, installing MariaDB Shell Agent, or editing environment or unit files. The command prints these steps where they fall.
 - Rolling back automatically. The guide documents the rollback.
 - Changing the in-place baseline policy before the first formal release.
 

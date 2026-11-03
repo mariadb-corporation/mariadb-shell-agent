@@ -3,7 +3,7 @@
 ## 状态
 
 - 状态：Draft
-- 范围：Qwen Code 实验分支中的图片、音频、视频文件级 Memory
+- 范围：MariaDB Shell Agent 实验分支中的图片、音频、视频文件级 Memory
 - 前置设计：
   [多模态文件识别与元数据提取架构设计](./2026-07-29-multimodal-file-recognition-and-metadata.md)、
   [Omni 多模态数据处理 Policy 编排架构设计](./2026-07-29-omni-multimodal-policy-orchestration.md)
@@ -25,7 +25,7 @@ SHA-256 与技术 metadata 的媒体资源；Policy 阶段又可以从这些资�
 - 当前问题是否已有可复用结果，还是仍需调用某个 policy；
 - 原文件发生变化后，哪些旧结果已经不应默认召回。
 
-因此，本设计在现有 Qwen Code 识别服务、Policy Tool 和请求构造链路上增加一个
+因此，本设计在现有 MariaDB Shell Agent 识别服务、Policy Tool 和请求构造链路上增加一个
 文件级的结构化 Memory。它不是新的产品、独立平台或 Agent 自主记忆系统；它只把
 Harness 已经确定的文件事实和成功 policy 结果组织成可追溯、可召回的文件内图。
 
@@ -401,7 +401,7 @@ staging 不是第三个触发点，也不是持久可召回图；它只是
 
 ### 7.1 固定调用与模型调用共用
 
-所有 policy 都以 Qwen Code Tool 实现；Fixed Policy 与 Transport Guard policy 也
+所有 policy 都以 MariaDB Shell Agent Tool 实现；Fixed Policy 与 Transport Guard policy 也
 通过 `execute` 运行。因此，固定调用、模型 ToolCall 和 direct client 调用在成功后
 都进入同一个 `OmniPolicySucceeded` 逻辑边界，不为不同调用来源复制 Memory 写入代码。
 
@@ -623,7 +623,7 @@ interface MediaMemoryRecallResult {
 
 ## 10. 顶层 Omni 配置
 
-Memory 配置直接放在现有实验配置的 `omni.memory` 下，不并入 Qwen Code 当前的
+Memory 配置直接放在现有实验配置的 `omni.memory` 下，不并入 MariaDB Shell Agent 当前的
 managed auto-memory 配置，也不增加独立配置文件、环境变量或 CLI flag。初版没有
 `omni.enabled` 或 `memory.enabled`；收集始终按两个确定触发点执行，默认 recall 模式
 为 `active`。
@@ -818,9 +818,9 @@ quarantine 的落盘形式、保留周期和垃圾回收由
 [Omni 受管媒体存储设计](./2026-07-30-omni-managed-media-storage.md) 定义；本节的
 "artifact 生命周期不得早于 active Memory 记录"是该设计必须满足的强约束。
 
-## 14. 与当前 Qwen Code 源码的对应关系
+## 14. 与当前 MariaDB Shell Agent 源码的对应关系
 
-本设计是现有 Qwen Code 能力上的增量开发：
+本设计是现有 MariaDB Shell Agent 能力上的增量开发：
 
 - 文件识别设计新增的 `MediaRecognitionService` 在成功结果形成后调用
   `recordFileRecognized`；policy-origin 结果携带 invocation ID 进入 staging；
@@ -849,7 +849,7 @@ quarantine 的落盘形式、保留周期和垃圾回收由
   extraction/dream 和用户/项目主题文件为核心，不作为结构化 media graph 的存储格式，
   也不参与本设计写入。
 
-建议把新增能力作为一个 Qwen Code Core service 放在：
+建议把新增能力作为一个 MariaDB Shell Agent Core service 放在：
 
 ```text
 packages/core/src/services/media-memory/

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +10,7 @@ import { deriveWebSocketBase } from '../../ui/voice/voice-stream-session.js';
 
 export const DEFAULT_LIVE_VOICE_MODEL = 'qwen3.5-omni-plus-realtime';
 export const DEFAULT_LIVE_ENDPOINT =
-  'wss://dashscope.aliyuncs.com/api-ws/v1/realtime';
+  'wss://dashscope.aliyuncs.invalid/api-ws/v1/realtime';
 const REALTIME_PATH = '/api-ws/v1/realtime';
 export const DEFAULT_LIVE_VOICE = 'Tina';
 export const DEFAULT_LIVE_SHORTCUT = 'Command+E';
@@ -84,14 +85,14 @@ export function readLiveVoiceConfiguration(
 function isDashScopeHost(hostname: string): boolean {
   const host = hostname.toLowerCase();
   return (
-    host === 'dashscope.aliyuncs.com' ||
-    host === 'dashscope-intl.aliyuncs.com' ||
-    host === 'dashscope-us.aliyuncs.com' ||
-    host.endsWith('.dashscope.aliyuncs.com') ||
-    host.endsWith('.dashscope-intl.aliyuncs.com') ||
-    host.endsWith('.dashscope-us.aliyuncs.com') ||
-    host === 'maas.aliyuncs.com' ||
-    host.endsWith('.maas.aliyuncs.com')
+    host === 'dashscope.aliyuncs.invalid' ||
+    host === 'dashscope-intl.aliyuncs.invalid' ||
+    host === 'dashscope-us.aliyuncs.invalid' ||
+    host.endsWith('.dashscope.aliyuncs.invalid') ||
+    host.endsWith('.dashscope-intl.aliyuncs.invalid') ||
+    host.endsWith('.dashscope-us.aliyuncs.invalid') ||
+    host === 'maas.aliyuncs.invalid' ||
+    host.endsWith('.maas.aliyuncs.invalid')
   );
 }
 

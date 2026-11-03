@@ -1,4 +1,4 @@
-# 远程 Qwen Code 使用本地桌面机：launchd 按需拉起的 node_repl 中继
+# 远程 MariaDB Shell Agent 使用本地桌面机：launchd 按需拉起的 node_repl 中继
 
 > 状态：v4，已实现（本 PR）。2026-09-25 真实 Linux → Mac 的原生授权、桌面读写与裁剪截图、会话切换保持、主动断开撤销和非 GUI 取消恢复已通过；2026-09-26 的最终候选又收敛为单一 Web Shell 路径，并完成受限凭证和失败路径回归。未覆盖场景与发布前提见 §6 及 `docs/verification/remote-computer-use/results.md`。v1（中继驱动守护进程）和 v2（`qwen bridge` 子命令）都被替换，原因见 §1、§2。
 > 真机验证步骤见 `docs/verification/remote-computer-use/README.md`。
@@ -8,7 +8,7 @@
 
 用户面前那台有图形会话的机器（下称桌面机）把自己的 `node_repl`（连同 `@qwen-code/cua-sdk` 和内嵌驱动）借给一个远端会话。两个部件：
 
-1. **桌面机上一次性安装**：`npx -y @qwen-code/node-repl-mcp@0.1.7 desktop-relay install`。它把运行时装到 `~/.qwen/desktop-relay`，并向 launchd 注册 `127.0.0.1:47821` 上的 socket（inetd 模式）。平时没有任何进程；有连接进来时 launchd 才拉起一个短命进程。
+1. **桌面机上一次性安装**：`npx -y @qwen-code/node-repl-mcp@0.1.7 desktop-relay install`。它把运行时装到 `~/.mariadb-shell-agent/desktop-relay`，并向 launchd 注册 `127.0.0.1:47821` 上的 socket（inetd 模式）。平时没有任何进程；有连接进来时 launchd 才拉起一个短命进程。
 2. **Web Shell 的“使用这台电脑”入口**：页面先向 daemon 换取一次性、短时且只绑定当前会话与 `desktop-node-repl` 的凭证，再把 daemon 地址、`sessionId` 和该凭证交给本机中继；中继在桌面机上弹出原生确认框；用户允许后，中继拉起 `node_repl`，通过 daemon 的反向工具通道按会话注册给这一个会话。daemon 的完整 bearer token 不会发送到本机中继。
 
 Computer Use skill 会优先选择 `desktop-node-repl`，并在它存在时跳过普通 `node_repl` 的安装引导；未连接桌面中继时仍走原有本地路径。
@@ -23,13 +23,13 @@ Computer Use skill 会优先选择 `desktop-node-repl`，并在它存在时跳�
 
 ## 2. 形态是怎么定下来的
 
-| 候选                              | 否决理由                                       |
-| --------------------------------- | ---------------------------------------------- |
-| 独立的桌面 app（签名、菜单栏）    | 要用户额外装一个 app                           |
-| `qwen bridge` 子命令              | 每次使用都要在桌面机上敲命令，不是开箱即用     |
-| 桌面机上常驻本地 `qwen serve`     | 浏览器用户为此多跑一个服务，不合适             |
-| 本地 TUI 连远端 daemon            | TUI 今天没有这种模式，离本需求太远             |
-| **launchd socket 激活（本方案）** | 一次性安装，之后零常驻进程；浏览器里点按钮即可 |
+| 候选                                         | 否决理由                                       |
+| -------------------------------------------- | ---------------------------------------------- |
+| 独立的桌面 app（签名、菜单栏）               | 要用户额外装一个 app                           |
+| `qwen bridge` 子命令                         | 每次使用都要在桌面机上敲命令，不是开箱即用     |
+| 桌面机上常驻本地 `mariadb-shell-agent serve` | 浏览器用户为此多跑一个服务，不合适             |
+| 本地 TUI 连远端 daemon                       | TUI 今天没有这种模式，离本需求太远             |
+| **launchd socket 激活（本方案）**            | 一次性安装，之后零常驻进程；浏览器里点按钮即可 |
 
 有一个事实绕不开：浏览器页面不能读别的 app 的界面、也不能替用户点鼠标，所以桌面机上必须有一个原生进程充当“桌面”这项能力的服务端。本方案让这个进程只在需要时存在。
 
@@ -39,13 +39,13 @@ Computer Use skill 会优先选择 `desktop-node-repl`，并在它存在时跳�
 
 ```text
 桌面机                                                     远端开发机
-浏览器 Web Shell ──(1) POST /desktop-relay/credential ───────► qwen serve
+浏览器 Web Shell ──(1) POST /desktop-relay/credential ───────► mariadb-shell-agent serve
        └──────────(2) POST http://127.0.0.1:47821/connect
                         │
 launchd（inetd 模式）拉起：node-repl-mcp desktop-relay agent
    ├─ 原生确认框（osascript）
-   ├─ 拉起 node_repl（stdio，cwd = ~/.qwen/desktop-relay）
-   └─ (3) WebSocket /acp ────────────────────────────►  qwen serve（QWEN_SERVE_CLIENT_MCP_OVER_WS=1）
+   ├─ 拉起 node_repl（stdio，cwd = ~/.mariadb-shell-agent/desktop-relay）
+   └─ (3) WebSocket /acp ────────────────────────────►  mariadb-shell-agent serve（QWEN_SERVE_CLIENT_MCP_OVER_WS=1）
          ACP initialize → mcp_register {server:'desktop-node-repl', sessionId}
          mcp_message ⇄ node_repl                         该会话里出现 node_repl 工具
 ```

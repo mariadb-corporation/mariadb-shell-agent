@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -61,7 +62,7 @@ function scopedPm(projectRoot: string, basePm?: unknown) {
 }
 
 const skillsPath = (projectRoot: string, ...segs: string[]) =>
-  path.join(projectRoot, '.qwen', 'skills', ...segs);
+  path.join(projectRoot, '.mariadb-shell-agent', 'skills', ...segs);
 
 async function writeSkillFile(
   projectRoot: string,
@@ -77,7 +78,12 @@ async function writeSkillFile(
 
 async function archiveSkillDir(projectRoot: string, directoryName: string) {
   await fs.mkdir(
-    path.join(projectRoot, '.qwen', 'archived-skills', directoryName),
+    path.join(
+      projectRoot,
+      '.mariadb-shell-agent',
+      'archived-skills',
+      directoryName,
+    ),
     { recursive: true },
   );
 }
@@ -338,12 +344,14 @@ describe('buildTaskPrompt', () => {
   });
 
   it('instructs the agent to use the auto-skill- directory prefix (#4837)', async () => {
-    // `.gitignore` re-ignores `.qwen/skills/auto-skill-*/`, so new auto skills
+    // `.gitignore` re-ignores `.mariadb-shell-agent/skills/auto-skill-*/`, so new auto skills
     // must land under an `auto-skill-`-prefixed dir to stay out of version
     // control. The prompt is the soft guard that steers the agent there.
     const prompt = await buildTaskPrompt(dirs.projectRoot);
     expect(prompt).toContain(AUTO_SKILL_DIR_PREFIX);
-    expect(prompt).toContain(`.qwen/skills/${AUTO_SKILL_DIR_PREFIX}<name>/`);
+    expect(prompt).toContain(
+      `.mariadb-shell-agent/skills/${AUTO_SKILL_DIR_PREFIX}<name>/`,
+    );
     expect(prompt).toMatch(/mandatory/i);
   });
 });
@@ -356,7 +364,7 @@ describe('SKILL_REVIEW_SYSTEM_PROMPT', () => {
     // drop the prefix mandate from the other.
     expect(SKILL_REVIEW_SYSTEM_PROMPT).toContain(AUTO_SKILL_DIR_PREFIX);
     expect(SKILL_REVIEW_SYSTEM_PROMPT).toContain(
-      `.qwen/skills/${AUTO_SKILL_DIR_PREFIX}<name>/`,
+      `.mariadb-shell-agent/skills/${AUTO_SKILL_DIR_PREFIX}<name>/`,
     );
     expect(SKILL_REVIEW_SYSTEM_PROMPT).toMatch(/MUST use/i);
   });

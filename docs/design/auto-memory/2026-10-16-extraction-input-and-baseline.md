@@ -5,8 +5,8 @@
 **Status:** Proposed; no runtime change or performance acceptance in this document.
 **Date:** 2026-10-16
 **Source baseline:** `38d58c63cf2f07835efe168929ceb4b5be813eef` on `main`.
-**Tracking:** [#13004](https://github.com/QwenLM/qwen-code/issues/13004), [#13612](https://github.com/QwenLM/qwen-code/issues/13612).
-**Paused experiment:** [#13571](https://github.com/QwenLM/qwen-code/pull/13571), converted to draft on 2026-10-16; its code is not the baseline.
+**Tracking:** [#13004](https://github.invalid/QwenLM/qwen-code/issues/13004), [#13612](https://github.invalid/QwenLM/qwen-code/issues/13612).
+**Paused experiment:** [#13571](https://github.invalid/QwenLM/qwen-code/pull/13571), converted to draft on 2026-10-16; its code is not the baseline.
 
 ## 1. Goal and decision
 
@@ -48,7 +48,7 @@ This PR must not change extraction frequency, cursor semantics, prompts, model c
 
 - Pin the source SHA, CLI entrypoint, provider, resolved main/extractor models, generation options, and memory protocol.
 - Use synthetic fixtures and isolated configuration, project/user memory, session storage, and workspaces. Do not read or overwrite the operator's real memory or settings.
-- Verify the installed CLI separately. The local `qwen --version` preflight returned `0.25.0`; that installed release is not interchangeable with the pinned source baseline. No conversational model run has been performed for this design.
+- Verify the installed CLI separately. The local `mariadb-shell-agent --version` preflight returned `0.25.0`; that installed release is not interchangeable with the pinned source baseline. No conversational model run has been performed for this design.
 - Keep Dream, recall, migration, permission classifiers, and foreground calls attributable separately. If isolation needs a setting change, apply it only to test configuration and use it identically across variants.
 - Wait for observed extraction settlement in the harness before scoring. Record pending/timeouts explicitly rather than calling them zero cost or no-op.
 

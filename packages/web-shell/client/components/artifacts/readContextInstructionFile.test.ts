@@ -27,7 +27,10 @@ function makeClient(options: ClientOptions = {}) {
   }));
   const memory = vi.fn(async () => ({
     files: options.memoryFiles ?? [
-      { path: '/home/u/.qwen/QWEN.md', content: 'global content' },
+      {
+        path: '/home/u/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md',
+        content: 'global content',
+      },
     ],
   }));
   const byCwd = vi.fn(() => ({ readWorkspaceFile: secondaryRead }));
@@ -90,7 +93,7 @@ describe('readContextInstructionFile', () => {
       client,
       capabilities,
       '/a',
-      '/home/u/.qwen/QWEN.md',
+      '/home/u/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md',
     );
     expect(result.content).toBe('global content');
     expect(result.truncated).toBe(false);
@@ -116,7 +119,7 @@ describe('readContextInstructionFile', () => {
         client,
         capabilities,
         '/a',
-        '/home/u/.qwen/other.md',
+        '/home/u/.mariadb-shell-agent/other.md',
       ),
     ).rejects.toThrow('No readable memory file');
   });
@@ -126,7 +129,7 @@ describe('readContextInstructionFile', () => {
       workspaceCwd: '/repo',
       workspaces: [{ id: 'repo', cwd: '/repo', primary: true, trusted: true }],
     } as unknown as DaemonCapabilities;
-    const worktreeFile = '/repo/.qwen/worktrees/task/AGENTS.md';
+    const worktreeFile = '/repo/.mariadb-shell-agent/worktrees/task/AGENTS.md';
     const { client, primaryRead, byCwd } = makeClient();
 
     const result = await readContextInstructionFile(
@@ -145,7 +148,7 @@ describe('readContextInstructionFile', () => {
       readContextInstructionFile(
         client,
         repoCapabilities,
-        '/repo/.qwen/worktrees/task',
+        '/repo/.mariadb-shell-agent/worktrees/task',
         worktreeFile,
       ),
     ).rejects.toThrow('workspace');
@@ -186,14 +189,18 @@ describe('readContextInstructionFile', () => {
   it('surfaces truncation from the memory route', async () => {
     const { client } = makeClient({
       memoryFiles: [
-        { path: '/home/u/.qwen/QWEN.md', content: 'global', truncated: true },
+        {
+          path: '/home/u/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md',
+          content: 'global',
+          truncated: true,
+        },
       ],
     });
     const result = await readContextInstructionFile(
       client,
       capabilities,
       '/a',
-      '/home/u/.qwen/QWEN.md',
+      '/home/u/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md',
     );
     expect(result.content).toBe('global');
     expect(result.truncated).toBe(true);
@@ -202,14 +209,16 @@ describe('readContextInstructionFile', () => {
   it('distinguishes a listed memory file whose text is withheld from a missing one', async () => {
     // The route keeps the entry but omits content for non-UTF-8 bytes.
     const { client } = makeClient({
-      memoryFiles: [{ path: '/home/u/.qwen/QWEN.md' }],
+      memoryFiles: [
+        { path: '/home/u/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md' },
+      ],
     });
     await expect(
       readContextInstructionFile(
         client,
         capabilities,
         '/a',
-        '/home/u/.qwen/QWEN.md',
+        '/home/u/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md',
       ),
     ).rejects.toThrow('could not be read as UTF-8');
   });

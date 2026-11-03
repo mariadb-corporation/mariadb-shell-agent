@@ -1,14 +1,15 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * A program's place among the Qwen Code sessions running as this user.
+ * A program's place among the MariaDB Shell Agent sessions running as this user.
  *
  * Starting an endpoint binds an inbox and publishes a session record, so
- * the program shows up in `qwen sessions ps`, and in the `list_agents` of
+ * the program shows up in `mariadb-shell-agent sessions ps`, and in the `list_agents` of
  * every session that takes part in cross-session messaging — its
  * `agents.crossSessionMessaging` setting is on, and it was not started with
  * `--bare` or `--safe-mode` — which is also what lets those sessions
@@ -93,7 +94,7 @@ export interface PeerEndpointOptions {
   sessionId?: string;
   /** Free text recorded as the writer's version. */
   version?: string;
-  /** The Qwen home to join. Default `QWEN_HOME`, else `~/.qwen`. */
+  /** The Qwen home to join. Default `QWEN_HOME`, else `~/.mariadb-shell-agent`. */
   qwenHome?: string;
   /**
    * Bind the inbox here instead of choosing a path. If something live
@@ -102,7 +103,7 @@ export interface PeerEndpointOptions {
    */
   socketPath?: string;
   /**
-   * A controller token minted with `qwen sessions controllers add`.
+   * A controller token minted with `mariadb-shell-agent sessions controllers add`.
    *
    * Presented only on sends marked `controller: true`. The token works
    * against every session in the Qwen home, and addresses are resolved from
@@ -112,7 +113,7 @@ export interface PeerEndpointOptions {
    *
    * A controller send is delivered without review unless the receiving
    * session's own `agents.crossSessionInbound` setting says `hold` or
-   * `refuse` — that outranks the grant. It is for Qwen Code sessions:
+   * `refuse` — that outranks the grant. It is for MariaDB Shell Agent sessions:
    * another peer endpoint's inbox accepts only its own token, so a
    * controller send to one is dropped unread.
    */
@@ -131,7 +132,7 @@ export interface PeerEndpointOptions {
   /**
    * Remove the record and the socket when the process exits through
    * `process.exit` or an empty event loop. Default true. A process killed
-   * by a signal it does not handle leaves both behind; the next Qwen Code
+   * by a signal it does not handle leaves both behind; the next MariaDB Shell Agent
    * session that lists the directory clears the record once the start
    * token proves this process is gone.
    */
@@ -394,7 +395,7 @@ export class PeerEndpoint {
     ) {
       throw new PeerEndpointError(
         'invalid-controller-token',
-        'controllerToken must be a token minted with `qwen sessions controllers add`, which starts with qpc_; an empty value usually means the variable holding it is unset',
+        'controllerToken must be a token minted with `mariadb-shell-agent sessions controllers add`, which starts with qpc_; an empty value usually means the variable holding it is unset',
       );
     }
 

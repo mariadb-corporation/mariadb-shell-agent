@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,7 +25,7 @@ import {
 } from './acp-session-bridge.js';
 import { createManagedEngineChannelFactory } from './managed-engine-channel-factory.js';
 
-// Real `qwen --acp` children, run from source through tsx; workspace
+// Real `mariadb-shell-agent --acp` children, run from source through tsx; workspace
 // packages resolve to their sources too, not their built output.
 const CLI_ENTRY = fileURLToPath(new URL('../cli.ts', import.meta.url));
 const CLI_TSCONFIG = fileURLToPath(

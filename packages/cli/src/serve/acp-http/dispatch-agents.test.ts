@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -71,7 +72,7 @@ describe('ACP HTTP agent backend rejection', () => {
         publishWorkspaceEvent,
         assertOpen,
       } = setup();
-      const agentsDir = join(directory, '.qwen', 'agents');
+      const agentsDir = join(directory, '.mariadb-shell-agent', 'agents');
       await fs.mkdir(agentsDir, { recursive: true });
       const file = join(agentsDir, 'existing-agent.md');
       const original =

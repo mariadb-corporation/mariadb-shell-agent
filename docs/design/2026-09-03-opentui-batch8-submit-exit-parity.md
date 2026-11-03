@@ -1,7 +1,7 @@
 # Batch 8 — OpenTUI submit/exit semantics and mid-turn coverage
 
 Closes U-15, U-21, U-22, U-23, U-24 and U-25 from #8662. Planned in
-<https://github.com/QwenLM/qwen-code/issues/8662#issuecomment-5519887822>. Registers three
+<https://github.invalid/QwenLM/qwen-code/issues/8662#issuecomment-5519887822>. Registers three
 gaps it deliberately leaves unfixed: U-26, U-27 and U-28.
 
 ## What this batch is about

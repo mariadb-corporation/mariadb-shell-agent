@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +10,7 @@
  *
  * Every adapter implements the contract's `AgentAdapter`; the orchestrator
  * (and, for remote turns, the Host) picks one by program. Construction takes
- * an {@link AgentAdapterContext} because the `qwen` adapter drives this
+ * an {@link AgentAdapterContext} because the `mariadb-shell-agent` adapter drives this
  * daemon's own bridge and must know which agent's hidden session it owns.
  */
 
@@ -38,7 +39,7 @@ export interface AgentAdapterContext {
   permissionVoteContext?: (
     requestId: string,
   ) => BridgeClientRequestContext | undefined;
-  /** See `QwenAcpAdapterOptions.sessionSend` (used by the `qwen` adapter). */
+  /** See `QwenAcpAdapterOptions.sessionSend` (used by the `mariadb-shell-agent` adapter). */
   sessionSend?: QwenSessionSendBinding;
 }
 

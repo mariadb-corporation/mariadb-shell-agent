@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -37,7 +38,9 @@ describe('settings/trustedFolders path getters are lazy', () => {
 
   it('getUserSettingsPath() reflects QWEN_HOME set after module load', () => {
     const defaultPath = getUserSettingsPath();
-    expect(defaultPath).toBe(path.join(homedir(), '.qwen', 'settings.json'));
+    expect(defaultPath).toBe(
+      path.join(homedir(), '.mariadb-shell-agent', 'settings.json'),
+    );
 
     process.env['QWEN_HOME'] = '/tmp/qwen-lazy-test';
     expect(getUserSettingsPath()).toBe(
@@ -46,7 +49,9 @@ describe('settings/trustedFolders path getters are lazy', () => {
   });
 
   it('getUserSettingsDir() reflects QWEN_HOME set after module load', () => {
-    expect(getUserSettingsDir()).toBe(path.join(homedir(), '.qwen'));
+    expect(getUserSettingsDir()).toBe(
+      path.join(homedir(), '.mariadb-shell-agent'),
+    );
 
     process.env['QWEN_HOME'] = '/tmp/qwen-lazy-test';
     expect(getUserSettingsDir()).toBe(path.normalize('/tmp/qwen-lazy-test'));
@@ -54,7 +59,7 @@ describe('settings/trustedFolders path getters are lazy', () => {
 
   it('getTrustedFoldersPath() reflects QWEN_HOME set after module load', () => {
     expect(getTrustedFoldersPath()).toBe(
-      path.join(homedir(), '.qwen', 'trustedFolders.json'),
+      path.join(homedir(), '.mariadb-shell-agent', 'trustedFolders.json'),
     );
 
     process.env['QWEN_HOME'] = '/tmp/qwen-lazy-test';

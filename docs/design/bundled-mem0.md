@@ -6,13 +6,13 @@ Status: implemented; PolarDB V2 was verified through a private tunnel, not publi
 
 ## Problem and scope
 
-[#12596](https://github.com/QwenLM/qwen-code/issues/12596) asks for Mem0 from a normal Qwen Code installation. Requiring an unpublished package, separate MCP configuration, and a manually installed write-confirmation Hook does not meet that goal. [#9964](https://github.com/QwenLM/qwen-code/issues/9964) additionally requires interactive OSS write coverage.
+[#12596](https://github.invalid/QwenLM/qwen-code/issues/12596) asks for Mem0 from a normal MariaDB Shell Agent installation. Requiring an unpublished package, separate MCP configuration, and a manually installed write-confirmation Hook does not meet that goal. [#9964](https://github.invalid/QwenLM/qwen-code/issues/9964) additionally requires interactive OSS write coverage.
 
 Deliver configurable search and opt-in writes with the main CLI. Do not implement arbitrary REST dialects, unknown protocol versions, automatic recall, or a new service. Existing advanced configurations remain supported. This design supersedes the administrator-only, separately installed delivery requirement of earlier direct-external-context designs for this opt-in built-in path.
 
 ## Configuration and contract
 
-Add to user settings (`~/.qwen/settings.json`), then restart Qwen Code. As with `modelProviders`, the top-level `env` field can define the credential value and `envKey` selects its name:
+Add to user settings (`~/.mariadb-shell-agent/settings.json`), then restart MariaDB Shell Agent. As with `modelProviders`, the top-level `env` field can define the credential value and `envKey` selects its name:
 
 ```json
 {
@@ -29,7 +29,7 @@ Add to user settings (`~/.qwen/settings.json`), then restart Qwen Code. As with 
 }
 ```
 
-`envKey` defaults to `MEM0_API_KEY`. The historical `credentialEnv` remains an alias; unequal names supplied together are rejected. Neither field contains a key value. Reuse the existing environment loader: nonempty process values take precedence over `.env`, then `settings.env`. The MCP process inherits the resolved environment; generated binding configuration contains only the variable reference, not the credential. No new credential store or loader is introduced. The single-file setup needs no shell export, but JSON stores plaintext credentials; use user settings and never commit or publish them. Shell exports and `~/.qwen/.env` remain alternatives.
+`envKey` defaults to `MEM0_API_KEY`. The historical `credentialEnv` remains an alias; unequal names supplied together are rejected. Neither field contains a key value. Reuse the existing environment loader: nonempty process values take precedence over `.env`, then `settings.env`. The MCP process inherits the resolved environment; generated binding configuration contains only the variable reference, not the credential. No new credential store or loader is introduced. The single-file setup needs no shell export, but JSON stores plaintext credentials; use user settings and never commit or publish them. Shell exports and `~/.mariadb-shell-agent/.env` remain alternatives.
 
 `baseUrl` is an origin plus optional reverse-proxy prefix, not a full operation URL. Credentials, query, fragment, whitespace and backslashes are rejected. HTTPS is required except loopback HTTP; a trusted plain-HTTP PolarDB endpoint requires `"allowInsecureHttp": true`. This does not bypass routing or provider whitelists.
 

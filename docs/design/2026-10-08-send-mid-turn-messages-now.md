@@ -14,7 +14,7 @@ check. The message therefore waits for the model response that is streaming
 and for that response's tool batch. When the response is a plain answer, the
 message waits for the whole answer and then runs as a new prompt.
 
-Measured with `qwen serve`, Web Shell and a scripted provider (times run from
+Measured with `mariadb-shell-agent serve`, Web Shell and a scripted provider (times run from
 the insert to the request that carries the message):
 
 | Situation at insert time                   | Delay  | Waiting for                |

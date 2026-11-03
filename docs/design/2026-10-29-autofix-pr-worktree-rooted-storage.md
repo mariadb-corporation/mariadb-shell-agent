@@ -15,7 +15,7 @@ is a **linked worktree** of a multi-worktree clone. Session
 `/autofix-pr` for PR #15816; `prepare` refused:
 
 ```
-…/git/qwen-code/.qwen/tmp/autofix-pr-15816 is outside this session's working
+…/git/qwen-code/.mariadb-shell-agent/tmp/autofix-pr-15816 is outside this session's working
 directory (…/git/qwen-code-x2): the daemon runs the fix agent's commands only
 there … Prepare the PR from …/git/qwen-code …
 ```
@@ -34,7 +34,7 @@ Two deliberate decisions collide:
    (`packages/cli/src/commands/review/lib/git.ts`) returns the clone's **main
    worktree** (first entry of `git worktree list --porcelain`).
    `autofixPrPaths(root, pr)` (`packages/cli/src/commands/autofix-pr/state.ts`)
-   places the worktree and every state file under `<main>/.qwen/tmp/`. The
+   places the worktree and every state file under `<main>/.mariadb-shell-agent/tmp/`. The
    design rationale: branches are shared by every worktree of a clone, so a
    watch belongs to the clone and every helper finds it from any worktree.
 2. **Daemon containment.** The daemon shell guard
@@ -49,7 +49,7 @@ session-owned isolation worktree, so the clone-rooted artifacts are permanently
 out of reach. The daemon watch listing is clone-rooted too:
 `cloneRootOf()` / `listAutofixPrWatches()`
 (`packages/cli/src/serve/routes/autofix-pr-watches.ts`) scan the main
-worktree's `.qwen/tmp` so "two workspaces of one clone list the same watches".
+worktree's `.mariadb-shell-agent/tmp` so "two workspaces of one clone list the same watches".
 
 ## Goals
 
@@ -125,7 +125,7 @@ watches and `status` would execute the replacement's `core.fsmonitor`.
 
 The genuine clone identity is recorded in an **anchor store outside every
 workspace**:
-`~/.qwen/autofix-anchors/<host>+<owner>+<repo>/<cloneKey>-pr-<n>.json`
+`~/.mariadb-shell-agent/autofix-anchors/<host>+<owner>+<repo>/<cloneKey>-pr-<n>.json`
 (`QWEN_AUTOFIX_ANCHOR_DIR` overrides the root for tests). `<cloneKey>` is a
 hash of the clone's main worktree path, so two independent clones watching the
 same PR keep **distinct** anchors — preparing or resuming one cannot revoke the
@@ -152,7 +152,7 @@ and limitations" below for exactly what it does and does not protect against.
 
 `status` (default, no explicit root) and the daemon `listAutofixPrWatches`
 enumerate the clone's worktrees NUL-safely (`cloneWorktreeRoots`) and scan
-each one's `.qwen/tmp`, merging watches. Dedupe by PR number: git forbids the
+each one's `.mariadb-shell-agent/tmp`, merging watches. Dedupe by PR number: git forbids the
 same branch checked out in two worktrees, so a PR's watch worktree exists in
 at most one worktree and merges never double-count an active watch; a live
 watch worktree wins over a stale state file in another root. The daemon view
@@ -163,7 +163,7 @@ callers) still scans just that worktree; the CLI exposes no `--root` flag.
 
 Before reading, `vouchedScanRoots` filters the enumerated roots (file reads
 only, no git command, so the daemon stays within its one git call): it drops
-watch worktrees nested in another root's `.qwen/tmp` (a state file force-added
+watch worktrees nested in another root's `.mariadb-shell-agent/tmp` (a state file force-added
 there would forge a watch), and vouches each remaining root against the
 genuine clone's worktree entries — a stale entry an unrelated repository now
 occupies, or a sibling whose `.git` was rewritten, is not read as this clone's
@@ -172,11 +172,11 @@ worktree's `.git` directory, or a bare clone's main entry, which _is_ the git
 dir (no `.git` child). An anchor that cannot be resolved is **not** validation
 success: the scan then trusts only the primary root, never failing open to
 unvouched siblings. Each worktree's directory scan is isolated: a sibling
-whose `.qwen/tmp` is a regular file or inaccessible (ENOTDIR/EACCES) is
+whose `.mariadb-shell-agent/tmp` is a regular file or inaccessible (ENOTDIR/EACCES) is
 skipped, not allowed to abort the listing of every other worktree's watches (a
 500 for the whole clone via the daemon). The **primary** root's read failure
 is surfaced (thrown), not swallowed into an empty listing — an unreadable main
-`.qwen/tmp` is a real diagnostic. The same per-root isolation applies to watch
+`.mariadb-shell-agent/tmp` is a real diagnostic. The same per-root isolation applies to watch
 discovery (`findWatchRoot`), so a malformed sibling cannot stop a helper from
 finding and ending a healthy watch elsewhere. The daemon view redacts sibling
 absolute paths and state-file names from `unreadable[].error` (the CLI keeps
@@ -201,12 +201,12 @@ load-bearing:
   relocation/mutation outside the session boundary and otherwise allows it
   (`return denial ?? { allowed: true }`; a permission-checked call in the
   session's own cwd is allowed outright). A round can therefore write any
-  same-user file — including `~/.qwen/autofix-anchors` — with a non-git command
+  same-user file — including `~/.mariadb-shell-agent/autofix-anchors` — with a non-git command
   (`node -e …`, `printf > …`). The anchor file is **not** beyond a round's
   reach.
 - **A round that can write any same-user file is already a full compromise.**
   It can read the daemon discovery sidecar, rewrite the CLI source and the
-  bundled skill, and edit `~/.qwen/settings.json`. No file-based anchor can be
+  bundled skill, and edit `~/.mariadb-shell-agent/settings.json`. No file-based anchor can be
   the trust authority against such a round. The anchor defeats the _git-level_
   gitfile-rewrite attack (repointing a `.git` pointer within the working
   directory) — the capability the review witnesses exercised — and separates
@@ -259,7 +259,7 @@ defense-in-depth, **not** a sandbox against a same-user round.
 
 - ESM, strict TS, no `any`; kebab-case files; collocated `*.test.ts`.
 - Security checks must remain fail-closed; no helper writes outside the
-  watch's `.qwen/tmp`.
+  watch's `.mariadb-shell-agent/tmp`.
 - The daemon listing runs on its own thread and must not hang: keep the
   per-worktree git timeout and non-blocking file reads.
 
@@ -321,7 +321,7 @@ defense-in-depth, **not** a sandbox against a same-user round.
 - Regression pin: a daemon session in a linked worktree prepares a watch
   whose worktree is inside the session cwd and `assertSessionCanRunWorktree`
   passes (the exact b1887512 failure).
-- E2E (`.qwen/e2e-tests/`): from a linked-worktree daemon session,
+- E2E (`.mariadb-shell-agent/e2e-tests/`): from a linked-worktree daemon session,
   `/autofix-pr <n>` prepares, runs a round and pushes; the Web Shell watch
   list shows the watch from a sibling workspace of the same clone.
 - `npm run build && npm run typecheck` plus the changed packages' unit tests.

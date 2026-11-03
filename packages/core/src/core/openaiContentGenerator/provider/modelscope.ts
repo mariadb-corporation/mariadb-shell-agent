@@ -15,7 +15,8 @@ export class ModelScopeOpenAICompatibleProvider extends DefaultOpenAICompatibleP
     try {
       const hostname = new URL(baseUrl).hostname.toLowerCase();
       return (
-        hostname === 'modelscope.cn' || hostname.endsWith('.modelscope.cn')
+        hostname === 'modelscope.invalid' ||
+        hostname.endsWith('.modelscope.invalid')
       );
     } catch {
       return false;

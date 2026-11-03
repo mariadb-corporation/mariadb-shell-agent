@@ -26,7 +26,7 @@ The model prompt uses the effective backend: Landlock describes partial content-
 
 ## Bundled helper
 
-Qwen Code ships `qwen-landlock-run` for Linux x64 and arm64 under `packages/core/vendor/landlock-run/<arch>-linux/`. The Apache-2.0 C11 source uses the stable raw Landlock UAPI and has no runtime library dependency because release binaries are statically linked with musl.
+MariaDB Shell Agent ships `qwen-landlock-run` for Linux x64 and arm64 under `packages/core/vendor/landlock-run/<arch>-linux/`. The Apache-2.0 C11 source uses the stable raw Landlock UAPI and has no runtime library dependency because release binaries are statically linked with musl.
 
 Before probing or launching the bundled helper, the host restores its mode to 0755 if packaging removed all executable bits. This applies to fresh and managed installs without a postinstall script. A read-only or permission-restricted install that cannot restore the mode fails before the payload starts; it never substitutes a host command. Explicit helper-path overrides are not chmod'ed. Helper lookup distinguishes source layout from the bundle directory by its trailing path components, so installation ancestor names do not change asset resolution.
 
@@ -59,7 +59,7 @@ Landlock does not create a PID namespace. Host processes remain visible, while L
 
 The build script compiles one architecture at a time with a native `musl-gcc` or an explicit Zig musl target. The two committed binaries are copied by the existing core `vendor/` package and bundle paths. A dedicated Linux x64/arm64 workflow rebuilds the helper, compares it byte-for-byte with the committed binary, runs the functional probe, and checks read-only denial, workspace write allowance, outside-write denial, descendant inheritance, and launcher failure attribution.
 
-Production-bundle acceptance covers read-only and workspace-write policies, network and mask refusal, literal argv and payload environment isolation, byte-exact stdin/stdout/stderr, streamed-input backpressure, slow consumers, EPIPE cleanup, negative controls, and no unconfined replay. Unit coverage exercises settings validation, exact backend selection order, incompatible-network refusal, probe parsing, asset resolution, helper argv, backend dispatch, status-wire parsing, diagnostics, and public `qwen sandbox` verification differences. Real Linux acceptance must run the exact committed helper on both architectures. macOS tests can validate selection and argv construction but do not establish kernel enforcement.
+Production-bundle acceptance covers read-only and workspace-write policies, network and mask refusal, literal argv and payload environment isolation, byte-exact stdin/stdout/stderr, streamed-input backpressure, slow consumers, EPIPE cleanup, negative controls, and no unconfined replay. Unit coverage exercises settings validation, exact backend selection order, incompatible-network refusal, probe parsing, asset resolution, helper argv, backend dispatch, status-wire parsing, diagnostics, and public `mariadb-shell-agent sandbox` verification differences. Real Linux acceptance must run the exact committed helper on both architectures. macOS tests can validate selection and argv construction but do not establish kernel enforcement.
 
 ## Security and compatibility
 

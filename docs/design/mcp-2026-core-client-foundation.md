@@ -4,14 +4,14 @@
 
 ## Context
 
-Qwen Code's configured MCP sessions currently use the v1 TypeScript SDK. A
+MariaDB Shell Agent's configured MCP sessions currently use the v1 TypeScript SDK. A
 server that only implements the MCP `2026-07-28` stateless protocol cannot
 complete the legacy `initialize` handshake, while unconditionally switching to
 the modern protocol would break existing servers.
 
 The official TypeScript SDK v2 already owns the wire-level compatibility
 logic: `server/discover` negotiation, legacy fallback, per-request metadata and
-HTTP headers, pagination, and cache-hint handling. Qwen Code should configure
+HTTP headers, pagination, and cache-hint handling. MariaDB Shell Agent should configure
 that behavior rather than duplicate it.
 
 ## Scope
@@ -35,7 +35,7 @@ The following remain separate follow-ups:
   ACP;
 - links, downloads, messages, model-context
   updates, and fullscreen display;
-- migration of Qwen Code's internal IDE, Computer Use, and embedded MCP server
+- migration of MariaDB Shell Agent's internal IDE, Computer Use, and embedded MCP server
   integrations, which are not configured external MCP sessions.
 
 ## Design
@@ -59,19 +59,19 @@ Remote HTTP / SSE / TCP clients use `versionNegotiation.mode = 'legacy'` and
 never send `server/discover`.
 
 Modern sessions use the typed v2 list/read methods so the SDK can aggregate
-pagination and honor `ttlMs` and `cacheScope`. Legacy sessions keep Qwen Code's
+pagination and honor `ttlMs` and `cacheScope`. Legacy sessions keep MariaDB Shell Agent's
 raw request path for prompts and resources because it intentionally tolerates
 older servers that expose methods without declaring the matching capability.
 
 Tool discovery uses the single cache-aware `tools/list` result for both schema
 registration and annotations. Tool execution continues through the raw client
 so progress, cancellation, timeout, permission checks, and output handling stay
-inside the existing Qwen Code path.
+inside the existing MariaDB Shell Agent path.
 
 Configured clients advertise the `io.modelcontextprotocol/ui` extension and
 the `text/html;profile=mcp-app` resource type. When a server also advertises
 that extension, tool discovery preserves its `ui://` resource URI. After a
-successful call, Qwen Code reads and validates the matching HTML resource and
+successful call, MariaDB Shell Agent reads and validates the matching HTML resource and
 stores it in a structured display result while leaving the model-visible result
 unchanged. A missing, oversized, malformed, or unreadable resource still
 produces an `mcp_app` display with empty `html`, whose `fallbackText` leads
@@ -169,7 +169,7 @@ for the origin lifecycle, capability boundary and validation limits.
 - Configured stdio servers use the single-process legacy flow by default and
   can opt into the extra negotiation process with `versionNegotiation: "auto"`.
 - Legacy fallback remains the SDK's byte-compatible v1 sequence.
-- Authorization and Qwen Code's MCP permission boundary are unchanged.
+- Authorization and MariaDB Shell Agent's MCP permission boundary are unchanged.
 - The modern cache is private per client instance; no result is shared across
   workspaces or authorization principals.
 - MCP App HTML defaults to a 1 MiB limit, can be configured up to 4 MiB per

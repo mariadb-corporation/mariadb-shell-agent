@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -129,10 +130,10 @@ describe('GET /brand', () => {
     expect(response.body).toEqual({ name: 'QiuQiu Code' });
     // The protocol reference publishes this exact line as the operator's only
     // channel for "my logo was refused", so both prefixes are pinned: the
-    // route's `qwen serve: GET /brand: ` and the resolver's `ui.brand.logoPath `.
+    // route's `mariadb-shell-agent serve: GET /brand: ` and the resolver's `ui.brand.logoPath `.
     expect(writeStderrLine).toHaveBeenCalledWith(
       expect.stringMatching(
-        /^qwen serve: GET \/brand: ui\.brand\.logoPath does not exist: /,
+        /^mariadb-shell-agent serve: GET \/brand: ui\.brand\.logoPath does not exist: /,
       ),
     );
   });
@@ -174,11 +175,13 @@ describe('GET /brand', () => {
       .then(() => {
         expect(writeStderrLine).toHaveBeenCalledTimes(2);
         expect(writeStderrLine).toHaveBeenCalledWith(
-          expect.stringMatching(/^qwen serve: GET \/brand: ui\.brand\.name /),
+          expect.stringMatching(
+            /^mariadb-shell-agent serve: GET \/brand: ui\.brand\.name /,
+          ),
         );
         expect(writeStderrLine).toHaveBeenCalledWith(
           expect.stringMatching(
-            /^qwen serve: GET \/brand: ui\.brand\.logoPath /,
+            /^mariadb-shell-agent serve: GET \/brand: ui\.brand\.logoPath /,
           ),
         );
       });

@@ -11,9 +11,9 @@ Managed-only WebShell. Users also need the ordinary daemon's Local sessions in
 the same application, started with one command. The existing WebShell already
 supports Local and Managed navigation when supplied with a Java provider.
 
-`qwen serve --managed --open` supervises the ordinary daemon, Java and the
+`mariadb-shell-agent serve --managed --open` supervises the ordinary daemon, Java and the
 private Harness, exposing one authenticated loopback origin. Ordinary
-`qwen serve` keeps its current behavior. Runtime installation, H2 persistence,
+`mariadb-shell-agent serve` keeps its current behavior. Runtime installation, H2 persistence,
 Managed Workspace ownership and existing recovery constraints remain in force.
 
 ## Implementation

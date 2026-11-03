@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review comment-status`: one deterministic pass over a PR's existing
+// `mariadb-shell-agent review comment-status`: one deterministic pass over a PR's existing
 // inline comments, emitting a per-thread status index — anchor validity at the
 // live head, whether the anchored file changed in the reviewed worktree since
 // the comment was filed (and which commits touched it), reply participation,
@@ -554,11 +555,11 @@ function writeCommentStatusReport(
       `warning: the worktree at ${worktree} was not read — ${worktreeUntrusted}. ` +
         `Every thread's code facts (changedSinceComment, touchedBy) are \`unknown\`; ` +
         `only the anchor and reply facts are usable. Sweep the tree ` +
-        `(\`qwen review cleanup\`) and re-fetch before trusting code facts for this PR.`,
+        `(\`mariadb-shell-agent review cleanup\`) and re-fetch before trusting code facts for this PR.`,
     );
   } else if (worktreeMissing) {
     writeStdoutLine(
-      `warning: no worktree at ${worktree} — run \`qwen review fetch-pr\` first. ` +
+      `warning: no worktree at ${worktree} — run \`mariadb-shell-agent review fetch-pr\` first. ` +
         `Every thread's code facts (changedSinceComment, touchedBy) are \`unknown\`; ` +
         `only the anchor and reply facts are usable.`,
     );
@@ -809,7 +810,7 @@ export const commentStatusCommand: CommandModule = {
       .option('host', {
         type: 'string',
         describe:
-          "The host the target lives on. An Aone host (*.alibaba-inc.com) selects the a1 backend; omitted: detected from the clone's origin, else GitHub (GH_HOST, then github.com).",
+          "The host the target lives on. An Aone host (*.alibaba-inc.invalid) selects the a1 backend; omitted: detected from the clone's origin, else GitHub (GH_HOST, then github.com).",
       }),
   handler: async (argv) => {
     const host = (argv as { host?: string }).host;

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -119,7 +120,7 @@ describe('getExtensionManager', () => {
     const { ExtensionManager } = await import('@qwen-code/qwen-code-core');
     // Settings alone would opt out and declare no proxy, so only the env terms
     // can produce the expected values: replacing the two resolver calls in
-    // `utils.ts` with raw `settings.privacy?.usageStatisticsEnabled ?? true` /
+    // `utils.ts` with raw `settings.privacy?.usageStatisticsEnabled ?? false` /
     // `settings.proxy` reads reds this case, which is what re-opens the
     // `QwenLogger.getInstance` gate for enable/disable/link/update. The
     // winners are opposite on purpose — consent is env-then-settings, proxy

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1472,7 +1473,7 @@ describe('fetchPrData', () => {
     expect(JSON.parse(readFileSync(cachePath, 'utf8'))).toEqual({ A: null });
 
     // The gate stops asking once its time is spent, and keeps answers
-    // where no `.qwen/tmp` was made yet.
+    // where no `.mariadb-shell-agent/tmp` was made yet.
     rmSync(cacheDir, { recursive: true, force: true });
     const now = vi.spyOn(Date, 'now');
     let clock = 1_000_000;

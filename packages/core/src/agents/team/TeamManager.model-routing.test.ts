@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * @fileoverview Regression tests for #10071: a named Agent Team teammate
- * spawned from a `.qwen/agents/<name>.md` definition must resolve the same
+ * spawned from a `.mariadb-shell-agent/agents/<name>.md` definition must resolve the same
  * model/provider route as the same definition launched as an ordinary
  * subagent. Before the fix, `TeamManager.spawnTeammate` dropped the
  * selector's authType and never set `inProcess.authOverrides`, so
@@ -145,9 +146,9 @@ describe('TeamManager teammate model routing (#10071)', () => {
   const agentId = (name: string) => formatAgentId(name, TEAM_NAME);
   const members = () => teamManager.getTeamFile().members;
 
-  /** Writes `.qwen/agents/<name>.md`; omitting `model` leaves no selector. */
+  /** Writes `.mariadb-shell-agent/agents/<name>.md`; omitting `model` leaves no selector. */
   async function define(name: string, description: string, model?: string) {
-    const dir = path.join(projectDir, '.qwen', 'agents');
+    const dir = path.join(projectDir, '.mariadb-shell-agent', 'agents');
     await fs.mkdir(dir, { recursive: true });
     const fm = [`name: ${name}`, `description: ${description}`]
       .concat(model ? [`model: ${model}`] : [])

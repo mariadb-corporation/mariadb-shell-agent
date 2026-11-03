@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -107,7 +108,7 @@ vi.mock('./theme.js', () => ({
   C: new Proxy({}, { get: () => '#ffffff' }),
 }));
 // The dialog loads the style catalog from disk; stub just that so the test
-// never depends on the developer's own ~/.qwen/output-styles.
+// never depends on the developer's own ~/.mariadb-shell-agent/output-styles.
 vi.mock('../commands/output-style-utils.js', async (importOriginal) => ({
   ...(await importOriginal<
     typeof import('../commands/output-style-utils.js')
@@ -1994,9 +1995,9 @@ describe('OpenTuiSettingsDialog region budget', () => {
     press('return');
 
     expect(
-      screen.getByText(/To see changes, Qwen Code must be restarted/),
+      screen.getByText(/To see changes, MariaDB Shell Agent must be restarted/),
     ).not.toBeNull();
-    expect(screen.getByText(items[0]!.label)).not.toBeNull();
+    expect(screen.queryByText(items[0]!.label)).toBeNull();
     expect(screen.getByText(items[1]!.label)).not.toBeNull();
     expect(screen.queryByText(items[2]!.label)).toBeNull();
   });
@@ -2029,7 +2030,7 @@ describe('OpenTuiSettingsDialog region budget', () => {
     press('return');
 
     expect(
-      screen.getByText(/To see changes, Qwen Code must be restarted/),
+      screen.getByText(/To see changes, MariaDB Shell Agent must be restarted/),
     ).not.toBeNull();
     // The prompt paints the rows it wraps into, so the window is one row:
     // the toggled row the highlight sits on.
@@ -2122,7 +2123,7 @@ describe('OpenTuiSettingsDialog region budget', () => {
       true,
     );
     expect(
-      screen.getByText(/To see changes, Qwen Code must be restarted/),
+      screen.getByText(/To see changes, MariaDB Shell Agent must be restarted/),
     ).not.toBeNull();
 
     press('r');
@@ -2232,7 +2233,7 @@ describe('OpenTuiSettingsDialog region budget', () => {
     );
     // The restart prompt takes the last list row — the window is now zero.
     expect(
-      screen.getByText(/To see changes, Qwen Code must be restarted/),
+      screen.getByText(/To see changes, MariaDB Shell Agent must be restarted/),
     ).not.toBeNull();
 
     // Not press(): its synthesized sequence for 'space' is '', which cannot

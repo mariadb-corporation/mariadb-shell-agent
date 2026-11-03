@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -197,7 +198,7 @@ function useTempQwenHome(): string {
   );
   process.env['QWEN_HOME'] = tempQwenHome;
   // getUserLevelEnvPathsFastPath always includes os.homedir() candidates,
-  // so redirect HOME/USERPROFILE too — a real ~/.env or ~/.qwen/.env would
+  // so redirect HOME/USERPROFILE too — a real ~/.env or ~/.mariadb-shell-agent/.env would
   // otherwise leak keys and warning counts into these tests.
   process.env['HOME'] = tempQwenHome;
   process.env['USERPROFILE'] = tempQwenHome;
@@ -783,7 +784,7 @@ describe('serve fast path argument parsing', () => {
         ['--external-tool-guard-timeout-ms', '3000'],
       ],
       ['channel', ['--channel', 'telegram']],
-      // The managed Agent Host worker flags. A Host runs its own `qwen serve`
+      // The managed Agent Host worker flags. A Host runs its own `mariadb-shell-agent serve`
       // that only reaches out, so these have to be reachable the same way
       // every other serve option is.
       ['agent-host-server', ['--agent-host-server', 'https://example.invalid']],
@@ -986,8 +987,11 @@ describe('serve fast path argument parsing', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-fallback-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
-    writeFileSync(join(tempWorkspace, '.qwen', 'settings.json'), '{');
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
+    writeFileSync(
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
+      '{',
+    );
     const stderrWrites: string[] = [];
     vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
       stderrWrites.push(String(chunk));
@@ -999,34 +1003,34 @@ describe('serve fast path argument parsing', () => {
     ).resolves.toBe(false);
 
     expect(stderrWrites.join('')).toContain(
-      'qwen serve: fast-path bootstrap failed, falling back to full startup:',
+      'mariadb-shell-agent serve: fast-path bootstrap failed, falling back to full startup:',
     );
   });
 
   it.each([
     [
       ['serve', '--mcp-client-budget', '0'],
-      'qwen serve: --mcp-client-budget must be a positive integer.',
+      'mariadb-shell-agent serve: --mcp-client-budget must be a positive integer.',
     ],
     [
       ['serve', '--mcp-budget-mode', 'enforce'],
-      'qwen serve: --mcp-budget-mode=enforce requires --mcp-client-budget=N.',
+      'mariadb-shell-agent serve: --mcp-budget-mode=enforce requires --mcp-client-budget=N.',
     ],
     [
       ['serve', '--max-pending-prompts-per-session=-1'],
-      'qwen serve: --max-pending-prompts-per-session must be a non-negative integer (0 / Infinity = unlimited).',
+      'mariadb-shell-agent serve: --max-pending-prompts-per-session must be a non-negative integer (0 / Infinity = unlimited).',
     ],
     [
       ['serve', '--compacted-replay-max-bytes=0'],
-      'qwen serve: --compacted-replay-max-bytes must be a positive safe integer in [1, 268435456].',
+      'mariadb-shell-agent serve: --compacted-replay-max-bytes must be a positive safe integer in [1, 268435456].',
     ],
     [
       ['serve', '--rate-limit', '--rate-limit-prompt=0'],
-      'qwen serve: --rate-limit-prompt must be a positive integer.',
+      'mariadb-shell-agent serve: --rate-limit-prompt must be a positive integer.',
     ],
     [
       ['serve', '--memory-budget-mb', '512'],
-      'qwen serve: --memory-budget-mb must be an integer in [1024, 1048576].',
+      'mariadb-shell-agent serve: --memory-budget-mb must be an integer in [1024, 1048576].',
     ],
   ])(
     'validates %s before bootstrapping settings and environment',
@@ -1180,7 +1184,7 @@ describe('serve fast path environment bootstrap', () => {
 
     expect(close).toHaveBeenCalledTimes(1);
     expect(stderrWrites.join('')).toContain(
-      'qwen serve: runtime startup failed after listener was ready: runtime boom',
+      'mariadb-shell-agent serve: runtime startup failed after listener was ready: runtime boom',
     );
     expect(process.exit).toHaveBeenCalledWith(1);
   });
@@ -1219,9 +1223,9 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-rate-limit-env-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         env: {
           QWEN_SERVE_RATE_LIMIT: '1',
@@ -1255,7 +1259,7 @@ describe('serve fast path environment bootstrap', () => {
     ).rejects.toThrow('process.exit(1)');
 
     expect(stderrWrites.join('')).toContain(
-      'qwen serve: --rate-limit-prompt must be a positive integer.',
+      'mariadb-shell-agent serve: --rate-limit-prompt must be a positive integer.',
     );
     expect(process.exit).toHaveBeenCalledWith(1);
   });
@@ -1288,7 +1292,9 @@ describe('serve fast path environment bootstrap', () => {
       ]),
     ).rejects.toThrow('process.exit(1)');
 
-    expect(stderrWrites.join('')).toContain('qwen serve: listen boom');
+    expect(stderrWrites.join('')).toContain(
+      'mariadb-shell-agent serve: listen boom',
+    );
     expect(process.exit).toHaveBeenCalledWith(1);
   });
 
@@ -1333,9 +1339,11 @@ describe('serve fast path environment bootstrap', () => {
 
       expect(stderrWrites.join('')).toContain(HEADLESS_YOLO_NO_SANDBOX_WARNING);
       expect(stderrWrites.join('')).toContain(
-        'qwen serve: runtime startup failed after listener was ready: runtime boom',
+        'mariadb-shell-agent serve: runtime startup failed after listener was ready: runtime boom',
       );
-      expect(stderrWrites.join('')).not.toContain('qwen serve: stderr closed');
+      expect(stderrWrites.join('')).not.toContain(
+        'mariadb-shell-agent serve: stderr closed',
+      );
       expect(close).toHaveBeenCalledTimes(1);
       expect(process.exit).toHaveBeenCalledWith(1);
     } finally {
@@ -1398,7 +1406,7 @@ describe('serve fast path environment bootstrap', () => {
     },
   );
 
-  it.each(['.env', '.qwen/.env'])(
+  it.each(['.env', '.mariadb-shell-agent/.env'])(
     'never applies QWEN_SERVER_TOKEN from the workspace %s before the daemon starts',
     async (envRelPath) => {
       delete process.env['QWEN_SERVER_TOKEN'];
@@ -1445,9 +1453,9 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-compile-cache-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
-      join(tempWorkspace, '.qwen', '.env'),
+      join(tempWorkspace, '.mariadb-shell-agent', '.env'),
       'NODE_COMPILE_CACHE=/tmp/operator-cache\n',
     );
 
@@ -1467,9 +1475,9 @@ describe('serve fast path environment bootstrap', () => {
     tempLaunchCwd = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-launch-cwd-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
-      join(tempWorkspace, '.qwen', '.env'),
+      join(tempWorkspace, '.mariadb-shell-agent', '.env'),
       [
         'FAST_PATH_REFERENCED_TOKEN=from-explicit-workspace-env',
         'QWEN_SERVER_TOKEN=from-explicit-workspace-env',
@@ -1550,7 +1558,9 @@ describe('serve fast path environment bootstrap', () => {
         mkdtempSync(join(os.tmpdir(), `qws-fast-path-settings-env-${scope}-`)),
       );
       const settingsDir =
-        scope === 'home' ? qwenHome : join(tempWorkspace, '.qwen');
+        scope === 'home'
+          ? qwenHome
+          : join(tempWorkspace, '.mariadb-shell-agent');
       mkdirSync(settingsDir, { recursive: true });
       writeFileSync(
         join(settingsDir, 'settings.json'),
@@ -1591,9 +1601,9 @@ describe('serve fast path environment bootstrap', () => {
     tempQwenHome = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-discovered-home-')),
     );
-    mkdirSync(join(tempLaunchCwd, '.qwen'), { recursive: true });
+    mkdirSync(join(tempLaunchCwd, '.mariadb-shell-agent'), { recursive: true });
     writeFileSync(
-      join(tempLaunchCwd, '.qwen', '.env'),
+      join(tempLaunchCwd, '.mariadb-shell-agent', '.env'),
       `QWEN_HOME=${tempQwenHome}\n`,
     );
     writeFileSync(
@@ -1677,7 +1687,7 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-settings-parity-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     const { SETTINGS_VERSION, loadSettings } = await import(
       '../config/settings.js'
     );
@@ -1723,7 +1733,7 @@ describe('serve fast path environment bootstrap', () => {
       ),
     );
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify(
         versioned({
           env: {
@@ -1783,9 +1793,9 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-invalid-channels-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         context: { fileName: 'CUSTOM.md' },
         policy: { permissionStrategy: 'consensus', consensusQuorum: 3 },
@@ -1804,7 +1814,7 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-startup-channels-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
       join(qwenHome, 'settings.json'),
       JSON.stringify({ serve: { channels: ['discord'] } }),
@@ -1813,7 +1823,7 @@ describe('serve fast path environment bootstrap', () => {
     expect(loadServeFastPathSettings(tempWorkspace).serve).toBeUndefined();
 
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ serve: { channels: ['telegram'] } }),
     );
 
@@ -1827,7 +1837,7 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-user-channels-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
       join(qwenHome, 'settings.json'),
       JSON.stringify({
@@ -1836,7 +1846,7 @@ describe('serve fast path environment bootstrap', () => {
       }),
     );
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ serve: { channels: ['telegram'] } }),
     );
 
@@ -1851,11 +1861,11 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-token-qr-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     // A workspace file must never enable it — the key would push the
     // operator's stable bearer into captured stdout.
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ serve: { tokenQr: true } }),
     );
     const workspaceScoped = loadServeFastPathSettings(tempWorkspace);
@@ -1880,10 +1890,10 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-max-sessions-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     // A workspace file must never raise a daemon-wide resource cap.
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ serve: { maxSessions: 4 } }),
     );
     const workspaceScoped = loadServeFastPathSettings(tempWorkspace);
@@ -1936,7 +1946,7 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-bad-workspace-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
       join(qwenHome, 'settings.json'),
       JSON.stringify({ serve: { maxSessions: 3, tokenQr: true } }),
@@ -1944,7 +1954,10 @@ describe('serve fast path environment bootstrap', () => {
 
     const onWorkspaceSettingsError = vi.fn();
     for (const contents of ['[]', '{not json']) {
-      writeFileSync(join(tempWorkspace, '.qwen', 'settings.json'), contents);
+      writeFileSync(
+        join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
+        contents,
+      );
       const settings = loadServeFastPathSettings(tempWorkspace, {
         onWorkspaceSettingsError,
       });
@@ -1962,13 +1975,13 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-token-qr-channels-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
       join(qwenHome, 'settings.json'),
       JSON.stringify({ serve: { tokenQr: true } }),
     );
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({ serve: { channels: ['telegram'] } }),
     );
 
@@ -2084,7 +2097,7 @@ describe('serve fast path environment bootstrap', () => {
       tempWorkspace = realpathSync(
         mkdtempSync(join(os.tmpdir(), 'qws-fast-path-startup-trust-')),
       );
-      mkdirSync(join(tempWorkspace, '.qwen'));
+      mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
       writeFileSync(
         join(qwenHome, 'settings.json'),
         JSON.stringify({ security: { folderTrust: { enabled: userEnabled } } }),
@@ -2112,7 +2125,7 @@ describe('serve fast path environment bootstrap', () => {
         JSON.stringify(rule ? { [tempWorkspace]: rule } : {}),
       );
       writeFileSync(
-        join(tempWorkspace, '.qwen', 'settings.json'),
+        join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({ serve: { channels: ['telegram'] } }),
       );
 
@@ -2292,7 +2305,7 @@ describe('serve fast path environment bootstrap', () => {
     expect(process.env['QWEN_SERVER_TOKEN']).toBeUndefined();
   });
 
-  it.each(['.env', '.qwen/.env', 'settings.env'])(
+  it.each(['.env', '.mariadb-shell-agent/.env', 'settings.env'])(
     'keeps update download sources user-owned when loading %s',
     (source) => {
       const qwenHome = useTempQwenHome();
@@ -2352,7 +2365,7 @@ describe('serve fast path environment bootstrap', () => {
   // cross-workspace vector the daemon-side scrub closes.
   it('never applies loader-affecting keys from .env files or settings.env', () => {
     // Hermetic: the walk-up reaches the user-level candidates, so the real
-    // ~/.qwen/.env must not leak into this test.
+    // ~/.mariadb-shell-agent/.env must not leak into this test.
     useTempQwenHome();
     const trackedKeys = [
       'NODE_OPTIONS',
@@ -2394,7 +2407,7 @@ describe('serve fast path environment bootstrap', () => {
       expect(process.env['FASTPATH_DOTENV_ALLOWED']).toBe('allowed');
       rmSync(tempWorkspace, { recursive: true, force: true });
 
-      // The privileged .qwen/.env scope bypasses excludedEnvVars, so pin it
+      // The privileged .mariadb-shell-agent/.env scope bypasses excludedEnvVars, so pin it
       // separately: exempting it would ship green without this case.
       tempWorkspace = realpathSync(
         mkdtempSync(join(os.tmpdir(), 'qws-fast-path-loader-env-')),
@@ -2539,7 +2552,7 @@ describe('serve fast path environment bootstrap', () => {
   });
 
   // QWEN_CLI_ENTRY is the spawned session-process entrypoint: a start-dir
-  // .env fixing it turns `qwen serve` in an untrusted repo into arbitrary
+  // .env fixing it turns `mariadb-shell-agent serve` in an untrusted repo into arbitrary
   // script execution for every workspace's sessions. The fast path consults
   // no reload tier, so the key must be hardcoded-excluded here.
   it('never applies QWEN_CLI_ENTRY from a project .env on the fast path', () => {
@@ -2850,9 +2863,9 @@ describe('serve fast path environment bootstrap', () => {
       join(qwenHome, 'system-defaults.json'),
       JSON.stringify({ security: { folderTrust: { enabled: true } } }),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         env: { FAST_PATH_SYSTEM_DEFAULTS_MARKER: 'from-workspace-settings' },
       }),
@@ -2884,9 +2897,9 @@ describe('serve fast path environment bootstrap', () => {
       process.env['QWEN_CODE_SYSTEM_SETTINGS_PATH'],
       JSON.stringify({ security: { folderTrust: { enabled: true } } }),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         env: { FAST_PATH_SYSTEM_TRUST_MARKER: 'from-workspace-settings' },
       }),
@@ -3139,9 +3152,9 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-settings-env-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         env: {
           QWEN_SERVE_RATE_LIMIT: '${FAST_PATH_REFERENCED_TOKEN}',
@@ -3166,9 +3179,9 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-settings-secret-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         env: {
           FAST_PATH_LEAKED_COPY: 'copy=${QWEN_SERVER_TOKEN}/$qwen_server_token',
@@ -3202,9 +3215,9 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-settings-env-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         env: { QWEN_SERVE_RATE_LIMIT: '${FAST_PATH_REFERENCED_TOKEN}' },
       }),
@@ -3227,9 +3240,9 @@ describe('serve fast path environment bootstrap', () => {
       tempWorkspace = realpathSync(
         mkdtempSync(join(os.tmpdir(), 'qws-fast-path-bad-settings-')),
       );
-      mkdirSync(join(tempWorkspace, '.qwen'));
+      mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
       writeFileSync(
-        join(tempWorkspace, '.qwen', 'settings.json'),
+        join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
         settingsJson,
       );
       process.chdir(tempWorkspace);
@@ -3246,7 +3259,7 @@ describe('serve fast path environment bootstrap', () => {
     tempWorkspace = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-untrusted-settings-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
       join(qwenHome, 'settings.json'),
       JSON.stringify({ security: { folderTrust: { enabled: true } } }),
@@ -3259,7 +3272,10 @@ describe('serve fast path environment bootstrap', () => {
       process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'],
       JSON.stringify({ [tempWorkspace]: TrustLevel.DO_NOT_TRUST }),
     );
-    writeFileSync(join(tempWorkspace, '.qwen', 'settings.json'), '[]');
+    writeFileSync(
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
+      '[]',
+    );
     process.chdir(tempWorkspace);
 
     expect(() => loadServeFastPathSettings(tempWorkspace!)).toThrow(
@@ -3277,7 +3293,7 @@ describe('serve fast path environment bootstrap', () => {
     tempLaunchCwd = realpathSync(
       mkdtempSync(join(os.tmpdir(), 'qws-fast-path-trusted-launch-')),
     );
-    mkdirSync(join(tempWorkspace, '.qwen'));
+    mkdirSync(join(tempWorkspace, '.mariadb-shell-agent'));
     writeFileSync(
       join(qwenHome, 'settings.json'),
       JSON.stringify({ security: { folderTrust: { enabled: true } } }),
@@ -3301,7 +3317,7 @@ describe('serve fast path environment bootstrap', () => {
       ].join('\n'),
     );
     writeFileSync(
-      join(tempWorkspace, '.qwen', 'settings.json'),
+      join(tempWorkspace, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify({
         env: { QWEN_SERVER_TOKEN: 'from-untrusted-workspace-settings' },
       }),

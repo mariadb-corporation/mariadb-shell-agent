@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -89,7 +90,7 @@ let runCounter = 0;
 
 // Where a run's model credentials come from: exported in the shell, in the
 // settings file's `env` block (where `/auth` stores them), or in
-// `~/.qwen/.env` (where the docs recommend them). The two file sources
+// `~/.mariadb-shell-agent/.env` (where the docs recommend them). The two file sources
 // exercise the env-file relaunch rule.
 export const CREDENTIAL_SOURCES = ['shell', 'settings', 'dotenv'];
 
@@ -114,7 +115,7 @@ export function makeRunEnvironment({
   const home = path.join(dir, 'home');
   const cwd = path.join(dir, 'workspace');
   for (const d of [
-    path.join(home, '.qwen'),
+    path.join(home, '.mariadb-shell-agent'),
     cwd,
     path.join(dir, 'xdg'),
     path.join(dir, 'runtime'),
@@ -126,7 +127,7 @@ export function makeRunEnvironment({
     OPENAI_BASE_URL: modelServer.baseUrl(runId),
   };
   fs.writeFileSync(
-    path.join(home, '.qwen', 'settings.json'),
+    path.join(home, '.mariadb-shell-agent', 'settings.json'),
     JSON.stringify({
       security: { auth: { selectedType: 'openai' } },
       model: { name: 'bench-model' },
@@ -135,7 +136,7 @@ export function makeRunEnvironment({
   );
   if (credentials === 'dotenv') {
     fs.writeFileSync(
-      path.join(home, '.qwen', '.env'),
+      path.join(home, '.mariadb-shell-agent', '.env'),
       Object.entries(modelEnv)
         .map(([key, value]) => `${key}=${value}\n`)
         .join(''),
@@ -155,7 +156,7 @@ export function makeRunEnvironment({
       LANG: 'C.UTF-8',
       TERM: 'xterm-256color',
       HOME: home,
-      QWEN_HOME: path.join(home, '.qwen'),
+      QWEN_HOME: path.join(home, '.mariadb-shell-agent'),
       QWEN_RUNTIME_DIR: path.join(dir, 'runtime'),
       XDG_CONFIG_HOME: path.join(dir, 'xdg', 'config'),
       XDG_CACHE_HOME: path.join(dir, 'xdg', 'cache'),
@@ -366,7 +367,7 @@ export async function runInteractive({
   return result;
 }
 
-/** Runs `qwen -p` against the stub and reports when its first request arrived. */
+/** Runs `mariadb-shell-agent -p` against the stub and reports when its first request arrived. */
 export async function runHeadless({
   command,
   args,

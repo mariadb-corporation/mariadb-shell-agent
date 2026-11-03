@@ -16,7 +16,7 @@ Status: proposed and implemented in the same change.
 ## Goals
 
 - The `harness` row applies the same negotiation the first Session applies, and the lifecycle each configured Workspace profile needs.
-- It reports a Harness that runs another Qwen Code version than the distribution's `manifest.json` names, or that does not say which version it runs.
+- It reports a Harness that runs another MariaDB Shell Agent version than the distribution's `manifest.json` names, or that does not say which version it runs.
 - Preflight reports Runtime workers that an earlier run left alive.
 - `--check --online` runs against a live service without false failures.
 - The offline port rows agree with the server on a port in `TIME_WAIT`.
@@ -39,7 +39,7 @@ Failures are told apart:
 - A different digest fails as "advertises another capability digest", without printing either value. With the credentials file, the fix names the file's `QWEN_HOSTED_HARNESS_CAPABILITY_DIGEST`, which both sides read. Without it, the fix names both variables: the Harness's `QWEN_HOSTED_HARNESS_CAPABILITY_DIGEST` and the control plane's `QWEN_MANAGED_AGENT_CAPABILITY_DIGEST`.
 - A transport failure, client saturation, or an HTTP error on the negotiation's own request fails as "did not answer the compatibility request" or "answered the compatibility request with HTTP `<status>`", with a retry fix. A 401 or 403 names the token setting, as the probe does. Only the status is printed, never the response body.
 - A base URL the client cannot use, such as one with credentials, fails naming `QWEN_MANAGED_AGENT_HARNESS_BASE_URL`.
-- Any other negotiation failure is a protocol mismatch. It fails with the client's message, and the fix names the Qwen Code version to install.
+- Any other negotiation failure is a protocol mismatch. It fails with the client's message, and the fix names the MariaDB Shell Agent version to install.
 
 Every detail shows the URL without its user information. Text that comes from the Harness, such as a client message, has control characters replaced and is cut to 200 characters.
 
@@ -51,7 +51,7 @@ Then each Workspace profile the deployment may admit needs its lifecycle, by the
   - An explicit value replaces the whole list, so the fix names the complete list to set: the protocol 2 profiles the Harness already offers, then the ones the deployment needs.
 - Profiles outside both protocols, such as `hosted-workspace-files/3`, are not checked.
 
-A PASS reads "compatible: Hosted Harness protocol 1, capability digest matches, Qwen Code `<version>`". The row WARNs, with the version to install as the fix, in three cases:
+A PASS reads "compatible: Hosted Harness protocol 1, capability digest matches, MariaDB Shell Agent `<version>`". The row WARNs, with the version to install as the fix, in three cases:
 
 - `qwenCodeVersion` in the capabilities response differs from `compatibility.qwenCodeVersion` in `manifest.json`;
 - the response has no `qwenCodeVersion`, or one that is not a plain version (`[0-9A-Za-z.+-]{1,64}`), while the manifest names one;
@@ -100,7 +100,7 @@ The offline port rows bind with the JDK's default `SO_REUSEADDR`, as Tomcat and 
   - a compatibility request that was not answered;
   - an unusable base URL;
   - a missing lifecycle.
-- The `harness` row warns on another Qwen Code version than the manifest's, on a version the Harness does not advertise readably, or, with Shell enabled, on a missing `workspace-shell-mcp/1`.
+- The `harness` row warns on another MariaDB Shell Agent version than the manifest's, on a version the Harness does not advertise readably, or, with Shell enabled, on a missing `workspace-shell-mcp/1`.
 - The `workers` row warns on live workers in the state directory while offline, on orphaned workers online without a durable Broker, and on a state directory that cannot be resolved.
 - `--online` with nothing listening on a port fails that port row. An `--online=` value other than `true` or `false` fails the `online` row.
 

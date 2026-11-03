@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -40,7 +41,7 @@ describe('supportsOpenAIPrefixCaching', () => {
       supportsOpenAIPrefixCaching(
         config(
           AuthType.QWEN_OAUTH,
-          'https://dashscope.aliyuncs.com/compatible-mode/v1',
+          'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
         ),
       ),
     ).toBe(true);

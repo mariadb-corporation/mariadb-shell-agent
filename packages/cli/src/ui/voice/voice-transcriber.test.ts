@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -244,7 +245,7 @@ describe('voice-transcriber', () => {
     const workspaceDir = fs.mkdtempSync(
       path.join(os.tmpdir(), 'voice-transcriber-keyterms-'),
     );
-    const qwenDir = path.join(workspaceDir, '.qwen');
+    const qwenDir = path.join(workspaceDir, '.mariadb-shell-agent');
     fs.mkdirSync(qwenDir, { recursive: true });
     fs.writeFileSync(path.join(qwenDir, 'voice-keyterms.txt'), 'Paraformer\n');
     try {
@@ -282,7 +283,7 @@ describe('voice-transcriber', () => {
     const workspaceDir = fs.mkdtempSync(
       path.join(os.tmpdir(), 'voice-transcriber-keyterms-'),
     );
-    const qwenDir = path.join(workspaceDir, '.qwen');
+    const qwenDir = path.join(workspaceDir, '.mariadb-shell-agent');
     fs.mkdirSync(qwenDir, { recursive: true });
     fs.writeFileSync(path.join(qwenDir, 'voice-keyterms.txt'), 'Paraformer\n');
     try {
@@ -425,7 +426,7 @@ describe('voice-transcriber', () => {
         id: 'qwen3-asr-flash',
         label: 'Qwen ASR',
         authType: AuthType.USE_OPENAI,
-        baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       },
     ]);
 
@@ -437,15 +438,15 @@ describe('voice-transcriber', () => {
       }),
     ).toEqual({
       model: 'qwen3-asr-flash',
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       apiKey: 'sk-from-settings',
     });
   });
 
   it('falls back to the primary auth apiKey for DashScope intl and US hosts', () => {
     for (const baseUrl of [
-      'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
-      'https://dashscope-us.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
+      'https://dashscope-us.aliyuncs.invalid/compatible-mode/v1',
     ]) {
       const config = createConfig([
         {
@@ -536,7 +537,7 @@ describe('voice-transcriber', () => {
         id: 'qwen3-asr-flash',
         label: 'Qwen ASR',
         authType: AuthType.USE_OPENAI,
-        baseUrl: 'http://dashscope.aliyuncs.com/compatible-mode/v1',
+        baseUrl: 'http://dashscope.aliyuncs.invalid/compatible-mode/v1',
       },
     ]);
 
@@ -1274,8 +1275,8 @@ describe('voice-transcriber', () => {
 
   it('rejects voice base URLs with embedded credentials', () => {
     for (const baseUrl of [
-      'https://user:secret@dashscope.aliyuncs.com/compatible-mode/v1',
-      'https://dashscope.aliyuncs.com@evil.com/compatible-mode/v1',
+      'https://user:secret@dashscope.aliyuncs.invalid/compatible-mode/v1',
+      'https://dashscope.aliyuncs.invalid@evil.com/compatible-mode/v1',
     ]) {
       const config = createConfig([
         {

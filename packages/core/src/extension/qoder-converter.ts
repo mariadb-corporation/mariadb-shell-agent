@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -189,7 +190,7 @@ function resolveContextFiles(
   }
   addContextFile('system-prompt.md');
   if (contextFiles.length > 0) {
-    addContextFile('QWEN.md', true);
+    addContextFile('MARIADB-SHELL-AGENT.md', true);
   }
   return contextFiles.length > 0 ? contextFiles : undefined;
 }

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -82,7 +83,7 @@ describe('convertQoderPlugin', () => {
       displayName: 'Sample plugin',
       description: 'A synthetic Qoder plugin',
     });
-    write('QWEN.md', '# Qwen context');
+    write('MARIADB-SHELL-AGENT.md', '# Qwen context');
     write('system-prompt.md', '# System context');
     write('.mcp.json', SAMPLE_MCP_JSON);
     write(
@@ -105,7 +106,7 @@ describe('convertQoderPlugin', () => {
       version: '2.0.0',
       displayName: 'Sample plugin',
       description: 'A synthetic Qoder plugin',
-      contextFileName: ['QWEN.md', 'system-prompt.md'],
+      contextFileName: ['MARIADB-SHELL-AGENT.md', 'system-prompt.md'],
     });
     expect(result.config.mcpServers?.['sample']).toMatchObject({
       httpUrl: 'https://example.com/mcp',
@@ -183,14 +184,14 @@ describe('convertQoderPlugin', () => {
       name: NAME,
       contextFileName: ['custom.md', 42, 'custom.md', './system-prompt.md'],
     });
-    write('QWEN.md', '# Qwen context');
+    write('MARIADB-SHELL-AGENT.md', '# Qwen context');
     write('custom.md', '# Custom');
     write('system-prompt.md', '# System context');
 
     const result = await convert();
 
     expect(result.config.contextFileName).toEqual([
-      'QWEN.md',
+      'MARIADB-SHELL-AGENT.md',
       'custom.md',
       'system-prompt.md',
     ]);
@@ -306,15 +307,15 @@ describe('convertQoderPlugin', () => {
     expect(exists(result.convertedDir, '.mcp.json')).toBe(false);
   });
 
-  it('loads QWEN.md with system-prompt.md when context is not configured', async () => {
+  it('loads MARIADB-SHELL-AGENT.md with system-prompt.md when context is not configured', async () => {
     writeManifest({ name: NAME, contextFileName: [] });
-    write('QWEN.md', '# Qwen context');
+    write('MARIADB-SHELL-AGENT.md', '# Qwen context');
     write('system-prompt.md', '# System context');
 
     const result = await convert();
 
     expect(result.config.contextFileName).toEqual([
-      'QWEN.md',
+      'MARIADB-SHELL-AGENT.md',
       'system-prompt.md',
     ]);
   });
@@ -369,7 +370,7 @@ describe('convertQoderPlugin', () => {
     expect(exists(result.convertedDir, 'skills', 'leak.txt')).toBe(false);
   });
 
-  it.each(['QWEN.md', 'system-prompt.md'])(
+  it.each(['MARIADB-SHELL-AGENT.md', 'system-prompt.md'])(
     'does not load an escaping default %s symlink',
     async (contextFile) => {
       const externalFile = path.join(makeExternalDir(), contextFile);

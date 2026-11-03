@@ -14,7 +14,7 @@ checks remain unchanged.
 
 Keep the artifact checkout pinned to the release's `SOURCE_SHA`. Separately check
 out `scripts` from `github.workflow_sha` into the already ignored
-`.qwen/managed-release-tools` directory, without persisted credentials. Run the
+`.mariadb-shell-agent/managed-release-tools` directory, without persisted credentials. Run the
 release helper there so backfills of old tags can use the new preflight. Its
 imports resolve through the root installation; the source checkout, Git metadata,
 version, and build timestamp remain unchanged.

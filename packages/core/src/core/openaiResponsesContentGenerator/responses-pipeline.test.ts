@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1209,7 +1210,7 @@ describe('ResponsesPipeline', () => {
       await executeDone();
 
       expect(sentHeaders().get('user-agent')).toBe(
-        `QwenCode/9.9.9-test (${process.platform}; ${process.arch})`,
+        `MariaDBShellAgent/9.9.9-test (${process.platform}; ${process.arch})`,
       );
     });
 
@@ -1289,7 +1290,7 @@ describe('ResponsesPipeline', () => {
     it('adds the first-party session_id header for an allowlisted gateway host', async () => {
       await executeDone(
         pipe(
-          { baseUrl: 'https://routify.alibaba-inc.com' },
+          { baseUrl: 'https://routify.alibaba-inc.invalid' },
           makeCliConfig(undefined, 'session-abc'),
         ),
       );

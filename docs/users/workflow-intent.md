@@ -28,7 +28,7 @@ compatibility rule accepts standalone whitespace-separated words with edge
 punctuation, such as `(workflow)`, but not `workflows` or `my-workflow-runner`.
 When both keywords occur, only one reminder is added.
 
-Plain `qwen -p`, plain stdin, scheduled input, and SDK string prompts do not
+Plain `mariadb-shell-agent -p`, plain stdin, scheduled input, and SDK string prompts do not
 automatically opt in. TypeScript SDK streaming input can explicitly identify
 each original human message:
 

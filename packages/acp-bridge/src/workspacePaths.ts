@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,7 +15,7 @@ const WINDOWS_ABSOLUTE_PATH_RE = /^([A-Za-z]):[\\/](.*)$/;
  * host-side sandbox launcher (`C:\work\proj` → `/c/work/proj`, mirroring
  * `getContainerPath` in `cli/src/serve/sandbox.ts`).
  *
- * A Windows host relaunching `qwen serve` into a Linux Docker/Podman sandbox
+ * A Windows host relaunching `mariadb-shell-agent serve` into a Linux Docker/Podman sandbox
  * translates the bind mount and `--workdir`, but path-valued CLI arguments
  * (`--workspace C:\…`), client-registered workspaces, and persisted
  * registrations reach the in-container daemon in host shape. Left alone,

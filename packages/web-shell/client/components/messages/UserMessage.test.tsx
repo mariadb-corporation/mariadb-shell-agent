@@ -632,29 +632,29 @@ describe('UserMessage', () => {
   });
 
   it('renders file references as chips from input annotations', () => {
-    const content = 'list @.qwen/ files';
+    const content = 'list @.mariadb-shell-agent/ files';
     const container = render(
       <UserMessage
         content={content}
         inputAnnotations={[
-          referenceAnnotation(content, '@.qwen/', {
-            id: 'file:@.qwen/',
+          referenceAnnotation(content, '@.mariadb-shell-agent/', {
+            id: 'file:@.mariadb-shell-agent/',
             kind: 'file',
-            value: '.qwen/',
-            serialized: '@.qwen/',
+            value: '.mariadb-shell-agent/',
+            serialized: '@.mariadb-shell-agent/',
           }),
         ]}
       />,
     );
-    const chip = container.querySelector('[title="@.qwen/"]');
+    const chip = container.querySelector('[title="@.mariadb-shell-agent/"]');
 
     expect(chip).not.toBeNull();
-    expect(chip?.textContent).toBe('.qwen/');
-    expect(container.textContent).toContain('list .qwen/ files');
+    expect(chip?.textContent).toBe('.mariadb-shell-agent/');
+    expect(container.textContent).toContain('list .mariadb-shell-agent/ files');
   });
 
   it('uses configured composer tag icons for annotation chips', () => {
-    const content = 'list @.qwen/ files';
+    const content = 'list @.mariadb-shell-agent/ files';
     const container = render(
       <WebShellCustomizationProvider
         value={{
@@ -664,18 +664,18 @@ describe('UserMessage', () => {
         <UserMessage
           content={content}
           inputAnnotations={[
-            referenceAnnotation(content, '@.qwen/', {
-              id: 'file:@.qwen/',
+            referenceAnnotation(content, '@.mariadb-shell-agent/', {
+              id: 'file:@.mariadb-shell-agent/',
               kind: 'file',
-              value: '.qwen/',
-              serialized: '@.qwen/',
+              value: '.mariadb-shell-agent/',
+              serialized: '@.mariadb-shell-agent/',
             }),
           ]}
         />
       </WebShellCustomizationProvider>,
     );
     const icon = container.querySelector<HTMLElement>(
-      '[title="@.qwen/"] [aria-hidden="true"]',
+      '[title="@.mariadb-shell-agent/"] [aria-hidden="true"]',
     );
 
     expect(icon).not.toBeNull();

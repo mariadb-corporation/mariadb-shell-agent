@@ -2796,7 +2796,7 @@ export class HostedWorkspaceToolTurn {
           if (!queued) {
             queued = true;
             writeStderrLineSafe(
-              `qwen serve: Hosted Harness turn ${this.promptId} waits for the Workspace mount held by another Session.`,
+              `mariadb-shell-agent serve: Hosted Harness turn ${this.promptId} waits for the Workspace mount held by another Session.`,
             );
           }
           try {
@@ -2889,7 +2889,8 @@ export class HostedWorkspaceToolTurn {
       );
     } catch (cause) {
       writeStderrLineSafe(
-        'qwen serve: Hosted Workspace context read failed: ' + String(cause),
+        'mariadb-shell-agent serve: Hosted Workspace context read failed: ' +
+          String(cause),
       );
     }
   }
@@ -5354,7 +5355,8 @@ export class HostedWorkspaceToolTurn {
         renewTimer = setInterval(() => {
           void renewGrants!().catch((cause: unknown) => {
             writeStderrLineSafe(
-              'qwen serve: Tool publication renewal failed: ' + String(cause),
+              'mariadb-shell-agent serve: Tool publication renewal failed: ' +
+                String(cause),
             );
           });
         }, 10_000);
@@ -5791,13 +5793,13 @@ export class HostedWorkspaceToolTurn {
               });
               if (processProven)
                 writeStderrLineSafe(
-                  `qwen serve: Settled never-started background child run ${executionCallId} from durable process-ledger absence.`,
+                  `mariadb-shell-agent serve: Settled never-started background child run ${executionCallId} from durable process-ledger absence.`,
                 );
             }
           } catch (settleCause) {
             settled = false;
             writeStderrLineSafe(
-              'qwen serve: Unstarted child run record was not settled: ' +
+              'mariadb-shell-agent serve: Unstarted child run record was not settled: ' +
                 String(settleCause),
             );
           }
@@ -5811,7 +5813,7 @@ export class HostedWorkspaceToolTurn {
             .catch((settleCause: unknown) => {
               settled = false;
               writeStderrLineSafe(
-                'qwen serve: Unstarted monitor run record was not settled: ' +
+                'mariadb-shell-agent serve: Unstarted monitor run record was not settled: ' +
                   String(settleCause),
               );
             });
@@ -5846,7 +5848,7 @@ export class HostedWorkspaceToolTurn {
           // its close failing is expected and not worth a line.
           if (!limitRefusal || saved.originalBinding !== undefined)
             writeStderrLineSafe(
-              'qwen serve: Tool publication close was not confirmed: ' +
+              'mariadb-shell-agent serve: Tool publication close was not confirmed: ' +
                 String(closeCause),
             );
         }
@@ -5877,7 +5879,7 @@ export class HostedWorkspaceToolTurn {
       for (const { executionCallId, request, probe } of probeOutcomes) {
         if (!probe.proven) {
           writeStderrLineSafe(
-            `qwen serve: Background process absence could not be confirmed for ${executionCallId} (${probe.cause}).`,
+            `mariadb-shell-agent serve: Background process absence could not be confirmed for ${executionCallId} (${probe.cause}).`,
           );
           continue;
         }
@@ -5904,7 +5906,7 @@ export class HostedWorkspaceToolTurn {
         // refusal whose close was not confirmed holds its slot only until
         // its grant expires.
         writeStderrLineSafe(
-          `qwen serve: Tool publication refused batch ${messageId} before any call started: ${limitRefusal.message}`,
+          `mariadb-shell-agent serve: Tool publication refused batch ${messageId} before any call started: ${limitRefusal.message}`,
         );
         // Only the calls that capture output reserve: the answer tells the
         // model whether waiting can help them, and that the others can go
@@ -7981,7 +7983,7 @@ export class HostedWorkspaceToolTurn {
       });
     } catch (cause) {
       writeStderrLineSafe(
-        'qwen serve: Background Shell v3 ACK can be retried after its Session receipt: ' +
+        'mariadb-shell-agent serve: Background Shell v3 ACK can be retried after its Session receipt: ' +
           String(cause),
       );
     }
@@ -8327,7 +8329,7 @@ export class HostedWorkspaceToolTurn {
       });
     } catch (cause) {
       writeStderrLineSafe(
-        'qwen serve: Tool v3 ACK can be retried after its Session receipt: ' +
+        'mariadb-shell-agent serve: Tool v3 ACK can be retried after its Session receipt: ' +
           String(cause),
       );
     }
@@ -8927,7 +8929,7 @@ export class HostedWorkspaceToolTurn {
     ) {
       holdPendingSiblingFired = true;
       writeStderrLineSafe(
-        `qwen serve: E2E holding pending sibling approval for Session ${holdPendingSiblingSession} call ${call.callId}`,
+        `mariadb-shell-agent serve: E2E holding pending sibling approval for Session ${holdPendingSiblingSession} call ${call.callId}`,
       );
       // Reject on abort so a leaked flag cannot park a real Session
       // un-cancelably; the runner SIGKILLs this generation after the barrier.
@@ -9116,7 +9118,7 @@ export class HostedWorkspaceToolTurn {
         if (line !== reported) {
           reported = line;
           writeStderrLineSafe(
-            `qwen serve: Hosted Harness turn ${this.promptId} could not release the Workspace mount after its recovery block${retry ? ' (retrying)' : ''}: ${line}`,
+            `mariadb-shell-agent serve: Hosted Harness turn ${this.promptId} could not release the Workspace mount after its recovery block${retry ? ' (retrying)' : ''}: ${line}`,
           );
         }
         return retry;

@@ -181,7 +181,7 @@ describe('on-demand subagent transcript projection', () => {
           prompt: 'Review the change.',
           subagent_type: 'general-purpose',
           run_in_background: false,
-          working_dir: '.qwen/tmp/review-pr-1',
+          working_dir: '.mariadb-shell-agent/tmp/review-pr-1',
           name: 'reviewer',
         },
       },
@@ -190,7 +190,7 @@ describe('on-demand subagent transcript projection', () => {
     expect(result).toMatchObject({
       rawInput: {
         run_in_background: false,
-        working_dir: '.qwen/tmp/review-pr-1',
+        working_dir: '.mariadb-shell-agent/tmp/review-pr-1',
         name: 'reviewer',
       },
     });

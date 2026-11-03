@@ -11,7 +11,7 @@ recorded in the linked design.
 ## Goal
 
 Browser Use gives models a structured API for controlling the user's existing
-Chrome from Qwen Code.
+Chrome from MariaDB Shell Agent.
 
 - The Browser SDK runs as a library inside the persistent Node Kernel exposed
   by the Node REPL MCP server.
@@ -23,7 +23,7 @@ Chrome from Qwen Code.
 
 ```mermaid
 flowchart TB
-  Agent["Qwen Code agent"] -->|"MCP"| Repl["Node REPL MCP server"]
+  Agent["MariaDB Shell Agent agent"] -->|"MCP"| Repl["Node REPL MCP server"]
   Repl -->|"cell execution"| SDK
 
   subgraph Kernel["Persistent Node Kernel process"]
@@ -51,7 +51,7 @@ Playwright's browser-level CDP adapter.
 `chromium.connectOverCDP(transport)`. Qwen therefore keeps Native Messaging and
 does not add a local WebSocket server.
 
-Browser Use ships with Qwen Code as a bundled skill and its runtime resources.
+Browser Use ships with MariaDB Shell Agent as a bundled skill and its runtime resources.
 No separate Browser Use runtime package or second Qwen extension is required;
 the existing Qwen Chrome extension is reused. The skill's `runtime/` directory
 contains the Browser SDK, Native Host, and pinned Playwright dependency. The
@@ -254,7 +254,7 @@ Metadata travels on the image event and is returned immediately before each
 retained image, independently of the ordinary text output budget. Rejected or
 omitted images do not leave metadata behind. There is no metadata-specific size
 cap; the existing protocol-frame and client output limits still apply.
-Bundling the Node REPL MCP server with Qwen Code is deferred to a follow-up.
+Bundling the Node REPL MCP server with MariaDB Shell Agent is deferred to a follow-up.
 This protocol support first ships in `@qwen-code/node-repl-mcp` 0.1.6 and is
 absent from the published 0.1.2 through 0.1.5 packages, so the Browser Use
 skill pins that version instead of `latest`.
@@ -418,9 +418,9 @@ attachment does not authorize closing an unregistered tab.
 The first release adds no separate Browser Use authorization or process
 authentication layer.
 
-The `qwen serve` `/cdp` bridge is not part of Browser Use. It is a serve-mode
+The `mariadb-shell-agent serve` `/cdp` bridge is not part of Browser Use. It is a serve-mode
 tunnel for an external automation adapter and the active Chrome tab. Browser
-Use instead operates in a normal Qwen Code session and provides multi-tab
+Use instead operates in a normal MariaDB Shell Agent session and provides multi-tab
 discovery and Qwen-specific control operations that are not CDP.
 
 The two paths are independent debugger clients and are mutually exclusive per

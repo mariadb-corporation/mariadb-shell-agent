@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 import { spawnSync } from 'node:child_process';
@@ -36,7 +37,7 @@ const runtimeScriptName = 'fake-runtime.js';
 const FAKE_RUNTIME = `#!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-const debugDir = path.join(process.env.HOME, '.qwen', 'debug', 'daemon');
+const debugDir = path.join(process.env.HOME, '.mariadb-shell-agent', 'debug', 'daemon');
 fs.mkdirSync(debugDir, { recursive: true });
 fs.appendFileSync(
   path.join(debugDir, 'daemon.log'),
@@ -88,7 +89,7 @@ if (process.env.SMOKE_FIXTURE_LOCK_WORKSPACE === '1') {
   fs.writeFileSync(path.join(locked, 'secret'), 'x');
   fs.chmodSync(locked, 0o500);
 }
-const runtimeLog = path.join(home, '.qwen', 'debug', 'daemon', 'daemon.log');
+const runtimeLog = path.join(home, '.mariadb-shell-agent', 'debug', 'daemon', 'daemon.log');
 const server = http.createServer((req, res) => {
   if (req.url === '/' && (req.headers['sec-fetch-mode'] === 'navigate' || (req.headers['accept'] || '').includes('text/html'))) {
     res.writeHead(200, { 'content-type': 'text/html' });
@@ -117,7 +118,7 @@ server.listen(0, '127.0.0.1', async () => {
       : path.join(process.env.XDG_STATE_HOME || home, 'com.alibaba.qwen-code', 'logs');
   fs.mkdirSync(logRoot, { recursive: true });
   fs.appendFileSync(path.join(logRoot, 'desktop-runtime.log'),
-    \`qwen serve listening on http://127.0.0.1:\${port}\\n\`);
+    \`mariadb-shell-agent serve listening on http://127.0.0.1:\${port}\\n\`);
 });
 `;
 

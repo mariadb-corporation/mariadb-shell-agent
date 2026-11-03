@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -41,7 +42,7 @@ bootstrapHomeEnv();
 if (!qwenSandbox) {
   const configDir = process.env.QWEN_HOME
     ? resolvePath(process.env.QWEN_HOME)
-    : join(os.homedir(), '.qwen');
+    : join(os.homedir(), '.mariadb-shell-agent');
   const userSettingsFile = join(configDir, 'settings.json');
   if (existsSync(userSettingsFile)) {
     const settings = JSON.parse(
@@ -61,7 +62,7 @@ if (!qwenSandbox) {
   // redirect global state through this back door.
   let currentDir = process.cwd();
   while (true) {
-    const qwenEnv = join(currentDir, '.qwen', '.env');
+    const qwenEnv = join(currentDir, '.mariadb-shell-agent', '.env');
     const regularEnv = join(currentDir, '.env');
     let candidate = null;
     if (existsSync(qwenEnv)) {

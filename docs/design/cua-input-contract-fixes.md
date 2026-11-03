@@ -4,7 +4,7 @@
 
 ## Status and scope
 
-Prepare native driver, CUA SDK, Browser SDK and Node REPL 0.27.0 together under the existing release contract. These input-delivery, window-selection and lifecycle corrections join main's existing cursor/PiP features in the same release. This change preserves those features and does not change browser behavior or the Qwen Code CLI version.
+Prepare native driver, CUA SDK, Browser SDK and Node REPL 0.27.0 together under the existing release contract. These input-delivery, window-selection and lifecycle corrections join main's existing cursor/PiP features in the same release. This change preserves those features and does not change browser behavior or the MariaDB Shell Agent CLI version.
 
 Earlier real-host checks used private, immutable payloads with 0.26.0 compatibility metadata. Their evidence applies to the corresponding functional changes; it does not establish production signatures, installation of future 0.27.0 assets, or complete benchmark acceptance. No benchmark or monitoring operation is part of this release preparation.
 

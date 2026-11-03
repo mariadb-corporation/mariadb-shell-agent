@@ -11,12 +11,12 @@
 
 > **状态:** 提案阶段计划。这是跨节点 EventTransport 设计
 > ([2026-10-04-managed-agent-event-transport](2026-10-04-managed-agent-event-transport.zh-CN.md)
-> §7)的 **MQ2** 阶段,由 [#12380](https://github.com/QwenLM/qwen-code/issues/12380) 跟踪。
+> §7)的 **MQ2** 阶段,由 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380) 跟踪。
 > 父设计为 MQ2 设置的每道门禁现已全部关闭:MQ1 的 seam 已落地
-> ([#13909](https://github.com/QwenLM/qwen-code/pull/13909)),§5.1 LiteTopic 核实
-> 已在文档级([#13927](https://github.com/QwenLM/qwen-code/pull/13927))与真实
+> ([#13909](https://github.invalid/QwenLM/qwen-code/pull/13909)),§5.1 LiteTopic 核实
+> 已在文档级([#13927](https://github.invalid/QwenLM/qwen-code/pull/13927))与真实
 > 5.5.1 预发集群上核销,§11 的路由与唤醒载体决策已落地
-> ([#13933](https://github.com/QwenLM/qwen-code/pull/13933))。
+> ([#13933](https://github.invalid/QwenLM/qwen-code/pull/13933))。
 
 ## 问题
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -65,15 +66,18 @@ describe('LoopTickResolver', () => {
   let homeDir: string;
   let resolver: LoopTickResolver;
 
-  const projectFile = () => path.join(projectRoot, '.qwen', 'loop.md');
-  const homeFile = () => path.join(homeDir, '.qwen', 'loop.md');
+  const projectFile = () =>
+    path.join(projectRoot, '.mariadb-shell-agent', 'loop.md');
+  const homeFile = () => path.join(homeDir, '.mariadb-shell-agent', 'loop.md');
   const writeProject = (content: string) =>
     fs
-      .mkdir(path.join(projectRoot, '.qwen'), { recursive: true })
+      .mkdir(path.join(projectRoot, '.mariadb-shell-agent'), {
+        recursive: true,
+      })
       .then(() => fs.writeFile(projectFile(), content));
   const writeHome = (content: string) =>
     fs
-      .mkdir(path.join(homeDir, '.qwen'), { recursive: true })
+      .mkdir(path.join(homeDir, '.mariadb-shell-agent'), { recursive: true })
       .then(() => fs.writeFile(homeFile(), content));
   /** A resolver over this test's dirs; project file allowed by default. */
   const makeResolver = (deps: Partial<LoopTickResolverDeps> = {}) =>
@@ -425,8 +429,8 @@ describe('LoopTickResolver', () => {
     expect(absent.modelText).toContain('loop.md is not currently present');
   });
 
-  it('names the real home loop.md in the absent reminder (QWEN_HOME-aware, not a hardcoded ~/.qwen)', async () => {
-    // Regression: the absent body hardcoded `~/.qwen/loop.md (home)`, wrong
+  it('names the real home loop.md in the absent reminder (QWEN_HOME-aware, not a hardcoded ~/.mariadb-shell-agent)', async () => {
+    // Regression: the absent body hardcoded `~/.mariadb-shell-agent/loop.md (home)`, wrong
     // under a relocated QWEN_HOME. The label is MODEL-FACING, so a $QWEN_HOME
     // outside $HOME (tildeifyPath no-op there) must read as the literal
     // `$QWEN_HOME/loop.md`, never the raw absolute path.
@@ -444,8 +448,12 @@ describe('LoopTickResolver', () => {
     );
     expect(relocatedTick.modelText).toContain('$QWEN_HOME/loop.md (home)');
     // The old hardcoded home location is gone; the project label stays relative.
-    expect(relocatedTick.modelText).not.toContain('~/.qwen/loop.md');
-    expect(relocatedTick.modelText).toContain('.qwen/loop.md (project)');
+    expect(relocatedTick.modelText).not.toContain(
+      '~/.mariadb-shell-agent/loop.md',
+    );
+    expect(relocatedTick.modelText).toContain(
+      '.mariadb-shell-agent/loop.md (project)',
+    );
     // Privacy: the raw absolute global dir never reaches the model text.
     expect(relocatedTick.modelText).not.toContain(relocated);
     vi.unstubAllEnvs();

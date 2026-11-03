@@ -201,8 +201,8 @@ introducing a new profile vocabulary in v1.
 
 `closed` is a whole-network-namespace cut, not an egress filter: it also
 removes loopback, so the IDE companion (discovered through a port in the
-`~/.qwen/ide` lock file, `core/src/ide/ide-client.ts:644-678`), a host-side
-`qwen serve` on `:4170`, and any localhost MCP server all become unreachable.
+`~/.mariadb-shell-agent/ide` lock file, `core/src/ide/ide-client.ts:644-678`), a host-side
+`mariadb-shell-agent serve` on `:4170`, and any localhost MCP server all become unreachable.
 Abstract-namespace unix sockets are per-network-namespace too, so an X11
 connection that resolves to the abstract socket dies with them. `closed` is
 therefore correct only for single-shot confined runs; the § Verified
@@ -438,7 +438,7 @@ sandbox-exec branch (they are in-place hops, not images — no
 suffix (`landlock (partial)`) lands with P1, which is the phase that can
 actually produce a level other than `full` — shipping the suffix earlier would
 mean an unreachable branch for a backend that does not exist yet. P0 still
-surfaces the level where it is meaningful: `qwen sandbox` prints
+surfaces the level where it is meaningful: `mariadb-shell-agent sandbox` prints
 `Enforcement: <level>` from `SANDBOX_ENFORCEMENT`.
 
 ### Model-visible boundary
@@ -459,7 +459,7 @@ The measured spelling matters. A denied `git add` in a worktree checkout reads
 must name `Read-only file system` in prose — naming only the `EROFS` symbol
 would not match what the model actually sees.
 
-### `qwen sandbox` self-check subcommand
+### `mariadb-shell-agent sandbox` self-check subcommand
 
 New `packages/cli/src/commands/sandbox.ts` (+ test), registered beside the
 existing command modules. Pulled into P0 rather than deferred: every impact in
@@ -467,13 +467,13 @@ existing command modules. Pulled into P0 rather than deferred: every impact in
 the backend and the way to prove it works have to ship together — this is also
 what the proposed CI lanes and E2E table below call. The Linux bwrap CI lane is not implemented in this PR.
 
-Use `QWEN_SANDBOX=bwrap qwen sandbox` from the project directory on the host to inspect this backend explicitly. A one-shot environment assignment on the original session does not persist in the host shell. The report uses that directory's settings; session-only `--include-directories` grants can differ.
+Use `QWEN_SANDBOX=bwrap mariadb-shell-agent sandbox` from the project directory on the host to inspect this backend explicitly. A one-shot environment assignment on the original session does not persist in the host shell. The report uses that directory's settings; session-only `--include-directories` grants can differ.
 
-- `qwen sandbox` — print resolved backend, probe result, enforcement level,
+- `mariadb-shell-agent sandbox` — print resolved backend, probe result, enforcement level,
   writable roots (including the resolved git dirs), and network mode.
-- `qwen sandbox <cmd>…` — run one command through the resolved backend and
+- `mariadb-shell-agent sandbox <cmd>…` — run one command through the resolved backend and
   report the outcome (the `codex sandbox` equivalent).
-- `qwen sandbox --verify` — the behavior battery: write outside the workspace
+- `mariadb-shell-agent sandbox --verify` — the behavior battery: write outside the workspace
   must fail; write inside must succeed; the payload must report the same `/proc/self/ns/pid` identity as the host (the regression guard for D6); unreadable identities fail verification;
   network checks inspect interface visibility: `closed` must expose only `lo`, while `open`/`proxied` must expose a non-loopback interface. They do not test Internet reachability, proxy availability, or exclusive proxy routing; those require separate integration checks.
 
@@ -605,12 +605,12 @@ these are documented consequences of an opt-in flag.
 | Area                                                                                       | Impact                        | Mechanism                                                                                                                                                                                                                                                                                                    | Handling in v1                                                                                                                                   |
 | ------------------------------------------------------------------------------------------ | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | git in a worktree checkout                                                                 | would break entirely          | git dir and common dir resolve outside cwd (verified layout in § Phase P0)                                                                                                                                                                                                                                   | **fixed** — both are writable roots                                                                                                              |
-| Cross-process owner liveness                                                               | would hang silently           | `process.kill(pid, 0)` with non-`ESRCH` ⇒ alive, over PIDs shared through `~/.qwen` (`conversation-runtime-ownership.ts:44-65`, `serve/live/discovery.ts:147`, `worktreeSessionService.ts:424-446`)                                                                                                          | **avoided** — no PID namespace at all (D6)                                                                                                       |
+| Cross-process owner liveness                                                               | would hang silently           | `process.kill(pid, 0)` with non-`ESRCH` ⇒ alive, over PIDs shared through `~/.mariadb-shell-agent` (`conversation-runtime-ownership.ts:44-65`, `serve/live/discovery.ts:147`, `worktreeSessionService.ts:424-446`)                                                                                           | **avoided** — no PID namespace at all (D6)                                                                                                       |
 | GUI launch (OAuth login, `artifact` open)                                                  | browser cannot run confined   | `xdg-open` child inherits confinement and `~/.config/<browser>` is not a writable root                                                                                                                                                                                                                       | display vars deleted ⇒ deterministic print-the-URL path                                                                                          |
 | ssh-agent auth for `git push`                                                              | unaffected                    | the agent socket usually lives under `/run/user/$UID` (kept reachable by the read-only host bind); a `/tmp/ssh-*` socket also keeps working because host `/tmp` stays bound rather than replaced by a tmpfs — see § Security considerations for what sharing `/tmp` exposes                                  | —                                                                                                                                                |
 | Voice input                                                                                | unavailable                   | `--dev /dev` masks `/dev/snd`; `voice-availability.ts:50` also needs `PULSE_SERVER`                                                                                                                                                                                                                          | documented — use a container backend or run unconfined                                                                                           |
 | Self-update                                                                                | partly affected               | the default managed update root is `QWEN_DIR/updates/npm` (Qwen home follows `QWEN_HOME`); staging, versions, and the active manifest must be writable, and the host launcher later executes that code; custom pinned update roots may lie outside the grants and npm-global updates write the global prefix | retain the default managed update grant and its host-execution risk; update from the host when the installation target is outside writable roots |
-| IDE companion, host `qwen serve`, localhost MCP                                            | unreachable in `closed` only  | `--unshare-net` removes loopback (D5)                                                                                                                                                                                                                                                                        | `open` / `proxied` keep them working                                                                                                             |
+| IDE companion, host `mariadb-shell-agent serve`, localhost MCP                             | unreachable in `closed` only  | `--unshare-net` removes loopback (D5)                                                                                                                                                                                                                                                                        | `open` / `proxied` keep them working                                                                                                             |
 | Writes to `~/.config`, `~/.kube`, `~/.ssh`, `/usr/local`                                   | denied                        | not writable roots — this is the point of the sandbox                                                                                                                                                                                                                                                        | extra home-internal roots are refused; non-home paths can be granted with `--include-directories`                                                |
 | Session data, checkpoints, worktrees, Arena, IDE lock file, MCP OAuth tokens, token ledger | unaffected                    | all under `QWEN_DIR` / `RUNTIME_DIR` (`storage.ts:193-241`, `gitWorktreeService.ts:419`, `ArenaManager.ts:136`)                                                                                                                                                                                              | —                                                                                                                                                |
 | `docker.sock`, D-Bus, Wayland and other host unix sockets                                  | reachable on bwrap (measured) | the kernel's read-only-fs write check exempts `S_ISSOCK` (only `S_ISREG`/`S_ISDIR`/`S_ISLNK` yield `EROFS`), so a socket under `--ro-bind / /` still accepts `connect()`                                                                                                                                     | **verified** on bwrap — a socket outside every writable root still accepted `connect()`; the Landlock backend stays a P1 `--verify` case         |
@@ -773,14 +773,14 @@ The proposed `test:integration:sandbox:bwrap` script and Ubuntu workflow install
 | machine with `kernel.unprivileged_userns_clone=0`  | named `bwrap` ⇒ "installed but cannot run"; named `landlock` ⇒ works |
 | kernel < 5.13 (no Landlock)                        | `landlock` probe ⇒ unusable; explicit request ⇒ `FatalSandboxError`  |
 | Ctrl-C / CLI crash                                 | no orphaned confined processes                                       |
-| `qwen sandbox --verify`                            | battery passes                                                       |
+| `mariadb-shell-agent sandbox --verify`             | battery passes                                                       |
 
 ## Rollout & compatibility
 
 - P0: no default behavior change on any platform; `bwrap` available by name.
   Additions only — `VALID_SANDBOX_COMMANDS`, one `start_sandbox` branch, the
   type widening, the handoff branch widening, the prompt branch, and the
-  `qwen sandbox` subcommand.
+  `mariadb-shell-agent sandbox` subcommand.
 - P1: adds vendored binaries (~70 KB × 2 arches) and the `landlock`
   named command; no default behavior change.
 - P2: tightens the landlock backend with seccomp — the one phase before P3 that
@@ -834,9 +834,9 @@ CONTRIBUTING.md size thresholds.
 - Live verification on Linux, 2026-09-10 — Lima VM, kernel `7.0.0-28-generic`,
   bubblewrap 0.11.1, git 2.53.0, `unprivileged_userns_clone=1`, Landlock present
   in `/sys/kernel/security/lsm`. The probe script lived at
-  `.qwen/scripts/verify-bwrap-assumptions.sh`, which `.gitignore` excludes by
+  `.mariadb-shell-agent/scripts/verify-bwrap-assumptions.sh`, which `.gitignore` excludes by
   repository convention, so it is not part of this change — the measurements it
-  produced are recorded below instead, and `qwen sandbox --verify` is the
+  produced are recorded below instead, and `mariadb-shell-agent sandbox --verify` is the
   committed four-check subset, not a replacement for the manual Git and socket checks. The original probe
   exercised ten claims from this document: nine passed and one failed (the
   `--proc` claim in D6, corrected in place above). Confirmed by measurement:

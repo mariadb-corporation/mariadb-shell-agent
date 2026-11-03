@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -942,7 +943,7 @@ describe('SettingsSchema', () => {
       // The runtime reads `output.format` from settings.json via
       // `normalizeOutputFormat`, which returns `OutputFormat.STREAM_JSON` for
       // `"stream-json"` — a documented, first-class CLI output format. The
-      // settings schema drives VS Code validation of `.qwen/settings.json`, so
+      // settings schema drives VS Code validation of `.mariadb-shell-agent/settings.json`, so
       // it must not reject a value the runtime accepts and runs.
       const format = getSettingsSchema().output?.properties.format;
 

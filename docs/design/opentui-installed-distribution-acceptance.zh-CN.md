@@ -65,7 +65,7 @@ preview 脚本解压到自有同级 staging 目录，触碰活动目标前校验
 
 ## Release 来源与证据
 
-2026-10-26 读取的 GitHub 元数据显示 CLI stable [v0.26.1](https://github.com/QwenLM/qwen-code/releases/tag/v0.26.1) 于 2026-10-24 发布，含五个 classic 归档、五个 preview 归档和 `SHA256SUMS`；[v0.26.0](https://github.com/QwenLM/qwen-code/releases/tag/v0.26.0) 是另一已发布源版本候选。这份 GitHub 清单只是元数据：release 资产的下载、hash 和实际可执行性仍为 NOT_RUN。GitHub `releases/latest` 当前指向 SDK release，不能用通用 latest endpoint 选择 CLI 基线。
+2026-10-26 读取的 GitHub 元数据显示 CLI stable [v0.26.1](https://github.invalid/QwenLM/qwen-code/releases/tag/v0.26.1) 于 2026-10-24 发布，含五个 classic 归档、五个 preview 归档和 `SHA256SUMS`；[v0.26.0](https://github.invalid/QwenLM/qwen-code/releases/tag/v0.26.0) 是另一已发布源版本候选。这份 GitHub 清单只是元数据：release 资产的下载、hash 和实际可执行性仍为 NOT_RUN。GitHub `releases/latest` 当前指向 SDK release，不能用通用 latest endpoint 选择 CLI 基线。
 
 本 checkout 也声明版本 0.26.1，同版本候选字节不等于已发布包。公开 npm 对 0.26.0 与 0.26.1 的匿名 metadata 读取已通过：公开 0.26.0 没有私有 Bun optional 依赖，公开 0.26.1 的四个 POSIX Bun 包固定为 1.3.14，与当前源码候选的 1.4.4 不同。显式选择源 release、候选源码/版本及允许的 endpoint；现有公开 release 的下载、完整性和更新激活仍需受控执行验证，验收不包含任何发布操作。真实 release、未发布候选、本地 fixture、真实公开 registry 访问及跨平台证据分别记录。
 

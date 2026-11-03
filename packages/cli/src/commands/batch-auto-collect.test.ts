@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -212,7 +213,7 @@ describe('batch auto-collect', () => {
     await collector(h).tick();
     expect(h.notices[0]).toMatch(/1 result\(s\) delivered/);
     expect(h.notices[0]).toMatch(
-      new RegExp(`1 failed .*qwen batch retry ${taskId}`),
+      new RegExp(`1 failed .*mariadb-shell-agent batch retry ${taskId}`),
     );
     expect(h.api.uploadJsonl).toHaveBeenCalledTimes(1);
   });
@@ -251,7 +252,7 @@ describe('batch auto-collect', () => {
     const ac = collector(h);
     await ac.tick();
     expect(h.notices).toEqual([
-      `Batch task ${taskId} has a submission that could not be matched to a provider batch — it may exist and be billing. Check with: qwen batch collect ${taskId}`,
+      `Batch task ${taskId} has a submission that could not be matched to a provider batch — it may exist and be billing. Check with: mariadb-shell-agent batch collect ${taskId}`,
     ]);
     const lists = h.api.listBatches.mock.calls.length;
     h.clock.now += 10 * 60_000;
@@ -368,14 +369,14 @@ describe('batch auto-collect', () => {
     const h = setup();
     await submit(h);
     const resolveEndpoint = vi.fn(() => {
-      throw new Error('qwen batch needs an API key');
+      throw new Error('mariadb-shell-agent batch needs an API key');
     });
     const ac = collector(h, { resolveEndpoint });
     await ac.tick();
     await ac.tick(); // same moment: not retried yet
     expect(resolveEndpoint).toHaveBeenCalledTimes(1);
     expect(h.notices).toEqual([
-      '1 /batch-api task(s) of this project cannot be collected automatically: qwen batch needs an API key',
+      '1 /batch-api task(s) of this project cannot be collected automatically: mariadb-shell-agent batch needs an API key',
     ]);
 
     h.clock.now += 6 * 60_000; // retried later, but not announced again
@@ -427,7 +428,7 @@ describe('describeCollect', () => {
       jobErrors: [],
     });
     expect(text).toMatch(/1 held \(target "docs\/en\/b.md" already exists/);
-    expect(text).toMatch(/qwen batch collect t/);
+    expect(text).toMatch(/mariadb-shell-agent batch collect t/);
     expect(text).toMatch(/3 still waiting on the provider/);
   });
 

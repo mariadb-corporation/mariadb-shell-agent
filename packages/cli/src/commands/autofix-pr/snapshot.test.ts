@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,7 +29,7 @@ function state(overrides: Partial<AutofixPrState> = {}): AutofixPrState {
     headRefName: 'feat',
     baseRefName: 'main',
     branch: 'qwen-autofix/pr-7',
-    worktreePath: '/repo/.qwen/tmp/autofix-pr-7',
+    worktreePath: '/repo/.mariadb-shell-agent/tmp/autofix-pr-7',
     viewer: 'me',
     prAuthor: 'me',
     lastKnownHeadSha: HEAD,
@@ -139,7 +140,7 @@ describe('buildSnapshot', () => {
             databaseId: 32985578813,
             url: 'https://github.com/o/r/actions/runs/32985578813',
             event: 'pull_request',
-            workflow: { databaseId: 176254679, name: 'Qwen Code CI' },
+            workflow: { databaseId: 176254679, name: 'MariaDB Shell Agent CI' },
           },
         },
         {
@@ -160,10 +161,10 @@ describe('buildSnapshot', () => {
       events: [
         {
           type: 'ci_failed',
-          check: 'Qwen Code CI',
+          check: 'MariaDB Shell Agent CI',
           runId: 32985578813,
           startupFailure: true,
-          key: `Qwen Code CI@${HEAD}@#startup:176254679:pull_request`,
+          key: `MariaDB Shell Agent CI@${HEAD}@#startup:176254679:pull_request`,
         },
       ],
     });
@@ -173,7 +174,7 @@ describe('buildSnapshot', () => {
         data,
         state({
           handledChecks: [
-            `Qwen Code CI@${HEAD}@#startup:176254679:pull_request`,
+            `MariaDB Shell Agent CI@${HEAD}@#startup:176254679:pull_request`,
           ],
         }),
       ).action,

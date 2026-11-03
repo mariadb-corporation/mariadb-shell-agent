@@ -5,7 +5,7 @@
 - **Status:** Proposed
 - **Date:** 2026-10-18
 - **Baseline:** `0fac9973df`
-- **Issue:** [#12937](https://github.com/QwenLM/qwen-code/issues/12937) (split out of [#12868](https://github.com/QwenLM/qwen-code/pull/12868))
+- **Issue:** [#12937](https://github.invalid/QwenLM/qwen-code/issues/12937) (split out of [#12868](https://github.invalid/QwenLM/qwen-code/pull/12868))
 - **Modules:** `packages/managed-agent-server`, `packages/cli/src/serve`, `packages/core/src/tools`
 
 Every claim in "Current state" was re-read at the baseline commit above. "Proposed"

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -125,7 +126,7 @@ function formatRun(result: AutoSkillCuratorRunResult): string {
     lines.push(
       ...result.skippedCollisions.map(
         (name) =>
-          `  ${name} — remove or rename .qwen/archived-skills/${name} to re-archive`,
+          `  ${name} — remove or rename .mariadb-shell-agent/archived-skills/${name} to re-archive`,
       ),
     );
   }

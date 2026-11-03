@@ -84,7 +84,7 @@
 - Modify: `docs/developers/qwen-serve-protocol.md`
 - Modify: `packages/cli/src/serve/channel-delivery-ipc.test.ts`
 - Modify: `packages/cli/src/serve/channel-delivery.test.ts`
-- Create: `.qwen/e2e-tests/channel-delivery-final-only.md` (git-ignored working artifact)
+- Create: `.mariadb-shell-agent/e2e-tests/channel-delivery-final-only.md` (git-ignored working artifact)
 
 **Interfaces:**
 

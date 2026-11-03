@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -124,7 +125,7 @@ describe.skipIf(!replayable)('codeql-failure-issue script behavior', () => {
             RUNNER_TEMP: dir,
             REPO: 'QwenLM/qwen-code',
             RUN_ID: '1',
-            RUN_URL: 'https://github.com/QwenLM/qwen-code/actions/runs/1',
+            RUN_URL: 'https://github.invalid/QwenLM/qwen-code/actions/runs/1',
             DEDUP_LABEL: 'scope/ci-cd',
           },
         },

@@ -2,10 +2,10 @@
 
 [English](2026-09-15-acp-bridge-completion.md) | [简体中文](2026-09-15-acp-bridge-completion.zh-CN.md)
 
-状态：已通过 [#11916](https://github.com/QwenLM/qwen-code/pull/11916) 合入；
+状态：已通过 [#11916](https://github.invalid/QwenLM/qwen-code/pull/11916) 合入；
 2026-09-16，合入提交通过了配置中的 Linux CI 完整测试。
 证据及限制见[合入后验收](#合入后验收)。在[前四个切片](2026-09-14-acp-bridge-control-plane-harness-boundary.zh-CN.md)
-之后实现 [#11866](https://github.com/QwenLM/qwen-code/issues/11866) 的剩余边界抽取。
+之后实现 [#11866](https://github.invalid/QwenLM/qwen-code/issues/11866) 的剩余边界抽取。
 
 ## 问题与范围
 
@@ -97,7 +97,7 @@ journal 登记、会话 reaper 启动及 prompt handler 绑定。公共错误 he
 保留现有工作区隔离、启动合并、启动失败、新旧通道重叠、同会话 FIFO、跨会话
 并发、退出扇出、空闲/preheat、恢复、终态、artifact 及 worktree/reset 测试。
 对新边界的覆盖缺口增加确定性测试，包括同步关联及退出释放顺序。E2E 计划为
-`.qwen/e2e-tests/issue-11866-completion.md`，复用已有全局公共基线，并检查
+`.mariadb-shell-agent/e2e-tests/issue-11866-completion.md`，复用已有全局公共基线，并检查
 真实进程退出及独立资源清理。
 
 验收要求职责显式分离、harness 不持有会话注册表/队列/事件、bridge 不持有物理
@@ -131,7 +131,7 @@ await token 的总数。时序依据来自逐函数及接线检查，不能仅�
 Build、工作区 typecheck、lint、格式、core 子路径导出及 serve bundle 边界检查
 通过。完整 ACP bridge 测试共 2,092 项通过。两轮无问题自审及对冻结 44 文件候选
 的独立审查未发现未决源码缺陷。证据保留在
-`.qwen/investigations/issue-11866-completion/`。
+`.mariadb-shell-agent/investigations/issue-11866-completion/`。
 
 八个串行最终 bundle E2E 样本满足各自验收条件：公共生命周期、原生监听下
 32 个技能、两个活动 writer 会话、两个直接 EOF 场景、停读和 EPIPE 负例，
@@ -181,8 +181,8 @@ bundle、serve bundle 边界及 core 导出检查，全部通过。新的 1,079 
 和 EPIPE。所拥有的进程和监听端口均已消失。规范化的正向输出与此前最终 bundle
 一致，历史失败另行保留。在该阶段，由于仓库级命令尚未全绿，完整测试验收仍未关闭。
 详细证据及独立后续事项保留在
-`.qwen/investigations/issue-11866-completion/` 和
-`.qwen/issues/issue-11866-unrelated-unit-followups.md`。
+`.mariadb-shell-agent/investigations/issue-11866-completion/` 和
+`.mariadb-shell-agent/issues/issue-11866-unrelated-unit-followups.md`。
 
 ## 首次发布候选：main 整合
 
@@ -251,7 +251,7 @@ MISMATCH：CLI 版本和两个内置技能正文不同。正文与更新后上�
 所拥有的进程和监听端口均经过独立检查。直接测量的 ACP 退出继续与 daemon
 子进程消失的观察分开。Rebase 证据由 completion 调查目录内的
 `rebase-e2e-manifest.json` 索引；源码审计及重新构建的产物清单位于
-`.qwen/pr-reviews/`。上文继续保留历史失败及其边界。
+`.mariadb-shell-agent/pr-reviews/`。上文继续保留历史失败及其边界。
 
 ## 后续合并渠道输出模式
 
@@ -367,7 +367,7 @@ no-AK 集成、Serve A/B、daemon E2E、desktop shell、Web Shell smoke 及 TUI
 观察器最初的配置意外拼接了包级 include 模式，已以退出 130 中止，原始日志及
 已观察端口/进程的清理证据保留，不计入有效基线或变异数量。后续每次观察均通过
 精确文件过滤及加载记录核验。证据索引为
-`.qwen/investigations/issue-11866-comments/mutation-summary.json`。
+`.mariadb-shell-agent/investigations/issue-11866-comments/mutation-summary.json`。
 
 冻结产物上的八个串行进程场景全部满足正向或预期负向验收条件。公共多会话
 生命周期、32 个技能的原生监听、活动 writer 关停均测得 daemon 退出 0。
@@ -437,7 +437,7 @@ ESLint 通过。首轮九文件 CLI 运行有 2,062 项通过、一项失败：�
 `2dfcc70b196ea01e036301649484eb611a3b9130b733af12e84b866db65c2d12`。
 上文历史计数或产物均不重新标记为本次结果。当前日志是 completion 调查目录
 中的 `conflict2-*` 记录，进程证据位于
-`.qwen/investigations/issue-11866-conflict2/`。最终 lint 和审计结论见相应 PR
+`.mariadb-shell-agent/investigations/issue-11866-conflict2/`。最终 lint 和审计结论见相应 PR
 跟进记录。
 
 评审另记录了 `b8124075c6` 上 Linux 两个 core 文件的运行：91 项通过，六项
@@ -447,7 +447,7 @@ skill-manager 失败。其基线对照被缺失构建产物的前置检查拦住
 后六项通过；随后无此覆盖值的完整两文件运行 97 项通过，源码/测试身份未变。
 这在本地验证了覆盖值造成失败的机制，不能证明先前 Linux 运行的实际环境或
 原因。三组观察与历史完整 workspace 失败分别保留。证据位于
-`.qwen/investigations/issue-11866-conflict2/skills-*`。
+`.mariadb-shell-agent/investigations/issue-11866-conflict2/skills-*`。
 
 ## Workflow 启动输入集成
 
@@ -461,7 +461,7 @@ skill-manager 失败。其基线对照被缺失构建产物的前置检查拦住
 移植后，同一份测试六项全部通过。另检查了构建后的方法；这是源码测试和构建
 证据，不是新的真实 daemon E2E 运行。上文历史进程结果仍绑定原提交。新的集成
 检查和最终审计记录在 PR 跟进中；原始复现与验证证据位于
-`.qwen/investigations/issue-11866-conflict3/`。
+`.mariadb-shell-agent/investigations/issue-11866-conflict3/`。
 
 ## 合入后验收
 
@@ -472,7 +472,7 @@ PR #11916 于 2026-09-16 合入，对应提交
 日志均指向该合入提交，而非之后的 main 版本。这些是在合入后核实的已完成 CI
 结果，不是本次新执行的本地测试。
 
-[合入后单测 job](https://github.com/QwenLM/qwen-code/actions/runs/35068367808/job/104703832563)
+[合入后单测 job](https://github.invalid/QwenLM/qwen-code/actions/runs/35068367808/job/104703832563)
 运行了全部 22 个配置了 `test:ci` 的 workspace，随后运行根目录脚本测试：
 
 | 测试范围           |   通过 | 失败 | 跳过 |
@@ -482,9 +482,9 @@ PR #11916 于 2026-09-16 合入，对应提交
 
 其中包含 ACP bridge 2,179 项、CLI 31,744 项、core 26,808 项、TypeScript SDK
 2,046 项及 Web Shell 8,386 项通过。
-[合入后静态检查 job](https://github.com/QwenLM/qwen-code/actions/runs/35068367808/job/104703832566)
+[合入后静态检查 job](https://github.invalid/QwenLM/qwen-code/actions/runs/35068367808/job/104703832566)
 还通过了配置中的 Node helper 测试：580 项通过，零失败、零跳过。两个 job
-均成功完成。[PR 最终单测 job](https://github.com/QwenLM/qwen-code/actions/runs/35066664366/job/104698456229)
+均成功完成。[PR 最终单测 job](https://github.invalid/QwenLM/qwen-code/actions/runs/35066664366/job/104698456229)
 在相同代码树上另行报告了相同的 workspace 和根目录脚本测试计数。
 
 这些结果满足 #11866 在配置中的 Linux 完整测试验收。本次运行使用 Node 22、
@@ -496,5 +496,5 @@ Python、Java、mobile 及真实 daemon 的结果仍绑定各自另行记录的�
 上文此前的本地失败与未完成归因继续作为历史证据保留；本次 Linux 结果既不修复
 这些失败，也不为它们确定原因。没有为取得本验收记录而修改生产代码、测试、断言、
 期限或 CI 策略。边界抽取已完成；无状态 `wake(sessionId)` / `getEvents()`、
-worker 池和外部事件存储仍由 [#11868](https://github.com/QwenLM/qwen-code/issues/11868)
+worker 池和外部事件存储仍由 [#11868](https://github.invalid/QwenLM/qwen-code/issues/11868)
 跟进。

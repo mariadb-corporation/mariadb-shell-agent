@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Thin wrapper around `git` for the `qwen review` subcommands. Same
+// Thin wrapper around `git` for the `mariadb-shell-agent review` subcommands. Same
 // `execFileSync` pattern as `lib/gh.ts` so quoting / escaping is consistent
 // across platforms.
 
@@ -78,7 +79,7 @@ function gitOpts() {
  *
  * The memo's key is the LEXICAL marker scan, never `mountRootFor`'s answer.
  * That null is overloaded (see `insideReviewTmpLexically`), and the rename
- * attack turns on the difference: `mv .qwen .qwen-real` from inside the outer
+ * attack turns on the difference: `mv .mariadb-shell-agent .qwen-real` from inside the outer
  * mount leaves the live cwd's stale spelling matching the marker while the
  * mount stops answering, so a memo keyed on "no mount root" recorded TRUSTED
  * for a spelling inside the review temp dir — and served it to whatever tree
@@ -433,10 +434,10 @@ export function worktreeReleaseResult(
  * `reason` when it is still there.
  *
  * `git worktree remove` needs the directory. A user reclaiming disk with
- * `rm -rf .qwen/tmp` leaves the worktree *registered but missing*, and from then
+ * `rm -rf .mariadb-shell-agent/tmp` leaves the worktree *registered but missing*, and from then
  * on git refuses both of the things the next review needs:
  *
- *     $ git worktree add .qwen/tmp/review-pr-6457 qwen-review/pr-6457
+ *     $ git worktree add .mariadb-shell-agent/tmp/review-pr-6457 qwen-review/pr-6457
  *     fatal: '...' is a missing but already registered worktree;
  *     use 'add -f' to override, or 'prune' or 'remove' to clear
  *
@@ -449,7 +450,7 @@ export function worktreeReleaseResult(
 export function releaseWorktree(worktreePath: string): WorktreeRelease {
   // An ANCESTOR symlink first, because the leaf guard below cannot see one:
   // `lstatSync` dereferences every component except the last, so a link at
-  // `.qwen/tmp` makes every path under it lstat as an ordinary directory while
+  // `.mariadb-shell-agent/tmp` makes every path under it lstat as an ordinary directory while
   // `git worktree remove --force` and the `rmSync` fallback both land in
   // whatever checkout it points at. `runCleanup` refuses its whole sweep for
   // this reason; `cleanStale` releases with no guard of its own, so the
@@ -460,7 +461,7 @@ export function releaseWorktree(worktreePath: string): WorktreeRelease {
   //
   // In its own try, because the never-throws contract starts HERE, before any
   // `gitProbe` call: `resolve` reads the cwd for the RELATIVE path production
-  // callers pass (`worktreePath()` returns `.qwen/tmp/review-pr-<n>`), and so
+  // callers pass (`worktreePath()` returns `.mariadb-shell-agent/tmp/review-pr-<n>`), and so
   // does `redirectedAncestor`'s default `stopAt = process.cwd()` — evaluated
   // at the call, outside that function's own try. A cwd deleted out from
   // under the process (an operator `rm -rf` mid-run, the nested geometry's
@@ -616,7 +617,7 @@ function couldNotRunError(): Error {
     'the `git worktree prune` that frees the registration and the branch ' +
       'could not be run at all (a spawn failure or the timeout kill), so ' +
       'both survive — the next `git worktree add` over the path will still ' +
-      'fail with "missing but already registered". Re-run `qwen review ' +
+      'fail with "missing but already registered". Re-run `mariadb-shell-agent review ' +
       'cleanup`.',
   );
 }
@@ -627,7 +628,7 @@ function refusalError(refusal: string | null): Error | undefined {
   return new Error(
     `git could not run from this directory — ${refusal}. The directory is ` +
       `cleared but this worktree's registration and branch were not, so the ` +
-      `next \`git worktree add\` over it will still fail. Run \`qwen review ` +
+      `next \`git worktree add\` over it will still fail. Run \`mariadb-shell-agent review ` +
       `cleanup\` from a checkout outside the review temp dir.`,
   );
 }

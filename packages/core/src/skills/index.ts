@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,8 +15,8 @@
  * Skills are stored as directories containing a SKILL.md file with YAML
  * frontmatter for metadata. They can be loaded from four levels
  * (precedence: project > user > extension > bundled):
- * - Project-level: `.qwen/skills/`
- * - User-level: `~/.qwen/skills/`
+ * - Project-level: `.mariadb-shell-agent/skills/`
+ * - User-level: `~/.mariadb-shell-agent/skills/`
  * - Extension-level: provided by installed extensions
  * - Bundled: built-in skills shipped with qwen-code
  */

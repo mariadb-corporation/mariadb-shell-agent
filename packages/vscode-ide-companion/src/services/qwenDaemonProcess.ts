@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,7 +18,8 @@ export interface QwenDaemonListenerHandle {
 }
 
 const STARTUP_TIMEOUT_MS = 30_000;
-const LISTENING_URL = /qwen serve listening on (http:\/\/[^\s]+)/;
+const LISTENING_URL =
+  /mariadb-shell-agent serve listening on (http:\/\/[^\s]+)/;
 
 export class QwenDaemonProcess {
   private child: ChildProcess | null = null;
@@ -47,6 +49,7 @@ export class QwenDaemonProcess {
   start(
     cliEntryPath: string,
     workspaceCwd: string,
+    extraArgs: readonly string[] = [],
   ): Promise<QwenDaemonRuntime> {
     // A daemon is bound to one workspace at spawn. Reusing it for a different
     // root — which a multi-root window hits as soon as a second chat opens
@@ -87,6 +90,7 @@ export class QwenDaemonProcess {
           '--require-auth',
           '--allow-origin',
           '*',
+          ...extraArgs,
         ],
         {
           cwd: workspaceCwd,

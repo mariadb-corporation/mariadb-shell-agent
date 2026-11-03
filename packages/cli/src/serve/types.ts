@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,7 +31,7 @@ import type {
  * Stage 1 daemon mode shape.
  *
  * `http-bridge` (Stage 1): production attempts to preheat the primary
- *   `qwen --acp` child and retries on first use after failure; trusted
+ *   `mariadb-shell-agent --acp` child and retries on first use after failure; trusted
  *   secondaries start one on demand, while untrusted secondaries do not.
  *   Multiple sessions in one runtime multiplex onto its child via the
  *   agent's native `connection.newSession()` (see
@@ -275,7 +276,7 @@ export interface ServeOptions {
   mcpPoolActive?: boolean;
   /**
    * Total memory budget in MB for the whole daemon process tree — the root
-   * plus every `qwen --acp` child it spawns. When unset, derived as half of
+   * plus every `mariadb-shell-agent --acp` child it spawns. When unset, derived as half of
    * the cgroup-constrained or host memory.
    *
    * `childHeapMode: 'admit'` limits child starts using the modeled slot count;
@@ -475,7 +476,7 @@ export interface CapabilitiesEnvelope {
    */
   protocolVersions?: ServeProtocolVersions;
   /**
-   * Qwen Code CLI/SDK version served by this daemon. Optional because this is
+   * MariaDB Shell Agent CLI/SDK version served by this daemon. Optional because this is
    * additive to v=1; older v=1 daemons omit it.
    */
   qwenCodeVersion?: string;

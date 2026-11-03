@@ -76,4 +76,4 @@ Use the previous review's controlled failing cases and focused regression tests:
 Run package tests, build, typecheck, bundle, lint, and formatting. Automated
 component/reducer checks use isolated data; do not overwrite the user's real
 session to validate failure paths. Detailed plans and results live in
-`.qwen/e2e-tests/`.
+`.mariadb-shell-agent/e2e-tests/`.

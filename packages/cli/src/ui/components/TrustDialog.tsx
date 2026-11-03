@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -114,8 +115,8 @@ export function TrustDialog({
       {needsRestart && (
         <Box marginLeft={1} marginTop={1}>
           <Text color={theme.status.warning}>
-            To apply the trust changes, Qwen Code must be restarted. Press
-            &apos;r&apos; to restart CLI now.
+            To apply the trust changes, MariaDB Shell Agent must be restarted.
+            Press &apos;r&apos; to restart CLI now.
           </Text>
         </Box>
       )}

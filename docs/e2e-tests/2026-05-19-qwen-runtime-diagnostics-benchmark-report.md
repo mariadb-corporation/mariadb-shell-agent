@@ -1,11 +1,11 @@
-# Qwen Code Runtime Diagnostics Benchmark Report
+# MariaDB Shell Agent Runtime Diagnostics Benchmark Report
 
 Date: 2026-05-19
 
 ## Scope
 
-This run repeats the previous Qwen Code benchmark shapes with the new opt-in
-runtime diagnostics enabled. It only tests Qwen Code, not Claude Code.
+This run repeats the previous MariaDB Shell Agent benchmark shapes with the new opt-in
+runtime diagnostics enabled. It only tests MariaDB Shell Agent, not Claude Code.
 
 Initial model matrix:
 
@@ -29,7 +29,7 @@ The run used the local bundled CLI from the diagnostics branch, with
 hooks were not loaded for this benchmark.
 
 Important caveat: these absolute RSS numbers are lower than the previous
-PATH-resolved `qwen` runs because this run used `node dist/cli.js` from the
+PATH-resolved `mariadb-shell-agent` runs because this run used `node dist/cli.js` from the
 local branch plus a stripped temporary config. Treat this report as an internal
 diagnostics distribution run, not a direct replacement for the earlier installed
 CLI RSS comparison.
@@ -38,15 +38,15 @@ CLI RSS comparison.
 
 A follow-up sanity check used the same minimal prompt, model, and non-interactive
 mode across the installed CLI and the local diagnostics bundle. The only
-intentional variable was whether Qwen Code loaded a stripped temporary CLI home
+intentional variable was whether MariaDB Shell Agent loaded a stripped temporary CLI home
 or the normal user config.
 
-| CLI                 | Config mode     | Total tokens | Tree RSS peak | Root RSS peak | Process count peak | Runtime diagnostics |
-| ------------------- | --------------- | -----------: | ------------: | ------------: | -----------------: | ------------------- |
-| PATH `qwen`         | stripped config |       33,965 |     542.4 MiB |     249.9 MiB |                  3 | no                  |
-| local `dist/cli.js` | stripped config |       47,281 |     455.2 MiB |     214.2 MiB |                  4 | yes                 |
-| PATH `qwen`         | normal config   |       97,615 |   1,099.9 MiB |     250.1 MiB |                  6 | no                  |
-| local `dist/cli.js` | normal config   |       97,954 |   1,105.4 MiB |     212.7 MiB |                  8 | yes                 |
+| CLI                        | Config mode     | Total tokens | Tree RSS peak | Root RSS peak | Process count peak | Runtime diagnostics |
+| -------------------------- | --------------- | -----------: | ------------: | ------------: | -----------------: | ------------------- |
+| PATH `mariadb-shell-agent` | stripped config |       33,965 |     542.4 MiB |     249.9 MiB |                  3 | no                  |
+| local `dist/cli.js`        | stripped config |       47,281 |     455.2 MiB |     214.2 MiB |                  4 | yes                 |
+| PATH `mariadb-shell-agent` | normal config   |       97,615 |   1,099.9 MiB |     250.1 MiB |                  6 | no                  |
+| local `dist/cli.js`        | normal config   |       97,954 |   1,105.4 MiB |     212.7 MiB |                  8 | yes                 |
 
 This check changes the attribution: the earlier 1 GiB user-visible peak is
 reproducible with the normal config even on the local diagnostics bundle. It is
@@ -91,12 +91,12 @@ as normal task benchmark results, and do not compare their token/tool-call
 behavior with the matrix above. They are only useful for estimating how much
 process-tree RSS comes from normal config and configured child processes.
 
-| CLI                 | Mode     | Wall | Turns | Tool uses | Tree RSS peak | Root RSS peak | Process count peak |
-| ------------------- | -------- | ---: | ----: | --------: | ------------: | ------------: | -----------------: |
-| PATH `qwen`         | normal   | 5.5s |     1 |         0 |   1,021.3 MiB |     251.5 MiB |                  5 |
-| PATH `qwen`         | `--bare` | 2.4s |     1 |         0 |     525.7 MiB |     246.4 MiB |                  2 |
-| local `dist/cli.js` | normal   | 4.9s |     1 |         0 |   1,046.2 MiB |     213.3 MiB |                  5 |
-| local `dist/cli.js` | `--bare` | 2.3s |     1 |         0 |     454.3 MiB |     216.5 MiB |                  3 |
+| CLI                        | Mode     | Wall | Turns | Tool uses | Tree RSS peak | Root RSS peak | Process count peak |
+| -------------------------- | -------- | ---: | ----: | --------: | ------------: | ------------: | -----------------: |
+| PATH `mariadb-shell-agent` | normal   | 5.5s |     1 |         0 |   1,021.3 MiB |     251.5 MiB |                  5 |
+| PATH `mariadb-shell-agent` | `--bare` | 2.4s |     1 |         0 |     525.7 MiB |     246.4 MiB |                  2 |
+| local `dist/cli.js`        | normal   | 4.9s |     1 |         0 |   1,046.2 MiB |     213.3 MiB |                  5 |
+| local `dist/cli.js`        | `--bare` | 2.3s |     1 |         0 |     454.3 MiB |     216.5 MiB |                  3 |
 
 The result confirms the process-tree hypothesis for startup/config attribution.
 On this machine, normal config adds roughly 0.50-0.59 GiB of user-visible
@@ -120,16 +120,16 @@ No global settings were modified. The case used `qwen3.6-plus` and a minimal
 startup prompt, so it measures startup/config process-tree cost, not task
 reasoning quality.
 
-| CLI                 | Temporary config     | MCP servers | Tools | Tree RSS peak | Root RSS peak | Process count peak |
-| ------------------- | -------------------- | ----------: | ----: | ------------: | ------------: | -----------------: |
-| PATH `qwen`         | full                 |           4 |    46 |   1,017.4 MiB |     249.8 MiB |                  5 |
-| PATH `qwen`         | MCP disabled         |           0 |    17 |     548.7 MiB |     252.4 MiB |                  2 |
-| PATH `qwen`         | hooks disabled       |           4 |    46 |   1,003.8 MiB |     246.4 MiB |                  5 |
-| PATH `qwen`         | MCP + hooks disabled |           0 |    17 |     542.5 MiB |     248.0 MiB |                  2 |
-| local `dist/cli.js` | full                 |           4 |    48 |     865.9 MiB |     220.4 MiB |                  6 |
-| local `dist/cli.js` | MCP disabled         |           0 |    19 |     442.9 MiB |     209.6 MiB |                  2 |
-| local `dist/cli.js` | hooks disabled       |           4 |    48 |     848.3 MiB |     212.6 MiB |                  5 |
-| local `dist/cli.js` | MCP + hooks disabled |           0 |    19 |     447.2 MiB |     217.8 MiB |                  2 |
+| CLI                        | Temporary config     | MCP servers | Tools | Tree RSS peak | Root RSS peak | Process count peak |
+| -------------------------- | -------------------- | ----------: | ----: | ------------: | ------------: | -----------------: |
+| PATH `mariadb-shell-agent` | full                 |           4 |    46 |   1,017.4 MiB |     249.8 MiB |                  5 |
+| PATH `mariadb-shell-agent` | MCP disabled         |           0 |    17 |     548.7 MiB |     252.4 MiB |                  2 |
+| PATH `mariadb-shell-agent` | hooks disabled       |           4 |    46 |   1,003.8 MiB |     246.4 MiB |                  5 |
+| PATH `mariadb-shell-agent` | MCP + hooks disabled |           0 |    17 |     542.5 MiB |     248.0 MiB |                  2 |
+| local `dist/cli.js`        | full                 |           4 |    48 |     865.9 MiB |     220.4 MiB |                  6 |
+| local `dist/cli.js`        | MCP disabled         |           0 |    19 |     442.9 MiB |     209.6 MiB |                  2 |
+| local `dist/cli.js`        | hooks disabled       |           4 |    48 |     848.3 MiB |     212.6 MiB |                  5 |
+| local `dist/cli.js`        | MCP + hooks disabled |           0 |    19 |     447.2 MiB |     217.8 MiB |                  2 |
 
 Interpretation:
 
@@ -259,7 +259,7 @@ Overlapping small PR `#4268` model snapshot:
 2. The local bundle run peaks around 0.36-0.41 GiB, not the earlier
    0.83-1.04 GiB, because the matrix used a stripped temporary config. A
    follow-up normal-config sanity check reproduced about 1.1 GiB tree RSS on
-   both PATH `qwen` and local `dist/cli.js`, with the extra memory coming from
+   both PATH `mariadb-shell-agent` and local `dist/cli.js`, with the extra memory coming from
    child MCP/Node processes in the process tree.
 3. V8 heap is much smaller than RSS. End heap is about 99-143 MiB while end RSS
    is about 216-411 MiB. The remaining footprint is likely loaded modules,
@@ -387,19 +387,19 @@ Current gaps:
 Issue/PR evidence points to several different OOM shapes, not one single
 failure mode:
 
-| Source                                                                                                                 | Evidence summary                                                                                                                                      | Hypothesis to test                                                                                                               |
-| ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| [`#4309`](https://github.com/QwenLM/qwen-code/issues/4309)                                                             | User reports 5.84 GiB memory usage / 7.02 GiB warning with YOLO mode and DeepSeek backend; increasing Node memory to 8 GiB did not remove the symptom | Long autonomous tool loops can retain enough state that simply raising old-space limit is not a root fix                         |
-| [`#4149`](https://github.com/QwenLM/qwen-code/issues/4149)                                                             | Multiple reports show `Ineffective mark-compacts near heap limit`, including 4 GiB and much larger heap-limit cases                                   | A large fraction of heap is reachable application state, not immediately collectible garbage                                     |
-| [`#4116`](https://github.com/QwenLM/qwen-code/issues/4116)                                                             | OOM occurred while context display was around 9.5%; analysis points to `structuredClone`, UI history, Ink static tree, and large context windows      | Token usage can be low while JS heap pressure is high; token threshold alone is not a reliable memory guard                      |
-| [`#4167`](https://github.com/QwenLM/qwen-code/issues/4167)                                                             | User says the crash happened while compressing; analysis identifies compression peak memory as a distinct shape                                       | Compression can itself create a peak when heap is already high, especially if history is cloned/stringified around the same time |
-| [`#2128`](https://github.com/QwenLM/qwen-code/issues/2128)                                                             | Report identifies unbounded UI history, retained file diffs / terminal output, string-width caches, and checkpoint serialization                      | Interactive TUI long sessions may retain memory outside model history and outside non-interactive benchmarks                     |
-| [`#2562`](https://github.com/QwenLM/qwen-code/issues/2562)                                                             | Report focuses on `GeminiChat.getHistory()` deep-cloning full history in long sessions                                                                | Full-history cloning can amplify memory peaks and should be measured separately from retained steady-state size                  |
-| [`#4185`](https://github.com/QwenLM/qwen-code/issues/4185)                                                             | Tracks V8 heap pressure exceeding limit before token-based compaction runs                                                                            | Heap-pressure guard is necessary, but it only mitigates symptoms if retained data remains large                                  |
-| [`#4184`](https://github.com/QwenLM/qwen-code/issues/4184)                                                             | Proposes diagnostics and offload/preview for large retained tool results                                                                              | Large tool output may be bounded for model requests while still retained in local hot memory                                     |
-| [`#4186`](https://github.com/QwenLM/qwen-code/pull/4186)                                                               | Merged heap-pressure auto-compaction safety net and O(1) last-history access for `nextSpeakerChecker`                                                 | Covers part of heap-pressure and clone amplification, but does not claim to solve all OOM classes                                |
-| [`#4127`](https://github.com/QwenLM/qwen-code/pull/4127), [`#4168`](https://github.com/QwenLM/qwen-code/pull/4168)     | Open compaction-threshold PRs; one uses fixed heap thresholds, the other redesigns token thresholds and compression behavior                          | Useful related work, but long-task testing must verify whether heap, token, and compression signals line up in real runs         |
-| [`#3000`](https://github.com/QwenLM/qwen-code/issues/3000), [`#4183`](https://github.com/QwenLM/qwen-code/issues/4183) | Diagnostic roadmap calls out `/doctor memory`, heap snapshot, and bounded memory timeline                                                             | Snapshot/timeline support is needed to move from RSS attribution to retained-object attribution                                  |
+| Source                                                                                                                         | Evidence summary                                                                                                                                      | Hypothesis to test                                                                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| [`#4309`](https://github.invalid/QwenLM/qwen-code/issues/4309)                                                                 | User reports 5.84 GiB memory usage / 7.02 GiB warning with YOLO mode and DeepSeek backend; increasing Node memory to 8 GiB did not remove the symptom | Long autonomous tool loops can retain enough state that simply raising old-space limit is not a root fix                         |
+| [`#4149`](https://github.invalid/QwenLM/qwen-code/issues/4149)                                                                 | Multiple reports show `Ineffective mark-compacts near heap limit`, including 4 GiB and much larger heap-limit cases                                   | A large fraction of heap is reachable application state, not immediately collectible garbage                                     |
+| [`#4116`](https://github.invalid/QwenLM/qwen-code/issues/4116)                                                                 | OOM occurred while context display was around 9.5%; analysis points to `structuredClone`, UI history, Ink static tree, and large context windows      | Token usage can be low while JS heap pressure is high; token threshold alone is not a reliable memory guard                      |
+| [`#4167`](https://github.invalid/QwenLM/qwen-code/issues/4167)                                                                 | User says the crash happened while compressing; analysis identifies compression peak memory as a distinct shape                                       | Compression can itself create a peak when heap is already high, especially if history is cloned/stringified around the same time |
+| [`#2128`](https://github.invalid/QwenLM/qwen-code/issues/2128)                                                                 | Report identifies unbounded UI history, retained file diffs / terminal output, string-width caches, and checkpoint serialization                      | Interactive TUI long sessions may retain memory outside model history and outside non-interactive benchmarks                     |
+| [`#2562`](https://github.invalid/QwenLM/qwen-code/issues/2562)                                                                 | Report focuses on `GeminiChat.getHistory()` deep-cloning full history in long sessions                                                                | Full-history cloning can amplify memory peaks and should be measured separately from retained steady-state size                  |
+| [`#4185`](https://github.invalid/QwenLM/qwen-code/issues/4185)                                                                 | Tracks V8 heap pressure exceeding limit before token-based compaction runs                                                                            | Heap-pressure guard is necessary, but it only mitigates symptoms if retained data remains large                                  |
+| [`#4184`](https://github.invalid/QwenLM/qwen-code/issues/4184)                                                                 | Proposes diagnostics and offload/preview for large retained tool results                                                                              | Large tool output may be bounded for model requests while still retained in local hot memory                                     |
+| [`#4186`](https://github.invalid/QwenLM/qwen-code/pull/4186)                                                                   | Merged heap-pressure auto-compaction safety net and O(1) last-history access for `nextSpeakerChecker`                                                 | Covers part of heap-pressure and clone amplification, but does not claim to solve all OOM classes                                |
+| [`#4127`](https://github.invalid/QwenLM/qwen-code/pull/4127), [`#4168`](https://github.invalid/QwenLM/qwen-code/pull/4168)     | Open compaction-threshold PRs; one uses fixed heap thresholds, the other redesigns token thresholds and compression behavior                          | Useful related work, but long-task testing must verify whether heap, token, and compression signals line up in real runs         |
+| [`#3000`](https://github.invalid/QwenLM/qwen-code/issues/3000), [`#4183`](https://github.invalid/QwenLM/qwen-code/issues/4183) | Diagnostic roadmap calls out `/doctor memory`, heap snapshot, and bounded memory timeline                                                             | Snapshot/timeline support is needed to move from RSS attribution to retained-object attribution                                  |
 
 Initial interpretation:
 
@@ -485,7 +485,7 @@ reproduction.
 
 Setup:
 
-- Installed Qwen Code `0.15.11`, model `qwen-latest-series-invite-beta-v28`.
+- Installed MariaDB Shell Agent `0.15.11`, model `qwen-latest-series-invite-beta-v28`.
 - Temporary CLI home derived from the normal settings, with MCP and hook config
   removed. No global config was modified.
 - Interactive TUI mode with dual JSON event output and remote JSONL input.
@@ -652,7 +652,7 @@ Important attribution from this deterministic run:
 
 ## DeepSeek PR-Size Follow-Up
 
-After the initial model matrix, an additional Qwen Code-only run tested
+After the initial model matrix, an additional MariaDB Shell Agent-only run tested
 `DeepSeek/deepseek-v4-pro` across three real PR sizes. This model is configured
 through the Anthropic-compatible protocol; OpenAI-compatible execution returned
 404 in a smoke check, so the successful benchmark uses `--auth-type anthropic`.
@@ -704,7 +704,7 @@ DeepSeek observations:
    tool-result handling and request assembly, even when RSS does not spike.
 5. The DeepSeek run reinforces the model-choice conclusion: provider/model
    choice strongly changes turns, latency, token volume, and wire payload shape,
-   but the local bundle RSS peak remains dominated by Qwen Code runtime shape
+   but the local bundle RSS peak remains dominated by MariaDB Shell Agent runtime shape
    rather than scaling linearly with PR size.
 
 ## Long-Review JSONL Replay: History Clone Pressure
@@ -713,19 +713,19 @@ A recent long PR-review chat record was analyzed as a post-mortem shape for
 the reported OOM class. The raw JSONL is not included here because it contains
 prompt and tool output text. The aggregate shape is:
 
-| Signal                  | Value                         |
-| ----------------------- | ----------------------------- |
-| Duration                | 87.0 min                      |
-| Qwen Code version       | 0.15.10                       |
-| Model                   | qwen-latest-series beta model |
-| API responses           | 380                           |
-| Tool-call telemetry     | 507 events                    |
-| MCP tool-call telemetry | 4 events                      |
-| Subagent API responses  | 313                           |
-| Root API responses      | 67                            |
-| Root prompt growth      | 38,622 -> 168,555 tokens      |
-| Max prompt tokens       | 168,555                       |
-| Total response tokens   | 31.28M                        |
+| Signal                      | Value                         |
+| --------------------------- | ----------------------------- |
+| Duration                    | 87.0 min                      |
+| MariaDB Shell Agent version | 0.15.10                       |
+| Model                       | qwen-latest-series beta model |
+| API responses               | 380                           |
+| Tool-call telemetry         | 507 events                    |
+| MCP tool-call telemetry     | 4 events                      |
+| Subagent API responses      | 313                           |
+| Root API responses          | 67                            |
+| Root prompt growth          | 38,622 -> 168,555 tokens      |
+| Max prompt tokens           | 168,555                       |
+| Total response tokens       | 31.28M                        |
 
 This shape does not support MCP as the primary OOM cause for this case. Only
 4 of 507 tool-call telemetry events were MCP, and all four recorded

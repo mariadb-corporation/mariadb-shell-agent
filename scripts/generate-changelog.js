@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -230,7 +231,7 @@ export function formatRelease(release) {
 
 const HEADER = `# Changelog
 
-All notable changes to [Qwen Code](https://github.com/QwenLM/qwen-code) are
+All notable changes to [MariaDB Shell Agent](https://github.invalid/QwenLM/qwen-code) are
 documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
@@ -239,7 +240,7 @@ and the project follows
 are listed; nightly and preview pre-releases are intentionally omitted.
 
 > **This file is generated automatically** from
-> [GitHub Releases](https://github.com/QwenLM/qwen-code/releases). Do not edit it
+> [GitHub Releases](https://github.invalid/QwenLM/qwen-code/releases). Do not edit it
 > by hand — run \`npm run changelog\` to regenerate.
 `;
 

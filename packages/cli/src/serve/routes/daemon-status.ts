@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -108,7 +109,7 @@ export function registerDaemonStatusRoutes(
       );
     } catch (err) {
       writeStderrLine(
-        `qwen serve: /daemon/status failed: ${err instanceof Error ? err.message : String(err)}`,
+        `mariadb-shell-agent serve: /daemon/status failed: ${err instanceof Error ? err.message : String(err)}`,
       );
       res.status(500).json({
         error: 'Failed to build daemon status',

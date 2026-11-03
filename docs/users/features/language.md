@@ -1,16 +1,16 @@
 # Internationalization (i18n) & Language
 
-Qwen Code is built for multilingual workflows: it supports UI localization (i18n/l10n) in the CLI, lets you choose the assistant output language, and allows custom UI language packs.
+MariaDB Shell Agent is built for multilingual workflows: it supports UI localization (i18n/l10n) in the CLI, lets you choose the assistant output language, and allows custom UI language packs.
 
 ## Overview
 
-From a user point of view, Qwen Code’s “internationalization” spans multiple layers:
+From a user point of view, MariaDB Shell Agent’s “internationalization” spans multiple layers:
 
-| Capability / Setting     | What it controls                                                       | Where stored                 |
-| ------------------------ | ---------------------------------------------------------------------- | ---------------------------- |
-| `/language ui`           | Terminal UI text (menus, system messages, prompts)                     | `~/.qwen/settings.json`      |
-| `/language output`       | Language the AI responds in (an output preference, not UI translation) | `~/.qwen/output-language.md` |
-| Custom UI language packs | Overrides/extends built-in UI translations                             | `~/.qwen/locales/*.js`       |
+| Capability / Setting     | What it controls                                                       | Where stored                                |
+| ------------------------ | ---------------------------------------------------------------------- | ------------------------------------------- |
+| `/language ui`           | Terminal UI text (menus, system messages, prompts)                     | `~/.mariadb-shell-agent/settings.json`      |
+| `/language output`       | Language the AI responds in (an output preference, not UI translation) | `~/.mariadb-shell-agent/output-language.md` |
+| Custom UI language packs | Overrides/extends built-in UI translations                             | `~/.mariadb-shell-agent/locales/*.js`       |
 
 ## UI Language
 
@@ -46,7 +46,7 @@ Aliases are also supported:
 
 ### Auto-detection
 
-On first startup, Qwen Code detects your system locale and sets the UI language automatically.
+On first startup, MariaDB Shell Agent detects your system locale and sets the UI language automatically.
 
 Detection priority:
 
@@ -61,11 +61,11 @@ The LLM output language controls what language the AI assistant responds in, reg
 
 ### How It Works
 
-The LLM output language is controlled by a rule file at `~/.qwen/output-language.md`. This file is automatically included in the LLM's context during startup, instructing it to respond in the specified language.
+The LLM output language is controlled by a rule file at `~/.mariadb-shell-agent/output-language.md`. This file is automatically included in the LLM's context during startup, instructing it to respond in the specified language.
 
 ### Auto-detection
 
-On first startup, if no `output-language.md` file exists, Qwen Code automatically creates one based on your system locale. For example:
+On first startup, if no `output-language.md` file exists, MariaDB Shell Agent automatically creates one based on your system locale. For example:
 
 - System locale `zh` creates a rule for Chinese responses
 - System locale `en` creates a rule for English responses
@@ -91,12 +91,12 @@ Any language name works. The LLM will be instructed to respond in that language.
 
 > [!note]
 >
-> After changing the output language, restart Qwen Code for the change to take effect.
+> After changing the output language, restart MariaDB Shell Agent for the change to take effect.
 
 ### File Location
 
 ```
-~/.qwen/output-language.md
+~/.mariadb-shell-agent/output-language.md
 ```
 
 ## Configuration
@@ -117,17 +117,17 @@ This influences auto-detection on first startup (if you haven’t set a UI langu
 
 ## Custom Language Packs
 
-For UI translations, you can create custom language packs in `~/.qwen/locales/`:
+For UI translations, you can create custom language packs in `~/.mariadb-shell-agent/locales/`:
 
-- Example: `~/.qwen/locales/es.js` for Spanish
-- Example: `~/.qwen/locales/fr.js` for French
+- Example: `~/.mariadb-shell-agent/locales/es.js` for Spanish
+- Example: `~/.mariadb-shell-agent/locales/fr.js` for French
 
 User directory takes precedence over built-in translations.
 
 > [!tip]
 >
 > Contributions are welcome! If you’d like to improve built-in translations or add new languages.
-> For a concrete example, see [PR #1238: feat(i18n): add Russian language support](https://github.com/QwenLM/qwen-code/pull/1238).
+> For a concrete example, see [PR #1238: feat(i18n): add Russian language support](https://github.invalid/QwenLM/qwen-code/pull/1238).
 
 ### Maintaining `zh-TW` (Traditional Chinese for Taiwan)
 
@@ -155,7 +155,7 @@ The `check-i18n` script (run in CI via `npm run check-i18n`) will fail the build
 ### Language Pack Format
 
 ```javascript
-// ~/.qwen/locales/es.js
+// ~/.mariadb-shell-agent/locales/es.js
 export default {
   Hello: 'Hola',
   Settings: 'Configuracion',

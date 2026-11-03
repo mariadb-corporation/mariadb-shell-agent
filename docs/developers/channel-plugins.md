@@ -1,6 +1,6 @@
 # Channel Plugin Developer Guide
 
-A channel plugin connects Qwen Code to a messaging platform. It's packaged as an [extension](../users/extension/introduction) and loaded at startup. For user-facing docs on installing and configuring plugins, see [Plugins](../users/features/channels/plugins).
+A channel plugin connects MariaDB Shell Agent to a messaging platform. It's packaged as an [extension](../users/extension/introduction) and loaded at startup. For user-facing docs on installing and configuring plugins, see [Plugins](../users/features/channels/plugins).
 
 ## How It Fits Together
 
@@ -12,16 +12,16 @@ ChannelBase  →  gates → commands → routing → ChannelAgentBridge.prompt()
 ChannelBase  →  calls your sendMessage() with the agent's response
 ```
 
-`ChannelAgentBridge` is the adapter-facing bridge contract. The current standalone `qwen channel start` path provides an `AcpBridge`, but plugin code should type constructor parameters as `ChannelAgentBridge` so the same adapter can run behind other bridge implementations later.
+`ChannelAgentBridge` is the adapter-facing bridge contract. The current standalone `mariadb-shell-agent channel start` path provides an `AcpBridge`, but plugin code should type constructor parameters as `ChannelAgentBridge` so the same adapter can run behind other bridge implementations later.
 
-Migration note for existing TypeScript plugins: if your adapter constructor or factory explicitly types `bridge` as `AcpBridge`, change that annotation to `ChannelAgentBridge` and keep using only the methods exposed by that contract. JavaScript plugins are unaffected at runtime, and standalone `qwen channel start` still passes the current `AcpBridge` implementation.
+Migration note for existing TypeScript plugins: if your adapter constructor or factory explicitly types `bridge` as `AcpBridge`, change that annotation to `ChannelAgentBridge` and keep using only the methods exposed by that contract. JavaScript plugins are unaffected at runtime, and standalone `mariadb-shell-agent channel start` still passes the current `AcpBridge` implementation.
 
 ## Runtime Modes
 
 The same plugin adapter can be hosted by either channel runtime:
 
-- `qwen channel start [name]` is the standalone ACP-backed service. It still uses `AcpBridge` and remains the stable command for running channels outside a daemon.
-- `qwen serve --channel <name>` and repeatable `--channel` flags start experimental daemon-managed channel workers. Named channels are grouped by owning workspace, with one worker per owning runtime. `--channel all` intentionally starts only the primary workspace's configured channels. Workers are owned by `qwen serve`, connect to that daemon through the SDK, and pass adapters a `ChannelAgentBridge` facade backed by `DaemonChannelBridge`.
+- `mariadb-shell-agent channel start [name]` is the standalone ACP-backed service. It still uses `AcpBridge` and remains the stable command for running channels outside a daemon.
+- `mariadb-shell-agent serve --channel <name>` and repeatable `--channel` flags start experimental daemon-managed channel workers. Named channels are grouped by owning workspace, with one worker per owning runtime. `--channel all` intentionally starts only the primary workspace's configured channels. Workers are owned by `mariadb-shell-agent serve`, connect to that daemon through the SDK, and pass adapters a `ChannelAgentBridge` facade backed by `DaemonChannelBridge`.
 
 Daemon-managed channels inherit the daemon's lifecycle and status reporting. They are intentionally out-of-process so adapter or platform SDK failures do not crash the daemon. Every named channel must resolve to exactly one registered, trusted workspace; its worker receives that runtime's canonical cwd and environment overlay. A user/system channel with no cwd is ambiguous when several workspaces are registered, while a channel in a workspace-local settings file belongs to that workspace by default. `--channel all` remains primary-only and cannot be combined with named selections.
 

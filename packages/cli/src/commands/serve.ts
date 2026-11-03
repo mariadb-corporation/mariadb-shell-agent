@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,9 +12,9 @@ import type { RunHandle } from '../serve/run-qwen-serve.js';
 import { normalizeServeChannelSelection } from '../serve/channel-selection.js';
 // Type-only imports — no runtime cost. The serve module pulls in express +
 // body-parser + qs + the daemon transport stack; static-importing it from
-// here would tax every `qwen` invocation (interactive, mcp, channel, etc.)
+// here would tax every `mariadb-shell-agent` invocation (interactive, mcp, channel, etc.)
 // with ~50ms of cold ESM resolution. The runtime import is deferred to the
-// handler below so it only loads when the user actually runs `qwen serve`.
+// handler below so it only loads when the user actually runs `mariadb-shell-agent serve`.
 import { writeStderrLine, writeStdoutLine } from '../utils/stdioHelpers.js';
 import { DEFAULT_RING_SIZE } from '@qwen-code/acp-bridge/eventBus';
 import {
@@ -195,7 +196,7 @@ export async function maybeOpenWebShellBrowser(
     await handle.runtimeReady;
   } catch (runtimeErr) {
     writeStderrLine(
-      `qwen serve: Web Shell runtime not ready; skipping --open: ${
+      `mariadb-shell-agent serve: Web Shell runtime not ready; skipping --open: ${
         runtimeErr instanceof Error ? runtimeErr.message : String(runtimeErr)
       }`,
     );
@@ -220,7 +221,7 @@ export async function maybeOpenWebShellBrowser(
     }
     if (handle.resolvedToken) {
       writeStderrLine(
-        'qwen serve: --open passes the token in the browser launch command ' +
+        'mariadb-shell-agent serve: --open passes the token in the browser launch command ' +
           '(visible via `ps` / /proc); on a multi-user host open the URL manually instead.',
       );
     }
@@ -231,7 +232,7 @@ export async function maybeOpenWebShellBrowser(
         ? `. Please open this URL manually: ${target.toString()}`
         : '';
     writeStderrLine(
-      `qwen serve: failed to open browser: ${browserErr instanceof Error ? browserErr.message : String(browserErr)}${manualUrl}`,
+      `mariadb-shell-agent serve: failed to open browser: ${browserErr instanceof Error ? browserErr.message : String(browserErr)}${manualUrl}`,
     );
   }
 }
@@ -320,7 +321,7 @@ function primaryWorkspaceArg(
 export const serveCommand: CommandModule<unknown, ServeArgs> = {
   command: 'serve',
   describe:
-    'Run Qwen Code as a local HTTP daemon (Stage 1 experimental: --http-bridge)',
+    'Run MariaDB Shell Agent as a local HTTP daemon (Stage 1 experimental: --http-bridge)',
   builder: (yargs: Argv) =>
     yargs
       .option('port', {
@@ -504,7 +505,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       .option('join', {
         type: 'string',
         description:
-          'Join another Qwen Code as a runtime, with the one-line link it shows under Agent → Runtime → Add runtime.',
+          'Join another MariaDB Shell Agent as a runtime, with the one-line link it shows under Agent → Runtime → Add runtime.',
       })
       .option('agent-host-server', {
         type: 'string',
@@ -628,7 +629,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
         type: 'boolean',
         default: true,
         description:
-          'HTTP bridge mode: attempt to preheat the primary `qwen --acp` child; ' +
+          'HTTP bridge mode: attempt to preheat the primary `mariadb-shell-agent --acp` child; ' +
           'trusted secondaries start one on demand. Stage 2 native in-process mode is ' +
           'not yet implemented; this flag will become opt-in then.',
       })
@@ -901,7 +902,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
         process.exit(await handle.finished);
       } catch (error) {
         writeStderrLine(
-          `qwen serve: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: ${error instanceof Error ? error.message : String(error)}`,
         );
         process.exit(1);
       }
@@ -953,13 +954,15 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
         process.exit(await handle.finished);
       } catch (error) {
         writeStderrLine(
-          `qwen serve: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: ${error instanceof Error ? error.message : String(error)}`,
         );
         process.exit(1);
       }
     }
     if (argv['managed-data-dir'] !== undefined) {
-      writeStderrLine('qwen serve: --managed-data-dir requires --managed.');
+      writeStderrLine(
+        'mariadb-shell-agent serve: --managed-data-dir requires --managed.',
+      );
       process.exit(1);
     }
     const managedRuntimeBrokerUrl =
@@ -975,7 +978,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
     delete process.env['QWEN_AGENT_HOST_ENROLLMENT_TOKEN'];
     if (!argv['http-bridge']) {
       writeStderrLine(
-        'qwen serve: --no-http-bridge (native mode) is not yet implemented; ' +
+        'mariadb-shell-agent serve: --no-http-bridge (native mode) is not yet implemented; ' +
           'falling back to http-bridge.',
       );
     }
@@ -985,7 +988,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       // operators toward the env-var path which uses
       // `/proc/<pid>/environ` (owner-only).
       writeStderrLine(
-        'qwen serve: --token is visible in the process command line; ' +
+        'mariadb-shell-agent serve: --token is visible in the process command line; ' +
           'prefer the QWEN_SERVER_TOKEN env var for any non-trivial ' +
           'deployment.',
       );
@@ -993,7 +996,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
     if (argv['managed-runtime-broker-token'] !== undefined) {
       // Same exposure for the Broker credential the Harness holds.
       writeStderrLine(
-        'qwen serve: --managed-runtime-broker-token is visible in the ' +
+        'mariadb-shell-agent serve: --managed-runtime-broker-token is visible in the ' +
           'process command line; prefer the ' +
           'QWEN_MANAGED_RUNTIME_BROKER_TOKEN env var.',
       );
@@ -1003,7 +1006,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       channelSelection = normalizeServeChannelSelection(argv.channel);
     } catch (err) {
       writeStderrLine(
-        `qwen serve: ${err instanceof Error ? err.message : String(err)}`,
+        `mariadb-shell-agent serve: ${err instanceof Error ? err.message : String(err)}`,
       );
       process.exit(1);
     }
@@ -1020,14 +1023,14 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
         mcpClientBudget <= 0
       ) {
         writeStderrLine(
-          'qwen serve: --mcp-client-budget must be a positive integer.',
+          'mariadb-shell-agent serve: --mcp-client-budget must be a positive integer.',
         );
         process.exit(1);
       }
     }
     if (mcpBudgetMode === 'enforce' && mcpClientBudget === undefined) {
       writeStderrLine(
-        'qwen serve: --mcp-budget-mode=enforce requires --mcp-client-budget=N.',
+        'mariadb-shell-agent serve: --mcp-budget-mode=enforce requires --mcp-client-budget=N.',
       );
       process.exit(1);
     }
@@ -1049,7 +1052,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
         maxPendingPromptsPerSession < 0)
     ) {
       writeStderrLine(
-        'qwen serve: --max-pending-prompts-per-session must be a non-negative integer (0 / Infinity = unlimited).',
+        'mariadb-shell-agent serve: --max-pending-prompts-per-session must be a non-negative integer (0 / Infinity = unlimited).',
       );
       process.exit(1);
     }
@@ -1058,7 +1061,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       // policy in stderr (journald / docker logs) so operators don't
       // have to parse /capabilities or /workspace/mcp to confirm it.
       writeStderrLine(
-        `qwen serve: --mcp-client-budget=${mcpClientBudget} mode=${resolvedMcpMode}` +
+        `mariadb-shell-agent serve: --mcp-client-budget=${mcpClientBudget} mode=${resolvedMcpMode}` +
           (resolvedMcpMode === 'enforce'
             ? ' (servers past the cap will be refused at discovery)'
             : resolvedMcpMode === 'warn'
@@ -1135,7 +1138,9 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
           value !== undefined &&
           (!Number.isFinite(value) || !Number.isInteger(value) || value <= 0)
         ) {
-          writeStderrLine(`qwen serve: ${name} must be a positive integer.`);
+          writeStderrLine(
+            `mariadb-shell-agent serve: ${name} must be a positive integer.`,
+          );
           process.exit(1);
         }
       }
@@ -1146,7 +1151,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
           rateLimitWindowMs < 1000)
       ) {
         writeStderrLine(
-          'qwen serve: --rate-limit-window-ms must be an integer >= 1000.',
+          'mariadb-shell-agent serve: --rate-limit-window-ms must be an integer >= 1000.',
         );
         process.exit(1);
       }
@@ -1359,7 +1364,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
           throw error;
         }
       }
-      // Saved Host connections (`qwen agents join`) of every trusted
+      // Saved Host connections (`mariadb-shell-agent agents join`) of every trusted
       // workspace are restored by the daemon itself (serve/server.ts).
       // Open the Web Shell in a browser once the listener is up (best-effort;
       // never throws — see maybeOpenWebShellBrowser).
@@ -1377,7 +1382,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       await maybeOpenWebShellBrowser(handle, open, openWithAuth);
     } catch (err) {
       writeStderrLine(
-        `qwen serve: ${err instanceof Error ? err.message : String(err)}`,
+        `mariadb-shell-agent serve: ${err instanceof Error ? err.message : String(err)}`,
       );
       process.exit(1);
     }

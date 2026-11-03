@@ -232,7 +232,7 @@ describe('React performance measure guard', () => {
 });
 
 describe('brand pre-paint script', () => {
-  const BUILT_IN_TITLE = 'Qwen Code Web chat';
+  const BUILT_IN_TITLE = 'MariaDB Shell Agent Web chat';
   const BUILT_IN_ICON = 'data:image/svg+xml,BUILT-IN';
 
   function runBrandScript(stored: string | null): {
@@ -302,7 +302,9 @@ describe('built-in brand document contract', () => {
   // pre-paint script and main.tsx fall back to, so they are pinned here rather
   // than left to a visual diff.
   it('ships the built-in document title', () => {
-    expect(readIndexHtml()).toContain('<title>Qwen Code Web chat</title>');
+    expect(readIndexHtml()).toContain(
+      '<title>MariaDB Shell Agent Web chat</title>',
+    );
   });
 
   it('ships the built-in favicon as an inline data URI', () => {
@@ -311,7 +313,7 @@ describe('built-in brand document contract', () => {
 
     expect(href?.startsWith('data:image/svg+xml,')).toBe(true);
     // The Qwen mark's blue, percent-encoded.
-    expect(href).toContain('%23082DFF');
+    expect(href).toContain('viewBox%3D%220%200%201024%201024%22');
   });
 
   // The brand script swaps the icon link's href, so it must run after that

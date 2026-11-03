@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Provider registry — imports all provider definitions and assembles the
@@ -16,6 +17,7 @@ import { tokenPlanProvider } from './presets/alibaba-token-plan.js';
 import { alibabaStandardProvider } from './presets/alibaba-standard.js';
 import { openRouterProvider } from './presets/openrouter.js';
 import { requestyProvider } from './presets/requesty.js';
+import { openaiProvider } from './presets/openai.js';
 import { deepseekProvider } from './presets/deepseek.js';
 import { grokProvider } from './presets/grok.js';
 import { minimaxProvider } from './presets/minimax.js';
@@ -34,6 +36,7 @@ export {
   alibabaStandardProvider,
   openRouterProvider,
   requestyProvider,
+  openaiProvider,
   deepseekProvider,
   grokProvider,
   minimaxProvider,
@@ -71,19 +74,92 @@ export const ALL_PROVIDERS: readonly ProviderConfig[] = [
   modelscopeProvider,
   openRouterProvider,
   requestyProvider,
+  openaiProvider,
   customProvider,
 ];
 
 /** Providers grouped by uiGroup. */
-export const QWENCLOUD_PROVIDERS = ALL_PROVIDERS.filter(
-  (p) => p.uiGroup === 'qwencloud',
-);
-export const ALIBABA_PROVIDERS = ALL_PROVIDERS.filter(
-  (p) => p.uiGroup === 'alibaba',
-);
-export const THIRD_PARTY_PROVIDERS = ALL_PROVIDERS.filter(
-  (p) => p.uiGroup === 'third-party',
-);
+export const QWENCLOUD_PROVIDERS = ALL_PROVIDERS.filter((p) =>
+  [
+    'openrouter',
+    'requesty',
+    'openai',
+    'grok',
+    'custom-openai-compatible',
+  ].includes(p.id),
+)
+  .sort(
+    (a, b) =>
+      [
+        'openrouter',
+        'requesty',
+        'openai',
+        'grok',
+        'custom-openai-compatible',
+      ].indexOf(a.id) -
+      [
+        'openrouter',
+        'requesty',
+        'openai',
+        'grok',
+        'custom-openai-compatible',
+      ].indexOf(b.id),
+  )
+  .filter((p) => p.uiGroup === 'qwencloud');
+export const ALIBABA_PROVIDERS = ALL_PROVIDERS.filter((p) =>
+  [
+    'openrouter',
+    'requesty',
+    'openai',
+    'grok',
+    'custom-openai-compatible',
+  ].includes(p.id),
+)
+  .sort(
+    (a, b) =>
+      [
+        'openrouter',
+        'requesty',
+        'openai',
+        'grok',
+        'custom-openai-compatible',
+      ].indexOf(a.id) -
+      [
+        'openrouter',
+        'requesty',
+        'openai',
+        'grok',
+        'custom-openai-compatible',
+      ].indexOf(b.id),
+  )
+  .filter((p) => p.uiGroup === 'alibaba');
+export const THIRD_PARTY_PROVIDERS = ALL_PROVIDERS.filter((p) =>
+  [
+    'openrouter',
+    'requesty',
+    'openai',
+    'grok',
+    'custom-openai-compatible',
+  ].includes(p.id),
+)
+  .sort(
+    (a, b) =>
+      [
+        'openrouter',
+        'requesty',
+        'openai',
+        'grok',
+        'custom-openai-compatible',
+      ].indexOf(a.id) -
+      [
+        'openrouter',
+        'requesty',
+        'openai',
+        'grok',
+        'custom-openai-compatible',
+      ].indexOf(b.id),
+  )
+  .filter((p) => p.uiGroup === 'third-party');
 
 export function findProviderById(id: string): ProviderConfig | undefined {
   return ALL_PROVIDERS.find((p) => p.id === id);

@@ -128,7 +128,7 @@ non-cache follow-up input, and snapshot-only reactive overflow reseeding with
 user/fork turn classification, raw shallow indexes/writeback, and actual summary,
 recap, and title requests. Existing one-shot helper tests remain applicable.
 Tests must use the active project path
-`.qwen/memory`, not `.qwen/memories`, when seeding real runtime catalogs.
+`.mariadb-shell-agent/memory`, not `.mariadb-shell-agent/memories`, when seeding real runtime catalogs.
 
 Run from `packages/core`:
 

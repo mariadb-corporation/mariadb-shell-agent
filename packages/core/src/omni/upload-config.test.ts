@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,7 +14,8 @@ import {
   OmniUploadConfigError,
 } from './upload-config.js';
 
-const DASH_SCOPE_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+const DASH_SCOPE_BASE_URL =
+  'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
 
 describe('normalizeDedicatedOmniUploadConfig', () => {
   it('returns undefined when no dedicated upload setting is present', () => {

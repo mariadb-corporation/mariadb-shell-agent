@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +9,7 @@
  * @fileoverview Host side of the Agent Host protocol (v2).
  *
  * This daemon joins a coordinator's workspace as a runtime: it enrolls once
- * (credential under `~/.qwen/agent-hosts/`, 0600), heartbeats every 5 s with
+ * (credential under `~/.mariadb-shell-agent/agent-hosts/`, 0600), heartbeats every 5 s with
  * its program probe and the leases it holds, long-polls for session turns and
  * runs up to {@link MAX_CONCURRENT_HOST_TURNS} at once through the same
  * adapters the coordinator uses locally. Adapter events stream back in
@@ -610,7 +611,7 @@ async function connectAgentHost(
   let probes: HostProgramProbe[] = await getHostProgramProbe().catch(
     (error: unknown) => {
       writeStderrLine(
-        `qwen serve: Agent Host program probe failed: ${extractErrorMessage(error)}`,
+        `mariadb-shell-agent serve: Agent Host program probe failed: ${extractErrorMessage(error)}`,
       );
       return [];
     },
@@ -639,10 +640,10 @@ async function connectAgentHost(
   assertOpen();
   const turns = new Map<string, HostTurn>();
   /**
-   * `session_send` for remote `qwen` turns. The hidden session outlives a run
+   * `session_send` for remote `mariadb-shell-agent` turns. The hidden session outlives a run
    * and its MCP servers are fixed when it is (re)created, so the relay token
    * belongs to the (chat session, agent) binding, like the coordinator's own
-   * qwen agents (see qwen-acp.ts); posts go to that binding's current turn.
+   * mariadb-shell-agent agents (see qwen-acp.ts); posts go to that binding's current turn.
    */
   const qwenRelayBindings = new Map<
     string,
@@ -787,7 +788,7 @@ async function connectAgentHost(
     turn.waiters.clear();
     if (cancelled) {
       writeStderrLine(
-        `qwen serve: run ${turn.assignment.runId} was stopped on the coordinator.`,
+        `mariadb-shell-agent serve: run ${turn.assignment.runId} was stopped on the coordinator.`,
       );
     }
     refreshDecisionPoll();
@@ -955,7 +956,7 @@ async function connectAgentHost(
         // Resending gets the same answer (a batch too large, an event the
         // coordinator does not accept); drop it so the run is not stuck.
         writeStderrLine(
-          `qwen serve: coordinator refused agent events; dropped ${turn.inflight?.events.length ?? 0}: ${extractErrorMessage(error)}`,
+          `mariadb-shell-agent serve: coordinator refused agent events; dropped ${turn.inflight?.events.length ?? 0}: ${extractErrorMessage(error)}`,
         );
         turn.inflight = undefined;
         if (turn.pending.length > 0) scheduleFlush(turn, 0);
@@ -1053,7 +1054,7 @@ async function connectAgentHost(
       if (Date.now() - turn.renewedAt >= TURN_LEASE_MS) return false;
       if (Date.now() >= deadline) {
         writeStderrLine(
-          'qwen serve: could not deliver all agent events; posting the result.',
+          'mariadb-shell-agent serve: could not deliver all agent events; posting the result.',
         );
         return true;
       }
@@ -1089,12 +1090,12 @@ async function connectAgentHost(
         if (status === 409) {
           if (isCancellation(error)) {
             writeStderrLine(
-              `qwen serve: run ${turn.assignment.runId} was stopped on the coordinator; result discarded.`,
+              `mariadb-shell-agent serve: run ${turn.assignment.runId} was stopped on the coordinator; result discarded.`,
             );
             return;
           }
           writeStderrLine(
-            `qwen serve: discarded agent turn result (${message}).`,
+            `mariadb-shell-agent serve: discarded agent turn result (${message}).`,
           );
           return;
         }
@@ -1104,7 +1105,7 @@ async function connectAgentHost(
           // the lease runs out.
           if (result.result.status === 'failed') {
             writeStderrLine(
-              `qwen serve: agent turn result rejected; giving up: ${message}`,
+              `mariadb-shell-agent serve: agent turn result rejected; giving up: ${message}`,
             );
             return;
           }
@@ -1125,7 +1126,7 @@ async function connectAgentHost(
           continue;
         }
         writeStderrLine(
-          `qwen serve: agent turn result upload failed; retrying: ${message}`,
+          `mariadb-shell-agent serve: agent turn result upload failed; retrying: ${message}`,
         );
         // The heartbeat keeps renewing this run's lease meanwhile.
         await delay(RETRY_MS, undefined, { signal: stop.signal });
@@ -1165,7 +1166,7 @@ async function connectAgentHost(
               assignment.sessionId,
             )
           : undefined);
-      // A `qwen` turn runs in a hidden `sourceType: 'agent'` session on this
+      // A `mariadb-shell-agent` turn runs in a hidden `sourceType: 'agent'` session on this
       // Host's own bridge. The ACP child authorizes that session only through
       // a session-agents binding naming it, and the agent is not in this
       // Host's roster, so write a binding that carries the coordinator's
@@ -1232,7 +1233,7 @@ async function connectAgentHost(
         await settleRemoteQwenTurn(options.workspaceCwd, assignment).catch(
           (error: unknown) =>
             writeStderrLine(
-              `qwen serve: could not settle remote agent binding for run ${assignment.runId}: ${extractErrorMessage(error)}`,
+              `mariadb-shell-agent serve: could not settle remote agent binding for run ${assignment.runId}: ${extractErrorMessage(error)}`,
             ),
         );
       }
@@ -1281,7 +1282,7 @@ async function connectAgentHost(
       applyDecisions(response.decisions);
       if (offline) {
         writeStderrLine(
-          `qwen serve: Agent Host ${activeCredential.hostId} reconnected.`,
+          `mariadb-shell-agent serve: Agent Host ${activeCredential.hostId} reconnected.`,
         );
       }
       offline = false;
@@ -1308,7 +1309,7 @@ async function connectAgentHost(
       if (stop.signal.aborted) return false;
       if (!offline) {
         writeStderrLine(
-          `qwen serve: Agent Host heartbeat failed: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: Agent Host heartbeat failed: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
       offline = true;
@@ -1325,7 +1326,7 @@ async function connectAgentHost(
   const timer = setInterval(() => void heartbeat(), HEARTBEAT_MS);
   timer.unref?.();
   writeStderrLine(
-    `qwen serve: connected as Agent Host ${activeCredential.hostId} for ${options.workspaceId}.`,
+    `mariadb-shell-agent serve: connected as Agent Host ${activeCredential.hostId} for ${options.workspaceId}.`,
   );
 
   void (async () => {
@@ -1349,13 +1350,13 @@ async function connectAgentHost(
             // A v1 coordinator hands out thread runs this Host no longer
             // executes; the run's lease lapses there.
             writeStderrLine(
-              'qwen serve: the coordinator speaks an older Agent Host protocol; upgrade it to run agents on this Host.',
+              'mariadb-shell-agent serve: the coordinator speaks an older Agent Host protocol; upgrade it to run agents on this Host.',
             );
             await delay(25_000, undefined, { signal: stop.signal });
             continue;
           }
           writeStderrLine(
-            `qwen serve: Agent Host ${activeCredential.hostId} running ${assignment.agent.name} (${assignment.program}).`,
+            `mariadb-shell-agent serve: Agent Host ${activeCredential.hostId} running ${assignment.agent.name} (${assignment.program}).`,
           );
           const task: Promise<void> = runAssignment(assignment)
             .catch(async (error: unknown) => {
@@ -1368,7 +1369,7 @@ async function connectAgentHost(
               }
               if (!stop.signal.aborted) {
                 writeStderrLine(
-                  `qwen serve: agent turn failed: ${extractErrorMessage(error)}`,
+                  `mariadb-shell-agent serve: agent turn failed: ${extractErrorMessage(error)}`,
                 );
               }
             })
@@ -1388,7 +1389,7 @@ async function connectAgentHost(
             return;
           }
           writeStderrLine(
-            `qwen serve: Agent Host pickup failed: ${error instanceof Error ? error.message : String(error)}`,
+            `mariadb-shell-agent serve: Agent Host pickup failed: ${error instanceof Error ? error.message : String(error)}`,
           );
           await delay(RETRY_MS);
         }
@@ -1396,7 +1397,7 @@ async function connectAgentHost(
     } catch (error) {
       if (!options.generationGuard?.closed && !stop.signal.aborted) {
         writeStderrLine(
-          `qwen serve: Agent Host connection stopped: ${error instanceof Error ? error.message : String(error)}`,
+          `mariadb-shell-agent serve: Agent Host connection stopped: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     } finally {
@@ -1428,7 +1429,7 @@ async function connectAgentHost(
 }
 
 /**
- * Bind a coordinator's `qwen` turn to this Host's hidden agent session (see
+ * Bind a coordinator's `mariadb-shell-agent` turn to this Host's hidden agent session (see
  * `SessionAgentBinding.remotePersona`). The run entry has no lease: from this
  * daemon's point of view the turn executes locally.
  */

@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * `qwen agents join <link>`: make the running local `qwen serve` join a
+ * `mariadb-shell-agent agents join <link>`: make the running local `mariadb-shell-agent serve` join a
  * coordinator as an Agent Host, without restarting it. It calls the daemon's
  * own `POST /workspaces/<cwd>/agent/hosts/connect`; the daemon enrolls,
  * remembers the connection and reconnects after restarts.
@@ -142,7 +143,7 @@ export async function runAgentsJoin(
     target = parseJoinLink(argv.link);
   } catch {
     deps.err(
-      'qwen agents join expects the link shown by the coordinator, like https://host:4170/join/<workspace>.',
+      'mariadb-shell-agent agents join expects the link shown by the coordinator, like https://host:4170/join/<workspace>.',
     );
     return 1;
   }
@@ -184,9 +185,11 @@ export async function runAgentsJoin(
       signal: AbortSignal.timeout(60_000),
     });
   } catch {
-    deps.err(`No running qwen serve daemon answered at ${baseUrl}.`);
     deps.err(
-      `Start one that joins directly instead:\n  ${ENROLLMENT_TOKEN_ENV}=<token> qwen serve --join ${argv.link}${argv['allow-http'] ? ' --agent-host-allow-http' : ''}`,
+      `No running mariadb-shell-agent serve daemon answered at ${baseUrl}.`,
+    );
+    deps.err(
+      `Start one that joins directly instead:\n  ${ENROLLMENT_TOKEN_ENV}=<token> mariadb-shell-agent serve --join ${argv.link}${argv['allow-http'] ? ' --agent-host-allow-http' : ''}`,
     );
     return 1;
   }
@@ -224,7 +227,7 @@ export async function runAgentsJoin(
 export const joinCommand: CommandModule<unknown, JoinArgs> = {
   command: 'join <link>',
   describe:
-    'Join a coordinator as an Agent Host from the running local qwen serve (no restart)',
+    'Join a coordinator as an Agent Host from the running local mariadb-shell-agent serve (no restart)',
   builder: (yargs) =>
     yargs
       .positional('link', {

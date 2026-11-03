@@ -4,7 +4,7 @@
 
 ## 1. 状态与证据
 
-这是 [#13010](https://github.com/QwenLM/qwen-code/issues/13010) 的修复方案，
+这是 [#13010](https://github.invalid/QwenLM/qwen-code/issues/13010) 的修复方案，
 日期为 2026-10-08，已在本地工作区实施。第 9 节记录本机验证，
 不代表生产发布授权或 issue 已关闭。
 
@@ -12,7 +12,7 @@
 问题。这不代表运行时验收通过。
 
 已通过 `gh` 阅读 issue 及完整评论。历史证据是 `3da25b7c` 上的
-[O2 第 9 轮报告](https://github.com/QwenLM/qwen-code/pull/12894#issuecomment-5888143498)：
+[O2 第 9 轮报告](https://github.invalid/QwenLM/qwen-code/pull/12894#issuecomment-5888143498)：
 Shell 参数中的孤立代理项使两条捕获路径都被阻塞，同 Workspace 的第二个 Session
 在八分钟后仍收到 `workspace_busy`。应保留该报告及其日志链接。报告没有运行独立
 main 构建，因此不算当前 main 的复现。
@@ -158,10 +158,10 @@ reservation、prepare、start/execute 和 worker 副作用均为零。Runtime wa
 ## 6. 实施与验证计划
 
 实施前由只读 `test-engineer` 使用独立的真实 Java Store/Broker/Harness/worker
-环境，在当时 main 构建上复现。先尝试已安装的全局 `qwen`，private profile 不可达
+环境，在当时 main 构建上复现。先尝试已安装的全局 `mariadb-shell-agent`，private profile 不可达
 时记录 unavailable，不能记为基线通过。用确定性模型 fixture 分别覆盖 local capture
 与 O2；输入准入测试不要求真实 OSS bucket。保存第 9 轮日志和新 exact-head
-before/after 结果，将 E2E 计划与报告放入 `.qwen/e2e-tests/`。
+before/after 结果，将 E2E 计划与报告放入 `.mariadb-shell-agent/e2e-tests/`。
 
 主要实施/测试文件：
 
@@ -228,8 +228,8 @@ npx vitest run src/serve/hosted-shell-input.test.ts src/serve/hosted-hook-sessio
 | 1    | 新审计者 audit_round_1 发现外层检查前的顺序 Hook 传播（P1）和冷恢复丢失 callback 抑制（P2）。已补 Hosted 共用校验器、顺序前缀终态重建、持久 completion 判定，以及对应反例/兼容性见证。              | 两项均接受并修订；第 2 轮已独立复核。                              |
 | 2    | 新审计者 audit_round_2 独立核对 issue/源码，审计正向行为与反向兼容性/恢复反例。未发现新实质问题，第 1 轮修正已覆盖。报告保留事件返回形状和嵌套 PermissionRequest 的实施约束，不扩大合法 Hook 语义。 | 满足用户“无新问题”停止条件，结束审计循环（最多 7 轮，实际 2 轮）。 |
 
-本地审计报告：`.qwen/pr-reviews/issue-13010-design-round-1.md` 和
-`.qwen/pr-reviews/issue-13010-design-round-2.md`（git-ignored 工作产物）。
+本地审计报告：`.mariadb-shell-agent/pr-reviews/issue-13010-design-round-1.md` 和
+`.mariadb-shell-agent/pr-reviews/issue-13010-design-round-2.md`（git-ignored 工作产物）。
 
 ## 9. 实施与本机验证
 

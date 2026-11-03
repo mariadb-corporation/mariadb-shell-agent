@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review submit`: the only thing in this skill that writes to a pull
+// `mariadb-shell-agent review submit`: the only thing in this skill that writes to a pull
 // request.
 //
 // Step 7 has always opened with a posting gate — "posting is a public,
@@ -1039,8 +1040,8 @@ function submit(
   // the recorded binding, else the cwd probe — with four write-specific
   // disciplines:
   //  - The predicate is the CANONICAL Aone pair, not the family wildcard:
-  //    `*.alibaba-inc.com` also names GitHub Enterprise instances (an
-  //    org's `ghe.alibaba-inc.com`), and an irreversible write must not
+  //    `*.alibaba-inc.invalid` also names GitHub Enterprise instances (an
+  //    org's `ghe.alibaba-inc.invalid`), and an irreversible write must not
   //    take the a1 path on a family resemblance.
   //  - The ambient GH_HOST export is NEVER consulted here. It is a
   //    GitHub-ROUTING variable; a read would never detect Aone from it
@@ -1145,8 +1146,8 @@ function submit(
   }
   // The cwd arm probes the origin's host through the SAME canonical
   // predicate — it must not delegate to the registry's detection, which
-  // matches the `*.alibaba-inc.com` FAMILY wildcard: safe for reads, not
-  // for writes — an origin on an org GHE family host (ghe.alibaba-inc.com)
+  // matches the `*.alibaba-inc.invalid` FAMILY wildcard: safe for reads, not
+  // for writes — an origin on an org GHE family host (ghe.alibaba-inc.invalid)
   // would take the a1 path with nothing proving a canonical Aone target.
   // A family-only resemblance falls through to the gh path.
   const cwdOriginUrl = gitOpt('remote', 'get-url', 'origin');
@@ -1739,7 +1740,7 @@ function submit(
         `copy of each into its own thread. Thread replies that failed are ` +
         `named in that submit's output and re-ruled next round; they are ` +
         `not finished by a re-submit. A deliberate second review of the ` +
-        `same commit is the user's call — run \`qwen review cleanup ` +
+        `same commit is the user's call — run \`mariadb-shell-agent review cleanup ` +
         `pr-${args.pr}\` first. Nothing was written.`,
       'already-posted-this-commit',
     );
@@ -2413,7 +2414,7 @@ export const submitCommand: CommandModule = {
       .option('skill-args', {
         type: 'string',
         describe:
-          "Path to the CLI-written record of the review's invocation arguments (defaults to .qwen/tmp/qwen-skill-args-review.txt). Its `--comment` — or the standing `review.comment` setting — is what authorises a post. Deliberately NOT the parser's JSON output: that is a document the caller writes, and a caller that wants to post can write anything in it.",
+          "Path to the CLI-written record of the review's invocation arguments (defaults to .mariadb-shell-agent/tmp/qwen-skill-args-review.txt). Its `--comment` — or the standing `review.comment` setting — is what authorises a post. Deliberately NOT the parser's JSON output: that is a document the caller writes, and a caller that wants to post can write anything in it.",
       })
       .option('user-authorized', {
         type: 'boolean',
@@ -2424,7 +2425,7 @@ export const submitCommand: CommandModule = {
       .option('host', {
         type: 'string',
         describe:
-          'The host the target lives on. SELECTS the platform the write lands on: a canonical Aone host (code.alibaba-inc.com or gitlab.alibaba-inc.com) routes the post at a1, anything else at gh (a GitHub Enterprise host routes gh via GH_HOST). It is also the remedy the target-platform-unbound refusal names.',
+          'The host the target lives on. SELECTS the platform the write lands on: a canonical Aone host (code.alibaba-inc.invalid or gitlab.alibaba-inc.invalid) routes the post at a1, anything else at gh (a GitHub Enterprise host routes gh via GH_HOST). It is also the remedy the target-platform-unbound refusal names.',
       })
       .option('dry-run', {
         type: 'boolean',

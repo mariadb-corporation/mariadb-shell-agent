@@ -8,7 +8,7 @@
 [双引擎 owner 选择](./2026-09-26-paired-engine-owner-selection.zh-CN.md)（B2a）与
 [双引擎工作区 runtime 身份](./2026-09-26-paired-engine-workspace-runtime-identity.zh-CN.md)
 （B2b 第一部分），并落实 #12737 中
-[Q2/Q3 回复](https://github.com/QwenLM/qwen-code/issues/12737#issuecomment-5846370487)
+[Q2/Q3 回复](https://github.invalid/QwenLM/qwen-code/issues/12737#issuecomment-5846370487)
 确定的隔离恢复决策。带确认的工作区变更下发（B2b 第二部分）与宿主接线（B2d）仍是独立
 切片。目前没有普通宿主构造双引擎 Bridge。#12795 评审要求在 B2d 之前完成的两项后续——隔离
 期间的后台通知，以及退出确认的起算点——已体现在下文中。

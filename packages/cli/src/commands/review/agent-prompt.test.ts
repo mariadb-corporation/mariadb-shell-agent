@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -87,7 +88,8 @@ import {
 } from './lib/prompt-record.js';
 
 const PLAN = {
-  diffPathAbsolute: '/abs/.qwen/tmp/qwen-review-pr-6771-diff.txt',
+  diffPathAbsolute:
+    '/abs/.mariadb-shell-agent/tmp/qwen-review-pr-6771-diff.txt',
   chunks: [
     {
       id: 13,
@@ -1610,7 +1612,7 @@ describe('--roster — every prompt the plan requires, in one call', () => {
       git('commit', '-qm', 'head');
       // The review worktree is a LINKED worktree — the production shape, and
       // the residue probe's identity gate fails closed for anything else.
-      const wt = join(dir, '.qwen', 'tmp', 'review-pr-9207');
+      const wt = join(dir, '.mariadb-shell-agent', 'tmp', 'review-pr-9207');
       git('worktree', 'add', '--detach', '-q', wt, 'HEAD');
       // What the live run's auditor read: a probe's mutant, and a probe file.
       writeFileSync(join(wt, 'a.ts'), 'export const x = 2;\n');
@@ -1728,7 +1730,7 @@ describe('--roster — every prompt the plan requires, in one call', () => {
         git('commit', '-qm', 'head');
         const sha64 = git('rev-parse', 'HEAD').trim();
         expect(sha64).toMatch(/^[0-9a-f]{64}$/);
-        const wt = join(dir, '.qwen', 'tmp', 'review-pr-sha256');
+        const wt = join(dir, '.mariadb-shell-agent', 'tmp', 'review-pr-sha256');
         git('worktree', 'add', '--detach', '-q', wt, 'HEAD');
         const plan = join(dir, 'plan.json');
         writeFileSync(
@@ -1954,7 +1956,10 @@ describe('--roster — every prompt the plan requires, in one call', () => {
       const plan = join(dir, 'plan.json');
       writeFileSync(
         plan,
-        JSON.stringify({ ...PLAN, worktreePath: '.qwen/tmp/review-pr-1' }),
+        JSON.stringify({
+          ...PLAN,
+          worktreePath: '.mariadb-shell-agent/tmp/review-pr-1',
+        }),
       );
       (agentPromptCommand.handler as (a: unknown) => void)({
         plan,
@@ -2280,7 +2285,7 @@ describe('--roster — every prompt the plan requires, in one call', () => {
     // must be there, not just 400 lines back in SKILL.md.
     const dir = mkdtempSync(join(tmpdir(), 'ap-roster-wt-'));
     try {
-      const wt = '.qwen/tmp/review-pr-9999';
+      const wt = '.mariadb-shell-agent/tmp/review-pr-9999';
       const plan = join(dir, 'plan.json');
       writeFileSync(
         plan,
@@ -2842,7 +2847,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     ...PLAN,
     prNumber: '6766',
     ownerRepo: 'QwenLM/qwen-code',
-    worktreePath: '.qwen/tmp/review-pr-6766',
+    worktreePath: '.mariadb-shell-agent/tmp/review-pr-6766',
     // A real merge base is `git merge-base` output: a full sha. The old
     // 6-char fixture sat below git's own abbreviation floor, so it
     // modelled a value the pipeline cannot produce.
@@ -3372,7 +3377,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     expect(p).toContain('--label verify--round-2--deadbeef1234');
     // A relative --worktree would resolve against the agent's cwd, which IS the
     // worktree — the trap Agent 7's block already documents.
-    expect(p).not.toMatch(/--worktree \.qwen/);
+    expect(p).not.toMatch(/--worktree \.mariadb-shell-agent/);
     // And the ESCAPE, not just the wrap: a plain `'…'` wrap passes this
     // fixture and still breaks on `~/Documents/John's Projects/…`, which is
     // the workspace shape `shellQuotePath` exists for.
@@ -3536,7 +3541,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
       }),
     ).not.toContain('--fetched-sha');
     // No worktree, no copy — prose-exec owes its WRITES a tree, and a local
-    // or cross-repo review has none. (The brief BODY names `qwen review
+    // or cross-repo review has none. (The brief BODY names `mariadb-shell-agent review
     // scratch-tree` unconditionally, so the pin targets the welded command.)
     expect(buildRoleBrief(PLAN, 'prose-exec')).not.toContain(
       '"${QWEN_CODE_CLI:-qwen}" review scratch-tree --worktree',
@@ -3847,7 +3852,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
   it('pins Agent 7 to the PR worktree and hands it the test-efficacy probe', () => {
     const planPath = resolve('/tmp/plan.json');
     const p = buildRoleBrief(PR_PLAN, '7', { planPath });
-    expect(p).toContain('.qwen/tmp/review-pr-6766');
+    expect(p).toContain('.mariadb-shell-agent/tmp/review-pr-6766');
     expect(p).toContain(
       `"\${QWEN_CODE_CLI:-qwen}" review test-efficacy ${planPath}`,
     );
@@ -3866,20 +3871,20 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     expect(p).toContain('skippedForControl');
     expect(p).toContain('neither validated nor refuted');
     expect(p).toContain('mutants.note');
-    // No bare executable `qwen` anywhere in this brief. Agent 7 is the one
+    // No bare executable `mariadb-shell-agent` anywhere in this brief. Agent 7 is the one
     // SUBAGENT that shells out to the review CLI — the one call site neither the
     // SKILL.md sweep nor check-coverage's stderr hints can reach — and its shell
     // gets QWEN_CODE_CLI exactly as the orchestrator's does. On the machine that
     // motivated the variable, an unprefixed `build-test` resolves to a global old
     // enough to lack the subcommand entirely, wedging the agent between its
     // mandate (no hand-run builds) and a command that does not exist.
-    expect(p).not.toMatch(/^qwen review /m);
+    expect(p).not.toMatch(/^mariadb-shell-agent review /m);
   });
 
   it('gives Agent 7 ABSOLUTE paths — its cwd is the worktree, not the repo', () => {
     // `worktreePath` and the plan path are repo-relative in the report, and this
     // agent's working directory IS the worktree — so `--worktree
-    // .qwen/tmp/review-pr-6766` resolves to `<worktree>/.qwen/tmp/review-pr-6766`,
+    // .mariadb-shell-agent/tmp/review-pr-6766` resolves to `<worktree>/.mariadb-shell-agent/tmp/review-pr-6766`,
     // which does not exist. Watched live: Agent 7 of a real 29-agent run spent its
     // time running `find … -name "*6457*fetch*"`, hunting for a plan it had been
     // handed a path to that could not resolve from where it was standing.
@@ -3889,7 +3894,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
       `"\${QWEN_CODE_CLI:-qwen}" review test-efficacy ${planPath}`,
     );
     expect(p).toContain(`--worktree ${resolve(PR_PLAN.worktreePath)}`);
-    expect(p).not.toMatch(/--worktree \.qwen/);
+    expect(p).not.toMatch(/--worktree \.mariadb-shell-agent/);
     expect(p).toContain(
       `--out ${join(absTmp, 'qwen-review-pr-6766-efficacy.json')}`,
     );
@@ -3901,7 +3906,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     expect(p).toContain('"${QWEN_CODE_CLI:-qwen}" review build-test');
     expect(p).toContain(`--plan ${planPath}`);
     expect(p).toContain(`--worktree ${resolve(PR_PLAN.worktreePath)}`);
-    expect(p).not.toMatch(/--plan \.qwen/);
+    expect(p).not.toMatch(/--plan \.mariadb-shell-agent/);
     expect(p).toContain(
       `--out ${join(absTmp, 'qwen-review-pr-6766-build-test.json')}`,
     );
@@ -3997,7 +4002,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     // The FULL wrapper, on THIS block: the whole-prompt pins are satisfied
     // by the first invocation block and vice versa, so a wrapper deleted
     // from either one shipped green — and a resume block without it execs
-    // bare PATH `qwen`, an old global that lacks `build-test` entirely.
+    // bare PATH `mariadb-shell-agent`, an old global that lacks `build-test` entirely.
     expect(resumeBlock[0]).toContain(
       '"${QWEN_CODE_CLI:-qwen}" review build-test',
     );
@@ -4006,7 +4011,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     // different run. Never asserted before — a dropped `--worktree` line
     // shipped green.
     expect(resumeBlock[0]).toContain(
-      `--worktree ${resolve('.qwen/tmp/review-pr-6766')}`,
+      `--worktree ${resolve('.mariadb-shell-agent/tmp/review-pr-6766')}`,
     );
     expect(resumeBlock[0]).toContain(
       `--out ${join(resolve('/abs/tmp'), 'qwen-review-pr-6766-build-test.json')}`,
@@ -4021,7 +4026,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     expect(firstBlock).toBeDefined();
     expect(firstBlock).toContain('"${QWEN_CODE_CLI:-qwen}" review build-test');
     expect(firstBlock).toContain(
-      `--worktree ${resolve('.qwen/tmp/review-pr-6766')}`,
+      `--worktree ${resolve('.mariadb-shell-agent/tmp/review-pr-6766')}`,
     );
 
     // The third-shape sentence, at BOTH prose sites — the role-7 base brief
@@ -4808,7 +4813,10 @@ describe('path rules — they arrive where they belong, and nowhere else', () =>
 // does not write these prompts any more.
 describe('lightweight mode — the diff, and nothing else', () => {
   const LIGHT = { ...PLAN }; // no worktreePath, no untrackedFiles → diff-only
-  const LOCAL = { ...PLAN, worktreePath: '.qwen/tmp/review-pr-1' };
+  const LOCAL = {
+    ...PLAN,
+    worktreePath: '.mariadb-shell-agent/tmp/review-pr-1',
+  };
 
   it('tells a code-reviewing agent there is no tree to read', () => {
     expect(buildRoleBrief(LIGHT, '1a')).toContain(
@@ -8232,7 +8240,8 @@ describe('incremental-scope briefs', () => {
     files: [{ path, newStart: 1, newEnd: 10 }],
   });
   const INCREMENTAL_PLAN = {
-    diffPathAbsolute: '/abs/.qwen/tmp/qwen-review-pr-7-diff-incremental.txt',
+    diffPathAbsolute:
+      '/abs/.mariadb-shell-agent/tmp/qwen-review-pr-7-diff-incremental.txt',
     chunks: [chunk(1, 'src/changed.ts', 1), chunk(2, 'src/caller.ts', 11)],
     incremental: {
       scope: {
@@ -8242,7 +8251,7 @@ describe('incremental-scope briefs', () => {
           { path: 'src/caller.ts', importsChanged: ['src/changed.ts'] },
         ],
         contextFileCount: 1,
-        fullDiffPath: '.qwen/tmp/qwen-review-pr-7-diff.txt',
+        fullDiffPath: '.mariadb-shell-agent/tmp/qwen-review-pr-7-diff.txt',
       },
     },
   };

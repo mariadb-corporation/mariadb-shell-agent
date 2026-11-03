@@ -4,7 +4,7 @@
 
 ## 问题与范围
 
-Issue [#15312](https://github.com/QwenLM/qwen-code/issues/15312) 反馈，用户容易将
+Issue [#15312](https://github.invalid/QwenLM/qwen-code/issues/15312) 反馈，用户容易将
 工作区行内用于新建分组的「+」误认为新建会话。新建会话是高频操作，而新建分组
 是偶尔使用的整理操作。本次只迁移分组创建入口，保留其名称和行为。
 
@@ -33,7 +33,7 @@ Issue [#15312](https://github.com/QwenLM/qwen-code/issues/15312) 反馈，用户
 
 运行针对性的组件测试、构建、类型检查及含前后对比证据的浏览器验证。
 主要风险是丢失锁定侧栏入口，或将其他工作区的操作发送给主工作区客户端；
-回归检查必须覆盖这两点。E2E 计划和结果放在 `.qwen/e2e-tests/`。
+回归检查必须覆盖这两点。E2E 计划和结果放在 `.mariadb-shell-agent/e2e-tests/`。
 
 ## 浏览器证据
 

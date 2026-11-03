@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -132,11 +133,11 @@ async function createApp(
 }
 
 async function enableSecondaryVoice(runtime: WorkspaceRuntime): Promise<void> {
-  await fsp.mkdir(path.join(runtime.workspaceCwd, '.qwen'), {
+  await fsp.mkdir(path.join(runtime.workspaceCwd, '.mariadb-shell-agent'), {
     recursive: true,
   });
   await fsp.writeFile(
-    path.join(runtime.workspaceCwd, '.qwen', 'settings.json'),
+    path.join(runtime.workspaceCwd, '.mariadb-shell-agent', 'settings.json'),
     JSON.stringify({
       voiceModel: 'secondary-asr',
       general: { voice: { enabled: true } },

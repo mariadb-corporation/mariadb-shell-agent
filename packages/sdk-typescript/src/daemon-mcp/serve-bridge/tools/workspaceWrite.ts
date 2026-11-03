@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -148,12 +149,12 @@ export function workspaceWriteTools(state: BridgeState): any[] {
 
     tool(
       'workspace_init',
-      'Scaffold an empty QWEN.md at the workspace root. No LLM invocation.',
+      'Scaffold an empty MARIADB-SHELL-AGENT.md at the workspace root. No LLM invocation.',
       {
         force: z
           .boolean()
           .optional()
-          .describe('Overwrite existing QWEN.md if present.'),
+          .describe('Overwrite existing MARIADB-SHELL-AGENT.md if present.'),
       },
       handler(async (args) =>
         formatJsonResult(
@@ -182,7 +183,7 @@ export function workspaceWriteTools(state: BridgeState): any[] {
 
     tool(
       'workspace_memory_read',
-      'Read workspace memory (QWEN.md hierarchy).',
+      'Read workspace memory (MARIADB-SHELL-AGENT.md hierarchy).',
       {},
       handler(async () =>
         formatJsonResult(await state.client.workspaceMemory()),
@@ -191,7 +192,7 @@ export function workspaceWriteTools(state: BridgeState): any[] {
 
     tool(
       'workspace_memory_write',
-      'Write to workspace memory (QWEN.md). Supports append or replace mode.',
+      'Write to workspace memory (MARIADB-SHELL-AGENT.md). Supports append or replace mode.',
       {
         scope: z.enum(['workspace', 'global']).describe('Memory scope.'),
         content: z.string().describe('Content to write.'),

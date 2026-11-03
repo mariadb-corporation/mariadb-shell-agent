@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -61,7 +62,7 @@ describe('bundled batch-api skill', () => {
         ),
       ).resolves.toMatchObject({ finalPermission: 'allow' });
     }
-    // Writing the plan and `qwen batch run` (which spends money) must still
+    // Writing the plan and `mariadb-shell-agent batch run` (which spends money) must still
     // ask the user.
     for (const tool of ['write_file', 'edit']) {
       await expect(

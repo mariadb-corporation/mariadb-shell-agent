@@ -90,7 +90,9 @@ describe('instruction and memory categories', () => {
     (language) => {
       const status = makeStatus(60, false);
       status.usage.breakdown.instructionFiles = 15;
-      status.usage.instructionFiles = [{ path: 'QWEN.md', tokens: 15 }];
+      status.usage.instructionFiles = [
+        { path: 'MARIADB-SHELL-AGENT.md', tokens: 15 },
+      ];
       status.usage.memoryFiles = [{ path: 'auto memory', tokens: 5 }];
       status.usage.showDetails = true;
       expect(
@@ -103,18 +105,18 @@ describe('instruction and memory categories', () => {
       expect(container.textContent).toContain(
         language === 'en' ? 'Auto memory' : '自动记忆',
       );
-      expect(container.textContent).toContain('QWEN.md');
+      expect(container.textContent).toContain('MARIADB-SHELL-AGENT.md');
       expect(container.textContent).not.toContain('Memory files');
     },
   );
 
   it('preserves the legacy category without guessing file ownership', () => {
     const status = makeStatus(60, false);
-    status.usage.memoryFiles = [{ path: 'QWEN.md', tokens: 5 }];
+    status.usage.memoryFiles = [{ path: 'MARIADB-SHELL-AGENT.md', tokens: 5 }];
     status.usage.showDetails = true;
     const container = render(status, false);
     expect(container.textContent).toContain('Memory files');
-    expect(container.textContent).toContain('QWEN.md');
+    expect(container.textContent).toContain('MARIADB-SHELL-AGENT.md');
     expect(container.textContent).not.toContain('Auto memory');
     expect(container.textContent).not.toContain('Instruction files');
   });
@@ -547,7 +549,11 @@ describe('ContextUsageMessage', () => {
     // Older producers combine real files into memoryFiles; the synthetic
     // auto-memory aggregate has no absolute path.
     status.usage.memoryFiles = [
-      { path: 'QWEN.md', tokens: 3, absolutePath: '/workspace/QWEN.md' },
+      {
+        path: 'MARIADB-SHELL-AGENT.md',
+        tokens: 3,
+        absolutePath: '/workspace/MARIADB-SHELL-AGENT.md',
+      },
       { path: 'auto memory', tokens: 2 },
     ];
     const onOpenMemoryFile = vi.fn();
@@ -572,7 +578,9 @@ describe('ContextUsageMessage', () => {
     );
     expect(openable).not.toBeNull();
     // Legacy memoryFiles real files are openable too.
-    expect(container.querySelector('button[title="QWEN.md"]')).not.toBeNull();
+    expect(
+      container.querySelector('button[title="MARIADB-SHELL-AGENT.md"]'),
+    ).not.toBeNull();
     // The synthetic aggregate has no absolute path and stays plain text.
     expect(container.querySelector('button[title="auto memory"]')).toBeNull();
     expect(container.querySelector('[title="auto memory"]')?.tagName).toBe(

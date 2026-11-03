@@ -1,10 +1,10 @@
 {
   "name": "@qwen-code/channel-dws",
   "version": "0.26.5",
-  "description": "DingTalk Workspace channel adapter for Qwen Code",
+  "description": "DingTalk Workspace channel adapter for MariaDB Shell Agent",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/QwenLM/qwen-code.git",
+    "url": "git+https://github.invalid/QwenLM/qwen-code.git",
     "directory": "packages/channels/dws"
   },
   "type": "module",

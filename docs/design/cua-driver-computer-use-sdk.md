@@ -4,7 +4,7 @@
 
 Upgrade the vendored CUA Driver 0.20.0 implementation with a native, versioned accessibility observation revision protocol, then expose the resulting capability through its typed SDKs and a small JavaScript wrapper.
 
-The finished SDK must be directly importable from an ordinary Node.js program and independently testable without Qwen Code, Node REPL, a Skill, or any Qwen host integration. Stage 3 will teach Qwen Code to call this SDK from the Node REPL delivered by #9333.
+The finished SDK must be directly importable from an ordinary Node.js program and independently testable without MariaDB Shell Agent, Node REPL, a Skill, or any Qwen host integration. Stage 3 will teach MariaDB Shell Agent to call this SDK from the Node REPL delivered by #9333.
 
 ## Stage boundary
 
@@ -17,7 +17,7 @@ This stage includes only:
 
 This stage does not:
 
-- modify Qwen Code core, CLI, ACP, TUI, tool registry, scheduler, or permission manager;
+- modify MariaDB Shell Agent core, CLI, ACP, TUI, tool registry, scheduler, or permission manager;
 - register any SDK or capability in the Node REPL;
 - add a hidden Qwen bridge or Qwen-specific runtime session;
 - track which observation reached a model;
@@ -33,7 +33,7 @@ ordinary Node.js program
   -> AX / UIA / AT-SPI platform implementation
 ```
 
-The wrapper calls the typed SDK directly. It does not route calls through Qwen Code or a second tool protocol. It preserves cua-driver's existing runtime, permission, transport, and lifecycle behavior.
+The wrapper calls the typed SDK directly. It does not route calls through MariaDB Shell Agent or a second tool protocol. It preserves cua-driver's existing runtime, permission, transport, and lifecycle behavior.
 
 The TypeScript SDK and Computer Use wrapper are distributed together as the
 single `@qwen-code/cua-sdk` npm package. The package root exposes the generated
@@ -120,7 +120,7 @@ Provider invalidation, truncation, subtree read failure, target ambiguity, or fa
 
 ## SDK wrapper
 
-The JavaScript wrapper exposes a small Computer Use API while directly using the generated TypeScript cua-driver SDK. It hides raw low-level constructors and arbitrary tool dispatch from its public surface, but it does not depend on Qwen Code.
+The JavaScript wrapper exposes a small Computer Use API while directly using the generated TypeScript cua-driver SDK. It hides raw low-level constructors and arbitrary tool dispatch from its public surface, but it does not depend on MariaDB Shell Agent.
 
 The observation API automatically uses the last successful revision for the same PID and window. The first observation, a new driver generation, an unsupported lineage, or an explicit one-shot `disableDiff` request returns a full tree. Incomplete captures receive one bounded default retry and remain observation-only if they cannot recover. Revision and lineage identifiers stay inside the wrapper; callers receive the observation mode, optional resync reason, current AX payload, screenshot, and a nested diagnostics object without cursor values. Actions consume opaque element tokens returned by the driver. The wrapper does not compute a second semantic diff or invent element identity.
 
@@ -140,4 +140,4 @@ Completion requires:
 - at least 30 deterministic real transitions and a median accessibility-text reduction of at least 40% for small UI changes;
 - clean build, typecheck, packaging, and release artifacts.
 
-No Qwen Code or model-in-the-loop result is part of this stage's completion claim.
+No MariaDB Shell Agent or model-in-the-loop result is part of this stage's completion claim.

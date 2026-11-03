@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -60,9 +61,9 @@ export function tokenQrNoEffectReason(input: {
 }): string | undefined {
   if (!input.requested) return undefined;
   if (!input.webShellMounted)
-    return 'qwen serve: --token-qr / serve.tokenQr has no effect because the Web Shell is not mounted.';
+    return 'mariadb-shell-agent serve: --token-qr / serve.tokenQr has no effect because the Web Shell is not mounted.';
   if (quickstartPrintMode(input.boundAddress, input.generated) !== 'full')
-    return 'qwen serve: --token-qr / serve.tokenQr has no effect on this bind: a loopback listener prints no quickstart QR.';
+    return 'mariadb-shell-agent serve: --token-qr / serve.tokenQr has no effect on this bind: a loopback listener prints no quickstart QR.';
   return undefined;
 }
 
@@ -169,7 +170,7 @@ export async function printRemoteQuickstart(input: {
   tokenQrMode?: 'policy' | 'force' | 'veto';
   interfaces?: ReturnType<typeof networkInterfaces>;
 }): Promise<void> {
-  // An informational block whose reader going away (`qwen serve | head`) must
+  // An informational block whose reader going away (`mariadb-shell-agent serve | head`) must
   // never take the already-listening daemon down with it: the serve entry
   // point installs a broken-pipe guard, and every write here goes through
   // the non-throwing helper.

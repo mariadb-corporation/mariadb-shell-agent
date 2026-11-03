@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -44,7 +45,7 @@ export const OMNI_TRANSCRIBE_AUDIO_TOOL_NAME = ToolNames.OMNI_TRANSCRIBE_AUDIO;
  */
 export const TRANSCRIBE_AUDIO_DEFAULTS = {
   model: 'qwen3.5-omni-plus',
-  baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
   apiKeyEnv: 'DASHSCOPE_API_KEY',
   maxInputBytes: 10 * 1024 * 1024,
   chunkSeconds: 180,

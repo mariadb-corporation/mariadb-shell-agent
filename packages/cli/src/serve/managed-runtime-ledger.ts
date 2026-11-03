@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -487,7 +488,7 @@ function writeLedgerDocument(
     temporary,
     JSON.stringify({ version: LEDGER_FILE_VERSION, worker, groups }),
     // Worker pids, group ids and call ids are read-side hygiene: another
-    // local user who can traverse $HOME/.qwen should not read them, so the
+    // local user who can traverse $HOME/.mariadb-shell-agent should not read them, so the
     // file (and, via rename, its finished shape) lands owner-only.
     { encoding: 'utf8', mode: 0o600 },
   );

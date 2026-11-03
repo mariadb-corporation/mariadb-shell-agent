@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +22,7 @@ const { readerKindMock, aoneAuthMock, aoneResolveRepoMock } = vi.hoisted(
     readerKindMock: vi.fn((): 'github' | 'aone' => 'github'),
     aoneAuthMock: vi.fn(),
     aoneResolveRepoMock: vi.fn(() => ({
-      host: 'gitlab.alibaba-inc.com',
+      host: 'gitlab.alibaba-inc.invalid',
       owner: 'maxcompute',
       repo: 'odps_src',
     })),
@@ -54,7 +55,7 @@ vi.mock('./lib/platform/registry.js', async (importOriginal) => {
             getPrMeta: (n: number) => ({
               number: n,
               headSha: 'sha-aone',
-              webUrl: 'https://code.alibaba-inc.com/g/p/codereview/' + n,
+              webUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/' + n,
             }),
             getClosingIssues: () => [],
             getIssue: () => {
@@ -289,15 +290,15 @@ describe('runMeta', () => {
       const result = runMeta({
         prNumber: 7,
         repo: 'g/p',
-        host: 'gitlab.alibaba-inc.com',
+        host: 'gitlab.alibaba-inc.invalid',
       });
       expect(result).toEqual({
         platform: 'aone',
-        host: 'gitlab.alibaba-inc.com',
+        host: 'gitlab.alibaba-inc.invalid',
         ownerRepo: 'g/p',
         number: 7,
         headSha: 'sha-aone',
-        webUrl: 'https://code.alibaba-inc.com/g/p/codereview/7',
+        webUrl: 'https://code.alibaba-inc.invalid/g/p/codereview/7',
       });
       expect(aoneAuthMock).toHaveBeenCalledTimes(1);
     });
@@ -320,16 +321,16 @@ describe('runMeta', () => {
       process.env['GH_HOST'] = 'ghe_internal';
       const result = runMeta({ prNumber: 7 });
       expect(result.platform).toBe('aone');
-      expect(result.host).toBe('gitlab.alibaba-inc.com');
+      expect(result.host).toBe('gitlab.alibaba-inc.invalid');
       expect(result.ownerRepo).toBe('maxcompute/odps_src');
     });
 
     it('an explicit --host still steers routing on discovery', () => {
       // The reported host stays the discovered one; the flag routes the gh
       // surface (the discovery branch's documented precedence).
-      const result = runMeta({ prNumber: 7, host: 'code.alibaba-inc.com' });
-      expect(result.host).toBe('gitlab.alibaba-inc.com');
-      expect(setGhHostMock).toHaveBeenCalledWith('code.alibaba-inc.com');
+      const result = runMeta({ prNumber: 7, host: 'code.alibaba-inc.invalid' });
+      expect(result.host).toBe('gitlab.alibaba-inc.invalid');
+      expect(setGhHostMock).toHaveBeenCalledWith('code.alibaba-inc.invalid');
     });
   });
 });

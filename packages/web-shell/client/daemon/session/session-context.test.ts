@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -149,7 +150,7 @@ describe('session context', () => {
           },
           {
             id: '6899bd1e20ba5254',
-            cwd: '/Users/me/Documents/Qwen Code/Conversations',
+            cwd: '/Users/me/Documents/MariaDB Shell Agent/Conversations',
             displayName: 'Conversations',
             primary: false,
             trusted: true,
@@ -157,7 +158,7 @@ describe('session context', () => {
           },
         ],
       }),
-    ).toBe('/Users/me/Documents/Qwen Code/Conversations');
+    ).toBe('/Users/me/Documents/MariaDB Shell Agent/Conversations');
   });
 
   it('fails closed for missing, ambiguous, or untrusted Live runtimes', () => {

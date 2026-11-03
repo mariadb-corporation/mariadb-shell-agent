@@ -119,12 +119,12 @@ of using a later round's shared head.
 A published verification comment ends with the same attribution shape
 `/review` posts:
 
-`_— <model> via Qwen Code /verify-pr (v<cli-version>; skill <skill-hash>)_`
+`_— <model> via MariaDB Shell Agent /verify-pr (v<cli-version>; skill <skill-hash>)_`
 
 - The model is the identity the round ran under, the CLI version is
-  `qwen --version`, and the skill version is the first 12 characters of
-  `git hash-object --no-filters .qwen/skills/verify-pr/SKILL.md`. A content
-  hash, not a commit: the lane's tree is depth-2 and its `.qwen` arrives by
+  `mariadb-shell-agent --version`, and the skill version is the first 12 characters of
+  `git hash-object --no-filters .mariadb-shell-agent/skills/verify-pr/SKILL.md`. A content
+  hash, not a commit: the lane's tree is depth-2 and its `.mariadb-shell-agent` arrives by
   `git archive`, so no history is reachable, and the hash names exactly the
   instructions the round loaded — including uncommitted edits on a
   workstation. `--no-filters` because prepare leaves `.git` node-owned,
@@ -135,12 +135,12 @@ A published verification comment ends with the same attribution shape
   never read from the agent-writable artifact tree. They are collected
   right after the base re-pin and BEFORE the agent starts: the workspace
   parent directory stays node-owned, so during the agent era PR code can
-  replace the whole `.qwen` directory (mv + mkdir) without touching the
+  replace the whole `.mariadb-shell-agent` directory (mv + mkdir) without touching the
   root-owned files inside it, and a post-agent hash could name instructions
   the round never loaded. A meta-test pins that ordering, not just the
   strings. The publisher stamps the footer only on a body that carries a
   report and only when all three values arrived; otherwise the comment
-  keeps the generic `— _Qwen Code · sandboxed verification_` signature,
+  keeps the generic `— _MariaDB Shell Agent · sandboxed verification_` signature,
   which every weak notice (cancelled / infra / skipped / results
   unavailable / downloaded artifact with no report) also keeps: they report
   the lane, not a round.
@@ -237,7 +237,7 @@ A published verification comment ends with the same attribution shape
   publisher case labels, so a fifth word on one side fails the suite.
 - The PR title is untrusted input reaching a maintainer terminal, so control
   characters are dropped before it is printed.
-- These are local helpers: the lane pins `.qwen` from the base branch, so the
+- These are local helpers: the lane pins `.mariadb-shell-agent` from the base branch, so the
   skill text that references them takes effect only after this change merges.
 - The guard normalizes each item to `id`, a stamp read as
   `updated_at ?? submitted_at`, the `body`, and — for reviews only — the

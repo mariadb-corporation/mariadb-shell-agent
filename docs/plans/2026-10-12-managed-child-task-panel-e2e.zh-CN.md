@@ -4,11 +4,11 @@
 
 ## 基线
 
-实现前运行全局 `qwen --version` 和 `qwen serve --help`。CLI 基线证明运行时可用，不证明浏览器功能支持。独立启动端口 18480 的 Web Shell Vite，使用已有 Managed Java Provider 浏览器 fixture。变更前即使 Java Session 声明 `tasks: true`，也没有子 Agent 任务入口。浏览器测试使用受控 BFF 制造响应丢失与竞争，不作为真实 Hosted 执行证据。
+实现前运行全局 `mariadb-shell-agent --version` 和 `mariadb-shell-agent serve --help`。CLI 基线证明运行时可用，不证明浏览器功能支持。独立启动端口 18480 的 Web Shell Vite，使用已有 Managed Java Provider 浏览器 fixture。变更前即使 Java Session 声明 `tasks: true`，也没有子 Agent 任务入口。浏览器测试使用受控 BFF 制造响应丢失与竞争，不作为真实 Hosted 执行证据。
 
 ## 浏览器分组
 
-通过 `.qwen/e2e-tests/managed-child-task-panel-browser.mjs` 运行隔离 Playwright context；临时状态和截图保存在 `.qwen/e2e-tests/`。使用已安装的 Chromium。每个 context 独立持有 Session 和 operation map。
+通过 `.mariadb-shell-agent/e2e-tests/managed-child-task-panel-browser.mjs` 运行隔离 Playwright context；临时状态和截图保存在 `.mariadb-shell-agent/e2e-tests/`。使用已安装的 Chromium。每个 context 独立持有 Session 和 operation map。
 
 1. 兼容：缺少任务能力及 Daemon 无入口；Java 缺少身份范围时可读取、不可取消。
 2. 浏览：混合原始分页、过滤空页但有下一页、返回上一页及滚动恢复；不捏造名称或总数。查看详情、状态历史与产物缺失，验证草稿和历史保留、不重载 transcript。
@@ -42,4 +42,4 @@
 | --------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | ![没有任务入口](../design/assets/managed-child-task-panel-before.png) | ![对话旁的任务面板](../design/assets/managed-child-task-panel-after-wide.png) | ![带主题的任务弹层](../design/assets/managed-child-task-panel-after-narrow.png) |
 
-本地可复用命令为 `node .qwen/e2e-tests/managed-child-task-panel-browser.mjs`、同一命令加 `--extras`，以及依次执行 `.qwen/e2e-tests/` 下的 `managed-child-task-hosted-launch.mjs` / `managed-child-task-panel-hosted-browser.mjs`。脚本和原始报告为忽略的工作产物；PR 独立报告发布其实际结果。验证后已停止独立 Vite 和真实 Java/Hosted 进程。
+本地可复用命令为 `node .mariadb-shell-agent/e2e-tests/managed-child-task-panel-browser.mjs`、同一命令加 `--extras`，以及依次执行 `.mariadb-shell-agent/e2e-tests/` 下的 `managed-child-task-hosted-launch.mjs` / `managed-child-task-panel-hosted-browser.mjs`。脚本和原始报告为忽略的工作产物；PR 独立报告发布其实际结果。验证后已停止独立 Vite 和真实 Java/Hosted 进程。

@@ -294,13 +294,13 @@ Worker 与其工具子进程目前共享 UID 和 PID 命名空间。stdin/stdout
 进程清理和容器死亡。模拟运行时测试只证明协议行为，不证明内核隔离。
 明确报告无法执行的真实运行时测试。
 
-[独立 Linux 验证](https://github.com/QwenLM/qwen-code/pull/11711#issuecomment-5645312113)
+[独立 Linux 验证](https://github.invalid/QwenLM/qwen-code/pull/11711#issuecomment-5645312113)
 报告在 `ebae028529` 上使用 rootful Docker 26.1.5 完成十组 harness 和十三条 CLI 验证。
 因无法拉取 0.23.3，使用已发布的 0.23.0 镜像；因 bridge 无公网出口，使用本地 HTTP tarball 服务。
 该报告仍未验证 Podman、真实 rootless daemon 和配置的 0.23.3 镜像。
 这些是外部报告结果，与本机进程夹具检查分别记录。
 
-[独立 Linux 第 2 轮](https://github.com/QwenLM/qwen-code/pull/11711#issuecomment-5652725410)
+[独立 Linux 第 2 轮](https://github.invalid/QwenLM/qwen-code/pull/11711#issuecomment-5652725410)
 报告在 `e544823995` 上验证策略及生命周期，使用配置的 0.23.3 镜像，
 在 Docker 26.1.5、rootful Podman 5.4.2 和 rootless Podman 5.4.2 上各完成十四项边界检查。
 该报告使用复制的独立 bundle、本地 HTTP tarball 服务，以及通过 `runuser` 配合 cgroupfs

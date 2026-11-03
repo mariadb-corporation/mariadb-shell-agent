@@ -1,19 +1,19 @@
 # Quickstart & Operations
 
-This page focuses on **how to start `qwen serve`, how to verify that it is working, and what the internal call chain looks like from `qwen serve` to the listening server**. Architecture, components, and wire protocol details live in the other daemon deep-dive pages.
+This page focuses on **how to start `mariadb-shell-agent serve`, how to verify that it is working, and what the internal call chain looks like from `mariadb-shell-agent serve` to the listening server**. Architecture, components, and wire protocol details live in the other daemon deep-dive pages.
 
 ## 1. Shortest path
 
 ```bash
-qwen serve
+mariadb-shell-agent serve
 ```
 
 Output:
 
 ```text
-qwen serve listening on http://127.0.0.1:4170 (mode=http-bridge, workspace=/your/cwd)
-qwen serve: bound to workspace "/your/cwd"
-qwen serve: trusted loopback mode; local callers have full API access without bearer authentication, including code execution as the daemon user. Use --require-auth with QWEN_SERVER_TOKEN on shared or untrusted hosts.
+mariadb-shell-agent serve listening on http://127.0.0.1:4170 (mode=http-bridge, workspace=/your/cwd)
+mariadb-shell-agent serve: bound to workspace "/your/cwd"
+mariadb-shell-agent serve: trusted loopback mode; local callers have full API access without bearer authentication, including code execution as the daemon user. Use --require-auth with QWEN_SERVER_TOKEN on shared or untrusted hosts.
 ```
 
 Open `http://127.0.0.1:4170/` in a browser to get the Web Shell UI: chat, session list, and workspace inspection. This token-less loopback primary listener grants local callers full operator API authority, while preserving workspace trust, session ownership, client-id, permission, feature, validation, and resource checks. `createServeApp()` mounts the bundled Web Shell assets (`packages/cli/src/serve/web-shell-static.ts`) **before** `bearerAuth`, so the shell itself loads without a token; its own API calls carry the bearer when one is configured — start the daemon with `--open` (which puts the token in the URL fragment, never sent to the server) or append `#token=…` manually when auth is enabled. `--no-web` opts out and leaves the daemon API-only.
@@ -22,53 +22,53 @@ Open `http://127.0.0.1:4170/` in a browser to get the Web Shell UI: chat, sessio
 
 ```bash
 # 1. Local dev default (loopback, no token)
-qwen serve
+mariadb-shell-agent serve
 
 # 2. Explicit workspace + ephemeral port
-qwen serve --workspace /path/to/repo --port 0
+mariadb-shell-agent serve --workspace /path/to/repo --port 0
 
 # 3. Hardened loopback development (force bearer even on loopback)
-QWEN_SERVER_TOKEN=$(openssl rand -hex 32) qwen serve --require-auth
+QWEN_SERVER_TOKEN=$(openssl rand -hex 32) mariadb-shell-agent serve --require-auth
 
 # 4. Expose to LAN (a stable token; without one the daemon generates
 #    an ephemeral bearer and prints it once)
 QWEN_SERVER_TOKEN=$(openssl rand -hex 32) \
-  qwen serve --hostname 0.0.0.0 --port 4170
+  mariadb-shell-agent serve --hostname 0.0.0.0 --port 4170
 
 # 4b. Expose to LAN with the generated ephemeral bearer
-qwen serve --hostname 0.0.0.0 --port 4170
+mariadb-shell-agent serve --hostname 0.0.0.0 --port 4170
 
 # 5. Tune for many sessions and a larger replay ring
-qwen serve --max-sessions 0 --event-ring-size 32000
+mariadb-shell-agent serve --max-sessions 0 --event-ring-size 32000
 
 # 6. Multi-client collaboration + strict MCP budget
 QWEN_SERVER_TOKEN=secret \
-  qwen serve --require-auth \
+  mariadb-shell-agent serve --require-auth \
              --mcp-client-budget 10 \
              --mcp-budget-mode enforce
 
 # 7. Start with a consensus policy configured in settings.json
 # settings.json: { "policy": { "permissionStrategy": "consensus", "consensusQuorum": 2 } }
-qwen serve
+mariadb-shell-agent serve
 
 # 8. Debug logging
-QWEN_SERVE_DEBUG=1 qwen serve
+QWEN_SERVE_DEBUG=1 mariadb-shell-agent serve
 
 # 9. Disable the F2 pool (fallback to per-session MCP clients)
-QWEN_SERVE_NO_MCP_POOL=1 qwen serve
+QWEN_SERVE_NO_MCP_POOL=1 mariadb-shell-agent serve
 
 # 10. Allow browser web UI cross-origin access
 QWEN_SERVER_TOKEN=secret \
-  qwen serve --allow-origin 'http://localhost:3000'
+  mariadb-shell-agent serve --allow-origin 'http://localhost:3000'
 
 # 11. Prompt deadline + SSE idle timeout
-qwen serve --prompt-deadline-ms 300000 --writer-idle-timeout-ms 600000
+mariadb-shell-agent serve --prompt-deadline-ms 300000 --writer-idle-timeout-ms 600000
 
 # 12. Keep an idle ACP child reusable for 60s after work drains (admit/enforce may reclaim it earlier)
-qwen serve --channel-idle-timeout-ms 60000
+mariadb-shell-agent serve --channel-idle-timeout-ms 60000
 
 # 13. Enable HTTP rate limiting
-QWEN_SERVE_RATE_LIMIT=1 qwen serve
+QWEN_SERVE_RATE_LIMIT=1 mariadb-shell-agent serve
 ```
 
 With the hardened loopback recipe (3), `/health` is registered after `bearerAuth`, so probes must carry the token like every other API route (the Web Shell static surface stays pre-auth by design; pass `--no-web` for an API-only daemon).
@@ -95,7 +95,7 @@ The CLI is defined in **`packages/cli/src/commands/serve.ts`**:
 | `--require-auth`                        | boolean                        | `false`                                      | Token source on loopback                                                                                                                                                                                 | Extends bearer auth to loopback **and** `/health`. Boot refuses to start when no token source resolves — a **loopback-only** fail-fast, because on a non-loopback bind the generated ephemeral token satisfies the flag. Loopback sources are `--token`, `QWEN_SERVER_TOKEN`, and `--open-with-auth` (which installs its own generated token before boot, so `--require-auth --open-with-auth` starts).                                                                                                                                                                                                                                                                                                                                                                     |
 | `--enable-session-shell`                | boolean                        | `false`                                      | Bearer or trusted loopback                                                                                                                                                                               | Enables direct `POST /session/:id/shell` execution. Callers must also send a session-bound `X-Qwen-Client-Id`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `--event-ring-size <n>`                 | number                         | `8000`                                       | -                                                                                                                                                                                                        | Per-session SSE replay ring depth. Soft cap is `MAX_EVENT_RING_SIZE = 1_000_000`; out-of-range values throw during bridge construction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `--http-bridge`                         | boolean                        | `true`                                       | -                                                                                                                                                                                                        | Bridge mode: production attempts to preheat one primary `qwen --acp` child and retries on first use after failure; trusted secondaries start one on demand, while untrusted secondaries cannot start ACP. Stage 2 in-process mode is not implemented yet; `--no-http-bridge` falls back and prints to stderr.                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `--http-bridge`                         | boolean                        | `true`                                       | -                                                                                                                                                                                                        | Bridge mode: production attempts to preheat one primary `mariadb-shell-agent --acp` child and retries on first use after failure; trusted secondaries start one on demand, while untrusted secondaries cannot start ACP. Stage 2 in-process mode is not implemented yet; `--no-http-bridge` falls back and prints to stderr.                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `--mcp-client-budget <n>`               | number                         | none                                         | Required for `mcp-budget-mode=enforce`                                                                                                                                                                   | Workspace MCP client cap. Must be a positive integer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `--mcp-budget-mode <m>`                 | `'enforce' \| 'warn' \| 'off'` | `warn` when a budget is set, otherwise `off` | `enforce` requires `--mcp-client-budget`                                                                                                                                                                 | `enforce` refuses, `warn` only warns at 75%, `off` is observation only.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `--allow-origin <pattern>`              | repeatable string              | none                                         | -                                                                                                                                                                                                        | CORS allowlist that replaces the default Origin denial. Wildcard and non-loopback HTTP(S) origins require a resolved token; these guards read the token _after_ generation, so on a non-loopback bind the ephemeral bearer satisfies them and the refusals are loopback-only.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -230,10 +230,10 @@ CSP is built by `buildWebShellCsp()` and is deliberately looser than a static pa
 
 For raw protocol inspection, subscribe to the SSE stream directly (`routes/sse-events.ts`) — see the curl recipes in section 7.
 
-## 9. Call chain from `qwen serve` to the listening server
+## 9. Call chain from `mariadb-shell-agent serve` to the listening server
 
 ```text
-qwen serve
+mariadb-shell-agent serve
    |
    v (process)
 packages/cli/index.ts              main()
@@ -278,7 +278,7 @@ serve/run-qwen-serve.ts              server = createServer(app) / https.createSe
    |  |- server.listen(port, hostname)
    |  |- server.maxConnections = cap
    |  |- actualPort = server.address().port
-   |  |- write "qwen serve listening on ..."
+   |  |- write "mariadb-shell-agent serve listening on ..."
    |  |- register SIGINT / SIGTERM (onSignal)
    |  `- resolve(handle: RunHandle)
    |
@@ -326,7 +326,7 @@ For the complete route and wire protocol reference, see [`../qwen-serve-protocol
 
 ## 12. Embedding boundary
 
-`runQwenServe`, `createServeApp`, and their lifecycle helpers are internal implementation APIs; the published `@qwen-code/qwen-code` package does not export a `./serve` subpath. External integrations should start `qwen serve --no-web` and use the documented HTTP/SSE protocol or `@qwen-code/sdk`. Repository code and tests may import the source modules directly, but those imports are not a supported integration contract.
+`runQwenServe`, `createServeApp`, and their lifecycle helpers are internal implementation APIs; the published `@qwen-code/qwen-code` package does not export a `./serve` subpath. External integrations should start `mariadb-shell-agent serve --no-web` and use the documented HTTP/SSE protocol or `@qwen-code/sdk`. Repository code and tests may import the source modules directly, but those imports are not a supported integration contract.
 
 For repository-internal callers of `createServeApp`, the default `fsFactory.trusted = false`. Agent-side ACP `writeTextFile` is rejected as `untrusted_workspace`, and a stderr warning is printed once. Either inject `deps.fsFactory` with explicit trust, inject `deps.bridge`, or accept the trust-gated default behavior.
 
@@ -350,7 +350,7 @@ curl -N -H 'Accept: text/event-stream' \
      'http://127.0.0.1:4170/session/<sid>/events'
 
 # Verbose logs
-QWEN_SERVE_DEBUG=1 qwen serve
+QWEN_SERVE_DEBUG=1 mariadb-shell-agent serve
 ```
 
 ## References

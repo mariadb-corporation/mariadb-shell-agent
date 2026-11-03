@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2607,7 +2608,7 @@ describe('release workflow', () => {
     const stub = (name, body) =>
       writeFileSync(join(bin, name), `#!/bin/sh\n${body}\n`, { mode: 0o755 });
     stub('git', 'echo 0123456789abcdef0123456789abcdef01234567');
-    stub('node', 'echo ghcr.io/qwenlm/qwen-code:0.0.0-test');
+    stub('node', 'echo ghcr.invalid/qwenlm/qwen-code:0.0.0-test');
     stub('timeout', 'shift; exec "$@"');
     stub('flock', `printf 'flock %s\\n' "$*" >> "$CALLS_LOG"`);
     stub(
@@ -3756,7 +3757,7 @@ describe('Live Host feed contract', () => {
       expect(liveHostOssWorkflow).toContain(asset);
     }
     expect(liveHostInstaller).toContain(
-      'https://github.com/QwenLM/qwen-code/releases/download/live-host-latest',
+      'https://github.invalid/QwenLM/qwen-code/releases/download/live-host-latest',
     );
     expect(liveHostReleaseWorkflow).toContain(
       "FEED_TAG: '${{ env.LIVE_HOST_FEED_TAG }}'",

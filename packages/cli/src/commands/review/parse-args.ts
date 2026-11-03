@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review parse-args`: deterministic argument parsing for the /review
+// `mariadb-shell-agent review parse-args`: deterministic argument parsing for the /review
 // skill. The flag grammar (`--comment`, `--effort <level>`, `--effort=<level>`)
 // and the target disambiguation (PR number / PR URL / file path / local diff)
 // used to live as prose in SKILL.md, which the model re-simulated on every
@@ -265,7 +266,7 @@ export const TOPOLOGIES: ReadonlySet<string> = new Set([
 const PR_URL_RE =
   /^(https?):\/\/([A-Za-z0-9.-]+(?::\d+)?)\/([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)\/pull\/(\d+)(?=$|[/?#])/i;
 
-// Aone Code CR URLs: `https://code.alibaba-inc.com/<group>[/subgroup…]/<project>/codereview/<global-id>`.
+// Aone Code CR URLs: `https://code.alibaba-inc.invalid/<group>[/subgroup…]/<project>/codereview/<global-id>`.
 // The trailing number is the global MR id (what the Aone refspec and `a1 mr
 // view` key on), carried as the target's `number` exactly like a GitHub PR
 // number; when this host is passed on to the subcommands as `--host`, it
@@ -274,7 +275,7 @@ const PR_URL_RE =
 // The group path may be nested (`group/subgroup/project`) — the repo identity
 // keeps the last two segments, mirroring aone.parseRemoteUrl. Unlike
 // `…/pull/<n>` (which any GHE host legitimately serves), the host is
-// constrained to a REAL Aone subdomain: `(?:[A-Za-z0-9-]+\.)+alibaba-inc.com`
+// constrained to a REAL Aone subdomain: `(?:[A-Za-z0-9-]+\.)+alibaba-inc.invalid`
 // requires a dot boundary, so lookalikes (`evilalibaba-inc.com`,
 // `notalibaba-inc.com`) hit the fail-closed invalid-url refusal instead of
 // becoming live targets. The family capture is shape-first only — the
@@ -282,7 +283,7 @@ const PR_URL_RE =
 // (isAoneCanonicalHost), so a family-only GHE host's `/codereview/` URL
 // stays `invalid-url` instead of becoming a misrouted live target.
 const AONE_CR_URL_RE =
-  /^(https?):\/\/((?:[A-Za-z0-9-]+\.)+alibaba-inc\.com(?::\d+)?)\/((?:[A-Za-z0-9_.-]+\/)+[A-Za-z0-9_.-]+)\/codereview\/(\d+)(?=$|[/?#])/i;
+  /^(https?):\/\/((?:[A-Za-z0-9-]+\.)+alibaba-inc\.invalid(?::\d+)?)\/((?:[A-Za-z0-9_.-]+\/)+[A-Za-z0-9_.-]+)\/codereview\/(\d+)(?=$|[/?#])/i;
 
 /**
  * Case-insensitive: `--effort High` has exactly one plausible meaning, and
@@ -365,8 +366,8 @@ function classifyToken(token: string): ReviewTarget | 'invalid-url' | null {
     // host is a fabrication (the Aone CR grammar is `…/codereview/<id>`,
     // keyed on the global MR id). Refuse it fail-closed, mirroring the
     // Aone-only constraint on `/codereview/` (a non-Aone host there is
-    // refused too). The canonical pair only: a `*.alibaba-inc.com` GHE
-    // instance (`ghe.alibaba-inc.com`) legitimately serves `/pull/` pages,
+    // refused too). The canonical pair only: a `*.alibaba-inc.invalid` GHE
+    // instance (`ghe.alibaba-inc.invalid`) legitimately serves `/pull/` pages,
     // and the family wildcard once refused its real PR URLs.
     if (isAoneCanonicalHost(lowerHost)) return 'invalid-url';
     return {
@@ -1478,7 +1479,7 @@ export const parseArgsCommand: CommandModule = {
     );
     const json = JSON.stringify(parsed, null, 2);
     if (out) {
-      // Step 0's write is the round's FIRST into `.qwen/tmp`: the scratch
+      // Step 0's write is the round's FIRST into `.mariadb-shell-agent/tmp`: the scratch
       // directory is refused here when the workspace redirected it, before
       // this file — or anything after it — lands through the link.
       if (writesIntoReviewTmp(out)) ensureReviewTmpDir('parse-args');

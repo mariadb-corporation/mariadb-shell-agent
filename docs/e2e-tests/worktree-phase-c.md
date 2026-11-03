@@ -8,7 +8,7 @@ End-to-end verification of Phase C features against the local build at
 Phase C delivers:
 
 - **Task 1, 3, 4** — `WorktreeSession` sidecar JSON file at
-  `~/.qwen/tmp/<projectHash>/chats/<sessionId>.worktree.json`
+  `~/.mariadb-shell-agent/tmp/<projectHash>/chats/<sessionId>.worktree.json`
 - **Task 2** — `core.hooksPath` configured inside new worktrees
 - **Task 5–6** — `useWorktreeSession` hook, `UIState.activeWorktree`, Footer
   worktree indicator, `StatusLineCommandInput.worktree` field
@@ -20,7 +20,7 @@ Phase C delivers:
 ## Binaries
 
 - **Local build**: `node /Users/mochi/code/qwen-code/.claude/worktrees/romantic-burnell-b6e48c/dist/cli.js`
-- **Baseline (for pre-impl comparison if needed)**: globally installed `qwen`
+- **Baseline (for pre-impl comparison if needed)**: globally installed `mariadb-shell-agent`
 
 ## Test environment template
 
@@ -57,7 +57,7 @@ SESSION=$(node $QWEN "use the enter_worktree tool with name='a1-test' to create 
   | jq -r '.[] | select(.type=="system") | .session_id' | head -1)
 
 PROJECT_ID=$(node -e "console.log(process.argv[1].replace(/[^a-zA-Z0-9]/g,'-'))" "$TEST_DIR")
-SIDECAR=~/.qwen/projects/$PROJECT_ID/chats/$SESSION.worktree.json
+SIDECAR=~/.mariadb-shell-agent/projects/$PROJECT_ID/chats/$SESSION.worktree.json
 
 # Verify all fields present
 cat "$SIDECAR" | jq '.slug, .worktreePath, .worktreeBranch, .originalCwd, .originalBranch, .originalHeadCommit'
@@ -66,7 +66,7 @@ cat "$SIDECAR" | jq '.slug, .worktreePath, .worktreeBranch, .originalCwd, .origi
 **Expected:**
 
 - `slug` = "a1-test"
-- `worktreePath` ends with `.qwen/worktrees/a1-test`
+- `worktreePath` ends with `.mariadb-shell-agent/worktrees/a1-test`
 - `worktreeBranch` = "worktree-a1-test"
 - `originalCwd` = `$TEST_DIR` (resolved)
 - `originalBranch` = "main"
@@ -81,7 +81,7 @@ SESSION=$(node $QWEN "create a worktree named 'a2-test' using enter_worktree, th
   --approval-mode yolo --output-format json 2>/dev/null \
   | jq -r '.[] | select(.type=="system") | .session_id' | head -1)
 
-SIDECAR=~/.qwen/projects/$PROJECT_ID/chats/$SESSION.worktree.json
+SIDECAR=~/.mariadb-shell-agent/projects/$PROJECT_ID/chats/$SESSION.worktree.json
 test ! -f "$SIDECAR" && echo "PASS: sidecar removed" || echo "FAIL: sidecar still exists"
 ```
 
@@ -96,10 +96,10 @@ SESSION=$(node $QWEN "create a worktree named 'a3-test' using enter_worktree, th
   --approval-mode yolo --output-format json 2>/dev/null \
   | jq -r '.[] | select(.type=="system") | .session_id' | head -1)
 
-SIDECAR=~/.qwen/projects/$PROJECT_ID/chats/$SESSION.worktree.json
+SIDECAR=~/.mariadb-shell-agent/projects/$PROJECT_ID/chats/$SESSION.worktree.json
 test ! -f "$SIDECAR" && echo "PASS: sidecar removed" || echo "FAIL: sidecar still exists"
 # Also verify the worktree dir is gone
-test ! -d "$TEST_DIR/.qwen/worktrees/a3-test" && echo "PASS: worktree dir removed"
+test ! -d "$TEST_DIR/.mariadb-shell-agent/worktrees/a3-test" && echo "PASS: worktree dir removed"
 ```
 
 **Expected:** both the sidecar AND the worktree directory are gone.
@@ -116,7 +116,7 @@ test ! -d "$TEST_DIR/.qwen/worktrees/a3-test" && echo "PASS: worktree dir remove
 node $QWEN "use enter_worktree with name='b1-test' to create a worktree" \
   --approval-mode yolo --output-format json 2>/dev/null > /dev/null
 
-HOOKS_PATH=$(git -C "$TEST_DIR/.qwen/worktrees/b1-test" config --local core.hooksPath)
+HOOKS_PATH=$(git -C "$TEST_DIR/.mariadb-shell-agent/worktrees/b1-test" config --local core.hooksPath)
 echo "Got hooksPath: $HOOKS_PATH"
 test "$HOOKS_PATH" = "$TEST_DIR/.git/hooks" && echo "PASS" || echo "FAIL"
 ```
@@ -135,7 +135,7 @@ chmod +x "$TEST_DIR/.husky/pre-commit"
 node $QWEN "use enter_worktree with name='b2-test' to create a worktree" \
   --approval-mode yolo --output-format json 2>/dev/null > /dev/null
 
-HOOKS_PATH=$(git -C "$TEST_DIR/.qwen/worktrees/b2-test" config --local core.hooksPath)
+HOOKS_PATH=$(git -C "$TEST_DIR/.mariadb-shell-agent/worktrees/b2-test" config --local core.hooksPath)
 test "$HOOKS_PATH" = "$TEST_DIR/.husky" && echo "PASS" || echo "FAIL got=$HOOKS_PATH"
 ```
 
@@ -158,7 +158,7 @@ node $QWEN "use enter_worktree with name='b3-test' to create a worktree" \
   --approval-mode yolo --output-format json 2>/dev/null > /dev/null
 
 # Commit something inside the worktree
-WT="$TEST_DIR/.qwen/worktrees/b3-test"
+WT="$TEST_DIR/.mariadb-shell-agent/worktrees/b3-test"
 echo "x" > "$WT/file.txt"
 git -C "$WT" add file.txt
 rm -f /tmp/qwen-wt-hook-marker
@@ -201,10 +201,10 @@ echo "$RESUMED" | grep -q "Resumed.*Active worktree.*c1-test" && echo "PASS" || 
 INIT_OUT=$(node $QWEN "use enter_worktree with name='c2-test' to create a worktree" \
   --approval-mode yolo --output-format json 2>/dev/null)
 SESSION=$(echo "$INIT_OUT" | jq -r '.[] | select(.type=="system") | .session_id' | head -1)
-SIDECAR=~/.qwen/projects/$PROJECT_ID/chats/$SESSION.worktree.json
+SIDECAR=~/.mariadb-shell-agent/projects/$PROJECT_ID/chats/$SESSION.worktree.json
 
 # Delete the worktree directory out-of-band
-rm -rf "$TEST_DIR/.qwen/worktrees/c2-test"
+rm -rf "$TEST_DIR/.mariadb-shell-agent/worktrees/c2-test"
 test -f "$SIDECAR" || { echo "SKIP: sidecar was already gone"; exit 0; }
 
 # Resume — should clean up the stale sidecar
@@ -332,7 +332,7 @@ tmux send-keys -t wt-e2 Enter
 for i in $(seq 1 30); do sleep 2; tmux capture-pane -t wt-e2 -p | grep -q "Type your message" && break; done
 
 # Make the worktree dirty: 1 new commit + 1 uncommitted file
-WT="$TEST_DIR/.qwen/worktrees/e2-test"
+WT="$TEST_DIR/.mariadb-shell-agent/worktrees/e2-test"
 echo "new" > "$WT/new.txt"
 git -C "$WT" add new.txt
 git -C "$WT" commit -q -m "test commit" --no-verify
@@ -385,7 +385,7 @@ tmux capture-pane -t wt-e3 -p | grep -q "Type your message" && echo "PASS" || \
   { echo "FAIL — captured:"; tmux capture-pane -t wt-e3 -p; }
 
 # Verify the worktree was NOT removed
-test -d "$TEST_DIR/.qwen/worktrees/e3-test" && echo "worktree intact" || echo "FAIL: worktree gone"
+test -d "$TEST_DIR/.mariadb-shell-agent/worktrees/e3-test" && echo "worktree intact" || echo "FAIL: worktree gone"
 tmux kill-session -t wt-e3
 ```
 
@@ -420,7 +420,7 @@ for i in $(seq 1 20); do
 done
 
 # Worktree directory should still exist
-test -d "$TEST_DIR/.qwen/worktrees/e4-test" && echo "PASS: worktree preserved" || \
+test -d "$TEST_DIR/.mariadb-shell-agent/worktrees/e4-test" && echo "PASS: worktree preserved" || \
   echo "FAIL: worktree was removed"
 tmux kill-session -t wt-e4 2>/dev/null || true
 ```
@@ -458,7 +458,7 @@ for i in $(seq 1 20); do
 done
 
 # Worktree directory should be GONE
-test ! -d "$TEST_DIR/.qwen/worktrees/e5-test" && echo "PASS: worktree removed" || \
+test ! -d "$TEST_DIR/.mariadb-shell-agent/worktrees/e5-test" && echo "PASS: worktree removed" || \
   echo "FAIL: worktree still on disk"
 # Branch should also be deleted
 git -C "$TEST_DIR" branch --list | grep -q "worktree-e5-test" && \
@@ -488,7 +488,7 @@ tmux send-keys -t wt-f1 Enter
 for i in $(seq 1 30); do sleep 2; tmux capture-pane -t wt-f1 -p | grep -q "Type your message" && break; done
 
 # Step 2: read the absolute worktree path so the model knows where to write
-WT="$TEST_DIR/.qwen/worktrees/f1-feature"
+WT="$TEST_DIR/.mariadb-shell-agent/worktrees/f1-feature"
 tmux send-keys -t wt-f1 "write the file $WT/hello.txt with content 'hi from worktree'"
 sleep 0.5
 tmux send-keys -t wt-f1 Enter
@@ -522,7 +522,7 @@ tmux kill-session -t wt-f1
 
 ```bash
 # Create a statusline script that prints the JSON it receives via stdin
-SETTINGS_DIR=~/.qwen
+SETTINGS_DIR=~/.mariadb-shell-agent
 SETTINGS_FILE=$SETTINGS_DIR/settings.json
 cp -f "$SETTINGS_FILE" /tmp/qwen-settings-backup.json 2>/dev/null || true
 mkdir -p "$SETTINGS_DIR"

@@ -48,8 +48,8 @@ should not persist a temporary screen clamp as a new user preference.
 ### Audio
 
 Official reference inspected 2026-09-08:
-https://help.aliyun.com/zh/model-studio/realtime and its session.update link
-https://help.aliyun.com/zh/model-studio/client-events#26a8302028sjm .
+https://help.aliyun.invalid/zh/model-studio/realtime and its session.update link
+https://help.aliyun.invalid/zh/model-studio/client-events#26a8302028sjm .
 
 Qwen3.5 Omni Plus/Flash Realtime support `audio.input.format` and
 `audio.output.format` with PCM/WAV and 8/16/24/48 kHz; defaults are 16 kHz input,
@@ -73,7 +73,7 @@ No system-wide audio setting is changed and no real media is opened for tests.
 ## Verification and scope
 
 Follow the independent baseline/test plan in
-`.qwen/e2e-tests/2026-09-08-live-followups.md`. Use offline actual-source tests,
+`.mariadb-shell-agent/e2e-tests/2026-09-08-live-followups.md`. Use offline actual-source tests,
 renderer fixtures, safe WebSocket mocks and device fakes. Run focused tests from
 package directories, builds/typechecks serially, then two clean review passes.
 Preserve all existing dirty changes. No reinstall, publishing, broad refactor,

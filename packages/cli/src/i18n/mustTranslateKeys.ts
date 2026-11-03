@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -105,7 +106,7 @@ export const MUST_TRANSLATE_KEYS = [
   'Invalid approval mode "{{arg}}". Valid modes: {{modes}}',
   'Approval mode set to "{{mode}}"',
   'auto_mode.entry_notice',
-  "Set up Qwen Code's status line UI",
+  "Set up MariaDB Shell Agent's status line UI",
   'Cached (included in Input): {{tokens}}',
   'By source:',
   'Unclosed quote in arguments.',

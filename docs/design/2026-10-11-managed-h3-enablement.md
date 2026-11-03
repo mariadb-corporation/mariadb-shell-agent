@@ -2,7 +2,7 @@
 
 [English](2026-10-11-managed-h3-enablement.md) | [简体中文](2026-10-11-managed-h3-enablement.zh-CN.md)
 
-Status: implemented and physically accepted (2026-10-11). Implements #13856. The acceptance pass ran on the H3 rig at `e64ee1fbeb` with the production gate lists and no admission arms: all six behaviours observed, including the previously blocked output-as-Artifact arm (byte-identical readback) and the Monitor watch outliving its turn; the pass needed — and got — the page-closure fix this change carries. Record: `.qwen/e2e-tests/2026-10-11-h3-enablement.md`. Related:
+Status: implemented and physically accepted (2026-10-11). Implements #13856. The acceptance pass ran on the H3 rig at `e64ee1fbeb` with the production gate lists and no admission arms: all six behaviours observed, including the previously blocked output-as-Artifact arm (byte-identical readback) and the Monitor watch outliving its turn; the pass needed — and got — the page-closure fix this change carries. Record: `.mariadb-shell-agent/e2e-tests/2026-10-11-h3-enablement.md`. Related:
 [H3 Shell/Monitor runtime](2026-10-03-managed-shell-monitor-runtime.md)
 (the runtime being enabled), #13532 (physical acceptance), #13533 (B1/B2 and
 the two design calls), #13789 (A1 fix), #13830 (B1), #13834 (B2 witness),
@@ -355,7 +355,7 @@ projection is removed (mutation-checked).
 - Fault gates: the D8 table's CI arms, plus the existing pinned gates
   unchanged.
 - Physical: the D7 rig pass on the packaged chain, recorded in this
-  document and `.qwen/e2e-tests/2026-10-11-h3-enablement.md`.
+  document and `.mariadb-shell-agent/e2e-tests/2026-10-11-h3-enablement.md`.
 - `npm run build && npm run typecheck`, package-level test runs for every
   touched package, and the pre-commit multi-pass audit.
 

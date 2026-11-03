@@ -6,7 +6,7 @@ Status: historical design and verification record for the lifecycle-registry,
 handshake, transport and startup slices, 2026-09-15. The remaining split is now
 implemented; final combined acceptance is tracked in the
 [completion design](2026-09-15-acp-bridge-completion.md).
-Tracks [#11866](https://github.com/QwenLM/qwen-code/issues/11866). Baseline code
+Tracks [#11866](https://github.invalid/QwenLM/qwen-code/issues/11866). Baseline code
 and test observations refer to `9efdd898e7`; local implementation and verification
 results are identified separately below.
 
@@ -143,7 +143,7 @@ Use the existing guard, private capability, file capability, active-work,
 liveness and startup-failure bridge tests as regression evidence. Add focused
 bridge-level coverage for unsupported capability versions and negotiation before
 the initialize span finishes. Run those tests before the source extraction,
-repeat the public HTTP/SSE baseline against global `qwen`, then build, typecheck,
+repeat the public HTTP/SSE baseline against global `mariadb-shell-agent`, then build, typecheck,
 bundle, run affected tests and repeat the E2E harness against the local bundle.
 Acceptance is sole ownership of handshake wire construction/interpretation in
 the new module, no additional async hop and no changed lifecycle or session
@@ -251,12 +251,12 @@ and channel-exit separation.
 3. Update both design versions with actual boundaries and verification evidence
    as each slice lands. File length alone is not acceptance evidence.
 
-[#11867](https://github.com/QwenLM/qwen-code/issues/11867) can define and test the
+[#11867](https://github.invalid/QwenLM/qwen-code/issues/11867) can define and test the
 external daemon contract in parallel. Process count and spawn coalescing belong
 in bridge/lifecycle tests, not in a cross-implementation wire contract.
-[#11868](https://github.com/QwenLM/qwen-code/issues/11868) owns event storage and
+[#11868](https://github.invalid/QwenLM/qwen-code/issues/11868) owns event storage and
 retention changes. Share the boundary with
-[#11869](https://github.com/QwenLM/qwen-code/issues/11869), but do not make its Java
+[#11869](https://github.invalid/QwenLM/qwen-code/issues/11869), but do not make its Java
 implementation a prerequisite for the first internal extraction.
 
 ## Validation and acceptance
@@ -286,9 +286,9 @@ than timing delays to hold startup and physical teardown open.
 | Session behavior                | Same-session FIFO, cross-session concurrency, shared-channel sibling survival and exit fan-out remain unchanged.                                                             |
 | Idle eligibility                | Reuse and timer cancellation, pending restores/new sessions, workspace operations and keep-alive reservations retain their current protections.                              |
 
-Before production changes, write the executable E2E plan in `.qwen/e2e-tests/`
+Before production changes, write the executable E2E plan in `.mariadb-shell-agent/e2e-tests/`
 and dry-run its public create/prompt/SSE/delete and workspace-isolation scenarios
-against the global `qwen` CLI. Use deterministic fake channels for internal
+against the global `mariadb-shell-agent` CLI. Use deterministic fake channels for internal
 startup/exit races. After each source slice, run root build and typecheck, focused
 package tests, and the affected E2E scenarios against the local bundle. The final
 split also requires the full suite requested by #11866 and two clean self-audit
@@ -304,13 +304,13 @@ in the bridge source but was absent from its local built declaration. Running
 manifests or lockfiles. Full root build and typecheck then passed before the
 production extraction.
 
-The global `qwen` 0.23.3 E2E dry-run also passed before extraction: workspace
+The global `mariadb-shell-agent` 0.23.3 E2E dry-run also passed before extraction: workspace
 mismatch returns 400, concurrent creates return distinct sessions, each SSE
 receives its own prompt result and exactly one terminal, deletion returns 204,
 and the sibling continues prompting after the first session closes. All three
 model requests used a local fake endpoint; the daemon exited cleanly without
 remaining test processes. The executable plan and report are in
-`.qwen/e2e-tests/issue-11866-channel-lifecycle.md`.
+`.mariadb-shell-agent/e2e-tests/issue-11866-channel-lifecycle.md`.
 
 After extraction, root build, typecheck and bundle passed, as did ESLint on the
 three source/test files and formatting checks. The five affected bridge test
@@ -336,7 +336,7 @@ and cleanup. Both comparison runs exited normally with no remaining test
 processes. An earlier global run passed the public assertions but exited 1
 during shutdown; the report retains that intermittent baseline observation and
 does not infer its cause. The separate plan and evidence are recorded in
-`.qwen/e2e-tests/issue-11866-channel-handshake.md`.
+`.mariadb-shell-agent/e2e-tests/issue-11866-channel-handshake.md`.
 
 The third slice's four new bridge-level tests passed before and after
 extraction. They cover the exact teardown deadline and forced signal, retention
@@ -351,7 +351,7 @@ The third slice's public E2E matched its global baseline for HTTP results,
 prompt terminals, model requests and cleanup. Both daemons exited 0; independent
 process and TCP checks also confirmed no local test process or listening port
 remained, with no shutdown error in the log. The separate plan and evidence are
-in `.qwen/e2e-tests/issue-11866-channel-transport.md`. These results validate the
+in `.mariadb-shell-agent/e2e-tests/issue-11866-channel-transport.md`. These results validate the
 three local slices, not the completed issue or full repository suite.
 
 The fourth slice's three bridge regressions passed before and after extraction:
@@ -384,7 +384,7 @@ The fourth slice's initial public E2E matches its global baseline for HTTP resul
 prompt terminals, model requests and cleanup. Both daemons exited 0; independent
 process and TCP checks confirmed no local test process or listener remained,
 with no shutdown error in the log. The report and evidence are in
-`.qwen/e2e-tests/issue-11866-channel-startup.md`. These results cover four local
+`.mariadb-shell-agent/e2e-tests/issue-11866-channel-startup.md`. These results cover four local
 slices, not the completed issue or a full-repository test run.
 
 A later post-review local sanity run passed every public assertion but its
@@ -412,8 +412,8 @@ script now fails on a nonzero actual daemon exit. With the existing
 exited 0 against both global and local binaries, with process/port cleanup
 confirmed. Polling is a tested mitigation, not a default change or permanent fix.
 Production code remains unchanged. Evidence and limitations are recorded in
-`.qwen/issues/issue-11866-shutdown.md` and
-`.qwen/investigations/issue-11866-shutdown/journal.md`.
+`.mariadb-shell-agent/issues/issue-11866-shutdown.md` and
+`.mariadb-shell-agent/investigations/issue-11866-shutdown/journal.md`.
 
 Acceptance for the first PR is single ownership of the three lifecycle slots,
 no mutable registry escape, no changed observable behavior, and the evidence

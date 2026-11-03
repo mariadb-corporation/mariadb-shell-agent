@@ -1,6 +1,6 @@
 # /review: promote language-pitfall and wrapper/proxy checks out of Agent 1a
 
-Issue: [#9788](https://github.com/QwenLM/qwen-code/issues/9788)
+Issue: [#9788](https://github.invalid/QwenLM/qwen-code/issues/9788)
 
 ## Problem
 

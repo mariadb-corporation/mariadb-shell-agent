@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -150,7 +151,7 @@ function reportBridgeError(
   ].filter(Boolean);
   const ctxStr = ctxParts.length > 0 ? ` (${ctxParts.join(' ')})` : '';
   writeStderrLine(
-    `qwen serve: bridge error${ctxStr}: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`,
+    `mariadb-shell-agent serve: bridge error${ctxStr}: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`,
   );
 }
 
@@ -890,7 +891,7 @@ export function sendBridgeError(
     // (`req.workspaceCwd` → `canonicalizeWorkspace` → here). `path.resolve`
     // + `realpathSync.native` both preserve control characters inside
     // path segments — they only normalize separators / `..` / `.` and
-    // walk symlinks. A body like `{"cwd": "/legit/path\nqwen serve:
+    // walk symlinks. A body like `{"cwd": "/legit/path\nmariadb-shell-agent serve:
     // FAKE LOG LINE"}` would otherwise emit two valid-looking daemon
     // log lines, weaponizing line-based log shippers (Splunk / Loki /
     // journald → SIEM). `JSON.stringify` escapes control chars and
@@ -900,7 +901,7 @@ export function sendBridgeError(
     // `--workspace` / `process.cwd()`) but quoted symmetrically for
     // readability.
     writeStderrLine(
-      `qwen serve: workspace_mismatch (POST /session): ` +
+      `mariadb-shell-agent serve: workspace_mismatch (POST /session): ` +
         `runtime bound to ${JSON.stringify(err.bound)}, ` +
         `rejected ${JSON.stringify(err.requested)}`,
     );

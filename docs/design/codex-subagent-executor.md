@@ -95,7 +95,7 @@ unproven-tree diagnostic without replacing the task outcome. Cancellation does n
 
 ## Validation and acceptance
 
-The test plan is `.qwen/e2e-tests/codex-subagent-executor.md`. Confirm the missing
+The test plan is `.mariadb-shell-agent/e2e-tests/codex-subagent-executor.md`. Confirm the missing
 capability with global Qwen, then verify the rebuilt CLI using isolated model
 and native-protocol fixtures. Check both builtin definitions, actual Codex
 dispatch, foreground/background results, completion notification, message and

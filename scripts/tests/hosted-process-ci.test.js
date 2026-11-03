@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -600,7 +601,7 @@ describe('Hosted real-process gates', () => {
     expect(read(hostedTestPath('HostedHookStreamGapIT'))).toContain(
       '"target/fg13-cases"',
     );
-    // The runner writes the Step 3 gate evidence under .qwen/, a hidden
+    // The runner writes the Step 3 gate evidence under .mariadb-shell-agent/, a hidden
     // path that upload-artifact drops silently without the flag. The arms
     // that write it run in the failover job, so the upload lives there.
     const evidence = java.jobs['hosted-failover-e2e'].steps.find(
@@ -608,10 +609,10 @@ describe('Hosted real-process gates', () => {
     );
     expect(evidence.if).toBe('always()');
     expect(evidence.with.path).toBe(
-      '.qwen/investigations/g3-step3-implementation/',
+      '.mariadb-shell-agent/investigations/g3-step3-implementation/',
     );
     expect(evidence.with['include-hidden-files']).toBe(true);
-    expect(upload.with.path).not.toContain('.qwen/');
+    expect(upload.with.path).not.toContain('.mariadb-shell-agent/');
     // The writer side of the same path: the runner's default report
     // directory must stay under what the step uploads, or the artifact
     // goes empty with only a warning.

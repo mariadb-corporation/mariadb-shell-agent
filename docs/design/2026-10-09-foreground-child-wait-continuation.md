@@ -408,7 +408,7 @@ DELETED` end-to-end after a wedge at interruption point 1.
   against the unmutated expectation (e.g. drop the `commitAwaitAgent` call →
   point-1 probe stays wedged; drop the journaled dedupe → point-2 probe
   double-folds), then restored byte-identical before commit.
-- **Reproduction pins filled in `.qwen/issues/issue-13708.md`:** the red
+- **Reproduction pins filled in `.mariadb-shell-agent/issues/issue-13708.md`:** the red
   state of the new suite against pre-fix code serves as the executable
   reproduction report; the green state as the verification report.
 

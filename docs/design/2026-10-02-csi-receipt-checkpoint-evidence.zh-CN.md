@@ -176,7 +176,7 @@ Fixture 提供惰性 producer 字节及受控 outcome/history 输入，没有运
 全部拒绝。观察未改变全部 16 张跟踪表和 object 字节；自有进程、端口和临时
 目录已回收，870 个输入与 121 个依赖保持不变。
 
-报告保存在 `.qwen/e2e-tests/`：native/CLI post 报告及 2026-10-03 独立 SQL
+报告保存在 `.mariadb-shell-agent/e2e-tests/`：native/CLI post 报告及 2026-10-03 独立 SQL
 报告。较早 39 场景/16 组运行和失败复现保留为历史证据。本次只认证固定 inline
 profile 下显式选择的一条原 publication。Workspace 全量库存、持久 ACK、严格
 MCP 历史、可信 stop/unpublish、物理 holder 释放、新云端执行，以及 CST JVM/

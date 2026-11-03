@@ -6,14 +6,14 @@
 
 ## 1. 问题与证据
 
-[#14062](https://github.com/QwenLM/qwen-code/issues/14062) 报告：Hosted `send_message` 通过原始 UTF-8 大小检查后，仍可能在 `encodeToolInput` 处使发送方整个 Turn 失败。模型拿不到工具响应，无法修正参数。另一个分支缺口使团队成员 `to: "parent"` 缺少普通子 agent 已有的原始正文大小检查。
+[#14062](https://github.invalid/QwenLM/qwen-code/issues/14062) 报告：Hosted `send_message` 通过原始 UTF-8 大小检查后，仍可能在 `encodeToolInput` 处使发送方整个 Turn 失败。模型拿不到工具响应，无法修正参数。另一个分支缺口使团队成员 `to: "parent"` 缺少普通子 agent 已有的原始正文大小检查。
 
 本设计基于本地分支 `feat/managed-agents/mirror` 的 HEAD `7d6dcc8c95ec85b94a1836de17f192c4a2a2113e`。添加本文档前工作区干净。下文基线源码索引固定引用该版本。2026-10-18 使用 `gh` 读取到的 GitHub 状态如下：
 
-- #14062 为 OPEN，标签为 `priority/P2`。已检查正文、全部四条评论和关联的[真实栈报告](https://github.com/QwenLM/qwen-code/pull/13955#issuecomment-6139614564)。报告中的运行结果属于原作者证据，本文不声称已复现。
-- [#13822](https://github.com/QwenLM/qwen-code/pull/13822)（H4d-b）和 [#13955](https://github.com/QwenLM/qwen-code/pull/13955)（成员消息）均已 MERGED。当前源码包含相应路由。
-- [#14118](https://github.com/QwenLM/qwen-code/pull/14118) 为 OPEN，head 为 `96c0b290578e7cbcee29da6a2921f17d3fad3568`。其生产代码补丁已提出下文两个小改动；报告和审查记录披露了 assistant record 超限的残留问题。它是参考提案，不能视为上游已实现或已接受的修复。
-- [#14054](https://github.com/QwenLM/qwen-code/issues/14054) 是故障门禁总索引；FG9 跟踪项 [#14164](https://github.com/QwenLM/qwen-code/issues/14164) 已 CLOSED。[本地 FG9 设计](../2026-10-15-session-relay-fault-gates.md) 明确写明，小消息夹具不覆盖、也不修复 #14062。FG9 完成不是本修复的验收证据。
+- #14062 为 OPEN，标签为 `priority/P2`。已检查正文、全部四条评论和关联的[真实栈报告](https://github.invalid/QwenLM/qwen-code/pull/13955#issuecomment-6139614564)。报告中的运行结果属于原作者证据，本文不声称已复现。
+- [#13822](https://github.invalid/QwenLM/qwen-code/pull/13822)（H4d-b）和 [#13955](https://github.invalid/QwenLM/qwen-code/pull/13955)（成员消息）均已 MERGED。当前源码包含相应路由。
+- [#14118](https://github.invalid/QwenLM/qwen-code/pull/14118) 为 OPEN，head 为 `96c0b290578e7cbcee29da6a2921f17d3fad3568`。其生产代码补丁已提出下文两个小改动；报告和审查记录披露了 assistant record 超限的残留问题。它是参考提案，不能视为上游已实现或已接受的修复。
+- [#14054](https://github.invalid/QwenLM/qwen-code/issues/14054) 是故障门禁总索引；FG9 跟踪项 [#14164](https://github.invalid/QwenLM/qwen-code/issues/14164) 已 CLOSED。[本地 FG9 设计](../2026-10-15-session-relay-fault-gates.md) 明确写明，小消息夹具不覆盖、也不修复 #14062。FG9 完成不是本修复的验收证据。
 
 Issue 的一条评论称“没有任何消息”能同时通过原始大小检查并容纳编码，范围过宽：小消息可以同时满足两者。准确结论是：65,536 字节原始上限不代表保证可用的消息大小，包装与转义也消耗同一个 inline 预算。
 
@@ -21,16 +21,16 @@ Issue 的一条评论称“没有任何消息”能同时通过原始大小检�
 
 ### 2.1 源码索引
 
-| 源码                                                                                                                                                                                           | 职责与已观察行为                                                                                                                                                                |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [hosted-harness-model.ts](https://github.com/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/cli/src/serve/hosted-harness-model.ts#L719)                               | 复制完整模型 parts，恢复工具 call ID，调用 `toolTurn.execute`，再将返回响应送入下一轮模型调用。                                                                                 |
-| [hosted-workspace-tool-turn.ts](https://github.com/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/cli/src/serve/hosted-workspace-tool-turn.ts#L2943)                  | `prepareRequests` 校验并编码每个调用。成员路由从第 3380 行开始，成员分支绕过后面的原始正文检查。第 3545 行的 encode catch 仅恢复有效 `workflow`，或本来已有校验拒绝的调用。     |
-| [encodeToolInput](https://github.com/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/cli/src/serve/hosted-workspace-tool-turn.ts#L4791)                                | 将 `{toolName,input}` 编为 `payloadJson`，再编码 `{harnessSessionId,runtimeSessionId,payloadJson}`。当这些 UTF-8 字节超过 65,536 时抛出私有 `HostedToolInputInlineLimitError`。 |
-| [hosted-harness-session.ts](https://github.com/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/cli/src/serve/hosted-harness-session.ts#L3145)                          | 提供完整 ChatRecord 构造、持久提交回调和 `messageFitsInline` 判定，包括记录元数据、model 和全部 parts。                                                                         |
-| [managed-session-message-record.ts](https://github.com/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/core/src/managed-runtime/managed-session-message-record.ts#L32) | `MANAGED_SESSION_MESSAGE_LIMITS.maxContentBytes = 64 * 1024`。                                                                                                                  |
-| [managed-child-operations.ts](https://github.com/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/core/src/managed-runtime/managed-child-operations.ts#L46)             | `MANAGED_CHILD_LIMITS.maxEnvelopeBytes = 32 * 1024`。                                                                                                                           |
-| [http-managed-session-store.ts](https://github.com/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/core/src/managed-runtime/http-managed-session-store.ts#L58)         | `HTTP_MANAGED_SESSION_STORE_CONTRACT.maxInlineResourceBytes = 64 * 1024`。                                                                                                      |
-| [hosted-session-message-session.ts](https://github.com/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/cli/src/serve/hosted-session-message-session.ts#L128)           | `memberMessageContent` 添加发送者头尾，成员信封检查会计算这部分字节。                                                                                                           |
+| 源码                                                                                                                                                                                               | 职责与已观察行为                                                                                                                                                                |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [hosted-harness-model.ts](https://github.invalid/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/cli/src/serve/hosted-harness-model.ts#L719)                               | 复制完整模型 parts，恢复工具 call ID，调用 `toolTurn.execute`，再将返回响应送入下一轮模型调用。                                                                                 |
+| [hosted-workspace-tool-turn.ts](https://github.invalid/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/cli/src/serve/hosted-workspace-tool-turn.ts#L2943)                  | `prepareRequests` 校验并编码每个调用。成员路由从第 3380 行开始，成员分支绕过后面的原始正文检查。第 3545 行的 encode catch 仅恢复有效 `workflow`，或本来已有校验拒绝的调用。     |
+| [encodeToolInput](https://github.invalid/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/cli/src/serve/hosted-workspace-tool-turn.ts#L4791)                                | 将 `{toolName,input}` 编为 `payloadJson`，再编码 `{harnessSessionId,runtimeSessionId,payloadJson}`。当这些 UTF-8 字节超过 65,536 时抛出私有 `HostedToolInputInlineLimitError`。 |
+| [hosted-harness-session.ts](https://github.invalid/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/cli/src/serve/hosted-harness-session.ts#L3145)                          | 提供完整 ChatRecord 构造、持久提交回调和 `messageFitsInline` 判定，包括记录元数据、model 和全部 parts。                                                                         |
+| [managed-session-message-record.ts](https://github.invalid/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/core/src/managed-runtime/managed-session-message-record.ts#L32) | `MANAGED_SESSION_MESSAGE_LIMITS.maxContentBytes = 64 * 1024`。                                                                                                                  |
+| [managed-child-operations.ts](https://github.invalid/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/core/src/managed-runtime/managed-child-operations.ts#L46)             | `MANAGED_CHILD_LIMITS.maxEnvelopeBytes = 32 * 1024`。                                                                                                                           |
+| [http-managed-session-store.ts](https://github.invalid/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/core/src/managed-runtime/http-managed-session-store.ts#L58)         | `HTTP_MANAGED_SESSION_STORE_CONTRACT.maxInlineResourceBytes = 64 * 1024`。                                                                                                      |
+| [hosted-session-message-session.ts](https://github.invalid/QwenLM/qwen-code/blob/7d6dcc8c95ec85b94a1836de17f192c4a2a2113e/packages/cli/src/serve/hosted-session-message-session.ts#L128)           | `memberMessageContent` 添加发送者头尾，成员信封检查会计算这部分字节。                                                                                                           |
 
 该表记录修复前的 HEAD，源码永久链接固定到该版本，不随实现后的行号移动。第 8 节记录工作区实现与验证。
 
@@ -139,7 +139,7 @@ encoder 已是精确大小判据。捕获其私有大小异常，可以避免第
 
 不能只依赖 command/session-message 测试当前的 `messageFitsInline = () => true`，它无法证明真实 transcript 可容纳。直接 `execute` 测试可隔离编码和分支逻辑，但同 Turn 重试承诺必须经过实际 model loop 与 Harness 注入的生产 ChatRecord 大小判定。不得在测试内抄一份简化 ChatRecord 就当作生产判据；复用既有测试接口，不为测试单独新增公共 serializer API。
 
-实现前，若全局 `qwen` 可访问 Hosted 路径，先记录基线行为，将版本、环境写到 `.qwen/e2e-tests/`；仅 CLI 启动不算复现。先运行失败用例，再修复，并从 `packages/cli` 重跑：
+实现前，若全局 `mariadb-shell-agent` 可访问 Hosted 路径，先记录基线行为，将版本、环境写到 `.mariadb-shell-agent/e2e-tests/`；仅 CLI 启动不算复现。先运行失败用例，再修复，并从 `packages/cli` 重跑：
 
 ```bash
 npx vitest run src/serve/hosted-workspace-tool-turn.commands.test.ts src/serve/hosted-workspace-tool-turn.session-message.test.ts src/serve/hosted-workspace-tool-turn.workflow-child.test.ts
@@ -172,16 +172,16 @@ npx vitest run src/serve/hosted-workspace-tool-turn.commands.test.ts src/serve/h
 - S2：修正原始正文或信封、编码输入、transcript 预算之间的关系表述。
 - S3：将源码锚点调整到实际相关符号。
 
-审计报告保留在本地 `.qwen/pr-reviews/issue-14062-design-audit.md`（git-ignored）。独立复核：已完成，D1、S1–S3 均已闭环，无未处理审计发现，也未发现新的实质问题。用户随后授权实施有边界修复，第 8 节记录其证据与完整 issue 的剩余边界。
+审计报告保留在本地 `.mariadb-shell-agent/pr-reviews/issue-14062-design-audit.md`（git-ignored）。独立复核：已完成，D1、S1–S3 均已闭环，无未处理审计发现，也未发现新的实质问题。用户随后授权实施有边界修复，第 8 节记录其证据与完整 issue 的剩余边界。
 
 ## 8. 实现证据（2026-10-19）
 
 工作区仅实施第 4 节的两个生产代码改动：成员→parent 的原始正文检查，以及窄范围的 `send_message` 编码超限拒绝。Store 上限、公共声明、schema、relay 行为不变。
 
-- 独立测试工程师在源码修改前复现五项基线失败，并先实际尝试全局 `qwen` 0.23.3。其普通 CLI 返回 `Tool "send_message" not found in registry`，未到达 Hosted 工具，不能算 Hosted 验收。
+- 独立测试工程师在源码修改前复现五项基线失败，并先实际尝试全局 `mariadb-shell-agent` 0.23.3。其普通 CLI 返回 `Tool "send_message" not found in registry`，未到达 Hosted 工具，不能算 Hosted 验收。
 - command、session-message、workflow 套件共 102 项通过，覆盖成员、广播、parent 通道、UTF-8 原始限制、65,536 与 65,537 字节精确编码边界、首次批次拒绝、收件人错误优先级、拒绝写入失败，以及普通工具超限行为不变。成员通道被告知的是自身的 32768 字节包装上限，而非 Store 上限。宽松 transcript 判据下的直接调用测试仍仅作为 guard/encoder 的隔离证据。
 - 完整 Harness 套件共 611 项通过，其中七项新增回归使用实际模型循环、本地 OpenAI-compatible 脚本端点、生产 ChatRecord 大小判定及 HTTP resource-store inline 检查。原有五项覆盖成员与普通子 agent 发往 `parent`、两项 assistant record 场景，以及真实 Hook 改写；新增两项覆盖成员→`bob` 与成员→`*`（广播）的命令通道恢复。成员、命令通道与普通子 agent 的高转义消息可在同一 prompt 内拒绝后缩短重试；真实 `HostedHookSession` 先处理、持久化脚本化 worker 结果，再让改写消息获得拒绝并缩短。两项 65,400 字节 ASCII 场景仍在 assistant record 处失败，不产生消息记录。
 - 上述 Harness 测试使用本地 journal/resources，并 mock Broker/worker 访问。一条本地排队的 `session_message` 不代表远端收件人已收到。真实 managed-agent-server/MySQL/Broker/Harness/worker 验收尚未执行：Docker 已安装，但 daemon 不可用。
-- `npm run build`、`npm run bundle`、完整 workspace/integration `npm run typecheck`、针对性 ESLint、Prettier 及引用检查均通过。两项源码变异均被直接识别，固定源码按字节恢复。独立修复后验证通过原始五项复现及 24 项选定验收/正常路径用例。独立代码审查的两项建议已纳入，无未处理发现。本地报告及 E2E 计划位于 `.qwen/issues/issue-14062.md` 与 `.qwen/e2e-tests/issue-14062/`；代码审查记录位于 `.qwen/pr-reviews/issue-14062-implementation-review.md`。
+- `npm run build`、`npm run bundle`、完整 workspace/integration `npm run typecheck`、针对性 ESLint、Prettier 及引用检查均通过。两项源码变异均被直接识别，固定源码按字节恢复。独立修复后验证通过原始五项复现及 24 项选定验收/正常路径用例。独立代码审查的两项建议已纳入，无未处理发现。本地报告及 E2E 计划位于 `.mariadb-shell-agent/issues/issue-14062.md` 与 `.mariadb-shell-agent/e2e-tests/issue-14062/`；代码审查记录位于 `.mariadb-shell-agent/pr-reviews/issue-14062-implementation-review.md`。
 
 可以按有边界修复 review 本实现；不能把超大 assistant record 或未执行的物理验收算作已修复、已验证。

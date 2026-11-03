@@ -1,22 +1,22 @@
-# A peer endpoint for programs outside Qwen Code
+# A peer endpoint for programs outside MariaDB Shell Agent
 
 [English](2026-09-10-peer-endpoint-sdk.md) | [简体中文](2026-09-10-peer-endpoint-sdk.zh-CN.md)
 
 Status: implemented alongside this document. Adds `@qwen-code/sdk/peer`, a
 standalone implementation of the cross-session protocol for a program that
-is not a Qwen Code session.
+is not a MariaDB Shell Agent session.
 
 ## Problem
 
 [Cross-Session Protocol](../users/features/cross-session-protocol.md)
-describes everything a program outside Qwen Code must do to be found,
+describes everything a program outside MariaDB Shell Agent must do to be found,
 reached and answered: write a registry record, bind an inbox, present the
 right token, frame its messages, and read receipts as state transitions.
 Two things were missing.
 
 ### Nobody had implemented the page
 
-Every reader and writer of the protocol was Qwen Code itself, and the page
+Every reader and writer of the protocol was MariaDB Shell Agent itself, and the page
 was written from that code. Nothing showed the page was complete or
 unambiguous. A rule that lived only in the code — how a record's file name
 must agree with its PID, which token a receipt presents, when an inbox takes
@@ -35,19 +35,19 @@ repository — each one a chance to disagree with the sessions it talks to.
 ## Design
 
 **A second implementation, not a wrapper.** The module is written from the
-protocol page using Node's own modules alone. Qwen Code's core is not a
+protocol page using Node's own modules alone. MariaDB Shell Agent's core is not a
 runtime dependency of the SDK, and a wrapper around it would not have tested
 the page anyway. The build refuses a bundle that contains any runtime
-dependency or Qwen Code source.
+dependency or MariaDB Shell Agent source.
 
-**Tested against Qwen Code, in both directions.** A conformance suite runs
-the endpoint against Qwen Code's own registry, inbox, directory and send path
+**Tested against MariaDB Shell Agent, in both directions.** A conformance suite runs
+the endpoint against MariaDB Shell Agent's own registry, inbox, directory and send path
 in one process. Each lists and reaches the other; frames sent each way are
 parsed and answered; a folded drop receipt settles a burst; a controller
 token minted the way a user mints one is recognised, and a forged one is not.
 The same suite feeds hostile lines, record files and names to both
 implementations and requires the same verdicts, and pins every limit the
-page publishes to Qwen Code's constants. A disagreement there means one of
+page publishes to MariaDB Shell Agent's constants. A disagreement there means one of
 the implementations, or the page, is wrong.
 
 **Its own subpath, Node only.** `@qwen-code/sdk/peer` is a separate entry,
@@ -56,7 +56,7 @@ the endpoint's sockets cannot exist, and the default entry is what every
 `query()` user loads; the endpoint is opt-in for both.
 
 **The shared record name when it is free.** An endpoint publishes
-`<pid>.json`, the name every Qwen Code build with a registry can read. When
+`<pid>.json`, the name every MariaDB Shell Agent build with a registry can read. When
 that name is held — by another endpoint in the same process, by a record from
 another namespace or machine that collides on the PID, by a newer schema — it
 publishes a minted `<pid>-<8 hex>.json` rather than overwrite something that
@@ -66,7 +66,7 @@ endpoints starting together cannot both take the shared name.
 
 **It finds, receives, sends and tracks — nothing more.** The inbox accepts
 exactly one token, the endpoint's own. It keeps none of the review machinery
-a Qwen Code session keeps for itself: no rate limits, no holds, no controller
+a MariaDB Shell Agent session keeps for itself: no rate limits, no holds, no controller
 grants. A program that joins the directory decides for itself what to do
 with a message. It does remember the ids it has answered, so a sender that
 retries an id gets the same answer instead of the program handling the
@@ -74,7 +74,7 @@ message twice.
 
 **It never deletes what others wrote.** Listing reads the directory and
 applies the page's liveness rules, but never removes a record or a socket
-file. Clearing out dead sessions is left to Qwen Code sessions; a program
+file. Clearing out dead sessions is left to MariaDB Shell Agent sessions; a program
 that merely joined has no business removing other processes' files.
 
 **The controller token travels only where the caller sends it.** A program
@@ -97,7 +97,7 @@ nothing.
 running, as a server would. Closing removes the record and the socket, and an
 exit hook does the same on `process.exit`. The endpoint installs no signal
 handlers, which would change how the program exits; a process killed without
-closing leaves a record that Qwen Code sessions clear once its start token
+closing leaves a record that MariaDB Shell Agent sessions clear once its start token
 proves the process gone.
 
 **On Linux, no record without its identity.** When the start token or the
@@ -120,7 +120,7 @@ are now stated in "Writing your own record":
   `<pid>-<8 hex>.json`. Readers accept both names, and the record in the way
   may belong to a live process in another namespace or on another machine.
 
-The conformance suite found no disagreement between the page, Qwen Code and
+The conformance suite found no disagreement between the page, MariaDB Shell Agent and
 the endpoint on anything else it covers.
 
 ## What it does not do
@@ -148,4 +148,4 @@ the endpoint on anything else it covers.
 - Turn `agents.crossSessionMessaging` on by default, so a user's sessions
   can be reached without a settings change.
 - Inbound delivery to sessions a program drives over ACP.
-- Windows named pipes, for Qwen Code sessions and this endpoint alike.
+- Windows named pipes, for MariaDB Shell Agent sessions and this endpoint alike.

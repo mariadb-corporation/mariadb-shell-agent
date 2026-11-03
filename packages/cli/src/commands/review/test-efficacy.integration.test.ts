@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -94,7 +95,7 @@ function treeState(wt: string): string {
  * worktree and base SHA, with the report already written to `report.json`.
  */
 function scaffoldModifiedPr(
-  // The gate tests need the worktree UNDER `.qwen/tmp`, because that is the
+  // The gate tests need the worktree UNDER `.mariadb-shell-agent/tmp`, because that is the
   // only place `mountRootFor` answers and so the only place the gates speak.
   // A parameter rather than a fork: the fixture's shape — the report schema,
   // the workspace layout the handler requires, the fake runner's contract —
@@ -324,11 +325,11 @@ describe('the review worktree is the first pointer a probe run trusts', () => {
       // rewrite. It checks files out, so it runs whatever filter the pointer
       // leads to, on the host, before any gate inside the restore could fire.
       //
-      // The fixture has to sit under `.qwen/tmp`: everywhere else `mountRootFor`
+      // The fixture has to sit under `.mariadb-shell-agent/tmp`: everywhere else `mountRootFor`
       // answers null and the gate short-circuits, which is how deleting it
       // shipped green.
       const { wt, base } = scaffoldModifiedPr(
-        join(repo, '.qwen', 'tmp', 'review-pr-1'),
+        join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
       );
 
       // The rewrite reviewed code can make from inside the mount — and a
@@ -337,7 +338,7 @@ describe('the review worktree is the first pointer a probe run trusts', () => {
       // run reaches the checkout. An empty directory would fail earlier for a
       // reason that has nothing to do with the gate.
       plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-git'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
         adminEntryOf(wt),
         wt,
         join(repo, '.git'),
@@ -383,7 +384,7 @@ describe('the revert phase is reached after the gates refuse', () => {
       // The rewrite is done by the PR's own suite, which is who does it in
       // production: the fake runner below runs with the probe tree as its cwd.
       const { wt, base } = scaffoldModifiedPr(
-        join(repo, '.qwen', 'tmp', 'review-pr-1'),
+        join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
       );
 
       // A runner that rewrites its own tree's `.git` the first time it is
@@ -392,10 +393,10 @@ describe('the revert phase is reached after the gates refuse', () => {
       // oracle can be the thing itself — a canary the host writes only if a
       // checkout ran through this pointer — rather than the refusal message,
       // which reads the same whichever side of the write the gate fires on.
-      const planted = join(repo, '.qwen', 'tmp', '.evil-git');
+      const planted = join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git');
       const canary = join(repo, 'PWNED');
       const fakeCommon = plantRepository(
-        join(repo, '.qwen', 'tmp', '.evil-common'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-common'),
         join(repo, '.git'),
         canary,
         'smudge',

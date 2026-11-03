@@ -24,7 +24,7 @@ Changes span daemon lifecycle routing/capabilities, the TypeScript workspace SDK
 
 Cover absent/void/rejected callbacks; callback-before-reload-before-read order; unchanged current model; failures retaining the old list; duplicate clicks; navigation during every await; welcome-state deferred reload; secondary-workspace isolation and trust/generation failures; compatibility with older daemons; and newly visible models being selectable. Verify busy-session model reload without interrupting generation. Run build, typecheck, bundle, focused tests, browser E2E, and two clean self-audit passes.
 
-Global `qwen` baseline was attempted but its installed 0.18.5-preview.0 distribution lacks Web Shell assets. Record that limitation and use the repository browser harness plus the local bundled daemon for verification. Design status: implemented; verification results belong in the E2E report and PR.
+Global `mariadb-shell-agent` baseline was attempted but its installed 0.18.5-preview.0 distribution lacks Web Shell assets. Record that limitation and use the repository browser harness plus the local bundled daemon for verification. Design status: implemented; verification results belong in the E2E report and PR.
 
 ## Open questions
 

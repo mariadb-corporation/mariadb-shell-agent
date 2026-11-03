@@ -12,7 +12,7 @@ Implemented (2026-09-21). This addendum records a deviation from
 
 ## Problem
 
-The Artifact tool publishes a live page under `~/.qwen/artifacts/<id>/index.html`
+The Artifact tool publishes a live page under `~/.mariadb-shell-agent/artifacts/<id>/index.html`
 and a restorable snapshot under the runtime snapshot directory. The live page
 is a `published` `file://` locator. V2 defaulted every `published` artifact to
 `restorable`, so the live page was written to the session journal. Restore

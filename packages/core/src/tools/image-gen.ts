@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -45,7 +46,7 @@ class ImageGenInvocation extends BaseToolInvocation<
     const sessionDir = Storage.sanitizePlanSessionId(config.getSessionId());
     this.outputPath = path.join(
       config.getTargetDir(),
-      '.qwen',
+      '.mariadb-shell-agent',
       'generated-images',
       sessionDir,
       `${randomUUID()}.png`,

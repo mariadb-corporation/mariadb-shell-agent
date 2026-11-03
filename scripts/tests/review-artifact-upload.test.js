@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -154,7 +155,7 @@ describe('review artifact upload — naming contract', () => {
   it('extracts the stage patterns from the workflow', () => {
     expect(stageBlock).not.toBe('');
     expect(uploadBlock).not.toBe('');
-    // .qwen/reviews: report-or-artifact plus the cost ledger. .qwen/tmp:
+    // .mariadb-shell-agent/reviews: report-or-artifact plus the cost ledger. .mariadb-shell-agent/tmp:
     // the side-file prefix. A rename of the workflow's find directories
     // away from the CLI constants empties these lists — and with
     // `if-no-files-found: 'ignore'` nothing else would raise a signal.
@@ -165,11 +166,11 @@ describe('review artifact upload — naming contract', () => {
   });
 
   it.each([
-    // reportPatternFor(pr): `<date>-<time>-pr-<n>.md` under .qwen/reviews/.
+    // reportPatternFor(pr): `<date>-<time>-pr-<n>.md` under .mariadb-shell-agent/reviews/.
     '2026-08-23-120000-pr-42.md',
     // save-artifact reuses the report stem with .json (SKILL.md Step 8).
     '2026-08-23-120000-pr-42.json',
-    // cost-ledger --out: `.qwen/reviews/<report>-cost-ledger.json`.
+    // cost-ledger --out: `.mariadb-shell-agent/reviews/<report>-cost-ledger.json`.
     '2026-08-23-120000-pr-42-cost-ledger.json',
   ])('stages the durable record %s', (name) => {
     expect(inReviews(name)).toBe(true);
@@ -215,14 +216,14 @@ describe('review artifact upload — naming contract', () => {
     // symlink there is followed by upload-artifact (exfiltration), a
     // force-committed regular file is a forged record entry. The stage step
     // must not reference it, and the upload must read only the staging dir.
-    expect(stageBlock).not.toContain('.qwen/tmp/review-pr-');
-    expect(uploadBlock).not.toContain('.qwen');
+    expect(stageBlock).not.toContain('.mariadb-shell-agent/tmp/review-pr-');
+    expect(uploadBlock).not.toContain('.mariadb-shell-agent');
     // `-type f` without any follow mode: a planted symlink never matches.
     // Excluding only `-L` leaves `-follow` (and `-H`, which follows
     // command-line arguments) free to smuggle the same behaviour in.
     expect(stageBlock).toContain('-type f');
     expect(stageBlock).not.toMatch(/(^|\s)-(L|H|follow)(\s|$)/m);
-    // The .qwen/tmp find's containment is ITS OWN `-maxdepth 1` (pinned to
+    // The .mariadb-shell-agent/tmp find's containment is ITS OWN `-maxdepth 1` (pinned to
     // that find, not the block): without it, find descends into the
     // worktree checkout living under that same tree. The reviews find has
     // no such subtree, so only the tmp find's flag load-bears.
@@ -358,30 +359,57 @@ describe('review artifact upload — the stage step, extracted and run', () => {
     () => {
       const runnerTemp = mkdtempSync(join(tmpdir(), 'review-stage-temp-'));
       const cwd = mkdtempSync(join(tmpdir(), 'review-stage-cwd-'));
-      mkdirSync(join(cwd, '.qwen', 'reviews'), { recursive: true });
-      mkdirSync(join(cwd, '.qwen', 'tmp'), { recursive: true });
+      mkdirSync(join(cwd, '.mariadb-shell-agent', 'reviews'), {
+        recursive: true,
+      });
+      mkdirSync(join(cwd, '.mariadb-shell-agent', 'tmp'), { recursive: true });
       writeFileSync(
-        join(cwd, '.qwen', 'reviews', '2026-08-23-120000-pr-42.md'),
+        join(
+          cwd,
+          '.mariadb-shell-agent',
+          'reviews',
+          '2026-08-23-120000-pr-42.md',
+        ),
         'report',
       );
       writeFileSync(
-        join(cwd, '.qwen', 'tmp', 'qwen-review-pr-42-findings.json'),
+        join(
+          cwd,
+          '.mariadb-shell-agent',
+          'tmp',
+          'qwen-review-pr-42-findings.json',
+        ),
         '{}',
       );
       // Near-misses the patterns must leave behind.
       writeFileSync(
-        join(cwd, '.qwen', 'tmp', 'qwen-review-pr-421-findings.json'),
+        join(
+          cwd,
+          '.mariadb-shell-agent',
+          'tmp',
+          'qwen-review-pr-421-findings.json',
+        ),
         '{}',
       );
       writeFileSync(
-        join(cwd, '.qwen', 'tmp', 'qwen-review-lease-pr-42.json'),
+        join(
+          cwd,
+          '.mariadb-shell-agent',
+          'tmp',
+          'qwen-review-lease-pr-42.json',
+        ),
         '{}',
       );
       // A planted symlink matching the name pattern: `-type f` without a
       // follow mode must leave it (and its target) out of the upload.
       symlinkSync(
-        join(cwd, '.qwen', 'reviews', '2026-08-23-120000-pr-42.md'),
-        join(cwd, '.qwen', 'tmp', 'qwen-review-pr-42-evil.json'),
+        join(
+          cwd,
+          '.mariadb-shell-agent',
+          'reviews',
+          '2026-08-23-120000-pr-42.md',
+        ),
+        join(cwd, '.mariadb-shell-agent', 'tmp', 'qwen-review-pr-42-evil.json'),
       );
       // A planted filename carrying a workflow-command shape across an
       // embedded newline — legal on the Linux lanes, and the channel a
@@ -389,7 +417,12 @@ describe('review artifact upload — the stage step, extracted and run', () => {
       // (or worse) through step stdout. The step prints nothing
       // filename-derived, so no command-shaped line may reach stdout.
       writeFileSync(
-        join(cwd, '.qwen', 'tmp', 'qwen-review-pr-42-note\n::error::forged'),
+        join(
+          cwd,
+          '.mariadb-shell-agent',
+          'tmp',
+          'qwen-review-pr-42-note\n::error::forged',
+        ),
         '{}',
       );
       try {

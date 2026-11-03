@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,9 +17,9 @@ const debugLogger = createDebugLogger('OUTBOUND_CORRELATION');
 
 export const SESSION_ID_HEADER = 'session_id';
 export const SESSION_ID_HEADER_HOSTS: readonly string[] = [
-  'routify.alibaba-inc.com',
-  'routify-online.alibaba-inc.com',
-  'routify-pub.alibaba-inc.com',
+  'routify.alibaba-inc.invalid',
+  'routify-online.alibaba-inc.invalid',
+  'routify-pub.alibaba-inc.invalid',
 ];
 
 type FetchLike = (

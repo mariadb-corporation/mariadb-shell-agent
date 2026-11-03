@@ -330,7 +330,7 @@ MAX_ZIP_ARCHIVE_BYTES   = 3 * floor(10_485_430 / 4) // 7_864_071
 
 **被拒绝的安装可能留下基础目录。** 技能基础目录在获取来源之前创建，因此
 来源文件夹不存在、GitHub 404，或 ZIP 解码失败时，失败发生在
-`<workspace>/.qwen/skills`（或全局对应位置）已经存在之后。只有非法 base64
+`<workspace>/.mariadb-shell-agent/skills`（或全局对应位置）已经存在之后。只有非法 base64
 的 ZIP 形状会在创建目录之前被拒绝。留下空目录是有意为之：暂存目录必须与
 目标同盘，最后的 rename 才能不跨文件系统。
 
@@ -339,8 +339,8 @@ MAX_ZIP_ARCHIVE_BYTES   = 3 * floor(10_485_430 / 4) // 7_864_071
 错误还会留下。
 
 **Generation 关闭。** `does not create Skill directories after the generation
-closes` 在第三次 `assertGenerationOpen` 时抛出，并期望不存在 `.qwen` 目录。
-调整写入顺序后，不能留下 `.qwen` 或暂存目录。调用序列变化时更新检查序号；
+closes` 在第三次 `assertGenerationOpen` 时抛出，并期望不存在 `.mariadb-shell-agent` 目录。
+调整写入顺序后，不能留下 `.mariadb-shell-agent` 或暂存目录。调用序列变化时更新检查序号；
 保持这个可观察结果。
 
 ## 实现范围

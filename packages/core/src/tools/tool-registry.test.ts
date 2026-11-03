@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -997,13 +998,32 @@ describe('ToolRegistry', () => {
 
       toolRegistry.revealDeferredTool('hidden-a');
 
+      // Revealed deferred tools follow the sorted rest, so a reveal only
+      // appends to the tools block (prompt caching).
       expect(declared(toolRegistry)).toEqual([
-        'hidden-a',
         'visible-m',
         'visible-z',
+        'hidden-a',
       ]);
       expect(toolRegistry.isDeferredToolRevealed('hidden-a')).toBe(true);
       expect(toolRegistry.isDeferredToolRevealed('other-hidden')).toBe(false);
+    });
+
+    it('appends a later reveal without reordering the declared tools', () => {
+      register(
+        toolRegistry,
+        'visible-b',
+        deferred('late'),
+        'visible-a',
+        deferred('early'),
+      );
+      toolRegistry.revealDeferredTool('early');
+      const before = declared(toolRegistry);
+
+      toolRegistry.revealDeferredTool('late');
+
+      expect(before).toEqual(['visible-a', 'visible-b', 'early']);
+      expect(declared(toolRegistry)).toEqual([...before, 'late']);
     });
 
     it('sorts MCP declarations deterministically regardless of registration order', () => {
@@ -1022,9 +1042,11 @@ describe('ToolRegistry', () => {
 
       const namesA = declared(registryA);
 
+      // Revealed deferred tools are declared in reveal order, independent of
+      // the registration order.
       expect(namesA).toEqual([
-        'mcp__filesystem__read_tree',
         'mcp__github__search_issues',
+        'mcp__filesystem__read_tree',
       ]);
       expect(declared(registryB)).toEqual(namesA);
     });

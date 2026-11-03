@@ -72,7 +72,7 @@ async function evidence(
   locators: readonly Locator[],
 ) {
   const directory = resolve(
-    '../../.qwen/e2e-tests/unavailable-models-evidence',
+    '../../.mariadb-shell-agent/e2e-tests/unavailable-models-evidence',
   );
   await mkdir(directory, { recursive: true });
   await page.screenshot({

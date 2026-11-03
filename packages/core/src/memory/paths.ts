@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -39,7 +40,7 @@ export const USER_AUTO_MEMORY_CONSOLIDATION_LOCK_FILENAME =
 export const USER_AUTO_MEMORY_DIRNAME = 'memories';
 
 /**
- * Directory name (under the repo's `.qwen/`) for the team auto-memory layer —
+ * Directory name (under the repo's `.mariadb-shell-agent/`) for the team auto-memory layer —
  * project memory shared with every collaborator. Unlike the private layers it
  * lives INSIDE the repository and is tracked by git, which is the sync transport.
  */
@@ -179,11 +180,11 @@ export function clearAutoMemoryRootCache(): void {
  * repo-tracked contents, and is therefore safe to canonicalize through symlinks.
  *
  * In local-memory mode (`QWEN_CODE_MEMORY_LOCAL=1`) the root is
- * `<projectRoot>/.qwen/memory`, so the anchor is the project root; otherwise the
+ * `<projectRoot>/.mariadb-shell-agent/memory`, so the anchor is the project root; otherwise the
  * root lives under the shared memory base dir, which is the anchor. The write
  * boundary (isAllowedMemoryPath) canonicalizes this anchor but appends the
  * managed suffix literally, so a symlink planted INSIDE the suffix (e.g. a
- * repo-tracked `.qwen -> /outside`) can't silently relocate the allowed root
+ * repo-tracked `.mariadb-shell-agent -> /outside`) can't silently relocate the allowed root
  * out of the trusted anchor.
  */
 export function getAutoMemoryTrustedAnchor(projectRoot: string): string {
@@ -328,7 +329,7 @@ export function getAutoMemoryFilePath(
 
 /**
  * Returns the user-level (cross-project) auto-memory root.
- * Lives at `${getMemoryBaseDir()}/memories/` — typically `~/.qwen/memories/`.
+ * Lives at `${getMemoryBaseDir()}/memories/` — typically `~/.mariadb-shell-agent/memories/`.
  * Unlike project memory, this is NOT scoped to a git root; it is shared
  * across every project the user works in.
  */
@@ -368,7 +369,7 @@ export function isUserAutoMemPath(absolutePath: string): boolean {
 }
 
 /**
- * Returns the team auto-memory root: `<gitRoot>/.qwen/team-memory/`.
+ * Returns the team auto-memory root: `<gitRoot>/.mariadb-shell-agent/team-memory/`.
  * Anchored at the current worktree root so tracked writes appear in the active
  * branch diff. Falls back to projectRoot when there is no git root.
  */

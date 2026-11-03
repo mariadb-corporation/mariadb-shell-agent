@@ -2,7 +2,7 @@
 
 ## Goal
 
-Let daemon interactions that require a human response wait indefinitely by default. Operators that require a wall-clock cap continue to use the existing `permissionResponseTimeoutMs` option or `qwen serve --permission-response-timeout-ms` flag.
+Let daemon interactions that require a human response wait indefinitely by default. Operators that require a wall-clock cap continue to use the existing `permissionResponseTimeoutMs` option or `mariadb-shell-agent serve --permission-response-timeout-ms` flag.
 
 ## Current boundary
 

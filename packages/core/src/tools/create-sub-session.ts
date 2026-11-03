@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +9,7 @@
  * `create_sub_session` tool — spawns a FRESH top-level sub-session (a sibling
  * of the current session, its own transcript) and runs a prompt in it.
  *
- * Daemon-only: it only ever exists under `qwen serve`, where the ACP session
+ * Daemon-only: it only ever exists under `mariadb-shell-agent serve`, where the ACP session
  * both wires a {@link SubSessionSpawner} (routing the request to the daemon
  * bridge via `spawnOrAttach` + `sendPrompt`) and registers this tool. In
  * interactive TUI / headless there is no bridge, so the tool is never
@@ -48,7 +49,7 @@ export interface CreateSubSessionParams {
 }
 
 const DAEMON_ONLY_MESSAGE =
-  'create_sub_session is only available when running under `qwen serve` ' +
+  'create_sub_session is only available when running under `mariadb-shell-agent serve` ' +
   '(daemon mode). There is no session bridge in this environment, so a ' +
   'sub-session cannot be spawned.';
 
@@ -233,7 +234,7 @@ export class CreateSubSessionTool extends BaseDeclarativeTool<
         'transcript) and run a prompt in it. Use to fan work out into a ' +
         'separate session — e.g. a self-contained sub-task you want isolated ' +
         'from this conversation.\n\n' +
-        'ONLY available when running under `qwen serve` (daemon mode); it is ' +
+        'ONLY available when running under `mariadb-shell-agent serve` (daemon mode); it is ' +
         'not declared at all in plain interactive or headless sessions.\n\n' +
         '## Completion modes\n' +
         "- `first-turn` (default): waits for the sub-session's first turn to " +

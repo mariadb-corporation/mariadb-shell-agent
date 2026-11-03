@@ -45,11 +45,11 @@ probe stays a CLI command and the trigger stays a gated scheduled task.
   model and the prompt cannot un-start the turn.
 - The prompt consumes what the wrapper forwards: `head_moved_externally` → run
   the round for that sha; `stop` (merged/closed) → delete the task and stop.
-- The wrapper's `--check` refuses to install when `.qwen/tmp` already holds
+- The wrapper's `--check` refuses to install when `.mariadb-shell-agent/tmp` already holds
   `autofix-pr-<n>-gate.json` or `autofix-pr-<n>-state.json`: one cursor serves
   one consumer, so a second watch on the same PR would take the head moves and
   `stop` the first one needs.
-- Dedupe lives in a state file (`.qwen/tmp/verify-pr-watch-<n>.json`): the last
+- Dedupe lives in a state file (`.mariadb-shell-agent/tmp/verify-pr-watch-<n>.json`): the last
   sha this session verified, plus an in-flight marker. A fire for a sha already
   verified, or while a round is in flight, is ignored without a model turn.
   Write the sha **before** starting the round, so a round that dies still does
@@ -61,7 +61,7 @@ probe stays a CLI command and the trigger stays a gated scheduled task.
    piece is the contract between them, and that contract is prose the agent
    follows. A new command would duplicate the scheduling half it cannot own.
 2. **Absolute CLI path in the gate.** A gate runs in a fresh shell, and the
-   `qwen` on `PATH` may predate the probe. The skill says to resolve the path
+   `mariadb-shell-agent` on `PATH` may predate the probe. The skill says to resolve the path
    from `which qwen` and verify `autofix-pr snapshot --help` succeeds; a binary
    without it means the task can never fire, and the skill must refuse rather
    than schedule a broken gate.
@@ -80,7 +80,7 @@ probe stays a CLI command and the trigger stays a gated scheduled task.
    that does not exist, so the watch refuses instead: saying "unsupported"
    beats two watchers silently starving each other. A read-only check is racy —
    two sessions can both pass it before either probe has run — so setup takes an
-   atomic claim (`.qwen/tmp/verify-pr-watch-<n>.owner.json`, created with `wx`).
+   atomic claim (`.mariadb-shell-agent/tmp/verify-pr-watch-<n>.owner.json`, created with `wx`).
    It is released on stop or a failed task creation; a claim left by a dead
    setup is released explicitly with `--release` rather than taken over, because
    judging staleness from a timestamp is itself the same race.
@@ -90,13 +90,13 @@ probe stays a CLI command and the trigger stays a gated scheduled task.
 - Not a GitHub Actions change: the CI verify lane stays comment-triggered.
 - Not a webhook: no repository-level event subscription, no forwarder process.
 - No new daemon route or setting. `cron_*` and the probe are used as shipped.
-- Repo-wide watching (`qwen review watch-repo`) is documented as the way to
+- Repo-wide watching (`mariadb-shell-agent review watch-repo`) is documented as the way to
   watch _all_ open PRs, but `--watch` itself stays per-PR: a verify round is
   per-PR by nature.
 
 ## Files affected
 
-- `.qwen/skills/verify-pr/SKILL.md` — the `--watch` contract and its guardrails.
+- `.mariadb-shell-agent/skills/verify-pr/SKILL.md` — the `--watch` contract and its guardrails.
 - `scripts/verify-pr-watch-gate.mjs` — the gate wrapper: forwards only `resync`
   and `stop`, and refuses to install over another consumer's probe state.
 - `scripts/tests/verify-pr-watch-gate.test.js` — the filter's five outcomes and
@@ -104,7 +104,7 @@ probe stays a CLI command and the trigger stays a gated scheduled task.
 - `scripts/tests/qwen-triage-workflow.test.js` — assertions pinning the wrapper
   command, the filter, the ownership check, and the capable-binary refusal.
 - `docs/design/verify-pr-watch.md` + `.zh-CN.md` — this document.
-- `.qwen/e2e-tests/verify-pr-watch.md` — the test plan and its results.
+- `.mariadb-shell-agent/e2e-tests/verify-pr-watch.md` — the test plan and its results.
 
 ## Risks
 

@@ -4,7 +4,7 @@
 
 Status: implemented in this change for `child_agent` tasks. `cancelSessionTask` and `cancelWebShellTask` move from `planned` to `partial` in contract `1.40.0` (provisional: open pull requests already claim `1.39.0`). Landed: durable `task_cancel` admission in the order the task contract fixes, delivery that reads every outcome from the task's committed record, a bounded retry that parks instead of holding the Session, the child result relay's stop arm that physically stops a child, the `cancel` action on the task view, and the WebShell request's trace-only `requestId`. Still open: every other task kind's cancel path, output events for child tasks, and the channel-delivery half (Follow-up work).
 
-This is slice **H4f** of [#12827](https://github.com/QwenLM/qwen-code/issues/12827), stage H of the Managed Agent proposal [#12380](https://github.com/QwenLM/qwen-code/issues/12380), tracked by [#13746](https://github.com/QwenLM/qwen-code/issues/13746). It implements the cancel semantics that [#12847](https://github.com/QwenLM/qwen-code/issues/12847) A6/A7 asked for and #12998 settled in contract v1.23 ([task contract](2026-09-27-managed-agent-task-contract.md), sections 4.4 and 4.5). It adds #12847 B12 and answers open question 1 of [H4b](2026-10-07-managed-child-session-runtime.md), which asked how an operator closes an `unknown` delivery.
+This is slice **H4f** of [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827), stage H of the Managed Agent proposal [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380), tracked by [#13746](https://github.invalid/QwenLM/qwen-code/issues/13746). It implements the cancel semantics that [#12847](https://github.invalid/QwenLM/qwen-code/issues/12847) A6/A7 asked for and #12998 settled in contract v1.23 ([task contract](2026-09-27-managed-agent-task-contract.md), sections 4.4 and 4.5). It adds #12847 B12 and answers open question 1 of [H4b](2026-10-07-managed-child-session-runtime.md), which asked how an operator closes an `unknown` delivery.
 
 ## Problem
 
@@ -195,7 +195,7 @@ The facts below are from `main` at `ba8615f4c4` (Flyway V60, contract `1.38.0`),
   - `ManagedAgentApiContractTest` serves both routes: `202`, replay, cross-surface replay, conflict, action refusal, `400` (including an unknown WebShell field and an overlong key answering `invalid_idempotency_key`), `404`, the tenant filter's `403`, and the operation read-back carrying `task_id`.
   - `PlannedTaskContractTest` now pins both routes as `partial` and checks the `requestId` instances.
   - `SurfaceRegistry` gains both routes under a new `TASK_OPERATOR` rule class, which `SurfaceAdmissionAcceptanceTest` probes on both surfaces: `404` below read, `403 task_forbidden` for a reader, and an OPERATOR or owner-rank caller admitted to the route's own `409`. The same suite pins that a retained key never bypasses current access: the admitting OPERATOR replays, then gets `403 task_forbidden` once demoted to reader and `404 session_not_found` once the Session is deleted.
-- **Real stack** (after the first change merged, [results on #13746](https://github.com/QwenLM/qwen-code/issues/13746#issuecomment-6100505354)):
+- **Real stack** (after the first change merged, [results on #13746](https://github.invalid/QwenLM/qwen-code/issues/13746#issuecomment-6100505354)):
   - The stack: the packaged chain with a live Hosted Harness, real child Sessions, a scripted model, and fault-injecting proxies in front of the Session Store and the Harness.
   - The orderings it ran:
     - a lost cancel reply;

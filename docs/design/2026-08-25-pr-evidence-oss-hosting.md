@@ -56,7 +56,7 @@ credentials to the jobs that execute PR code. They consume only bounded,
 validated image artifacts.
 
 The automated review workflow has a third, separate image path through
-`qwen review publish-assets`. That CLI feature remains available for an
+`mariadb-shell-agent review publish-assets`. That CLI feature remains available for an
 explicitly designated assets repository, but the workflow now rejects a
 designation that points back to the repository under review. An unset or
 self-targeting destination degrades to prose and downloadable run artifacts;

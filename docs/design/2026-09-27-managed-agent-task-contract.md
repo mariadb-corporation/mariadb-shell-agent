@@ -4,7 +4,7 @@
 
 Status: H0a implemented as a contract only (every route and schema it added, and every property it added to an existing schema, was `planned`); H0b has landed; H0c marks the four task read routes and their schemas `partial` and drops the marker from `capabilities.tasks`, serves the task list and detail and announces task changes ([design](2026-09-27-managed-extension-authority.md)); H3 serves the task events; H4f serves cancel as `partial` for `child_agent` tasks from `1.40.0` ([design](2026-10-10-managed-task-cancel.md)); the rest of H1 to H6 is pending
 Date: 2026-09-27; contract follow-up: 2026-09-29
-Issue: [#12827](https://github.com/QwenLM/qwen-code/issues/12827), part of [#12380](https://github.com/QwenLM/qwen-code/issues/12380)
+Issue: [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827), part of [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380)
 
 ## 1. Problem
 
@@ -16,7 +16,7 @@ its section 11. Section 6 of the [API contract][api] asks for the task view,
 task query and cancel, idempotent commands and errors to be frozen in the
 OpenAPI before H0 is implemented.
 
-The in-repo OpenAPI from [#12808](https://github.com/QwenLM/qwen-code/pull/12808)
+The in-repo OpenAPI from [#12808](https://github.invalid/QwenLM/qwen-code/pull/12808)
 has none of these resources. The only task surfaces today are daemon routes
 (`GET /session/:id/tasks`, `GET /session/:id/hooks`, `/workspace/mcp`,
 `/scheduled-tasks`). The design treats them as internal adapter sources, not as
@@ -50,7 +50,7 @@ has nothing to plan against except those daemon routes.
 
 ## 4. Decisions
 
-The 2026-09-29 follow-up settles A1–A8 of [#12847](https://github.com/QwenLM/qwen-code/issues/12847) in contract v1.23.0. Events and cancel remain `planned`; no runtime behavior is added. A9 and the task-route part of A10 landed in #12966. The original H0a scope and validation below remain historical.
+The 2026-09-29 follow-up settles A1–A8 of [#12847](https://github.invalid/QwenLM/qwen-code/issues/12847) in contract v1.23.0. Events and cancel remain `planned`; no runtime behavior is added. A9 and the task-route part of A10 landed in #12966. The original H0a scope and validation below remain historical.
 
 ### 4.1 Everything added is `planned`
 

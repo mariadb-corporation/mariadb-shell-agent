@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -99,7 +100,7 @@ beforeEach(() => {
   git('config', 'user.name', 'a');
   git('config', 'commit.gpgsign', 'false');
   git('config', 'core.hooksPath', join(repo, '.no-such-hooks'));
-  write('.gitignore', '.qwen/\nplan.json\n');
+  write('.gitignore', '.mariadb-shell-agent/\nplan.json\n');
   write('src/a.ts', 'export const v = 0;\n');
   git('add', '-A');
   git('commit', '-q', '--no-verify', '-m', 'base');
@@ -137,14 +138,19 @@ describe('capture-local — visibility oracle rides the sampling discipline', ()
     expect(invisibleCalls).toBe(4);
     expect(plan['nothingToReview']).toBeUndefined();
     expect(
-      existsSync(join(repo, '.qwen/tmp/qwen-review-local-stop.json')),
+      existsSync(
+        join(repo, '.mariadb-shell-agent/tmp/qwen-review-local-stop.json'),
+      ),
     ).toBe(false);
     // A clean tree has no chunks: the round ends without a verdict, so the
     // ledger-only candidate is not published and the stable path is empty.
     expect(plan['cacheCandidatePath']).toBeUndefined();
     expect(
       existsSync(
-        join(repo, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+        join(
+          repo,
+          '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+        ),
       ),
     ).toBe(false);
     expect(stderrLines.join('\n')).toContain(
@@ -164,7 +170,10 @@ describe('capture-local — visibility oracle rides the sampling discipline', ()
     expect(plan['cacheCandidatePath']).toBeUndefined();
     expect(
       existsSync(
-        join(repo, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+        join(
+          repo,
+          '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+        ),
       ),
     ).toBe(false);
   });
@@ -178,7 +187,7 @@ describe('capture-local — visibility oracle rides the sampling discipline', ()
     // alone no longer tells this arm from the withhold arms above.
     const candidate = join(
       repo,
-      '.qwen/tmp/qwen-review-local-cache-candidate.json',
+      '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
     );
     expect(existsSync(candidate)).toBe(true);
     expect(isLedgerOnlyCandidate(candidate)).toBe(false);

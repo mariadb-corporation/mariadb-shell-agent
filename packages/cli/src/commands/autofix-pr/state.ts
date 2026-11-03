@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -342,7 +343,7 @@ export interface AutofixPrPaths {
 export { repoRoot };
 
 /**
- * The directory a watch's worktree and state live under (`.qwen/tmp`).
+ * The directory a watch's worktree and state live under (`.mariadb-shell-agent/tmp`).
  *
  * A daemon session runs the fix agent's commands only inside its own working
  * directory, so a watch prepared from a linked worktree must keep its files
@@ -394,7 +395,7 @@ export function cloneWorktreeRoots(): string[] {
 }
 
 /**
- * The worktree whose `.qwen/tmp` holds this PR's state, or null when the clone
+ * The worktree whose `.mariadb-shell-agent/tmp` holds this PR's state, or null when the clone
  * has no watch of it. A watch lives wherever it was prepared, which a helper
  * cannot re-derive from its own cwd — the session may have moved — so every
  * helper that operates on an existing watch finds it here rather than guessing
@@ -407,7 +408,7 @@ export function findWatchRoot(prNumber: number): string | null {
   let found: string | null = null;
   for (const root of vouchedScanRoots(cloneWorktreeRoots())) {
     const paths = autofixPrPaths(root, prNumber);
-    // A sibling whose `.qwen/tmp` is a regular file or inaccessible throws
+    // A sibling whose `.mariadb-shell-agent/tmp` is a regular file or inaccessible throws
     // ENOTDIR/EACCES here; isolate it so a healthy watch elsewhere is still
     // discovered (the listing isolates the same failure).
     let hasState: boolean;
@@ -458,7 +459,7 @@ export function resolveWatchRoot(prNumber: number): string {
 export function anchorStoreRoot(): string {
   return (
     process.env['QWEN_AUTOFIX_ANCHOR_DIR'] ??
-    join(homedir(), '.qwen', 'autofix-anchors')
+    join(homedir(), '.mariadb-shell-agent', 'autofix-anchors')
   );
 }
 
@@ -576,7 +577,7 @@ export function trustAnchor(state: {
 
 /**
  * The worktree roots a watch scan may read, main first. Drops watch worktrees
- * nested in another root's `.qwen/tmp` (a state file force-added there would
+ * nested in another root's `.mariadb-shell-agent/tmp` (a state file force-added there would
  * forge a watch), and vouches each remaining root against the genuine clone: a
  * stale entry an unrelated repository now occupies, or a sibling whose `.git`
  * was rewritten, is not this clone's worktree and must not be read as one.
@@ -589,7 +590,9 @@ export function vouchedScanRoots(roots: string[]): string[] {
   const notNested = roots.filter(
     (r) =>
       !roots.some(
-        (other) => other !== r && isWithinRoot(r, join(other, '.qwen', 'tmp')),
+        (other) =>
+          other !== r &&
+          isWithinRoot(r, join(other, '.mariadb-shell-agent', 'tmp')),
       ),
   );
   let genuineCommon: string;
@@ -689,7 +692,7 @@ export function statePaths(
 export function autofixPrPaths(root: string, prNumber: number): AutofixPrPaths {
   // The number goes into file names, the branch name and `refs/pull/<n>/head`.
   assertPositiveInteger(prNumber, 'PR number');
-  const tmp = join(root, '.qwen', 'tmp');
+  const tmp = join(root, '.mariadb-shell-agent', 'tmp');
   return {
     worktreePath: join(tmp, `autofix-pr-${prNumber}`),
     statePath: join(tmp, `autofix-pr-${prNumber}-state.json`),
@@ -1130,7 +1133,7 @@ export function readState(statePath: string): AutofixPrState | null {
 /**
  * Writes of a watch's files replace a link rather than follow it: the code
  * a round runs could plant one there to have a helper write outside
- * `.qwen/tmp`.
+ * `.mariadb-shell-agent/tmp`.
  */
 export const NO_FOLLOW = { noFollow: true } as const;
 

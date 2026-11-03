@@ -43,7 +43,7 @@ AgentTool 的 `isolation: 'worktree'` 只走通用路径，Arena 内部不经过
 由 `EnterWorktree` 工具或 AgentTool `isolation: 'worktree'` 创建的 worktree 固定存放在：
 
 ```
-{git 仓库根}/.qwen/worktrees/{slug}
+{git 仓库根}/.mariadb-shell-agent/worktrees/{slug}
 ```
 
 路径不可配置。slug 命名规则：
@@ -53,7 +53,7 @@ AgentTool 的 `isolation: 'worktree'` 只走通用路径，Arena 内部不经过
 
 ### Arena worktree 路径（已有，保持不变）
 
-Arena 的 worktree 路径由 `agents.arena.worktreeBaseDir` 控制，默认 `~/.qwen/arena`（`ArenaManager.ts:125`），与通用路径完全独立，不做任何改动。
+Arena 的 worktree 路径由 `agents.arena.worktreeBaseDir` 控制，默认 `~/.mariadb-shell-agent/arena`（`ArenaManager.ts:125`），与通用路径完全独立，不做任何改动。
 
 ### 扩展配置
 
@@ -81,7 +81,7 @@ name?: string  // 可选，slug 格式：字母/数字/点/下划线/破折号�
 
 1. 验证当前未在 worktree 中（防止嵌套）
 2. 解析到 git 仓库根（处理已在子目录的情况）
-3. 调用 `GitWorktreeService` 创建 worktree，路径为 `.qwen/worktrees/{slug}`
+3. 调用 `GitWorktreeService` 创建 worktree，路径为 `.mariadb-shell-agent/worktrees/{slug}`
 4. 将 worktree 会话写入 `SessionService`
 5. 切换工作目录到 worktree 路径
 6. 清除文件缓存
@@ -117,7 +117,7 @@ discard_changes?: boolean  // 仅 action='remove' 时有效
 | -------------- | -------------------------------------------------------- | -------- |
 | 会话中明确请求 | 用户说 "在 worktree 中开始工作" → 模型调用 EnterWorktree | Phase A  |
 | Agent 隔离     | 模型为 subagent 设置 `isolation: 'worktree'`             | Phase B  |
-| CLI 启动标志   | `qwen --worktree my-feature`                             | Phase D  |
+| CLI 启动标志   | `mariadb-shell-agent --worktree my-feature`              | Phase D  |
 
 无斜杠命令。会话中 worktree 的触发依赖用户明确提及，`isolation: 'worktree'` 才是模型自主决策的场景。
 
@@ -163,9 +163,9 @@ discard_changes?: boolean  // 仅 action='remove' 时有效
 _Agent 隔离核心：_
 
 - `AgentTool` 新增 `isolation?: 'worktree'` 参数
-- Agent 启动时创建临时 worktree（slug：`agent-{7hex}`，路径：`.qwen/worktrees/agent-{7hex}`）
+- Agent 启动时创建临时 worktree（slug：`agent-{7hex}`，路径：`.mariadb-shell-agent/worktrees/agent-{7hex}`）
 - Agent 结束后：无变更则自动删除；有变更则保留，将路径和分支返回在结果中
-- 过期 worktree 自动清理：扫描 `.qwen/worktrees/`，匹配 `agent-{7hex}` 模式，超过 30 天且无未推送提交则删除，fail-closed 策略
+- 过期 worktree 自动清理：扫描 `.mariadb-shell-agent/worktrees/`，匹配 `agent-{7hex}` 模式，超过 30 天且无未推送提交则删除，fail-closed 策略
 
 _描述与提示词更新：_
 
@@ -174,7 +174,7 @@ _描述与提示词更新：_
 
 _无需改动：_
 
-- review skill（`SKILL.md`）：review 使用独立机制（路径 `.qwen/tmp/review-pr-<n>`，通过 `qwen review fetch-pr` 命令创建），与通用 worktree 路径和机制完全不同，不存在混淆
+- review skill（`SKILL.md`）：review 使用独立机制（路径 `.mariadb-shell-agent/tmp/review-pr-<n>`，通过 `mariadb-shell-agent review fetch-pr` 命令创建），与通用 worktree 路径和机制完全不同，不存在混淆
 
 **Arena 兼容保证：** Arena 内部不经过 `isolation` 参数创建 worktree，此改动不触碰 Arena 代码路径。
 
@@ -245,11 +245,11 @@ _WorktreeExitDialog：_
 
 **参数形态：** yargs 选项接受三种形式：
 
-| 形式                      | 行为                                                 |
-| ------------------------- | ---------------------------------------------------- |
-| `qwen --worktree`         | bare flag，自动生成 slug（`{形容词}-{名词}-{6hex}`） |
-| `qwen --worktree my-name` | 显式 slug，沿用 `EnterWorktreeTool` 的 slug 校验规则 |
-| `qwen --worktree=my-name` | 等价于上一种                                         |
+| 形式                                     | 行为                                                 |
+| ---------------------------------------- | ---------------------------------------------------- |
+| `mariadb-shell-agent --worktree`         | bare flag，自动生成 slug（`{形容词}-{名词}-{6hex}`） |
+| `mariadb-shell-agent --worktree my-name` | 显式 slug，沿用 `EnterWorktreeTool` 的 slug 校验规则 |
+| `mariadb-shell-agent --worktree=my-name` | 等价于上一种                                         |
 
 不提供短别名 `-w`（qwen-code 短别名只保留给最高频参数，避免命名冲突）。
 

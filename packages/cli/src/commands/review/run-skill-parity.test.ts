@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 // `review run` pins the artifacts it captures by exact filename, and those
 // names are the bundled skill's to choose: the skill writes
-// `--out .qwen/tmp/qwen-review-{target}-composed.json` in Step 6 and the
+// `--out .mariadb-shell-agent/tmp/qwen-review-{target}-composed.json` in Step 6 and the
 // report stems in Step 8. `composedNameFor`/`reportPatternFor` are therefore
 // a SECOND copy of a template that lives in prose — and when the two drift,
 // every affected `review run` completes (and, with --comment, posts) while
@@ -84,7 +85,7 @@ describe('run pins match the bundled skill templates', () => {
 
   itWithSkill('composedNameFor renders Step 6’s --out template', () => {
     // The template as the skill writes it, e.g.
-    //   --out .qwen/tmp/qwen-review-{target}-composed.json
+    //   --out .mariadb-shell-agent/tmp/qwen-review-{target}-composed.json
     // The filename must END the token: an unanchored capture matches a skill
     // edit that APPENDS to the artifact name (`…composed.json.tmp` for an
     // atomic write-then-rename, `…json-v2` for a rename) as a prefix,
@@ -92,7 +93,7 @@ describe('run pins match the bundled skill templates', () => {
     // drift it exists to catch. Whitespace-or-end, not a rejected character
     // class, so no future suffix character has to be foreseen.
     const m =
-      /--out\s+\.qwen\/tmp\/(qwen-review-\{target\}-composed\.json)(?=\s|$)/.exec(
+      /--out\s+\.mariadb-shell-agent\/tmp\/(qwen-review-\{target\}-composed\.json)(?=\s|$)/.exec(
         coreSkill as string,
       );
     // A null here means SKILL.md no longer writes that `--out` line: update
@@ -107,10 +108,10 @@ describe('run pins match the bundled skill templates', () => {
 
   itWithStep8('reportPatternFor accepts Step 8’s report stems', () => {
     // The stems as the skill lists them, e.g.
-    //   `.qwen/reviews/<YYYY-MM-DD>-<HHMMSS>-pr-<number>.md`
+    //   `.mariadb-shell-agent/reviews/<YYYY-MM-DD>-<HHMMSS>-pr-<number>.md`
     const stems = [
       ...(step8Corpus as string).matchAll(
-        /`\.qwen\/reviews\/<YYYY-MM-DD>-<HHMMSS>-([^`]+)\.md`/g,
+        /`\.mariadb-shell-agent\/reviews\/<YYYY-MM-DD>-<HHMMSS>-([^`]+)\.md`/g,
       ),
     ].map((s) => s[1]);
     // A miss here means Step 8 no longer lists those stems: update

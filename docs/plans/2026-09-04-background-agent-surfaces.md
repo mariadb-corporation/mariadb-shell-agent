@@ -16,11 +16,11 @@ One consequence to state plainly, because it is the part that costs work: the da
 
 Measured at `678ac2e1ec`.
 
-| Model                     | Written by                                                                | Stored at                                                                   | Read by                                                                |
-| ------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| **Live-process registry** | every interactive session, unconditionally (`startInteractiveUI.tsx:421`) | `~/.qwen/sessions/<pid>.json`                                               | `qwen sessions ps`, peer messaging discovery (`ipc/peer-directory.ts`) |
-| **Agent View roster**     | the supervisor (`supervisor-store.ts`)                                    | `~/.qwen/daemon/roster.json` + `~/.qwen/jobs/`                              | `qwen sessions ps` (#10942), `peek`/`answer`/`stop` (#10949)           |
-| **Daemon sessions**       | `qwen serve`                                                              | daemon process memory (`serve/conversations/standalone-session-service.ts`) | Web Shell                                                              |
+| Model                     | Written by                                                                | Stored at                                                                    | Read by                                                                               |
+| ------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| **Live-process registry** | every interactive session, unconditionally (`startInteractiveUI.tsx:421`) | `~/.mariadb-shell-agent/sessions/<pid>.json`                                 | `mariadb-shell-agent sessions ps`, peer messaging discovery (`ipc/peer-directory.ts`) |
+| **Agent View roster**     | the supervisor (`supervisor-store.ts`)                                    | `~/.mariadb-shell-agent/daemon/roster.json` + `~/.mariadb-shell-agent/jobs/` | `mariadb-shell-agent sessions ps` (#10942), `peek`/`answer`/`stop` (#10949)           |
+| **Daemon sessions**       | `mariadb-shell-agent serve`                                               | daemon process memory (`serve/conversations/standalone-session-service.ts`)  | Web Shell                                                                             |
 
 The third does not know about the first two: `rg 'listLiveSessions|session-registry' packages/cli/src/serve` returns nothing across 94,136 lines.
 
@@ -30,11 +30,11 @@ That is the whole argument for the decision in §0.
 
 ## 2. What the CLI half already does
 
-- `qwen --bg "<prompt>"` records a session and a supervisor spawns it (#10943).
-- `qwen sessions ps` lists managed sessions beside interactive ones, deduplicated by session id, each with its real state (#10942).
-- `qwen sessions peek | answer | stop <id>` reads the question, answers it, ends the session (#10949).
+- `mariadb-shell-agent --bg "<prompt>"` records a session and a supervisor spawns it (#10943).
+- `mariadb-shell-agent sessions ps` lists managed sessions beside interactive ones, deduplicated by session id, each with its real state (#10942).
+- `mariadb-shell-agent sessions peek | answer | stop <id>` reads the question, answers it, ends the session (#10949).
 
-**A background session is peer-addressable for free.** The worker is launched as `qwen --session-id <id> --prompt-interactive=<prompt>` (`supervisor-dispatch.ts:196`), which is a full interactive session, so it registers in the live-process registry and — when `agents.crossSessionMessaging` is on — binds a peer inbox. It therefore appears in another session's `list_agents` and can be addressed with `send_message`, with no code that makes it so.
+**A background session is peer-addressable for free.** The worker is launched as `mariadb-shell-agent --session-id <id> --prompt-interactive=<prompt>` (`supervisor-dispatch.ts:196`), which is a full interactive session, so it registers in the live-process registry and — when `agents.crossSessionMessaging` is on — binds a peer inbox. It therefore appears in another session's `list_agents` and can be addressed with `send_message`, with no code that makes it so.
 
 This is worth naming because it decides what the Web Shell should _not_ build: a background agent is already reachable by the messaging tier. The Web Shell needs to show it, not to invent a second way to talk to it.
 
@@ -67,6 +67,6 @@ What must not happen is a third one. If Agent View attach ever wants tmux panes,
 
 ## 4. Left to a human
 
-**Should daemon-owned sessions adopt into the roster?** `qwen serve` starts sessions of its own (scheduled tasks, channel workers). They are background agents by any user's definition, and under §0 they would be visible in `qwen sessions ps` too. The supervisor already has an `adopt` operation for exactly this shape. Doing it means the daemon writes to the roster as well as reads it, which is a larger change than the panel and should be decided on its own.
+**Should daemon-owned sessions adopt into the roster?** `mariadb-shell-agent serve` starts sessions of its own (scheduled tasks, channel workers). They are background agents by any user's definition, and under §0 they would be visible in `mariadb-shell-agent sessions ps` too. The supervisor already has an `adopt` operation for exactly this shape. Doing it means the daemon writes to the roster as well as reads it, which is a larger change than the panel and should be decided on its own.
 
 Not proposed here: moving the live-process registry or the daemon's session model under the roster. They answer different questions and both have consumers.

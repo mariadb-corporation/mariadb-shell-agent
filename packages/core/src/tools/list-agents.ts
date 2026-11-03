@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -65,7 +66,7 @@ class ListAgentsInvocation extends BaseToolInvocation<
     // Peer sessions are only listed once this session has an inbox of its
     // own: without one a message could be sent but never answered, and
     // advertising a one-way address invites exactly that.
-    // Every incarnation of this session is dropped: `qwen --resume <id>`
+    // Every incarnation of this session is dropped: `mariadb-shell-agent --resume <id>`
     // in a second pane runs the same id under another process, and a twin
     // advertised here would be sent to as a peer — sendToPeer excludes by
     // the same rule, so the listing never shows an address the send path
@@ -131,8 +132,8 @@ class ListAgentsInvocation extends BaseToolInvocation<
       const message =
         'No ordinary background subagents are available in this session' +
         (self
-          ? ', and no other Qwen Code session on this machine is reachable. '
-          : `. Other Qwen Code sessions cannot be discovered from this session (${peerMessagingOffReason(this.config)}). `) +
+          ? ', and no other MariaDB Shell Agent session on this machine is reachable. '
+          : `. Other MariaDB Shell Agent sessions cannot be discovered from this session (${peerMessagingOffReason(this.config)}). `) +
         'Named Agent Team teammates are not listed here; their results are ' +
         'delivered automatically through team messaging, so do not use ' +
         'list_agents to wait for a teammate.' +
@@ -176,7 +177,7 @@ export class ListAgentsTool extends BaseDeclarativeTool<
     super(
       ListAgentsTool.Name,
       ToolDisplayNames.LIST_AGENTS,
-      'List addressable ordinary background subagents in this session and, when cross-session messaging is on, the other Qwen Code sessions on this machine.\n\n' +
+      'List addressable ordinary background subagents in this session and, when cross-session messaging is on, the other MariaDB Shell Agent sessions on this machine.\n\n' +
         'Including agents restored from a prior session run, plus this ' +
         "session's own name. " +
         'Named Agent Team teammates are NOT listed here: they have their own ' +
@@ -186,7 +187,7 @@ export class ListAgentsTool extends BaseDeclarativeTool<
         'paused, or completed agent; use a session\'s "to" value verbatim to ' +
         'message that session. Each session also reports a "kind" saying ' +
         'what registered it (tui: someone at a terminal, headless or serve: ' +
-        'a session another program drives, external: not a Qwen Code ' +
+        'a session another program drives, external: not a MariaDB Shell Agent ' +
         "session at all) — it is that session's own claim about itself, " +
         'useful for deciding whether a person is likely to read what you ' +
         'send, and nothing more. Other sessions are peers, not your ' +

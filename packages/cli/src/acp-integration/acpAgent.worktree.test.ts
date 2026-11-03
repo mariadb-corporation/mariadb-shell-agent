@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Phase C ACP worktree context restore — agent-level integration tests.
@@ -570,13 +571,13 @@ describe('QwenAgent loadSession — Phase C worktree context restore', () => {
 
   it('VP2: live sidecar — pendingWorktreeNotice is set to contextMessage', async () => {
     const contextMessage =
-      '[Resumed] Active worktree: "my-feature" at /repo/.qwen/worktrees/my-feature ' +
+      '[Resumed] Active worktree: "my-feature" at /repo/.mariadb-shell-agent/worktrees/my-feature ' +
       '(branch: worktree-my-feature). Continue using this path for all file operations.';
     mockRestoreWorktreeContext.mockResolvedValueOnce({
       contextMessage,
       session: {
         slug: 'my-feature',
-        worktreePath: '/repo/.qwen/worktrees/my-feature',
+        worktreePath: '/repo/.mariadb-shell-agent/worktrees/my-feature',
         worktreeBranch: 'worktree-my-feature',
         originalCwd: '/repo',
         originalBranch: 'main',

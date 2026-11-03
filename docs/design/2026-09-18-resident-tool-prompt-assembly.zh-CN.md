@@ -2,7 +2,7 @@
 
 [English](2026-09-18-resident-tool-prompt-assembly.md) | [简体中文](2026-09-18-resident-tool-prompt-assembly.zh-CN.md)
 
-**状态：** [#12032](https://github.com/QwenLM/qwen-code/issues/12032) 的方案稿，属于 [#12028](https://github.com/QwenLM/qwen-code/issues/12028)。仅包含第一步（会话开始时装配）；第二步只作为后续工作点明，不在本文提案范围内。
+**状态：** [#12032](https://github.invalid/QwenLM/qwen-code/issues/12032) 的方案稿，属于 [#12028](https://github.invalid/QwenLM/qwen-code/issues/12028)。仅包含第一步（会话开始时装配）；第二步只作为后续工作点明，不在本文提案范围内。
 
 文中所有代码引用均读自 `main` 的 `8bd2feabba`。本文档未构建、未运行、未实测任何内容；标注来自 #12032 的 token 数字是该 issue 自己的实测值，本文未重新测量。
 
@@ -46,7 +46,7 @@
 
 **目标。** 基础提示词只描述会话实际声明的工具。`/context` 与真实请求对这个集合的认知一致。提示词缓存前缀的重写频率不高于现状。安全、权限与危险操作文本保持无条件生成。
 
-**非目标。** 会话中途每次揭示都重新生成提示词（第二步，且与 [#11321](https://github.com/QwenLM/qwen-code/issues/11321) 重叠）。子 agent 的提示词。新增面向用户的配置项。修改安全文本。压缩单个工具的描述（[#12054](https://github.com/QwenLM/qwen-code/issues/12054)）。门控 skill 清单或记忆文件（[#12030](https://github.com/QwenLM/qwen-code/issues/12030)）。
+**非目标。** 会话中途每次揭示都重新生成提示词（第二步，且与 [#11321](https://github.invalid/QwenLM/qwen-code/issues/11321) 重叠）。子 agent 的提示词。新增面向用户的配置项。修改安全文本。压缩单个工具的描述（[#12054](https://github.invalid/QwenLM/qwen-code/issues/12054)）。门控 skill 清单或记忆文件（[#12030](https://github.invalid/QwenLM/qwen-code/issues/12030)）。
 
 ## 4. 方案
 
@@ -91,11 +91,11 @@ getCoreSystemPrompt(
 
 ### 4.4 提示词缓存
 
-提示词只依赖会话开始时的快照，因此 `setStaticSystemPrefix`（`client.ts:1672`）的重写频率与现状完全相同——每次构建系统指令一次——会话中途的揭示仍然只改变 tools 块。这是明确的设计约束，不是备注：把 `refreshSystemInstruction` 接到各揭示点上，会在每次 ToolSearch 加载时重写全局缓存块，并且与 [#12029](https://github.com/QwenLM/qwen-code/issues/12029) 相互拉扯——后者的全部目的正是让延迟加载（从而让揭示）在大窗口下真正发生。#12029 应引用本约束，使最终的缓存行为是被选择的，而不是被动继承的。
+提示词只依赖会话开始时的快照，因此 `setStaticSystemPrefix`（`client.ts:1672`）的重写频率与现状完全相同——每次构建系统指令一次——会话中途的揭示仍然只改变 tools 块。这是明确的设计约束，不是备注：把 `refreshSystemInstruction` 接到各揭示点上，会在每次 ToolSearch 加载时重写全局缓存块，并且与 [#12029](https://github.invalid/QwenLM/qwen-code/issues/12029) 相互拉扯——后者的全部目的正是让延迟加载（从而让揭示）在大窗口下真正发生。#12029 应引用本约束，使最终的缓存行为是被选择的，而不是被动继承的。
 
 ### 4.5 `/context`
 
-`collectContextData` 通过 `getMainSessionBaseSystemPrompt` 构建提示词、并另外读取声明列表，且它不预热注册表。因此它读取同一份快照，使其系统提示词一行与真实请求保持一致。本改动叠加在 [#12119](https://github.com/QwenLM/qwen-code/pull/12119)（#12033）的分类重构之上，后者的数字正是 §7 的度量工具。
+`collectContextData` 通过 `getMainSessionBaseSystemPrompt` 构建提示词、并另外读取声明列表，且它不预热注册表。因此它读取同一份快照，使其系统提示词一行与真实请求保持一致。本改动叠加在 [#12119](https://github.invalid/QwenLM/qwen-code/pull/12119)（#12033）的分类重构之上，后者的数字正是 §7 的度量工具。
 
 ### 4.6 Agent 桥接可达（#13033）
 

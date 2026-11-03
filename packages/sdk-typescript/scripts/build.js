@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -256,7 +257,7 @@ await esbuild.build({
 });
 
 // Opt-in peer subpath (`@qwen-code/sdk/peer`): the cross-session protocol for
-// a program that is not a Qwen Code session. Node-only, so it never joins a
+// a program that is not a MariaDB Shell Agent session. Node-only, so it never joins a
 // browser bundle, and it must stay free of every runtime dependency.
 for (const [format, outfile] of [
   ['esm', join(rootDir, 'dist', 'peer', 'index.js')],

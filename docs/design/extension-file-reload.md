@@ -47,7 +47,7 @@ rebuilt from one coherent snapshot.
 - `SettingsWatcher` and existing MCP/LSP watchers do not cover installed
   extension package content. Extension-specific files need their own watcher.
 - Linked extensions can live outside the user extension directory, so watching
-  only `~/.qwen/extensions` misses active development workflows.
+  only `~/.mariadb-shell-agent/extensions` misses active development workflows.
 
 ## Goals
 

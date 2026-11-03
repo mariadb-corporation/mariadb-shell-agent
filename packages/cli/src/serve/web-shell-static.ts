@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -247,7 +248,7 @@ function createSendIndex(
         // loading (EACCES/ESTALE on a network mount, a permissions change, or
         // a partial deploy).
         writeStderrLine(
-          `qwen serve: Web Shell index send failed: ${err instanceof Error ? err.message : String(err)}`,
+          `mariadb-shell-agent serve: Web Shell index send failed: ${err instanceof Error ? err.message : String(err)}`,
         );
         if (!res.headersSent) {
           res.status(500).type('text/plain').send('Failed to load Web Shell');
@@ -327,7 +328,7 @@ export function mountWebShellAssets(
     // it under serve debug mode so a white-screen shell has a diagnostic trail.
     if (isServeDebugMode()) {
       writeStderrLine(
-        `qwen serve: Web Shell asset not found: ${req.originalUrl}`,
+        `mariadb-shell-agent serve: Web Shell asset not found: ${req.originalUrl}`,
       );
     }
     res.status(404).type('text/plain').send('Not found');
@@ -364,7 +365,7 @@ export function mountWebShellAssets(
           const status = 'status' in err && err.status === 404 ? 404 : 500;
           if (status === 500) {
             writeStderrLine(
-              `qwen serve: Web Shell asset send failed (${route}): ${err instanceof Error ? err.message : String(err)}`,
+              `mariadb-shell-agent serve: Web Shell asset send failed (${route}): ${err instanceof Error ? err.message : String(err)}`,
             );
           }
           res
@@ -420,7 +421,7 @@ export function mountWebShellSpaFallback(
     // the shell vs. hitting real routes (routing-misconfig / proxy diagnosis).
     if (isServeDebugMode()) {
       writeStderrLine(
-        `qwen serve: Web Shell SPA fallback served for ${req.method} ${req.originalUrl}`,
+        `mariadb-shell-agent serve: Web Shell SPA fallback served for ${req.method} ${req.originalUrl}`,
       );
     }
     sendIndex(req, res);

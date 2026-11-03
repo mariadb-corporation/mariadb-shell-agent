@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -183,7 +184,10 @@ describe('capture-local — TOCTOU anchor withholding', () => {
     run();
     expect(
       isLedgerOnlyCandidate(
-        join(repo, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+        join(
+          repo,
+          '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+        ),
       ),
     ).toBe(true);
     expect(stderrLines.join('\n')).toContain(
@@ -200,12 +204,18 @@ describe('capture-local — TOCTOU anchor withholding', () => {
     run();
     expect(
       existsSync(
-        join(repo, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+        join(
+          repo,
+          '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+        ),
       ),
     ).toBe(true);
     expect(
       isLedgerOnlyCandidate(
-        join(repo, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+        join(
+          repo,
+          '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+        ),
       ),
     ).toBe(false);
 
@@ -217,7 +227,10 @@ describe('capture-local — TOCTOU anchor withholding', () => {
     run();
     expect(
       isLedgerOnlyCandidate(
-        join(repo, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+        join(
+          repo,
+          '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+        ),
       ),
     ).toBe(true);
   });
@@ -236,7 +249,10 @@ describe('capture-local — TOCTOU anchor withholding', () => {
     const cachePath = join(repo, 'cache.json');
     const promoted = JSON.parse(
       readFileSync(
-        join(repo, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+        join(
+          repo,
+          '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+        ),
         'utf8',
       ),
     ) as Record<string, unknown>;
@@ -316,7 +332,10 @@ describe('capture-local — TOCTOU anchor withholding', () => {
     run();
     expect(
       isLedgerOnlyCandidate(
-        join(repo, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+        join(
+          repo,
+          '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+        ),
       ),
     ).toBe(true);
     expect(stderrLines.join('\n')).toContain(
@@ -343,7 +362,10 @@ describe('capture-local — TOCTOU anchor withholding', () => {
     run();
     expect(
       isLedgerOnlyCandidate(
-        join(repo, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+        join(
+          repo,
+          '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+        ),
       ),
     ).toBe(true);
     expect(stderrLines.join('\n')).toContain(
@@ -356,12 +378,18 @@ describe('capture-local — TOCTOU anchor withholding', () => {
     run();
     expect(
       existsSync(
-        join(repo, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+        join(
+          repo,
+          '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+        ),
       ),
     ).toBe(true);
     expect(
       isLedgerOnlyCandidate(
-        join(repo, '.qwen/tmp/qwen-review-local-cache-candidate.json'),
+        join(
+          repo,
+          '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+        ),
       ),
     ).toBe(false);
     expect(stderrLines.join('\n')).not.toContain('findings ledger only');
@@ -377,11 +405,11 @@ describe('capture-local — the unanchored candidate is announced with its own s
     // file can never pass `--state-id` for it.
     const stale = join(
       repo,
-      '.qwen/tmp/qwen-review-local-cache-candidate.json',
+      '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
     );
     // PLANT an earlier round's candidate: without it the removal assertion
     // passes even when the removal itself is deleted.
-    mkdirSync(join(repo, '.qwen/tmp'), { recursive: true });
+    mkdirSync(join(repo, '.mariadb-shell-agent/tmp'), { recursive: true });
     writeFileSync(
       stale,
       JSON.stringify({ v: 1, target: 'local', stale: true }),
@@ -407,7 +435,7 @@ describe('capture-local — the unanchored candidate is announced with its own s
   });
 
   it.skipIf(process.platform === 'win32')(
-    'a symlinked `.qwen/tmp` is refused before the withhold branch can remove through it',
+    'a symlinked `.mariadb-shell-agent/tmp` is refused before the withhold branch can remove through it',
     () => {
       // The removal side of the redirected-scratch-directory threat: a link
       // to a directory holding the deterministic candidate name, and a
@@ -418,8 +446,8 @@ describe('capture-local — the unanchored candidate is announced with its own s
       const victim = realpathSync(mkdtempSync(join(tmpdir(), 'victim-')));
       const planted = join(victim, 'qwen-review-local-cache-candidate.json');
       writeFileSync(planted, 'ORIGINAL');
-      mkdirSync(join(repo, '.qwen'), { recursive: true });
-      symlinkSync(victim, join(repo, '.qwen/tmp'));
+      mkdirSync(join(repo, '.mariadb-shell-agent'), { recursive: true });
+      symlinkSync(victim, join(repo, '.mariadb-shell-agent/tmp'));
       try {
         captures.push(
           { diff: DIFF_A },
@@ -452,7 +480,10 @@ describe('capture-local — the unanchored candidate is announced with its own s
 
 describe('capture-local — the ledger-only candidate at its edges (#12657)', () => {
   const CANDIDATE = () =>
-    join(repo, '.qwen/tmp/qwen-review-local-cache-candidate.json');
+    join(
+      repo,
+      '.mariadb-shell-agent/tmp/qwen-review-local-cache-candidate.json',
+    );
   const plan = () =>
     JSON.parse(readFileSync(join(repo, 'plan.json'), 'utf8')) as Record<
       string,
@@ -472,13 +503,13 @@ describe('capture-local — the ledger-only candidate at its edges (#12657)', ()
     const ledgerId = String(plan()['cacheCandidateStateId']);
     expect(ledgerId).toBe(`ledger-${anchoredId}`);
 
-    const ledger = join(repo, '.qwen/tmp/ledger.json');
+    const ledger = join(repo, '.mariadb-shell-agent/tmp/ledger.json');
     writeFileSync(ledger, JSON.stringify({ round: 1, findings: [] }));
     const promote = (stateId: string) =>
       (cacheCommitCommand.handler as (argv: unknown) => void)({
         candidate: CANDIDATE(),
         ledger,
-        out: join(repo, '.qwen/review-cache/local.json'),
+        out: join(repo, '.mariadb-shell-agent/review-cache/local.json'),
         stateId,
       });
     // The ledger-only file is on disk: the anchored round's id is refused.
@@ -527,7 +558,7 @@ describe('capture-local — the ledger-only candidate at its edges (#12657)', ()
   });
 
   it('a failed write publishes nothing, removes the stale file, and says the ledger is lost', () => {
-    mkdirSync(join(repo, '.qwen/tmp'), { recursive: true });
+    mkdirSync(join(repo, '.mariadb-shell-agent/tmp'), { recursive: true });
     writeFileSync(CANDIDATE(), JSON.stringify({ v: 1, stale: true }));
     failCandidateWrite = true;
     captures.push({ diff: DIFF_A }, { diff: Buffer.from('moved mid-hash\n') });

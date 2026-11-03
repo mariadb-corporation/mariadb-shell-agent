@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -118,7 +119,7 @@ async function prepare(config = makeConfig()) {
 
 beforeEach(() => {
   dir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'autofix-pr-')));
-  worktree = path.join(dir, '.qwen', 'tmp', 'autofix-pr-12');
+  worktree = path.join(dir, '.mariadb-shell-agent', 'tmp', 'autofix-pr-12');
   fs.mkdirSync(worktree, { recursive: true });
   // A repository of its own, with git's sample hooks only, and none of this
   // machine's global settings.
@@ -144,7 +145,7 @@ afterEach(() => {
 });
 
 describe('validateAutofixPrParams', () => {
-  const plan = '/repo/.qwen/tmp/autofix-pr-1-plan.json';
+  const plan = '/repo/.mariadb-shell-agent/tmp/autofix-pr-1-plan.json';
 
   it.each<[AutofixPrParams, RegExp]>([
     [{ command: 'rm' as never, pr: 1 }, /must be one of/],
@@ -169,14 +170,18 @@ describe('validateAutofixPrParams', () => {
     ],
     [{ command: 'reply', pr: 2, plan }, /reply plan the skill writes/],
     [
-      { command: 'reply', pr: 1, plan: '.qwen/tmp/autofix-pr-1-plan.json' },
+      {
+        command: 'reply',
+        pr: 1,
+        plan: '.mariadb-shell-agent/tmp/autofix-pr-1-plan.json',
+      },
       /reply plan the skill writes/,
     ],
     [
       {
         command: 'reply',
         pr: 1,
-        plan: '/repo/.qwen/tmp/autofix-pr-1/.qwen/tmp/autofix-pr-1-plan.json',
+        plan: '/repo/.mariadb-shell-agent/tmp/autofix-pr-1/.mariadb-shell-agent/tmp/autofix-pr-1-plan.json',
       },
       /reply plan the skill writes/,
     ],
@@ -188,7 +193,7 @@ describe('validateAutofixPrParams', () => {
       {
         command: 'reply',
         pr: 1,
-        plan: '/repo/.qwen/tmp/AUTOFIX-PR-1/.qwen/tmp/autofix-pr-1-plan.json',
+        plan: '/repo/.mariadb-shell-agent/tmp/AUTOFIX-PR-1/.mariadb-shell-agent/tmp/autofix-pr-1-plan.json',
       },
       /reply plan the skill writes/,
     ],
@@ -238,10 +243,15 @@ describe('autofixPrArgs', () => {
       {
         command: 'reply',
         pr: 5,
-        plan: '/x/.qwen/tmp/autofix-pr-5-plan.json',
+        plan: '/x/.mariadb-shell-agent/tmp/autofix-pr-5-plan.json',
         no_post: true,
       },
-      ['reply', '5', '/x/.qwen/tmp/autofix-pr-5-plan.json', '--no-post'],
+      [
+        'reply',
+        '5',
+        '/x/.mariadb-shell-agent/tmp/autofix-pr-5-plan.json',
+        '--no-post',
+      ],
     ],
     [
       { command: 'sync', pr: 5, discard: true, task: 't1' },
@@ -350,7 +360,7 @@ describe('permission rules', () => {
   it('treat a watch the state file moved to another host as unconfirmed', async () => {
     vi.stubEnv('FAKE_HOST', 'github.com');
     await prepare();
-    const plan = '/x/.qwen/tmp/autofix-pr-12-plan.json';
+    const plan = '/x/.mariadb-shell-agent/tmp/autofix-pr-12-plan.json';
     expect((await presented({ command: 'reply', pr: 12, plan }))['watch']).toBe(
       'confirmed',
     );
@@ -392,7 +402,7 @@ describe('permission rules', () => {
           await presented({
             command: 'reply',
             pr: 12,
-            plan: '/x/.qwen/tmp/autofix-pr-12-plan.json',
+            plan: '/x/.mariadb-shell-agent/tmp/autofix-pr-12-plan.json',
           })
         )['watch'],
       ).toBe('unconfirmed');
@@ -462,7 +472,7 @@ describe('permission rules', () => {
         'unconfirmed',
       );
     }
-    const plan = '/x/.qwen/tmp/autofix-pr-12-plan.json';
+    const plan = '/x/.mariadb-shell-agent/tmp/autofix-pr-12-plan.json';
     expect((await presented({ command: 'reply', pr: 12, plan }))['watch']).toBe(
       'confirmed',
     );
@@ -739,7 +749,7 @@ describe('resolveAutofixPrLaunch', () => {
 
   it('refuses when there is nothing to run', () => {
     expect(() => resolveAutofixPrLaunch({}, ['/usr/bin/node'])).toThrow(
-      /cannot find the Qwen Code CLI/,
+      /cannot find the MariaDB Shell Agent CLI/,
     );
   });
 });
@@ -762,7 +772,7 @@ describe('running a helper', () => {
 
   it('passes a path with shell syntax through as one argument', async () => {
     const clone = path.join(dir, 'a $(touch pwned); b');
-    const tmp = path.join(clone, '.qwen', 'tmp');
+    const tmp = path.join(clone, '.mariadb-shell-agent', 'tmp');
     fs.mkdirSync(path.join(tmp, 'autofix-pr-12'), { recursive: true });
     vi.stubEnv('FAKE_WORKTREE', path.join(tmp, 'autofix-pr-12'));
     await prepare();
@@ -779,7 +789,7 @@ describe('running a helper', () => {
     const elsewhere = path.join(
       os.tmpdir(),
       'other',
-      '.qwen',
+      '.mariadb-shell-agent',
       'tmp',
       'autofix-pr-12-plan.json',
     );
@@ -789,17 +799,22 @@ describe('running a helper', () => {
       plan: elsewhere,
     }).execute(signal());
     expect(result.error?.message).toContain(
-      path.join(dir, '.qwen', 'tmp', 'autofix-pr-12-plan.json'),
+      path.join(dir, '.mariadb-shell-agent', 'tmp', 'autofix-pr-12-plan.json'),
     );
   });
 
   it('takes the reply plan of an in-place watch from inside its checkout', async () => {
     // An in-place watch's worktree IS the checkout: its plan sits in
-    // <checkout>/.qwen/tmp, not beside the checkout (its parent).
+    // <checkout>/.mariadb-shell-agent/tmp, not beside the checkout (its parent).
     vi.stubEnv('FAKE_IN_PLACE', '1');
     vi.stubEnv('FAKE_WORKTREE', dir);
     await prepare();
-    const plan = path.join(dir, '.qwen', 'tmp', 'autofix-pr-12-plan.json');
+    const plan = path.join(
+      dir,
+      '.mariadb-shell-agent',
+      'tmp',
+      'autofix-pr-12-plan.json',
+    );
     fs.mkdirSync(path.dirname(plan), { recursive: true });
     fs.writeFileSync(plan, '{}');
     const result = await invocation({ command: 'reply', pr: 12, plan }).execute(
@@ -1682,7 +1697,7 @@ describe('background fixes', () => {
 
   describe('the attempt', () => {
     const marker = () =>
-      path.join(dir, '.qwen', 'tmp', 'autofix-pr-12-fix.json');
+      path.join(dir, '.mariadb-shell-agent', 'tmp', 'autofix-pr-12-fix.json');
     const writeMarker = (attempt: string) =>
       fs.writeFileSync(
         marker(),
@@ -1931,7 +1946,7 @@ describe('background fixes', () => {
 
     it('tells the round to go on with the options the session scheduled', () => {
       expect(fix.followUp()).toBe(
-        'Written by Qwen Code, not by the agent: this agent was the background ' +
+        'Written by MariaDB Shell Agent, not by the agent: this agent was the background ' +
           'fix of /autofix-pr for o/r#12. Go on with its round now: invoke the ' +
           'autofix-pr skill with these arguments:\n' +
           `after-fix o/r#12 --task feedc0ffee12 --attempt ${fix.attempt} --no-reply -- keep the API`,

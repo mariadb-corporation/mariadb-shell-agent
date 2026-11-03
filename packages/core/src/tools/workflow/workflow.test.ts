@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -309,7 +310,7 @@ describe('WorkflowTool', () => {
         // #8690: speak this project's vocabulary. Without a location the
         // model cannot reach a saved workflow: `workflow('<name>')` is a
         // blind guess and `scriptPath` wants a path it cannot construct.
-        '.qwen/workflows',
+        '.mariadb-shell-agent/workflows',
         // The result surface: without these the model expects no script
         // path back, and resumes by re-sending the whole source.
         /Every run hands back its runId/,
@@ -613,7 +614,7 @@ await agent('scan package.json')
     // path rule would approve whatever the file later holds.
     it('offers no grant for a scriptPath that cannot be loaded', async () => {
       const details = await detailsFor(
-        { scriptPath: '/home/u/.qwen/workflows/audit.js' },
+        { scriptPath: '/home/u/.mariadb-shell-agent/workflows/audit.js' },
         configWithStorage().config,
       );
       expect(details.hideAlwaysAllow).toBe(true);
@@ -831,7 +832,7 @@ await agent('scan package.json')
   it.each([
     ['the description', 4_800],
     ['script', 900],
-    ['scriptPath', 950],
+    ['scriptPath', 950 + 64],
     ['name', 400],
     ['args', 250],
     ['resumeFromRunId', 850],
@@ -880,7 +881,7 @@ await agent('scan package.json')
     } as unknown as Config);
 
     expect(tool.authoringSurface).toBe('inline');
-    expect(tool.description.length).toBeLessThanOrEqual(29_500);
+    expect(tool.description.length).toBeLessThanOrEqual(29_500 + 64);
   });
 
   it.each([
@@ -1316,7 +1317,7 @@ await agent('scan package.json')
     await expect(run(false)).resolves.toEqual(await run(undefined));
   });
 
-  // A headless run (`qwen --prompt`, CI, cron) has no TUI, no approval bridge
+  // A headless run (`mariadb-shell-agent --prompt`, CI, cron) has no TUI, no approval bridge
   // and a closed stdin. `getDefaultPermission()` is 'ask', which the
   // scheduler resolves against the approval mode, but nothing INSIDE the tool
   // or runner may reach for interactivity, or the foreground call hangs on a
@@ -2243,7 +2244,7 @@ await agent('scan package.json')
       ).join('\n');
 
       expect(text).toContain(
-        "this reads an extension's workflow file; copy it into .qwen/workflows",
+        "this reads an extension's workflow file; copy it into .mariadb-shell-agent/workflows",
       );
       expect(text).not.toContain('this reads the saved workflow');
     });
@@ -2644,7 +2645,10 @@ describe('WorkflowTool — extension workflow labels', () => {
 
   it("keeps the saved-workflow label for the user's own script while an extension is active", async () => {
     const scriptPath = await extensionScript();
-    const ownScript = path.join(dir, 'project/.qwen/workflows/deploy.js');
+    const ownScript = path.join(
+      dir,
+      'project/.mariadb-shell-agent/workflows/deploy.js',
+    );
     await fs.mkdir(path.dirname(ownScript), { recursive: true });
     await fs.writeFile(ownScript, 'return 1;\n', 'utf8');
     await expectLabel(
@@ -2681,7 +2685,10 @@ describe('WorkflowTool — name-only sessions', () => {
 
   it.each([
     [{ script: 'return 1' }, 'script'],
-    [{ scriptPath: '/proj/.qwen/workflows/audit.js' }, 'scriptPath'],
+    [
+      { scriptPath: '/proj/.mariadb-shell-agent/workflows/audit.js' },
+      'scriptPath',
+    ],
     [{ script: 'return 1', resumeFromRunId: 'wf_0123' }, 'script'],
     [{ name: 'audit', scriptPath: '/w/a.js' }, 'scriptPath'],
   ])('refuses %j, naming %s', (params, field) => {

@@ -48,13 +48,13 @@ If you installed via the standalone installer (`curl ... | bash` or `irm ... | i
 **Linux / macOS**
 
 ```bash
-curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.sh | bash
+curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/installation/uninstall-qwen-standalone.sh | bash
 ```
 
 **Windows**
 
 ```powershell
-irm https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.ps1 | iex
+irm https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid/installation/uninstall-qwen-standalone.ps1 | iex
 ```
 
-The uninstaller removes the standalone runtime, generated `qwen` wrapper, and installer-managed PATH changes. Your Qwen Code configuration (`~/.qwen`) is preserved by default.
+The uninstaller removes the standalone runtime, generated `mariadb-shell-agent` wrapper, and installer-managed PATH changes. Your MariaDB Shell Agent configuration (`~/.mariadb-shell-agent`) is preserved by default.

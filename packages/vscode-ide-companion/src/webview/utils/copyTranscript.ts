@@ -1,13 +1,14 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Clipboard copy support for the WebShell transcript timeline.
  *
- * The contributed `qwen-code.copyMessage` / `copyAllMessages` /
+ * The contributed `mariadb-shell-agent.copyMessage` / `copyAllMessages` /
  * `copyLastReply` commands route through the extension host
  * (`WebViewProvider.sendCopyCommand`) and land back in the webview as a
  * `copyCommand` message. The pre-PR timeline copied from the legacy
@@ -144,7 +145,7 @@ export function formatBlocksForCopyAll(
     } else if (block.kind === 'thought') {
       parts.push(`**Thinking:** ${content}`);
     } else {
-      parts.push(`**Qwen Code:** ${content}`);
+      parts.push(`**MariaDB Shell Agent:** ${content}`);
     }
   }
   return parts.join('\n\n---\n\n');

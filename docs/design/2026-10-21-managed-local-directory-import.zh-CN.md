@@ -76,18 +76,18 @@ Workspace 创建根。同一根目录使用期间再次导入项目，应复用�
 5. 未启用或向远程暴露的部署不能浏览任意主机路径。原有空目录创建、授权目录选择及
    SSH 保持可用。
 6. 执行专项 H2/单元测试、临时 MySQL 8.4 集成测试、Maven 验证、TypeScript
-   build/typecheck/bundle，以及桌面和移动宽度浏览器验证。在 `.qwen/e2e-tests/`
+   build/typecheck/bundle，以及桌面和移动宽度浏览器验证。在 `.mariadb-shell-agent/e2e-tests/`
    记录基线和结果。
 
 ## 状态与开放问题
 
 原始目录导入已实现。此前的原生 macOS 验证覆盖空登记表导入、文件查询、模型 Read 工具、运行中根目录复用、
 浏览器重试，以及关闭新增导入后的重启。未在本地执行原生 Linux 验收。专项 Java/MySQL
-和 TypeScript/浏览器检查与中断的 Java 全量测试分别记录在 `.qwen/e2e-tests/`。
+和 TypeScript/浏览器检查与中断的 Java 全量测试分别记录在 `.mariadb-shell-agent/e2e-tests/`。
 没有未决产品选择。普通创建回执省略未使用的导入字段，继续支持旧 Java 版本读取。
 
 本机启动器后续验收还覆盖原生 macOS 上的回环 SIGNED 启动、保留的 bearer/签名
 拒绝、浏览器绝对路径导入、真实 Read 工具 Turn 和重启保留。详细命令结果与测试
-产物限制记录在 `.qwen/e2e-tests/managed-local-import.md`。
+产物限制记录在 `.mariadb-shell-agent/e2e-tests/managed-local-import.md`。
 
 共享项目后续改动的本地验证单独记录于对应[设计](2026-10-28-managed-local-shared-projects.zh-CN.md)。上面的早期模型、浏览器和重启证据不能作为该后续改动已验证这些路径的证明。

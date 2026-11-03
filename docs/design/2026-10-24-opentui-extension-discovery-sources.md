@@ -2,7 +2,7 @@
 
 [English](2026-10-24-opentui-extension-discovery-sources.md) | [简体中文](2026-10-24-opentui-extension-discovery-sources.zh-CN.md)
 
-Implementation and validation evidence, including their scope and unresolved findings, are tracked in [PR #15671](https://github.com/QwenLM/qwen-code/pull/15671). The E1–E10 requirements below remain the final acceptance gate.
+Implementation and validation evidence, including their scope and unresolved findings, are tracked in [PR #15671](https://github.invalid/QwenLM/qwen-code/pull/15671). The E1–E10 requirements below remain the final acceptance gate.
 
 ## Problem and existing behavior
 

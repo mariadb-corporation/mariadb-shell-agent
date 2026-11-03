@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -48,7 +49,7 @@ export function resolveUsageStatisticsEnabled(
   return (
     parseBooleanEnvFlag(env['QWEN_USAGE_STATISTICS_ENABLED']) ??
     settingsValue ??
-    true
+    false
   );
 }
 
@@ -58,14 +59,14 @@ export function resolveUsageStatisticsEnabled(
  * (`settings.proxy`, then `HTTPS_PROXY` / `https_proxy` / `HTTP_PROXY` /
  * `http_proxy`), minus the leading CLI-flag term: `--proxy` is deprecated
  * in favor of `settings.proxy` and never reaches the extension command
- * handlers (`qwen extensions ...` exits before `loadCliConfig`).
+ * handlers (`mariadb-shell-agent extensions ...` exits before `loadCliConfig`).
  *
  * Returns the RAW first match; normalization (and the SOCKS rejection a
  * session would fail on at startup) happens in
  * `ExtensionManager.getTelemetryConfig`, which drops an unsupported value
  * instead of aborting the extension mutation.
  *
- * `env` is injectable so a long-lived host (the `qwen serve` daemon) can pass
+ * `env` is injectable so a long-lived host (the `mariadb-shell-agent serve` daemon) can pass
  * the resolved environment of the runtime that owns the workspace being
  * resolved, rather than an ambient `process.env` that per-workspace settings
  * loads may have polluted. A host that cannot attribute an env to the

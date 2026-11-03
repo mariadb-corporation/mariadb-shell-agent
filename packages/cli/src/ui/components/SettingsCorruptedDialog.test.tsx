@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -49,7 +50,8 @@ enum TerminalKeys {
 }
 
 describe('SettingsCorruptedDialog', () => {
-  const mockCorruptedPath = '/home/user/.qwen/settings.json.corrupted';
+  const mockCorruptedPath =
+    '/home/user/.mariadb-shell-agent/settings.json.corrupted';
   const mockOnExit = vi.fn();
   const mockOnContinue = vi.fn();
 

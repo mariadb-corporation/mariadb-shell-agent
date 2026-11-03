@@ -7,7 +7,7 @@ grouping daemon-managed channel workers by workspace. Voice
 (`/workspaces/:workspace/voice/stream`) is a separate Phase 4b slice and is out
 of scope here.
 
-Today `qwen serve --channel <name>` starts a single channel worker bound to the
+Today `mariadb-shell-agent serve --channel <name>` starts a single channel worker bound to the
 primary workspace. In multi-workspace mode the worker must be grouped by the
 workspace that owns each channel: each registered, trusted workspace gets its
 own worker process bound to that workspace's cwd, `QWEN_DAEMON_WORKSPACE`, and
@@ -59,7 +59,7 @@ candidate owner **iff `resolvedCwd === W`** (i.e. the channel would pass
 
 - explicit `cwd` = a registered path X: only `W === X` satisfies -> owner = X
   (unambiguous).
-- no `cwd`, defined only in a workspace's own scope (`/B/.qwen/settings.json`):
+- no `cwd`, defined only in a workspace's own scope (`/B/.mariadb-shell-agent/settings.json`):
   appears only in B's merged config and resolves to B -> owner = B
   (unambiguous).
 - no `cwd`, defined in user/system scope: satisfied under every W -> multiple
@@ -137,7 +137,7 @@ workspaceId; workspaceCwd; primary }`); `primarySnapshot()` backs the legacy
 `ServiceInfo` gains an optional `workers?: Array<{ workspaceId?; workspaceCwd?;
 channels: string[]; workerPid? }>`. The top-level `channels` becomes the union
 of all workers' channels, and the top-level `workerPid` stays the primary
-worker's pid, so old readers (`qwen channel status`, which only reads
+worker's pid, so old readers (`mariadb-shell-agent channel status`, which only reads
 `workerPid` and `channels`) are unaffected.
 
 Concurrency: with N workers, `onReady`/`onExit` callbacks fire concurrently. A
@@ -211,7 +211,7 @@ ordering cannot regress behind an injected ready-only factory.
 - single workspace is unchanged; old pidfile/status readers keep
   `channels`/`workerPid`/`channelWorker`.
 - operator guidance: to host a channel in a non-primary workspace, define it in
-  that workspace's own `.qwen/settings.json` (no `cwd` needed) or define it in
+  that workspace's own `.mariadb-shell-agent/settings.json` (no `cwd` needed) or define it in
   any scope with an explicit `cwd` equal to the workspace path. A user/system
   scope channel with no `cwd` must be disambiguated in multi-workspace mode or
   the daemon boot-errors.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -108,6 +109,7 @@ export class LspConfigLoader {
             ...this.parseConfigSource(
               hydrated,
               `${originBase} (${configPath})`,
+              { keyedByServer: true },
             ),
           );
         } catch (error) {
@@ -122,7 +124,9 @@ export class LspConfigLoader {
           extension.path,
         );
         configs.push(
-          ...this.parseConfigSource(hydrated, `${originBase} (lspServers)`),
+          ...this.parseConfigSource(hydrated, `${originBase} (lspServers)`, {
+            keyedByServer: true,
+          }),
         );
       } else {
         debugLogger.warn(
@@ -196,7 +200,7 @@ export class LspConfigLoader {
   private parseConfigSource(
     source: unknown,
     origin: string,
-    options: { forceTrustRequired?: boolean } = {},
+    options: { forceTrustRequired?: boolean; keyedByServer?: boolean } = {},
   ): LspServerConfig[] {
     if (!this.isRecord(source)) {
       return [];
@@ -210,9 +214,18 @@ export class LspConfigLoader {
       }
 
       // In basic format: key is language name, server name comes from command.
-      const languages = [key];
+      // Extensions (Claude plugins) key by server name and list their
+      // languages in extensionToLanguage.
+      const mappedLanguages = options.keyedByServer
+        ? this.languagesOf(spec['extensionToLanguage'])
+        : [];
+      const languages = mappedLanguages.length > 0 ? mappedLanguages : [key];
       const name =
-        typeof spec['command'] === 'string' ? (spec['command'] as string) : key;
+        mappedLanguages.length > 0
+          ? key
+          : typeof spec['command'] === 'string'
+            ? (spec['command'] as string)
+            : key;
 
       const config = this.buildServerConfig(name, languages, spec, origin, {
         forceTrustRequired: options.forceTrustRequired,
@@ -284,6 +297,20 @@ export class LspConfigLoader {
       '/': path.sep,
       pathSeparator: path.sep,
     });
+  }
+
+  private languagesOf(extensionToLanguage: unknown): string[] {
+    if (!this.isRecord(extensionToLanguage)) {
+      return [];
+    }
+    return [
+      ...new Set(
+        Object.values(extensionToLanguage).filter(
+          (language): language is string =>
+            typeof language === 'string' && language.length > 0,
+        ),
+      ),
+    ];
   }
 
   private buildServerConfig(

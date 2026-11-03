@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -233,7 +234,7 @@ function useTempProject(prefix: string, memory?: { scaffoldAt?: string }) {
     await fs.mkdir(tmp.projectRoot, { recursive: true });
     tmp.skillFilePath = path.join(
       tmp.projectRoot,
-      '.qwen/skills/auto-skill-foo/SKILL.md',
+      '.mariadb-shell-agent/skills/auto-skill-foo/SKILL.md',
     );
     if (memory) {
       await ensureAutoMemoryScaffold(
@@ -878,7 +879,7 @@ describe('MemoryManager', () => {
     });
 
     it('still schedules dream when the migration candidate scan fails', async () => {
-      // A trusted repo that ships .qwen/memory as a symlink makes
+      // A trusted repo that ships .mariadb-shell-agent/memory as a symlink makes
       // resolveTrustedMemoryRoot throw inside the scan. The gate has to fail
       // open — a root that cannot be scanned cannot be migrated either —
       // because rejecting escapes before the task record and telemetry exist,
@@ -1689,13 +1690,18 @@ describe('MemoryManager', () => {
     });
 
     it.each([
-      ['private', '.qwen/memory/user/test.md', false, false],
-      ['team', '.qwen/team-memory/test.md', false, false],
-      ['bridged private', '.qwen/memory/user/test.md', true, false],
-      ['bridged team', '.qwen/team-memory/test.md', true, false],
+      ['private', '.mariadb-shell-agent/memory/user/test.md', false, false],
+      ['team', '.mariadb-shell-agent/team-memory/test.md', false, false],
+      [
+        'bridged private',
+        '.mariadb-shell-agent/memory/user/test.md',
+        true,
+        false,
+      ],
+      ['bridged team', '.mariadb-shell-agent/team-memory/test.md', true, false],
       [
         'bridged private with JSON arguments',
-        '.qwen/memory/user/test.md',
+        '.mariadb-shell-agent/memory/user/test.md',
         true,
         true,
       ],
@@ -1838,7 +1844,7 @@ describe('MemoryManager', () => {
                   args: {
                     file_path: path.join(
                       tmp.projectRoot,
-                      '.qwen/memory/user/test.md',
+                      '.mariadb-shell-agent/memory/user/test.md',
                     ),
                   },
                 },
@@ -1880,7 +1886,7 @@ describe('MemoryManager', () => {
                   args: {
                     file_path: path.join(
                       tmp.projectRoot,
-                      '.qwen/memory/user/test.md',
+                      '.mariadb-shell-agent/memory/user/test.md',
                     ),
                   },
                 },
@@ -1969,7 +1975,10 @@ describe('MemoryManager', () => {
       );
       const mgr = new MemoryManager();
 
-      const file_path = path.join(tmp.projectRoot, '.qwen/memory/user/test.md');
+      const file_path = path.join(
+        tmp.projectRoot,
+        '.mariadb-shell-agent/memory/user/test.md',
+      );
       const call = fnCall(ToolNames.TOOL_CALL, {
         name: 'web_fetch',
         arguments: { file_path },
@@ -2362,7 +2371,7 @@ describe('MemoryManager', () => {
             fnCall('write_file', {
               file_path: path.join(
                 tmp.projectRoot,
-                '.qwen/memory/user/test.md',
+                '.mariadb-shell-agent/memory/user/test.md',
               ),
             }),
           ),
@@ -3512,7 +3521,7 @@ describe('MemoryManager', () => {
             fnCall('write_file', {
               file_path: path.join(
                 tmp.projectRoot,
-                '.qwen/memory/project/unrelated.md',
+                '.mariadb-shell-agent/memory/project/unrelated.md',
               ),
               content: 'The build system is LANTERN.',
             }),
@@ -3562,7 +3571,7 @@ describe('MemoryManager', () => {
             fnCall('write_file', {
               file_path: path.join(
                 tmp.projectRoot,
-                '.qwen/memory/project/unrelated.md',
+                '.mariadb-shell-agent/memory/project/unrelated.md',
               ),
               content: 'The build system is LANTERN.',
             }),
@@ -3667,7 +3676,9 @@ describe('MemoryManager', () => {
     beforeEach(() => {
       vi.resetAllMocks();
       vi.mocked(runSkillReviewByAgent).mockResolvedValue({
-        touchedSkillFiles: ['/project/.qwen/skills/test/SKILL.md'],
+        touchedSkillFiles: [
+          '/project/.mariadb-shell-agent/skills/test/SKILL.md',
+        ],
       });
     });
 
@@ -3773,14 +3784,14 @@ describe('MemoryManager', () => {
       expect(pendingSkills).toBeDefined();
       expect(pendingSkills).toHaveLength(1);
 
-      // The skill must no longer be under .qwen/skills/
+      // The skill must no longer be under .mariadb-shell-agent/skills/
       await expect(fs.access(tmp.skillFilePath)).rejects.toThrow();
     });
 
     it('stages a new skill whose name exists only in the archive', async () => {
       const archivedManifest = path.join(
         tmp.projectRoot,
-        '.qwen/archived-skills/auto-skill-foo/SKILL.md',
+        '.mariadb-shell-agent/archived-skills/auto-skill-foo/SKILL.md',
       );
       await fs.mkdir(path.dirname(archivedManifest), { recursive: true });
       await fs.writeFile(archivedManifest, 'archived');
@@ -3809,7 +3820,7 @@ describe('MemoryManager', () => {
       expect(record.status).toBe('completed');
       expect(record.metadata?.['pendingSkills']).toBeUndefined();
 
-      // The skill must still be under .qwen/skills/
+      // The skill must still be under .mariadb-shell-agent/skills/
       await expect(fs.access(tmp.skillFilePath)).resolves.toBeUndefined();
     });
 
@@ -3947,7 +3958,7 @@ describe('MemoryManager', () => {
       const taskId = (await scheduleAndAwait(mgr)).id;
       await mgr.acceptPendingSkillFromTask(taskId, 'auto-skill-foo');
 
-      // The skill must now exist at its final path under .qwen/skills/
+      // The skill must now exist at its final path under .mariadb-shell-agent/skills/
       await expect(fs.access(tmp.skillFilePath)).resolves.toBeUndefined();
 
       // The task record must reflect 0 remaining pending skills
@@ -3961,13 +3972,13 @@ describe('MemoryManager', () => {
       const taskId = (await scheduleAndAwait(mgr)).id;
       await mgr.rejectPendingSkillFromTask(taskId, 'auto-skill-foo');
 
-      // The skill must NOT exist under .qwen/skills/
+      // The skill must NOT exist under .mariadb-shell-agent/skills/
       await expect(fs.access(tmp.skillFilePath)).rejects.toThrow();
 
       // The staged dir must also be gone
       const stagedPath = path.join(
         tmp.projectRoot,
-        '.qwen/pending-skills/auto-skill-foo',
+        '.mariadb-shell-agent/pending-skills/auto-skill-foo',
       );
       await expect(fs.access(stagedPath)).rejects.toThrow();
 
@@ -3981,7 +3992,13 @@ describe('MemoryManager', () => {
       const mgr = new MemoryManager();
       const names = ['auto-skill-a', 'auto-skill-b', 'auto-skill-c'];
       const files = names.map((n) =>
-        path.join(tmp.projectRoot, '.qwen', 'skills', n, 'SKILL.md'),
+        path.join(
+          tmp.projectRoot,
+          '.mariadb-shell-agent',
+          'skills',
+          n,
+          'SKILL.md',
+        ),
       );
       agentCreatesSkills('---\ndescription: x\n---\n# x\n', files);
       const record = await mgr.scheduleSkillReview(

@@ -891,7 +891,7 @@ describe('DaemonWorkspaceService', () => {
       deviceFlowRegistry: {},
       subagentManager: {},
       boundWorkspace: '/w',
-      contextFilename: 'QWEN.md',
+      contextFilename: 'MARIADB-SHELL-AGENT.md',
       persistDisabledTools: vi.fn(),
       publishWorkspaceEvent: vi.fn(),
       knownClientIds: () => new Set<string>(),

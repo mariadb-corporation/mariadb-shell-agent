@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -324,7 +325,7 @@ ${escapeXml(entry.description)}
 /**
  * Whether a skill's side effects — `allowedTools` session allow rules and
  * frontmatter hooks — may be applied. A project skill is discovered from
- * `<repo>/.qwen/skills/` regardless of folder trust because its body only
+ * `<repo>/.mariadb-shell-agent/skills/` regardless of folder trust because its body only
  * influences the model, but its side effects grant tool approvals or run
  * repo-supplied commands, so they need a trusted folder: the same gate
  * `Config.getProjectHooks()` applies to settings-file hooks. User, extension

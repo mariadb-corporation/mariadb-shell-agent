@@ -69,7 +69,7 @@ registered model-specific choices. The controls stay available instead of
 disappearing after session creation. DashScope likewise maps `minimal` to
 `low`; a static `thinking_budget` maps to `low` at 0–4096 tokens, `medium` at
 4097–16384, and `xhigh` at 16385–262144, following the
-[OpenAI-compatible Qwen API](https://help.aliyun.com/zh/model-studio/qwen-api-via-openai-chat-completions).
+[OpenAI-compatible Qwen API](https://help.aliyun.invalid/zh/model-studio/qwen-api-via-openai-chat-completions).
 
 If a static DashScope thinking field currently overrides the unified setting,
 ACP projects its effective off state or effort alias through the same controls.

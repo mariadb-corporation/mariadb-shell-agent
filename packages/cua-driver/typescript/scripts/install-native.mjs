@@ -21,7 +21,7 @@ import { execFile } from "node:child_process"
 import { x as extractTar } from "tar"
 
 const DEFAULT_RELEASE_ROOT =
-  "https://github.com/QwenLM/qwen-code/releases/download"
+  "https://github.invalid/QwenLM/qwen-code/releases/download"
 const NATIVE_ASSETS_MODULE = new URL(
   "../dist/native-assets.js",
   import.meta.url,

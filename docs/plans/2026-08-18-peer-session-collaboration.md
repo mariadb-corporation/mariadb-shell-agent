@@ -1,12 +1,12 @@
-# Peer session collaboration for Qwen Code
+# Peer session collaboration for MariaDB Shell Agent
 
 > Status: Board layer implemented by #9402; not a standalone collaboration milestone
-> Tracking: [#8724](https://github.com/QwenLM/qwen-code/issues/8724)
+> Tracking: [#8724](https://github.invalid/QwenLM/qwen-code/issues/8724)
 
 ## Decision
 
 The product path and the portable board are separate layers. The original #8724 milestone is
-Qwen-to-Qwen collaboration: already-running Qwen Code sessions discover each other and use
+Qwen-to-Qwen collaboration: already-running MariaDB Shell Agent sessions discover each other and use
 `send_message` with a receiver-side consent gate. Agent Team already owns the simpler case
 where one session spawns and coordinates an in-process Qwen teammate.
 
@@ -24,7 +24,7 @@ The first release has three rules:
 3. **Pull is the contract.** Work becomes visible on the board. Nothing is delivered into a
    running agent process.
 
-This is the smallest storage model shared by Qwen Code, Codex, shell scripts, scheduled jobs,
+This is the smallest storage model shared by MariaDB Shell Agent, Codex, shell scripts, scheduled jobs,
 and other tools that can run a command. It is not by itself a scheduler, launcher, or inbox.
 
 ## Product sequence
@@ -50,7 +50,7 @@ An already-running process can receive unsolicited input only if it voluntarily 
 inbound channel. Foreign CLIs do not expose a common one. They can all run a command, so
 fetching shared state is the portable operation.
 
-Qwen Code already has the pieces needed for a filesystem-backed implementation:
+MariaDB Shell Agent already has the pieces needed for a filesystem-backed implementation:
 
 - atomic JSON writes;
 - `proper-lockfile` for cross-process locking;
@@ -65,7 +65,7 @@ storage or scheduler because those are scoped to a spawned, in-process team.
 ### Scope and identity
 
 `--board` is required on every command. It is a logical name, not a path. The implementation
-validates it before resolving the directory under `~/.qwen/boards/`.
+validates it before resolving the directory under `~/.mariadb-shell-agent/boards/`.
 
 `--as` is required when creating or changing an item. Read-only commands may omit it unless
 they request an identity-filtered view. The value is written into fields such as `createdBy`,
@@ -78,7 +78,7 @@ unambiguous contract ships.
 ### Storage
 
 ```
-~/.qwen/boards/{board}/
+~/.mariadb-shell-agent/boards/{board}/
     tasks/{id}.json
     asks/{id}.json
 ```
@@ -113,14 +113,14 @@ There is no generic message. Status belongs on a task and information requests a
 The MVP surface is non-interactive and machine-readable:
 
 ```text
-qwen board show --board <board> [--as <name>] [--json]
-qwen board task --board <board> --as <name> <subject> [--owner <name>]
-qwen board claim --board <board> --as <name> <task-id>
-qwen board done --board <board> --as <name> <task-id> [--note <text>]
-qwen board ask --board <board> --as <name> <to> <question> [--wait] [--timeout <duration>]
-qwen board answer --board <board> --as <name> <ask-id> <answer>
-qwen board decline --board <board> --as <name> <ask-id> <reason>
-qwen board prune --board <board> --as <name> --older-than <duration>
+mariadb-shell-agent board show --board <board> [--as <name>] [--json]
+mariadb-shell-agent board task --board <board> --as <name> <subject> [--owner <name>]
+mariadb-shell-agent board claim --board <board> --as <name> <task-id>
+mariadb-shell-agent board done --board <board> --as <name> <task-id> [--note <text>]
+mariadb-shell-agent board ask --board <board> --as <name> <to> <question> [--wait] [--timeout <duration>]
+mariadb-shell-agent board answer --board <board> --as <name> <ask-id> <answer>
+mariadb-shell-agent board decline --board <board> --as <name> <ask-id> <reason>
+mariadb-shell-agent board prune --board <board> --as <name> --older-than <duration>
 ```
 
 `--json` produces stable data without ANSI output. Human output may be formatted but must not

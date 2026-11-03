@@ -1,11 +1,11 @@
-# `qwen serve --open-with-auth` implementation plan
+# `mariadb-shell-agent serve --open-with-auth` implementation plan
 
-- Status: Implemented in [#9738](https://github.com/QwenLM/qwen-code/pull/9738)
+- Status: Implemented in [#9738](https://github.invalid/QwenLM/qwen-code/pull/9738)
 - Baseline: `main` at `ea872a4621` (2026-08-22)
 - Revalidated: `main` at `7385b278b2` (2026-08-23)
 - Design: [2026-08-22-serve-open-with-auth.md](../design/2026-08-22-serve-open-with-auth.md)
 - Related tracking issue:
-  [#4514](https://github.com/QwenLM/qwen-code/issues/4514)
+  [#4514](https://github.invalid/QwenLM/qwen-code/issues/4514)
 
 ## Delivery rule
 
@@ -109,13 +109,13 @@ revocation work in #4514.
   CLI-owned `--open-with-auth` generation step without implying that
   `runQwenServe()` itself gained a new source.
 - Document the stable-token migration for multi-client use:
-  `QWEN_SERVER_TOKEN=... qwen serve --open`, with the same value supplied to
+  `QWEN_SERVER_TOKEN=... mariadb-shell-agent serve --open`, with the same value supplied to
   each SDK or curl client.
 - Name affected first-party clients and their migrations: daemon-backed
-  `qwen channel set/reload` and remote `status/stop` need the explicit shared
+  `mariadb-shell-agent channel set/reload` and remote `status/stop` need the explicit shared
   token only when connecting to an opted-in temporary-token daemon; the Chrome
   extension keeps its documented plain
-  `qwen serve --allow-origin chrome-extension://<id>` flow without the new flag
+  `mariadb-shell-agent serve --allow-origin chrome-extension://<id>` flow without the new flag
   because it cannot discover the generated credential.
 - Add the channel-command migration to `docs/users/qwen-serve.md`, and add a
   scoped note to `packages/chrome-extension/README.md` that the extension
@@ -143,7 +143,7 @@ command and fast-path suites.
 
 | Scenario                                                                         | Expected result                                                    |
 | -------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| Plain `qwen serve`                                                               | No token is generated                                              |
+| Plain `mariadb-shell-agent serve`                                                | No token is generated                                              |
 | Bare interactive loopback `--open`                                               | No token is generated; existing behavior is unchanged              |
 | Eligible `--open-with-auth` with Web Shell assets                                | Opens the browser and assigns a selected or generated token        |
 | `--open --open-with-auth`                                                        | Same authenticated behavior; the extra `--open` is harmless        |
@@ -214,17 +214,17 @@ npm run lint
 ## E2E test plan
 
 Before implementation, record the current behavior with the globally installed
-`qwen` CLI as required by the repository workflow. Store the plan and results
-under `.qwen/e2e-tests/`; do not commit that ignored artifact.
+`mariadb-shell-agent` CLI as required by the repository workflow. Store the plan and results
+under `.mariadb-shell-agent/e2e-tests/`; do not commit that ignored artifact.
 
 Build and bundle the candidate. Use a temporary executable as `BROWSER` so the
 test captures the browser URL without exposing a real credential to another
 application.
 
-1. Record that bare `qwen serve --port 0 --open` still launches without an
+1. Record that bare `mariadb-shell-agent serve --port 0 --open` still launches without an
    automatic token: unauthenticated `/capabilities` returns 200 and a strict
    mutation without a token returns `token_required`.
-2. Start `qwen serve --port 0 --open-with-auth` on loopback with no
+2. Start `mariadb-shell-agent serve --port 0 --open-with-auth` on loopback with no
    configured token. Capture the launch fragment, decode it, and verify it
    represents 32 bytes.
 3. Verify unauthenticated `/capabilities` returns 401 and the same request with

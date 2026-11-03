@@ -4,7 +4,7 @@
 
 状态：生命周期注册表、握手、传输操作与启动四个切片的历史设计及验证记录，2026-09-15。
 剩余拆分现已实现；最终组合验收记录在[完成设计](2026-09-15-acp-bridge-completion.zh-CN.md)中。
-对应 [#11866](https://github.com/QwenLM/qwen-code/issues/11866)。代码和测试基线
+对应 [#11866](https://github.invalid/QwenLM/qwen-code/issues/11866)。代码和测试基线
 基于 `9efdd898e7`；本地实现与验证结果在下文单独标明。
 
 ## 问题与现状
@@ -116,7 +116,7 @@ active-work snapshot，不在本次范围内。
 
 复用已有的 guard、私有 capability、文件能力、active-work、liveness 和启动失败
 bridge 测试作为回归证据。补充 bridge 层测试，覆盖不支持的能力版本，以及 initialize
-span 完成前已进行协商。在源码抽取前运行这些测试，重新用全局 `qwen` 执行公共
+span 完成前已进行协商。在源码抽取前运行这些测试，重新用全局 `mariadb-shell-agent` 执行公共
 HTTP/SSE 基线，再构建、typecheck、bundle、运行受影响测试并使用本地 bundle 重跑
 E2E harness。验收标准是握手 wire 构造/解析由新模块独立拥有，不增加异步跳转，
 生命周期和会话行为不变。此切片不代表完成启动监管或整个 Issue。
@@ -200,10 +200,10 @@ channel 归属和正常公共行为保持不变；整个 Issue 仍包含后续�
 3. 随切片落地，同步更新两种语言的设计，记录实际边界和验证证据。文件行数本身不
    构成验收证据。
 
-[#11867](https://github.com/QwenLM/qwen-code/issues/11867) 可以并行定义和测试
+[#11867](https://github.invalid/QwenLM/qwen-code/issues/11867) 可以并行定义和测试
 daemon 外部契约。进程数量和 spawn 合并属于 bridge/lifecycle 测试，不属于跨实现
-的 wire 契约。[#11868](https://github.com/QwenLM/qwen-code/issues/11868) 负责
-事件存储和保留策略变化。与 [#11869](https://github.com/QwenLM/qwen-code/issues/11869)
+的 wire 契约。[#11868](https://github.invalid/QwenLM/qwen-code/issues/11868) 负责
+事件存储和保留策略变化。与 [#11869](https://github.invalid/QwenLM/qwen-code/issues/11869)
 同步边界，但不把其 Java 实现作为首个内部抽取的前置条件。
 
 ## 验证与验收
@@ -230,8 +230,8 @@ daemon 外部契约。进程数量和 spawn 合并属于 bridge/lifecycle 测试
 | 会话行为        | 同会话 FIFO、跨会话并发、共享 channel 的兄弟会话存活和 exit 扇出保持不变。                                                  |
 | Idle 条件       | 复用和 timer 取消、pending restore/new session、workspace 操作和 keep-alive reservation 保留现有保护。                      |
 
-修改生产代码前，在 `.qwen/e2e-tests/` 写可执行 E2E 计划，针对公共
-create/prompt/SSE/delete 和工作区隔离场景，用全局 `qwen` CLI 进行基线 dry-run。
+修改生产代码前，在 `.mariadb-shell-agent/e2e-tests/` 写可执行 E2E 计划，针对公共
+create/prompt/SSE/delete 和工作区隔离场景，用全局 `mariadb-shell-agent` CLI 进行基线 dry-run。
 内部启动/退出竞态使用确定性的 fake channel。每个源码切片完成后，在根目录运行
 build 和 typecheck、包内定向测试，并针对本地 bundle 运行受影响的 E2E 场景。
 最终拆分还须通过 #11866 要求的全量测试，以及 `AGENTS.md` 要求的连续两轮干净
@@ -245,11 +245,11 @@ build 和 typecheck、包内定向测试，并针对本地 bundle 运行受影�
 workspace：运行 `QWEN_SKIP_PREPARE=true npm ci` 恢复锁定的依赖，未修改 manifest
 或锁文件。随后根目录完整 build 和 typecheck 均在生产代码抽取前通过。
 
-全局 `qwen` 0.23.3 E2E dry-run 也在抽取前通过：工作区不匹配返回 400，并发创建
+全局 `mariadb-shell-agent` 0.23.3 E2E dry-run 也在抽取前通过：工作区不匹配返回 400，并发创建
 返回不同会话，每个 SSE 收到自己 prompt 的结果和恰好一个终态，删除返回 204，
 关闭首会话后兄弟会话仍可继续 prompt。三次模型请求全部使用本地 fake endpoint，
 daemon 正常退出且没有测试进程残留。可执行计划和报告位于
-`.qwen/e2e-tests/issue-11866-channel-lifecycle.md`。
+`.mariadb-shell-agent/e2e-tests/issue-11866-channel-lifecycle.md`。
 
 抽取后，根目录 build、typecheck 和 bundle 均通过，三个源码/测试文件的 ESLint
 以及格式检查也通过。五个受影响的 bridge 测试文件共 965 个测试全部通过。同一个
@@ -269,7 +269,7 @@ E2E harness 在本地 bundle 上通过；归一化后的 HTTP method/route/statu
 和清理结果与重新执行的全局基线一致。两次对照运行均正常退出，没有测试进程残留。
 更早的一次全局运行虽通过公共断言，却在 shutdown 时退出 1；报告保留了这项间歇性
 基线观察，不推断其原因。独立计划和证据记录在
-`.qwen/e2e-tests/issue-11866-channel-handshake.md`。
+`.mariadb-shell-agent/e2e-tests/issue-11866-channel-handshake.md`。
 
 第三个切片新增的四个 bridge 层测试在抽取前后均通过，覆盖精确的终止 deadline
 和强制信号、底层操作迟到完成后仍保留该超时、同步和异步 kill 失败与强杀失败的
@@ -281,7 +281,7 @@ E2E harness 在本地 bundle 上通过；归一化后的 HTTP method/route/statu
 第三个切片的公共 E2E 在 HTTP 结果、prompt 终态、模型请求和清理方面均与其全局
 基线一致。两个 daemon 都退出 0；独立的进程和 TCP 检查还确认本地测试进程及监听
 端口均无残留，日志中没有 shutdown 错误。独立计划和证据位于
-`.qwen/e2e-tests/issue-11866-channel-transport.md`。这些结果验证三个本地切片，
+`.mariadb-shell-agent/e2e-tests/issue-11866-channel-transport.md`。这些结果验证三个本地切片，
 不代表整个 Issue 或全仓库测试已完成。
 
 第四个切片新增的三个 bridge 回归在抽取前后均通过：50 ms 预算中 factory 消耗
@@ -305,7 +305,7 @@ shutdown。测试现改为在 factory 仍挂起时等待一个事件循环轮次
 第四个切片最初的公共 E2E 在 HTTP 结果、prompt 终态、模型请求和清理方面均与其全局
 基线一致。两个 daemon 都退出 0；独立的进程和 TCP 检查确认本地测试进程及监听
 端口无残留，日志中没有 shutdown 错误。报告和证据位于
-`.qwen/e2e-tests/issue-11866-channel-startup.md`。这些结果验证四个本地切片，
+`.mariadb-shell-agent/e2e-tests/issue-11866-channel-startup.md`。这些结果验证四个本地切片，
 不代表整个 Issue 或全仓库测试已完成。
 
 后来一次审查后的本地 sanity 虽通过全部公共断言，daemon 却退出 1：子进程在
@@ -324,8 +324,8 @@ workspace 监听器时同步阻塞在 macOS FSEvents 中，直到父进程五秒
 使用已有的 `CHOKIDAR_USEPOLLING=1` 启动设置后，同一夹具在全局与本地版本
 均通过公共检查并退出 0，进程和端口清理也已确认。轮询是已验证的临时缓解方式，
 没有成为默认设置，也不属于永久修复。生产代码保持不变。证据和限制记录在
-`.qwen/issues/issue-11866-shutdown.md` 和
-`.qwen/investigations/issue-11866-shutdown/journal.md`。
+`.mariadb-shell-agent/issues/issue-11866-shutdown.md` 和
+`.mariadb-shell-agent/investigations/issue-11866-shutdown/journal.md`。
 
 首个 PR 的验收条件是三个生命周期槽位只有一个所有者、不暴露可变注册表、可观察
 行为不变，并提供上述证据。整个 issue 的最终验收还要求 supervisor 不再捕获或

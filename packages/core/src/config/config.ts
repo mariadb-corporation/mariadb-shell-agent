@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1059,7 +1060,7 @@ export interface WorktreeSettings {
    *
    * Paths must be relative to the repo root; absolute paths and any
    * entry containing `..` are rejected by the service. Entries that
-   * resolve to git-internal paths (`.git`, `.qwen`) are also rejected
+   * resolve to git-internal paths (`.git`, `.mariadb-shell-agent`) are also rejected
    * — symlinking those would either break git inside the worktree or
    * create a worktrees-inside-worktrees loop. Missing source dirs and
    * pre-existing destinations are silently skipped.
@@ -1101,7 +1102,7 @@ export interface AgentsCollabSettings {
   displayMode?: string;
   /** Arena-specific settings */
   arena?: {
-    /** Custom base directory for Arena worktrees (default: ~/.qwen/arena) */
+    /** Custom base directory for Arena worktrees (default: ~/.mariadb-shell-agent/arena) */
     worktreeBaseDir?: string;
     /** Preserve worktrees and state files after session ends */
     preserveArtifacts?: boolean;
@@ -1354,7 +1355,7 @@ export interface ConfigParameters {
    * Defaults to `true`. Throwaway Configs that exist only to route
    * telemetry events must pass `false`: they still expose the proxy via
    * `getProxy()` for the RUM logger's own agent, but must not rewrite the
-   * host process's global network state — in `qwen serve` one long-lived
+   * host process's global network state — in `mariadb-shell-agent serve` one long-lived
    * process hosts many workspaces, and nothing ever restores the
    * dispatcher (#12770).
    */
@@ -1604,7 +1605,7 @@ export interface ConfigParameters {
   channel?: string;
   /**
    * File descriptor number for structured JSON event output (dual output mode).
-   * When set, Qwen Code outputs structured JSON events to this fd while
+   * When set, MariaDB Shell Agent outputs structured JSON events to this fd while
    * continuing to render the TUI on stdout. The caller must provide this fd
    * via spawn stdio configuration.
    * Mutually exclusive with jsonFile.
@@ -1620,7 +1621,7 @@ export interface ConfigParameters {
    * JSON Schema that the model's final output must conform to. When set, a
    * synthetic `structured_output` tool is registered and the non-interactive
    * CLI ends the session the first time the model calls it with valid args.
-   * Only meaningful in headless mode (`qwen -p`).
+   * Only meaningful in headless mode (`mariadb-shell-agent -p`).
    */
   jsonSchema?: Record<string, unknown>;
   /**
@@ -1760,7 +1761,7 @@ export interface ConfigParameters {
    * settings). It carries no scope, so it never counts as system hooks.
    */
   hooks?: Record<string, unknown>;
-  /** Glob patterns to exclude from .qwen/rules/ loading. */
+  /** Glob patterns to exclude from .mariadb-shell-agent/rules/ loading. */
   contextRuleExcludes?: string[];
   /** Warnings generated during configuration resolution */
   warnings?: string[];
@@ -3559,9 +3560,9 @@ export class Config {
     this.gitCoAuthor = {
       ...normalizeGitCoAuthor(params.gitCoAuthor),
       name: 'Qwen-Coder',
-      email: 'qwen-coder@alibabacloud.com',
+      email: 'qwen-coder@alibabacloud.invalid',
     };
-    this.usageStatisticsEnabled = params.usageStatisticsEnabled ?? true;
+    this.usageStatisticsEnabled = params.usageStatisticsEnabled ?? false;
     // A Managed session reads in its Runtime worker, so this process could
     // neither elide a repeated read nor prove the read an edit requires.
     this.fileReadCacheDisabled =
@@ -4289,6 +4290,7 @@ export class Config {
       });
     }
     recordStartupEvent('config_initialize_extensions_initial_end');
+    this.refreshLspAfterExtensionsLoaded();
     options?.signal?.throwIfAborted();
     this.debugLogger.debug('Extension manager initialized');
 
@@ -4833,7 +4835,7 @@ export class Config {
     // unconditionally skipping discovery in either would silently strand
     // them: `getMcpServers()` reports them as configured, but nothing ever
     // connects to them or registers their tools (a live repro of exactly
-    // this — `qwen --bare --mcp-config` with a top-tier server — surfaced
+    // this — `mariadb-shell-agent --bare --mcp-config` with a top-tier server — surfaced
     // the bare-mode half of this gate was never updated alongside safe
     // mode's). Checking `getMcpServers()` (not `topTierMcpServers` directly)
     // also respects the `allowedMcpServers` filter already applied there.
@@ -4869,7 +4871,7 @@ export class Config {
     // directory the worktree creators (`enter_worktree` and
     // `agent isolation:'worktree'`) write to. Using `this.targetDir`
     // directly would cause launches from a monorepo subdirectory to
-    // scan `<subdir>/.qwen/worktrees/` — which never exists — and the
+    // scan `<subdir>/.mariadb-shell-agent/worktrees/` — which never exists — and the
     // sweep would silently be a no-op forever.
     if (
       !this.shellExecutionSandbox &&
@@ -4880,13 +4882,17 @@ export class Config {
       void (async () => {
         try {
           // Resolve the repo top-level FIRST. The previous code bailed
-          // on `fs.access(<targetDir>/.qwen/worktrees)` before resolving,
+          // on `fs.access(<targetDir>/.mariadb-shell-agent/worktrees)` before resolving,
           // so a monorepo subdir launch (where `targetDir` is the
           // subdir, not the repo root) always early-returned and the
           // sweep was permanently a no-op. Fast-bail still happens, just
           // against the *correct* directory.
           const root = findGitRoot(this.targetDir) ?? this.targetDir;
-          const worktreesDir = path.join(root, '.qwen', 'worktrees');
+          const worktreesDir = path.join(
+            root,
+            '.mariadb-shell-agent',
+            'worktrees',
+          );
           try {
             await fsPromises.access(worktreesDir);
           } catch {
@@ -5524,7 +5530,7 @@ export class Config {
     signal?: AbortSignal,
   ): Promise<void> {
     if (this.executionEnvironment) return;
-    // Safe mode: skip all context file loading (QWEN.md, AGENTS.md, rules)
+    // Safe mode: skip all context file loading (MARIADB-SHELL-AGENT.md, AGENTS.md, rules)
     if (this.isSafeMode()) {
       this.setUserMemory('');
       this.autoMemoryPrompt = '';
@@ -5572,7 +5578,7 @@ export class Config {
     this.ignoredExtensionRules = ignoredExtensionRules ?? [];
     if (this.isManagedMemoryAvailable()) {
       // User-level read is best-effort — an EACCES on
-      // `~/.qwen/memories/MEMORY.md` must not strip the whole managed-memory
+      // `~/.mariadb-shell-agent/memories/MEMORY.md` must not strip the whole managed-memory
       // section out of the system prompt. Project-level read still bubbles
       // (its failure is a real config-load problem).
       const teamMemoryEnabled =
@@ -5793,7 +5799,7 @@ export class Config {
         ? windowClause
         : `${MEMORY_CONTEXT_WARNING_MAX_TOKENS.toLocaleString()} tokens — the smaller of that and ${windowClause}`;
     return (
-      `Warning: Loaded always-on context (QWEN.md context files + auto-memory) uses about ` +
+      `Warning: Loaded always-on context (MARIADB-SHELL-AGENT.md context files + auto-memory) uses about ` +
       `${estimatedTokens.toLocaleString()} tokens, more than ${bound}. ` +
       `Consider trimming long always-loaded context or moving details into ` +
       `on-demand files.`
@@ -6587,7 +6593,7 @@ export class Config {
     //
     // Only refresh when THIS process established its own sidecar at
     // startup (interactive UI). A non-interactive `/clear` (e.g.
-    // qwen --prompt-interactive) must not delete a sibling shell's
+    // mariadb-shell-agent --prompt-interactive) must not delete a sibling shell's
     // sidecar that happens to share the outgoing session id
     // mirrors the kimi-cli "write only when a session is
     // established for this process" rule.
@@ -6622,7 +6628,7 @@ export class Config {
         // advertising the pre-/clear session id until exit.
         //
         // `name` is deliberately not patched: it is the handle a user
-        // just read out of `qwen sessions ps`, and re-deriving it here
+        // just read out of `mariadb-shell-agent sessions ps`, and re-deriving it here
         // would rename a live session on every /clear for no gain — the
         // directory it names has not changed.
         this.queueRetriedSessionRegistryPatch(
@@ -6856,7 +6862,7 @@ export class Config {
       this.queueSessionRegistryWrite(async () => {
         // The registry's DIRECTORY column is how a user tells two live
         // sessions apart, so a mid-session directory switch has to reach
-        // it too — otherwise `qwen sessions ps` keeps advertising the
+        // it too — otherwise `mariadb-shell-agent sessions ps` keeps advertising the
         // folder this session left. Unlike the /clear path, `name`
         // follows: it is derived from the directory's basename, which is
         // exactly what changed here.
@@ -8639,7 +8645,7 @@ export class Config {
   /**
    * Replace the in-process `disabledTools`
    * snapshot with a fresh set sourced from the workspace settings.
-   * Intended for the `qwen serve` mutation surface
+   * Intended for the `mariadb-shell-agent serve` mutation surface
    * (`setWorkspaceToolEnabled` → ACP `qwen/control/...` → here): the
    * settings file is the source of truth, and this setter keeps the
    * in-memory Config in sync so a subsequent MCP rediscovery / next
@@ -8667,7 +8673,7 @@ export class Config {
    * injected by the daemon-mode `QwenAgent`. When set, the wrapping
    * `ToolRegistry` threads it into `McpClientManager`, which delegates
    * non-SDK MCP server discovery to the pool instead of spawning its
-   * own per-session `McpClient`. Standalone `qwen` (non-daemon) leaves
+   * own per-session `McpClient`. Standalone `mariadb-shell-agent` (non-daemon) leaves
    * this `undefined` and the manager keeps its previous behavior.
    *
    * Eagerly instantiated by `QwenAgent` (per Q6 resolved); the
@@ -9324,6 +9330,26 @@ export class Config {
   ): void {
     this.lspInitializationError =
       error instanceof Error ? error.message : error;
+  }
+
+  /**
+   * LSP discovery runs while the CLI config is built, before `initialize()`
+   * loads the extensions, so LSP servers declared by extensions (Claude
+   * plugins with a `.lsp.json`) were never found at startup. Discover again
+   * once they are loaded; not awaited, since starting a server can take long.
+   */
+  refreshLspAfterExtensionsLoaded(): void {
+    if (
+      !this.isLspEnabled() ||
+      !this.getActiveExtensions().some(
+        (extension) => extension.config?.lspServers,
+      )
+    ) {
+      return;
+    }
+    void this.reinitializeLsp().catch((error: unknown) =>
+      this.debugLogger.warn('LSP discovery for extensions failed:', error),
+    );
   }
 
   async reinitializeLsp(): Promise<LspServiceReinitializeResult | undefined> {

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -63,7 +64,7 @@ const hello = (model: string, extra: Record<string, unknown> = {}) =>
     ...extra,
   }) as OpenAI.Chat.ChatCompletionCreateParams;
 
-const UA = `QwenCode/1.0.0 (${process.platform}; ${process.arch})`;
+const UA = `MariaDBShellAgent/1.0.0 (${process.platform}; ${process.arch})`;
 
 describe('DefaultOpenAICompatibleProvider', () => {
   const MAX_OUTPUT_TOKENS_ENV = 'QWEN_CODE_MAX_OUTPUT_TOKENS';
@@ -183,7 +184,7 @@ describe('DefaultOpenAICompatibleProvider', () => {
       const headers = provider.buildHeaders();
 
       expect(headers).toEqual({
-        'User-Agent': `QwenCode/unknown (${process.platform}; ${process.arch})`,
+        'User-Agent': `MariaDBShellAgent/unknown (${process.platform}; ${process.arch})`,
       });
     });
   });
@@ -219,7 +220,7 @@ describe('DefaultOpenAICompatibleProvider', () => {
         config: { fetch: typeof fetch };
       };
       await client.config.fetch(
-        'https://routify-pub.alibaba-inc.com/protocol/openai/v1',
+        'https://routify-pub.alibaba-inc.invalid/protocol/openai/v1',
       );
       await client.config.fetch('https://api.openai.com/v1');
 

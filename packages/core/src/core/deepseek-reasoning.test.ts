@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,7 +19,7 @@ import { AuthType } from '../utils/auth-type.js';
 
 const official = 'https://api.deepseek.com/v1';
 const maas =
-  'https://workspace.cn-beijing.maas.aliyuncs.com/compatible-mode/v1';
+  'https://workspace.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1';
 const config: ContentGeneratorConfig = {
   model: 'deepseek-v4.1-flash-1017',
   authType: AuthType.USE_OPENAI,
@@ -31,25 +32,31 @@ describe('built-in DeepSeek reasoning', () => {
     ['https://us.api.deepseek.com/v1', 'thinking'],
     [maas, 'enable_thinking'],
     [
-      'https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1',
+      'https://token-plan.ap-southeast-1.maas.aliyuncs.invalid/compatible-mode/v1',
       'enable_thinking',
     ],
-    ['https://dashscope.aliyuncs.com/compatible-mode/v1', 'enable_thinking'],
     [
-      'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       'enable_thinking',
     ],
-    ['https://dashscope-us.aliyuncs.com/compatible-mode/v1', 'enable_thinking'],
-    ['https://model-proxy.alibaba-inc.com/v1', 'enable_thinking'],
-    ['https://model-proxy.aliyun-inc.com/v1', 'enable_thinking'],
+    [
+      'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
+      'enable_thinking',
+    ],
+    [
+      'https://dashscope-us.aliyuncs.invalid/compatible-mode/v1',
+      'enable_thinking',
+    ],
+    ['https://model-proxy.alibaba-inc.invalid/v1', 'enable_thinking'],
+    ['https://model-proxy.aliyun-inc.invalid/v1', 'enable_thinking'],
     ['https://model-proxy.alicloudapi.com/v1', 'enable_thinking'],
     [
-      'https://gateway.cn-shanghai.pai-eas.aliyuncs.com/api/predict/demo/v1',
+      'https://gateway.cn-shanghai.pai-eas.aliyuncs.invalid/api/predict/demo/v1',
       'enable_thinking',
     ],
     ['https://my-vllm.example.com:8000/v1', 'enable_thinking'],
     [
-      'https://cn-hongkong.dashscope.aliyuncs.com/compatible-mode/v1',
+      'https://cn-hongkong.dashscope.aliyuncs.invalid/compatible-mode/v1',
       'enable_thinking',
     ],
   ])('uses the Flash contract on %s', (baseUrl, disableField) => {
@@ -73,17 +80,17 @@ describe('built-in DeepSeek reasoning', () => {
 
   it.each([
     'https://api.deepseek.com.evil.example/v1',
-    'https://maas.aliyuncs.com.evil.example/v1',
-    'https://notmaas.aliyuncs.com/v1',
+    'https://maas.aliyuncs.invalid.evil.example/v1',
+    'https://notmaas.aliyuncs.invalid/v1',
     'https://vllm.example.com/v1',
-    'https://coding.dashscope.aliyuncs.com/v1',
-    'https://coding-intl.dashscope.aliyuncs.com/v1',
-    'https://unknown.dashscope.aliyuncs.com/compatible-mode/v1',
-    'https://model-proxy.alibaba-inc.com.evil.example/v1',
-    'https://model-proxy.aliyun-inc.com.evil.example/v1',
+    'https://coding.dashscope.aliyuncs.invalid/v1',
+    'https://coding-intl.dashscope.aliyuncs.invalid/v1',
+    'https://unknown.dashscope.aliyuncs.invalid/compatible-mode/v1',
+    'https://model-proxy.alibaba-inc.invalid.evil.example/v1',
+    'https://model-proxy.aliyun-inc.invalid.evil.example/v1',
     'https://model-proxy.alicloudapi.com.evil.example/v1',
     'https://notalibaba-inc.com/v1',
-    'https://evil.example/model-proxy.alibaba-inc.com/v1',
+    'https://evil.example/model-proxy.alibaba-inc.invalid/v1',
   ])('does not infer a host-gated contract on %s', (baseUrl) => {
     expect(
       getBuiltinDeepSeekReasoning({
@@ -287,13 +294,13 @@ describe('built-in DeepSeek reasoning', () => {
     ).toBe(false);
     expect(
       isDeepSeekEstablishedHost(
-        'https://model-proxy.alibaba-inc.com/v1',
+        'https://model-proxy.alibaba-inc.invalid/v1',
         'deepseek-v4.1-flash-1017',
       ),
     ).toBe(true);
     expect(
       isDeepSeekEstablishedHost(
-        'https://model-proxy.alibaba-inc.com/v1',
+        'https://model-proxy.alibaba-inc.invalid/v1',
         'deepseek-v4.1-flash-custom',
       ),
     ).toBe(false);

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -173,7 +174,7 @@ export function registerWorkspaceLocalControlRoutes(
           // local attacker process cannot read over HTTP, so surface the URL
           // there (#9106).
           writeStdoutLineSafe(
-            `qwen serve: Local Control pairing URL: ${ui.url}`,
+            `mariadb-shell-agent serve: Local Control pairing URL: ${ui.url}`,
           );
         }
         res.status(200).json(presentStatus(req, ui, trustedLoopbackMode));
@@ -191,7 +192,7 @@ export function registerWorkspaceLocalControlRoutes(
         queueMicrotask(() => {
           void deps.service.disable().catch((error) => {
             writeStderrLine(
-              `qwen serve: Local Control disable failed: ${error instanceof Error ? error.message : String(error)}`,
+              `mariadb-shell-agent serve: Local Control disable failed: ${error instanceof Error ? error.message : String(error)}`,
             );
           });
         });
@@ -256,11 +257,11 @@ function sendEnableError(
         ...(bindError ? { errno: bindError.errno } : {}),
       });
     } else {
-      writeStderrLineSafe(`qwen serve: ${diagnostic}`);
+      writeStderrLineSafe(`mariadb-shell-agent serve: ${diagnostic}`);
     }
   } catch {
     // Logging must not replace the HTTP error response with another failure.
-    writeStderrLineSafe(`qwen serve: ${diagnostic}`);
+    writeStderrLineSafe(`mariadb-shell-agent serve: ${diagnostic}`);
   }
   res
     .status(bindError?.code === 'bind_denied' ? 403 : bindError ? 409 : 500)

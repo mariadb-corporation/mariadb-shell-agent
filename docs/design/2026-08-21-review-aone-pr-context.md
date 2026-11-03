@@ -1,6 +1,6 @@
 # Phase 3b: Aone Code `pr-context` backing for /review
 
-> Status: draft. Scope: back `qwen review pr-context` on Aone Code through the
+> Status: draft. Scope: back `mariadb-shell-agent review pr-context` on Aone Code through the
 > platform reader, lifting the forced context-unavailable cap on Aone runs.
 > Parent: `2026-08-13-review-platform-provider-abstraction.md` (Phase 3,
 > "still open: context reads"). Continues `2026-08-15-review-aone-provider.md`.

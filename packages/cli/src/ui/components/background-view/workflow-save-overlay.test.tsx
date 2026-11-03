@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -85,7 +86,7 @@ describe('WorkflowSaveOverlay', () => {
       status: 'saved',
       name: 'flow',
       scope: 'project',
-      path: '/proj/.qwen/workflows/flow.js',
+      path: '/proj/.mariadb-shell-agent/workflows/flow.js',
     });
     const { lastFrame, type, press, onClose } = setup();
     await type('flow');
@@ -100,7 +101,7 @@ describe('WorkflowSaveOverlay', () => {
       }),
     );
     expect(lastFrame() ?? '').toContain(
-      'Saved to /proj/.qwen/workflows/flow.js',
+      'Saved to /proj/.mariadb-shell-agent/workflows/flow.js',
     );
     await press({ name: 'return' });
     expect(onClose).toHaveBeenCalledWith('flow');
@@ -111,7 +112,7 @@ describe('WorkflowSaveOverlay', () => {
       status: 'saved',
       name: 'flow',
       scope: 'user',
-      path: '/home/.qwen/workflows/flow.js',
+      path: '/home/.mariadb-shell-agent/workflows/flow.js',
     });
     const { type, press } = setup();
     await type('flow');
@@ -144,13 +145,13 @@ describe('WorkflowSaveOverlay', () => {
         status: 'exists',
         name: 'flow',
         scope: 'project',
-        path: '/proj/.qwen/workflows/flow.js',
+        path: '/proj/.mariadb-shell-agent/workflows/flow.js',
       })
       .mockResolvedValueOnce({
         status: 'saved',
         name: 'flow',
         scope: 'project',
-        path: '/proj/.qwen/workflows/flow.js',
+        path: '/proj/.mariadb-shell-agent/workflows/flow.js',
       });
     const { type, press, lastFrame } = setup();
     await type('flow');

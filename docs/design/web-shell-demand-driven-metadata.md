@@ -71,7 +71,7 @@ automatic reads and event reloads only while project features are available
 and Settings is open. SessionProvider retains its providers read for chat model
 initialization. This removes one hidden-Settings request from chat startup;
 opening Settings later adds one request. The [maintainer's real-daemon
-verification](https://github.com/QwenLM/qwen-code/pull/11644#issuecomment-5649574918)
+verification](https://github.invalid/QwenLM/qwen-code/pull/11644#issuecomment-5649574918)
 measured three startup requests before this change and two afterward: the
 SessionProvider deferred-connect batch still ran twice during boot. That
 intra-provider duplicate remains outside this change, so #11604 remains open.
@@ -142,6 +142,6 @@ including focus and timer ticks; toggling consumers starts and stops reads.
 Verify provider prefetch opt-out for sessionless and attached states, default SDK
 compatibility, branch-event preservation, and branch rendering before an event.
 Run focused package tests, the repository build, and typecheck. Browser checks
-and baseline evidence are recorded under `.qwen/e2e-tests/`.
+and baseline evidence are recorded under `.mariadb-shell-agent/e2e-tests/`.
 
 The workspace-overview Playwright smoke test covers zero idle reads, hover-triggered loading and the 30-second cadence, and stopping both overview and Git reads after details or the workspace menu closes. Expanding a row alone does not reload facets.

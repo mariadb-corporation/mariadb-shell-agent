@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -4087,7 +4088,7 @@ describe('daemon UI normalizer — Wave 3/4 event coverage (PR-A)', () => {
     const events = normalizeDaemonEvent(
       envelopeOf('memory_changed', {
         scope: 'workspace',
-        filePath: '/work/QWEN.md',
+        filePath: '/work/MARIADB-SHELL-AGENT.md',
         mode: 'append',
         bytesWritten: 42,
       }),
@@ -4096,7 +4097,7 @@ describe('daemon UI normalizer — Wave 3/4 event coverage (PR-A)', () => {
       expect.objectContaining({
         type: 'workspace.memory.changed',
         scope: 'workspace',
-        filePath: '/work/QWEN.md',
+        filePath: '/work/MARIADB-SHELL-AGENT.md',
         mode: 'append',
         bytesWritten: 42,
       }),
@@ -4308,7 +4309,7 @@ describe('daemon UI normalizer — Wave 3/4 event coverage (PR-A)', () => {
       envelopeOf('github_setup_completed', {
         releaseTag: 'v1.2.3',
         readmeUrl:
-          'https://github.com/QwenLM/qwen-code-action/blob/v1.2.3/README.md#quick-start',
+          'https://github.invalid/QwenLM/qwen-code-action/blob/v1.2.3/README.md#quick-start',
         workflows: [
           {
             path: '.github/workflows/qwen-dispatch.yml',

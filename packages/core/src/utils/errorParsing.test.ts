@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -232,7 +233,7 @@ describe('parseAndFormatApiError', () => {
   // "[API Error: 400 status code (no body)]" and the user has no traceable id
   // to quote to their provider. The SDK does stamp `x-request-id` onto
   // APIError.headers, so surface it on the user-facing line.
-  // See https://github.com/QwenLM/qwen-code/issues/14115
+  // See https://github.invalid/QwenLM/qwen-code/issues/14115
   describe('request id surfacing', () => {
     const REQUEST_ID = 'a30a1854-1925-4da8-8803-73fee2865116';
     const BODYLESS = '400 status code (no body)';

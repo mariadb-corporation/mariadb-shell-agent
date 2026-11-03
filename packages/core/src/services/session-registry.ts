@@ -1,18 +1,19 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * An index of the Qwen Code sessions that are running right now.
+ * An index of the MariaDB Shell Agent sessions that are running right now.
  *
  * Each top-level session writes `<global dir>/sessions/<pid>.json` at
  * startup and unlinks it on exit. The directory is flat and keyed by PID
  * so that "who else is running" is one `readdir` plus a handful of small
  * reads.
  *
- * A process that hosts several sessions at once — the `qwen --acp` child a
+ * A process that hosts several sessions at once — the `mariadb-shell-agent --acp` child a
  * daemon spawns — writes one record per session instead, named
  * `<pid>-<8 hex>.json`. They are separate sessions with separate ids,
  * names and working directories, and one record cannot describe them all.
@@ -143,8 +144,8 @@ const TEMP_MAX_AGE_MS = 5 * 60 * 1000;
 
 /**
  * What kind of process registered: an interactive terminal, a
- * `qwen --acp` process running on its own, one the daemon spawned, or a
- * program that is not Qwen Code at all.
+ * `mariadb-shell-agent --acp` process running on its own, one the daemon spawned, or a
+ * program that is not MariaDB Shell Agent at all.
  *
  * A label for listings and for aggregators that want to tell a user's own
  * terminals apart from sessions something else is driving. Nothing that
@@ -177,7 +178,7 @@ const KIND_RE = /^[a-z][a-z0-9-]{0,15}$/;
  * Longest explicit display name kept.
  *
  * Derived names are short by construction, but an explicit one comes from
- * a caller and lands in `qwen sessions ps` and in peer listings, so it
+ * a caller and lands in `mariadb-shell-agent sessions ps` and in peer listings, so it
  * gets what a peer-supplied label gets: flattened to one line, then
  * bounded. Shorter than the envelope's 200 because this one is printed in
  * a fixed-width table column.

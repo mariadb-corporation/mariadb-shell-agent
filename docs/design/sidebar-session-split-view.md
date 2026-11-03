@@ -67,7 +67,7 @@ existing footer/picker behavior.
 
 Run focused unit and browser tests, build, typecheck, bundle, and repeat the
 relevant tests in local Docker Linux. Record baseline and verification
-evidence in `.qwen/e2e-tests/14775/`.
+evidence in `.mariadb-shell-agent/e2e-tests/14775/`.
 
 ## Open questions
 

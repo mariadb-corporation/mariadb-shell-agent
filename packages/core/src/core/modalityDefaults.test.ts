@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -66,7 +67,7 @@ beforeAll(() => {
   tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'modality-defaults-'));
   previousHome = process.env['QWEN_HOME'];
   previousSwitch = process.env['QWEN_CODE_MODELS_DEV'];
-  process.env['QWEN_HOME'] = path.join(tempDir, '.qwen');
+  process.env['QWEN_HOME'] = path.join(tempDir, '.mariadb-shell-agent');
   delete process.env['QWEN_CODE_MODELS_DEV'];
   invalidateModelCatalog();
 });
@@ -327,7 +328,7 @@ describe('isTieredEffortWireModel', () => {
     expect(isTieredEffortWireModel('Qwen4-Max-2026-10-01')).toBe(true);
   });
 
-  it('rejects other qwen models and non-qwen ids', () => {
+  it('rejects other mariadb-shell-agent models and non-qwen ids', () => {
     expect(isTieredEffortWireModel('qwen3.7-max')).toBe(false);
     expect(isTieredEffortWireModel('qwen3.9-max')).toBe(false);
     expect(isTieredEffortWireModel('qwen-latest-series-other')).toBe(false);

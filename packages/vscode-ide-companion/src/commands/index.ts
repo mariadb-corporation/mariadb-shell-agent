@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,18 +14,18 @@ import { CHAT_VIEW_ID_SIDEBAR } from '../constants/viewIds.js';
 
 type Logger = (message: string) => void;
 
-export const runQwenCodeCommand = 'qwen-code.runQwenCode';
+export const runQwenCodeCommand = 'mariadb-shell-agent.runQwenCode';
 export const showDiffCommand = 'qwenCode.showDiff';
 export const closeDiffCommand = 'qwenCode.closeDiff';
-export const openChatCommand = 'qwen-code.openChat';
+export const openChatCommand = 'mariadb-shell-agent.openChat';
 export const openNewChatTabCommand = 'qwenCode.openNewChatTab';
-export const authCommand = 'qwen-code.auth';
-export const focusChatCommand = 'qwen-code.focusChat';
-export const newConversationCommand = 'qwen-code.newConversation';
-export const showLogsCommand = 'qwen-code.showLogs';
+export const authCommand = 'mariadb-shell-agent.auth';
+export const focusChatCommand = 'mariadb-shell-agent.focusChat';
+export const newConversationCommand = 'mariadb-shell-agent.newConversation';
+export const showLogsCommand = 'mariadb-shell-agent.showLogs';
 
 /**
- * Register all Qwen Code chat-related commands.
+ * Register all MariaDB Shell Agent chat-related commands.
  *
  * `openChat` and `newConversation` always open an editor tab, while
  * `focusChat` focuses the Activity Bar chat view.
@@ -144,7 +145,7 @@ export function registerNewCommands(
         outputChannel.show(true);
       } else {
         vscode.window.showWarningMessage(
-          'Qwen Code Companion log channel is not available.',
+          'MariaDB Shell Agent Companion log channel is not available.',
         );
       }
     }),

@@ -1,14 +1,14 @@
 # 非对话上下文的 Token 治理
 
 日期：2026-09-16
-跟进 issue：[#12028](https://github.com/QwenLM/qwen-code/issues/12028)（伞）· [#12029](https://github.com/QwenLM/qwen-code/issues/12029) · [#12030](https://github.com/QwenLM/qwen-code/issues/12030) · [#12032](https://github.com/QwenLM/qwen-code/issues/12032) · [#12033](https://github.com/QwenLM/qwen-code/issues/12033) · [#12037](https://github.com/QwenLM/qwen-code/issues/12037)
+跟进 issue：[#12028](https://github.invalid/QwenLM/qwen-code/issues/12028)（伞）· [#12029](https://github.invalid/QwenLM/qwen-code/issues/12029) · [#12030](https://github.invalid/QwenLM/qwen-code/issues/12030) · [#12032](https://github.invalid/QwenLM/qwen-code/issues/12032) · [#12033](https://github.invalid/QwenLM/qwen-code/issues/12033) · [#12037](https://github.invalid/QwenLM/qwen-code/issues/12037)
 配套交接文档（带预期数值的验证步骤、影响面清单、待决策项）：[`docs/verification/context-token-governance/README.md`](../verification/context-token-governance/README.md)
 
 结论先行：**大头是配置和内容组织，不是缺机制。qwen-code 已经有延迟加载、skill 三层渐进披露和四套工具开关；把它们用对，空载成本可以从 47k 降到 15k 以内，不需要新增意图分类器一类的新逻辑。** 需要的代码改动只有两处，都已开 issue。
 
 ---
 
-> **⚠️ 2026-09-20：本文所有基线数字都是 `v0.24.1` 口径。** `v0.24.2` 含 [#10410](https://github.com/QwenLM/qwen-code/pull/10410)（`70edbf47`）：延迟工具改走 `tool_search` → `tool_call` 桥接，`tools.toolSearch.threshold` 默认 10→0，**按需池不再在开场预加载**。因此 §1 的健康线、§2 的实测样本（21,461 / 46,734 一类）、§5 的预期收益**都必须在 ≥ 0.24.2 上重测之后才能引用**；§6 的成本模型整节作废（告示就在 `## 6. 成本模型` 标题下面）。§3 的机制盘点**已就地更正**：豁免名单补上了桥接的另一半 `tool_call`（同样豁免于 `tools.eager`），"桥接不完整时的兜底"一行也从"揭示全部"改成了代码的实际行为。重测步骤见 [`docs/verification/context-token-governance/README.md`](../verification/context-token-governance/README.md) 的 §0.1。
+> **⚠️ 2026-09-20：本文所有基线数字都是 `v0.24.1` 口径。** `v0.24.2` 含 [#10410](https://github.invalid/QwenLM/qwen-code/pull/10410)（`70edbf47`）：延迟工具改走 `tool_search` → `tool_call` 桥接，`tools.toolSearch.threshold` 默认 10→0，**按需池不再在开场预加载**。因此 §1 的健康线、§2 的实测样本（21,461 / 46,734 一类）、§5 的预期收益**都必须在 ≥ 0.24.2 上重测之后才能引用**；§6 的成本模型整节作废（告示就在 `## 6. 成本模型` 标题下面）。§3 的机制盘点**已就地更正**：豁免名单补上了桥接的另一半 `tool_call`（同样豁免于 `tools.eager`），"桥接不完整时的兜底"一行也从"揭示全部"改成了代码的实际行为。重测步骤见 [`docs/verification/context-token-governance/README.md`](../verification/context-token-governance/README.md) 的 §0.1。
 >
 > 连带更正一句：§10 结尾那句「上游这几个 PR 加起来省下的量，不到这一步的十分之一」是旧口径，**已就地改写**为按 #10410 之后的归因（**它自己就贡献了约 4.2k**、白名单还剩约 11.4k）。
 
@@ -47,15 +47,15 @@
 
 某次交互会话开场第一轮的 `/context detail`，1M 上下文窗口：
 
-| 类别                    |      token | 占非对话 |
-| ----------------------- | ---------: | -------: |
-| 内置工具                |     21,461 |    45.9% |
-| 上下文（`QWEN.md`）文件 |     15,400 |    33.0% |
-| 系统提示词              |      5,253 |    11.2% |
-| skill 清单              |      4,620 |     9.9% |
-| MCP 工具                |          0 |        — |
-| **非对话合计**          | **46,734** |          |
-| 消息                    |        614 |          |
+| 类别                                   |      token | 占非对话 |
+| -------------------------------------- | ---------: | -------: |
+| 内置工具                               |     21,461 |    45.9% |
+| 上下文（`MARIADB-SHELL-AGENT.md`）文件 |     15,400 |    33.0% |
+| 系统提示词                             |      5,253 |    11.2% |
+| skill 清单                             |      4,620 |     9.9% |
+| MCP 工具                               |          0 |        — |
+| **非对话合计**                         | **46,734** |          |
+| 消息                                   |        614 |          |
 
 **这轮请求 98.7% 的输入是前缀。**
 
@@ -74,7 +74,7 @@
 
 其余：`create_sub_session` 409、`tool_search` 375、`get_goal` 365、`enter_plan_mode` 343、`grep_search` 301、`list_agents` 292、`notebook_edit` 291、`zoom_image` 279、`glob` 266、`record_source` 220、`read_mcp_resource` 191、`cron_delete` 116、`task_stop` 102、`cron_list` 80。
 
-上下文文件中，9 个 extension 的贡献为 9,989 token（由大到小 2,164 / 1,602 / 1,548 / 1,487 / 1,124 / 1,078 / 650 / 172 / 164），其余为项目 `QWEN.md` 4,021、auto-memory 1,180、输出语言文件 210。**extension 占了整个常驻上下文层的 65%。**
+上下文文件中，9 个 extension 的贡献为 9,989 token（由大到小 2,164 / 1,602 / 1,548 / 1,487 / 1,124 / 1,078 / 650 / 172 / 164），其余为项目 `MARIADB-SHELL-AGENT.md` 4,021、auto-memory 1,180、输出语言文件 210。**extension 占了整个常驻上下文层的 65%。**
 
 ---
 
@@ -167,13 +167,13 @@ extension 的内容按性质分三层：
 | 场景性指引（怎么写查询、怎么配调度）     | **`paths:` 门控的 skill**   | 清单 100–200 token，正文按需 |
 | 固定流程                                 | saved workflow（见 #11631） | 只写名字                     |
 
-依据：extension 可以携带 skill（`extensionManager.ts:1715-1717`），而 `.qwen/rules/` 的 `paths:` 条件机制**不对 extension 开放**（`rulesDiscovery.ts:305-324`）。更新的 `agent-plugins-v1` 格式已经完全跳过 `contextFileName`、只带 skill（`extensionManager.ts:1702-1705`）——方向上游已经选了，经典 extension 没跟上。
+依据：extension 可以携带 skill（`extensionManager.ts:1715-1717`），而 `.mariadb-shell-agent/rules/` 的 `paths:` 条件机制**不对 extension 开放**（`rulesDiscovery.ts:305-324`）。更新的 `agent-plugins-v1` 格式已经完全跳过 `contextFileName`、只带 skill（`extensionManager.ts:1702-1705`）——方向上游已经选了，经典 extension 没跟上。
 
 ### 步骤 4：系统提示词（低收益，先不动）
 
 不改上游的话，唯一合法的按段选择机制是 output style 的 `keepCodingInstructions: false`，它精确删掉 `## Software Engineering Tasks`（3,068 字符，`prompts.ts:369-372`），**不多不少**。20,801 → 17,733，约 -15%。（2026-09-25 就地更正：#12546 第二轮精简后，该段切片（标题到下一标题、`string.length` 口径）为 2,482 字符；严格说开关删掉的是 `getSoftwareEngineeringTasksSection` 的返回值，切片段尾 405 字符的两条通用 bullet 由调用方拼接、不在其内——删除量旧口径实为 2,663 字符，现为 2,077 字符，「精确删掉……不多不少」是按切片口径写成的，并不精确。该函数现位于 `prompts.ts:402`（原文 `:369-372` 已漂移），其中的安全锚点 `**Report outcomes faithfully:**` 现位于 `prompts.ts:415`、仍在被删段内。20,801 → 17,733 的总量仍是 v0.24.1 基线口径，引用前须按交接文档 §0.1 重测。）
 
-⚠️ **这一段里有一条安全条款。** `## Software Engineering Tasks` 由 `getSoftwareEngineeringTasksSection` 生成，其中包含 `**Report outcomes faithfully:**`（`prompts.ts:415`，不得把失败说成成功、不得隐瞒没做的验证）——它正是 §8 静态检查锚点之一。用这个开关时，要在该 output style 自己的 `prompt` 正文里补回这一条（output style 的 `prompt` 渲染在 `# Output Style: <name>` 下，项目级 style 放 `.qwen/output-styles/`，见 #10761）。
+⚠️ **这一段里有一条安全条款。** `## Software Engineering Tasks` 由 `getSoftwareEngineeringTasksSection` 生成，其中包含 `**Report outcomes faithfully:**`（`prompts.ts:415`，不得把失败说成成功、不得隐瞒没做的验证）——它正是 §8 静态检查锚点之一。用这个开关时，要在该 output style 自己的 `prompt` 正文里补回这一条（output style 的 `prompt` 渲染在 `# Output Style: <name>` 下，项目级 style 放 `.mariadb-shell-agent/output-styles/`，见 #10761）。
 
 各段体积（非 git、非沙箱快照，字符）供 #12032 参考：`Using Your Tools` 4,012 · `Core Mandates` 3,334 · `Examples` 3,240 · `Software Engineering Tasks` 3,043 · `Executing actions with care` 3,042 · `Tone and Style` 1,030 · `Communicating With the User` 632 · `Final Reminder` 603 · `Security and Safety Rules` 535 · `Outside of Sandbox` 361 · `New Applications` 195 · `Interaction Details` 158；在 git 仓库中另有 git 段约 1.9k。注意 `**Respect Tool Decisions:**` 也不在安全段里，而在 `Using Your Tools` 中——按段整删同样会带走它。（2026-09-25 就地更正：#12546 第二轮精简改动了其中四段；按「标题到下一标题切片、`string.length`」口径实测 merge base → #12546 head：`Using Your Tools` 3,706 → 3,217 · `Software Engineering Tasks` 3,068 → 2,482 · `Tone and Style` 689 → 658 · `Communicating With the User` 662 → 571。本句其余数字仍是 2026-09-16 基线，与当前构建已有漂移。）
 
@@ -182,7 +182,7 @@ extension 的内容按性质分三层：
 若仍要替换，还有几件不显眼的事：
 
 - **只能按进程生效。** `Config.systemPrompt` 是只读字段，只能由 `--system-prompt` 或 SDK 传入；没有 settings 键，daemon/ACP 也没有按会话设置主提示词的参数（`serve/acp-http/dispatch.ts` 里的 `systemPrompt` 属于子 agent 的增改接口）。只对某一类会话生效就需要独立进程池，回滚要重启或切流量。
-- **`QWEN_SYSTEM_MD` 坑更多。** 相对路径（包括默认的 `.qwen/system.md`）按进程工作目录解析；文件缺失直接抛 `missing system prompt file`，会话起不来而不是回退；每次重建系统指令都重读文件，会话中改文件会改变提示词并打掉缓存；它作用于所有 `getCoreSystemPrompt` 调用方（含 Arena），而 `--system-prompt` 只作用于主会话。
+- **`QWEN_SYSTEM_MD` 坑更多。** 相对路径（包括默认的 `.mariadb-shell-agent/system.md`）按进程工作目录解析；文件缺失直接抛 `missing system prompt file`，会话起不来而不是回退；每次重建系统指令都重读文件，会话中改文件会改变提示词并打掉缓存；它作用于所有 `getCoreSystemPrompt` 调用方（含 Arena），而 `--system-prompt` 只作用于主会话。
 - **动态装配随之消失。** 交互模式说明、output style 层及其每轮提醒（`resolveMainSessionOutputStyle` 在替换时返回 `undefined`）、`QWEN_SYSTEM_IDENTITY_MD`、`todo_write`/code mode 变体、按模型区分的工具调用示例（`getToolCallExamples`）都不再生成。仍会追加的是上下文文件、`appendSystemPrompt`、git status、auto-memory，以及放在消息里的每轮提醒（plan mode、延迟工具清单）。
 - **起点要用真实默认值。** 用 `QWEN_WRITE_SYSTEM_MD=<path>` 按部署的模型与模式导出一次再删减，并记录所基于的默认提示词哈希，升级时重新导出 diff。
 
@@ -208,7 +208,7 @@ extension 的内容按性质分三层：
 
 ## 6. 成本模型
 
-> **⚠️ 本节整节作废（含下面的 `threshold: 0` 小节），不要引用其中任何数字。** [#10410](https://github.com/QwenLM/qwen-code/pull/10410) 已于 2026-09-20 合入（`70edbf47`）：`tool_search` → `tool_call` 桥接取代了"揭示即改写声明列表"，声明列表保持字节稳定，**中途发现工具不再作废前缀缓存**，`tools.toolSearch.threshold` 的默认值随之改为 `0`。因此本节的每一个数字与结论——下面这张建立在空载 46.7k 上的每轮 ¥ 表、"**缓存命中率决定收益相差约 5 倍**"、以及 `threshold: 0` 小节里的"平衡点约 40 轮"、"一次揭示 ¥0.28–0.40"、"`tool_search` ≤2 次/会话"——**都不再成立**：延迟加载现在的代价是首次使用前多一次往返，而不是一次前缀重算。要重新论证"预加载是否值得"，必须按桥接语义重推，并在含 #10410 的版本上重新取基线。本节保留只为记录当时的推理过程。
+> **⚠️ 本节整节作废（含下面的 `threshold: 0` 小节），不要引用其中任何数字。** [#10410](https://github.invalid/QwenLM/qwen-code/pull/10410) 已于 2026-09-20 合入（`70edbf47`）：`tool_search` → `tool_call` 桥接取代了"揭示即改写声明列表"，声明列表保持字节稳定，**中途发现工具不再作废前缀缓存**，`tools.toolSearch.threshold` 的默认值随之改为 `0`。因此本节的每一个数字与结论——下面这张建立在空载 46.7k 上的每轮 ¥ 表、"**缓存命中率决定收益相差约 5 倍**"、以及 `threshold: 0` 小节里的"平衡点约 40 轮"、"一次揭示 ¥0.28–0.40"、"`tool_search` ≤2 次/会话"——**都不再成立**：延迟加载现在的代价是首次使用前多一次往返，而不是一次前缀重算。要重新论证"预加载是否值得"，必须按桥接语义重推，并在含 #10410 的版本上重新取基线。本节保留只为记录当时的推理过程。
 
 以 1M 窗口、输入 ¥12/百万 token、隐式缓存命中 20%（¥2.4/百万）计：
 

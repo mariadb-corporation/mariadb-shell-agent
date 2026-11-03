@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -523,7 +524,13 @@ describe('EditTool', () => {
 
   describe('team memory', () => {
     const teamFile = () =>
-      path.join(rootDir, '.qwen', 'team-memory', 'feedback', 'x.md');
+      path.join(
+        rootDir,
+        '.mariadb-shell-agent',
+        'team-memory',
+        'feedback',
+        'x.md',
+      );
     // Prior-read enforcement off so the test can edit an existing file directly.
     const writeTeamFile = (content: string) => {
       (mockConfig.getFileReadCacheDisabled as Mock).mockReturnValue(true);

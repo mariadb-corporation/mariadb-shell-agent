@@ -84,7 +84,7 @@ wire format; local Host and daemon builds must be updated together.
 - README and the existing visual/Proactive design documents: current behavior.
 
 The reproducible baseline and verification matrix live in
-`.qwen/e2e-tests/2026-09-05-qwen-live-audit-fixes.md`. Verification uses source
+`.mariadb-shell-agent/e2e-tests/2026-09-05-qwen-live-audit-fixes.md`. Verification uses source
 protocol simulations and built package artifacts, followed by targeted unit
 tests, type checks, builds, and independent review. The global qwen command is
 not available and has no standalone Live Proactive surface; runtime simulations

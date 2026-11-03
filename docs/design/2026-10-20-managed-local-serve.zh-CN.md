@@ -17,7 +17,7 @@ systemd 是可选的运维部署选择。
 
 ## 目标与范围
 
-Managed 本地模式运行 `qwen serve --managed --open`，无需 MySQL、Docker、
+Managed 本地模式运行 `mariadb-shell-agent serve --managed --open`，无需 MySQL、Docker、
 systemd、Maven 或源码。默认首次安装仅下载匹配的服务 JAR，要求本机 Java 21。
 独立安装的 managed-runtime archive 可同时提供匹配的 Java 服务 JAR 和
 Java 21 runtime，复用本地安装的 Qwen CLI、它的 Node 进程、
@@ -126,7 +126,7 @@ receipt；受影响的绑定工具 Turn 会在 Runtime 接入时返回 `workspac
 独立 `qwen-code-managed-runtime-<target>.tar.gz` 仅包含
 `managed-runtime/<cli-version>/<target>/manifest.json`、`server.jar` 和 `jre/`。
 保留 Java 许可证，不包含 Node、CLI、Hosted Harness、worker 副本或 WebShell
-资源。用户将其解压到 Qwen home，本地 `qwen serve --managed --open` 自动发现
+资源。用户将其解压到 Qwen home，本地 `mariadb-shell-agent serve --managed --open` 自动发现
 精确匹配的版本和平台目录。模型仍通过已安装的 CLI 配置。
 
 轻量 `qwen-code-managed-runtime-lite-<target>.tar.gz` 只包含相同的
@@ -160,7 +160,7 @@ runtime 构建不要求编译好的 CLI 资源或 Node archive，默认将 archi
 
 ### 首次下载与发布
 
-普通 CLI 包不包含 Java payload。仅 `qwen serve --managed` 会下载缺失的默认
+普通 CLI 包不包含 Java payload。仅 `mariadb-shell-agent serve --managed` 会下载缺失的默认
 runtime。版本化发行产物为 `qwen-managed-agent-server-<cli-version>.jar` 及匹配的
 `.sha256` 文件。安装器优先使用现有官方阿里云 OSS 发行前缀，再尝试相同 GitHub
 Release tag。不选择 `latest`，不解析 Maven 依赖，也不下载 Java。两个下载源都必须
@@ -208,7 +208,7 @@ runtime 制品的指导](https://central.sonatype.org/faq/429-operational-depend
 
 ## 验证与验收
 
-修改前用全局 `qwen` 记录基线。实现后验证本地 bundle，包括源码仓库外的发行布局。
+修改前用全局 `mariadb-shell-agent` 记录基线。实现后验证本地 bundle，包括源码仓库外的发行布局。
 验收覆盖参数处理、缺失/不兼容 runtime 拒绝、同目录互斥、凭据权限和持久化、私有
 监听认证、生产 UI 启动、Workspace 创建、一次真实本地 worker 文件/Shell Turn
 与同 Session 第二轮、优雅重启后的历史保留，以及故障清理。无 provider 凭据时

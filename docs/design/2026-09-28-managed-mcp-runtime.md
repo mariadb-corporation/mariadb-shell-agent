@@ -2,7 +2,7 @@
 
 [English](2026-09-28-managed-mcp-runtime.md) | [简体中文](2026-09-28-managed-mcp-runtime.zh-CN.md)
 
-Status: implemented as a private profile; production enablement remains separate. This implements H1 of [#12827](https://github.com/QwenLM/qwen-code/issues/12827), following H0c at `b32f261afd`. It includes the prerequisite wiring necessary for an actual Hosted call. The normative references are sections 4, 12–14 of the [extension runtime design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-extension-runtime.md) and section 5 of the [configuration design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-config-extensions.md).
+Status: implemented as a private profile; production enablement remains separate. This implements H1 of [#12827](https://github.invalid/QwenLM/qwen-code/issues/12827), following H0c at `b32f261afd`. It includes the prerequisite wiring necessary for an actual Hosted call. The normative references are sections 4, 12–14 of the [extension runtime design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-extension-runtime.md) and section 5 of the [configuration design](https://github.com/doudouOUC/code_agent/blob/689121646cc25ca08a34508a5f5555ae15308833/qwen-code/feature/managed-agents/managed-agent-config-extensions.md).
 
 ## Problem and existing boundaries
 
@@ -59,7 +59,7 @@ Each Runtime instance permits at most 16 connections and 32 in-flight requests, 
 - `packages/core/src/managed-runtime`: MCP record/protocol definitions, authority integration and resource closure.
 - `packages/cli/src/serve`: MCP Runtime service/routes, worker admission, Hosted orchestration and model catalog.
 - `packages/managed-agent-server` and `managed-agent-server`: scoped forwarding, record materialization, catalog contract and tests.
-- `.qwen/e2e-tests/12827-h1.md`: baseline, deterministic protocol tests and fault evidence.
+- `.mariadb-shell-agent/e2e-tests/12827-h1.md`: baseline, deterministic protocol tests and fault evidence.
 
 ## Private profile usage
 

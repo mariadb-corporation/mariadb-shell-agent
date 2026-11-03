@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -756,13 +757,13 @@ describe('artifact workspacePath contract (write_file ⇄ GET /file)', () => {
   it('round-trips an artifact written inside a worktree session', async () => {
     const h = await makeHarness();
     try {
-      // A worktree session's cwd is <workspace>/.qwen/worktrees/<slug>, but the
+      // A worktree session's cwd is <workspace>/.mariadb-shell-agent/worktrees/<slug>, but the
       // route only ever resolves against <workspace>. A path relative to the
       // session cwd ("report.html") would resolve to <workspace>/report.html —
       // a different file, or none at all.
       const sessionCwd = path.join(
         h.workspace,
-        '.qwen',
+        '.mariadb-shell-agent',
         'worktrees',
         'my-feature',
       );
@@ -771,7 +772,9 @@ describe('artifact workspacePath contract (write_file ⇄ GET /file)', () => {
       await fsp.writeFile(filePath, ARTIFACT);
 
       const workspacePath = emittedWorkspacePath(sessionCwd, filePath);
-      expect(workspacePath).toBe('.qwen/worktrees/my-feature/report.html');
+      expect(workspacePath).toBe(
+        '.mariadb-shell-agent/worktrees/my-feature/report.html',
+      );
 
       const res = await request(h.app)
         .get('/file')
@@ -796,7 +799,7 @@ describe('artifact workspacePath contract (write_file ⇄ GET /file)', () => {
       );
       const sessionCwd = path.join(
         h.workspace,
-        '.qwen',
+        '.mariadb-shell-agent',
         'worktrees',
         'my-feature',
       );
@@ -870,7 +873,7 @@ describe('artifact workspacePath contract (record_artifact ⇄ GET /file)', () =
     try {
       const sessionCwd = path.join(
         h.workspace,
-        '.qwen',
+        '.mariadb-shell-agent',
         'worktrees',
         'my-feature',
       );
@@ -881,7 +884,9 @@ describe('artifact workspacePath contract (record_artifact ⇄ GET /file)', () =
         sessionCwd,
         'report.csv',
       );
-      expect(workspacePath).toBe('.qwen/worktrees/my-feature/report.csv');
+      expect(workspacePath).toBe(
+        '.mariadb-shell-agent/worktrees/my-feature/report.csv',
+      );
 
       const res = await request(h.app)
         .get('/file')
@@ -902,7 +907,7 @@ describe('artifact workspacePath contract (record_artifact ⇄ GET /file)', () =
       await fsp.writeFile(abs, ARTIFACT);
       const sessionCwd = path.join(
         h.workspace,
-        '.qwen',
+        '.mariadb-shell-agent',
         'worktrees',
         'my-feature',
       );
@@ -931,7 +936,7 @@ describe('artifact workspacePath contract (record_artifact ⇄ GET /file)', () =
       );
       const sessionCwd = path.join(
         h.workspace,
-        '.qwen',
+        '.mariadb-shell-agent',
         'worktrees',
         'my-feature',
       );

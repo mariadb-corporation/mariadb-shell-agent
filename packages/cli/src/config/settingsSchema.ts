@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -338,7 +339,7 @@ const SETTINGS_SCHEMA = {
     category: 'Advanced',
     requiresRestart: true,
     default: {},
-    description: 'Persistent qwen serve settings.',
+    description: 'Persistent mariadb-shell-agent serve settings.',
     showInDialog: false,
     mergeStrategy: MergeStrategy.SHALLOW_MERGE,
     properties: {
@@ -360,7 +361,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: false,
         description:
-          "Print the token-bearing QR even when stdout is captured and the bearer is an operator-supplied (stable) token. Honored from user, system, and system-defaults settings only — a workspace settings file must not be able to push the operator's credential into logs; qwen serve --no-token-qr suppresses the QR for that run. Same effect as qwen serve --token-qr.",
+          "Print the token-bearing QR even when stdout is captured and the bearer is an operator-supplied (stable) token. Honored from user, system, and system-defaults settings only — a workspace settings file must not be able to push the operator's credential into logs; mariadb-shell-agent serve --no-token-qr suppresses the QR for that run. Same effect as mariadb-shell-agent serve --token-qr.",
         showInDialog: false,
       },
       maxSessions: {
@@ -371,7 +372,7 @@ const SETTINGS_SCHEMA = {
         default: 32,
         minimum: 0,
         description:
-          'Per-workspace cap on concurrent live sessions. New spawn requests beyond this return 503; attaching to an existing session still works. Set to 0 to disable. Honored from user, system, and system-defaults settings only — a workspace settings file must not raise a daemon-wide resource cap; qwen serve --max-sessions wins when passed.',
+          'Per-workspace cap on concurrent live sessions. New spawn requests beyond this return 503; attaching to an existing session still works. Set to 0 to disable. Honored from user, system, and system-defaults settings only — a workspace settings file must not raise a daemon-wide resource cap; mariadb-shell-agent serve --max-sessions wins when passed.',
         showInDialog: false,
       },
       maxConcurrentSubSessionsPerCaller: {
@@ -433,7 +434,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: undefined as string | undefined,
     description:
-      'Custom directory for approved Plan Mode files. Relative paths are resolved from the project root, and the resolved path must stay within the project root. Defaults to ~/.qwen/plans.',
+      'Custom directory for approved Plan Mode files. Relative paths are resolved from the project root, and the resolved path must stay within the project root. Defaults to ~/.mariadb-shell-agent/plans.',
     showInDialog: false,
   },
 
@@ -488,7 +489,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: undefined as string | undefined,
         description:
-          'Name of the output style that shapes how responses are written: a built-in such as "Concise" or "Explanatory", or a custom style\'s name — its frontmatter `name`, defaulting to the file name without ".md" — from ~/.qwen/output-styles or .qwen/output-styles. Leave unset for the default style. Change it with /output-style. Only the built-ins are available in --bare and --safe-mode.',
+          'Name of the output style that shapes how responses are written: a built-in such as "Concise" or "Explanatory", or a custom style\'s name — its frontmatter `name`, defaulting to the file name without ".md" — from ~/.mariadb-shell-agent/output-styles or .mariadb-shell-agent/output-styles. Leave unset for the default style. Change it with /output-style. Only the built-ins are available in --bare and --safe-mode.',
         // The style list includes user/project-defined entries; the dedicated
         // /output-style picker owns selection rather than a static enum here.
         showInDialog: false,
@@ -551,7 +552,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: '',
             description:
-              'Path to a custom keyterms file (one term per line, "#" for comments) that biases voice transcription toward domain-specific terms. Relative paths resolve from the workspace root; defaults to ".qwen/voice-keyterms.txt" when present. The file contents are sent to the ASR provider and it is read only in trusted workspaces. Only applies to Qwen ASR models (qwen3-asr-*).',
+              'Path to a custom keyterms file (one term per line, "#" for comments) that biases voice transcription toward domain-specific terms. Relative paths resolve from the workspace root; defaults to ".mariadb-shell-agent/voice-keyterms.txt" when present. The file contents are sent to the ASR provider and it is read only in trusted workspaces. Only applies to Qwen ASR models (qwen3-asr-*).',
             showInDialog: false,
           },
           refineTranscript: {
@@ -571,7 +572,7 @@ const SETTINGS_SCHEMA = {
         label: 'Enable Auto Update',
         category: 'General',
         requiresRestart: false,
-        default: true,
+        default: false,
         description:
           'Enable automatic update checks and installations on startup.',
         showInDialog: true,
@@ -622,7 +623,7 @@ const SETTINGS_SCHEMA = {
         default: 30,
         minimum: 0,
         description:
-          'Number of days to retain ~/.qwen/file-history/ session backups used by /rewind, background subagent transcripts under <projectDir>/subagents/, and session debug logs under the runtime debug/ directory. Data older than this is removed by a background housekeeping pass that runs at most once per day. Set to 0 for minimum retention (~1 hour) — protects sessions touched in the last hour, plus the currently active session.',
+          'Number of days to retain ~/.mariadb-shell-agent/file-history/ session backups used by /rewind, background subagent transcripts under <projectDir>/subagents/, and session debug logs under the runtime debug/ directory. Data older than this is removed by a background housekeeping pass that runs at most once per day. Set to 0 for minimum retention (~1 hour) — protects sessions touched in the last hour, plus the currently active session.',
         showInDialog: true,
       },
       gitCoAuthor: {
@@ -636,7 +637,7 @@ const SETTINGS_SCHEMA = {
         // editor-surfaced defaults.
         default: { commit: true, pr: true },
         description:
-          'Attribution added to git commits and pull requests created through Qwen Code.',
+          'Attribution added to git commits and pull requests created through MariaDB Shell Agent.',
         showInDialog: false,
         // Pre-V4 settings stored this as a single boolean. The V3→V4
         // migration rewrites those on first launch, but the IDE schema
@@ -653,7 +654,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: true,
             description:
-              'Add a Co-authored-by trailer to git commit messages AND attach a per-file AI-attribution git note (`refs/notes/ai-attribution`) for commits made through Qwen Code. Disabling skips both.',
+              'Add a Co-authored-by trailer to git commit messages AND attach a per-file AI-attribution git note (`refs/notes/ai-attribution`) for commits made through MariaDB Shell Agent. Disabling skips both.',
             showInDialog: true,
           },
           pr: {
@@ -663,7 +664,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: true,
             description:
-              'Append a Qwen Code attribution line to PR descriptions when running `gh pr create`.',
+              'Append a MariaDB Shell Agent attribution line to PR descriptions when running `gh pr create`.',
             showInDialog: true,
           },
         },
@@ -686,7 +687,7 @@ const SETTINGS_SCHEMA = {
         description:
           'The language for the user interface. Use "auto" to detect from system settings. ' +
           'You can also use custom language codes (e.g., "es", "fr") by placing JS language files ' +
-          'in ~/.qwen/locales/ (e.g., ~/.qwen/locales/es.js).',
+          'in ~/.mariadb-shell-agent/locales/ (e.g., ~/.mariadb-shell-agent/locales/es.js).',
         showInDialog: true,
         options: [] as readonly SettingEnumOption[],
       },
@@ -738,7 +739,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: true,
         description:
-          'Prevent the system from sleeping while Qwen Code is streaming a model response or executing tools. Idle prompt time and permission prompts do not inhibit sleep.',
+          'Prevent the system from sleeping while MariaDB Shell Agent is streaming a model response or executing tools. Idle prompt time and permission prompts do not inhibit sleep.',
         showInDialog: true,
       },
       chatRecording: {
@@ -783,7 +784,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: true,
         description:
-          'Append the attribution footer naming the model and CLI version (e.g. "_— qwen3-coder via Qwen Code /review (v0.21.2)_") to review bodies and inline comments posted to GitHub. Disable to post reviews without VISIBLE AI attribution: no footer, and no "**[Critical]**"/"**[Suggestion]**" severity markers on posted comments and body lists. Unattributed posts stay identifiable in the raw source: each posted comment carries an invisible severity marker ("<!-- qwen-review critical -->") and the review body carries a ledger marker ("<!-- qwen-review-ledger ... -->") — anything reading comment bodies (GitHub API automation, the workflows this setting couples to) still recognizes a /review artifact, and presubmit duplicate detection recognizes the reviewing account\'s earlier posts by the severity marker, though unattributed posts from other accounts escape it. Another consequence: qwen-autofix\'s Critical-only mode (engaged after round 5, or earlier when a counting window\'s diff-growth budget trips) no longer recognizes the posted findings as Critical and defers them. Only honored from User, System, and SystemDefaults settings scopes; values set in Workspace settings are ignored, so a repository cannot set review policy for its reviewers.',
+          'Append the attribution footer naming the model and CLI version (e.g. "_— qwen3-coder via MariaDB Shell Agent /review (v0.21.2)_") to review bodies and inline comments posted to GitHub. Disable to post reviews without VISIBLE AI attribution: no footer, and no "**[Critical]**"/"**[Suggestion]**" severity markers on posted comments and body lists. Unattributed posts stay identifiable in the raw source: each posted comment carries an invisible severity marker ("<!-- qwen-review critical -->") and the review body carries a ledger marker ("<!-- qwen-review-ledger ... -->") — anything reading comment bodies (GitHub API automation, the workflows this setting couples to) still recognizes a /review artifact, and presubmit duplicate detection recognizes the reviewing account\'s earlier posts by the severity marker, though unattributed posts from other accounts escape it. Another consequence: qwen-autofix\'s Critical-only mode (engaged after round 5, or earlier when a counting window\'s diff-growth budget trips) no longer recognizes the posted findings as Critical and defers them. Only honored from User, System, and SystemDefaults settings scopes; values set in Workspace settings are ignored, so a repository cannot set review policy for its reviewers.',
         showInDialog: true,
       },
       sandbox: {
@@ -1126,7 +1127,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: true,
         description:
-          'Show Qwen Code session name and status in the terminal window title',
+          'Show MariaDB Shell Agent session name and status in the terminal window title',
         showInDialog: true,
       },
       hideTips: {
@@ -1351,7 +1352,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: true,
         description:
-          'Enable in-app SGR mouse tracking. While enabled, Qwen Code captures mouse events for text selection, click-to-position in text inputs, row hover, history-item toggling, and viewport scrolling. Because the terminal forwards all mouse events to the app, Qwen Code supplies its own equivalents for what the terminal can no longer do natively: a single click opens an http(s) hyperlink under the pointer (other link schemes are copied to the clipboard), and right-click over a link or a text selection opens an in-app context menu with Open Link / Copy Link Address / Copy Selection. Disable to hand the mouse fully back to the terminal (native right-click menu and link clicks); this turns off all in-app mouse interaction, and in Virtualized History the wheel no longer scrolls the transcript — use Shift+↑/↓, PgUp/PgDn, or Ctrl+Home/End instead (pair with ui.useTerminalBuffer: false to restore native terminal scrollback).',
+          'Enable in-app SGR mouse tracking. While enabled, MariaDB Shell Agent captures mouse events for text selection, click-to-position in text inputs, row hover, history-item toggling, and viewport scrolling. Because the terminal forwards all mouse events to the app, MariaDB Shell Agent supplies its own equivalents for what the terminal can no longer do natively: a single click opens an http(s) hyperlink under the pointer (other link schemes are copied to the clipboard), and right-click over a link or a text selection opens an in-app context menu with Open Link / Copy Link Address / Copy Selection. Disable to hand the mouse fully back to the terminal (native right-click menu and link clicks); this turns off all in-app mouse interaction, and in Virtualized History the wheel no longer scrolls the transcript — use Shift+↑/↓, PgUp/PgDn, or Ctrl+Home/End instead (pair with ui.useTerminalBuffer: false to restore native terminal scrollback).',
         showInDialog: true,
       },
       arrowKeysScrollTranscript: {
@@ -1410,7 +1411,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: '' as string,
         description:
-          'Replace the default ">_ Qwen Code" title shown in the banner info panel. The version suffix is always appended.',
+          'Replace the default ">_ MariaDB Shell Agent" title shown in the banner info panel. The version suffix is always appended.',
         showInDialog: false,
       },
       customBannerSubtitle: {
@@ -1532,7 +1533,7 @@ const SETTINGS_SCHEMA = {
         label: 'Enable Usage Statistics',
         category: 'Privacy',
         requiresRestart: true,
-        default: true,
+        default: false,
         description: 'Enable collection of usage statistics',
         showInDialog: true,
       },
@@ -1641,7 +1642,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: {},
     description:
-      'Independent model selection for /batch-api and qwen batch. Unset to reuse the main model configuration.',
+      'Independent model selection for /batch-api and mariadb-shell-agent batch. Unset to reuse the main model configuration.',
     showInDialog: false,
     properties: {
       model: {
@@ -1710,7 +1711,7 @@ const SETTINGS_SCHEMA = {
             type: 'string',
             enum: ['skip', 'reject'],
             description:
-              'Hooks for Claude Code events Qwen Code does not support. Defaults to skip, which reports them at startup; reject fails initialization instead.',
+              'Hooks for Claude Code events MariaDB Shell Agent does not support. Defaults to skip, which reports them at startup; reject fails initialization instead.',
           },
           options: {
             type: 'object',
@@ -2238,7 +2239,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: undefined,
             description:
-              "Overrides the default context window size for the selected model. Use this setting when a provider's effective context limit differs from Qwen Code's default. This value defines the model's assumed maximum context capacity, not a per-request token limit.",
+              "Overrides the default context window size for the selected model. Use this setting when a provider's effective context limit differs from MariaDB Shell Agent's default. This value defines the model's assumed maximum context capacity, not a per-request token limit.",
             parentKey: 'generationConfig',
             showInDialog: false,
           },
@@ -2391,12 +2392,12 @@ const SETTINGS_SCHEMA = {
           },
           respectQwenIgnore: {
             type: 'boolean',
-            label: 'Respect .qwenignore',
+            label: 'Respect .mariadb-shell-agentignore',
             category: 'Context',
             requiresRestart: true,
             default: true,
             description:
-              'Respect .qwenignore and configured custom ignore files when searching',
+              'Respect .mariadb-shell-agentignore and configured custom ignore files when searching',
             showInDialog: true,
           },
           customIgnoreFiles: {
@@ -2406,7 +2407,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: true,
             default: [...DEFAULT_QWEN_CUSTOM_IGNORE_FILE_NAMES] as string[],
             description:
-              'Project-root-relative ignore files to use instead of the defaults (`.agentignore`, `.aiignore`) when respectQwenIgnore is enabled. .qwenignore is always included when respectQwenIgnore is enabled.',
+              'Project-root-relative ignore files to use instead of the defaults (`.agentignore`, `.aiignore`) when respectQwenIgnore is enabled. .mariadb-shell-agentignore is always included when respectQwenIgnore is enabled.',
             showInDialog: false,
             items: { type: 'string' },
           },
@@ -2587,7 +2588,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: false,
         description:
-          'Enable a project memory tier shared with collaborators via the git-tracked `.qwen/team-memory/` directory. Off by default; writes to it are secret-scanned and reviewable in the git diff.',
+          'Enable a project memory tier shared with collaborators via the git-tracked `.mariadb-shell-agent/team-memory/` directory. Off by default; writes to it are secret-scanned and reviewable in the git diff.',
         showInDialog: false,
       },
       enableTeamMemorySync: {
@@ -2597,7 +2598,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: false,
         description:
-          'When team memory is enabled, automatically commit, fast-forward-pull, and push the `.qwen/team-memory/` directory at session start so collaborators stay in sync. Off by default; requires a configured git upstream.',
+          'When team memory is enabled, automatically commit, fast-forward-pull, and push the `.mariadb-shell-agent/team-memory/` directory at session start so collaborators stay in sync. Off by default; requires a configured git upstream.',
         showInDialog: false,
       },
       enableStructuredRecall: {
@@ -3509,7 +3510,7 @@ const SETTINGS_SCHEMA = {
     description:
       'Daemon multi-client coordination policies. Tool-level allow/deny rules ' +
       'live under `permissions`; this section is for runtime mediation behavior ' +
-      'between concurrent HTTP clients sharing one `qwen serve` daemon.',
+      'between concurrent HTTP clients sharing one `mariadb-shell-agent serve` daemon.',
     showInDialog: false,
     properties: {
       permissionStrategy: {
@@ -3822,7 +3823,7 @@ const SETTINGS_SCHEMA = {
         default: undefined as string | undefined,
         description:
           'Custom directory for runtime output (temp files, debug logs, session data, todos, etc.). ' +
-          'Config files remain at ~/.qwen (or QWEN_HOME if set). Env var QWEN_RUNTIME_DIR takes priority.',
+          'Config files remain at ~/.mariadb-shell-agent (or QWEN_HOME if set). Env var QWEN_RUNTIME_DIR takes priority.',
         showInDialog: false,
       },
     },
@@ -3891,7 +3892,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: true,
         description:
-          'Let Qwen Code sessions on this machine send each other messages over a per-session local socket. On by default: this session is discoverable by the others, takes peer messages under the review rules of agents.crossSessionInbound, and its model can address them from send_message. Two senders are delivered without review unless agents.crossSessionInbound is "hold" or "refuse": processes this session starts, which inherit its child token, and a same-user process that claims this session\'s own review class, which nothing authenticates. Set to false to disable peer discovery and messaging. --bare and --safe-mode disable messaging regardless of this setting. Interactive sessions can still appear in qwen sessions ps without a messaging address. Daemon- or editor-hosted sessions register only while messaging is active; Agent View managed rows are listed independently.',
+          'Let MariaDB Shell Agent sessions on this machine send each other messages over a per-session local socket. On by default: this session is discoverable by the others, takes peer messages under the review rules of agents.crossSessionInbound, and its model can address them from send_message. Two senders are delivered without review unless agents.crossSessionInbound is "hold" or "refuse": processes this session starts, which inherit its child token, and a same-user process that claims this session\'s own review class, which nothing authenticates. Set to false to disable peer discovery and messaging. --bare and --safe-mode disable messaging regardless of this setting. Interactive sessions can still appear in mariadb-shell-agent sessions ps without a messaging address. Daemon- or editor-hosted sessions register only while messaging is active; Agent View managed rows are listed independently.',
         showInDialog: false,
       },
       crossSessionInbound: {
@@ -4015,7 +4016,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: true,
             default: undefined as string | undefined,
             description:
-              'Custom base directory for Arena worktrees. Defaults to ~/.qwen/arena.',
+              'Custom base directory for Arena worktrees. Defaults to ~/.mariadb-shell-agent/arena.',
             showInDialog: false,
           },
           preserveArtifacts: {
@@ -4091,7 +4092,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: DEFAULT_STOP_HOOK_BLOCK_CAP,
     description:
-      'Maximum consecutive blocking Stop/SubagentStop hook decisions before Qwen Code overrides the hook loop and ends the turn. Can be overridden by QWEN_CODE_STOP_HOOK_BLOCK_CAP.',
+      'Maximum consecutive blocking Stop/SubagentStop hook decisions before MariaDB Shell Agent overrides the hook loop and ends the turn. Can be overridden by QWEN_CODE_STOP_HOOK_BLOCK_CAP.',
     // This is an advanced safety valve for runaway hook loops, not a common
     // interactive preference.
     showInDialog: false,
@@ -4364,7 +4365,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: [],
         description:
-          'Hooks that execute when an instruction file such as QWEN.md is loaded into context.',
+          'Hooks that execute when an instruction file such as MARIADB-SHELL-AGENT.md is loaded into context.',
         showInDialog: false,
         mergeStrategy: MergeStrategy.CONCAT,
         items: HOOK_DEFINITION_ITEMS,
@@ -4447,9 +4448,9 @@ const SETTINGS_SCHEMA = {
             category: 'Experimental',
             requiresRestart: false,
             default:
-              'wss://dashscope.aliyuncs.com/api-ws/v1/realtime' as string,
+              'wss://dashscope.aliyuncs.invalid/api-ws/v1/realtime' as string,
             description:
-              'Base URL of the DashScope Realtime service, such as https://dashscope.aliyuncs.com/compatible-mode/v1; a Realtime WebSocket URL is also accepted.',
+              'Base URL of the DashScope Realtime service, such as https://dashscope.aliyuncs.invalid/compatible-mode/v1; a Realtime WebSocket URL is also accepted.',
             showInDialog: false,
           },
           voice: {
@@ -4708,7 +4709,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: true,
             default: '',
             description:
-              'OSS endpoint host, e.g. "oss-cn-hangzhou.aliyuncs.com".',
+              'OSS endpoint host, e.g. "oss-cn-hangzhou.aliyuncs.invalid".',
             showInDialog: false,
           },
           keyPrefix: {
@@ -4772,7 +4773,7 @@ const SETTINGS_SCHEMA = {
           'tests / builds inside the worktree without a fresh install. ' +
           'Paths must be relative to the repo root; absolute paths, ' +
           'anything containing `..`, and any path inside `.git` or ' +
-          '`.qwen` (the CLI-managed metadata tree, which contains ' +
+          '`.mariadb-shell-agent` (the CLI-managed metadata tree, which contains ' +
           'the worktrees directory itself) are rejected. Missing ' +
           'source dirs and existing destination paths are silently ' +
           'skipped (no overwrite, no failure).',
@@ -4803,7 +4804,7 @@ const SETTINGS_SCHEMA = {
           'Enable the omni media pipeline. Media files (video, image, ' +
           'audio) referenced with @ — and media served from @https:// ' +
           'URLs — are recognized (ffprobe), stored content-addressed ' +
-          'under .qwen/omni/objects/, uploaded through the DashScope ' +
+          'under .mariadb-shell-agent/omni/objects/, uploaded through the DashScope ' +
           'temporary upload channel, and delivered as oss:// URLs instead ' +
           'of inline base64. Only active for DashScope-compatible ' +
           'endpoints. Can also be enabled via QWEN_CODE_ENABLE_OMNI=1.',
@@ -5183,7 +5184,8 @@ const SETTINGS_SCHEMA = {
         category: 'Experimental',
         requiresRestart: true,
         default: {},
-        description: 'Managed storage settings under .qwen/omni/.',
+        description:
+          'Managed storage settings under .mariadb-shell-agent/omni/.',
         showInDialog: false,
         properties: {
           retentionDays: {
@@ -5193,7 +5195,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: true,
             default: 14,
             description:
-              'Days an object in .qwen/omni/objects/ that no memory ' +
+              'Days an object in .mariadb-shell-agent/omni/objects/ that no memory ' +
               'record references survives before garbage collection may ' +
               'remove it. Referenced objects are never removed. Must be ' +
               'at least 1; non-positive values fall back to the default.',
@@ -5207,7 +5209,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: true,
             default: 21474836480,
             description:
-              'Soft byte budget for .qwen/omni/objects/. Over budget, ' +
+              'Soft byte budget for .mariadb-shell-agent/omni/objects/. Over budget, ' +
               'garbage collection removes the oldest unreferenced ' +
               'objects regardless of age; if only referenced objects ' +
               'remain it warns and suspends new policy derivations ' +
@@ -5227,7 +5229,7 @@ const SETTINGS_SCHEMA = {
             default: {},
             description:
               'Retention for failed policy invocations moved to ' +
-              '.qwen/omni/quarantine/ for diagnosis. Quarantined content ' +
+              '.mariadb-shell-agent/omni/quarantine/ for diagnosis. Quarantined content ' +
               'is never recalled into recognition or delivery.',
             showInDialog: false,
             properties: {

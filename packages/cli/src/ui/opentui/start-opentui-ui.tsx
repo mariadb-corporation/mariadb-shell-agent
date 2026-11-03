@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -684,7 +685,7 @@ export async function startOpenTuiUI(
             (await stat(sessionFile)).size > 0
           ) {
             writeStdoutLine(
-              `\n${t('To continue this session, run')}\nqwen --resume ${sessionId}`,
+              `\n${t('To continue this session, run')}\nmariadb-shell-agent --resume ${sessionId}`,
             );
           }
         }

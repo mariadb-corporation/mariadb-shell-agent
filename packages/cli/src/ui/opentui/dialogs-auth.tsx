@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -120,22 +121,6 @@ interface RadioItem {
 }
 
 const MAIN_ITEMS: RadioItem[] = [
-  {
-    key: 'QWENCLOUD',
-    label: t('QwenCloud'),
-    description: t(
-      'Official recommended setup: Token Plan or Standard API Key',
-    ),
-    value: 'QWENCLOUD',
-  },
-  {
-    key: 'ALIBABA_MODELSTUDIO',
-    label: t('Alibaba ModelStudio'),
-    description: t(
-      'Official recommended setup: Coding Plan, Token Plan, or Standard API Key',
-    ),
-    value: 'ALIBABA_MODELSTUDIO',
-  },
   {
     key: 'THIRD_PARTY_PROVIDERS',
     label: t('Third-party Providers'),
@@ -1528,7 +1513,7 @@ function AuthDialogFlow({
   const regionHeight = clampDialogHeight(availableTerminalHeight);
   const tosLabel = `${t('Terms of Services and Privacy Notice')}:`;
   const tosUrl =
-    'https://qwenlm.github.io/qwen-code-docs/en/users/support/tos-privacy/';
+    'https://qwenlm.github.invalid/qwen-code-docs/en/users/support/tos-privacy/';
   // Chrome charged ahead of every windowed list: the Shell's own rows plus
   // the rows the view's other runs paint. The Shell's title, the hint and an
   // armed error are measured at the content width, so a wrapped run is

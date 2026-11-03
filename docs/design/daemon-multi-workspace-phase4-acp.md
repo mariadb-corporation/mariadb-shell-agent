@@ -3,7 +3,7 @@
 ## Summary
 
 This document designs Phase 4 of issue #6378: workspace-qualified ACP for
-`qwen serve`. It builds directly on the Phase 3 workspace-qualified REST branch
+`mariadb-shell-agent serve`. It builds directly on the Phase 3 workspace-qualified REST branch
 (`codex/phase3-workspace-qualified-rest`, PR #6567), which is **not yet merged**
 (state `CHANGES_REQUESTED`). Phase 4 mounts a per-workspace ACP endpoint at
 `/workspaces/:workspace/acp`, gives each workspace runtime its own ACP

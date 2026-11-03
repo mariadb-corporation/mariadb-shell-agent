@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -45,8 +46,8 @@ const MAX_MODEL_MANIFEST_BYTES = 25_000;
  * [type] filePath (ISO-timestamp): description; keywords.
  *
  * Uses the absolute filePath (never relativePath) so docs from the two
- * memory scopes — per-project under `~/.qwen/projects/<hash>/memory/`
- * and user-level under `~/.qwen/memories/` — that happen to share the
+ * memory scopes — per-project under `~/.mariadb-shell-agent/projects/<hash>/memory/`
+ * and user-level under `~/.mariadb-shell-agent/memories/` — that happen to share the
  * same relativePath (e.g. `user/role.md` in both) remain individually
  * addressable. Keying by relativePath caused the selector's Map dedupe
  * to silently drop one scope.

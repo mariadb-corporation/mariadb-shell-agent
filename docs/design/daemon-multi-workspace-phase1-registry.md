@@ -2,7 +2,7 @@
 
 ## Summary
 
-Phase 1 introduces the internal single-runtime registry for `qwen serve` plus
+Phase 1 introduces the internal single-runtime registry for `mariadb-shell-agent serve` plus
 the two guardrails now called out in issue #6378: daemon-scoped identity and
 repeatable `--workspace` input handling. The daemon still serves exactly one
 primary workspace. Route/API behavior remains unchanged except that multiple

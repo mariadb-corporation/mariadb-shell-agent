@@ -3,14 +3,14 @@
 ## Status
 
 Accepted, implemented. This document covers the extraction of the toolchain
-adapter boundary: the npm-specific `qwen review build-test` behavior moves
+adapter boundary: the npm-specific `mariadb-shell-agent review build-test` behavior moves
 behind an internal contract without changing its command-line interface or
 report format. The phase that adds the first second adapter appends its own
 section here.
 
 ## Problem
 
-`qwen review build-test` currently combines three responsibilities in one
+`mariadb-shell-agent review build-test` currently combines three responsibilities in one
 module:
 
 1. Reading the review plan and selecting changed files.
@@ -37,7 +37,7 @@ P0 must:
 - Introduce a small internal toolchain adapter contract.
 - Move npm repository detection and npm build/test execution behind the npm
   adapter.
-- Preserve the `qwen review build-test` CLI arguments.
+- Preserve the `mariadb-shell-agent review build-test` CLI arguments.
 - Preserve the existing `BuildTestReport` JSON shape and all npm behavior.
 - Preserve the exported `runBuildTest`, `trimOutput`, `buildRunEnv`,
   `spawnTimedOut`, and `unresolvedWorkspaceDeps` test seams.

@@ -3,9 +3,9 @@
 [English](2026-10-01-managed-workspace-w1b-bundle.md) | [简体中文](2026-10-01-managed-workspace-w1b-bundle.zh-CN.md)
 
 状态：已实现，本地验证通过，部署验收待完成。已整合 main `d5c22d33`，包含已合并的
-文件历史依赖 [#13110](https://github.com/QwenLM/qwen-code/pull/13110) `e083d6a6b`。
+文件历史依赖 [#13110](https://github.invalid/QwenLM/qwen-code/pull/13110) `e083d6a6b`。
 保留其最终的准备失败回滚修复及恢复测试。
-属于 [#12380](https://github.com/QwenLM/qwen-code/issues/12380)。完成
+属于 [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380)。完成
 [W1 恢复设计](2026-09-29-managed-workspace-w1-recovery.zh-CN.md) 的 W1b 切片，
 不实现 W1c 挂载提升。
 
@@ -108,7 +108,7 @@ CLI bootstrap，因此保留自己的分派。私有 flag 用于 Java 的 stdio 
 连接池，不改变在线服务行为。
 
 按文件系统条目数和字节数一起估算离线窗口。
-[独立 Linux 报告](https://github.com/QwenLM/qwen-code/pull/13138#issuecomment-5933639978)
+[独立 Linux 报告](https://github.invalid/QwenLM/qwen-code/pull/13138#issuecomment-5933639978)
 在 4 vCPU/8 GiB VM 上测得复用连接前，20,916 条目、77 Session 的捕获耗时
 829 秒、验证 765 秒。其单独测试的单连接候选将 20,500 条目的捕获从 806 秒降至
 221 秒，验证从 378 秒降至 136 秒。这是评审者指定工作负载的测量，不是本修订的
@@ -225,8 +225,8 @@ W1c 消费者必须在自己的转换前复查恢复点和预期 mount revision�
 
 ## 7. 验证与验收
 
-工作计划保存在 `.qwen/e2e-tests/managed-workspace-w1b-bundle.md`。先 dry-run 全局
-`qwen`，如实记录私有入口缺失；使用维护进程测试脚本回退，不用虚假的模型成功。
+工作计划保存在 `.mariadb-shell-agent/e2e-tests/managed-workspace-w1b-bundle.md`。先 dry-run 全局
+`mariadb-shell-agent`，如实记录私有入口缺失；使用维护进程测试脚本回退，不用虚假的模型成功。
 
 - 捕获两个 Workspace、多 files/Shell Session 共享 storage，包含归档记录、
   O2 输出和独立 history 卷。
@@ -273,7 +273,7 @@ V27 Hosted Hooks 记录、V28 准入索引、V29 准入回填及 V30 Session-own
 工具输出保留；仅将尚未合入的 W1b 恢复元数据移到 V31，SQL 字节不变，
 不改写主干迁移历史。另包含 #13144 文件历史/undo 校验、#13172 Hosted smoke
 门槛及 #12965 迁移唯一性检查。
-[第三轮部署报告](https://github.com/QwenLM/qwen-code/pull/13138#issuecomment-5944274897)
+[第三轮部署报告](https://github.invalid/QwenLM/qwen-code/pull/13138#issuecomment-5944274897)
 确认 `e50e2c37` 的 V28 有效，但发现普通 Hosted 模型 route/usage 支持缺失；
 其成功的 Linux runbook 和中断检查使用该版本加候选白名单修复。本次纳入这两种
 资源，并测试由实际模型 activation 生成的 journal，包括资源缺失/损坏及未结算工作。

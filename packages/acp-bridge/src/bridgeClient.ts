@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -849,7 +850,7 @@ function takeUserMidTurnMessages(
  *     subscribers (`GET /session/:id/events`) drain it.
  *   - File reads/writes proxy to local fs (daemon and agent share the host).
  *
- * Stage 1 trust model: the spawned `qwen --acp` child runs as the same user
+ * Stage 1 trust model: the spawned `mariadb-shell-agent --acp` child runs as the same user
  * as the daemon, so the file-proxy methods do NOT enforce a workspace-cwd
  * sandbox. The agent could already read or write the same files via its
  * built-in tools (e.g. shell). Restricting the bridge here would be
@@ -903,7 +904,7 @@ export class BridgeClient implements Client {
      * Optional fs injection seam. When provided, `writeTextFile` /
      * `readTextFile` delegate to this implementation instead of running
      * the inline `fs.realpath` / `fs.writeFile` / `fs.readFile` proxy
-     * below. Production `qwen serve` wires a serve-side adapter
+     * below. Production `mariadb-shell-agent serve` wires a serve-side adapter
      * wrapping `WorkspaceFileSystem` here so writes get the TOCTOU +
      * symlink + trust-gate + audit machinery the inline proxy lacks.
      * Omitted by tests + Mode A in-process consumers + channels / IDE
@@ -1079,7 +1080,7 @@ export class BridgeClient implements Client {
     // grow `pendingPermissionIds` past the limit.
     if (entry.pendingPermissionIds.size >= this.maxPendingPerSession) {
       writeStderrLine(
-        `qwen serve: session ${entry.sessionId} exceeded ` +
+        `mariadb-shell-agent serve: session ${entry.sessionId} exceeded ` +
           `maxPendingPermissionsPerSession (${this.maxPendingPerSession}) — ` +
           `resolving new permission as cancelled.`,
       );
@@ -1142,7 +1143,7 @@ export class BridgeClient implements Client {
       });
     } catch (error) {
       writeStderrLine(
-        `qwen serve: failed to snapshot pending interaction ${requestId}: ${
+        `mariadb-shell-agent serve: failed to snapshot pending interaction ${requestId}: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );
@@ -3388,7 +3389,7 @@ export class BridgeClient implements Client {
       !this.inFlightSessionRegistrationIds.has(sessionId)
     ) {
       writeStderrLine(
-        `qwen serve: dropping early extNotification ` +
+        `mariadb-shell-agent serve: dropping early extNotification ` +
           `for tombstoned session ${JSON.stringify(sessionId)} ` +
           `(post-close stale event)`,
       );
@@ -3401,7 +3402,7 @@ export class BridgeClient implements Client {
         // Hitting this cap means the daemon is under notification
         // pressure from 64+ concurrent sessions — worth surfacing.
         writeStderrLine(
-          `qwen serve: dropping early extNotification — ` +
+          `mariadb-shell-agent serve: dropping early extNotification — ` +
             `early-event buffer at MAX_EARLY_EVENT_SESSIONS ` +
             `(${MAX_EARLY_EVENT_SESSIONS}); possible session-id fanout abuse`,
         );
@@ -3412,7 +3413,7 @@ export class BridgeClient implements Client {
     }
     if (buf.frames.length >= MAX_EARLY_EVENTS_PER_SESSION) {
       writeStderrLine(
-        `qwen serve: dropping early extNotification ` +
+        `mariadb-shell-agent serve: dropping early extNotification ` +
           `for session ${JSON.stringify(sessionId)} — per-session ` +
           `cap (${MAX_EARLY_EVENTS_PER_SESSION}) reached`,
       );
@@ -3551,7 +3552,7 @@ export class BridgeClient implements Client {
     params: WriteTextFileRequest,
   ): Promise<WriteTextFileResponse> {
     // Delegate to the injected `BridgeFileSystem` when present.
-    // Production `qwen serve` wires `WorkspaceFileSystem` through a
+    // Production `mariadb-shell-agent serve` wires `WorkspaceFileSystem` through a
     // serve-side adapter so writes get the trust-gate + TOCTOU +
     // symlink + `.gitignore` + audit machinery the inline proxy below
     // lacks. Tests, Mode A consumers, channels, and IDE companion
@@ -3707,7 +3708,7 @@ export class BridgeClient implements Client {
     params: ReadTextFileRequest,
   ): Promise<ReadTextFileResponse> {
     // Delegate to the injected `BridgeFileSystem` when present
-    // (parallels the write path above). Production `qwen serve` wires
+    // (parallels the write path above). Production `mariadb-shell-agent serve` wires
     // `WorkspaceFileSystem` adapter; tests + Mode A + channels + IDE
     // companion fall through to the inline proxy below.
     if (this.fileSystem) {

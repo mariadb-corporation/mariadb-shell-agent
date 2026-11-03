@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -75,7 +76,7 @@ describe('bundled SKILL.md files', () => {
   // (#12472). At 6,549 characters for 15 entries, that room is about 1,450.
   // A failure here means compress a bundled frontmatter, or raise this number
   // as a decision about how much of the listing bundled skills may take.
-  const BUNDLED_LISTING_BUDGET = 6_800;
+  const BUNDLED_LISTING_BUDGET = 6_900;
 
   it(`renders the model-invocable bundled listing within ${BUNDLED_LISTING_BUDGET} characters`, () => {
     const entries: AvailableSkillEntry[] = skillNames

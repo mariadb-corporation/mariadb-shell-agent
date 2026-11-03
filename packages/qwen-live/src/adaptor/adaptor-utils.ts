@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Helpers shared by every BackendAdaptor: wire-shape munging that both the
- * qwen serve adaptor and the ACP adaptor need — permission-option
+ * mariadb-shell-agent serve adaptor and the ACP adaptor need — permission-option
  * classification, tool-call title text, and clamped summaries. Extracted
  * from qwen-code-adaptor.ts verbatim; keep both adaptors importing from
  * here rather than re-deriving the rules.
@@ -26,7 +27,7 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
 /**
  * Map one wire permission option to the adaptor's kind + escalation.
  *
- * Both qwen serve and ACP stamp every option with the structured `kind`
+ * Both mariadb-shell-agent serve and ACP stamp every option with the structured `kind`
  * (`allow_once` | `allow_always` | `reject_once` | `reject_always` — see
  * `toPermissionOptions` in packages/cli acp-integration/permissionUtils.ts);
  * that is authoritative when present. An unknown structured kind fails

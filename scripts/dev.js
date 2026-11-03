@@ -2,11 +2,12 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Development entry point for Qwen Code CLI.
+ * Development entry point for MariaDB Shell Agent CLI.
  *
  * Runs the CLI from TypeScript source with prebuilt workspace dependencies.
  * Changes to packages/core or packages/cli are reflected immediately.
@@ -195,10 +196,10 @@ const env = {
   NODE_ENV: 'development',
   NODE_OPTIONS: `${existingNodeOptions} --expose-gc ${importFlag}`.trim(),
   // The entry a `qwen …` subprocess should call to reach THIS build — without
-  // it, a skill that shells out to `qwen` gets whatever PATH resolves, which on
+  // it, a skill that shells out to `mariadb-shell-agent` gets whatever PATH resolves, which on
   // a dev machine is routinely an older global install. Assignment, not `??` or
   // `||=`: an inherited value is another session's CLI (a dev CLI started from
-  // inside an outer qwen session's shell — the usual dogfooding flow), and
+  // inside an outer mariadb-shell-agent session's shell — the usual dogfooding flow), and
   // honouring it re-points every subprocess at the outer build — the same skew,
   // one level up, and silent. Each entry stamps itself; nested sessions each
   // call their own build. This one line also covers `npm run dev:daemon`, which

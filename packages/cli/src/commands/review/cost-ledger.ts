@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review cost-ledger`: what this review actually cost, from the
+// `mariadb-shell-agent review cost-ledger`: what this review actually cost, from the
 // harness's own usage records.
 //
 // The number exists because it kept having to be excavated. A maintainer's

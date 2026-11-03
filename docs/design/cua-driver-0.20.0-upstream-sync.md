@@ -57,13 +57,13 @@ though both npm and PyPI publish 0.20.0. The vendored examples and their npm
 lockfile are aligned to 0.20.0 so they exercise the synchronized contract.
 
 Upstream's monorepo-wide nightly orchestration, release-attribution services,
-Python publishing, and documentation publishing are not copied into Qwen Code.
+Python publishing, and documentation publishing are not copied into MariaDB Shell Agent.
 They depend on upstream-only scripts, secrets, repositories, and release
 governance. Cross-platform signed release publication remains a CI gate.
 
 ## Out of scope
 
-This change does not update Qwen Code's current built-in downloader pin,
+This change does not update MariaDB Shell Agent's current built-in downloader pin,
 Computer Use MCP adapter, bootstrap flow, permission UX, or model-visible tool
 schemas. It also does not implement Issue #9334. Those integration changes
 remain independently reviewable follow-ups on top of the verified 0.20.0

@@ -2,7 +2,7 @@
 
 [English](2026-09-29-hosted-operator-recovery.md) | [简体中文](2026-09-29-hosted-operator-recovery.zh-CN.md)
 
-Status: implementation design for [#12904](https://github.com/QwenLM/qwen-code/issues/12904). Depends on [W0e-3](2026-09-28-local-reboot-recovery.md).
+Status: implementation design for [#12904](https://github.invalid/QwenLM/qwen-code/issues/12904). Depends on [W0e-3](2026-09-28-local-reboot-recovery.md).
 
 ## Problem and supported boundary
 

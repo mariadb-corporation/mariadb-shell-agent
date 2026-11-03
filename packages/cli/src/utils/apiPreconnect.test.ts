@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -110,19 +111,20 @@ describe('apiPreconnect', () => {
 
     it('should use resolvedBaseUrl when it is a dashscope compatible-mode URL', async () => {
       preconnectApi('openai', {
-        resolvedBaseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        resolvedBaseUrl:
+          'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
         proxy: 'http://proxy.example.com:8080',
       });
       await waitForPreconnect();
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
         expect.objectContaining({ method: 'HEAD' }),
       );
     });
 
     it('should skip when resolvedBaseUrl is a dashscope subdomain-spoofed URL', () => {
       preconnectApi('openai', {
-        resolvedBaseUrl: 'https://dashscope.aliyuncs.com.malicious.com/v1',
+        resolvedBaseUrl: 'https://dashscope.aliyuncs.invalid.malicious.com/v1',
         proxy: 'http://proxy.example.com:8080',
       });
       expect(mockFetch).not.toHaveBeenCalled();
@@ -131,24 +133,25 @@ describe('apiPreconnect', () => {
     it('should accept DashScope regional endpoint (sg-singapore)', async () => {
       preconnectApi('openai', {
         resolvedBaseUrl:
-          'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+          'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
         proxy: 'http://proxy.example.com:8080',
       });
       await waitForPreconnect();
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+        'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
         expect.objectContaining({ method: 'HEAD' }),
       );
     });
 
     it('should accept DashScope regional endpoint (us-virginia)', async () => {
       preconnectApi('openai', {
-        resolvedBaseUrl: 'https://dashscope-us.aliyuncs.com/compatible-mode/v1',
+        resolvedBaseUrl:
+          'https://dashscope-us.aliyuncs.invalid/compatible-mode/v1',
         proxy: 'http://proxy.example.com:8080',
       });
       await waitForPreconnect();
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://dashscope-us.aliyuncs.com/compatible-mode/v1',
+        'https://dashscope-us.aliyuncs.invalid/compatible-mode/v1',
         expect.objectContaining({ method: 'HEAD' }),
       );
     });
@@ -156,12 +159,12 @@ describe('apiPreconnect', () => {
     it('should accept DashScope regional endpoint (cn-hongkong)', async () => {
       preconnectApi('openai', {
         resolvedBaseUrl:
-          'https://cn-hongkong.dashscope.aliyuncs.com/compatible-mode/v1',
+          'https://cn-hongkong.dashscope.aliyuncs.invalid/compatible-mode/v1',
         proxy: 'http://proxy.example.com:8080',
       });
       await waitForPreconnect();
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://cn-hongkong.dashscope.aliyuncs.com/compatible-mode/v1',
+        'https://cn-hongkong.dashscope.aliyuncs.invalid/compatible-mode/v1',
         expect.objectContaining({ method: 'HEAD' }),
       );
     });
@@ -173,7 +176,7 @@ describe('apiPreconnect', () => {
       });
       await waitForPreconnect();
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://coding.dashscope.aliyuncs.com',
+        'https://coding.dashscope.aliyuncs.invalid',
         expect.objectContaining({ method: 'HEAD' }),
       );
     });
@@ -184,7 +187,7 @@ describe('apiPreconnect', () => {
       });
       await waitForPreconnect();
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://coding.dashscope.aliyuncs.com',
+        'https://coding.dashscope.aliyuncs.invalid',
         expect.objectContaining({ method: 'HEAD' }),
       );
     });
@@ -197,7 +200,7 @@ describe('apiPreconnect', () => {
       });
       await waitForPreconnect();
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://coding.dashscope.aliyuncs.com',
+        'https://coding.dashscope.aliyuncs.invalid',
         expect.objectContaining({ method: 'HEAD' }),
       );
     });
@@ -270,7 +273,7 @@ describe('apiPreconnect', () => {
       await waitForPreconnect();
       expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://coding.dashscope.aliyuncs.com',
+        'https://coding.dashscope.aliyuncs.invalid',
         expect.objectContaining({ method: 'HEAD' }),
       );
     });

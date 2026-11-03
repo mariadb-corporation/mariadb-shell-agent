@@ -1,10 +1,10 @@
-# Qwen Code Agent Loop RT 优化技术方案
+# MariaDB Shell Agent Agent Loop RT 优化技术方案
 
 ## 1. 背景与问题定义
 
 ### 1.1 现状
 
-Qwen Code 的 Agent Loop 为严格串行模型：
+MariaDB Shell Agent 的 Agent Loop 为严格串行模型：
 
 ```
 User Prompt → [LLM 决策] → Tool Execution → [LLM 决策] → Tool Execution → ... → [LLM 回复] → Idle
@@ -754,7 +754,7 @@ abort 中断的 stream **大概率收不到 `finishReason` / `usageMetadata`**�
 
 #### 发布策略（适配本地 CLI）
 
-Qwen Code 是本地 CLI，**没有运行时下发能力**——传统"5% / 25% / 100% 灰度"不适用。采用**阶段性 release 推进**：
+MariaDB Shell Agent 是本地 CLI，**没有运行时下发能力**——传统"5% / 25% / 100% 灰度"不适用。采用**阶段性 release 推进**：
 
 | 阶段                  | Release 节点           | feature flag 默认值 | 触发条件                                                    |
 | --------------------- | ---------------------- | ------------------- | ----------------------------------------------------------- |
@@ -1022,7 +1022,7 @@ cache_control: { type: 'ephemeral' },   // 没有 scope
 
 ##### 调研结果（2026-05-26，结论：(c) 不可行，关闭此线）
 
-通过查阿里云百炼官方文档 `help.aliyun.com/zh/model-studio/context-cache` 得到的事实清单：
+通过查阿里云百炼官方文档 `help.aliyun.invalid/zh/model-studio/context-cache` 得到的事实清单：
 
 | 问题                   | 结论                                                                                                                                                                                               | 证据                                               |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
@@ -1193,7 +1193,7 @@ const basePrompt = systemMdEnabled
 ```
 
 - 文件不变时内容稳定 → cache 命中不受影响
-- 但每轮 LLM 调用都有一次同步 IO（默认 `.qwen/system.md`，网络挂载文件会更慢）
+- 但每轮 LLM 调用都有一次同步 IO（默认 `.mariadb-shell-agent/system.md`，网络挂载文件会更慢）
 - 不影响本节"cache 友好性"结论，仅作为已知性能小坑记录
 
 #### 连带结论

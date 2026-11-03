@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * @fileoverview The `session_send` stdio MCP server itself, loaded only when
- * `qwen agents session-send-mcp` runs (see session-send-mcp.ts). Nothing
+ * `mariadb-shell-agent agents session-send-mcp` runs (see session-send-mcp.ts). Nothing
  * here writes to stdout except the MCP transport.
  */
 

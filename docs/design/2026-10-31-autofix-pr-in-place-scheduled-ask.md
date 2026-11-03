@@ -208,7 +208,7 @@ proposal answer.
 
 - `schedule` is allowed for an in-place watch (it currently refuses);
   `unattended` keeps refusing in-place. The confirmed-watch record and reply
-  plan placement stay as v1 (plan in `<checkout>/.qwen/tmp`).
+  plan placement stay as v1 (plan in `<checkout>/.mariadb-shell-agent/tmp`).
 
 ### 6.5 `status`, `stop`, `resume`
 
@@ -246,7 +246,7 @@ refusal, push budget — carries over from v1 and the command design unchanged.
 - `packages/core/src/tools/autofix-pr.ts` — `schedule` allowed for in-place;
   `unattended` still refused.
 - Collocated tests for each; this design pair; an E2E test plan under
-  `.qwen/e2e-tests/`.
+  `.mariadb-shell-agent/e2e-tests/`.
 
 ## 9. Constraints and risks
 
@@ -280,7 +280,7 @@ Unit tests (collocated, vitest):
 - tool: `schedule` allowed for in-place; `unattended` still refused.
 - Regression: every worktree-mode test passes unchanged.
 
-E2E (plan under `.qwen/e2e-tests/`): a scheduled in-place watch on a scratch
+E2E (plan under `.mariadb-shell-agent/e2e-tests/`): a scheduled in-place watch on a scratch
 PR; a fire with a failing check proposes and waits; "Not now" edits nothing
 and the next fire re-proposes; "Fix it" runs a foreground round, pushes,
 replies, and advances the cursor; a dirty checkout at fire time refuses and

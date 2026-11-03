@@ -1,6 +1,6 @@
 # Lazy-load the OpenTelemetry SDK off the ACP child startup path
 
-- **Issue**: #4748 (Optimize daemon cold start and qwen serve fast-path latency)
+- **Issue**: #4748 (Optimize daemon cold start and mariadb-shell-agent serve fast-path latency)
 - **Status**: implemented
 - **Date**: 2026-07-19
 - **Depends on**: #7182 (TUI module removal), the metafile audit below
@@ -224,7 +224,7 @@ standing discipline before merging:
    site 3).
 4. **Bundle guard**: `node scripts/check-serve-fast-path-bundle.js` green with
    the extended blacklist; re-run the closure audit
-   (`.qwen/scripts/acp-closure-audit.mjs`) and record the new ACP closure
+   (`.mariadb-shell-agent/scripts/acp-closure-audit.mjs`) and record the new ACP closure
    total (expected ≈ 17.24 − ~2.0 MiB, minus whatever `@opentelemetry/api` and
    friends keep eager).
 5. **Unit tests**: `sdk.test.ts` awaits `initializeTelemetry` (15 call sites);

@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Daemon-backed IDE connection spike. It mirrors the ACP process connection
- * shape while replacing the local child process with a qwen serve session.
+ * shape while replacing the local child process with a mariadb-shell-agent serve session.
  */
 
 import { logger } from '../utils/logger.js';

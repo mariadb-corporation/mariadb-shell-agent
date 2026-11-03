@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Wire types for the `qwen serve` daemon HTTP API.
+ * Wire types for the `mariadb-shell-agent serve` daemon HTTP API.
  *
  * These mirror the shapes emitted by `packages/cli/src/serve` but are
  * defined SDK-side to avoid an SDK→CLI dependency. The shapes are stable
@@ -547,7 +548,7 @@ export interface DaemonGitWorktree {
   isMain: boolean;
   /** The selected workspace's own checkout. */
   isWorkspace: boolean;
-  /** Present for worktrees Qwen Code created under `.qwen/worktrees/`. */
+  /** Present for worktrees MariaDB Shell Agent created under `.mariadb-shell-agent/worktrees/`. */
   slug?: string;
 }
 
@@ -733,7 +734,7 @@ export interface DaemonCapabilities {
    */
   protocolVersions?: DaemonProtocolVersions;
   /**
-   * Qwen Code CLI/SDK version served by this daemon. Optional because this is
+   * MariaDB Shell Agent CLI/SDK version served by this daemon. Optional because this is
    * additive to v=1; older v=1 daemons omit it.
    */
   qwenCodeVersion?: string;
@@ -3009,7 +3010,7 @@ export interface DaemonWorkspaceFileUploadResult {
 /**
  * Storage level for a subagent definition.
  *
- * `project` / `user` / `builtin` are the levels the `qwen serve`
+ * `project` / `user` / `builtin` are the levels the `mariadb-shell-agent serve`
  * daemon currently surfaces through `GET /workspace/agents` and the
  * per-`agentType` detail route.
  *
@@ -4436,7 +4437,7 @@ export interface DaemonLiveSetupUpdate {
   voice?: string;
   /**
    * An OpenAI-compatible base URL (`https://…/compatible-mode/v1`) on a
-   * DashScope or `*.maas.aliyuncs.com` host, stored as entered; empty
+   * DashScope or `*.maas.aliyuncs.invalid` host, stored as entered; empty
    * restores the default. Refused with `live_endpoint_unused` when the model
    * follows a `realtimeOnly` route.
    */

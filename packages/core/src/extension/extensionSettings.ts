@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -156,7 +157,7 @@ const getKeychainStorageName = (
   extensionId: string,
   scope: ExtensionSettingScope,
 ): string => {
-  const base = `Qwen Code Extensions ${extensionName} ${extensionId}`;
+  const base = `MariaDB Shell Agent Extensions ${extensionName} ${extensionId}`;
   if (scope === ExtensionSettingScope.WORKSPACE) {
     return `${base} ${process.cwd()}`;
   }

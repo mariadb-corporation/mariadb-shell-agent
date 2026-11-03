@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -351,7 +352,7 @@ export async function checkForUpdatesDetailed(
           status: 'update',
           info: {
             message: t(
-              'A new version of Qwen Code is available! {{current}} → {{latest}}',
+              'A new version of MariaDB Shell Agent is available! {{current}} → {{latest}}',
               { current: version, latest: bestUpdate.latest },
             ),
             update: { ...bestUpdate, current: version },
@@ -373,10 +374,13 @@ export async function checkForUpdatesDetailed(
         return {
           status: 'update',
           info: {
-            message: t('Qwen Code update available! {{current}} → {{latest}}', {
-              current: version,
-              latest: updateInfo.latest,
-            }),
+            message: t(
+              'MariaDB Shell Agent update available! {{current}} → {{latest}}',
+              {
+                current: version,
+                latest: updateInfo.latest,
+              },
+            ),
             update: { ...updateInfo, current: version },
           },
         };

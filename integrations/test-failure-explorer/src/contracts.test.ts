@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +22,7 @@ function persistedSnapshot() {
     schemaVersion: 1,
     reportId: `r1_${'a'.repeat(64)}`,
     source: {
-      relativePath: '.qwen/test-reports/mixed.json',
+      relativePath: '.mariadb-shell-agent/test-reports/mixed.json',
       sha256: 'b'.repeat(64),
       bytes: 100,
     },

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,6 +10,7 @@ import {
   assembleSystemPrompt,
   getCoreSystemPrompt,
   getCustomSystemPrompt,
+  getMainSessionInteractionModeReminder,
   getManualPlanExitSystemReminder,
   getPlanModeSystemReminder,
   resolvePathFromEnv,
@@ -150,10 +152,7 @@ describe('Core System Prompt (prompts.ts)', () => {
   /** No memory separator, the default identity (plus `more`), snapshot. */
   function expectBasePrompt(prompt: string, ...more: string[]) {
     expect(prompt).not.toContain('---\n\n');
-    expectText(prompt, [
-      'You are Qwen Code, an interactive CLI agent',
-      ...more,
-    ]);
+    expectText(prompt, ['You are MariaDB Shell Agent, a CLI agent', ...more]);
     expect(prompt).toMatchSnapshot();
   }
 
@@ -250,11 +249,31 @@ describe('Core System Prompt (prompts.ts)', () => {
     'aligns the system prompt with %s mode',
     (mode, role, questionGuidance) => {
       expectText(unsandboxed({ mode }), [
-        `You are Qwen Code, ${role}`,
+        'You are MariaDB Shell Agent, a CLI agent developed by',
+        `Interaction mode reminder: You are running as ${role}.`,
         questionGuidance,
       ]);
     },
   );
+
+  it('shares one prompt prefix across interaction modes, for prompt caching', () => {
+    const prompts = (['interactive', 'headless', 'acp'] as const).map((mode) =>
+      unsandboxed({ mode }),
+    );
+    const common = (a: string, b: string) => {
+      let i = 0;
+      while (i < a.length && a[i] === b[i]) i++;
+      return i;
+    };
+    const shared = Math.min(
+      common(prompts[0]!, prompts[1]!),
+      common(prompts[0]!, prompts[2]!),
+    );
+    // Only the closing interaction-mode reminder and the tool examples
+    // differ; a provider's prompt cache can reuse everything before them.
+    const shortest = Math.min(...prompts.map((p) => p.length));
+    expect(shared).toBeGreaterThan(shortest * 0.95);
+  });
 
   it('does not tell headless runs to wait for user input', () => {
     vi.mocked(isGitRepository).mockReturnValue(true);
@@ -409,7 +428,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     const memory = 'This is custom user memory.\nBe extra polite.';
     const prompt = unsandboxed({ memory });
     expect(prompt.endsWith(`\n\n---\n\n${memory}`)).toBe(true);
-    expect(prompt).toContain('You are Qwen Code, an interactive CLI agent'); // Ensure base prompt follows
+    expect(prompt).toContain('You are MariaDB Shell Agent, a CLI agent'); // Ensure base prompt follows
     expect(prompt).toMatchSnapshot();
   });
 
@@ -475,7 +494,7 @@ describe('Core System Prompt (prompts.ts)', () => {
         // /dev is a fresh minimal devtmpfs, so host device nodes are absent
         // (ENOENT), not read-only: the remedy is an argv change, not a root grant.
         'minimal synthetic device tree',
-        'QWEN_SANDBOX=bwrap qwen sandbox',
+        'QWEN_SANDBOX=bwrap mariadb-shell-agent sandbox',
         // The inspection remedy is addressed to the user, from the project
         // directory, with the settings-derived scope of the report named.
         'tell the user to run it from this project directory on the host',
@@ -621,7 +640,7 @@ describe('Core System Prompt (prompts.ts)', () => {
       const baseline = getCoreSystemPrompt();
 
       expect(withOverride.startsWith(customIdentity)).toBe(true);
-      expect(withOverride).not.toContain('You are Qwen Code');
+      expect(withOverride).not.toContain('You are MariaDB Shell Agent');
       // trimEnd() strips trailing spaces/newlines from the identity file.
       expect(withOverride.slice(customIdentity.length)).toBe(
         baseline.slice(defaultIdentity.length),
@@ -643,7 +662,7 @@ describe('Core System Prompt (prompts.ts)', () => {
       const systemPath = path.resolve('/custom/empty-system.md');
       const prompt = withSystemMdAndIdentity(systemPath, '');
       expect(prompt).toBe('');
-      expectText(prompt, [], [customIdentity, 'You are Qwen Code']);
+      expectText(prompt, [], [customIdentity, 'You are MariaDB Shell Agent']);
     });
 
     it('should throw when identity env points to a missing file', () => {
@@ -894,11 +913,31 @@ describe('main-session style: reminder decision matches prompt section', () => {
         headless: 'a non-interactive CLI agent',
         acp: 'a CLI agent operating through an ACP host',
       } as const;
-      expect(getMainSessionBaseSystemPrompt(makeConfig(flags))).toContain(
-        markers[session],
+      // The main session names its mode in the startup prelude; its system
+      // prompt is the same in every mode (prompt caching).
+      expect(
+        getMainSessionInteractionModeReminder(makeConfig(flags)),
+      ).toContain(markers[session]);
+      expect(getMainSessionBaseSystemPrompt(makeConfig(flags))).not.toContain(
+        'Interaction mode reminder',
       );
     },
   );
+
+  it('gives the main session one system prompt for every interaction mode', () => {
+    const prompts = sessions.map(([, flags]) =>
+      getMainSessionBaseSystemPrompt(makeConfig(flags)),
+    );
+    expect(new Set(prompts).size).toBe(1);
+  });
+
+  it('sends no mode reminder for a configured system prompt override', () => {
+    expect(
+      getMainSessionInteractionModeReminder(
+        makeConfig({ customPrompt: 'Custom.', interactive: true, acp: false }),
+      ),
+    ).toBeNull();
+  });
 
   interface Case {
     name: string;
@@ -946,9 +985,9 @@ describe('main-session style: reminder decision matches prompt section', () => {
       expect(reminded).toBe(prompt.includes('# Output Style:'));
       if (customPrompt) {
         // The override replaces the base verbatim.
-        expectText(prompt, [customPrompt], ['You are Qwen Code']);
+        expectText(prompt, [customPrompt], ['You are MariaDB Shell Agent']);
       } else if (!systemMd) {
-        expect(prompt).toContain('You are Qwen Code');
+        expect(prompt).toContain('You are MariaDB Shell Agent');
       }
     },
   );

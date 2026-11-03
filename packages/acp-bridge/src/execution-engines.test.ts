@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2780,7 +2781,7 @@ async function flushWithoutTime(): Promise<void> {
   for (let i = 0; i < 20; i++) await vi.advanceTimersByTimeAsync(0);
 }
 
-/** A child that reports active work, as a real `qwen --acp` child does. */
+/** A child that reports active work, as a real `mariadb-shell-agent --acp` child does. */
 const activeWorkInitialize = () => ({
   protocolVersion: PROTOCOL_VERSION,
   agentInfo: { name: 'active-work-agent', version: '0' },

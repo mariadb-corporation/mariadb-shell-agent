@@ -4,7 +4,7 @@
 
 ## Current producers and problem
 
-The P3 issue [#13884](https://github.com/QwenLM/qwen-code/issues/13884)
+The P3 issue [#13884](https://github.invalid/QwenLM/qwen-code/issues/13884)
 predates the shared schema consolidation. At `06efd789b1`, the Session
 collector already releases retired journal owners and collects unreferenced
 immutable SQL resources without restricting their kind. The remaining work
@@ -75,9 +75,9 @@ objects. External `fileData` bytes remain owned by their external producer;
 collecting the SQL locator does not delete the remote object.
 
 This change does not create a speculative Hosted omni adapter or enable a
-new recovery layout. It does not close [#13884](https://github.com/QwenLM/qwen-code/issues/13884) or claim production physical
+new recovery layout. It does not close [#13884](https://github.invalid/QwenLM/qwen-code/issues/13884) or claim production physical
 collection acceptance. The future physically shared lifecycle and the
-deployment gates in [#13090](https://github.com/QwenLM/qwen-code/issues/13090)
+deployment gates in [#13090](https://github.invalid/QwenLM/qwen-code/issues/13090)
 remain open.
 
 ## Validation and acceptance

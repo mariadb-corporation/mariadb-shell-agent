@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,7 +27,11 @@ describe('fork profiles', () => {
     name: string,
     content: string,
   ): Promise<void> {
-    const profileDir = path.join(projectRoot, '.qwen', 'fork-profiles');
+    const profileDir = path.join(
+      projectRoot,
+      '.mariadb-shell-agent',
+      'fork-profiles',
+    );
     await fs.mkdir(profileDir, { recursive: true });
     await fs.writeFile(path.join(profileDir, `${name}.md`), content, 'utf8');
   }
@@ -118,7 +123,7 @@ describe('fork profiles', () => {
     expect(() => loadForkProfile(projectRoot, 'missing')).toThrowError(
       `Fork profile "missing" was not found at ${path.join(
         projectRoot,
-        '.qwen',
+        '.mariadb-shell-agent',
         'fork-profiles',
         'missing.md',
       )}.`,
@@ -127,7 +132,11 @@ describe('fork profiles', () => {
 
   it('rejects a profile symlink that escapes the profile directory', async () => {
     const projectRoot = await createProject();
-    const profileDir = path.join(projectRoot, '.qwen', 'fork-profiles');
+    const profileDir = path.join(
+      projectRoot,
+      '.mariadb-shell-agent',
+      'fork-profiles',
+    );
     const outsideProfile = path.join(projectRoot, 'outside.md');
     await fs.mkdir(profileDir, { recursive: true });
     await fs.writeFile(
@@ -149,7 +158,12 @@ describe('fork profiles', () => {
   it('rejects a non-regular profile before reading it', async () => {
     const projectRoot = await createProject();
     await fs.mkdir(
-      path.join(projectRoot, '.qwen', 'fork-profiles', 'ro-research.md'),
+      path.join(
+        projectRoot,
+        '.mariadb-shell-agent',
+        'fork-profiles',
+        'ro-research.md',
+      ),
       { recursive: true },
     );
 

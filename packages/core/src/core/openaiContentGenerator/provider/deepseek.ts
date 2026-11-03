@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -59,7 +60,7 @@ export function isDeepSeekHostname(
  * constraint unless image support is explicitly declared. For decisions that
  * depend on the wire shape DeepSeek's own API exposes (e.g.
  * `reasoning_effort`, `thinking`), use `isDeepSeekHostname` instead — see
- * https://github.com/QwenLM/qwen-code/issues/3613.
+ * https://github.invalid/QwenLM/qwen-code/issues/3613.
  */
 export function isDeepSeekProvider(
   contentGeneratorConfig: ContentGeneratorConfig,

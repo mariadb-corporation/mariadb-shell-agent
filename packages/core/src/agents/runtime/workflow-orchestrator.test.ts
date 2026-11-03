@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -119,7 +120,7 @@ const worktreeStubs = vi.hoisted(() => {
       ) => ({
         success: true,
         worktree: {
-          path: `/fake/repo/.qwen/worktrees/${slug}`,
+          path: `/fake/repo/.mariadb-shell-agent/worktrees/${slug}`,
           branch: `worktree-${slug}`,
         },
       }),
@@ -4503,7 +4504,7 @@ describe('WorkflowOrchestrator P3 — agentType / model / isolation / schema', (
 
   // ─── workingDir: pin to a caller-owned worktree ─────────────────
 
-  const PINNED = { workingDir: '.qwen/tmp/review-pr-7' };
+  const PINNED = { workingDir: '.mariadb-shell-agent/tmp/review-pr-7' };
 
   // The fast path cannot rebind a directory: `workingDir` would be dropped
   // and the agent run in the parent tree, the failure it exists to prevent.
@@ -4520,7 +4521,7 @@ describe('WorkflowOrchestrator P3 — agentType / model / isolation / schema', (
     const helper = await dispatched({ onCreate: ends('pinned') }, 'hi', PINNED);
     // Not the parent's '/fake/repo': its tools resolve inside the worktree.
     expect(helper.calls[0]!.runtimeTargetDir).toBe(
-      '/fake/repo/.qwen/tmp/review-pr-7',
+      '/fake/repo/.mariadb-shell-agent/tmp/review-pr-7',
     );
     expect(helper.calls[0]!.runtimeContextSame).toBe(false);
     expect(helper.calls[0]!.runtimeIgnoreFiles).toContain('.cursorignore');
@@ -4593,7 +4594,7 @@ describe('WorkflowOrchestrator P3 — agentType / model / isolation / schema', (
   });
 
   it('workingDir refuses a worktree a background fix of /autofix-pr works in', async () => {
-    const wt = '/fake/repo/.qwen/tmp/review-pr-7';
+    const wt = '/fake/repo/.mariadb-shell-agent/tmp/review-pr-7';
     grantUnattendedFixes('wf-session', {
       pr: 7,
       worktree: wt,
@@ -4716,7 +4717,9 @@ describe('WorkflowOrchestrator P3 — agentType / model / isolation / schema', (
 
   it("waits for a dropped fix's agent to settle before it pins an agent to that worktree", async () => {
     try {
-      const fix = await fixAt('/fake/repo/.qwen/tmp/review-pr-7');
+      const fix = await fixAt(
+        '/fake/repo/.mariadb-shell-agent/tmp/review-pr-7',
+      );
       fix.drop();
       let returned = false;
       const pinned = dispatchVia({ onCreate: ends('pinned') }, 'hi', PINNED);
@@ -4800,7 +4803,7 @@ describe('WorkflowOrchestrator P3 — agentType / model / isolation / schema', (
     const { config } = fakeConfigWithMgr({});
     // A target dir that looks nested-worktree-ish.
     (config as unknown as { getTargetDir: () => string }).getTargetDir = () =>
-      '/some/repo/.qwen/worktrees/agent-existing/inner';
+      '/some/repo/.mariadb-shell-agent/worktrees/agent-existing/inner';
     await expect(
       createProductionDispatch(config)('hi', { isolation: 'worktree' }),
     ).rejects.toThrow(/already inside a worktree/);
@@ -4896,7 +4899,7 @@ describe('WorkflowOrchestrator P3 — agentType / model / isolation / schema', (
       'hi',
       { model: 'qwen3-max', isolation: 'worktree' },
     );
-    const worktree = '/fake/repo/.qwen/worktrees/agent-deadbe1';
+    const worktree = '/fake/repo/.mariadb-shell-agent/worktrees/agent-deadbe1';
     const runtime = calls[0].runtimeContext;
     expect(calls[0].config.model).toBe('qwen3-max');
     // The default-clean stub auto-removes; no suffix expected.
@@ -4910,7 +4913,7 @@ describe('WorkflowOrchestrator P3 — agentType / model / isolation / schema', (
     // path is not on disk, so assert presence, not resolved directories.
     expect(runtime.getWorkspaceContext()).toBeDefined();
     expect(runtime.getFileService().getQwenIgnoreFileNamesDisplay()).toBe(
-      '.qwenignore, .cursorignore',
+      '.mariadb-shell-agentignore, .cursorignore',
     );
     expect(config.getTargetDir()).toBe('/fake/repo');
   });

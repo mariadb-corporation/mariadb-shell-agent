@@ -2,7 +2,7 @@
 
 [English](2026-10-14-managed-close-stops-child-turn.md) | [简体中文](2026-10-14-managed-close-stops-child-turn.zh-CN.md)
 
-Status: implemented in this change. Delivers [#13875](https://github.com/QwenLM/qwen-code/issues/13875), finding 2 of [H4f](2026-10-10-managed-task-cancel.md)'s real-stack acceptance. Unit-level validation is done; the real-stack acceptance probes of the issue are listed under Validation and remain to be rerun.
+Status: implemented in this change. Delivers [#13875](https://github.invalid/QwenLM/qwen-code/issues/13875), finding 2 of [H4f](2026-10-10-managed-task-cancel.md)'s real-stack acceptance. Unit-level validation is done; the real-stack acceptance probes of the issue are listed under Validation and remain to be rerun.
 
 ## Problem
 

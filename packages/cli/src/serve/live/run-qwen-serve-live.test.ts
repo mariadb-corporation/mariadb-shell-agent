@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -64,7 +65,7 @@ afterEach(async () => {
   );
 });
 
-describe('qwen serve Live Host discovery', () => {
+describe('mariadb-shell-agent serve Live Host discovery', () => {
   it('publishes the authenticated listener and removes only its own record', async () => {
     const runtime = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qwen-serve-live-'),

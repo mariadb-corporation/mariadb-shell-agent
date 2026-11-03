@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -702,7 +703,7 @@ describe('OpenTuiArenaDialog select pane charging', () => {
     );
     expect(
       screen.getByText(
-        'https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/#modelproviders',
+        'https://qwenlm.github.invalid/qwen-code-docs/en/users/configuration/settings/#modelproviders',
       ),
     ).toBeTruthy();
     expect(screen.getByText(/\[openai\] model-1/)).toBeTruthy();

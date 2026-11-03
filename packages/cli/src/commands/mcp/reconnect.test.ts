@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -365,7 +366,7 @@ describe('mcp reconnect command', () => {
         '✗ server-two: Failed - Timeout',
       );
       // A partial failure must still exit non-zero so wrapper scripts
-      // (`qwen mcp reconnect --all || alert`) can see it — matching the
+      // (`mariadb-shell-agent mcp reconnect --all || alert`) can see it — matching the
       // single-server path, which exits 1 for the identical failure.
       expect(mockWriteStderrLine).toHaveBeenCalledWith(
         'Failed to reconnect 1 of 2 configured server(s).',
@@ -375,7 +376,7 @@ describe('mcp reconnect command', () => {
       // exactly when the user's running session still has broken tools.
       expect(mockWriteStdoutLine).toHaveBeenCalledWith(
         expect.stringContaining(
-          'cannot refresh the MCP tools of an already-running Qwen Code session',
+          'cannot refresh the MCP tools of an already-running MariaDB Shell Agent session',
         ),
       );
     });
@@ -420,7 +421,7 @@ describe('mcp reconnect command', () => {
 
       expect(mockWriteStdoutLine).toHaveBeenCalledWith(
         expect.stringContaining(
-          'cannot refresh the MCP tools of an already-running Qwen Code session',
+          'cannot refresh the MCP tools of an already-running MariaDB Shell Agent session',
         ),
       );
     });
@@ -441,7 +442,7 @@ describe('mcp reconnect command', () => {
 
       expect(mockWriteStdoutLine).toHaveBeenCalledWith(
         expect.stringContaining(
-          'cannot refresh the MCP tools of an already-running Qwen Code session',
+          'cannot refresh the MCP tools of an already-running MariaDB Shell Agent session',
         ),
       );
     });
@@ -468,7 +469,7 @@ describe('mcp reconnect command', () => {
       expect(mockProcessExit).toHaveBeenCalledWith(1);
       expect(mockWriteStdoutLine).toHaveBeenCalledWith(
         expect.stringContaining(
-          'cannot refresh the MCP tools of an already-running Qwen Code session',
+          'cannot refresh the MCP tools of an already-running MariaDB Shell Agent session',
         ),
       );
     });
@@ -535,7 +536,7 @@ describe('mcp reconnect command', () => {
       expect(mockProcessExit).toHaveBeenCalledWith(1);
       expect(mockWriteStdoutLine).toHaveBeenCalledWith(
         expect.stringContaining(
-          'cannot refresh the MCP tools of an already-running Qwen Code session',
+          'cannot refresh the MCP tools of an already-running MariaDB Shell Agent session',
         ),
       );
     });
@@ -679,7 +680,7 @@ describe('mcp reconnect command', () => {
         '- server-two: Skipped - server is pending approval (.mcp.json)',
       );
       // Nothing was attempted-and-failed: no failure summary, exit 0. A
-      // wrapper running `qwen mcp reconnect --all || alert` must not alert
+      // wrapper running `mariadb-shell-agent mcp reconnect --all || alert` must not alert
       // on an intentional skip.
       expect(mockWriteStderrLine).not.toHaveBeenCalled();
       expect(mockProcessExit).not.toHaveBeenCalled();

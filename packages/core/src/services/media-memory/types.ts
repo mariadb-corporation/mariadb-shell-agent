@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -237,7 +238,7 @@ export interface NormalizedPolicyOutput {
 // ─── Store snapshot shape (v1 JSON backend) ─────────────────────────────
 
 /** Whole-store snapshot persisted as one JSON document. v1 keeps the
- * entire graph in one file (`.qwen/omni/memory.json`) — swapping the
+ * entire graph in one file (`.mariadb-shell-agent/omni/memory.json`) — swapping the
  * backend later changes only the store internals (S4 precedent D2). */
 export interface MediaMemorySnapshot {
   schemaVersion: 1;

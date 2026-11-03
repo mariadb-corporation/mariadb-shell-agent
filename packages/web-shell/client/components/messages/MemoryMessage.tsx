@@ -73,14 +73,14 @@ export function MemoryMessage({
         scope: 'workspace',
         title: t('memory.project'),
         description: t('memory.project.desc'),
-        fallbackPath: 'QWEN.md',
+        fallbackPath: 'MARIADB-SHELL-AGENT.md',
         file: workspaceFile,
       },
       {
         scope: 'global',
         title: t('memory.global'),
         description: t('memory.global.desc'),
-        fallbackPath: '~/.qwen/QWEN.md',
+        fallbackPath: '~/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md',
         file: globalFile,
       },
     ];

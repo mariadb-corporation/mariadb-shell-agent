@@ -41,7 +41,7 @@ Declaration resolution and prompt refresh must finish before a fresh request sta
 
 ## Validation plan
 
-Attempt the baseline with global `qwen`; inspect actual requests to a local mock OpenAI provider where the Hosted route is available. Use the real Hosted Harness model integration boundary when the global route requires unavailable SQL/Broker infrastructure.
+Attempt the baseline with global `mariadb-shell-agent`; inspect actual requests to a local mock OpenAI provider where the Hosted route is available. Use the real Hosted Harness model integration boundary when the global route requires unavailable SQL/Broker infrastructure.
 
 Cover no tools, the five-tool profile (`read_file`, `write_file`, `edit`, `run_shell_command`, `monitor`), search/Agent additions and removals, unchanged reordered names, and recorded model-request replay followed by a fresh round. Assert both request tool schemas and generated tool guidance/examples. Also verify core policy and the order of Agent instructions and Workspace context.
 

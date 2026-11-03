@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -127,7 +128,7 @@ describe('loadDaemonVoiceContext', () => {
           'internal-asr': [
             {
               id: 'qwen3-asr-flash',
-              baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+              baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
               envKey: 'DASHSCOPE_API_KEY',
             },
           ],

@@ -33,7 +33,7 @@ qwen-code 当前把 **Ctrl+O 绑定为 `TOGGLE_COMPACT_MODE`**：一个**全局�
 
 这造成了"**精简模式 vs 详细模式**"的全局割裂：同一段历史会因为一个全局开关在两种完全不同的形态间整体跳变，心智负担大、视觉抖动明显，且与上游 gemini-cli、与 Claude Code 的设计哲学都背离。
 
-> **本方案叠加在 [#5661](https://github.com/QwenLM/qwen-code/pull/5661) 的 partition 基线之上（已合入 main）。** #5661 重构了工具组的默认渲染：把 `CompactToolGroupDisplay` 扩展为**按类别分区的摘要渲染器**（`ToolCategory` / `TOOL_NAME_TO_CATEGORY` / `CATEGORY_ORDER` / `getToolCategory` / `buildToolSummary`），并把 `ToolGroupMessage` 的折叠决策改为 **type-based partition**：用 `forceExpandAll` 逆向门控，把工具**按类型**拆成 `collapsibleTools`（read/search/list，经 `isCollapsibleTool(name)`）→ 折叠成 `CompactToolGroupDisplay` 分区摘要，与 `nonCollapsibleTools`（edit/write/command/agent 及 Canceled）→ **始终逐个** `ToolMessage`。**注意：#5661 与 `compactMode` 无关**——`compactMode` 不再影响工具渲染，分区折叠纯由工具类型 + `forceExpandAll` 决定。本 PR **不重建工具渲染基线**——它在 #5661 的 partition 基线 + #5751 的鼠标基础设施之上，叠加 (1) 删除残留的全局 `compactMode`、(2) Ctrl+O transcript 全详情屏、(3) 鼠标点击就地展开工具块。详见 §3.1（partition 基线）、§4.1 / §5（删除清单）、§9（栈式 commit 拆分）。
+> **本方案叠加在 [#5661](https://github.invalid/QwenLM/qwen-code/pull/5661) 的 partition 基线之上（已合入 main）。** #5661 重构了工具组的默认渲染：把 `CompactToolGroupDisplay` 扩展为**按类别分区的摘要渲染器**（`ToolCategory` / `TOOL_NAME_TO_CATEGORY` / `CATEGORY_ORDER` / `getToolCategory` / `buildToolSummary`），并把 `ToolGroupMessage` 的折叠决策改为 **type-based partition**：用 `forceExpandAll` 逆向门控，把工具**按类型**拆成 `collapsibleTools`（read/search/list，经 `isCollapsibleTool(name)`）→ 折叠成 `CompactToolGroupDisplay` 分区摘要，与 `nonCollapsibleTools`（edit/write/command/agent 及 Canceled）→ **始终逐个** `ToolMessage`。**注意：#5661 与 `compactMode` 无关**——`compactMode` 不再影响工具渲染，分区折叠纯由工具类型 + `forceExpandAll` 决定。本 PR **不重建工具渲染基线**——它在 #5661 的 partition 基线 + #5751 的鼠标基础设施之上，叠加 (1) 删除残留的全局 `compactMode`、(2) Ctrl+O transcript 全详情屏、(3) 鼠标点击就地展开工具块。详见 §3.1（partition 基线）、§4.1 / §5（删除清单）、§9（栈式 commit 拆分）。
 >
 > **修订说明（rebase 到 #5661 合入态）**：本文档早期版本基于 #5661 的早期 state-based 快照（`showCompact = (compactMode || allComplete)`、整组完成即整组折叠）撰写。#5661 在 review 中演进为上述 **type-based partition** 并已合入 main。§3.1 / §4.1 / §4.5 / 附录已据真实合入实现改写：核心符号是 `isCollapsibleTool` / `forceExpandAll`（**它们确实存在**），transcript 的 `fullDetail` 直接置 `forceExpandAll=true`（而非改一个已不存在的 `showCompact`）。
 
@@ -80,7 +80,7 @@ qwen-code 当前把 **Ctrl+O 绑定为 `TOGGLE_COMPACT_MODE`**：一个**全局�
 
 ### 3.1 默认基线（主视图）= #5661 的 partition 模型
 
-主视图对**所有历史项**采用单一、稳定的渲染规则，**不存在任何全局开关切换它**。该基线**不是本方案自建**，而是 [#5661](https://github.com/QwenLM/qwen-code/pull/5661) 已落地的 **type-based partition（按工具类型分区折叠）模型**——本方案保留它不动，仅删除与之无关的全局 `compactMode` 开关：
+主视图对**所有历史项**采用单一、稳定的渲染规则，**不存在任何全局开关切换它**。该基线**不是本方案自建**，而是 [#5661](https://github.invalid/QwenLM/qwen-code/pull/5661) 已落地的 **type-based partition（按工具类型分区折叠）模型**——本方案保留它不动，仅删除与之无关的全局 `compactMode` 开关：
 
 | 块类型                                                          | 默认基线渲染（#5661 type-based partition 模型）                                                                                                                                                                 | 是否在 transcript 才看全         |
 | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
@@ -289,7 +289,7 @@ transcript 走 alt-screen 接管整屏，但后台对话仍在跑——这带来
 
 除键盘（Ctrl+O→transcript、Alt+T→思考块）外,（后续 PR）提供**鼠标点击**作为就地展开的第二通道。以下为该 follow-up 的设计草案。
 
-**与 [#5751](https://github.com/QwenLM/qwen-code/pull/5751) 的分工（依赖关系，不重复造轮子）**：
+**与 [#5751](https://github.invalid/QwenLM/qwen-code/pull/5751) 的分工（依赖关系，不重复造轮子）**：
 
 - **#5751（已合入 main，2026-06-23）提供"鼠标基础设施"**：把终端鼠标追踪从 per-component 启停改为**全局引用计数**（修复"折叠块卸载时误关鼠标，导致 VP 下鼠标失效"）、为 `ScrollableList`/`VirtualizedList` 增加滚轮滚动与**滚动条点击拖拽**。涉及 `useMouseEvents.ts`、`ScrollableList.tsx`、`VirtualizedList.tsx`。本设计基于其已合入的基础设施。
 - **本 PR 不改这些鼠标底座文件**，避免与 #5751 冲突/重复；待 #5751 合入 main 后 rebase，在其稳定的鼠标基础上叠加下述"点击工具块展开"。若 #5751 迟迟未合并，再评估 cherry-pick（默认走依赖路径）。
@@ -473,7 +473,7 @@ claude code 的机制是"**存储层保留完整、显示层按 `verbose` 截断
 
 ## 9. 落地拆分（单 PR + 内部分 commit）
 
-本 PR 实现按 commit 拆分以便 review/回滚（下表为**实际/计划状态**，非纯 design-first 的"先文档后实现"）。**依赖基线 [#5661](https://github.com/QwenLM/qwen-code/pull/5661)（partition 基线）+ [#5751](https://github.com/QwenLM/qwen-code/pull/5751)（鼠标基础设施）均已合入 main**，本分支已 rebase 其上。**每个 commit 必须自身可编译可测**：
+本 PR 实现按 commit 拆分以便 review/回滚（下表为**实际/计划状态**，非纯 design-first 的"先文档后实现"）。**依赖基线 [#5661](https://github.invalid/QwenLM/qwen-code/pull/5661)（partition 基线）+ [#5751](https://github.invalid/QwenLM/qwen-code/pull/5751)（鼠标基础设施）均已合入 main**，本分支已 rebase 其上。**每个 commit 必须自身可编译可测**：
 
 1. `commit 1` — **删残留全局 compactMode（保留 type-based partition 基线）**：删 `CompactModeContext`/`useCompactMode`/`compactMode` settings(schema)/i18n，删失去引用的 `mergeCompactToolGroups.ts`（含 `compactToggleHasVisualEffect`）。**不动** `ToolGroupMessage` 的 `forceExpandAll`/分区决策（无 `showCompact`/`compactMode ||` 可删）。同步引入 `fullDetail` prop（默认 false）穿过 `HistoryItemDisplay`/`ToolGroupMessage`，并把 `fullDetail` 并入 `forceExpandAll`/`forceShowResult`、思考块折入 `resolvedThoughtExpanded`；主视图不传（沿用 #5661 的 type-based partition）。完成后主视图即为"#5661 type-based partition 基线、无全局开关"，Ctrl+O 暂为 no-op。
 2. `commit 2` — 接入 alt-screen 能力：**复用现有 `AlternateScreen.tsx`（PR #5627）**，验证 `disabled={useVP}` 跳过 double-enter、退出 `refreshStatic()` 重绘 + `isTranscriptOpenRef` 守卫期间 refreshStatic、非 TTY 退化。仅加能力、不接线。
@@ -489,7 +489,7 @@ claude code 的机制是"**存储层保留完整、显示层按 `verbose` 截断
 
 ## 10. 与既有设计文档 #3100 的互鉴
 
-前序工作 [PR #3100](https://github.com/QwenLM/qwen-code/pull/3100) 已产出 `docs/design/compact-mode/compact-mode-design.md`（284 行竞品分析）。本方案与之的关系：
+前序工作 [PR #3100](https://github.invalid/QwenLM/qwen-code/pull/3100) 已产出 `docs/design/compact-mode/compact-mode-design.md`（284 行竞品分析）。本方案与之的关系：
 
 1. **我们采纳了它分析过、但当时没走的那条路**。#3100 §4.4 已对比 "screen-level transcript（Claude Code）" vs "component-level toggle（qwen 当时选择）"，并指出前者"更简单、一致性有保证"。本方案正是转向 screen-level transcript。
 2. **修正一处事实错误**：#3100 表格断言 Claude Code "Frozen snapshot: None (no concept)"。经 claude-code 最新源码取证，**确有冻结快照**（`frozenTranscriptState` + `messages.slice(0, len)`）。本方案据真实实现采用冻结快照，并在 §3.2 标注来源。

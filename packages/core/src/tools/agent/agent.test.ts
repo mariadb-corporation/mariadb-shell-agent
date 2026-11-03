@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -316,14 +317,14 @@ describe('AgentTool', () => {
       description: 'Specialized agent for searching and analyzing files',
       systemPrompt: 'You are a file search specialist.',
       level: 'project',
-      filePath: '/project/.qwen/agents/file-search.md',
+      filePath: '/project/.mariadb-shell-agent/agents/file-search.md',
     },
     {
       name: 'code-review',
       description: 'Agent for reviewing code quality and best practices',
       systemPrompt: 'You are a code review specialist.',
       level: 'user',
-      filePath: '/home/user/.qwen/agents/code-review.md',
+      filePath: '/home/user/.mariadb-shell-agent/agents/code-review.md',
     },
   ];
 
@@ -409,7 +410,9 @@ describe('AgentTool', () => {
       getToolRegistry: vi.fn().mockReturnValue(stubToolRegistry),
       createToolRegistry: vi.fn().mockResolvedValue(stubToolRegistry),
       storage: {
-        getProjectDir: vi.fn().mockReturnValue('/test/project/.qwen'),
+        getProjectDir: vi
+          .fn()
+          .mockReturnValue('/test/project/.mariadb-shell-agent'),
       },
     } as unknown as Config;
 
@@ -577,10 +580,10 @@ describe('AgentTool', () => {
     vi.mocked(config.getHookSystem).mockReturnValue(mockHookSystem);
     return mockHookSystem;
   };
-  /** Adds a linked worktree on a new branch (default `.qwen/tmp/review-pr-1`). */
+  /** Adds a linked worktree on a new branch (default `.mariadb-shell-agent/tmp/review-pr-1`). */
   const addWorktree = (
     repo: string,
-    wt = path.join(repo, '.qwen', 'tmp', 'review-pr-1'),
+    wt = path.join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
     args = ['-b', 'review-pr-1'],
   ) => {
     fs.mkdirSync(path.dirname(wt), { recursive: true });
@@ -1333,7 +1336,7 @@ describe('AgentTool', () => {
       expect(forkProfile.minLength).toBe(2);
       expect(forkProfile.maxLength).toBe(50);
       expectText(forkProfile.description, [
-        '.qwen/fork-profiles/<name>.md',
+        '.mariadb-shell-agent/fork-profiles/<name>.md',
         'Cannot be combined with fork_tools',
       ]);
     });
@@ -1400,7 +1403,7 @@ describe('AgentTool', () => {
     };
     const todoIdError =
       'Parameter "todo_id" must be a non-empty string of at most 500 characters.';
-    const reviewDir = '.qwen/tmp/review-pr-1';
+    const reviewDir = '.mariadb-shell-agent/tmp/review-pr-1';
 
     // title → [params over validParams, expected (null = valid, string =
     // exact message, RegExp = match), team manager (omitted = untouched,
@@ -1567,7 +1570,7 @@ describe('AgentTool', () => {
       'accepts redundant isolation for a named worktree teammate': [
         {
           name: 'writer',
-          working_dir: '.qwen/tmp/writer',
+          working_dir: '.mariadb-shell-agent/tmp/writer',
           isolation: 'worktree',
         },
         null,
@@ -1992,14 +1995,17 @@ describe('AgentTool', () => {
           prompt: 'Review the diff',
           subagent_type: 'file-search',
           name: 'reviewer',
-          working_dir: '.qwen/tmp/review-pr-1',
+          working_dir: '.mariadb-shell-agent/tmp/review-pr-1',
           isolation: 'worktree',
         });
         expect(spawnTeammate).toHaveBeenCalledWith(
           expect.objectContaining({
             name: 'reviewer',
             // path.resolve'd, so platform-normalized (backslashes on Windows).
-            cwd: path.resolve('/test/project', '.qwen/tmp/review-pr-1'),
+            cwd: path.resolve(
+              '/test/project',
+              '.mariadb-shell-agent/tmp/review-pr-1',
+            ),
           }),
         );
       } finally {
@@ -2012,7 +2018,10 @@ describe('AgentTool', () => {
         branch: 'worktree-writer',
         headCommit: 'abc123',
       }));
-      const wt = path.resolve('/test/project', '.qwen/tmp/review-pr-1');
+      const wt = path.resolve(
+        '/test/project',
+        '.mariadb-shell-agent/tmp/review-pr-1',
+      );
       grantUnattendedFixes('test-session-id', {
         pr: 1,
         worktree: canonicalWorktreePath(wt),
@@ -2046,7 +2055,7 @@ describe('AgentTool', () => {
           prompt: 'Review the diff',
           subagent_type: 'file-search',
           name: 'reviewer',
-          working_dir: '.qwen/tmp/review-pr-1',
+          working_dir: '.mariadb-shell-agent/tmp/review-pr-1',
         });
         expect(spawnTeammate).not.toHaveBeenCalled();
         expect(textOf(result)).toMatch(
@@ -2117,7 +2126,7 @@ describe('AgentTool', () => {
             prompt: 'Make the change',
             subagent_type: 'file-search',
             name: 'writer',
-            working_dir: '.qwen/tmp/writer',
+            working_dir: '.mariadb-shell-agent/tmp/writer',
           })
           .execute(controller.signal);
         expect(spawnTeammate).not.toHaveBeenCalled();
@@ -2279,7 +2288,7 @@ describe('AgentTool', () => {
       description,
       systemPrompt,
       level: 'project' as const,
-      filePath: `/project/.qwen/agents/${name}.md`,
+      filePath: `/project/.mariadb-shell-agent/agents/${name}.md`,
     });
 
     it('should refresh when change listener fires', async () => {
@@ -2439,7 +2448,7 @@ describe('AgentTool', () => {
       loadBackgroundDefinition();
       const updates: AgentResultDisplay[] = [];
       const result = await run(
-        review('.qwen/tmp/review-pr-1'),
+        review('.mariadb-shell-agent/tmp/review-pr-1'),
         undefined,
         (output) => {
           updates.push(output as AgentResultDisplay);
@@ -2597,9 +2606,9 @@ describe('AgentTool', () => {
     it('marks a worktree provisioning failure as a failed tool call (#9509)', async () => {
       loadFirstSubagent();
       // The nested-isolation guard fires before any git probe, so a cwd in
-      // `.qwen/worktrees/` (no repo) makes failWorktreeProvisioning() return.
+      // `.mariadb-shell-agent/worktrees/` (no repo) makes failWorktreeProvisioning() return.
       vi.mocked(config.getTargetDir).mockReturnValue(
-        '/test/project/.qwen/worktrees/agent-outer',
+        '/test/project/.mariadb-shell-agent/worktrees/agent-outer',
       );
       const result = await run(
         {
@@ -2630,7 +2639,7 @@ describe('AgentTool', () => {
         expect(agentConfig.getProjectRoot()).not.toBe(repo);
         expect(
           agentConfig.getFileService().getQwenIgnoreFileNamesDisplay(),
-        ).toBe('.qwenignore, .cursorignore');
+        ).toBe('.mariadb-shell-agentignore, .cursorignore');
         expect(
           agentConfig.getFileService().shouldQwenIgnoreFile('secret.txt'),
         ).toBe(true);
@@ -2646,7 +2655,7 @@ describe('AgentTool', () => {
     itInRepo(
       'pins the sub-agent to a caller-owned worktree via working_dir and leaves it in place',
       async (repo) => {
-        // Like the one `/review`'s fetch-pr provisions (`.qwen/tmp/...`).
+        // Like the one `/review`'s fetch-pr provisions (`.mariadb-shell-agent/tmp/...`).
         const wt = addWorktree(repo);
         const result = await run(review(wt));
         // Every cwd surface is rebound to the caller's worktree...
@@ -2744,7 +2753,7 @@ describe('AgentTool', () => {
           const wt = addWorktree(repo);
           const other = addWorktree(
             repo,
-            path.join(repo, '.qwen', 'tmp', 'review-pr-2'),
+            path.join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-2'),
             ['-b', 'review-pr-2'],
           );
           vi.mocked(config.isTrustedFolder).mockReturnValue(true);
@@ -2803,7 +2812,7 @@ describe('AgentTool', () => {
             .mock.calls.at(-1)?.[0] as AgentTaskRegistration | undefined;
 
         it("takes working_dir with run_in_background only for a granted worktree's general-purpose agent", () => {
-          const wt = '/test/project/.qwen/tmp/autofix-pr-7';
+          const wt = '/test/project/.mariadb-shell-agent/tmp/autofix-pr-7';
           expect(agentTool.validateToolParams(bgFix(wt))).toMatch(
             /incompatible/,
           );
@@ -2812,7 +2821,7 @@ describe('AgentTool', () => {
           // Relative, as the session's directory resolves it.
           expect(
             agentTool.validateToolParams(
-              bgFix(path.join('.qwen', 'tmp', 'autofix-pr-7')),
+              bgFix(path.join('.mariadb-shell-agent', 'tmp', 'autofix-pr-7')),
             ),
           ).toBeNull();
           expect(
@@ -3124,10 +3133,12 @@ describe('AgentTool', () => {
     itInRepo(
       'resolves a repo-relative working_dir against the parent cwd (the /review production form)',
       async (repo) => {
-        // fetch-pr creates <cwd>/.qwen/tmp/review-pr-<n>; the /review skill
+        // fetch-pr creates <cwd>/.mariadb-shell-agent/tmp/review-pr-<n>; the /review skill
         // passes that relative path verbatim, which must resolve to it.
         const wt = addWorktree(repo);
-        await run(review(path.join('.qwen', 'tmp', 'review-pr-1')));
+        await run(
+          review(path.join('.mariadb-shell-agent', 'tmp', 'review-pr-1')),
+        );
         expectRebound(wt);
       },
     );
@@ -3198,10 +3209,14 @@ describe('AgentTool', () => {
       'resolves a repo-relative working_dir against the subdirectory cwd, not the repo root (monorepo)',
       async (repo) => {
         // fetch-pr creates the worktree cwd-relative (as git resolves it), so
-        // from a package dir it lands under the SUBDIR's .qwen, and the pin
-        // must resolve there, not to <repo>/.qwen/tmp/review-pr-1.
+        // from a package dir it lands under the SUBDIR's .mariadb-shell-agent, and the pin
+        // must resolve there, not to <repo>/.mariadb-shell-agent/tmp/review-pr-1.
         const subdir = path.join(repo, 'packages', 'core');
-        const relative = path.join('.qwen', 'tmp', 'review-pr-1');
+        const relative = path.join(
+          '.mariadb-shell-agent',
+          'tmp',
+          'review-pr-1',
+        );
         const wt = path.join(subdir, relative);
         fs.mkdirSync(path.dirname(wt), { recursive: true });
         execFileSync(
@@ -3603,7 +3618,11 @@ describe('AgentTool', () => {
       body: (profileDir: string, runtimeDir: string) => Promise<void>,
     ) =>
       withTempDir(prefix, async (projectRoot) => {
-        const profileDir = path.join(projectRoot, '.qwen', 'fork-profiles');
+        const profileDir = path.join(
+          projectRoot,
+          '.mariadb-shell-agent',
+          'fork-profiles',
+        );
         fs.mkdirSync(profileDir, { recursive: true });
         for (const [name, text] of Object.entries(profiles))
           fs.writeFileSync(path.join(profileDir, `${name}.md`), text);
@@ -4870,7 +4889,7 @@ describe('AgentTool', () => {
       description: 'Background monitor agent',
       systemPrompt: 'You are a monitor.',
       level: 'project',
-      filePath: '/project/.qwen/agents/monitor.md',
+      filePath: '/project/.mariadb-shell-agent/agents/monitor.md',
       background: true,
     };
 

@@ -53,7 +53,7 @@ CA 签发给经过验证的法律实体的证书，例如公司签名服务、Az
 ## 当前状态与待满足条件
 
 截至 2026-10-22，`SIGNPATH_API_TOKEN` 已配置，原始 PE 配置和测试签名策略有效。
-[运行 39793940639](https://github.com/QwenLM/qwen-code/actions/runs/39793940639)
+[运行 39793940639](https://github.invalid/QwenLM/qwen-code/actions/runs/39793940639)
 构建了两个 Windows 目标，但 GitHub 连接器报错
 `Failed to retrieve GitHub App token`，因此改为直接调用 API 的设计。PR 保持
 Draft，等待直接 API 的 dry run 与 Windows 验收。本工作不授权任何发布或 npm 发布。

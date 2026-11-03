@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -163,7 +164,7 @@ export class ExtensionDirectoryLockedError extends Error {
 
   constructor(directory: string, options?: ErrorOptions) {
     super(
-      `Extension directory ${directory} is in use by a process holding it open. Exit any Qwen Code session that has this extension loaded - including this one - or close any other program holding this directory open, then try again.`,
+      `Extension directory ${directory} is in use by a process holding it open. Exit any MariaDB Shell Agent session that has this extension loaded - including this one - or close any other program holding this directory open, then try again.`,
       options,
     );
     this.name = 'ExtensionDirectoryLockedError';

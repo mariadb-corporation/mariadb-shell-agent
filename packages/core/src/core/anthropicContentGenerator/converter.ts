@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -118,7 +119,7 @@ export interface ConvertLlmRequestToAnthropicOptions {
    * models (whose unsigned blocks are owned by
    * `dropUnsignedAssistantThinking`) and off native base URLs, so the two
    * passes stay disjoint and native API history is left untouched.
-   * https://github.com/QwenLM/qwen-code/issues/11772
+   * https://github.invalid/QwenLM/qwen-code/issues/11772
    */
   fillUnsignedThinkingSignature?: boolean;
   /**
@@ -144,7 +145,7 @@ export interface ConvertLlmRequestToAnthropicOptions {
    *
    * Must be gated on the same per-request condition that emits the
    * top-level `thinking` config so disabled-thinking requests don't ship
-   * stray thinking blocks. https://github.com/QwenLM/qwen-code/issues/3786
+   * stray thinking blocks. https://github.invalid/QwenLM/qwen-code/issues/3786
    */
   injectThinkingOnToolUseTurns?: boolean;
   /**
@@ -650,7 +651,7 @@ export class AnthropicContentConverter {
             // on the wire as `thinking.signature`. Drop the payload instead,
             // mirroring the fallback `responses-converter.ts` already applies
             // in the other direction for an unreplayable signature.
-            // https://github.com/QwenLM/qwen-code/issues/9453
+            // https://github.invalid/QwenLM/qwen-code/issues/9453
             if (isResponsesReasoningSignature(part.thoughtSignature)) {
               debugLogger.debug(
                 'Dropping a Responses reasoning replay payload from thoughtSignature',
@@ -1310,7 +1311,7 @@ export class AnthropicContentConverter {
    * Should be paired with `fillMissingThinkingSignatures` running first
    * so that signature-less `thinking` blocks become compliant in place
    * (preserving their original text), and this pass then sees them as
-   * already-satisfying. https://github.com/QwenLM/qwen-code/issues/3786
+   * already-satisfying. https://github.invalid/QwenLM/qwen-code/issues/3786
    */
   private injectEmptyThinkingOnToolUseTurns(
     messages: AnthropicMessageParam[],

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -183,14 +184,14 @@ describe('agent versioned store', () => {
       token: first.token,
       name: 'worker',
       workspaceCwd: '/worker',
-      providers: ['Qwen Code ACP'],
+      providers: ['MariaDB Shell Agent ACP'],
     });
     const fresh = await issueAgentHostEnrollment(PROJECT_ROOT);
 
     await expect(
       heartbeatAgentHost(PROJECT_ROOT, enrolled.host.id, enrolled.secret, {
         workspaceCwd: '/worker',
-        providers: ['Qwen Code ACP'],
+        providers: ['MariaDB Shell Agent ACP'],
         enrollmentToken: fresh.token,
       }),
     ).resolves.toMatchObject({ id: enrolled.host.id });
@@ -199,7 +200,7 @@ describe('agent versioned store', () => {
         token: fresh.token,
         name: 'other',
         workspaceCwd: '/other',
-        providers: ['Qwen Code ACP'],
+        providers: ['MariaDB Shell Agent ACP'],
       }),
     ).rejects.toThrow('Invalid or expired Agent Host enrollment token.');
   });
@@ -235,7 +236,7 @@ describe('agent versioned store', () => {
       PROJECT_ROOT,
       enrolled.host.id,
       enrolled.secret,
-      { workspaceCwd: '/worker', providers: ['Qwen Code ACP'] },
+      { workspaceCwd: '/worker', providers: ['MariaDB Shell Agent ACP'] },
     );
     expect(v1?.programs).toBeUndefined();
     expect(v1?.protocol).toBeUndefined();
@@ -264,14 +265,14 @@ describe('agent versioned store', () => {
       token: first.token,
       name: 'worker',
       workspaceCwd: '/worker',
-      providers: ['Qwen Code ACP'],
+      providers: ['MariaDB Shell Agent ACP'],
     });
     const fresh = await issueAgentHostEnrollment(PROJECT_ROOT);
 
     await expect(
       heartbeatAgentHost(PROJECT_ROOT, enrolled.host.id, 'invalid', {
         workspaceCwd: '/worker',
-        providers: ['Qwen Code ACP'],
+        providers: ['MariaDB Shell Agent ACP'],
         enrollmentToken: fresh.token,
       }),
     ).resolves.toBeUndefined();
@@ -280,7 +281,7 @@ describe('agent versioned store', () => {
         token: fresh.token,
         name: 'replacement',
         workspaceCwd: '/worker',
-        providers: ['Qwen Code ACP'],
+        providers: ['MariaDB Shell Agent ACP'],
       }),
     ).resolves.toMatchObject({ host: { name: 'replacement' } });
   });
@@ -308,7 +309,7 @@ describe('removing and replacing an Agent Host', () => {
       token,
       name,
       workspaceCwd: '/worker',
-      providers: ['Qwen Code ACP'],
+      providers: ['MariaDB Shell Agent ACP'],
     });
   };
 
@@ -384,7 +385,7 @@ describe('removing and replacing an Agent Host', () => {
       token,
       name: 'new',
       workspaceCwd: '/worker',
-      providers: ['Qwen Code ACP'],
+      providers: ['MariaDB Shell Agent ACP'],
     };
     // The new identity is saved, then moving the bindings fails.
     renameFailure.path = getAgentsFilePath(PROJECT_ROOT);
@@ -434,7 +435,7 @@ describe('removing and replacing an Agent Host', () => {
     await expect(
       heartbeatAgentHost(PROJECT_ROOT, old.host.id, old.secret, {
         workspaceCwd: '/worker',
-        providers: ['Qwen Code ACP'],
+        providers: ['MariaDB Shell Agent ACP'],
         enrollmentToken: token,
       }),
     ).rejects.toThrow(AGENT_HOST_REPLACEMENT_REQUIRED);
@@ -446,7 +447,7 @@ describe('removing and replacing an Agent Host', () => {
       token,
       name: 'new',
       workspaceCwd: '/worker',
-      providers: ['Qwen Code ACP'],
+      providers: ['MariaDB Shell Agent ACP'],
     });
     expect(replacement.host.id).not.toBe(old.host.id);
     expect((await readAgentHosts(PROJECT_ROOT)).map((host) => host.id)).toEqual(
@@ -466,7 +467,7 @@ describe('removing and replacing an Agent Host', () => {
         token,
         name: 'new',
         workspaceCwd: '/worker',
-        providers: ['Qwen Code ACP'],
+        providers: ['MariaDB Shell Agent ACP'],
       }),
     ).rejects.toThrow('Agent Host to replace not found.');
   });
@@ -560,7 +561,7 @@ describe('retiring an agent', () => {
       token: enrollment.token,
       name: 'worker',
       workspaceCwd: '/worker',
-      providers: ['Qwen Code ACP'],
+      providers: ['MariaDB Shell Agent ACP'],
     });
     const results = await Promise.all([
       updateWorkspaceAgent(PROJECT_ROOT, ALICE.id, {

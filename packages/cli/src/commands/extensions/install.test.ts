@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -148,7 +149,7 @@ describe('handleInstall', () => {
     );
     // The stubbed resolvers make the settings term the whole story above, so
     // pin the routing itself: replacing the two calls in `install.ts` with raw
-    // `settings.privacy?.usageStatisticsEnabled ?? true` / `settings.proxy`
+    // `settings.privacy?.usageStatisticsEnabled ?? false` / `settings.proxy`
     // reads must red here. The env-vs-settings precedence each resolver
     // implements is pinned where the real ones run (core's `config.test.ts`,
     // and `uninstall.test.ts` / `utils.test.ts` for the call-site env term).

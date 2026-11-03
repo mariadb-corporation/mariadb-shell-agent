@@ -4,7 +4,7 @@
 [简体中文](2026-10-21-opentui-editor-transaction.zh-CN.md)
 
 当前交付（2026-10-21）：本工作与输入所有权、编辑和状态栏统一整合到
-[#14964](https://github.com/QwenLM/qwen-code/pull/14964)。下文原分批边界、代码基线、
+[#14964](https://github.invalid/QwenLM/qwen-code/pull/14964)。下文原分批边界、代码基线、
 验证结果及 stacked PR 转正式步骤均为历史记录；当前推进顺序以
 [交付计划](2026-10-20-opentui-migration-delivery.zh-CN.md)为准。
 统一验收仍待完成，必须以整合提交的新结果为依据。
@@ -14,7 +14,7 @@
 [剪贴板与来源生命周期批次](2026-10-24-opentui-clipboard-source-lifetime.zh-CN.md)让外部编辑继续使用同一原始展开草稿和最终提交所有者。模型归因只在待完成粘贴落定后添加，不由编辑器或已准备的 Retry 重做。该候选验证与下文历史结果分开记录。
 
 A 批基于 U2A `269600799782a5c507d62f3ae0db011c768be234`
-（[#14946](https://github.com/QwenLM/qwen-code/pull/14946)），从完整保存的
+（[#14946](https://github.invalid/QwenLM/qwen-code/pull/14946)），从完整保存的
 U2B v10 候选拆出，使一个完整事务符合预期 2–3k 行审查规模。
 本机作者与独立验证已在新 A 源码和 bundle 上通过：build/typecheck、
 488 项定向、两份原生脚本、三腿各 19 个正式产品场景和 U2A ownership 回归。
@@ -98,7 +98,7 @@ OpenTUI，断言可见文本/光标效果及精确 HTTP 载荷/次数，而非�
 旧树 wrapper 仅换环境变量不能验证 A。保留首次失败、输入 bytes、原始 ANSI、
 可见帧、运行时 hash 和清理结果。修复并验证后完成两遍干净全 diff 自审。
 
-本机 `.qwen/e2e-tests/u2b-editor-transaction-plan.md` 测试计划记录来源映射及
+本机 `.mariadb-shell-agent/e2e-tests/u2b-editor-transaction-plan.md` 测试计划记录来源映射及
 历史证据。独立原生 Markdown 对 `HELD_HEAD_1HELD_TAIL_1` 隐藏词内下划线，
 取消夹具换 sentinel 并未修复该 transcript 差异。OpenTUI 0.6.6 仍有相关
 编辑键位差异，因此本批不升级依赖。

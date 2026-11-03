@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -771,7 +772,7 @@ test('reports a failed runtime sync after saving a context window', async ({
     .getByRole('button', { name: 'save Configured Test Model', exact: true })
     .click();
   await expect(page.getByRole('status')).toContainText(
-    'The change was saved, but running sessions could not be refreshed. Restart qwen serve before using the updated model list.',
+    'The change was saved, but running sessions could not be refreshed. Restart mariadb-shell-agent serve before using the updated model list.',
   );
   await edit.click();
   await expect(page.getByLabel('Context window', { exact: true })).toHaveValue(

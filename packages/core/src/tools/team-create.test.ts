@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,7 +15,7 @@ import { TeamCreateTool } from './team-create.js';
 vi.mock('../config/storage.js', () => {
   let mockDir = '/tmp/test';
   return {
-    QWEN_DIR: '.qwen',
+    QWEN_DIR: '.mariadb-shell-agent',
     Storage: {
       getGlobalQwenDir: () => mockDir,
     },

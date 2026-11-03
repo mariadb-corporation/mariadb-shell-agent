@@ -13,7 +13,7 @@ video understanding when the user asks `/learn` to distill a tutorial.
 `learnCommand` returns a `submit_prompt` action whose content is the string
 produced by `buildLearnSkillPrompt`. The prompt tells the main model to use
 `web_fetch` for URLs and to write one `SKILL.md` below
-`.qwen/skills/learned-skill-<name>/`.
+`.mariadb-shell-agent/skills/learned-skill-<name>/`.
 
 The command result already accepts `PartListUnion`. The OpenAI-compatible
 content converter already maps video `fileData` to an OpenAI `video_url`, and
@@ -39,7 +39,7 @@ direct video-file URL:
 6. The main model writes exactly one learned skill plus a provenance reference:
 
    ```text
-   .qwen/skills/learned-skill-<name>/
+   .mariadb-shell-agent/skills/learned-skill-<name>/
    ├── SKILL.md
    └── references/
        └── source.md
@@ -61,7 +61,7 @@ focus. Arbitrary webpages are not treated as videos.
 Local files use the existing workspace boundary, ignore rules, MIME detection,
 and 10 MB encoded-data limit. `.mp4` uses `video/mp4`; other direct-file
 extensions use their corresponding video MIME type. Direct remote URLs are
-passed to the active model provider without a Qwen Code download.
+passed to the active model provider without a MariaDB Shell Agent download.
 
 YouTube watch pages are not video files. They are detected and rejected with
 guidance to download the video and pass the local file. This is deliberate:

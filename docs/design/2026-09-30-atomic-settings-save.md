@@ -4,7 +4,7 @@
 
 Status: implemented; macOS verification passes; maintainer reports native Linux acceptance at `d0be922868`; native Windows checks remain open.
 Date: 2026-09-30.
-Issue: [#12417](https://github.com/QwenLM/qwen-code/issues/12417).
+Issue: [#12417](https://github.invalid/QwenLM/qwen-code/issues/12417).
 Source baseline: 3a8fd11711a10b9a2435bd0051485e31479e90ae.
 
 ## Problem and evidence
@@ -17,17 +17,17 @@ sandbox policy from a concurrent startup.
 
 An independent controlled reproduction used the real baseline writer and
 reader, plus global qwen 0.24.6 on macOS arm64 / Node.js 22.14.0. Before and
-after the save, qwen sandbox read the configured policy and exited 1 because
+after the save, mariadb-shell-agent sandbox read the configured policy and exited 1 because
 the selected execution sandbox requires Linux. Pausing immediately after the
 backup rename made the target disappear; the source reader returned no policy
-and a second qwen sandbox exited 0 with "Tool execution sandbox: none".
+and a second mariadb-shell-agent sandbox exited 0 with "Tool execution sandbox: none".
 The writer was resumed and the isolated fixture removed.
 
 This proves an observable intermediate state, not the natural race frequency,
 a Linux tool escaping confinement, or Windows behavior. The historical
 2-in-100 measurement in the issue was not re-executed here. Reproduction
-artifacts are in .qwen/issues/issue-12417.md and
-.qwen/e2e-tests/issue-12417-settings-gap-repro.json.
+artifacts are in .mariadb-shell-agent/issues/issue-12417.md and
+.mariadb-shell-agent/e2e-tests/issue-12417-settings-gap-repro.json.
 
 ## Goals and boundaries
 
@@ -219,7 +219,7 @@ Tests must assert outcomes rather than the number or order of filesystem calls:
 After implementation run build and typecheck from the root, and focused writer,
 JSONC editor, operator-settings, settings, adapter and watcher tests from
 packages/cli. Build the bundle for CLI verification. The detailed plan is
-.qwen/e2e-tests/issue-12417-atomic-settings-save.md.
+.mariadb-shell-agent/e2e-tests/issue-12417-atomic-settings-save.md.
 
 Acceptance: no repository-owned replacement removes the target; readers see
 complete committed bytes; the helper's failure path never rolls back another
@@ -273,14 +273,14 @@ PR-submission run of the same production code at `3923fd845` again completes
 2,300 after release before the first writer completes. Reader sample counts
 vary with process scheduling; these are two separate successful runs, not
 conflicting measurements of one run. The PR E2E comment reports the latter.
-Its raw results are .qwen/e2e-tests/issue-12417-pr-settings-gap-verify.json and
-.qwen/e2e-tests/issue-12417-pr-concurrent-save-verify.json.
-Initial raw evidence is retained in .qwen/e2e-tests/issue-12417-settings-gap-verify.json
-and .qwen/e2e-tests/issue-12417-concurrent-save-verify.json; the corresponding
-scripts are in .qwen/scripts/.
+Its raw results are .mariadb-shell-agent/e2e-tests/issue-12417-pr-settings-gap-verify.json and
+.mariadb-shell-agent/e2e-tests/issue-12417-pr-concurrent-save-verify.json.
+Initial raw evidence is retained in .mariadb-shell-agent/e2e-tests/issue-12417-settings-gap-verify.json
+and .mariadb-shell-agent/e2e-tests/issue-12417-concurrent-save-verify.json; the corresponding
+scripts are in .mariadb-shell-agent/scripts/.
 
 On 2026-09-30, maintainer wenshao supplied [native Linux verification at
-`d0be922868`](https://github.com/QwenLM/qwen-code/pull/13119#issuecomment-5918187683):
+`d0be922868`](https://github.invalid/QwenLM/qwen-code/pull/13119#issuecomment-5918187683):
 Linux 6.12/ext4, Node 22.22 and real bubblewrap 0.12.0, using the bundled CLI.
 The report covers every writer checkpoint, process-kill injection, concurrent
 saves and live watcher behavior. During saves, the admitted policy remains

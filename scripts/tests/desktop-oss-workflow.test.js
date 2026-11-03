@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -225,7 +226,7 @@ describe('Desktop OSS mirror workflow', () => {
     expect(published.id).toBe('published');
     expect(published.env).toMatchObject({
       ALIYUN_OSS_PUBLIC_BASE_URL:
-        "${{ vars.ALIYUN_OSS_PUBLIC_BASE_URL || 'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com' }}",
+        "${{ vars.ALIYUN_OSS_PUBLIC_BASE_URL || 'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.invalid' }}",
       FEED_TAG: '${{ env.DESKTOP_FEED_TAG }}',
       GH_TOKEN: '${{ github.token }}',
       RELEASE_CLOBBER: '${{ inputs.clobber }}',
@@ -507,9 +508,9 @@ describe('Desktop OSS mirror workflow', () => {
     ).toContain('if: "${{ steps.latest.outputs.matches == \'true\' }}"');
   });
 
-  const feedPageTitle = 'Qwen Code Desktop latest (v1.2.3)';
+  const feedPageTitle = 'MariaDB Shell Agent Desktop latest (v1.2.3)';
   const feedPageNotes = expect.stringContaining(
-    'https://github.com/QwenLM/qwen-code/releases/tag/desktop-v1.2.3',
+    'https://github.invalid/QwenLM/qwen-code/releases/tag/desktop-v1.2.3',
   );
   const advanceCalls = [
     ['release', 'view', 'desktop-latest'],
@@ -624,7 +625,7 @@ describe('Desktop OSS mirror workflow', () => {
   it('resolves the release tag parent before the main ancestry check', () => {
     const source = getWorkflowStep(
       getWorkflowJob(releaseWorkflow, 'prepare'),
-      'Resolve Qwen Code source',
+      'Resolve MariaDB Shell Agent source',
     );
     expect(source).toContain(
       'if [ "$GITHUB_REF_NAME" != \'main\' ] && [ "$GITHUB_EVENT_NAME" != \'release\' ]; then',
@@ -656,10 +657,10 @@ describe('Desktop OSS mirror workflow', () => {
 });
 
 describe('Desktop release event', () => {
-  it('installs historical Qwen Code refs with their available lockfile', () => {
+  it('installs historical MariaDB Shell Agent refs with their available lockfile', () => {
     const install = getWorkflowStep(
       getWorkflowJob(releaseWorkflow, 'build'),
-      'Install Qwen Code dependencies',
+      'Install MariaDB Shell Agent dependencies',
     );
     expect(install).toContain("shell: 'bash'");
     expect(install).toContain('if [ -f pnpm-lock.yaml ]');

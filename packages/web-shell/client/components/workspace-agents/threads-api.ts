@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -39,7 +40,7 @@ export interface ThreadsApi {
     runtime?: WorkspaceAgentRuntimeView;
     runtimes?: WorkspaceAgentRuntimeView[];
   }>;
-  /** A single-use token for `qwen serve --join` on another machine. */
+  /** A single-use token for `mariadb-shell-agent serve --join` on another machine. */
   createJoinToken?(supersedesHostId?: string): Promise<JoinToken>;
   removeHost?(hostId: string): Promise<unknown>;
   createShare?(agentId: string): Promise<AgentShare>;

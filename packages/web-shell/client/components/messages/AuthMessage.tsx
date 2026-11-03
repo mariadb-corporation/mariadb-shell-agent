@@ -37,7 +37,7 @@ import { Switch } from '../ui/switch';
 import styles from './AuthMessage.module.css';
 
 const TOS_PRIVACY_URL =
-  'https://qwenlm.github.io/qwen-code-docs/en/users/support/tos-privacy/';
+  'https://qwenlm.github.invalid/qwen-code-docs/en/users/support/tos-privacy/';
 
 type AuthView = 'groups' | 'providers' | 'step' | 'review';
 type AuthGroup = DaemonAuthProviderCatalog['groups'][number];

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -640,7 +641,9 @@ function shouldSkipRuntimeStatusScanDir(name: string, parent: string): boolean {
   if (RUNTIME_STATUS_SCAN_SKIP_DIRS.has(name)) {
     return true;
   }
-  return name === 'worktrees' && path.basename(parent) === '.qwen';
+  return (
+    name === 'worktrees' && path.basename(parent) === '.mariadb-shell-agent'
+  );
 }
 
 async function getRuntimeStatusPathState(
@@ -791,14 +794,18 @@ export async function restoreWorktreeContext(
   }
 
   // Structural sanity check: the worktreePath MUST live under
-  // `<originalCwd>/.qwen/worktrees/`. Schema validation (readWorktreeSession)
+  // `<originalCwd>/.mariadb-shell-agent/worktrees/`. Schema validation (readWorktreeSession)
   // already ensures the fields are strings, but a manually-edited or
   // copy-pasted sidecar could still point worktreePath at an arbitrary
   // existing directory — the model would then be directed to operate
   // there. Restrict to the Qwen-managed worktrees subtree so a
   // tampered sidecar can't redirect file operations to /etc, ~/, etc.
   // (PR #4174 review #3256839787.)
-  const expectedParent = path.join(session.originalCwd, '.qwen', 'worktrees');
+  const expectedParent = path.join(
+    session.originalCwd,
+    '.mariadb-shell-agent',
+    'worktrees',
+  );
   const resolvedWorktree = path.resolve(session.worktreePath);
   if (!resolvedWorktree.startsWith(expectedParent + path.sep)) {
     onWarn?.(

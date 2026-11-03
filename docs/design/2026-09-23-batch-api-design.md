@@ -30,11 +30,11 @@ of items.
 - `disable-model-invocation: true`: only the user can enter the Batch path.
   `/batch`'s description lets the model _suggest_ typing `/batch-api`.
 - `allowedTools` pre-approves read-only tools (`glob`, `grep_search`,
-  `read_file`); writing the plan and `qwen batch run` (which spends money)
+  `read_file`); writing the plan and `mariadb-shell-agent batch run` (which spends money)
   stay behind the approval prompt.
 - Flow:
-  1. `qwen batch --help` confirms the CLI has these subcommands (an older CLI
-     would treat `batch check` as a billed prompt); then `qwen batch check`
+  1. `mariadb-shell-agent batch --help` confirms the CLI has these subcommands (an older CLI
+     would treat `batch check` as a billed prompt); then `mariadb-shell-agent batch check`
      verifies credentials, endpoint and the Batch route
      and shows the settings a run would freeze. Nothing is billed; on
      failure, stop before spending anything on preparation.
@@ -42,13 +42,13 @@ of items.
      the work realtime**.
   3. Prepare lightly: glob the files, read a 2–3 file sample, write the
      shared rules once.
-  4. Write the plan to `.qwen/batch/plans/<slug>.json`.
-  5. Preview with `qwen batch run <plan> --dry-run` (nothing uploaded) and
+  4. Write the plan to `.mariadb-shell-agent/batch/plans/<slug>.json`.
+  5. Preview with `mariadb-shell-agent batch run <plan> --dry-run` (nothing uploaded) and
      show the user the item count, frozen settings and estimate; then submit
-     that exact snapshot with `qwen batch run <plan> --expect <digest>`.
+     that exact snapshot with `mariadb-shell-agent batch run <plan> --expect <digest>`.
      Approving this command is the spending decision, made with the preview
      in view; a batch that changed since the preview is refused.
-  6. Start `qwen batch collect <task-id> --wait` as a background shell and
+  6. Start `mariadb-shell-agent batch collect <task-id> --wait` as a background shell and
      end the turn (§6).
   7. When the waiter exits, the agent is notified once: it reports the
      summary and does only the follow-up the user asked for. It never
@@ -56,7 +56,7 @@ of items.
 - Every command runs as `"${QWEN_CODE_CLI:-qwen}" batch …`, so it reaches the
   CLI running the session.
 
-### 2.2 `qwen batch` subcommands (deterministic executor)
+### 2.2 `mariadb-shell-agent batch` subcommands (deterministic executor)
 
 | Command             | Behavior                                                                                                                                                                          |
 | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -104,7 +104,7 @@ interactive session: batch-auto-collect.ts (started by startPostRenderPrefetches
   provider's batch list by `input_file_id` and **never resubmits blindly**,
   because a wrong answer bills twice.
 - **Records live with the user, not the repository.** Tasks are kept under
-  `~/.qwen/batch` (`QWEN_BATCH_HOME` overrides) with 0700/0600 permissions,
+  `~/.mariadb-shell-agent/batch` (`QWEN_BATCH_HOME` overrides) with 0700/0600 permissions,
   record their project root, and work from any directory. Only the agent's
   plan files stay in the project, git-ignored.
 - **A task is pinned to its endpoint.** `run` freezes the base URL and a
@@ -192,7 +192,7 @@ or unsupported selections fail before upload.
     the custom_id;
   - ids and targets are unique;
   - targets stay inside the project and outside every hidden path (`.git/`,
-    `.github/`, `.qwen/`, … at any depth): delivery runs hours after approval
+    `.github/`, `.mariadb-shell-agent/`, … at any depth): delivery runs hours after approval
     with nobody watching, so it must not create files that configure tools or
     run code, and a target that could not be written is refused before
     anything is billed;
@@ -244,7 +244,7 @@ Waiting never runs the agent loop: HTTP polling does it, and the model is
 involved only once, when results are in.
 
 - **Background waiter (primary).** After `run`, the skill starts
-  `qwen batch collect <task-id> --wait` with the shell tool's
+  `mariadb-shell-agent batch collect <task-id> --wait` with the shell tool's
   `is_background: true`. The process polls (10s → 60s), holds the task lock
   only to collect, writes the targets, prints a summary and exits. The shell
   registry then sends the model one `task-notification` with the output
@@ -269,8 +269,8 @@ involved only once, when results are in.
       endpoint or key (it backs off until the session switches back), or
       three failed passes in a row.
   - `general.batchAutoCollect` (default `true`) turns it off.
-  - Not covered: headless, `qwen serve`, ACP, web-shell — no model-free notice
-    channel there; use `qwen batch collect`.
+  - Not covered: headless, `mariadb-shell-agent serve`, ACP, web-shell — no model-free notice
+    channel there; use `mariadb-shell-agent batch collect`.
 
 ## 7. Non-goals
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -210,12 +211,12 @@ describe('memory configuration', () => {
 describe('memory endpoint derivation', () => {
   it.each([
     [
-      'wss://dashscope.aliyuncs.com/api-ws/v1/realtime?model=qwen',
-      'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      'wss://dashscope.aliyuncs.invalid/api-ws/v1/realtime?model=qwen',
+      'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
     ],
     [
-      'wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime',
-      'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+      'wss://dashscope-intl.aliyuncs.invalid/api-ws/v1/realtime',
+      'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
     ],
     [
       'ws://127.0.0.1:9000/api-ws/v1/realtime',

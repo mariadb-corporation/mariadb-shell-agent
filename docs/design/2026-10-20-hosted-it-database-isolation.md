@@ -9,7 +9,7 @@ Failsafe fork against one disposable MySQL schema. A class closes its Spring
 contexts, but its durable rows remain. The next class's recovery coordinators
 therefore discover operations and Turns belonging to earlier classes. Their
 Runtime credentials and Workspace mounts belong to a different fixture, so
-recovery cannot complete. See [#14850](https://github.com/QwenLM/qwen-code/issues/14850).
+recovery cannot complete. See [#14850](https://github.invalid/QwenLM/qwen-code/issues/14850).
 
 Production recovery deliberately spans tenants. Changing its predicates to
 accommodate test fixtures would weaken the production coverage.

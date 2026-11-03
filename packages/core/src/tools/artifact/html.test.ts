@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -70,7 +71,7 @@ describe('artifact html helpers', () => {
     });
 
     it('accepts external hyperlinks', () => {
-      const ok = `<a href="https://github.com/QwenLM/qwen-code/pull/1">PR</a>`;
+      const ok = `<a href="https://github.invalid/QwenLM/qwen-code/pull/1">PR</a>`;
       expect(validateSelfContained(ok)).toBeNull();
     });
 

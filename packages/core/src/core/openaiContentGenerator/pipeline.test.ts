@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -88,9 +89,9 @@ vi.mock('../../telemetry/gen-ai-request.js', () => ({
   reportOpenAiChunk: mockReportOpenAiChunk,
 }));
 
-const DASHSCOPE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+const DASHSCOPE_URL = 'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
 const TOKEN_PLAN_URL =
-  'https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1';
+  'https://token-plan.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1';
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1';
 /** A connection error naming proxy credentials, and its redacted form. */
 const PROXY_ERROR = 'connect ECONNREFUSED token@proxy.local:8080';
@@ -761,7 +762,7 @@ describe('ContentGenerationPipeline', () => {
           ['gpt-5-pro', 'gpt-6-astra'].map((model) => [
             `preserve required tool selection for name-derived mandatory ${model}`,
             {
-              baseUrl: 'https://idealab.alibaba-inc.com/api/openai/v1',
+              baseUrl: 'https://idealab.alibaba-inc.invalid/api/openai/v1',
               model,
               includeThoughts: false,
               expectedToolChoice: 'required',
@@ -1458,16 +1459,16 @@ describe('ContentGenerationPipeline', () => {
     it.each([
       ['https://api.deepseek.com/v1', 'thinking'],
       [
-        'https://workspace.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+        'https://workspace.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
         'enable_thinking',
       ],
       [TOKEN_PLAN_URL, 'enable_thinking'],
       [DASHSCOPE_URL, 'enable_thinking'],
-      ['https://model-proxy.alibaba-inc.com/v1', 'enable_thinking'],
-      ['https://model-proxy.aliyun-inc.com/v1', 'enable_thinking'],
+      ['https://model-proxy.alibaba-inc.invalid/v1', 'enable_thinking'],
+      ['https://model-proxy.aliyun-inc.invalid/v1', 'enable_thinking'],
       ['https://model-proxy.alicloudapi.com/v1', 'enable_thinking'],
       [
-        'https://gateway.cn-shanghai.pai-eas.aliyuncs.com/api/predict/demo/v1',
+        'https://gateway.cn-shanghai.pai-eas.aliyuncs.invalid/api/predict/demo/v1',
         'enable_thinking',
       ],
     ])(
@@ -1506,7 +1507,7 @@ describe('ContentGenerationPipeline', () => {
     it.each([
       ['https://api.deepseek.com/v1', 'thinking'],
       [TOKEN_PLAN_URL, 'enable_thinking'],
-      ['https://model-proxy.alibaba-inc.com/v1', 'enable_thinking'],
+      ['https://model-proxy.alibaba-inc.invalid/v1', 'enable_thinking'],
     ])(
       'preserves static overrides with built-in and legacy capabilities on %s',
       async (baseUrl, field) => {
@@ -1568,7 +1569,7 @@ describe('ContentGenerationPipeline', () => {
       const wire = await deepSeekWire(
         {
           baseUrl:
-            'https://workspace.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+            'https://workspace.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
           samplingParams: { reasoning: { effort: 'medium' } },
         },
         {
@@ -1590,7 +1591,7 @@ describe('ContentGenerationPipeline', () => {
       const wire = await deepSeekWire(
         {
           baseUrl:
-            'https://workspace.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+            'https://workspace.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
           reasoning: { effort: 'xhigh' },
         },
         {
@@ -1745,7 +1746,7 @@ describe('ContentGenerationPipeline', () => {
 
     it.each([
       'https://api.deepseek.com/v1',
-      'https://model-proxy.alibaba-inc.com/v1',
+      'https://model-proxy.alibaba-inc.invalid/v1',
     ])(
       'keeps explicit profiles ahead of built-in DeepSeek on %s',
       async (baseUrl) => {
@@ -2475,7 +2476,7 @@ describe('ContentGenerationPipeline', () => {
       ],
       // QWEN_OAUTH, the first-run default, ships `model: 'coder-model'`
       // (DEFAULT_QWEN_MODEL, aliased to Qwen 3.6 Plus hybrid). It does not
-      // start with `qwen`, so the gate must special-case it or #4501 stays
+      // start with `mariadb-shell-agent`, so the gate must special-case it or #4501 stays
       // live on the default flow.
       [
         'emits enable_thinking:false on QWEN_OAUTH with the default coder-model',
@@ -2491,9 +2492,9 @@ describe('ContentGenerationPipeline', () => {
       // DashScope by design (provider/dashscope.ts:75-78); pinned so tighter
       // hostname rules cannot silently drop internal users.
       [
-        'emits enable_thinking:false on internal alibaba-inc.com hostname',
+        'emits enable_thinking:false on internal alibaba-inc.invalid hostname',
         {
-          baseUrl: 'https://gateway.alibaba-inc.com/v1',
+          baseUrl: 'https://gateway.alibaba-inc.invalid/v1',
           model: 'qwen3.5-flash',
         },
         sideQuery('qwen3.5-flash'),
@@ -2559,10 +2560,10 @@ describe('ContentGenerationPipeline', () => {
         { enable_thinking: undefined },
       ],
       // buildRequest ships `context.model` (request.model || config.model),
-      // so a qwen config with a non-qwen request model gates on the request
+      // so a mariadb-shell-agent config with a non-qwen request model gates on the request
       // model — else the field leaks to the routing actually on the wire.
       [
-        'gates on the wire model, not config: qwen config + non-qwen request.model does NOT emit',
+        'gates on the wire model, not config: mariadb-shell-agent config + non-qwen request.model does NOT emit',
         { baseUrl: DASHSCOPE_URL, model: 'qwen3.5-flash' },
         sideQuery('glm-5'),
         { enable_thinking: undefined },

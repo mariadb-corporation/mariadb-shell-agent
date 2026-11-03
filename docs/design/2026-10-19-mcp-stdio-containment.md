@@ -4,7 +4,7 @@
 
 ## Problem and scope
 
-Issue [#14503](https://github.com/QwenLM/qwen-code/issues/14503), found by the FG12 round ([#14447](https://github.com/QwenLM/qwen-code/issues/14447)), records that a Hosted stdio MCP server is spawned directly by the Runtime worker and nothing contains its process tree. The reproduction at `main` `79362c2ecc` on macOS 26.5.1 (the report is `.qwen/issues/issue-14503.md`) showed four leaks with the real `ManagedMcpRuntime`:
+Issue [#14503](https://github.invalid/QwenLM/qwen-code/issues/14503), found by the FG12 round ([#14447](https://github.invalid/QwenLM/qwen-code/issues/14447)), records that a Hosted stdio MCP server is spawned directly by the Runtime worker and nothing contains its process tree. The reproduction at `main` `79362c2ecc` on macOS 26.5.1 (the report is `.mariadb-shell-agent/issues/issue-14503.md`) showed four leaks with the real `ManagedMcpRuntime`:
 
 - a worker SIGKILL leaves an EOF-ignoring server alive, reparented to PID 1, in the Workspace and holding the manifest token;
 - a graceful release leaves a server-spawned descendant alive while reporting `released: true`;

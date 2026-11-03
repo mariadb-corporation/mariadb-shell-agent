@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review fix-delta`: what `--fix` actually changed, as a diff — the fix
+// `mariadb-shell-agent review fix-delta`: what `--fix` actually changed, as a diff — the fix
 // auditor's input (Step 6B).
 //
 // The question the audit asks is about the EDIT, not the diff under review: a
@@ -63,20 +64,20 @@ export interface FixSnapshot {
 }
 
 /**
- * The review's own NAME families under `.qwen/tmp` — what the flow writes
+ * The review's own NAME families under `.mariadb-shell-agent/tmp` — what the flow writes
  * between the two states: the side files (`qwen-review-{target}-*`, the plan
  * and its `-prompts` directory among them), the file-target plan family
  * (`file-review-{file}-*`) and the worktree family (`review-pr-*`). Keyed on
  * the names the flow writes, never on whole directories, so content a user's
- * repository keeps elsewhere under `.qwen` stays reviewable — and a finding's
+ * repository keeps elsewhere under `.mariadb-shell-agent` stays reviewable — and a finding's
  * fix there stays in the hunks. Matched at any depth: the review writes them
  * under the directory it was run from, which is the repository root in the
  * common case and a subdirectory otherwise.
  */
 export const FIX_DELTA_EXCLUDES = [
-  '.qwen/tmp/qwen-review-*',
-  '.qwen/tmp/review-pr-*',
-  '.qwen/tmp/file-review-*',
+  '.mariadb-shell-agent/tmp/qwen-review-*',
+  '.mariadb-shell-agent/tmp/review-pr-*',
+  '.mariadb-shell-agent/tmp/file-review-*',
 ] as const;
 
 /**
@@ -89,7 +90,7 @@ export const FIX_DELTA_SCOPE =
   'repository: the files HEAD tracks, and every other file no ignore rule ' +
   'hides. Not in them: an edit inside a submodule or a nested repository, to ' +
   "a gitignored file HEAD does not track, or to any path in the review's " +
-  '.qwen/tmp name families (qwen-review-*, review-pr-*, file-review-*), ' +
+  '.mariadb-shell-agent/tmp name families (qwen-review-*, review-pr-*, file-review-*), ' +
   'tracked or not. A hunk shows a file as git stores it: a binary file (a ' +
   '`binary` or `-diff` attribute included) as `Binary files … differ`, ' +
   'without its content, and a clean-filtered file (Git LFS) as its filtered ' +
@@ -100,7 +101,7 @@ export const FIX_DELTA_SCOPE =
  * The name-family exclusions both captures share. A family needs both forms:
  * `X` alone leaves the contents of a directory matching `X` captured
  * (measured: `qwen-review-x-prompts/c.md` survived it). The `**` prefix
- * leaves no literal part, so an ignore rule over `.qwen/` or `tmp/` never
+ * leaves no literal part, so an ignore rule over `.mariadb-shell-agent/` or `tmp/` never
  * makes `add` refuse them.
  */
 const FAMILY_EXCLUDES = FIX_DELTA_EXCLUDES.flatMap((p) => [

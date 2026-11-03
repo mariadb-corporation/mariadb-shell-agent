@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -140,9 +141,9 @@ export class NativeHostNewerError extends Error {
     super(
       'The installed Browser Use Native Host speaks protocol ' +
         installedProtocolVersion +
-        ', newer than this Qwen Code (protocol ' +
+        ', newer than this MariaDB Shell Agent (protocol ' +
         CHROME_BRIDGE_PROTOCOL_VERSION +
-        '). Update Qwen Code; the installed Host was left unchanged.',
+        '). Update MariaDB Shell Agent; the installed Host was left unchanged.',
     );
     this.name = 'NativeHostNewerError';
   }
@@ -395,7 +396,7 @@ function resolveOptions(options: NativeHostInstallOptions): {
     nativeHostPath,
     nodePath,
     // Not `native-host.sh`: protocol 2 installers own and rewrite that path.
-    launcherPath: join(homeDir, '.qwen/browser-use/host.sh'),
+    launcherPath: join(homeDir, '.mariadb-shell-agent/browser-use/host.sh'),
     manifestPaths: manifestRoots.map((root) =>
       join(homeDir, root, MANIFEST_FILE),
     ),

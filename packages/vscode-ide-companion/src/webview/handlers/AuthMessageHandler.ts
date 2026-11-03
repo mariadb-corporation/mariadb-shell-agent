@@ -1,19 +1,16 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { logger } from '../../utils/logger.js';
-import * as vscode from 'vscode';
 import { BaseMessageHandler } from './BaseMessageHandler.js';
 import { getErrorMessage } from '../../utils/errorMessage.js';
 import {
-  ALL_PROVIDERS,
-  ALIBABA_PROVIDERS,
   AuthType,
-  QWENCLOUD_PROVIDERS,
-  THIRD_PARTY_PROVIDERS,
+  findProviderById,
   shouldShowStep,
   resolveBaseUrl,
   resolveModelProtocol,
@@ -24,13 +21,144 @@ import {
   type ProviderSetupInputs,
   type BaseUrlOption,
 } from '@qwen-code/qwen-code-core';
+import {
+  authWizardRouteKey,
+  type AuthWizardBaseUrl,
+  type AuthWizardProvider,
+  type AuthWizardSubmission,
+  type AuthWizardWireApi,
+} from '../authWizardTypes.js';
+
+/** The providers the setup wizard offers, in display order. */
+export const AUTH_WIZARD_PROVIDER_IDS = [
+  'openrouter',
+  'requesty',
+  'openai',
+  'grok',
+  'custom-openai-compatible',
+] as const;
+
+// AuthType's raw string values ('openai' / 'anthropic' / 'gemini') are an
+// implementation detail; the wizard shows human-readable labels.
+const PROTOCOL_LABELS: Record<string, string> = {
+  [AuthType.USE_OPENAI]: 'OpenAI Compatible',
+  [AuthType.USE_ANTHROPIC]: 'Anthropic',
+  [AuthType.USE_GEMINI]: 'Gemini',
+};
+
+const WIRE_APIS: readonly AuthWizardWireApi[] = [
+  'chat-completions',
+  'responses',
+];
+
+function getWizardProviders(): ProviderConfig[] {
+  return AUTH_WIZARD_PROVIDER_IDS.map((id) => findProviderById(id)).filter(
+    (p): p is ProviderConfig => p !== undefined,
+  );
+}
+
+function hasProtocolStep(provider: ProviderConfig): boolean {
+  return (
+    shouldShowStep(provider, 'protocol') &&
+    !!provider.protocolOptions &&
+    provider.protocolOptions.length > 1
+  );
+}
+
+/**
+ * Free-form URL default for a route. The effective route includes the API
+ * step's pick: a Responses choice dials the /v1-less default endpoint, so
+ * deriving the fallback from the raw bucket protocol would persist the Chat
+ * Completions endpoint on the Responses wire. No local fallback:
+ * getDefaultBaseUrlForProtocol owns the defaults, so CLI and VS Code stay in
+ * sync.
+ */
+function getBaseUrlPlaceholder(
+  provider: ProviderConfig,
+  protocol: AuthType | undefined,
+  wireApi: ModelWireApi | undefined,
+): string {
+  const effectiveProtocol =
+    resolveModelProtocol(protocol ?? provider.protocol, { wireApi }) ??
+    protocol ??
+    provider.protocol;
+  return getDefaultBaseUrlForProtocol(effectiveProtocol);
+}
+
+/** Describe a provider's setup steps as data for the webview wizard. */
+export function describeWizardProvider(
+  provider: ProviderConfig,
+): AuthWizardProvider {
+  const protocolStep = hasProtocolStep(provider);
+  // Protocol keys as the wizard submits them: '' when there is no protocol
+  // step (the provider's own protocol applies).
+  const protocolKeys: Array<AuthType | undefined> = protocolStep
+    ? [...provider.protocolOptions!]
+    : [undefined];
+  const wireApiProtocols = protocolKeys
+    .filter((protocol) =>
+      shouldShowStep(provider, 'wireApi', protocol ?? provider.protocol),
+    )
+    .map((protocol) => protocol ?? '');
+
+  let baseUrl: AuthWizardBaseUrl = { kind: 'fixed' };
+  if (shouldShowStep(provider, 'baseUrl')) {
+    if (Array.isArray(provider.baseUrl)) {
+      baseUrl = {
+        kind: 'choice',
+        stepTitle: provider.uiLabels?.baseUrlStepTitle ?? 'Endpoint',
+        options: (provider.baseUrl as BaseUrlOption[]).map((opt) => ({
+          value: opt.url,
+          label: opt.label,
+          description: opt.url,
+        })),
+      };
+    } else {
+      const placeholders: Record<string, string> = {};
+      for (const protocol of protocolKeys) {
+        const wireApis: Array<ModelWireApi | undefined> =
+          wireApiProtocols.includes(protocol ?? '')
+            ? [...WIRE_APIS]
+            : [undefined];
+        for (const wireApi of wireApis) {
+          placeholders[authWizardRouteKey(protocol, wireApi)] =
+            getBaseUrlPlaceholder(provider, protocol, wireApi);
+        }
+      }
+      baseUrl = { kind: 'input', placeholders };
+    }
+  }
+
+  return {
+    id: provider.id,
+    label: provider.label,
+    description: provider.description,
+    ...(protocolStep
+      ? {
+          protocols: provider.protocolOptions!.map((p) => ({
+            value: String(p),
+            label: PROTOCOL_LABELS[String(p)] ?? String(p),
+          })),
+        }
+      : {}),
+    wireApiProtocols,
+    baseUrl,
+    apiKeyPlaceholder: provider.apiKeyPlaceholder ?? 'sk-...',
+    ...(shouldShowStep(provider, 'models')
+      ? { models: getDefaultModelIds(provider) }
+      : {}),
+    advancedConfig: shouldShowStep(provider, 'advancedConfig'),
+  };
+}
 
 /**
  * Auth message handler
  * Handles all authentication-related messages.
  *
- * Uses the shared ProviderConfig registry from core to dynamically
- * generate setup flows instead of hardcoding provider-specific logic.
+ * `auth` opens the provider setup wizard in the webview; the wizard's
+ * answers come back as `authWizardSubmit`. The steps are generated from the
+ * shared ProviderConfig registry in core instead of hardcoding
+ * provider-specific logic.
  */
 export class AuthMessageHandler extends BaseMessageHandler {
   private authInteractiveHandler:
@@ -38,13 +166,26 @@ export class AuthMessageHandler extends BaseMessageHandler {
     | null = null;
 
   canHandle(messageType: string): boolean {
-    return ['auth', 'getAccountInfo'].includes(messageType);
+    return [
+      'auth',
+      'authWizardSubmit',
+      'authWizardCancel',
+      'getAccountInfo',
+    ].includes(messageType);
   }
 
   async handle(message: { type: string; data?: unknown }): Promise<void> {
     switch (message.type) {
       case 'auth':
-        await this.handleAuthInteractive();
+        this.openWizard();
+        break;
+
+      case 'authWizardSubmit':
+        await this.handleWizardSubmit(message.data);
+        break;
+
+      case 'authWizardCancel':
+        this.sendToWebView({ type: 'authCancelled' });
         break;
 
       case 'getAccountInfo':
@@ -94,137 +235,38 @@ export class AuthMessageHandler extends BaseMessageHandler {
     }
   }
 
-  /**
-   * Notify the webview that the interactive auth flow was dismissed.
-   */
-  private notifyAuthCancelled(): void {
-    this.sendToWebView({ type: 'authCancelled' });
+  /** Open the setup wizard in the webview. */
+  private openWizard(): void {
+    this.sendToWebView({
+      type: 'authWizard',
+      data: { providers: getWizardProviders().map(describeWizardProvider) },
+    });
   }
 
   /**
-   * Helper: show a QuickPick and return the selected item's `value`.
-   * Returns undefined if the user cancels.
-   *
-   * Items with `kind: Separator` are rendered by VSCode as non-selectable
-   * group headers; they should be left in `items` to preserve grouping.
+   * Reject a submission the wizard should have caught. The wizard stays open
+   * and shows the message; nothing was written, so the auth state is
+   * unchanged (unlike `authError`, which reports a failed connection).
    */
-  private async pick<T extends string>(
-    items: Array<{
-      label: string;
-      description?: string;
-      value: T;
-      kind?: vscode.QuickPickItemKind;
-    }>,
-    title: string,
-    placeHolder: string,
-  ): Promise<T | undefined> {
-    const choice = await vscode.window.showQuickPick(items, {
-      title,
-      placeHolder,
-      ignoreFocusOut: true,
-    });
-    if (!choice || choice.kind === vscode.QuickPickItemKind.Separator) {
-      this.notifyAuthCancelled();
-      return undefined;
-    }
-    return (choice as { value: T }).value;
-  }
-
-  /**
-   * Helper: show an InputBox. Returns undefined if the user cancels.
-   */
-  private async input(opts: {
-    title: string;
-    prompt: string;
-    placeHolder?: string;
-    value?: string;
-    password?: boolean;
-    required?: boolean;
-  }): Promise<string | undefined> {
-    const value = await vscode.window.showInputBox({
-      title: opts.title,
-      prompt: opts.prompt,
-      placeHolder: opts.placeHolder,
-      value: opts.value,
-      password: opts.password ?? false,
-      ignoreFocusOut: true,
-      validateInput: opts.required
-        ? (v) => (!v?.trim() ? 'This field is required' : null)
-        : undefined,
-    });
-    if (value === undefined) {
-      this.notifyAuthCancelled();
-      return undefined;
-    }
-    return value;
+  private rejectSubmission(message: string): void {
+    this.sendToWebView({ type: 'authWizardError', data: { message } });
   }
 
   // ---------------------------------------------------------------------------
-  // Main entry: dynamic provider selection from ALL_PROVIDERS
+  // Wizard submission — validated against the ProviderConfig
   // ---------------------------------------------------------------------------
 
   /**
-   * Handle auth — full interactive auth flow.
-   * Dynamically generates provider choices from the shared registry.
+   * Apply the wizard's answers. Always ends with `authWizardDone`: the wizard
+   * closes then unless an `authWizardError` or `authError` came first (some
+   * outcomes, such as saving service models only, send neither a success
+   * nor an error).
    */
-  private async handleAuthInteractive(): Promise<void> {
+  private async handleWizardSubmit(data: unknown): Promise<void> {
     try {
-      // Build grouped provider menu
-      const items: Array<{
-        label: string;
-        description?: string;
-        value: string;
-        kind?: vscode.QuickPickItemKind;
-      }> = [];
-
-      const addGroup = (
-        label: string,
-        providers: readonly ProviderConfig[],
-      ) => {
-        if (providers.length === 0) return;
-        items.push({
-          label,
-          value: '',
-          kind: vscode.QuickPickItemKind.Separator,
-        });
-        for (const p of providers) {
-          items.push({
-            label: p.label,
-            description: p.description,
-            value: p.id,
-          });
-        }
-      };
-
-      addGroup('QwenCloud', QWENCLOUD_PROVIDERS);
-      addGroup('Alibaba Cloud', ALIBABA_PROVIDERS);
-      addGroup('Third Party', THIRD_PARTY_PROVIDERS);
-
-      // Custom provider is always last
-      const customProviders = ALL_PROVIDERS.filter(
-        (p) => p.uiGroup === 'custom',
+      await this.applyWizardSubmission(
+        (data ?? {}) as Partial<AuthWizardSubmission>,
       );
-      if (customProviders.length > 0) {
-        addGroup('Custom', customProviders);
-      }
-
-      // Pass items including separators; VSCode QuickPick renders separator
-      // entries as non-selectable group headers (mirrors the CLI grouping).
-      const selectedId = await this.pick(
-        items,
-        'Qwen Code: Select Provider',
-        'Choose how to connect',
-      );
-      if (!selectedId) return;
-
-      const provider = ALL_PROVIDERS.find((p) => p.id === selectedId);
-      if (!provider) {
-        logger.error('[AuthMessageHandler] Provider not found:', selectedId);
-        return;
-      }
-
-      // Run generic setup flow
-      await this.runProviderSetupFlow(provider);
     } catch (error) {
       const errorMsg = getErrorMessage(error);
       logger.error('[AuthMessageHandler] auth failed:', error);
@@ -232,113 +274,69 @@ export class AuthMessageHandler extends BaseMessageHandler {
         type: 'authError',
         data: { message: `Auth failed: ${errorMsg}` },
       });
+    } finally {
+      this.sendToWebView({ type: 'authWizardDone' });
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Generic provider setup flow — driven by ProviderConfig
-  // ---------------------------------------------------------------------------
-
-  private async runProviderSetupFlow(provider: ProviderConfig): Promise<void> {
-    const flowTitle =
-      provider.uiLabels?.flowTitle ?? `Qwen Code: ${provider.label}`;
+  private async applyWizardSubmission(
+    answers: Partial<AuthWizardSubmission>,
+  ): Promise<void> {
+    const provider = getWizardProviders().find(
+      (p) => p.id === answers.providerId,
+    );
+    if (!provider) {
+      logger.error(
+        '[AuthMessageHandler] Provider not found:',
+        answers.providerId,
+      );
+      this.rejectSubmission('Select a provider.');
+      return;
+    }
 
     // Step 0: Protocol (only for providers offering multiple, e.g. custom)
     let protocol: AuthType | undefined;
-    if (
-      shouldShowStep(provider, 'protocol') &&
-      provider.protocolOptions &&
-      provider.protocolOptions.length > 1
-    ) {
-      // AuthType's raw string values ('openai' / 'anthropic' / 'gemini') are
-      // implementation detail; QuickPick should show human-readable labels.
-      const protocolLabels: Record<string, string> = {
-        [AuthType.USE_OPENAI]: 'OpenAI Compatible',
-        [AuthType.USE_ANTHROPIC]: 'Anthropic',
-        [AuthType.USE_GEMINI]: 'Gemini',
-      };
-      const selected = await this.pick(
-        provider.protocolOptions.map((p) => ({
-          label: protocolLabels[String(p)] ?? String(p),
-          value: String(p),
-        })),
-        `${flowTitle}: Protocol`,
-        'Select API protocol',
+    if (hasProtocolStep(provider)) {
+      protocol = provider.protocolOptions!.find(
+        (p) => String(p) === answers.protocol,
       );
-      if (!selected) return;
-      protocol = selected as AuthType;
+      if (!protocol) {
+        this.rejectSubmission('Select an API protocol.');
+        return;
+      }
     }
 
     let wireApi: ModelWireApi | undefined;
     if (shouldShowStep(provider, 'wireApi', protocol ?? provider.protocol)) {
-      const selected = await this.pick(
-        [
-          { label: 'Chat Completions', value: 'chat-completions' },
-          { label: 'Responses', value: 'responses' },
-        ],
-        `${flowTitle}: API`,
-        'Select OpenAI API',
-      );
-      if (!selected) return;
-      wireApi = selected as ModelWireApi;
+      wireApi = WIRE_APIS.find((api) => api === answers.wireApi);
+      if (!wireApi) {
+        this.rejectSubmission('Select an OpenAI API.');
+        return;
+      }
     }
 
     // Step 1: Base URL (if needed)
     let baseUrl: string;
     if (shouldShowStep(provider, 'baseUrl')) {
       if (Array.isArray(provider.baseUrl)) {
-        const options = provider.baseUrl as BaseUrlOption[];
-        const stepTitle = provider.uiLabels?.baseUrlStepTitle ?? 'Endpoint';
-        const selected = await this.pick(
-          options.map((opt) => ({
-            label: opt.label,
-            description: opt.url,
-            value: opt.url,
-          })),
-          `${flowTitle}: ${stepTitle}`,
-          `Select ${stepTitle.toLowerCase()}`,
+        const option = (provider.baseUrl as BaseUrlOption[]).find(
+          (opt) => opt.url === answers.baseUrl,
         );
-        if (!selected) return;
-        baseUrl = selected;
+        if (!option) {
+          this.rejectSubmission('Select an endpoint.');
+          return;
+        }
+        baseUrl = option.url;
       } else {
-        // Free-form URL input. Show a protocol-specific default as
-        // placeholder (NOT pre-filled value) so picking Anthropic/Gemini
-        // doesn't silently write the OpenAI endpoint when the user hits
-        // Enter on the OpenAI default. Defaults come from core's shared
-        // getDefaultBaseUrlForProtocol so CLI and VS Code stay in sync.
-        // The effective route includes the API step's pick: a Responses
-        // choice dials the /v1-less default endpoint, so deriving the
-        // fallback from the raw bucket protocol would persist the Chat
-        // Completions endpoint on the Responses wire.
-        const effectiveProtocol =
-          resolveModelProtocol(protocol ?? provider.protocol, { wireApi }) ??
-          protocol ??
-          provider.protocol;
-        // No local fallback: getDefaultBaseUrlForProtocol owns the defaults.
-        // Adding an OpenAI fallback here would silently mask a new AuthType
-        // that core hadn't been taught about, diverging from the CLI flow
-        // (which shows an empty placeholder + scheme error in the same case).
-        const placeholder = getDefaultBaseUrlForProtocol(effectiveProtocol);
-        const urlInput = await this.input({
-          title: `${flowTitle}: Base URL`,
-          prompt: 'Enter API base URL',
-          placeHolder: placeholder,
-          value: '',
-        });
-        if (urlInput === undefined) return;
-        baseUrl = urlInput.trim() || placeholder;
+        // A blank input means the protocol-specific default shown as the
+        // placeholder (NOT a pre-filled value), so picking Anthropic/Gemini
+        // doesn't silently write the OpenAI endpoint.
+        const placeholder = getBaseUrlPlaceholder(provider, protocol, wireApi);
+        baseUrl = (answers.baseUrl ?? '').trim() || placeholder;
         if (!/^https?:\/\//i.test(baseUrl)) {
-          // authError already clears the webview's connecting state; do NOT
-          // also send authCancelled — the webview clears the error on
-          // cancel, so the two messages race and the error flashes away
-          // before the user can read it. authCancelled is reserved for
-          // user-initiated dismissals (Escape on a QuickPick/InputBox).
-          this.sendToWebView({
-            type: 'authError',
-            data: {
-              message: 'Base URL must start with http:// or https://.',
-            },
-          });
+          this.rejectSubmission(
+            'Base URL must start with http:// or https://.',
+          );
           return;
         }
       }
@@ -347,30 +345,21 @@ export class AuthMessageHandler extends BaseMessageHandler {
     }
 
     // Step 2: API Key
-    const apiKeyInput = await this.input({
-      title: `${flowTitle}: API Key`,
-      prompt: 'Enter your API key',
-      placeHolder: provider.apiKeyPlaceholder ?? 'sk-...',
-      password: true,
-      required: true,
-    });
-    if (!apiKeyInput) return;
     // Trim before validation and persistence — a key pasted with trailing
     // whitespace would otherwise be stored as-is and cause silent auth
     // failures, and validateApiKey could reject in VS Code what the CLI
     // (which trims) accepts.
-    const apiKey = apiKeyInput.trim();
-    if (!apiKey) return;
+    const apiKey = (answers.apiKey ?? '').trim();
+    if (!apiKey) {
+      this.rejectSubmission('API key is required.');
+      return;
+    }
 
     // Validate API key if provider has validation
     if (provider.validateApiKey) {
       const validationError = provider.validateApiKey(apiKey, baseUrl);
       if (validationError) {
-        // No authCancelled here — see the base-URL validation note above.
-        this.sendToWebView({
-          type: 'authError',
-          data: { message: validationError },
-        });
+        this.rejectSubmission(validationError);
         return;
       }
     }
@@ -378,56 +367,27 @@ export class AuthMessageHandler extends BaseMessageHandler {
     // Step 3: Model selection (if needed)
     let modelIds: string[];
     if (shouldShowStep(provider, 'models')) {
-      const defaults = getDefaultModelIds(provider);
-      const modelInput = await this.input({
-        title: `${flowTitle}: Models`,
-        prompt: 'Enter model IDs (comma-separated)',
-        placeHolder: defaults.join(',') || 'model-name',
-        value: defaults.join(','),
-        required: true,
-      });
-      if (!modelInput) return;
-      modelIds = modelInput
+      modelIds = (answers.models ?? '')
         .split(',')
         .map((id) => id.trim())
         .filter(Boolean);
       if (modelIds.length === 0) {
-        // E.g. user typed only whitespace/commas like ", , ,". No
-        // authCancelled — see the base-URL validation note above.
-        this.sendToWebView({
-          type: 'authError',
-          data: { message: 'Model IDs cannot be empty.' },
-        });
+        // E.g. user typed only whitespace/commas like ", , ,".
+        this.rejectSubmission('Model IDs cannot be empty.');
         return;
       }
     } else {
       modelIds = getDefaultModelIds(provider);
     }
 
-    // Step 4: Advanced config (if needed)
+    // Step 4: Advanced config (if needed) — the thinking mode question
     let advancedConfig: ProviderSetupInputs['advancedConfig'];
     if (shouldShowStep(provider, 'advancedConfig')) {
-      // Simplified: just ask about thinking mode
-      const enableThinking = await this.pick(
-        [
-          {
-            label: 'Yes',
-            description: 'Enable extended thinking mode',
-            value: 'yes' as const,
-          },
-          {
-            label: 'No',
-            description: 'Standard mode',
-            value: 'no' as const,
-          },
-        ],
-        `${flowTitle}: Advanced Config`,
-        'Enable thinking mode?',
-      );
-      if (!enableThinking) return;
-      advancedConfig = {
-        enableThinking: enableThinking === 'yes',
-      };
+      if (typeof answers.enableThinking !== 'boolean') {
+        this.rejectSubmission('Choose whether to enable thinking mode.');
+        return;
+      }
+      advancedConfig = { enableThinking: answers.enableThinking };
     }
 
     // Submit
@@ -435,7 +395,6 @@ export class AuthMessageHandler extends BaseMessageHandler {
       logger.error(
         '[AuthMessageHandler] authInteractiveHandler not set; cannot apply provider config.',
       );
-      // No authCancelled — see the base-URL validation note above.
       this.sendToWebView({
         type: 'authError',
         data: {

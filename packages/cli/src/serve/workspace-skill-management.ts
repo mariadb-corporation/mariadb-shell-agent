@@ -317,7 +317,7 @@ function githubRequestError(
 function githubHeaders(githubToken?: string): Record<string, string> {
   return {
     Accept: 'application/vnd.github+json',
-    'User-Agent': 'qwen-code',
+    'User-Agent': 'mariadb-shell-agent',
     ...(githubToken ? { Authorization: `Bearer ${githubToken}` } : {}),
   };
 }
@@ -1076,7 +1076,7 @@ export function workspaceSkillBaseDir(
   scope: WorkspaceSkillScope,
 ): string {
   return scope === 'workspace'
-    ? path.join(workspace, '.qwen', 'skills')
+    ? path.join(workspace, '.mariadb-shell-agent', 'skills')
     : path.join(Storage.getGlobalQwenDir(), 'skills');
 }
 

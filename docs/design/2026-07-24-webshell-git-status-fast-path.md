@@ -180,7 +180,7 @@ provider 两处 `workspaceGit()` 调用只取 `.branch`，走默认 fast path �
 - webui `mappers.test.ts`：`git_status_changed` 匹配/不匹配 workspaceCwd
   两种分支。
 
-E2E（`.qwen/e2e-tests/2026-07-24-git-chip-fast-branch.md`，验证阶段补）：
+E2E（`.mariadb-shell-agent/e2e-tests/2026-07-24-git-chip-fast-branch.md`，验证阶段补）：
 真 daemon + web shell，大工作区新建会话——chip（branch）在编辑器就绪后立刻出现，
 计数器随后补齐；侧栏 chip 行为不变；focus/30s 轮询仍刷新；worktree 会话 chip 不变。
 

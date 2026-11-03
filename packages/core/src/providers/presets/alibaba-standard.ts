@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,30 +17,30 @@ export const alibabaStandardProvider: ProviderConfig = {
     {
       id: 'cn-beijing',
       label: 'China (Beijing)',
-      url: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      url: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       documentationUrl:
-        'https://bailian.console.aliyun.com/cn-beijing?tab=api#/api',
+        'https://bailian.console.aliyun.invalid/cn-beijing?tab=api#/api',
     },
     {
       id: 'sg-singapore',
       label: 'Singapore',
-      url: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+      url: 'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1',
       documentationUrl:
-        'https://modelstudio.console.alibabacloud.com/ap-southeast-1?tab=api#/api/?type=model&url=2712195',
+        'https://modelstudio.console.alibabacloud.invalid/ap-southeast-1?tab=api#/api/?type=model&url=2712195',
     },
     {
       id: 'us-virginia',
       label: 'US (Virginia)',
-      url: 'https://dashscope-us.aliyuncs.com/compatible-mode/v1',
+      url: 'https://dashscope-us.aliyuncs.invalid/compatible-mode/v1',
       documentationUrl:
-        'https://modelstudio.console.alibabacloud.com/us-east-1?tab=api#/api/?type=model&url=2712195',
+        'https://modelstudio.console.alibabacloud.invalid/us-east-1?tab=api#/api/?type=model&url=2712195',
     },
     {
       id: 'cn-hongkong',
       label: 'China (Hong Kong)',
-      url: 'https://cn-hongkong.dashscope.aliyuncs.com/compatible-mode/v1',
+      url: 'https://cn-hongkong.dashscope.aliyuncs.invalid/compatible-mode/v1',
       documentationUrl:
-        'https://modelstudio.console.alibabacloud.com/cn-hongkong?tab=api#/api/?type=model&url=2712195',
+        'https://modelstudio.console.alibabacloud.invalid/cn-hongkong?tab=api#/api/?type=model&url=2712195',
     },
   ],
   envKey: 'DASHSCOPE_API_KEY',

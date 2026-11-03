@@ -59,4 +59,4 @@ Core scheduler 已负责受限代理的执行。ACP session 适配器使用共�
 - Direct 模式保持原有行为。通过构建、类型检查、定向单元测试、确定性 CLI 检查和 Responses 模型测试验证改动。
 - 精确名称未命中时提供不泄露作用域外工具的恢复提示。压缩后能够重新发现缺失的 schema，完成调用和复用；通过实际请求历史和 provider usage 确认缓存行为。
 
-E2E 计划与结果保存在 `.qwen/e2e-tests/lazy-code-mode.md`。首版没有待定设计问题。
+E2E 计划与结果保存在 `.mariadb-shell-agent/e2e-tests/lazy-code-mode.md`。首版没有待定设计问题。

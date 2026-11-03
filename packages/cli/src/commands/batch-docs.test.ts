@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -545,9 +546,9 @@ describe('deliverResult', () => {
   });
 
   it('holds a visible symlink into a hidden directory before creating children', () => {
-    fs.mkdirSync(path.join(root, '.qwen'));
+    fs.mkdirSync(path.join(root, '.mariadb-shell-agent'));
     fs.symlinkSync(
-      path.join(root, '.qwen'),
+      path.join(root, '.mariadb-shell-agent'),
       path.join(root, 'output'),
       'junction',
     );
@@ -561,7 +562,9 @@ describe('deliverResult', () => {
       kind: 'held',
       reason: expect.stringContaining('hidden path'),
     });
-    expect(fs.existsSync(path.join(root, '.qwen', 'new'))).toBe(false);
+    expect(fs.existsSync(path.join(root, '.mariadb-shell-agent', 'new'))).toBe(
+      false,
+    );
   });
 
   it('holds without creating directories outside a symlinked parent', () => {

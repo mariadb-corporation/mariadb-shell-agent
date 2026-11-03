@@ -55,7 +55,7 @@ flowchart TD
 - Supporting input paths that do not provide `submitted_prompt` provenance.
 - DLP, trusted user identity, per-document ACL enforcement, or compliance audit.
 - Personal memory, writes, ingestion, retries, caching, or new providers.
-- `qwen serve`, ACP, headless mode, resumed sessions, non-interactive input, or multiple workspaces in one process.
+- `mariadb-shell-agent serve`, ACP, headless mode, resumed sessions, non-interactive input, or multiple workspaces in one process.
 - Mid-turn steering messages, which Qwen does not route through `UserPromptSubmit`.
 - Preventing indirect prompt injection at the model layer.
 - Protecting an administrator secret from trusted same-UID repository code.
@@ -65,7 +65,7 @@ flowchart TD
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant Q as Qwen Code
+    participant Q as MariaDB Shell Agent
     participant H as Auto-recall Hook process
     participant P as Credential-bound provider
     participant M as Model provider

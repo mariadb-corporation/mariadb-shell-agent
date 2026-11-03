@@ -4,7 +4,7 @@
 
 ## 状态与范围决定
 
-2026-10-24，运维方同意将完整 CSI 审计移出 [#13395](https://github.com/QwenLM/qwen-code/issues/13395) 首版前置条件。本文件沿用原路径并替代此前 P1 证据来源提案。[已发布的原提案](https://github.com/QwenLM/qwen-code/issues/13395#issuecomment-6363776281) 转为历史记录；原 P1 → P2 → P3 → P4 依赖链由下述交付计划替代。首版不再等待插件提供审计 hook。
+2026-10-24，运维方同意将完整 CSI 审计移出 [#13395](https://github.invalid/QwenLM/qwen-code/issues/13395) 首版前置条件。本文件沿用原路径并替代此前 P1 证据来源提案。[已发布的原提案](https://github.invalid/QwenLM/qwen-code/issues/13395#issuecomment-6363776281) 转为历史记录；原 P1 → P2 → P3 → P4 依赖链由下述交付计划替代。首版不再等待插件提供审计 hook。
 
 审计撤出时，未发布切片已恢复到其历史基准 `7ab5a95c61d5785ac66e50144e41ce29a7cf4cd5`。后续原生 S1 验收单独固定为 main `2c0c9fa8dc4a8ea5ec688060549e0ff0aed717b4`。最初的范围调整只改文档；2026-10-25 运维方要求在同一 PR 中实现下述两项 S1 修复。这些修复和后续同步主干均不会将原生验收结论扩展到已测版本之外。本工作不新增回收服务。平台托管回收、自动释放物理归属和跨 Workspace 卷交接仍是后续工作。范围调整不代表整个 issue 已通过验收。
 
@@ -74,7 +74,7 @@ resident 运行时词表仅包含 `read_file`、`write_file`、`edit`；模型�
 | S3：回收实现 | 只实现通过评审的 S2 契约，再验收原子释放和重复复用；通过这些检查前不存在 S3 释放许可。                                    |
 | 独立恢复     | 定义 CSI LOST 恢复和运维流程，不重新开放未知写入或绕过原 owner。                                                          |
 
-在 `2c0c9fa8dc4a8ea5ec688060549e0ff0aed717b4` 上的原生 S1 验收发现一项放置阻塞：某个常驻 binding 进入 `DRAINING` 后，同租户的新 Workspace 即使拥有不同的注册磁盘和存储身份，也可能因 `runtime_placement_recovery_required` 失败。放置围栏还会匹配共同的 `/workspace` 规范路径。已有的独立 binding 仍能继续使用，但这不能证明独立冷启动不受影响。在 [#13395](https://github.com/QwenLM/qwen-code/issues/13395) 中保留该失败；独立测试租户上的验收不能冲销它。S1 需要先解决并验证这一边界，才能通过验收。
+在 `2c0c9fa8dc4a8ea5ec688060549e0ff0aed717b4` 上的原生 S1 验收发现一项放置阻塞：某个常驻 binding 进入 `DRAINING` 后，同租户的新 Workspace 即使拥有不同的注册磁盘和存储身份，也可能因 `runtime_placement_recovery_required` 失败。放置围栏还会匹配共同的 `/workspace` 规范路径。已有的独立 binding 仍能继续使用，但这不能证明独立冷启动不受影响。在 [#13395](https://github.invalid/QwenLM/qwen-code/issues/13395) 中保留该失败；独立测试租户上的验收不能冲销它。S1 需要先解决并验证这一边界，才能通过验收。
 
 同一轮原生测试还发现第二项公开工具边界阻塞：实际模型 catalog 声明了 `web_fetch`，原 resident worker 却返回 HTTP 409 拒绝。没有注入响应故障，已 dispatch 的调用仍停在 SQL `UNKNOWN`，后续 Session 被 `workspace_busy` 拒绝。携带真实鉴权的探测确认同一原 worker 精确拒绝不支持的工具，前后 Read 均成功，但这不能证明公开 catalog 正确。S1 验收前需要让声明能力与 resident 准入一致，并验证已知不支持的调用不会卡住 Workspace。MCP catalog 和缺少 Hook catalog 的观察不代表有副作用的 MCP 或 Hook 执行通过验收。
 

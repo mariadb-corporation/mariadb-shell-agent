@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -39,7 +40,7 @@ const GIT_ERROR_MESSAGE_MAX = 512;
 function redactGitPaths(detail: string, cwd: string): string {
   const gitRoot = findGitRoot(cwd);
   const roots = new Set([cwd, ...(gitRoot ? [gitRoot] : [])]);
-  const managedWorktreeSegment = `${path.sep}.qwen${path.sep}worktrees${path.sep}`;
+  const managedWorktreeSegment = `${path.sep}.mariadb-shell-agent${path.sep}worktrees${path.sep}`;
   const managedWorktreeOffset = path
     .resolve(cwd)
     .indexOf(managedWorktreeSegment);

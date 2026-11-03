@@ -13,7 +13,7 @@ Web Shell 的「添加工作区」对话框目前只能注册守护进程主机�
 ## 现状
 
 - `packages/web-shell/client/components/dialogs/AddWorkspaceDialog.tsx` 接受绝对路径或 `ssh://` 工作区地址，通过 `onAdd` 提交。
-- `packages/cli/src/serve/routes/workspace-management.ts` 的 `POST /workspaces` 注册已存在的目录，或只接受 `{ "kind": "scratch" }`，在守护进程私有的 scratch 根目录（`~/.qwen/scratch-workspaces/scratch-*`）下创建并注册空目录。
+- `packages/cli/src/serve/routes/workspace-management.ts` 的 `POST /workspaces` 注册已存在的目录，或只接受 `{ "kind": "scratch" }`，在守护进程私有的 scratch 根目录（`~/.mariadb-shell-agent/scratch-workspaces/scratch-*`）下创建并注册空目录。
 - 仓库里没有任何 clone 路径；`workspace-git*` 路由都是只读的（status、diff、log、branches、worktrees）。
 - 除 managed scratch 与 live conversation 运行时外，新工作区默认是 `untrusted`，信任确认仍由用户完成。
 

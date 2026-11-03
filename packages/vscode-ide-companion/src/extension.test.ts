@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -115,21 +116,16 @@ describe('activate', () => {
     vi.restoreAllMocks();
   });
 
-  it('should show the info message on first activation', async () => {
-    const showInformationMessageMock = vi
-      .mocked(vscode.window.showInformationMessage)
-      .mockResolvedValue(undefined as never);
+  it('shows no installation message on first activation', async () => {
     vi.mocked(context.globalState.get).mockReturnValue(undefined);
     vi.mocked(vscode.extensions.getExtension).mockReturnValue({
       packageJSON: { version: '1.1.0' },
     } as vscode.Extension<unknown>);
     await activate(context);
-    expect(showInformationMessageMock).toHaveBeenCalledWith(
-      'Qwen Code Companion extension successfully installed.',
-    );
+    expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
   });
 
-  it('writes production logs to the Qwen Code Companion output channel', async () => {
+  it('writes production logs to the MariaDB Shell Agent Companion output channel', async () => {
     const appendLine = vi.fn();
     vi.mocked(vscode.window.createOutputChannel).mockReturnValue({
       appendLine,
@@ -138,12 +134,12 @@ describe('activate', () => {
     await activate(context);
 
     expect(vscode.window.createOutputChannel).toHaveBeenCalledWith(
-      'Qwen Code Companion',
+      'MariaDB Shell Agent Companion',
     );
     expect(appendLine).toHaveBeenCalledWith('[INFO] Extension activated');
   });
 
-  it('launches Qwen Code with the full multi-root workspace env', async () => {
+  it('launches MariaDB Shell Agent with the full multi-root workspace env', async () => {
     vi.mocked(context.globalState.get).mockReturnValue(true);
     const first = {
       name: 'first',
@@ -169,9 +165,9 @@ describe('activate', () => {
 
     const command = vi
       .mocked(vscode.commands.registerCommand)
-      .mock.calls.find(([id]) => id === 'qwen-code.runQwenCode')?.[1] as
-      | (() => Promise<void>)
-      | undefined;
+      .mock.calls.find(
+        ([id]) => id === 'mariadb-shell-agent.runQwenCode',
+      )?.[1] as (() => Promise<void>) | undefined;
     expect(command).toBeDefined();
     await command!();
 
@@ -188,15 +184,6 @@ describe('activate', () => {
     );
   });
 
-  it('should not show the info message on subsequent activations', async () => {
-    vi.mocked(context.globalState.get).mockReturnValue(true);
-    vi.mocked(vscode.extensions.getExtension).mockReturnValue({
-      packageJSON: { version: '1.1.0' },
-    } as vscode.Extension<unknown>);
-    await activate(context);
-    expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
-  });
-
   it('should register a handler for onDidGrantWorkspaceTrust', async () => {
     await activate(context);
     expect(vscode.workspace.onDidGrantWorkspaceTrust).toHaveBeenCalled();
@@ -211,21 +198,7 @@ describe('activate', () => {
 
     const viewIds = registerCalls.map((call) => call[0]);
 
-    expect(viewIds).toContain('qwen-code.chatView.sidebar');
-  });
-
-  it('should launch the Qwen Code when the user clicks the button', async () => {
-    const showInformationMessageMock = vi
-      .mocked(vscode.window.showInformationMessage)
-      .mockResolvedValue('Run Qwen Code' as never);
-    vi.mocked(context.globalState.get).mockReturnValue(undefined);
-    vi.mocked(vscode.extensions.getExtension).mockReturnValue({
-      packageJSON: { version: '1.1.0' },
-    } as vscode.Extension<unknown>);
-    await activate(context);
-    expect(showInformationMessageMock).toHaveBeenCalledWith(
-      'Qwen Code Companion extension successfully installed.',
-    );
+    expect(viewIds).toContain('mariadb-shell-agent.chatView.sidebar');
   });
 
   describe('update notification', () => {
@@ -257,7 +230,7 @@ describe('activate', () => {
       await activate(context);
 
       expect(showInformationMessageMock).toHaveBeenCalledWith(
-        'A new version (1.2.0) of the Qwen Code Companion extension is available.',
+        'A new version (1.2.0) of the MariaDB Shell Agent Companion extension is available.',
         'Update to latest version',
       );
     });
@@ -356,7 +329,7 @@ describe('activate', () => {
 
       expect(executeCommandMock).toHaveBeenCalledWith(
         'workbench.extensions.installExtension',
-        'qwenlm.qwen-code-vscode-ide-companion',
+        'MariaDB.mariadb-shell-agent',
       );
     });
 
@@ -400,13 +373,13 @@ describe('activate', () => {
           .mock.calls.find(([id]) => id === name)?.[1] as
           | ((uri?: unknown) => void)
           | undefined;
-      const acceptHandler = findHandler('qwen.diff.accept');
+      const acceptHandler = findHandler('mariadb-shell-agent.diff.accept');
       expect(acceptHandler).toBeDefined();
 
       const diffUri = {
-        scheme: 'qwen-diff',
+        scheme: 'mariadb-shell-agent-diff',
         fsPath: '/workspace/src/app.ts',
-        toString: () => 'qwen-diff:///workspace/src/app.ts',
+        toString: () => 'mariadb-shell-agent-diff:///workspace/src/app.ts',
       };
       const hasDiff = vi
         .spyOn(DiffManager.prototype, 'hasDiff')
@@ -463,13 +436,13 @@ describe('activate', () => {
 
       const acceptHandler = vi
         .mocked(vscode.commands.registerCommand)
-        .mock.calls.find(([id]) => id === 'qwen.diff.accept')?.[1] as (
-        uri?: unknown,
-      ) => Promise<void>;
+        .mock.calls.find(
+          ([id]) => id === 'mariadb-shell-agent.diff.accept',
+        )?.[1] as (uri?: unknown) => Promise<void>;
       const diffUri = {
-        scheme: 'qwen-diff',
+        scheme: 'mariadb-shell-agent-diff',
         fsPath: '/workspace/src/app.ts',
-        toString: () => 'qwen-diff:///workspace/src/app.ts',
+        toString: () => 'mariadb-shell-agent-diff:///workspace/src/app.ts',
       };
       const hasDiff = vi
         .spyOn(DiffManager.prototype, 'hasDiff')
@@ -494,7 +467,7 @@ describe('activate', () => {
       registrySpy.mockRestore();
     });
 
-    // R3-8: the reject half of the same gate. `qwen.diff.cancel` must resolve a
+    // R3-8: the reject half of the same gate. `mariadb-shell-agent.diff.cancel` must resolve a
     // request-bound diff through the approval, not by cancelling the diff.
     it('routes a request-bound reject through the approval instead of cancelDiff', async () => {
       vi.spyOn(global, 'fetch').mockResolvedValue({
@@ -516,15 +489,15 @@ describe('activate', () => {
 
       const cancelHandler = vi
         .mocked(vscode.commands.registerCommand)
-        .mock.calls.find(([id]) => id === 'qwen.diff.cancel')?.[1] as (
-        uri?: unknown,
-      ) => Promise<void>;
+        .mock.calls.find(
+          ([id]) => id === 'mariadb-shell-agent.diff.cancel',
+        )?.[1] as (uri?: unknown) => Promise<void>;
       expect(cancelHandler).toBeDefined();
 
       const diffUri = {
-        scheme: 'qwen-diff',
+        scheme: 'mariadb-shell-agent-diff',
         fsPath: '/workspace/src/app.ts',
-        toString: () => 'qwen-diff:///workspace/src/app.ts',
+        toString: () => 'mariadb-shell-agent-diff:///workspace/src/app.ts',
       };
       const hasDiff = vi
         .spyOn(DiffManager.prototype, 'hasDiff')

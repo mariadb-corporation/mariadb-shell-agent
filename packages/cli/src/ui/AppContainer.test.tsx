@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 // @vitest-environment jsdom
@@ -377,7 +378,7 @@ describe('AppContainer State Management', () => {
   vi.setConfig({ testTimeout: 30000, hookTimeout: 30000 });
 
   // That same initialize() creates a real ExtensionStore under the resolved
-  // QWEN_HOME (~/.qwen when unset); some runners — including the
+  // QWEN_HOME (~/.mariadb-shell-agent when unset); some runners — including the
   // review-address verification gate's clean child — inherit a HOME the test
   // process cannot write to. Ordinary CI already overrides HOME, so point
   // both HOME and QWEN_HOME at a scratch directory for this suite, and leave
@@ -1345,7 +1346,7 @@ describe('AppContainer State Management', () => {
     it('queries the branch from the worktree path during a worktree session', () => {
       mockedUseWorktreeSession.mockReturnValue({
         slug: 'feature',
-        worktreePath: '/repo/.qwen/worktrees/feature',
+        worktreePath: '/repo/.mariadb-shell-agent/worktrees/feature',
         worktreeBranch: 'worktree-feature',
         originalCwd: '/repo',
         originalBranch: 'main',
@@ -1362,7 +1363,7 @@ describe('AppContainer State Management', () => {
       );
 
       expect(mockedUseGitBranchName).toHaveBeenCalledWith(
-        '/repo/.qwen/worktrees/feature',
+        '/repo/.mariadb-shell-agent/worktrees/feature',
       );
     });
 
@@ -4433,12 +4434,12 @@ describe('AppContainer State Management', () => {
       );
 
       capturedUIActions.handleFinalSubmit(
-        '@.qwen/tmp/clipboard.png\n\ndescribe this image',
+        '@.mariadb-shell-agent/tmp/clipboard.png\n\ndescribe this image',
         { submittedPrompt: 'describe this image' },
       );
 
       expect(mockQueueMessage).toHaveBeenCalledWith(
-        '@.qwen/tmp/clipboard.png\n\ndescribe this image',
+        '@.mariadb-shell-agent/tmp/clipboard.png\n\ndescribe this image',
         false,
         'describe this image',
         false,
@@ -6878,7 +6879,7 @@ describe('AppContainer State Management', () => {
       ).mock.calls.filter((call: string[]) => call[0].includes('\x1b]2;'));
       expect(titleWrites).toHaveLength(1);
       expect(titleWrites[0][0]).toBe(
-        titleEscape(`${ICON.CIRCLE_LEFT_HALF} Qwen - workspace`),
+        titleEscape(`${ICON.CIRCLE_LEFT_HALF} MariaDB Shell Agent - workspace`),
       );
       unmount();
     });
@@ -6925,7 +6926,9 @@ describe('AppContainer State Management', () => {
         process.stdout.write as ReturnType<typeof vi.fn>
       ).mock.calls.filter((call: string[]) => call[0].includes('\x1b]2;'));
       expect(titleWrites).toHaveLength(1);
-      expect(titleWrites[0][0]).toBe(titleEscape('Qwen - workspace'));
+      expect(titleWrites[0][0]).toBe(
+        titleEscape('MariaDB Shell Agent - workspace'),
+      );
       unmount();
     });
 
@@ -6973,7 +6976,7 @@ describe('AppContainer State Management', () => {
       ).mock.calls.filter((call: string[]) => call[0].includes('\x1b]2;'));
       expect(titleWrites).toHaveLength(1);
       expect(titleWrites[0][0]).toBe(
-        titleEscape(`${ICON.SPARKLE} Qwen - workspace`),
+        titleEscape(`${ICON.SPARKLE} MariaDB Shell Agent - workspace`),
       );
       unmount();
     });
@@ -7022,12 +7025,12 @@ describe('AppContainer State Management', () => {
       ).mock.calls.filter((call: string[]) => call[0].includes('\x1b]2;'));
       expect(titleWrites).toHaveLength(1);
       const calledWith = titleWrites[0][0];
-      expect(calledWith).toContain('Qwen - workspace');
+      expect(calledWith).toContain('MariaDB Shell Agent - workspace');
       expect(calledWith).toContain('\x1b]0;');
       expect(calledWith).toContain('\x1b]2;');
       expect(calledWith).toContain('\x07');
       expect(calledWith).toBe(
-        titleEscape(`${ICON.CIRCLE_LEFT_HALF} Qwen - workspace`),
+        titleEscape(`${ICON.CIRCLE_LEFT_HALF} MariaDB Shell Agent - workspace`),
       );
       unmount();
     });
@@ -7076,7 +7079,7 @@ describe('AppContainer State Management', () => {
       ).mock.calls.filter((call: string[]) => call[0].includes('\x1b]2;'));
       expect(titleWrites).toHaveLength(1);
       expect(titleWrites[0][0]).toBe(
-        titleEscape(`${ICON.CIRCLE_LEFT_HALF} Qwen - workspace`),
+        titleEscape(`${ICON.CIRCLE_LEFT_HALF} MariaDB Shell Agent - workspace`),
       );
       unmount();
     });
@@ -7221,11 +7224,11 @@ describe('AppContainer State Management', () => {
         'Fix terminal title',
       );
       // When null, falls back to computeWindowTitle() which returns
-      // 'Qwen - qwen' when CLI_TITLE is not set.
-      expect(formatSessionWindowTitle(null)).toBe('Qwen - qwen');
+      // 'MariaDB Shell Agent - qwen' when CLI_TITLE is not set.
+      expect(formatSessionWindowTitle(null)).toBe('MariaDB Shell Agent - qwen');
       // When null with a folder name, adds the Qwen prefix.
       expect(formatSessionWindowTitle(null, 'my-project')).toBe(
-        'Qwen - my-project',
+        'MariaDB Shell Agent - my-project',
       );
       // Session names with control characters are sanitized at entry point.
       expect(formatSessionWindowTitle('Bad\x07Title')).toBe('BadTitle');
@@ -7330,7 +7333,7 @@ describe('AppContainer State Management', () => {
 
       // When sessionName is null (revert case), should use computeWindowTitle fallback
       const staticTitle = formatSessionWindowTitle(null, folderName);
-      expect(staticTitle).toBe('Qwen - my-project');
+      expect(staticTitle).toBe('MariaDB Shell Agent - my-project');
 
       // When CLI_TITLE is set, it should use that instead
       vi.stubEnv('CLI_TITLE', 'Custom Title');
@@ -9183,12 +9186,12 @@ describe('AppContainer State Management', () => {
         {
           id: 4,
           type: MessageType.INFO,
-          text: `${CONTEXT_FILES_ANNOUNCEMENT_PREFIX} QWEN.md`,
+          text: `${CONTEXT_FILES_ANNOUNCEMENT_PREFIX} MARIADB-SHELL-AGENT.md`,
         },
       ];
       const harness = renderRewindHarness({
         history,
-        contextFilePaths: ['QWEN.md'],
+        contextFilePaths: ['MARIADB-SHELL-AGENT.md'],
       });
 
       // Consume the latch so the rewind's re-arm is a real transition.
@@ -9220,14 +9223,14 @@ describe('AppContainer State Management', () => {
         {
           id: 2,
           type: MessageType.INFO,
-          text: `${CONTEXT_FILES_ANNOUNCEMENT_PREFIX} QWEN.md`,
+          text: `${CONTEXT_FILES_ANNOUNCEMENT_PREFIX} MARIADB-SHELL-AGENT.md`,
         },
         rewindUserItem(3, 'second prompt', 'prompt-2'),
         { id: 4, type: 'gemini', text: 'second response' },
       ];
       const harness = renderRewindHarness({
         history,
-        contextFilePaths: ['QWEN.md'],
+        contextFilePaths: ['MARIADB-SHELL-AGENT.md'],
       });
 
       await runRewind(harness.target, 'both');
@@ -9742,8 +9745,8 @@ describe('AppContainer State Management', () => {
 
     it('announces loaded context files above the first real prompt, once', () => {
       const { addItem, enqueueMessage } = renderAnnouncementHarness([
-        'QWEN.md',
-        '~/.qwen/QWEN.md',
+        'MARIADB-SHELL-AGENT.md',
+        '~/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md',
       ]);
 
       capturedUIActions.handleFinalSubmit('hello', {
@@ -9753,7 +9756,7 @@ describe('AppContainer State Management', () => {
       expect(addItem).toHaveBeenCalledWith(
         expect.objectContaining({
           type: MessageType.INFO,
-          text: `${CONTEXT_FILES_ANNOUNCEMENT_PREFIX} QWEN.md, ~/.qwen/QWEN.md`,
+          text: `${CONTEXT_FILES_ANNOUNCEMENT_PREFIX} MARIADB-SHELL-AGENT.md, ~/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md`,
         }),
         expect.any(Number),
       );
@@ -9774,7 +9777,7 @@ describe('AppContainer State Management', () => {
     });
 
     it('does not consume the latch on a leading slash command', () => {
-      const { addItem } = renderAnnouncementHarness(['QWEN.md']);
+      const { addItem } = renderAnnouncementHarness(['MARIADB-SHELL-AGENT.md']);
 
       capturedUIActions.handleFinalSubmit('/help', {
         submittedPrompt: '/help',
@@ -9788,7 +9791,7 @@ describe('AppContainer State Management', () => {
     });
 
     it('does not consume the latch on a leading /btw command', () => {
-      const { addItem } = renderAnnouncementHarness(['QWEN.md']);
+      const { addItem } = renderAnnouncementHarness(['MARIADB-SHELL-AGENT.md']);
 
       capturedUIActions.handleFinalSubmit('/btw side note', {
         submittedPrompt: '/btw side note',
@@ -9812,7 +9815,9 @@ describe('AppContainer State Management', () => {
       // Files attached later in the session (e.g. /directory add) must still
       // get their one-shot notice: the latch is only consumed when something
       // was actually announced.
-      vi.mocked(mockConfig.getContextFilePaths).mockReturnValue(['QWEN.md']);
+      vi.mocked(mockConfig.getContextFilePaths).mockReturnValue([
+        'MARIADB-SHELL-AGENT.md',
+      ]);
       capturedUIActions.handleFinalSubmit('again', {
         submittedPrompt: 'again',
       });
@@ -9820,7 +9825,7 @@ describe('AppContainer State Management', () => {
     });
 
     it('re-arms the latch after Ctrl-L (handleClearScreen) wipes the INFO', () => {
-      const { addItem } = renderAnnouncementHarness(['QWEN.md']);
+      const { addItem } = renderAnnouncementHarness(['MARIADB-SHELL-AGENT.md']);
 
       capturedUIActions.handleFinalSubmit('hello', {
         submittedPrompt: 'hello',
@@ -9849,7 +9854,9 @@ describe('AppContainer State Management', () => {
         stats: { sessionId: 'session-a' },
         seedPromptCount: vi.fn(),
       });
-      const { addItem, view } = renderAnnouncementHarness(['QWEN.md']);
+      const { addItem, view } = renderAnnouncementHarness([
+        'MARIADB-SHELL-AGENT.md',
+      ]);
 
       capturedUIActions.handleFinalSubmit('hello', {
         submittedPrompt: 'hello',
@@ -9905,7 +9912,9 @@ describe('AppContainer State Management', () => {
         lastCompletedUuid: 'u1',
       } as ReturnType<typeof mockConfig.getResumedSessionData>);
       vi.spyOn(mockConfig, 'loadPausedBackgroundAgents').mockResolvedValue([]);
-      const { addItem, loadHistory } = renderAnnouncementHarness(['QWEN.md']);
+      const { addItem, loadHistory } = renderAnnouncementHarness([
+        'MARIADB-SHELL-AGENT.md',
+      ]);
 
       // The startup resume path must route through the reconciling
       // wrapper: the rebuilt history has no announcement (the INFO is
@@ -9974,7 +9983,7 @@ describe('AppContainer State Management', () => {
     });
 
     it('does not consume the latch on a whitespace-only prompt', () => {
-      const { addItem } = renderAnnouncementHarness(['QWEN.md']);
+      const { addItem } = renderAnnouncementHarness(['MARIADB-SHELL-AGENT.md']);
 
       // Blank submissions are dropped downstream and never reach the model.
       capturedUIActions.handleFinalSubmit('   ', {
@@ -10005,7 +10014,7 @@ describe('AppContainer State Management', () => {
         shellConfirmationRequest: null,
         confirmationRequest: null,
       });
-      const { addItem } = renderAnnouncementHarness(['QWEN.md']);
+      const { addItem } = renderAnnouncementHarness(['MARIADB-SHELL-AGENT.md']);
 
       // Skills are expanded into a submit_prompt that reaches the model, so
       // the announcement must attach to this turn, not a later plain prompt.
@@ -10024,7 +10033,7 @@ describe('AppContainer State Management', () => {
       mockLoadHierarchicalMemory.mockResolvedValue({
         memoryContent: 'content',
         fileCount: 1,
-        contextFilePaths: ['/custom/QWEN.md'],
+        contextFilePaths: ['/custom/MARIADB-SHELL-AGENT.md'],
         conditionalRules: [],
         projectRoot: '/custom',
       });
@@ -10082,7 +10091,9 @@ describe('AppContainer State Management', () => {
         ['exclude-rule'],
         expect.objectContaining({ extensionRuleSources }),
       );
-      expect(setContextFilePathsSpy).toHaveBeenCalledWith(['/custom/QWEN.md']);
+      expect(setContextFilePathsSpy).toHaveBeenCalledWith([
+        '/custom/MARIADB-SHELL-AGENT.md',
+      ]);
     });
   });
 

@@ -26,7 +26,7 @@ packages/core/src/tools/computer-use/
   tool.ts                           # ComputerUseTool — parameterized BaseDeclarativeTool
   client.ts                         # ComputerUseClient — singleton MCP stdio process manager
   bootstrap.ts                      # state machine: probe → install confirm → install → perm guide
-  install-state.ts                  # ~/.qwen/computer-use/installed.json read/write
+  install-state.ts                  # ~/.mariadb-shell-agent/computer-use/installed.json read/write
   permission-detector.ts            # parse upstream error strings to detect missing perms
   schemas.test.ts                   # all 9 schemas parse, names match contract
   tool.test.ts                      # parameterized tool wiring
@@ -1146,7 +1146,7 @@ This phase replaces the `runBootstrap` stub from Task 5 with the full state mach
 - Create: `packages/core/src/tools/computer-use/install-state.ts`
 - Create: `packages/core/src/tools/computer-use/install-state.test.ts`
 
-Persisted at `~/.qwen/computer-use/installed.json`:
+Persisted at `~/.mariadb-shell-agent/computer-use/installed.json`:
 
 ```json
 {
@@ -1258,7 +1258,7 @@ export interface InstallState {
  * point at a temp directory.
  */
 export function installStatePathFor(home: string = homedir()): string {
-  return join(home, '.qwen', 'computer-use', 'installed.json');
+  return join(home, '.mariadb-shell-agent', 'computer-use', 'installed.json');
 }
 
 export async function loadInstallState(
@@ -1312,7 +1312,7 @@ Expected: PASS, 5 tests
 
 ```bash
 git add packages/core/src/tools/computer-use/install-state.ts packages/core/src/tools/computer-use/install-state.test.ts
-git commit -m "feat(computer-use): persist install approval state under ~/.qwen"
+git commit -m "feat(computer-use): persist install approval state under ~/.mariadb-shell-agent"
 ```
 
 ---
@@ -1885,7 +1885,7 @@ This is the task with the most variable scope. **IMPLEMENTER**: read the investi
 Wipe install state:
 
 ```bash
-rm -rf ~/.qwen/computer-use
+rm -rf ~/.mariadb-shell-agent/computer-use
 ```
 
 Launch qwen-code and ask a computer-use question. Confirm the install prompt appears in the chosen UX (confirm dialog or stderr) and that approving it persists state correctly.
@@ -1906,7 +1906,7 @@ This is a non-coding gate.
 - [ ] **Step 1: Clear caches**
 
 ```bash
-rm -rf ~/.qwen/computer-use
+rm -rf ~/.mariadb-shell-agent/computer-use
 rm -rf ~/.npm/_npx
 # macOS: revoke permissions
 # System Settings → Privacy & Security → Accessibility / Screen Recording

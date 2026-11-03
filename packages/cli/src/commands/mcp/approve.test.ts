@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,7 +25,7 @@ import {
 } from '../../config/mcpApprovals.js';
 import { loadProjectMcpServers } from '../../config/mcpJson.js';
 
-describe('qwen mcp approve / reject', () => {
+describe('mariadb-shell-agent mcp approve / reject', () => {
   let dir: string;
   let cwdSpy: ReturnType<typeof vi.spyOn>;
 
@@ -73,7 +74,7 @@ describe('qwen mcp approve / reject', () => {
   };
 
   const writeWorkspaceSettings = (servers: Record<string, unknown>) => {
-    const qwenDir = path.join(dir, '.qwen');
+    const qwenDir = path.join(dir, '.mariadb-shell-agent');
     fs.mkdirSync(qwenDir, { recursive: true });
     fs.writeFileSync(
       path.join(qwenDir, 'settings.json'),
@@ -109,7 +110,7 @@ describe('qwen mcp approve / reject', () => {
     expect(output()).toContain('Approved MCP server "slack"');
   });
 
-  it('approves a workspace .qwen/settings.json server', async () => {
+  it('approves a workspace .mariadb-shell-agent/settings.json server', async () => {
     writeWorkspaceSettings({ ws: { command: 'node', args: ['ws.js'] } });
 
     await run(approveCommand, { name: 'ws', all: false });

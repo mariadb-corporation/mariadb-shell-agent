@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -345,7 +346,7 @@ Some content without frontmatter.
       mockEntries([dirent('symlinked-skill', 'symlink')]);
       // realpath returns wherever the link points. Out-of-tree targets are
       // allowed (the supported user workflow is symlinking into
-      // ~/.qwen/skills/ from a separate repo).
+      // ~/.mariadb-shell-agent/skills/ from a separate repo).
       vi.mocked(fs.realpath).mockResolvedValue(
         '/elsewhere/skills-repo/symlinked-skill',
       );

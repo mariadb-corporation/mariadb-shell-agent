@@ -32,7 +32,7 @@ Hosted cancel handler 先中断活动 Turn，再追加 `requestCancel`，后者�
 
 ## 验证与验收
 
-E2E 计划位于 `.qwen/e2e-tests/managed-cancel-evidence.md`。先检查全局安装的 CLI，但该 CLI 不暴露 Java operation reconciler，因此采用确定性的 Java/SQL 测试脚本替代，覆盖真实命令准入、停车行、journal 字节、证据读取及持久结算。同一组测试在 H2 和一次性 MySQL 8.4 InnoDB 数据库上运行。
+E2E 计划位于 `.mariadb-shell-agent/e2e-tests/managed-cancel-evidence.md`。先检查全局安装的 CLI，但该 CLI 不暴露 Java operation reconciler，因此采用确定性的 Java/SQL 测试脚本替代，覆盖真实命令准入、停车行、journal 字节、证据读取及持久结算。同一组测试在 H2 和一次性 MySQL 8.4 InnoDB 数据库上运行。
 
 验收要求：匹配的取消结果恰好结算原 operation 一次；completed/error 结果诚实地令其失败；未知、损坏、外域和被压缩移除的证据保持停车；合并的取消分别结算且不产生第二次副作用；迟到取消及其他 operation 种类保留原有行为。Java 模块验证、公共契约门禁、生成 WebShell 契约校验及相关 Hosted 恢复检查，必须与完整部署验收分开报告。
 

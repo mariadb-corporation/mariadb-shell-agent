@@ -1,10 +1,10 @@
-# Connect Qwen Code to tools via MCP
+# Connect MariaDB Shell Agent to tools via MCP
 
-Qwen Code can connect to external tools and data sources through the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction). MCP servers give Qwen Code access to your tools, databases, and APIs.
+MariaDB Shell Agent can connect to external tools and data sources through the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction). MCP servers give MariaDB Shell Agent access to your tools, databases, and APIs.
 
 ## What you can do with MCP
 
-With MCP servers connected, you can ask Qwen Code to:
+With MCP servers connected, you can ask MariaDB Shell Agent to:
 
 - Work with files and repos (read/search/write, depending on the tools you enable)
 - Query databases (schema inspection, queries, reporting)
@@ -17,20 +17,20 @@ With MCP servers connected, you can ask Qwen Code to:
 
 ## Quick start
 
-Qwen Code loads MCP servers from `mcpServers` in your `settings.json`. You can configure servers either:
+MariaDB Shell Agent loads MCP servers from `mcpServers` in your `settings.json`. You can configure servers either:
 
 - By editing `settings.json` directly
-- By using `qwen mcp` commands (see [CLI reference](#manage-mcp-servers-with-qwen-mcp))
+- By using `mariadb-shell-agent mcp` commands (see [CLI reference](#manage-mcp-servers-with-qwen-mcp))
 
 ### Add your first server
 
 1. Add a server (example: remote HTTP MCP server):
 
 ```bash
-qwen mcp add --transport http my-server http://localhost:3000/mcp
+mariadb-shell-agent mcp add --transport http my-server http://localhost:3000/mcp
 ```
 
-2. Start Qwen Code and open the MCP management dialog to view and manage
+2. Start MariaDB Shell Agent and open the MCP management dialog to view and manage
    servers:
 
 ```bash
@@ -43,20 +43,20 @@ Then enter:
 /mcp
 ```
 
-3. If Qwen Code was already running before you added the server, restart it in
+3. If MariaDB Shell Agent was already running before you added the server, restart it in
    the same project. Then ask the model to use tools from that server.
 
 ## Where configuration is stored (scopes)
 
 Most users only need these two scopes:
 
-- **User scope (default)**: `~/.qwen/settings.json` across all projects on your machine
-- **Project scope**: `.qwen/settings.json` in your project root
+- **User scope (default)**: `~/.mariadb-shell-agent/settings.json` across all projects on your machine
+- **Project scope**: `.mariadb-shell-agent/settings.json` in your project root
 
 Write to user scope:
 
 ```bash
-qwen mcp add --scope user --transport http my-server http://localhost:3000/mcp
+mariadb-shell-agent mcp add --scope user --transport http my-server http://localhost:3000/mcp
 ```
 
 > [!tip]
@@ -77,13 +77,13 @@ qwen mcp add --scope user --transport http my-server http://localhost:3000/mcp
 >
 > If a server supports both, prefer **HTTP** over **SSE**.
 
-### Configure via `settings.json` vs `qwen mcp add`
+### Configure via `settings.json` vs `mariadb-shell-agent mcp add`
 
 Both approaches produce the same `mcpServers` entries in your `settings.json`—use whichever you prefer.
 
 #### Stdio server (local process)
 
-JSON (`.qwen/settings.json`):
+JSON (`.mariadb-shell-agent/settings.json`):
 
 ```json
 {
@@ -105,7 +105,7 @@ JSON (`.qwen/settings.json`):
 CLI (writes to user scope by default):
 
 ```bash
-qwen mcp add pythonTools -e DATABASE_URL=$DB_CONNECTION_STRING -e API_KEY=$EXTERNAL_API_KEY \
+mariadb-shell-agent mcp add pythonTools -e DATABASE_URL=$DB_CONNECTION_STRING -e API_KEY=$EXTERNAL_API_KEY \
   --timeout 15000 python -m my_mcp_server --port 8080
 ```
 
@@ -130,7 +130,7 @@ JSON:
 CLI:
 
 ```bash
-qwen mcp add --transport http httpServerWithAuth http://localhost:3000/mcp \
+mariadb-shell-agent mcp add --transport http httpServerWithAuth http://localhost:3000/mcp \
   --header "Authorization: Bearer your-api-token" --timeout 5000
 ```
 
@@ -152,12 +152,12 @@ JSON:
 CLI:
 
 ```bash
-qwen mcp add --transport sse sseServer http://localhost:8080/sse --timeout 30000
+mariadb-shell-agent mcp add --transport sse sseServer http://localhost:8080/sse --timeout 30000
 ```
 
 ## Using MCP prompts and resources
 
-Besides tools, Qwen Code discovers and surfaces two other MCP primitives.
+Besides tools, MariaDB Shell Agent discovers and surfaces two other MCP primitives.
 
 ### Prompts (slash commands)
 
@@ -177,7 +177,7 @@ The prompt's messages are sent to the model, which then acts on them.
 
 > Discovery is lenient about the declared `prompts` capability: some
 > servers implement `prompts/list` but omit `prompts` from their
-> `initialize` capabilities. Qwen Code attempts `prompts/list` anyway, so
+> `initialize` capabilities. MariaDB Shell Agent attempts `prompts/list` anyway, so
 > those prompts still appear. A server that genuinely has no prompts simply
 > answers `Method not found`, which is ignored.
 
@@ -213,7 +213,7 @@ untrusted folders.
 
 ## Progressive availability and discovery timeouts
 
-Qwen Code discovers MCP servers in the background after the UI is already
+MariaDB Shell Agent discovers MCP servers in the background after the UI is already
 interactive. You see the cli's first prompt within a few hundred
 milliseconds even when one of your MCP servers takes several seconds
 (or never responds), and the model's tool list updates within roughly
@@ -297,22 +297,22 @@ environment. This is kept as an escape hatch for at least one release.
 
 ### Connection-loss replay
 
-Qwen Code only reconnects and replays the current MCP tool call when the server has `trust: true`, the workspace is trusted, and the tool explicitly declares either `idempotentHint: true` or a consistent read-only annotation. Read-only annotations conflict with `destructiveHint: true` or `idempotentHint: false` and are not replayed.
+MariaDB Shell Agent only reconnects and replays the current MCP tool call when the server has `trust: true`, the workspace is trusted, and the tool explicitly declares either `idempotentHint: true` or a consistent read-only annotation. Read-only annotations conflict with `destructiveHint: true` or `idempotentHint: false` and are not replayed.
 
-Calls with missing annotations, conflicting annotations, an untrusted server, or an untrusted workspace are not replayed after a connection failure. Qwen Code reports that the result may be unknown because the server could have completed the operation before the response was lost. Verify the outcome before trying again. This conservative behavior can differ from earlier releases that transparently retried unannotated tools.
+Calls with missing annotations, conflicting annotations, an untrusted server, or an untrusted workspace are not replayed after a connection failure. MariaDB Shell Agent reports that the result may be unknown because the server could have completed the operation before the response was lost. Verify the outcome before trying again. This conservative behavior can differ from earlier releases that transparently retried unannotated tools.
 
 Annotations are server-provided behavior hints, not permissions or an authorization boundary. Only configure `trust: true` for servers you control and whose annotations you have verified.
 
 ### OAuth authentication
 
-Qwen Code supports OAuth 2.0 authentication for MCP servers. This is useful when accessing remote servers that require authentication.
+MariaDB Shell Agent supports OAuth 2.0 authentication for MCP servers. This is useful when accessing remote servers that require authentication.
 
 #### Basic usage
 
-When you add an MCP server with OAuth credentials, Qwen Code will automatically handle the authentication flow:
+When you add an MCP server with OAuth credentials, MariaDB Shell Agent will automatically handle the authentication flow:
 
 ```bash
-qwen mcp add --transport sse oauth-server https://api.example.com/sse/ \
+mariadb-shell-agent mcp add --transport sse oauth-server https://api.example.com/sse/ \
   --oauth-client-id your-client-id \
   --oauth-redirect-uri https://your-server.com/oauth/callback \
   --oauth-authorization-url https://provider.example.com/authorize \
@@ -323,14 +323,14 @@ qwen mcp add --transport sse oauth-server https://api.example.com/sse/ \
 
 The OAuth flow requires a redirect URI where the authorization provider sends the authentication code.
 
-- **Local development**: By default, Qwen Code uses `http://localhost:7777/oauth/callback`. This works when running Qwen Code on your local machine with a local browser.
+- **Local development**: By default, MariaDB Shell Agent uses `http://localhost:7777/oauth/callback`. This works when running MariaDB Shell Agent on your local machine with a local browser.
 
-- **Remote/cloud deployments**: When running Qwen Code on remote servers, cloud IDEs, or web terminals, the default `localhost` redirect will NOT work. Configure `--oauth-redirect-uri` with a public URL ending in `/oauth/callback`, then reverse-proxy that path to `http://127.0.0.1:7777/oauth/callback` on the machine running Qwen Code. Qwen Code does not terminate TLS; the proxy must do so.
+- **Remote/cloud deployments**: When running MariaDB Shell Agent on remote servers, cloud IDEs, or web terminals, the default `localhost` redirect will NOT work. Configure `--oauth-redirect-uri` with a public URL ending in `/oauth/callback`, then reverse-proxy that path to `http://127.0.0.1:7777/oauth/callback` on the machine running MariaDB Shell Agent. MariaDB Shell Agent does not terminate TLS; the proxy must do so.
 
 Example for remote servers:
 
 ```bash
-qwen mcp add --transport sse remote-server https://api.example.com/sse/ \
+mariadb-shell-agent mcp add --transport sse remote-server https://api.example.com/sse/ \
   --oauth-redirect-uri https://your-remote-server.example.com/oauth/callback
 ```
 
@@ -383,19 +383,19 @@ OAuth configuration properties:
 
 OAuth tokens are automatically:
 
-- **Stored** in `~/.qwen/mcp-oauth-tokens.json` (plaintext, mode 0600) by default. If `QWEN_CODE_FORCE_ENCRYPTED_FILE_STORAGE=true` is set, Qwen Code uses keychain-backed storage where available, or `~/.qwen/mcp-oauth-tokens-v2.json` with AES-256-GCM encryption.
+- **Stored** in `~/.mariadb-shell-agent/mcp-oauth-tokens.json` (plaintext, mode 0600) by default. If `QWEN_CODE_FORCE_ENCRYPTED_FILE_STORAGE=true` is set, MariaDB Shell Agent uses keychain-backed storage where available, or `~/.mariadb-shell-agent/mcp-oauth-tokens-v2.json` with AES-256-GCM encryption.
 - **Refreshed** when expired (if refresh tokens are available)
 - **Validated** before each connection attempt
 
 > [!WARNING]
 > By default, OAuth tokens are stored unencrypted on disk. On shared or multi-user machines, set `QWEN_CODE_FORCE_ENCRYPTED_FILE_STORAGE=true` to protect credentials.
 
-Use the `/mcp` dialog within Qwen Code to inspect MCP servers and manage
+Use the `/mcp` dialog within MariaDB Shell Agent to inspect MCP servers and manage
 authentication interactively.
 
 ### Tool filtering (allow/deny tools per server)
 
-Use `includeTools` / `excludeTools` to restrict tools exposed by a server (from Qwen Code’s perspective).
+Use `includeTools` / `excludeTools` to restrict tools exposed by a server (from MariaDB Shell Agent’s perspective).
 
 Example: include only a few tools:
 
@@ -434,9 +434,9 @@ Example:
 
 ## Troubleshooting
 
-- **Server shows “Disconnected” in `qwen mcp list`**: verify the URL/command is correct, then increase `timeout`.
+- **Server shows “Disconnected” in `mariadb-shell-agent mcp list`**: verify the URL/command is correct, then increase `timeout`.
 - **Stdio server fails to start**: use an absolute `command` path, and double-check `cwd`/`env`.
-- **Environment variables in JSON don’t resolve**: ensure they exist in the environment where Qwen Code runs (shell vs GUI app environments can differ).
+- **Environment variables in JSON don’t resolve**: ensure they exist in the environment where MariaDB Shell Agent runs (shell vs GUI app environments can differ).
 
 ## Reference
 
@@ -537,14 +537,14 @@ instead of adjusting its limits.
 
 <a id="qwen-mcp-cli"></a>
 
-### Manage MCP servers with `qwen mcp`
+### Manage MCP servers with `mariadb-shell-agent mcp`
 
 You can always configure MCP servers by manually editing `settings.json`, but the CLI is usually faster.
 
-#### Adding a server (`qwen mcp add`)
+#### Adding a server (`mariadb-shell-agent mcp add`)
 
 ```bash
-qwen mcp add [options] <name> <commandOrUrl> [args...]
+mariadb-shell-agent mcp add [options] <name> <commandOrUrl> [args...]
 ```
 
 | Argument/Option             | Description                                                         | Default                                | Example                                                            |
@@ -570,8 +570,8 @@ qwen mcp add [options] <name> <commandOrUrl> [args...]
 
 > `--oauth-*` flags apply only to `--transport sse` and `--transport http`. Combining them with `--transport stdio` is rejected.
 
-#### Removing a server (`qwen mcp remove`)
+#### Removing a server (`mariadb-shell-agent mcp remove`)
 
 ```bash
-qwen mcp remove <name>
+mariadb-shell-agent mcp remove <name>
 ```

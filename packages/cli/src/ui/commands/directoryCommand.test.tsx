@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -253,7 +254,10 @@ describe('directoryCommand', () => {
       vi.mocked(loadServerHierarchicalMemory).mockResolvedValue({
         memoryContent: 'reloaded memory',
         fileCount: 2,
-        contextFilePaths: ['a/QWEN.md', '~/.qwen/QWEN.md'],
+        contextFilePaths: [
+          'a/MARIADB-SHELL-AGENT.md',
+          '~/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md',
+        ],
         ruleCount: 0,
         conditionalRules: [],
         projectRoot: '/test/dir',
@@ -289,8 +293,8 @@ describe('directoryCommand', () => {
       );
       expect(mockConfig.setUserMemory).toHaveBeenCalledWith('reloaded memory');
       expect(mockConfig.setContextFilePaths).toHaveBeenCalledWith([
-        'a/QWEN.md',
-        '~/.qwen/QWEN.md',
+        'a/MARIADB-SHELL-AGENT.md',
+        '~/.mariadb-shell-agent/MARIADB-SHELL-AGENT.md',
       ]);
     });
 

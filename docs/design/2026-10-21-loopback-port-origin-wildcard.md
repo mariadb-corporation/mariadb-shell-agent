@@ -4,13 +4,13 @@
 
 - Status: implemented
 - Date: 2026-10-21
-- Issue: [#14939](https://github.com/QwenLM/qwen-code/issues/14939)
+- Issue: [#14939](https://github.invalid/QwenLM/qwen-code/issues/14939)
 
 ## Problem
 
 The desktop client serves its own Web Shell from its bundled daemon at
 `http://127.0.0.1:<OS-assigned port>`. Every request it makes to a remote
-`qwen serve` daemon is therefore cross-origin with a page origin that changes
+`mariadb-shell-agent serve` daemon is therefore cross-origin with a page origin that changes
 on every launch. `--allow-origin` matches canonical origins exactly, so no
 fixed entry can name that origin. With a static entry every
 `OPTIONS /capabilities` preflight returns `403` and the connect gate retries
@@ -58,7 +58,7 @@ configuration that made the desktop's remote-daemon flow work.
   boot with a wildcard entry, matching the existing `*` guard: otherwise any
   local page on any port could drive the daemon.
 
-Example: `qwen serve --hostname 0.0.0.0 --token <token> --allow-origin http://127.0.0.1:*`
+Example: `mariadb-shell-agent serve --hostname 0.0.0.0 --token <token> --allow-origin http://127.0.0.1:*`
 
 ## Implementation
 

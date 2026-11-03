@@ -4,7 +4,7 @@
 
 [Hosted 集成设计](2026-09-21-managed-session-durable-store.zh-CN.md)涵盖完整控制面；本文仅涵盖 PR #12693 中的 TypeScript 基础层。
 
-状态：PR #12693 的 TypeScript 存储和恢复基础模块。更新日期：2026-09-25。本 PR 未接入 Hosted Agent 循环，也不提供 Java 服务、数据库迁移、OSS 实现或跨进程 failover 证明。这些属于从 [#12358](https://github.com/QwenLM/qwen-code/pull/12358) 拆出的控制面集成。下文对目标部署的描述是要求，不能作为本 PR 已部署这些能力的证据。
+状态：PR #12693 的 TypeScript 存储和恢复基础模块。更新日期：2026-09-25。本 PR 未接入 Hosted Agent 循环，也不提供 Java 服务、数据库迁移、OSS 实现或跨进程 failover 证明。这些属于从 [#12358](https://github.invalid/QwenLM/qwen-code/pull/12358) 拆出的控制面集成。下文对目标部署的描述是要求，不能作为本 PR 已部署这些能力的证据。
 
 ## 1. 决策
 

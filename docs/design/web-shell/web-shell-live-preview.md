@@ -107,12 +107,12 @@ direct connection or an existing tunnel.
 
 ## Validation and open questions
 
-Use the global `qwen` binary for the baseline, then the locally built bundle
+Use the global `mariadb-shell-agent` binary for the baseline, then the locally built bundle
 for production CSP verification. Exercise a real development server, modules,
 storage, WebSocket updates, viewport size, tab switches, refresh, external
 opening, persistence, and invalid origins. Verify the trusted-wrapper policy
 against hostile redirects and scripts. The detailed plan and observed results
-live in `.qwen/e2e-tests/web-shell-live-preview.md`.
+live in `.mariadb-shell-agent/e2e-tests/web-shell-live-preview.md`.
 
 The pre-implementation browser spike passed modules, storage, Vite HMR and direct
 redirect/script-navigation blocking on Chromium and Firefox. A descendant-frame

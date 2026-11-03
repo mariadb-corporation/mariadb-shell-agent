@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -593,7 +594,7 @@ describe('no-AK integration CI wiring', () => {
       gateStep.indexOf(`npm run ${NO_AK_SCRIPT}`),
     );
     expect(gateStep).toContain(
-      "QWEN_HOME: '${{ runner.temp }}/qwen-no-ak-home/.qwen'",
+      "QWEN_HOME: '${{ runner.temp }}/qwen-no-ak-home/.mariadb-shell-agent'",
     );
     expect(gateStep).toContain('timeout-minutes: 20');
     expect(gateStep).toContain(

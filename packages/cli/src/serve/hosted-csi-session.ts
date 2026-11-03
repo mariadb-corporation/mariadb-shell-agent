@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -123,7 +124,7 @@ function blockOwner(
         ? 'native_persistence_unavailable'
         : 'csi_operation_unavailable';
   writeStderrLineSafe(
-    `qwen serve: Private CSI Session ${owner.key.sessionId} boot ${bootId} blocked during ${phase}: ${code}`,
+    `mariadb-shell-agent serve: Private CSI Session ${owner.key.sessionId} boot ${bootId} blocked during ${phase}: ${code}`,
   );
 }
 

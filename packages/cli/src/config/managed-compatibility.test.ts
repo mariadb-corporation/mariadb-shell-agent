@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -55,7 +56,9 @@ describe('evaluateManagedCompatibility', () => {
     );
     workspace = path.join(root, 'workspace');
     qwenHome = path.join(root, 'qwen-home');
-    fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+    fs.mkdirSync(path.join(workspace, '.mariadb-shell-agent'), {
+      recursive: true,
+    });
     fs.mkdirSync(qwenHome, { recursive: true });
     fs.mkdirSync(path.join(root, 'system'), { recursive: true });
     requestCwd = workspace;
@@ -94,7 +97,7 @@ describe('evaluateManagedCompatibility', () => {
   };
   const userSettings = () => path.join(qwenHome, 'settings.json');
   const workspaceSettings = () =>
-    path.join(workspace, '.qwen', 'settings.json');
+    path.join(workspace, '.mariadb-shell-agent', 'settings.json');
   const systemSettings = () => path.join(root, 'system', 'settings.json');
   const systemDefaults = () =>
     path.join(root, 'system', 'system-defaults.json');
@@ -597,9 +600,12 @@ describe('evaluateManagedCompatibility', () => {
           ? environment
           : { ...environment, QWEN_HOME: value },
     };
-    fs.mkdirSync(path.join(root, '.qwen', 'extensions', 'demo'), {
-      recursive: true,
-    });
+    fs.mkdirSync(
+      path.join(root, '.mariadb-shell-agent', 'extensions', 'demo'),
+      {
+        recursive: true,
+      },
+    );
 
     await expect(evaluate()).resolves.toEqual({
       status: 'deferred',
@@ -789,7 +795,7 @@ describe('evaluateManagedCompatibility', () => {
   });
 
   it('reads a value that is not a string as the string a session host receives', async () => {
-    // Read as unset, QWEN_HOME would give the home directory's .qwen instead.
+    // Read as unset, QWEN_HOME would give the home directory's .mariadb-shell-agent instead.
     vi.stubEnv('HOME', root);
     vi.stubEnv('USERPROFILE', root);
     runtime = {

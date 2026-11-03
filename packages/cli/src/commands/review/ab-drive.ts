@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review ab-drive`: run ONE script against TWO trees and hand back the
+// `mariadb-shell-agent review ab-drive`: run ONE script against TWO trees and hand back the
 // paired observation — the A/B's runtime form, with the pairing done by code
 // instead of by hand.
 //

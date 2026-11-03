@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -451,7 +452,7 @@ describe('verify-capture helper', () => {
   // browser route is no longer the recommendation and the live command is named.
   it('is the route the skill actually names', () => {
     const skill = readFileSync(
-      path.join(repoRoot, '.qwen/skills/verify-pr/SKILL.md'),
+      path.join(repoRoot, '.mariadb-shell-agent/skills/verify-pr/SKILL.md'),
       'utf8',
     );
     // Flatten whitespace so a prose reflow cannot break these, like the sibling

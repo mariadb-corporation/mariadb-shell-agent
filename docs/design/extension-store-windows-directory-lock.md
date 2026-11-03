@@ -11,8 +11,8 @@ filesystem error and no explanation:
 
 ```text
 EPERM: operation not permitted, rename
-'C:\Users\<user>\.qwen\extensions\i-have-adhd' ->
-'C:\Users\<user>\.qwen\extension-store\rollback\b101694b-c6a6-4a54-9cf1-4f3e8dd7f7c0'
+'C:\Users\<user>\.mariadb-shell-agent\extensions\i-have-adhd' ->
+'C:\Users\<user>\.mariadb-shell-agent\extension-store\rollback\b101694b-c6a6-4a54-9cf1-4f3e8dd7f7c0'
 ```
 
 The text reaches the terminal unchanged because the update command reports the
@@ -31,8 +31,8 @@ await renameWithRetry(destinationDirectory, backupDirectory, 3, 50);
 ```
 
 On Windows, `MoveFileEx` of a directory fails when any **descendant** of that
-directory has an open handle. Qwen Code creates exactly that handle itself:
-`ExtensionFileWatcher` watches `~/.qwen/extensions` with chokidar at unlimited
+directory has an open handle. MariaDB Shell Agent creates exactly that handle itself:
+`ExtensionFileWatcher` watches `~/.mariadb-shell-agent/extensions` with chokidar at unlimited
 depth, and chokidar attaches one native `ReadDirectoryChangesW` handle **per
 subdirectory** it discovers. Every interactive session therefore locks every
 directory of every installed extension.
@@ -59,7 +59,7 @@ data loss but never addressed Windows locks.
 Who holds the handles depends on the entry point: the CLI subcommand exits during
 argument parsing and never starts a watcher, so there the locks belong to _other_
 sessions. That is why the fix has to be holder-agnostic, and why "close your other
-Qwen Code sessions" is not a reliable workaround - the UI path is blocked by the
+MariaDB Shell Agent sessions" is not a reliable workaround - the UI path is blocked by the
 acting session itself.
 
 ### Measured evidence
@@ -83,14 +83,14 @@ renaming an extension directory that contains a nested subdirectory:
 | `cp -r` over a tree with a descendant handle    | OK                        |
 
 Confirmed against the live machine: a throwaway directory created under the real
-`~/.qwen/extensions` could not be renamed while other Qwen Code sessions were
+`~/.mariadb-shell-agent/extensions` could not be renamed while other MariaDB Shell Agent sessions were
 running, and the probe was removed afterwards. The last two rows are what make
 the fix possible: these handles block directory rename, not directory removal,
 deletion or copying, so a swap can avoid the lock without any cross-process
 protocol.
 
 Handle rows are split by sharing, which a single row conflated: a holder that
-grants delete - what `libuv` opens with, so every Qwen Code child counts - blocks
+grants delete - what `libuv` opens with, so every MariaDB Shell Agent child counts - blocks
 neither a rename nor a copy, while a holder that withholds it, such as a scanner or
 an editor holding one file exclusively, refuses the rename with `EPERM` and makes a
 copy over that file fail with `EBUSY`. That last value is the one a lock classifier
@@ -100,8 +100,8 @@ sees on the copy path, and it is why the copy retries.
 
 In scope:
 
-- `qwen extensions update <name>` and `uninstall <name>` succeed on Windows while
-  other Qwen Code sessions are running, and an update started from the
+- `mariadb-shell-agent extensions update <name>` and `uninstall <name>` succeed on Windows while
+  other MariaDB Shell Agent sessions are running, and an update started from the
   `/extensions` UI of a live session succeeds even though that session is itself
   one of the holders.
 - When the swap is still impossible, say so in terms the user can act on, and
@@ -466,7 +466,7 @@ Linux lane runs the same suite with the same handles and reports no lock at all.
 Acceptance:
 
 - On Windows, with at least one other interactive session running,
-  `qwen extensions update <name>` completes and the new version loads.
+  `mariadb-shell-agent extensions update <name>` completes and the new version loads.
 - A swap that cannot complete reports `extension_directory_locked` naming the
   directory, and the previous version is still installed and loadable. Three
   states can differ: a copy-mode rollback the same holder defeats may leave stale content,

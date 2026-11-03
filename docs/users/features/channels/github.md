@@ -1,17 +1,17 @@
 # GitHub
 
-This guide covers setting up a Qwen Code channel that monitors GitHub notifications and responds to mentions, review requests, assignments, and followed-thread activity.
+This guide covers setting up a MariaDB Shell Agent channel that monitors GitHub notifications and responds to mentions, review requests, assignments, and followed-thread activity.
 
 ## Prerequisites
 
 - A GitHub account authenticated with the permissions needed to read notifications and post comments
-- The [GitHub CLI](https://cli.github.com/) installed on the host running Qwen Code when using local `gh` authentication
+- The [GitHub CLI](https://cli.github.com/) installed on the host running MariaDB Shell Agent when using local `gh` authentication
 
 Use a dedicated bot account when the authenticated account also needs to operate the channel. GitHub does not generate a usable notification for the account's own activity, and the adapter ignores its own comments to prevent reply loops.
 
 ## Authentication
 
-To reuse the GitHub CLI login on the Qwen Code host, authenticate `gh` and explicitly set `useLocalGh: true` in the channel configuration:
+To reuse the GitHub CLI login on the MariaDB Shell Agent host, authenticate `gh` and explicitly set `useLocalGh: true` in the channel configuration:
 
 ```bash
 gh auth login
@@ -32,7 +32,7 @@ You can instead configure a classic personal access token (PAT). An explicit `to
 
 ## Configuration
 
-Add the channel to `~/.qwen/settings.json`:
+Add the channel to `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -58,7 +58,7 @@ Add the channel to `~/.qwen/settings.json`:
 }
 ```
 
-To override local `gh` authentication with a PAT, add `"token": "$GITHUB_TOKEN"` to the channel and set the environment variable before starting Qwen Code:
+To override local `gh` authentication with a PAT, add `"token": "$GITHUB_TOKEN"` to the channel and set the environment variable before starting MariaDB Shell Agent:
 
 ```bash
 export GITHUB_TOKEN="ghp_your_token_here"
@@ -123,7 +123,7 @@ The adapter uses GitHub's Notifications API as a wake-up signal:
 5. **Commit the poll window** only after accepted work completes: mark notifications read and advance the cursor
 6. **First-contact fallback**: a brand-new unread issue/PR body can be processed when no comment was dispatched; mention notifications still require an actual body mention
 
-The comment window is `(previousCursor, currentMaxUpdatedAt]`. Accepted, running, and failed tasks are stored under `~/.qwen/channels/<workspace-scope>/` with private file permissions. On restart, the channel recovers those tasks before polling GitHub again. Failed tasks are attempted up to three times, then become terminal; cancelled tasks are terminal and are not rerun. A task whose final reply was already posted, suppressed, or queued for definite no-write retry is not rerun.
+The comment window is `(previousCursor, currentMaxUpdatedAt]`. Accepted, running, and failed tasks are stored under `~/.mariadb-shell-agent/channels/<workspace-scope>/` with private file permissions. On restart, the channel recovers those tasks before polling GitHub again. Failed tasks are attempted up to three times, then become terminal; cancelled tasks are terminal and are not rerun. A task whose final reply was already posted, suppressed, or queued for definite no-write retry is not rerun.
 
 The notification cursor does not advance while recoverable tasks remain, or when inbound task state cannot be read or written. This prevents a crash or agent failure from losing an accepted comment and preserves the deduplication keys needed to avoid a second dispatch from the notification feed.
 
@@ -139,7 +139,7 @@ The GitHub channel publishes only completed responses. Intermediate model chunks
 
 If GitHub returns a definite no-write delivery failure, such as a rate-limit
 response, the channel stores the final reply in
-`~/.qwen/channels/<workspace-scope>/<channel>-<name-hash>-github-pending-deliveries.json`
+`~/.mariadb-shell-agent/channels/<workspace-scope>/<channel>-<name-hash>-github-pending-deliveries.json`
 with private file permissions and retries it on the next channel start. The
 corresponding inbound task remains in `reply_pending` state until that delivery
 succeeds or reaches a definite terminal failure. Ambiguous delivery failures are
@@ -156,5 +156,5 @@ not retried automatically because GitHub may have created the comment.
 ## Starting the Channel
 
 ```bash
-qwen channel start my-github
+mariadb-shell-agent channel start my-github
 ```

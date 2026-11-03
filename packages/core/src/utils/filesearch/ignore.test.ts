@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -119,9 +120,9 @@ describe('loadIgnoreRules', () => {
     expect(fileFilter('test.txt')).toBe(false);
   });
 
-  it('should load rules from .qwenignore', async () => {
+  it('should load rules from .mariadb-shell-agentignore', async () => {
     tmpDir = await createTmpDir({
-      '.qwenignore': '*.log',
+      '.mariadb-shell-agentignore': '*.log',
     });
     const ignore = loadIgnoreRules({
       projectRoot: tmpDir,
@@ -166,9 +167,9 @@ describe('loadIgnoreRules', () => {
     expect(dirFilter('src/')).toBe(false);
   });
 
-  it('should not let custom ignore negations unignore .qwenignore matches', async () => {
+  it('should not let custom ignore negations unignore .mariadb-shell-agentignore matches', async () => {
     tmpDir = await createTmpDir({
-      '.qwenignore': 'secrets/**',
+      '.mariadb-shell-agentignore': 'secrets/**',
       '.agentignore': '!secrets/**',
     });
     const ignore = loadIgnoreRules({
@@ -183,7 +184,7 @@ describe('loadIgnoreRules', () => {
 
   it('should keep negations scoped to the same ignore file', async () => {
     tmpDir = await createTmpDir({
-      '.qwenignore': 'secrets/**\n!secrets/public.txt',
+      '.mariadb-shell-agentignore': 'secrets/**\n!secrets/public.txt',
     });
     const ignore = loadIgnoreRules({
       projectRoot: tmpDir,
@@ -214,10 +215,10 @@ describe('loadIgnoreRules', () => {
     expect(fileFilter('visible.txt')).toBe(false);
   });
 
-  it('should combine rules from .gitignore and .qwenignore', async () => {
+  it('should combine rules from .gitignore and .mariadb-shell-agentignore', async () => {
     tmpDir = await createTmpDir({
       '.gitignore': '*.log',
-      '.qwenignore': '*.txt',
+      '.mariadb-shell-agentignore': '*.txt',
     });
     const ignore = loadIgnoreRules({
       projectRoot: tmpDir,
@@ -258,14 +259,14 @@ describe('loadIgnoreRules', () => {
 
   it('should handle ignore files that cannot be read gracefully', async () => {
     tmpDir = await createTmpDir({
-      '.qwenignore': '*.log',
+      '.mariadb-shell-agentignore': '*.log',
     });
     const originalReadFileSync = fs.readFileSync;
     vi.spyOn(fs, 'readFileSync').mockImplementation(((
       filePath: fs.PathOrFileDescriptor,
       options?: BufferEncoding | null,
     ) => {
-      if (String(filePath).endsWith('.qwenignore')) {
+      if (String(filePath).endsWith('.mariadb-shell-agentignore')) {
         throw new Error('ignore file disappeared');
       }
       return originalReadFileSync(filePath, options);

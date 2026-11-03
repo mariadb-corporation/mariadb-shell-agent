@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -506,7 +507,7 @@ describe('SettingsDialog', () => {
 
       expect(saveModifiedSettings).not.toHaveBeenCalled();
       expect(lastFrame()).not.toContain(
-        'To see changes, Qwen Code must be restarted',
+        'To see changes, MariaDB Shell Agent must be restarted',
       );
       unmount();
     });
@@ -1112,7 +1113,7 @@ describe('SettingsDialog', () => {
 
       // Should not show restart prompt initially
       expect(lastFrame()).not.toContain(
-        'To see changes, Qwen Code must be restarted',
+        'To see changes, MariaDB Shell Agent must be restarted',
       );
 
       unmount();
@@ -1659,7 +1660,7 @@ describe('SettingsDialog', () => {
               SettingScope.User,
             );
             expect(lastFrame()).toContain(
-              'To see changes, Qwen Code must be restarted',
+              'To see changes, MariaDB Shell Agent must be restarted',
             );
           });
           expect(onRestartRequest).not.toHaveBeenCalled();

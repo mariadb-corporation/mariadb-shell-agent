@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -53,24 +54,6 @@ type MainOption =
 // ---------------------------------------------------------------------------
 
 const MAIN_ITEMS = [
-  {
-    key: 'QWENCLOUD',
-    title: t('QwenCloud'),
-    label: t('QwenCloud'),
-    description: t(
-      'Official recommended setup: Token Plan or Standard API Key',
-    ),
-    value: 'QWENCLOUD' as MainOption,
-  },
-  {
-    key: 'ALIBABA_MODELSTUDIO',
-    title: t('Alibaba ModelStudio'),
-    label: t('Alibaba ModelStudio'),
-    description: t(
-      'Official recommended setup: Coding Plan, Token Plan, or Standard API Key',
-    ),
-    value: 'ALIBABA_MODELSTUDIO' as MainOption,
-  },
   {
     key: 'THIRD_PARTY_PROVIDERS',
     title: t('Third-party Providers'),
@@ -133,7 +116,7 @@ const VIEW_TITLES: Record<string, () => string> = {
 // ---------------------------------------------------------------------------
 
 const TERMS_URL =
-  'https://qwenlm.github.io/qwen-code-docs/en/users/support/tos-privacy/';
+  'https://qwenlm.github.invalid/qwen-code-docs/en/users/support/tos-privacy/';
 
 function ProviderMenu<T>({
   title,

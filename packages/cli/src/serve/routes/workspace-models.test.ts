@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,7 +20,7 @@ import { WorkspaceGenerationClosedError } from '../workspace-registry.js';
 import * as jsoncEditor from '../../utils/jsonc-editor.js';
 
 // The DELETE route resolves the User-scope selection env from the real home
-// (`~/.env`, plus the legacy `~/.qwen/.env` whenever `QWEN_HOME` points
+// (`~/.env`, plus the legacy `~/.mariadb-shell-agent/.env` whenever `QWEN_HOME` points
 // elsewhere), so a contributor's own credentials there would reach
 // `selectionEnv` and flip the active-selection decision. Pin `os.homedir()`
 // to the per-test home instead; `os.tmpdir()` and the rest stay real.
@@ -46,7 +47,7 @@ function readUserSettings(): Record<string, unknown> {
 }
 
 function writeWorkspaceSettings(settings: Record<string, unknown>): void {
-  const dir = path.join(workspace, '.qwen');
+  const dir = path.join(workspace, '.mariadb-shell-agent');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(
     path.join(dir, 'settings.json'),
@@ -56,7 +57,10 @@ function writeWorkspaceSettings(settings: Record<string, unknown>): void {
 
 function readWorkspaceSettings(): Record<string, unknown> {
   return JSON.parse(
-    fs.readFileSync(path.join(workspace, '.qwen', 'settings.json'), 'utf8'),
+    fs.readFileSync(
+      path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
+      'utf8',
+    ),
   );
 }
 
@@ -762,7 +766,7 @@ describe('DELETE /workspace/models', () => {
     expect(broadcastSettingsChanged).not.toHaveBeenCalled();
   });
 
-  it('removes a model from ~/.qwen/settings.json and keeps siblings', async () => {
+  it('removes a model from ~/.mariadb-shell-agent/settings.json and keeps siblings', async () => {
     writeUserSettings({
       modelProviders: {
         openai: [{ id: 'gpt-4o' }, { id: 'deepseek-v4' }],
@@ -1644,7 +1648,7 @@ describe('DELETE /workspace/models', () => {
     // Same shape as 'does not use workspace-only env to preserve a deleted
     // User selection', but the stored baseUrl carries userinfo. The pin must
     // keep the name and tombstone the baseUrl rather than copy the credential
-    // out of ~/.qwen/settings.json into the shareable .qwen/settings.json.
+    // out of ~/.mariadb-shell-agent/settings.json into the shareable .mariadb-shell-agent/settings.json.
     const storedBaseUrl = 'https://key@api.example.com';
     writeUserSettings({
       modelProviders: { openai: [{ id: 'gpt-4o', baseUrl: storedBaseUrl }] },
@@ -1739,9 +1743,11 @@ describe('DELETE /workspace/models', () => {
     expect(res.status).toBe(200);
     expect(res.body.clearedActiveModel).toBe(true);
     expect(readUserSettings()['model']).toEqual({ name: '', baseUrl: '' });
-    expect(fs.existsSync(path.join(workspace, '.qwen', 'settings.json'))).toBe(
-      false,
-    );
+    expect(
+      fs.existsSync(
+        path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
+      ),
+    ).toBe(false);
     expect(
       broadcastSettingsChanged.mock.calls.filter(
         ([, , scope]) => scope === 'workspace',

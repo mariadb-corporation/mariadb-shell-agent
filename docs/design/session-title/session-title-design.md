@@ -276,7 +276,7 @@ The picker's latency envelope survives corruption.
 
 Session reads open with `O_NOFOLLOW` (falls back to plain read-only on
 Windows, where the constant is not exposed). Defense in depth so a
-symlink planted in `~/.qwen/projects/<proj>/chats/` can't redirect a
+symlink planted in `~/.mariadb-shell-agent/projects/<proj>/chats/` can't redirect a
 metadata read to an unrelated file.
 
 ## Concurrency and Edge Cases
@@ -295,7 +295,7 @@ short-circuits the rest so the cheap ones run first:
 5. `autoTitleAttempts >= 3` → skip. Cap bounds total waste.
 6. `autoTitleDisabledByEnv()` → skip. `QWEN_DISABLE_AUTO_TITLE=1`
    explicit opt-out.
-7. `!config.isInteractive()` → skip. Headless `qwen -p` / CI never spends
+7. `!config.isInteractive()` → skip. Headless `mariadb-shell-agent -p` / CI never spends
    fast-model tokens on a one-shot session.
 8. `!config.getFastModel()` → skip. No fast-model → no-op.
 
@@ -408,7 +408,7 @@ generator's catch block. Failures are fully transparent to the user —
 auto-title is an auxiliary feature and never throws into the UI.
 
 Developers can grep for the `[SESSION_TITLE]` tag in the debug log
-(`~/.qwen/debug/<sessionId>.txt`; `latest.txt` symlinks to the current
+(`~/.mariadb-shell-agent/debug/<sessionId>.txt`; `latest.txt` symlinks to the current
 session). A working end-to-end call produces no log output; a failing
 one gets one WARN line with the underlying error message.
 
@@ -439,4 +439,4 @@ hostile text.
 | Settings-dialog toggle for auto generation  | Env var is the single knob. Full settings UI is easy to add later if user demand surfaces.                                                  |
 | i18n locale catalog entries for new strings | Consistent with existing `/rename` strings, which fall through to English. A repo-wide i18n pass is out of scope.                           |
 | Migration to re-classify legacy records     | Back-compat by design: absent `titleSource` is treated as manual. Rewriting old records would risk losing user intent.                      |
-| Non-interactive auto-titling                | `qwen -p` / CI scripts throw the session away; fast-model tokens for a title no one will ever resume is pure waste.                         |
+| Non-interactive auto-titling                | `mariadb-shell-agent -p` / CI scripts throw the session away; fast-model tokens for a title no one will ever resume is pure waste.          |

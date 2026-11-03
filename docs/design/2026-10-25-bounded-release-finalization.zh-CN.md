@@ -4,9 +4,9 @@
 
 ## 问题与证据
 
-v0.26.1 的 [finalize 运行](https://github.com/QwenLM/qwen-code/actions/runs/40108617400)处理了 156 个 PR。每批八项的串行请求多次触发 180 秒请求超时，耗尽了共享的 30 分钟模型预算。成功请求耗时 126–172 秒。脚本写出了回退说明，并跳过 highlights 和 themes；35 分钟 workflow 超时并未触发。日志没有输出 token 数，因此降低输出上限并不是经过验证的延迟修复。
+v0.26.1 的 [finalize 运行](https://github.invalid/QwenLM/qwen-code/actions/runs/40108617400)处理了 156 个 PR。每批八项的串行请求多次触发 180 秒请求超时，耗尽了共享的 30 分钟模型预算。成功请求耗时 126–172 秒。脚本写出了回退说明，并跳过 highlights 和 themes；35 分钟 workflow 超时并未触发。日志没有输出 token 数，因此降低输出上限并不是经过验证的延迟修复。
 
-随后创建的[发布 PR](https://github.com/QwenLM/qwen-code/pull/15468)还缺少 main 上更新 lint 门禁的提交。只检查分支 head 的 CI 正确拒绝了旧门禁；同步 main 后补齐了缺失的祖先提交。
+随后创建的[发布 PR](https://github.invalid/QwenLM/qwen-code/pull/15468)还缺少 main 上更新 lint 门禁的提交。只检查分支 head 的 CI 正确拒绝了旧门禁；同步 main 后补齐了缺失的祖先提交。
 
 ## 范围与决策
 
@@ -14,7 +14,7 @@ v0.26.1 的 [finalize 运行](https://github.com/QwenLM/qwen-code/actions/runs/4
 
 找到或创建发布 PR 后，先将 main 同步进其分支，再记录该 PR 可以进入自动审批。已经合并的 PR 在同步前退出。冲突或权限错误使任务失败；不强推、不自动解决冲突、不绕过保护。这会缩短门禁过期的时间窗口，但无法阻止同步之后 main 再发生变化。
 
-发布 tag 和已发布产物保持不可变。本次改动不触发发布、不轮换凭据。第二次审批仍受到 [#14341](https://github.com/QwenLM/qwen-code/issues/14341) 中独立身份冲突问题的影响。Runner 迁移继续由 [#15465](https://github.com/QwenLM/qwen-code/issues/15465) 跟踪。
+发布 tag 和已发布产物保持不可变。本次改动不触发发布、不轮换凭据。第二次审批仍受到 [#14341](https://github.invalid/QwenLM/qwen-code/issues/14341) 中独立身份冲突问题的影响。Runner 迁移继续由 [#15465](https://github.invalid/QwenLM/qwen-code/issues/15465) 跟踪。
 
 ## 风险与限制
 

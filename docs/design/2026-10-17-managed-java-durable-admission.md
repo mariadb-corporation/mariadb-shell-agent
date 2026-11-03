@@ -4,7 +4,7 @@
 
 Status: historical design. The [first-release contract cleanup](2026-10-23-managed-first-release-contract.md) replaces the optional profile and capability switch with mandatory operation fields on Turn admissions. The historical design below records the earlier implementation.
 
-This is slice **D7-3** of [#14122](https://github.com/QwenLM/qwen-code/issues/14122) (the D7 umbrella of [#12380](https://github.com/QwenLM/qwen-code/issues/12380), Stage D), tracked by [#14167](https://github.com/QwenLM/qwen-code/issues/14167). #12380 lets Stage D expose `java_durable` only with durable command delivery and original-command reconciliation. For Turn input and cancel, both exist on `main`. D7-1 ([turn command operations](2026-10-16-managed-turn-command-operations.md)) saves a `submit_input` or `cancel` operation with every admission. D7-2 ([operation reconciliation](2026-10-17-managed-operation-reconciliation.md)) reconciles an input whose acceptance is unknown from the Session journal.
+This is slice **D7-3** of [#14122](https://github.invalid/QwenLM/qwen-code/issues/14122) (the D7 umbrella of [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380), Stage D), tracked by [#14167](https://github.invalid/QwenLM/qwen-code/issues/14167). #12380 lets Stage D expose `java_durable` only with durable command delivery and original-command reconciliation. For Turn input and cancel, both exist on `main`. D7-1 ([turn command operations](2026-10-16-managed-turn-command-operations.md)) saves a `submit_input` or `cancel` operation with every admission. D7-2 ([operation reconciliation](2026-10-17-managed-operation-reconciliation.md)) reconciles an input whose acceptance is unknown from the Session journal.
 
 ## Problem
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -82,7 +83,7 @@ describe('Agent Plugins v1 skills', () => {
   it('validates standard metadata fields', () => {
     const filePath = path.join(pluginRoot, 'skills', 'portable', 'SKILL.md');
     const valid =
-      '---\nname: portable\ndescription: Portable skill\nlicense: Apache-2.0\ncompatibility: Qwen Code\nmetadata:\n  author: qwen\nallowed-tools: Read\n---\nBody';
+      '---\nname: portable\ndescription: Portable skill\nlicense: Apache-2.0\ncompatibility: MariaDB Shell Agent\nmetadata:\n  author: qwen\nallowed-tools: Read\n---\nBody';
     expect(parseAgentPluginSkill(valid, filePath)).toMatchObject({
       name: 'portable',
       description: 'Portable skill',

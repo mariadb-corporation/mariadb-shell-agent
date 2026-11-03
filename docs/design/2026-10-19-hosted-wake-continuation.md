@@ -3,7 +3,7 @@
 [English](2026-10-19-hosted-wake-continuation.md) | [简体中文](2026-10-19-hosted-wake-continuation.zh-CN.md)
 
 Status: implementation in this change; verification results belong in the PR.
-Tracks [#14047](https://github.com/QwenLM/qwen-code/issues/14047).
+Tracks [#14047](https://github.invalid/QwenLM/qwen-code/issues/14047).
 
 ## Problem and scope
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -105,13 +106,13 @@ function writeJson(path: string, value: unknown): void {
 }
 
 function fixture() {
-  const findings = join(root, '.qwen/tmp/findings.json');
-  const composed = join(root, '.qwen/tmp/composed.json');
-  const report = join(root, '.qwen/reviews/review.md');
-  const out = join(root, '.qwen/reviews/review.json');
+  const findings = join(root, '.mariadb-shell-agent/tmp/findings.json');
+  const composed = join(root, '.mariadb-shell-agent/tmp/composed.json');
+  const report = join(root, '.mariadb-shell-agent/reviews/review.md');
+  const out = join(root, '.mariadb-shell-agent/reviews/review.json');
   writeJson(findings, buildReport([finding]));
   writeJson(composed, verdict);
-  mkdirSync(join(root, '.qwen/reviews'), { recursive: true });
+  mkdirSync(join(root, '.mariadb-shell-agent/reviews'), { recursive: true });
   writeFileSync(report, '# Review\n');
   // The workspace root is explicit here because the test process's cwd is the
   // package directory, not the temp root — the same explicit-root path the
@@ -146,11 +147,11 @@ describe('saveReviewArtifact', () => {
       effort: 'high',
       verdict,
       ...buildReport([finding]),
-      markdownReportPath: '.qwen/reviews/review.md',
+      markdownReportPath: '.mariadb-shell-agent/reviews/review.md',
     });
     expect(readFileSync(paths.out, 'utf8')).toMatch(/\n$/);
     expect(
-      readdirSync(join(root, '.qwen/reviews')).filter((name) =>
+      readdirSync(join(root, '.mariadb-shell-agent/reviews')).filter((name) =>
         name.endsWith('.tmp'),
       ),
     ).toEqual([]);
@@ -158,9 +159,9 @@ describe('saveReviewArtifact', () => {
 
   it('reads PR inputs from its worktree and writes durable output to the main project', () => {
     const paths = fixture();
-    const worktree = join(root, '.qwen/tmp/review-pr-123');
-    const findings = join(worktree, '.qwen/tmp/findings.json');
-    const composed = join(worktree, '.qwen/tmp/composed.json');
+    const worktree = join(root, '.mariadb-shell-agent/tmp/review-pr-123');
+    const findings = join(worktree, '.mariadb-shell-agent/tmp/findings.json');
+    const composed = join(worktree, '.mariadb-shell-agent/tmp/composed.json');
     writeJson(findings, buildReport([finding]));
     writeJson(composed, verdict);
 
@@ -176,17 +177,17 @@ describe('saveReviewArtifact', () => {
       schemaVersion: 1,
       target: 'pr-123',
       verdict,
-      markdownReportPath: '.qwen/reviews/review.md',
+      markdownReportPath: '.mariadb-shell-agent/reviews/review.md',
     });
   });
 
-  it('refuses outputs outside .qwen/reviews, including .qwen/tmp and outside the workspace', () => {
+  it('refuses outputs outside .mariadb-shell-agent/reviews, including .mariadb-shell-agent/tmp and outside the workspace', () => {
     const paths = fixture();
     const outside = mkdtempSync(join(tmpdir(), 'review-artifact-outside-'));
     try {
       for (const out of [
-        join(root, '.qwen/tmp/review.json'),
-        join(root, '.qwen/reviews-other/review.json'),
+        join(root, '.mariadb-shell-agent/tmp/review.json'),
+        join(root, '.mariadb-shell-agent/reviews-other/review.json'),
         join(outside, 'review.json'),
       ]) {
         expect(() =>
@@ -196,7 +197,7 @@ describe('saveReviewArtifact', () => {
             target: 'local',
             effort: 'medium',
           }),
-        ).toThrow(/workspace|under .*\.qwen.*reviews/);
+        ).toThrow(/workspace|under .*\.mariadb-shell-agent.*reviews/);
         expect(existsSync(out)).toBe(false);
       }
     } finally {
@@ -207,8 +208,8 @@ describe('saveReviewArtifact', () => {
   it('refuses an output path that traverses a symlink', () => {
     const paths = fixture();
     const outside = mkdtempSync(join(tmpdir(), 'review-artifact-outside-'));
-    rmSync(join(root, '.qwen/reviews'), { recursive: true });
-    symlinkSync(outside, join(root, '.qwen/reviews'));
+    rmSync(join(root, '.mariadb-shell-agent/reviews'), { recursive: true });
+    symlinkSync(outside, join(root, '.mariadb-shell-agent/reviews'));
     try {
       expect(() =>
         saveReviewArtifact({
@@ -562,7 +563,7 @@ describe('saveReviewArtifact', () => {
     // For the reason its sibling paragraph above is carried: rank 2 sheds
     // before the not-reviewed disclosures, so the rounds that fire the
     // advisory are exactly the long rounds whose body is most likely to drop
-    // it — and a maintainer reading `.qwen/reviews` to make the
+    // it — and a maintainer reading `.mariadb-shell-agent/reviews` to make the
     // `land-with-residual-risk` call would otherwise find a "did not fit"
     // breadcrumb and none of the facts behind it.
     const paths = fixture();
@@ -835,7 +836,7 @@ describe('saveReviewArtifact', () => {
       const paths = fixture();
       const inputPath = join(
         root,
-        '.qwen/reviews',
+        '.mariadb-shell-agent/reviews',
         input === 'report' ? 'review.md' : `${input}.json`,
       );
       if (input !== 'report') {
@@ -867,7 +868,11 @@ describe('saveReviewArtifact', () => {
   // use.
   it('refuses to overwrite the findings input when the output is hardlinked to it (#12578)', (ctx) => {
     const paths = fixture();
-    const alias = join(root, '.qwen/reviews', 'out-findings-alias');
+    const alias = join(
+      root,
+      '.mariadb-shell-agent/reviews',
+      'out-findings-alias',
+    );
     linkSync(paths.findings, alias);
     const inode = statSync(paths.findings).ino;
     if (inode <= 0) {
@@ -893,9 +898,12 @@ describe('saveReviewArtifact', () => {
     // sameFile — false whenever a side is absent — passes green and lets
     // saveReviewArtifact overwrite an input it is about to read.
     const paths = fixture();
-    symlinkSync(join(root, '.qwen/tmp'), join(root, '.qwen/reviews/link'));
-    const absentInput = join(root, '.qwen/tmp/next.json');
-    const out = join(root, '.qwen/reviews/link/next.json');
+    symlinkSync(
+      join(root, '.mariadb-shell-agent/tmp'),
+      join(root, '.mariadb-shell-agent/reviews/link'),
+    );
+    const absentInput = join(root, '.mariadb-shell-agent/tmp/next.json');
+    const out = join(root, '.mariadb-shell-agent/reviews/link/next.json');
 
     expect(() =>
       saveReviewArtifact({
@@ -914,7 +922,7 @@ describe('saveReviewArtifact', () => {
     'refuses a case-insensitive output alias of the Markdown report',
     () => {
       const paths = fixture();
-      const alias = join(root, '.qwen/reviews/REVIEW.MD');
+      const alias = join(root, '.mariadb-shell-agent/reviews/REVIEW.MD');
       expect(existsSync(alias)).toBe(true);
       const original = readFileSync(paths.report, 'utf8');
 
@@ -930,9 +938,9 @@ describe('saveReviewArtifact', () => {
     },
   );
 
-  it('requires the Markdown report to be durable under .qwen/reviews', () => {
+  it('requires the Markdown report to be durable under .mariadb-shell-agent/reviews', () => {
     const paths = fixture();
-    const temporaryReport = join(root, '.qwen/tmp/review.md');
+    const temporaryReport = join(root, '.mariadb-shell-agent/tmp/review.md');
     writeFileSync(temporaryReport, '# Temporary\n');
 
     expect(() =>
@@ -995,23 +1003,27 @@ describe('saveReviewArtifact', () => {
     fixture();
 
     const saved = saveReviewArtifact({
-      findings: '.qwen/tmp/findings.json',
-      composed: '.qwen/tmp/composed.json',
-      report: '.qwen/reviews/review.md',
-      out: '.qwen/reviews/review.json',
+      findings: '.mariadb-shell-agent/tmp/findings.json',
+      composed: '.mariadb-shell-agent/tmp/composed.json',
+      report: '.mariadb-shell-agent/reviews/review.md',
+      out: '.mariadb-shell-agent/reviews/review.json',
       target: 'pr-123',
       effort: 'high',
       workspaceRoot: root,
     });
 
-    expect(saved.path).toBe(join(root, '.qwen/reviews/review.json'));
+    expect(saved.path).toBe(
+      join(root, '.mariadb-shell-agent/reviews/review.json'),
+    );
     // Canonical root-relative locator. record_artifact now prefers the
     // absolute `path` as input and stores this form itself.
-    expect(saved.workspacePath).toBe('.qwen/reviews/review.json');
+    expect(saved.workspacePath).toBe(
+      '.mariadb-shell-agent/reviews/review.json',
+    );
     expect(JSON.parse(readFileSync(saved.path, 'utf8'))).toMatchObject({
       schemaVersion: 1,
       target: 'pr-123',
-      markdownReportPath: '.qwen/reviews/review.md',
+      markdownReportPath: '.mariadb-shell-agent/reviews/review.md',
     });
   });
 
@@ -1032,17 +1044,23 @@ describe('saveReviewArtifact', () => {
       fixture();
       process.chdir(root);
       const saved = saveReviewArtifact({
-        findings: '.qwen/tmp/findings.json',
-        composed: '.qwen/tmp/composed.json',
-        report: '.qwen/reviews/review.md',
-        out: '.qwen/reviews/review.json',
+        findings: '.mariadb-shell-agent/tmp/findings.json',
+        composed: '.mariadb-shell-agent/tmp/composed.json',
+        report: '.mariadb-shell-agent/reviews/review.md',
+        out: '.mariadb-shell-agent/reviews/review.json',
         target: 'pr-123',
         effort: 'high',
       });
 
-      expect(saved.path).toBe(join(root, '.qwen/reviews/review.json'));
-      expect(saved.workspacePath).toBe('.qwen/reviews/review.json');
-      expect(existsSync(join(decoy, '.qwen/reviews/review.json'))).toBe(false);
+      expect(saved.path).toBe(
+        join(root, '.mariadb-shell-agent/reviews/review.json'),
+      );
+      expect(saved.workspacePath).toBe(
+        '.mariadb-shell-agent/reviews/review.json',
+      );
+      expect(
+        existsSync(join(decoy, '.mariadb-shell-agent/reviews/review.json')),
+      ).toBe(false);
     } finally {
       process.chdir(savedCwd);
       if (previous === undefined) {
@@ -1073,23 +1091,27 @@ describe('the CLI option contract', () => {
       yargs([]),
     ).parseSync([
       '--findings',
-      '.qwen/tmp/findings.json',
+      '.mariadb-shell-agent/tmp/findings.json',
       '--composed',
-      '.qwen/tmp/composed.json',
+      '.mariadb-shell-agent/tmp/composed.json',
       '--report',
-      '.qwen/reviews/review.md',
+      '.mariadb-shell-agent/reviews/review.md',
       '--target',
       'pr-123',
       '--effort',
       'high',
       '--out',
-      '.qwen/reviews/review.json',
+      '.mariadb-shell-agent/reviews/review.json',
       '--workspace-root',
       root,
     ]) as unknown as Parameters<typeof saveReviewArtifact>[0];
 
     const saved = saveReviewArtifact(parsed);
-    expect(saved.path).toBe(join(root, '.qwen/reviews/review.json'));
-    expect(saved.workspacePath).toBe('.qwen/reviews/review.json');
+    expect(saved.path).toBe(
+      join(root, '.mariadb-shell-agent/reviews/review.json'),
+    );
+    expect(saved.workspacePath).toBe(
+      '.mariadb-shell-agent/reviews/review.json',
+    );
   });
 });

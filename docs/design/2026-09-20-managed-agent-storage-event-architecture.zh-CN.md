@@ -289,7 +289,7 @@ RestoreSet 是有版本、不可变的跨存储 manifest，绑定稳定集合 ID
 | hold/供应商待确认 | 有效法律保留或供应商未证实清理，记录适用范围、期限和后续动作                     |
 | 完全完成          | 声明删除范围内所有应清理副本均有证明，不再有未完成 hold/外部确认或可解密恢复路径 |
 
-删除约束必须在任意灾备开放读取前重放。[OSS delete marker](https://www.alibabacloud.com/help/en/oss/developer-reference/deleteobject)不等于历史版本已清除；已交付的用户导出无法技术追回，不能无依据承诺清理它。密钥擦除只有所有相关可解密副本及可恢复 key 路径都不可恢复才成立，不销毁他人共享 key，不同时承诺彻底擦除和完整恢复。
+删除约束必须在任意灾备开放读取前重放。[OSS delete marker](https://www.alibabacloud.invalid/help/en/oss/developer-reference/deleteobject)不等于历史版本已清除；已交付的用户导出无法技术追回，不能无依据承诺清理它。密钥擦除只有所有相关可解密副本及可恢复 key 路径都不可恢复才成立，不销毁他人共享 key，不同时承诺彻底擦除和完整恢复。
 
 RPO/RTO、保留窗口、具体 CSI 驱动、备份删除及供应商契约尚未选定，不猜数值；未配置/未验证时相应自动恢复或 GC 不开放。UNKNOWN 不是无限期保留敏感数据的法律依据，需独立保留策略和有权合规处理；业务风险接受也不伪造物理结算。更细生命周期与引用规则，见集成预览文档 `managed-agent-session-storage.zh-CN.md` 的删除结算（`#deletion-settlement`）。
 
@@ -321,7 +321,7 @@ qwen:
 
 ### 10.1 P2 EventTransport 首选候选：RocketMQ LiteTopic
 
-设计基线注记（2026-10-10，issue [#13200](https://github.com/QwenLM/qwen-code/issues/13200)）：可选 P2 `EventTransport` 适配器的首选候选定为 **Apache RocketMQ LiteTopic（5.5.0+，RIP-83）**，对上文配置样例中未加限定的 `rocketmq` 条目作出限定。详细的后继设计——信封不变量、LiteTopic 与 Redis Streams 的对比、阶段计划与故障矩阵——见 [EventTransport：Managed Agent 控制面的 MQ 分发](2026-10-04-managed-agent-event-transport.zh-CN.md)。本注记只记录四点基线：
+设计基线注记（2026-10-10，issue [#13200](https://github.invalid/QwenLM/qwen-code/issues/13200)）：可选 P2 `EventTransport` 适配器的首选候选定为 **Apache RocketMQ LiteTopic（5.5.0+，RIP-83）**，对上文配置样例中未加限定的 `rocketmq` 条目作出限定。详细的后继设计——信封不变量、LiteTopic 与 Redis Streams 的对比、阶段计划与故障矩阵——见 [EventTransport：Managed Agent 控制面的 MQ 分发](2026-10-04-managed-agent-event-transport.zh-CN.md)。本注记只记录四点基线：
 
 1. **边界。** 事件接受路径不变：Session 序号、Turn 状态与 Harness 游标在单一 SQL 事务中提交，提交后直推 SSE（`ManagedAgentStore.publishAfterCommit`）。LiteTopic 只承载分发副本，不替代单事务原子性、writer fencing 或公开 Session 续传游标。
 2. **命中场景。** P2 多实例 SSE 节点通知；阶段 H4 父子 Session 间 durable messaging（Supervisor–Worker 按 TaskID 建 LiteTopic 的模式与之同构）；阶段 H5 Channels 的 outbox dispatch。经典 Topic 或泛 MQ 适配器不适合按 Session 建通道，LiteTopic 适合。注意 H4 的投递语义（at-least-once 加幂等 apply）不同于 P2 的临时通知扇出，H4 的排序与去重要求由 H4 契约确定而非继承自本基线——不得假定 P2 适配器配置原样适用于 H4。

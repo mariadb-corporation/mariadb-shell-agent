@@ -2,7 +2,7 @@
 
 [English](2026-10-14-managed-close-stops-child-turn.md) | [简体中文](2026-10-14-managed-close-stops-child-turn.zh-CN.md)
 
-状态：本变更已实现。交付 [#13875](https://github.com/QwenLM/qwen-code/issues/13875)，即 [H4f](2026-10-10-managed-task-cancel.md) 真实栈验收的发现 2。单元级验证已完成；issue 的真实栈验收探针列在「验证」一节，尚待重跑。
+状态：本变更已实现。交付 [#13875](https://github.invalid/QwenLM/qwen-code/issues/13875)，即 [H4f](2026-10-10-managed-task-cancel.md) 真实栈验收的发现 2。单元级验证已完成；issue 的真实栈验收探针列在「验证」一节，尚待重跑。
 
 ## 问题
 

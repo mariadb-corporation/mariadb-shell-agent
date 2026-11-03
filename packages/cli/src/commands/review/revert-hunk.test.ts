@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -79,7 +80,7 @@ function git(cwd: string, ...args: string[]): string {
 }
 
 // The R15-5/R24-1 cases below plant symlinks and (all but one) address trees
-// under `.qwen/tmp`, where the location gate only has an answer where
+// under `.mariadb-shell-agent/tmp`, where the location gate only has an answer where
 // containment can exist. On Windows `mountRootFor` refuses every absolute
 // path (a drive letter is a colon), so the gate never speaks — and the
 // fixtures cannot even be built there, symlink creation being privileged.
@@ -119,7 +120,7 @@ function twoHunkFixture(trailingNewline = true) {
 
 /**
  * A scratch tree in the pipeline's real geometry — a genuine linked worktree
- * at `<repo>/.qwen/tmp/shard/scratch`, one commit deep, with the PR diff
+ * at `<repo>/.mariadb-shell-agent/tmp/shard/scratch`, one commit deep, with the PR diff
  * beside it. The `shard` component is the ancestor between the review temp
  * root and the leaf that the R24-1 witness swaps for a symlink.
  */
@@ -146,7 +147,7 @@ function scratchTreeFixture() {
       '',
     ].join('\n'),
   );
-  const shard = join(repo, '.qwen', 'tmp', 'shard');
+  const shard = join(repo, '.mariadb-shell-agent', 'tmp', 'shard');
   mkdirSync(shard, { recursive: true });
   const scratch = join(shard, 'scratch');
   git(repo, 'worktree', 'add', '--detach', scratch);
@@ -776,7 +777,7 @@ describe('runRevertHunk', () => {
       // shared review worktree other agents are reading, or the A/B's base side —
       // while the report certifies the scratch path. None of the suite's other
       // `runRevertHunk` call sites can reach this: their fixtures are outside any
-      // `.qwen/tmp`, so the location gate never speaks there.
+      // `.mariadb-shell-agent/tmp`, so the location gate never speaks there.
       const dir = tempDir('rh-tree-target-');
       git(dir, 'init', '-q', '-b', 'main');
       git(dir, 'config', 'user.email', 't@t');
@@ -880,13 +881,13 @@ describe('runRevertHunk', () => {
           '',
         ].join('\n'),
       );
-      // The nested geometry: <repo>/.qwen/tmp/outer/.qwen/tmp/shard/scratch.
+      // The nested geometry: <repo>/.mariadb-shell-agent/tmp/outer/.mariadb-shell-agent/tmp/shard/scratch.
       const shard = join(
         repo,
-        '.qwen',
+        '.mariadb-shell-agent',
         'tmp',
         'outer',
-        '.qwen',
+        '.mariadb-shell-agent',
         'tmp',
         'shard',
       );
@@ -894,8 +895,8 @@ describe('runRevertHunk', () => {
       const scratch = join(shard, 'scratch');
       git(repo, 'worktree', 'add', '--detach', scratch);
       // The swap at the OUTER layer: `outer` becomes a link.
-      const outer = join(repo, '.qwen', 'tmp', 'outer');
-      const outerReal = join(repo, '.qwen', 'tmp', 'outer-real');
+      const outer = join(repo, '.mariadb-shell-agent', 'tmp', 'outer');
+      const outerReal = join(repo, '.mariadb-shell-agent', 'tmp', 'outer-real');
       renameSync(outer, outerReal);
       symlinkSync(outerReal, outer);
 
@@ -917,7 +918,7 @@ describe('runRevertHunk', () => {
     'still applies in a scratch tree under the review temp root with no redirect (R24-1 control)',
     () => {
       // The bounded walk must not buy its refusal at the price of the ordinary
-      // path: a genuine linked worktree under `.qwen/tmp` has every ancestor
+      // path: a genuine linked worktree under `.mariadb-shell-agent/tmp` has every ancestor
       // between the temp root and the leaf real, and the revert applies.
       const { diffPath, scratch } = scratchTreeFixture();
       const r = runRevertHunk({

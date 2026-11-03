@@ -66,7 +66,7 @@ export function filterGateOutput(text) {
   return '';
 }
 
-/** File names `autofix-pr` uses under `.qwen/tmp` for one PR. */
+/** File names `autofix-pr` uses under `.mariadb-shell-agent/tmp` for one PR. */
 export function ownedStateFiles(prNumber) {
   return [
     `autofix-pr-${prNumber}-gate.json`,
@@ -76,10 +76,10 @@ export function ownedStateFiles(prNumber) {
 
 /**
  * Returns the files that show another consumer already watches this PR, under
- * `<stateRoot>/.qwen/tmp`. An empty array means the watch may install.
+ * `<stateRoot>/.mariadb-shell-agent/tmp`. An empty array means the watch may install.
  */
 export function conflictingStateFiles(stateRoot, prNumber) {
-  const tmp = join(stateRoot, '.qwen', 'tmp');
+  const tmp = join(stateRoot, '.mariadb-shell-agent', 'tmp');
   return ownedStateFiles(prNumber)
     .map((name) => join(tmp, name))
     .filter((path) => existsSync(path));
@@ -89,7 +89,7 @@ export function conflictingStateFiles(stateRoot, prNumber) {
 export function ownershipPath(stateRoot, prNumber) {
   return join(
     stateRoot,
-    '.qwen',
+    '.mariadb-shell-agent',
     'tmp',
     `verify-pr-watch-${prNumber}.owner.json`,
   );
@@ -112,7 +112,9 @@ export function readOwnership(stateRoot, prNumber) {
  */
 export function claimOwnership(stateRoot, prNumber, now = Date.now()) {
   const path = ownershipPath(stateRoot, prNumber);
-  mkdirSync(join(stateRoot, '.qwen', 'tmp'), { recursive: true });
+  mkdirSync(join(stateRoot, '.mariadb-shell-agent', 'tmp'), {
+    recursive: true,
+  });
   const payload = `${JSON.stringify(
     {
       version: 1,

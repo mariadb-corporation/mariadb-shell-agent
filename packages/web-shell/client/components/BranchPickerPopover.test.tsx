@@ -2,6 +2,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -335,7 +336,7 @@ describe('BranchPickerPopover actions', () => {
     root = createRoot(container);
     workspaceGitBranches.mockResolvedValue({
       v: 1,
-      workspaceCwd: '/repo/.qwen/worktrees/test',
+      workspaceCwd: '/repo/.mariadb-shell-agent/worktrees/test',
       available: true,
       current: null,
       local: [],
@@ -345,21 +346,21 @@ describe('BranchPickerPopover actions', () => {
     });
     workspaceGit.mockResolvedValue({
       v: 2,
-      workspaceCwd: '/repo/.qwen/worktrees/test',
+      workspaceCwd: '/repo/.mariadb-shell-agent/worktrees/test',
       branch: 'worktree-test',
     });
     mount({
-      gitCwd: '/repo/.qwen/worktrees/test',
+      gitCwd: '/repo/.mariadb-shell-agent/worktrees/test',
       gitSessionId: 'session-1',
     });
     await flush();
 
     expect(workspaceGitBranches).toHaveBeenCalledWith(
-      '/repo/.qwen/worktrees/test',
+      '/repo/.mariadb-shell-agent/worktrees/test',
       'session-1',
     );
     expect(workspaceGit).toHaveBeenCalledWith({
-      cwd: '/repo/.qwen/worktrees/test',
+      cwd: '/repo/.mariadb-shell-agent/worktrees/test',
       sessionId: 'session-1',
     });
   });
@@ -370,7 +371,7 @@ describe('BranchPickerPopover actions', () => {
     root = createRoot(container);
     workspaceGitBranches.mockResolvedValue({
       v: 1,
-      workspaceCwd: '/repo/.qwen/worktrees/test',
+      workspaceCwd: '/repo/.mariadb-shell-agent/worktrees/test',
       available: true,
       local: [{ name: 'main', isHead: false }],
       remote: [],
@@ -380,7 +381,7 @@ describe('BranchPickerPopover actions', () => {
       detached: false,
     });
     mount({
-      gitCwd: '/repo/.qwen/worktrees/test',
+      gitCwd: '/repo/.mariadb-shell-agent/worktrees/test',
       gitSessionId: 'session-1',
     });
     await flush();
@@ -390,13 +391,13 @@ describe('BranchPickerPopover actions', () => {
 
     expect(workspaceGitCheckout).toHaveBeenCalledWith(
       'main',
-      '/repo/.qwen/worktrees/test',
+      '/repo/.mariadb-shell-agent/worktrees/test',
       'session-1',
     );
   });
 
   it('binds worktree pull mutations and their timeout to the owning session', async () => {
-    const gitCwd = '/repo/.qwen/worktrees/test';
+    const gitCwd = '/repo/.mariadb-shell-agent/worktrees/test';
     container = document.createElement('div');
     document.body.appendChild(container);
     root = createRoot(container);
@@ -1670,7 +1671,7 @@ describe('BranchPickerPopover action hints', () => {
             open
             onOpenChange={vi.fn()}
             workspaceCwd="/repo"
-            gitCwd="/repo/.qwen/worktrees/wt"
+            gitCwd="/repo/.mariadb-shell-agent/worktrees/wt"
           >
             <button type="button">trigger</button>
           </BranchPickerPopover>
@@ -1679,7 +1680,7 @@ describe('BranchPickerPopover action hints', () => {
     });
     await flush();
     expect(workspaceGit).toHaveBeenCalledWith({
-      cwd: '/repo/.qwen/worktrees/wt',
+      cwd: '/repo/.mariadb-shell-agent/worktrees/wt',
     });
   });
 

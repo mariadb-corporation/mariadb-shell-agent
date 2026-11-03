@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14560,7 +14561,7 @@ describe('Hosted Harness no-tool session', () => {
       const replay = await send(operationId);
       expect(replay.status).toBe(503);
       expect(replay.body.code).toBe('hosted_hook_operation_failed');
-      const blocked = `qwen serve: Hosted Hook operation ${operationId} is recovery blocked: Error: Hosted Hook requires reconciliation of its original execution.`;
+      const blocked = `mariadb-shell-agent serve: Hosted Hook operation ${operationId} is recovery blocked: Error: Hosted Hook requires reconciliation of its original execution.`;
       expect(
         log.mock.calls
           .map(([line]) => line)
@@ -14659,7 +14660,7 @@ describe('Hosted Harness no-tool session', () => {
     expect(failed.status).toBe(503);
     expect(failed.body.code).toBe('hosted_hook_operation_failed');
     expect(log).toHaveBeenCalledWith(
-      `qwen serve: Hosted Hook operation ${operationId} failed: Error: activation unavailable`,
+      `mariadb-shell-agent serve: Hosted Hook operation ${operationId} failed: Error: activation unavailable`,
     );
   });
 
@@ -14722,7 +14723,7 @@ describe('Hosted Harness no-tool session', () => {
     expect(failed.status).toBe(503);
     expect(failed.body.code).toBe('managed_session_close_failed');
     expect(log).toHaveBeenCalledWith(
-      `qwen serve: Hosted Session ${SESSION_ID} close failed: Error: activation unavailable`,
+      `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} close failed: Error: activation unavailable`,
     );
     // The busy guards run before body validation, so an empty prompt shows
     // the deletion cleared its Hook flag.
@@ -15365,7 +15366,7 @@ describe('Hosted Harness no-tool session', () => {
       expect(loaded.status).toBe(409);
       expect(loaded.body.reason).toBe('restore_verification_failed');
       expect(log.mock.calls.map(([line]) => line)).toContain(
-        `qwen serve: Hosted Session ${SESSION_ID} load refused (workspace_verify): Error: Hosted MCP configuration is not pinned.`,
+        `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} load refused (workspace_verify): Error: Hosted MCP configuration is not pinned.`,
       );
       expect(state.model).not.toHaveBeenCalled();
     },
@@ -18098,7 +18099,7 @@ describe('Hosted Harness no-tool session', () => {
       return ref.kind === 'managed-tool-outcome'
         ? Promise.reject(
             new Error(
-              'missing settled tool outcome\nqwen serve: forged\x1b[2J',
+              'missing settled tool outcome\nmariadb-shell-agent serve: forged\x1b[2J',
             ),
           )
         : original.call(this, ref);
@@ -18114,7 +18115,7 @@ describe('Hosted Harness no-tool session', () => {
     expect(refused.body.reason).toBe('restore_verification_failed');
     // The cause is Store-influenced text: the single-line tag must strip
     // newlines and control sequences rather than replay them to stderr.
-    const verifyLine = `qwen serve: Hosted Session ${SESSION_ID} load refused (workspace_verify): Error: missing settled tool outcomeqwen serve: forged`;
+    const verifyLine = `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} load refused (workspace_verify): Error: missing settled tool outcomemariadb-shell-agent serve: forged`;
     expect(log.mock.calls.map(([line]) => line)).toContain(verifyLine);
     expect(
       log.mock.calls
@@ -18556,7 +18557,7 @@ describe('Hosted Harness no-tool session', () => {
     // A write-probe failure during restore validation is a writer-lease
     // refusal, not a verification one.
     expect(log.mock.calls.map(([line]) => line)).toContain(
-      `qwen serve: Hosted Session ${SESSION_ID} load refused (workspace_writable): Error: writer lost`,
+      `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} load refused (workspace_writable): Error: writer lost`,
     );
     log.mockRestore();
     expect(state.model).not.toHaveBeenCalled();
@@ -19334,7 +19335,7 @@ describe('Hosted Harness no-tool session', () => {
     // The load's own open installs one activation record; the guard decides
     // at that boundary, before close() appends its release record after it.
     expect(log.mock.calls.map(([line]) => line)).toContain(
-      `qwen serve: Hosted Session ${SESSION_ID} load refused (unsettled_input): {"incompletePublication":null,"unsettled":["${PROMPT_ID}"],"resume":null,"settle":null,"through":${parked.events.at(-1)!.sequence + 1}}`,
+      `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} load refused (unsettled_input): {"incompletePublication":null,"unsettled":["${PROMPT_ID}"],"resume":null,"settle":null,"through":${parked.events.at(-1)!.sequence + 1}}`,
     );
   });
 
@@ -19357,7 +19358,7 @@ describe('Hosted Harness no-tool session', () => {
     // The stderr tag carries exactly the body reason's token, so the two
     // channels of the same refusal never disagree.
     expect(log.mock.calls.map(([line]) => line)).toContain(
-      `qwen serve: Hosted Session ${SESSION_ID} load refused (takeover_unsupported): profile=none broker=ready`,
+      `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} load refused (takeover_unsupported): profile=none broker=ready`,
     );
     const plain = await app();
     const refusedPlain = await headers(
@@ -19367,7 +19368,7 @@ describe('Hosted Harness no-tool session', () => {
     expect(refusedPlain.body.code).toBe('hosted_turn_recovery_required');
     expect(refusedPlain.body.reason).toBe('takeover_unsupported');
     expect(log.mock.calls.map(([line]) => line)).toContain(
-      `qwen serve: Hosted Session ${SESSION_ID} load refused (takeover_unsupported): profile=none broker=none`,
+      `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} load refused (takeover_unsupported): profile=none broker=none`,
     );
   });
 
@@ -21149,7 +21150,7 @@ describe('Hosted Harness no-tool session', () => {
       { timeout: settleTimeoutMs() },
     );
     expect(log).toHaveBeenCalledWith(
-      `qwen serve: Hosted Harness turn ${PROMPT_ID} failed: Error: model initialization failed`,
+      `mariadb-shell-agent serve: Hosted Harness turn ${PROMPT_ID} failed: Error: model initialization failed`,
     );
     await headers(supertest(server).delete(`/session/${SESSION_ID}`));
   });
@@ -21523,7 +21524,7 @@ describe('Hosted Harness no-tool session', () => {
     // The pending turn parked at await_runtime, so the refusal names its
     // blocking conjunct under the published gate tag, not only the gate.
     expect(log.mock.calls.map(([line]) => line)).toContain(
-      `qwen serve: Hosted Session ${SESSION_ID} load refused (file_history_pending): {"pendingTurn":"${PROMPT_ID}","pendingUndo":null,"unsettled":"${PROMPT_ID}","takeover":false,"ground":"phase_await_runtime","groundDetail":null}`,
+      `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} load refused (file_history_pending): {"pendingTurn":"${PROMPT_ID}","pendingUndo":null,"unsettled":"${PROMPT_ID}","takeover":false,"ground":"phase_await_runtime","groundDetail":null}`,
     );
     log.mockRestore();
     await headers(supertest(server).delete(`/session/${SESSION_ID}`));
@@ -25189,7 +25190,7 @@ describe('Hosted Harness tool approvals', () => {
     expect(loaded.body.code).toBe('hosted_turn_recovery_required');
     expect(loaded.body.reason).toBe('file_history_unsettled');
     expect(log.mock.calls.map(([line]) => line)).toContain(
-      `qwen serve: Hosted Session ${SESSION_ID} load refused (file_history_pending): {"pendingTurn":"${PROMPT_ID}","pendingUndo":null,"unsettled":"${PROMPT_ID}","takeover":false,"ground":"phase_await_runtime","groundDetail":null}`,
+      `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} load refused (file_history_pending): {"pendingTurn":"${PROMPT_ID}","pendingUndo":null,"unsettled":"${PROMPT_ID}","takeover":false,"ground":"phase_await_runtime","groundDetail":null}`,
     );
     expect(HostedWorkspaceBroker.prototype.acquire).not.toHaveBeenCalled();
     expect(HostedWorkspaceBroker.prototype.execute).not.toHaveBeenCalled();
@@ -25760,7 +25761,7 @@ describe('Hosted Harness tool approvals', () => {
           code: 'hosted_file_history_failed',
         });
         expect(log).toHaveBeenCalledWith(
-          `qwen serve: Hosted file history read failed: Error: ${detail}`,
+          `mariadb-shell-agent serve: Hosted file history read failed: Error: ${detail}`,
         );
         await headers(supertest(server).post(`/session/${SESSION_ID}/detach`))
           .set('X-Qwen-Client-Id', clientId)
@@ -25776,7 +25777,7 @@ describe('Hosted Harness tool approvals', () => {
           code: 'managed_session_open_failed',
         });
         expect(log).toHaveBeenCalledWith(
-          `qwen serve: Hosted Session open failed: Error: ${detail}`,
+          `mariadb-shell-agent serve: Hosted Session open failed: Error: ${detail}`,
         );
         fault.mockRestore();
         await headers(supertest(server).post(`/session/${SESSION_ID}/load`))
@@ -26123,7 +26124,7 @@ describe('Hosted Harness tool approvals', () => {
     vi.mocked(HostedWorkspaceBroker.prototype.fileHistory).mockImplementation(
       async (operation) => {
         if (operation.action === 'rewind')
-          throw new Error('worker\ngone qwen serve: forged');
+          throw new Error('worker\ngone mariadb-shell-agent serve: forged');
         return historyState;
       },
     );
@@ -26197,7 +26198,7 @@ describe('Hosted Harness tool approvals', () => {
     // replayed into a forged daemon diagnostic.
     expect(tag).not.toMatch(/[\r\n\u2028\u2029]/);
     expect(tag).toContain(
-      'Hosted file undo requires recovery: Error: workergone qwen serve: forged',
+      'Hosted file undo requires recovery: Error: workergone mariadb-shell-agent serve: forged',
     );
   });
 
@@ -29471,7 +29472,7 @@ describe('Hosted Harness Runtime turn takeover', () => {
     expect(loaded.body.code).toBe('hosted_turn_recovery_required');
     expect(loaded.body.reason).toBe('file_history_unsettled');
     expect(log.mock.calls.map(([line]) => line)).toContain(
-      `qwen serve: Hosted Session ${SESSION_ID} load refused (file_history_pending): {"pendingTurn":"${PROMPT_ID}","pendingUndo":null,"unsettled":"${PROMPT_ID}","takeover":false,"ground":"phase_await_runtime","groundDetail":null}`,
+      `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} load refused (file_history_pending): {"pendingTurn":"${PROMPT_ID}","pendingUndo":null,"unsettled":"${PROMPT_ID}","takeover":false,"ground":"phase_await_runtime","groundDetail":null}`,
     );
     expect(execute).not.toHaveBeenCalled();
     expect(acquireSpy).not.toHaveBeenCalled();
@@ -29553,7 +29554,7 @@ describe('Hosted Harness Runtime turn takeover', () => {
       // U+2028 survives a plain ANSI strip and JSON.stringify emits it
       // raw: the detail must reach the single-line tag already bounded.
       message:
-        'x\u2028qwen serve: Hosted Session 22222222-2222-4222-8222-222222222222 turn settled',
+        'x\u2028mariadb-shell-agent serve: Hosted Session 22222222-2222-4222-8222-222222222222 turn settled',
     } as never);
     const log = vi
       .spyOn(stdio, 'writeStderrLineSafe')
@@ -29576,7 +29577,7 @@ describe('Hosted Harness Runtime turn takeover', () => {
       /[\u2028\u2029\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/,
     );
     expect(tag).toContain(
-      '"groundDetail":"x qwen serve: Hosted Session 22222222-2222-4222-8222-222222222222 turn settled"',
+      '"groundDetail":"x mariadb-shell-agent serve: Hosted Session 22222222-2222-4222-8222-222222222222 turn settled"',
     );
   });
 
@@ -29591,7 +29592,7 @@ describe('Hosted Harness Runtime turn takeover', () => {
               ...record,
               // The record parser checks typeof only, and JSON.stringify
               // emits U+2028 raw: the tag must bound the field itself.
-              pendingTurn: `x\u2028qwen serve: Hosted Session ${SESSION_ID} turn settled`,
+              pendingTurn: `x\u2028mariadb-shell-agent serve: Hosted Session ${SESSION_ID} turn settled`,
             }
           : record;
       },
@@ -29617,7 +29618,7 @@ describe('Hosted Harness Runtime turn takeover', () => {
       /[\u2028\u2029\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/,
     );
     expect(tag).toContain(
-      `"pendingTurn":"x qwen serve: Hosted Session ${SESSION_ID} turn settled"`,
+      `"pendingTurn":"x mariadb-shell-agent serve: Hosted Session ${SESSION_ID} turn settled"`,
     );
   });
 
@@ -29641,7 +29642,7 @@ describe('Hosted Harness Runtime turn takeover', () => {
                 // assertManagedSessionStableId admits U+2028 (it is not a
                 // control character) and JSON.stringify emits it raw: the
                 // tag must bound the journal-read id itself.
-                turnId: `x\u2028qwen serve: Hosted Session ${SESSION_ID} turn settled`,
+                turnId: `x\u2028mariadb-shell-agent serve: Hosted Session ${SESSION_ID} turn settled`,
               },
             }
           : event,
@@ -29668,7 +29669,7 @@ describe('Hosted Harness Runtime turn takeover', () => {
       /[\u2028\u2029\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/,
     );
     expect(tag).toContain(
-      `"unsettled":"x qwen serve: Hosted Session ${SESSION_ID} turn settled"`,
+      `"unsettled":"x mariadb-shell-agent serve: Hosted Session ${SESSION_ID} turn settled"`,
     );
   });
 
@@ -33127,7 +33128,7 @@ describe('Hosted Harness Runtime turn takeover', () => {
     expect(loaded.status).toBe(409);
     expect(loaded.body.code).toBe('hosted_turn_recovery_required');
     expect(stderr.mock.calls.map(([line]) => line)).toContain(
-      `qwen serve: Hosted Session ${SESSION_ID} load refused (workspace_writable): Error: writer lost`,
+      `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} load refused (workspace_writable): Error: writer lost`,
     );
     expect(acquireSpy).toHaveBeenCalled();
     // The refusal invited a retried takeover load: the adopted lease must
@@ -33189,7 +33190,7 @@ describe('Hosted Harness Runtime turn takeover', () => {
     const { server, loaded } = await loadReplacement(true);
     expect(loaded.status).toBe(409);
     expect(stderr.mock.calls.map(([line]) => line)).toContain(
-      `qwen serve: Hosted Session ${SESSION_ID} load refused (workspace_writable): Error: writer lost`,
+      `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} load refused (workspace_writable): Error: writer lost`,
     );
     const second = await replacementHeaders(
       supertest(server).post(`/session/${SESSION_ID}/load`),
@@ -37775,7 +37776,7 @@ describe('Hosted Harness Runtime turn takeover', () => {
       'harnessRunAuthorization',
     ).mockRejectedValue(
       new Error(
-        `journal gone\n\u2028qwen serve: forged\x1b[2J${'x'.repeat(5000)}`,
+        `journal gone\n\u2028mariadb-shell-agent serve: forged\x1b[2J${'x'.repeat(5000)}`,
       ),
     );
     const release = vi.mocked(HostedWorkspaceBroker.prototype.release);
@@ -37792,8 +37793,9 @@ describe('Hosted Harness Runtime turn takeover', () => {
     // escape sequence are removed outright, the unsafe-class member became
     // a space, and the detail is capped at 4096 before it is interpolated;
     // the filler rides up to that cap.
-    const expectedDetailPrefix = 'Error: journal gone qwen serve: forged';
-    const expectedLine = `qwen serve: Hosted Session ${SESSION_ID} continue: run authorization could not be read: ${expectedDetailPrefix}${'x'.repeat(4096 - expectedDetailPrefix.length)}`;
+    const expectedDetailPrefix =
+      'Error: journal gone mariadb-shell-agent serve: forged';
+    const expectedLine = `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} continue: run authorization could not be read: ${expectedDetailPrefix}${'x'.repeat(4096 - expectedDetailPrefix.length)}`;
     expect(log.mock.calls.map(([emitted]) => emitted)).toContain(expectedLine);
     const line = log.mock.calls
       .map(([emitted]) => emitted)
@@ -37824,7 +37826,7 @@ describe('Hosted Harness Runtime turn takeover', () => {
       'harnessRunAuthorization',
     ).mockRejectedValue(
       new Error(
-        `journal gone\n\u2028qwen serve: forged\x1b[2J${'x'.repeat(5000)}`,
+        `journal gone\n\u2028mariadb-shell-agent serve: forged\x1b[2J${'x'.repeat(5000)}`,
       ),
     );
     const release = vi.mocked(HostedWorkspaceBroker.prototype.release);
@@ -37841,8 +37843,9 @@ describe('Hosted Harness Runtime turn takeover', () => {
     // newline and the escape sequence are removed outright, the
     // unsafe-class member became a space, and the detail is capped at 4096
     // before it is interpolated.
-    const expectedDetailPrefix = 'Error: journal gone qwen serve: forged';
-    const expectedLine = `qwen serve: Hosted Session ${SESSION_ID} cancel: run authorization could not be read: ${expectedDetailPrefix}${'x'.repeat(4096 - expectedDetailPrefix.length)}`;
+    const expectedDetailPrefix =
+      'Error: journal gone mariadb-shell-agent serve: forged';
+    const expectedLine = `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} cancel: run authorization could not be read: ${expectedDetailPrefix}${'x'.repeat(4096 - expectedDetailPrefix.length)}`;
     expect(log.mock.calls.map(([emitted]) => emitted)).toContain(expectedLine);
     const line = log.mock.calls
       .map(([emitted]) => emitted)
@@ -38013,7 +38016,7 @@ describe('Hosted Harness Runtime turn takeover', () => {
     ).mockResolvedValue({
       status: 'blocked',
       reason: 'invalid_state',
-      message: `invalid_state\n\u2028qwen serve: forged\x1b[2J${'x'.repeat(5000)}`,
+      message: `invalid_state\n\u2028mariadb-shell-agent serve: forged\x1b[2J${'x'.repeat(5000)}`,
     } as never);
     for (const route of ['continue', 'cancel'] as const) {
       log.mockClear();
@@ -38030,8 +38033,9 @@ describe('Hosted Harness Runtime turn takeover', () => {
       // escape sequence are removed outright, the unsafe-class member
       // became a space, the detail is capped at 4096 before it is
       // interpolated, and the filler rides up to that cap.
-      const expectedDetailPrefix = 'invalid_state qwen serve: forged';
-      const expectedLine = `qwen serve: Hosted Session ${SESSION_ID} ${route}: run authorization not runnable: invalid_state: ${expectedDetailPrefix}${'x'.repeat(4096 - expectedDetailPrefix.length)}`;
+      const expectedDetailPrefix =
+        'invalid_state mariadb-shell-agent serve: forged';
+      const expectedLine = `mariadb-shell-agent serve: Hosted Session ${SESSION_ID} ${route}: run authorization not runnable: invalid_state: ${expectedDetailPrefix}${'x'.repeat(4096 - expectedDetailPrefix.length)}`;
       expect(log.mock.calls.map(([emitted]) => emitted)).toContain(
         expectedLine,
       );

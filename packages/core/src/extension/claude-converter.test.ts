@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -577,7 +578,7 @@ describe('convertClaudePluginPackage', () => {
   );
 
   it('should populate commands/skills/agents when marketplace references the whole folder (deep-wiki shape)', async () => {
-    // Regression test for https://github.com/QwenLM/qwen-code/issues/4452.
+    // Regression test for https://github.invalid/QwenLM/qwen-code/issues/4452.
     //
     // microsoft/skills/.../deep-wiki declares its resources as
     //   commands: ["./commands/"]
@@ -1042,6 +1043,46 @@ describe('convertClaudePluginStandalone', () => {
     expect(exists(result.convertedDir, 'skills', 'leak.txt')).toBe(false);
   });
 
+  it('reads the servers of an mcpServers file in the .mcp.json format', async () => {
+    writeRepo(
+      { name: 'dev', version: '1.0.0', mcpServers: './.mcp.json' },
+      {
+        '.mcp.json': JSON.stringify({
+          mcpServers: { mariadb: { command: 'launcher', args: [] } },
+        }),
+      },
+    );
+
+    const result = await convertStandalone(testDir);
+    expect(Object.keys(result.config.mcpServers ?? {})).toEqual(['mariadb']);
+    expect(mcpServer(result, 'mariadb')).toMatchObject({ command: 'launcher' });
+  });
+
+  it('uses a root .lsp.json when plugin.json declares no lspServers', async () => {
+    writeRepo(
+      { name: 'dev', version: '1.0.0' },
+      {
+        '.lsp.json': JSON.stringify({
+          mariadb: { command: 'lsp', extensionToLanguage: { '.sql': 'sql' } },
+        }),
+      },
+    );
+
+    const result = await convertStandalone(testDir);
+    expect(result.config.lspServers).toBe('./.lsp.json');
+    expect(exists(result.convertedDir, '.lsp.json')).toBe(true);
+  });
+
+  it('keeps declared lspServers over a root .lsp.json', async () => {
+    writeRepo(
+      { name: 'dev', version: '1.0.0', lspServers: './lsp/servers.json' },
+      { '.lsp.json': '{}', 'lsp/servers.json': '{}' },
+    );
+
+    const result = await convertStandalone(testDir);
+    expect(result.config.lspServers).toBe('./lsp/servers.json');
+  });
+
   it('skips a .mcp.json that has no mcpServers object instead of misparsing it', async () => {
     // No `mcpServers` key — the whole object must not be treated as the map.
     writeRepo(
@@ -1096,7 +1137,7 @@ describe('performVariableReplacement for Claude extensions', () => {
     return fs.readFileSync(path.join(extDir, file), 'utf-8');
   }
 
-  it('should replace .claude with .qwen in shell scripts', () => {
+  it('should replace .claude with .mariadb-shell-agent in shell scripts', () => {
     const result = replaceIn(
       'ext-sh',
       'setup.sh',
@@ -1105,9 +1146,9 @@ describe('performVariableReplacement for Claude extensions', () => {
       CACHE_DIR="~/.claude/cache"
       LOCAL_DIR="./.claude/local"`,
     );
-    expect(result).toContain('$HOME/.qwen/config');
-    expect(result).toContain('~/.qwen/cache');
-    expect(result).toContain('./.qwen/local');
+    expect(result).toContain('$HOME/.mariadb-shell-agent/config');
+    expect(result).toContain('~/.mariadb-shell-agent/cache');
+    expect(result).toContain('./.mariadb-shell-agent/local');
     expect(result).not.toContain('.claude');
   });
 

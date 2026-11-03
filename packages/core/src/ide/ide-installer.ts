@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -121,11 +122,7 @@ class VsCodeInstaller implements IdeInstaller {
     try {
       const result = child_process.spawnSync(
         isWindows ? `"${commandPath}"` : commandPath,
-        [
-          '--install-extension',
-          'qwenlm.qwen-code-vscode-ide-companion',
-          '--force',
-        ],
+        ['--install-extension', 'MariaDB.mariadb-shell-agent', '--force'],
         { stdio: 'pipe', shell: isWindows },
       );
 

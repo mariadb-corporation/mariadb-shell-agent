@@ -2,7 +2,7 @@
 
 ## `qwen-code-sdk`
 
-`qwen-code-sdk` is an experimental Python SDK for Qwen Code. v1 targets the
+`qwen-code-sdk` is an experimental Python SDK for MariaDB Shell Agent. v1 targets the
 existing `stream-json` CLI protocol and keeps the transport surface small and
 testable.
 
@@ -11,7 +11,7 @@ testable.
 - Package name: `qwen-code-sdk`
 - Import path: `qwen_code_sdk`
 - Runtime requirement: Python `>=3.10`
-- CLI dependency: external `qwen` executable is required in v1
+- CLI dependency: external `mariadb-shell-agent` executable is required in v1
 - Transport scope: process transport only
 - Not included in v1: ACP transport, SDK-embedded MCP servers
 
@@ -27,7 +27,7 @@ For preview releases:
 pip install --pre qwen-code-sdk
 ```
 
-If `qwen` is not on `PATH`, pass `path_to_qwen_executable` explicitly.
+If `mariadb-shell-agent` is not on `PATH`, pass `path_to_qwen_executable` explicitly.
 On Windows, the SDK discovers npm's `qwen.cmd` shim only through the effective
 child `PATH`, ignoring extensionless shell shims and non-launchable `PATHEXT`
 associations. A command in the current directory is considered only when that
@@ -40,7 +40,7 @@ Closing a running Windows shim stops its CLI process tree through the system
 Before writing SDK code, make sure the CLI works in the same shell:
 
 ```bash
-qwen --version
+mariadb-shell-agent --version
 ```
 
 ## Quick Start
@@ -151,7 +151,7 @@ with query_sync(
 | -------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `cwd`                      | `str`                                                      | Working directory for the CLI process.                                                                                                                            |
 | `model`                    | `str`                                                      | Model override for this SDK session.                                                                                                                              |
-| `path_to_qwen_executable`  | `str`                                                      | `qwen`, an explicit binary path, or a `.js` CLI bundle.                                                                                                           |
+| `path_to_qwen_executable`  | `str`                                                      | `mariadb-shell-agent`, an explicit binary path, or a `.js` CLI bundle.                                                                                            |
 | `permission_mode`          | `default`, `plan`, `auto-edit`, `auto`, `yolo`             | Tool execution approval mode. `auto` lets an LLM classifier approve tool calls; `yolo` auto-approves all tools; use it only in trusted or sandboxed environments. |
 | `can_use_tool`             | async callback                                             | Custom permission callback for tool requests.                                                                                                                     |
 | `env`                      | `dict[str, str]`                                           | Extra environment variables passed to the CLI process.                                                                                                            |
@@ -480,14 +480,14 @@ except ProcessExitError as exc:
 
 If the SDK cannot start the CLI:
 
-- Verify `qwen --version` works in the target environment
+- Verify `mariadb-shell-agent --version` works in the target environment
 - Pass `path_to_qwen_executable` if your shell uses `nvm`, `pyenv`, or other
   non-standard PATH setup
 - Use `debug=True` or `stderr=print` to surface CLI stderr while debugging
 
 If session control calls time out:
 
-- Check that the target `qwen` version supports `--input-format stream-json`
+- Check that the target `mariadb-shell-agent` version supports `--input-format stream-json`
 - Increase `timeout.control_request`
 - Verify that no wrapper script is swallowing stdout/stderr
 
@@ -502,7 +502,7 @@ Repository-level helper commands:
 
 ## Real E2E Smoke
 
-For a real runtime check (actual `qwen` process + real model call), run from
+For a real runtime check (actual `mariadb-shell-agent` process + real model call), run from
 the repository root. The npm helper uses `python3`, so ensure it resolves to a
 Python `>=3.10` interpreter:
 

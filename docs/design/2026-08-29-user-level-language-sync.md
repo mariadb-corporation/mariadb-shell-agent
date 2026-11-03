@@ -1,7 +1,7 @@
 # User-Level Language Sync for the Daemon (`POST /language`)
 
 Date: 2026-08-29
-Upstream issue: https://github.com/QwenLM/qwen-code/issues/10234
+Upstream issue: https://github.invalid/QwenLM/qwen-code/issues/10234
 
 ## Background
 
@@ -18,7 +18,7 @@ user-level or process-global (see `sessionLanguage` in
 
 - `setLanguageAsync()` switches the process UI language;
 - `general.language` / `general.outputLanguage` persist at `SettingScope.User`;
-- the global `~/.qwen/output-language.md` is written when no project-bound file
+- the global `~/.mariadb-shell-agent/output-language.md` is written when no project-bound file
   is involved;
 - when output-language sync is requested, **all** active sessions are
   refreshed, not only the one named in the URL.
@@ -52,8 +52,8 @@ Two adjacent facts close the remaining escape hatches:
 
 Per the daemon-route ownership taxonomy, the new route is **process-global**:
 
-- It mutates user-global state (`~/.qwen/settings.json`,
-  `~/.qwen/output-language.md`) and the daemon process i18n.
+- It mutates user-global state (`~/.mariadb-shell-agent/settings.json`,
+  `~/.mariadb-shell-agent/output-language.md`) and the daemon process i18n.
 - It does not belong to a workspace runtime or a live-session owner; it must
   not consume a workspace selector or a session ID.
 - A workspace-qualified spelling (`/workspaces/:workspace/language`) was
@@ -129,7 +129,7 @@ route with `features.includes('user_language_sync')`.
   This also covers "workspaces registered but zero sessions".
 - **Project-bound output-language files are untouched.** The user-level route
   writes only the global file. On refresh, a session re-reads its registered
-  path, so a workspace `.qwen/output-language.md` continues to win — project
+  path, so a workspace `.mariadb-shell-agent/output-language.md` continues to win — project
   override semantics fall out naturally. This differs intentionally from the
   session route, which writes the new value into every session's project file;
   the protocol doc must state this difference.

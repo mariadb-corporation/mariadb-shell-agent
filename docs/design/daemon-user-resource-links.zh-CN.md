@@ -4,13 +4,13 @@
 
 ## 状态
 
-已在 [#11178](https://github.com/QwenLM/qwen-code/issues/11178) 的拟议修复中实现，等待维护者评审和发布。验证结果记录在 PR 中。
+已在 [#11178](https://github.invalid/QwenLM/qwen-code/issues/11178) 的拟议修复中实现，等待维护者评审和发布。验证结果记录在 PR 中。
 
 ## 问题
 
 ACP 用户 prompt 可以包含携带 URI 和展示元数据的 `resource_link`。实时客户端可以在本地生成附件卡片，但这不能证明已持久化。ACP session 只记录用户文字和 Daemon 原生附件引用，URI 链接在 transcript 回放前已经丢失。SDK 的归一化也会丢弃这些链接。
 
-[PR #11194](https://github.com/QwenLM/qwen-code/pull/11194) 处理了 SDK 投影，但假定本地文件的模型输入就是持久化的用户记录。原始引用必须独立于模型输入展开保存。
+[PR #11194](https://github.invalid/QwenLM/qwen-code/pull/11194) 处理了 SDK 投影，但假定本地文件的模型输入就是持久化的用户记录。原始引用必须独立于模型输入展开保存。
 
 ## 持久化和回放
 

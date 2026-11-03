@@ -135,7 +135,7 @@ current V1 baseline and verified that the original process hold excludes a
 second upload and physical fencing. The user explicitly added 30 minutes to
 the shared Java verification budget for this deployment work.
 
-The actual `qwen serve --managed` deployment used isolated data, signed
+The actual `mariadb-shell-agent serve --managed` deployment used isolated data, signed
 Gateway-to-Java requests, fresh H2, Hosted Harness, and the production bundled
 LOCAL Runtime without HTTP interception. Ten API groups passed binary/empty
 and 8 MiB uploads, oversize rejection, no-clobber/idempotent results, path safety

@@ -4,12 +4,12 @@
 
 - 状态：已实现
 - 日期：2026-10-21
-- Issue：[#14939](https://github.com/QwenLM/qwen-code/issues/14939)
+- Issue：[#14939](https://github.invalid/QwenLM/qwen-code/issues/14939)
 
 ## 问题
 
 桌面端由自带的 daemon 在 `http://127.0.0.1:<操作系统分配的端口>` 提供 Web Shell。
-因此它对远程 `qwen serve` 的每个请求都是跨源的，且页面 origin 每次启动都会变化。
+因此它对远程 `mariadb-shell-agent serve` 的每个请求都是跨源的，且页面 origin 每次启动都会变化。
 `--allow-origin` 按规范化 origin 精确匹配，任何固定条目都无法命中该 origin。使用静态条目时，
 每个 `OPTIONS /capabilities` 预检都返回 `403`，连接门无限重试。
 
@@ -47,7 +47,7 @@
 - 必须配置 bearer token。无 token 的 loopback daemon 遇到通配条目会拒绝启动，与现有 `*` 守卫一致：
   否则本机任意端口上的任意页面都能驱动 daemon。
 
-示例：`qwen serve --hostname 0.0.0.0 --token <token> --allow-origin http://127.0.0.1:*`
+示例：`mariadb-shell-agent serve --hostname 0.0.0.0 --token <token> --allow-origin http://127.0.0.1:*`
 
 ## 实现
 

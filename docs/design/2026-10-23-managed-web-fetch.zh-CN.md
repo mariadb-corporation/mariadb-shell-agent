@@ -4,7 +4,7 @@
 
 ## 问题与范围
 
-主 Hosted Workspace profile 尚未实现 [#15076](https://github.com/QwenLM/qwen-code/issues/15076) 中的 `web_fetch` 子需求。本次将其加入现有的 files、shell、search 和 team lead profile。快照 read profile 与独立的 CSI files 契约保留现有工具词表。`todo_write`、认证网页抓取和二进制下载不在本次范围内。
+主 Hosted Workspace profile 尚未实现 [#15076](https://github.invalid/QwenLM/qwen-code/issues/15076) 中的 `web_fetch` 子需求。本次将其加入现有的 files、shell、search 和 team lead profile。快照 read profile 与独立的 CSI files 契约保留现有工具词表。`todo_write`、认证网页抓取和二进制下载不在本次范围内。
 
 ## 执行与权限
 
@@ -29,6 +29,6 @@ Managed 抓取仅接受不含凭据、全部解析结果均为公网地址的 HT
 
 ## 验证与验收
 
-使用 `.qwen/e2e-tests/managed-web-fetch.md` 记录基线和改后验证。覆盖公网 HTML／Markdown／文本、格式协商、重定向、HTTP 错误、响应限制、取消、二进制拒绝，以及不含宿主路径的有界输出。验证私网和混合 DNS 拒绝、重定向／重试的连接固定、TLS 校验与审批拒绝／恢复。验证普通内联结果恢复和生命周期收敛。运行受影响的 Core／CLI 测试、根目录 build／typecheck／bundle、Java 定向测试和 `mvn verify`；独立报告未能执行的真实模型或部署检查。
+使用 `.mariadb-shell-agent/e2e-tests/managed-web-fetch.md` 记录基线和改后验证。覆盖公网 HTML／Markdown／文本、格式协商、重定向、HTTP 错误、响应限制、取消、二进制拒绝，以及不含宿主路径的有界输出。验证私网和混合 DNS 拒绝、重定向／重试的连接固定、TLS 校验与审批拒绝／恢复。验证普通内联结果恢复和生命周期收敛。运行受影响的 Core／CLI 测试、根目录 build／typecheck／bundle、Java 定向测试和 `mvn verify`；独立报告未能执行的真实模型或部署检查。
 
 验收要求：主 profile 声明并执行 `web_fetch`，审批展示实际 URL，拒绝后不发请求，安全公网文本进入模型和持久化历史，已完成调用允许生命周期清理。本地验证与部署验收分别记录。无未决设计问题。

@@ -2,7 +2,7 @@
 
 [English](2026-10-23-external-runtime-provider.md)
 
-Issue：https://github.com/QwenLM/qwen-code/issues/15247
+Issue：https://github.invalid/QwenLM/qwen-code/issues/15247
 
 ## 状态与目标
 

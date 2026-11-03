@@ -20,9 +20,11 @@ describe('channels/base paths – getGlobalQwenDir', () => {
     }
   });
 
-  it('defaults to ~/.qwen when QWEN_HOME is not set', () => {
+  it('defaults to ~/.mariadb-shell-agent when QWEN_HOME is not set', () => {
     delete process.env['QWEN_HOME'];
-    expect(getGlobalQwenDir()).toBe(path.join(os.homedir(), '.qwen'));
+    expect(getGlobalQwenDir()).toBe(
+      path.join(os.homedir(), '.mariadb-shell-agent'),
+    );
   });
 
   it('uses QWEN_HOME when set to absolute path', () => {

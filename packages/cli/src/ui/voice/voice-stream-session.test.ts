@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -66,8 +67,8 @@ describe('voice-stream-session', () => {
 
   it('derives websocket URLs from https/http base URLs with path prefixes', () => {
     expect(
-      deriveStreamUrl('https://dashscope.aliyuncs.com/compatible-mode/v1'),
-    ).toBe('wss://dashscope.aliyuncs.com/api-ws/v1/inference');
+      deriveStreamUrl('https://dashscope.aliyuncs.invalid/compatible-mode/v1'),
+    ).toBe('wss://dashscope.aliyuncs.invalid/api-ws/v1/inference');
     expect(deriveStreamUrl('http://localhost:8080/dashscope/v1')).toBe(
       'ws://localhost:8080/dashscope/api-ws/v1/inference',
     );

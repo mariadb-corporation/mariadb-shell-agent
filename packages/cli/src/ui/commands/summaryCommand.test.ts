@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -89,15 +90,19 @@ describe('summaryCommand custom export path', () => {
     }
   };
 
-  it('defaults to .qwen/PROJECT_SUMMARY.md with no argument', async () => {
+  it('defaults to .mariadb-shell-agent/PROJECT_SUMMARY.md with no argument', async () => {
     const result = await run('');
-    const fullPath = path.join(projectRoot, '.qwen', 'PROJECT_SUMMARY.md');
+    const fullPath = path.join(
+      projectRoot,
+      '.mariadb-shell-agent',
+      'PROJECT_SUMMARY.md',
+    );
     expect(await fileExists(fullPath)).toBe(true);
     const written = await fs.readFile(fullPath, 'utf8');
     expect(written).toContain('SUMMARY BODY');
     expect(written).toContain('## Summary Metadata');
     expect(result).toMatchObject({ type: 'message', messageType: 'info' });
-    expect(result.content).toContain('.qwen/PROJECT_SUMMARY.md');
+    expect(result.content).toContain('.mariadb-shell-agent/PROJECT_SUMMARY.md');
     if (process.platform !== 'win32') {
       const stat = await fs.stat(path.dirname(fullPath));
       expect(stat.mode & 0o777).toBe(0o700);
@@ -166,7 +171,7 @@ describe('summaryCommand custom export path', () => {
   });
 
   it('overwrites a hand-written file at the default path', async () => {
-    const qwenDir = path.join(projectRoot, '.qwen');
+    const qwenDir = path.join(projectRoot, '.mariadb-shell-agent');
     await fs.mkdir(qwenDir, { recursive: true });
     await fs.writeFile(
       path.join(qwenDir, 'PROJECT_SUMMARY.md'),
@@ -488,13 +493,16 @@ describe('summaryCommand custom export path', () => {
   });
 
   it.skipIf(process.platform === 'win32')(
-    'allows the default target when .qwen is a symlink',
+    'allows the default target when .mariadb-shell-agent is a symlink',
     async () => {
       const outside = await fs.mkdtemp(
         path.join(os.tmpdir(), 'summary-shared-'),
       );
       try {
-        await fs.symlink(outside, path.join(projectRoot, '.qwen'));
+        await fs.symlink(
+          outside,
+          path.join(projectRoot, '.mariadb-shell-agent'),
+        );
         const result = await run('');
         expect(result).toMatchObject({
           type: 'message',
@@ -550,11 +558,13 @@ describe('summaryCommand custom export path', () => {
   );
 
   it.skipIf(process.platform === 'win32')(
-    'applies 0o700 to .qwen/ when spelled explicitly',
+    'applies 0o700 to .mariadb-shell-agent/ when spelled explicitly',
     async () => {
-      const result = await run('.qwen/');
+      const result = await run('.mariadb-shell-agent/');
       expect(result).toMatchObject({ type: 'message', messageType: 'info' });
-      const stat = await fs.stat(path.join(projectRoot, '.qwen'));
+      const stat = await fs.stat(
+        path.join(projectRoot, '.mariadb-shell-agent'),
+      );
       expect(stat.mode & 0o777).toBe(0o700);
     },
   );
@@ -576,14 +586,14 @@ describe('summaryCommand custom export path', () => {
   );
 
   it('overwrites a hand-written file when the default path is spelled explicitly', async () => {
-    const qwenDir = path.join(projectRoot, '.qwen');
+    const qwenDir = path.join(projectRoot, '.mariadb-shell-agent');
     await fs.mkdir(qwenDir, { recursive: true });
     await fs.writeFile(
       path.join(qwenDir, 'PROJECT_SUMMARY.md'),
       'hand-written notes',
       'utf8',
     );
-    const result = await run('.qwen/PROJECT_SUMMARY.md');
+    const result = await run('.mariadb-shell-agent/PROJECT_SUMMARY.md');
     expect(result).toMatchObject({ type: 'message', messageType: 'info' });
     const written = await fs.readFile(
       path.join(qwenDir, 'PROJECT_SUMMARY.md'),

@@ -2,7 +2,7 @@
 
 [English](web-shell-pwa-installability.md) | [简体中文](web-shell-pwa-installability.zh-CN.md)
 
-Status: implementation under review. Follows the optional PWA direction in [issue #11704](https://github.com/QwenLM/qwen-code/issues/11704).
+Status: implementation under review. Follows the optional PWA direction in [issue #11704](https://github.invalid/QwenLM/qwen-code/issues/11704).
 
 ## Problem
 

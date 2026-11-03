@@ -1,6 +1,6 @@
 # GitLab
 
-This guide covers setting up a Qwen Code channel that monitors GitLab todos and responds to mentions on issues and merge requests.
+This guide covers setting up a MariaDB Shell Agent channel that monitors GitLab todos and responds to mentions on issues and merge requests.
 
 ## Prerequisites
 
@@ -17,7 +17,7 @@ This guide covers setting up a Qwen Code channel that monitors GitLab todos and 
 
 ## Configuration
 
-Add the channel to `~/.qwen/settings.json`:
+Add the channel to `~/.mariadb-shell-agent/settings.json`:
 
 ```json
 {
@@ -147,7 +147,7 @@ The adapter always sets `isMentioned = true` on dispatched envelopes, because Gi
 
 ### ⚠️ groupPolicy Must Be "open", "allowlist", or "pairing"
 
-`groupPolicy` must be set to `"open"`, `"allowlist"` with the project explicitly listed, or `"pairing"` for todos to be processed. Under `"pairing"`, the first mention from an unapproved project creates a group pairing request; approve it once with `qwen channel pairing approve`, and todos from that project are dispatched from then on. The default value `"disabled"` drops all mentions: todos are marked done and the cursor advances, but no dispatch occurs. A rejection is logged (`preflight rejected reason=group_disabled`) but the todo is still consumed. If your bot is not responding to mentions, check that `groupPolicy` is not `"disabled"`.
+`groupPolicy` must be set to `"open"`, `"allowlist"` with the project explicitly listed, or `"pairing"` for todos to be processed. Under `"pairing"`, the first mention from an unapproved project creates a group pairing request; approve it once with `mariadb-shell-agent channel pairing approve`, and todos from that project are dispatched from then on. The default value `"disabled"` drops all mentions: todos are marked done and the cursor advances, but no dispatch occurs. A rejection is logged (`preflight rejected reason=group_disabled`) but the todo is still consumed. If your bot is not responding to mentions, check that `groupPolicy` is not `"disabled"`.
 
 ## How It Works
 
@@ -182,5 +182,5 @@ Description mentions (no `#note_` anchor) do not receive an award emoji because 
 ## Starting the Channel
 
 ```bash
-qwen channel start my-gitlab
+mariadb-shell-agent channel start my-gitlab
 ```

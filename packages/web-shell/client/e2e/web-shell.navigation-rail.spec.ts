@@ -41,7 +41,9 @@ test('click opens Home and functional pages while collapse retains the draft @sm
   await home.hover();
   const preview = page.locator('[data-web-shell-home-popover]');
   await expect(preview).toBeVisible();
-  await expect(preview.getByText('Qwen Code', { exact: true })).toBeVisible();
+  await expect(
+    preview.getByText('MariaDB Shell Agent', { exact: true }),
+  ).toBeVisible();
   await expect(
     preview.getByRole('button', { name: 'New session', exact: true }),
   ).toBeVisible();
@@ -226,7 +228,7 @@ test('narrow embedded container uses a contained drawer on a wide viewport @smok
   await expect(page.locator(homeColumn)).toBeVisible();
   const brand = page
     .locator(homeColumn)
-    .getByText('Qwen Code', { exact: true });
+    .getByText('MariaDB Shell Agent', { exact: true });
   await expect(brand).toBeVisible();
   await expect(brand.locator('..').locator('svg')).toBeVisible();
   const host = await page.getByTestId('host-shell').boundingBox();

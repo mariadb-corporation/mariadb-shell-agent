@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -312,7 +313,7 @@ describe('EventBus', () => {
     ).toBeUndefined();
     expect(process.stderr.write).toHaveBeenCalledWith(
       expect.stringContaining(
-        'qwen serve: EventBus subscriber evicted {"reason":"queue_overflow"',
+        'mariadb-shell-agent serve: EventBus subscriber evicted {"reason":"queue_overflow"',
       ),
     );
     expect(bus.subscriberCount).toBe(0);
@@ -423,7 +424,7 @@ describe('EventBus', () => {
     });
     expect(process.stderr.write).toHaveBeenCalledWith(
       expect.stringContaining(
-        'qwen serve: EventBus slow_client_warning {"queueSize":6,"maxQueued":8',
+        'mariadb-shell-agent serve: EventBus slow_client_warning {"queueSize":6,"maxQueued":8',
       ),
     );
     abort.abort();
@@ -896,7 +897,7 @@ describe('EventBus', () => {
     ).toBeGreaterThan(0);
     expect(process.stderr.write).toHaveBeenCalledWith(
       expect.stringContaining(
-        'qwen serve: EventBus subscriber evicted {"reason":"queue_bytes_overflow"',
+        'mariadb-shell-agent serve: EventBus subscriber evicted {"reason":"queue_bytes_overflow"',
       ),
     );
     expect(bus.subscriberCount).toBe(0);
@@ -1058,7 +1059,7 @@ describe('EventBus', () => {
     expect(first.value.id).toBe(1);
     expect(process.stderr.write).toHaveBeenCalledWith(
       expect.stringContaining(
-        'qwen serve: EventBus event sizing failed {"type":"foo"}',
+        'mariadb-shell-agent serve: EventBus event sizing failed {"type":"foo"}',
       ),
     );
     expect(bus.subscriberCount).toBe(1);

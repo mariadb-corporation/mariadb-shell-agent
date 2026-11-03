@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -96,7 +97,7 @@ export class ConversationRuntimeManager {
     } catch {
       try {
         writeStderrLine(
-          'qwen serve: Conversations quarantine observer failed; runtime disposal will continue.',
+          'mariadb-shell-agent serve: Conversations quarantine observer failed; runtime disposal will continue.',
         );
       } catch {
         // Terminal containment must not depend on diagnostics.

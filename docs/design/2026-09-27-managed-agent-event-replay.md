@@ -4,7 +4,7 @@
 
 Status: implemented in this change
 Date: 2026-09-27
-Issue: [#12793](https://github.com/QwenLM/qwen-code/issues/12793), part of [#12380](https://github.com/QwenLM/qwen-code/issues/12380)
+Issue: [#12793](https://github.invalid/QwenLM/qwen-code/issues/12793), part of [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380)
 Builds on: [Managed Agent API Contract (Stage D1)](2026-09-27-managed-agent-api-contract.md) and [Session query (Stage D2)](2026-09-27-managed-agent-session-query.md)
 
 ## 1. Problem

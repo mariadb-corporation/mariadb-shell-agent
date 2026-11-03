@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -234,7 +235,7 @@ export async function reconcileNeverStartedChildRuns(input: {
   }
   if (skipped.length > 0) {
     writeStderrLineSafe(
-      `qwen serve: session ${sessionKey.sessionId}: ${skipped.length} ` +
+      `mariadb-shell-agent serve: session ${sessionKey.sessionId}: ${skipped.length} ` +
         `stranded child run(s) stayed unsettled on reload (not proven ` +
         `never-started): ${skipped
           .map((shellId) => `${shellId} (${skipCauses.get(shellId)})`)
@@ -243,7 +244,7 @@ export async function reconcileNeverStartedChildRuns(input: {
   }
   if (settled.length > 0) {
     writeStderrLineSafe(
-      `qwen serve: settled ${settled.length} stranded child run(s) as ` +
+      `mariadb-shell-agent serve: settled ${settled.length} stranded child run(s) as ` +
         `never-started on reload: ${settled.join(', ')}.`,
     );
   }

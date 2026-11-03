@@ -4,7 +4,7 @@
 
 ## Problem and scope
 
-The Spring control plane can create a Managed Session and call the private Hosted Harness client, while `qwen serve --profile hosted-harness` currently rejects startup. This slice connects one text-only, no-tool turn end to end on top of the durable Managed Session authority in #12693. It does not enable Runtime tools, approval-dependent work, worker lifecycle, or automatic crash recovery.
+The Spring control plane can create a Managed Session and call the private Hosted Harness client, while `mariadb-shell-agent serve --profile hosted-harness` currently rejects startup. This slice connects one text-only, no-tool turn end to end on top of the durable Managed Session authority in #12693. It does not enable Runtime tools, approval-dependent work, worker lifecycle, or automatic crash recovery.
 
 ## Design
 
@@ -20,4 +20,4 @@ The Spring control plane can create a Managed Session and call the private Hoste
 
 ## Validation and acceptance
 
-Run the repository build and typecheck, focused Managed Session and Hosted Harness tests, and a process-level test with Java, MySQL, and a real `qwen serve` process. The process test must show one canonical Session ID, a successful no-tool text turn, committed event replay after reconnect, and unchanged ordinary daemon behavior. Negative cases cover missing authentication, conflicting prompt identity, store failure, an oversized durable record, and a requested tool that performs no local side effect. After one or multiple failed or cancelled turns, the next model request must contain the new prompt and retain completed conversation history without resubmitting unanswered prompts, including when successful turns follow the failed turns. A hosted start must not revive saved channels or scheduled sessions; an SSE consumer that stops reading must not crash the daemon. This slice does not claim the complete Hosted Runtime or crash-recovery gates in #12380.
+Run the repository build and typecheck, focused Managed Session and Hosted Harness tests, and a process-level test with Java, MySQL, and a real `mariadb-shell-agent serve` process. The process test must show one canonical Session ID, a successful no-tool text turn, committed event replay after reconnect, and unchanged ordinary daemon behavior. Negative cases cover missing authentication, conflicting prompt identity, store failure, an oversized durable record, and a requested tool that performs no local side effect. After one or multiple failed or cancelled turns, the next model request must contain the new prompt and retain completed conversation history without resubmitting unanswered prompts, including when successful turns follow the failed turns. A hosted start must not revive saved channels or scheduled sessions; an SSE consumer that stops reading must not crash the daemon. This slice does not claim the complete Hosted Runtime or crash-recovery gates in #12380.

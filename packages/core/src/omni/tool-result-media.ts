@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -168,7 +169,7 @@ export async function processToolResultOmniMedia(
     }
 
     // Everything from staging-dir setup onward sits inside the try: mkdir
-    // itself can fail (ENOSPC, EACCES on ~/.qwen, ~/.qwen/omni existing as a
+    // itself can fail (ENOSPC, EACCES on ~/.mariadb-shell-agent, ~/.mariadb-shell-agent/omni existing as a
     // regular file → ENOTDIR), and the contract is that failure of any single
     // part leaves THAT part inline — not that the whole tool result rejects,
     // which would report a tool that succeeded as failed.

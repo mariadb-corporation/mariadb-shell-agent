@@ -1,6 +1,6 @@
 /**
  * Standalone Node.js E2E test: drives a REAL cua-driver runtime through this
- * high-level wrapper — no Qwen Code, no Node REPL, no Skill, no callTool.
+ * high-level wrapper — no MariaDB Shell Agent, no Node REPL, no Skill, no callTool.
  *
  * Gated behind two target variables so unit CI stays hermetic:
  *

@@ -142,7 +142,7 @@ the step summary. The step always exits 0 and never writes a verdict.
 - `MAVEN_ARGS=-Dmaven.repo.local=$RUNNER_TEMP/verify-maven-repo`
 - `QWEN_VERIFY_JAVA=1`
 
-`.qwen/skills/verify-pr/SKILL.md` tells the agent not to download a JDK or
+`.mariadb-shell-agent/skills/verify-pr/SKILL.md` tells the agent not to download a JDK or
 Maven, how to read `java-prepare.log`, how to reinstall siblings for the
 base side of an A/B (one non-SNAPSHOT copy in the repository), and to list
 database-backed integration tests under _Not covered_. A Java diff without

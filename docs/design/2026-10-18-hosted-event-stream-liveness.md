@@ -2,7 +2,7 @@
 
 [English](2026-10-18-hosted-event-stream-liveness.md) | [简体中文](2026-10-18-hosted-event-stream-liveness.zh-CN.md)
 
-Status: implemented in this change. Delivers [#14135](https://github.com/QwenLM/qwen-code/issues/14135), the heartbeat half of [#13302 item 2](https://github.com/QwenLM/qwen-code/issues/13302#issuecomment-6117110640) (decision 3 in #12380), and finding 1 of [H4f](2026-10-10-managed-task-cancel.md)'s real-stack acceptance. The model, tool and Turn operation budgets stay with #13302 item 2.
+Status: implemented in this change. Delivers [#14135](https://github.invalid/QwenLM/qwen-code/issues/14135), the heartbeat half of [#13302 item 2](https://github.invalid/QwenLM/qwen-code/issues/13302#issuecomment-6117110640) (decision 3 in #12380), and finding 1 of [H4f](2026-10-10-managed-task-cancel.md)'s real-stack acceptance. The model, tool and Turn operation budgets stay with #13302 item 2.
 
 ## Problem
 

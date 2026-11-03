@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -34,7 +35,7 @@ vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
     constructor(private readonly workspace: string) {}
 
     static getGlobalQwenDir() {
-      return process.env['QWEN_HOME'] ?? '/tmp/.qwen';
+      return process.env['QWEN_HOME'] ?? '/tmp/.mariadb-shell-agent';
     }
 
     static getGlobalSettingsPath() {
@@ -42,7 +43,7 @@ vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
     }
 
     getWorkspaceSettingsPath() {
-      return `${this.workspace}/.qwen/settings.json`;
+      return `${this.workspace}/.mariadb-shell-agent/settings.json`;
     }
   }
 
@@ -86,7 +87,7 @@ vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
     DEFAULT_WEB_SEARCH_MAX_PER_SESSION: 200,
     MAX_WEB_SEARCH_MAX_PER_SESSION: 10_000,
     DEFAULT_QWEN_CUSTOM_IGNORE_FILE_NAMES: ['.agentignore', '.aiignore'],
-    QWEN_DIR: '.qwen',
+    QWEN_DIR: '.mariadb-shell-agent',
     Storage,
     ModelsConfig,
     atomicWriteFileSync: vi.fn(),
@@ -154,7 +155,7 @@ function makeDeps(
   return {
     boundWorkspace: '/workspace',
     isWorkspaceTrusted: () => true,
-    contextFilename: 'QWEN.md',
+    contextFilename: 'MARIADB-SHELL-AGENT.md',
     persistDisabledTools: vi.fn().mockResolvedValue(undefined),
     persistDisabledSkills: vi.fn().mockResolvedValue({
       changed: true,
@@ -514,7 +515,7 @@ describe('createDaemonWorkspaceService', () => {
           rules: { allow: [], ask: [], deny: [] },
         },
         workspace: {
-          path: '/workspace/.qwen/settings.json',
+          path: '/workspace/.mariadb-shell-agent/settings.json',
           rules: { allow: ['Shell(*)'], ask: [], deny: [] },
         },
         merged: { allow: ['Shell(*)'], ask: [], deny: [] },
@@ -735,9 +736,12 @@ describe('createDaemonWorkspaceService', () => {
 
     it('grantWorkspaceTrust refuses a reported deny when only workspace settings enable trust', async () => {
       await withIsolatedWorkspace(async ({ home, workspace }) => {
-        await writeJson(path.join(workspace, '.qwen', 'settings.json'), {
-          security: { folderTrust: { enabled: true } },
-        });
+        await writeJson(
+          path.join(workspace, '.mariadb-shell-agent', 'settings.json'),
+          {
+            security: { folderTrust: { enabled: true } },
+          },
+        );
         const alias = path.join(home, 'ws-alias');
         await fs.symlink(workspace, alias);
         await writeJson(path.join(home, TRUSTED_FOLDERS_FILENAME), {
@@ -1626,7 +1630,7 @@ describe('createDaemonWorkspaceService', () => {
             description: 'User Skill',
             level: 'user',
             modelInvocable: true,
-            installedPath: '/tmp/.qwen/skills/review/SKILL.md',
+            installedPath: '/tmp/.mariadb-shell-agent/skills/review/SKILL.md',
           },
         ],
       });
@@ -3992,7 +3996,7 @@ describe('createDaemonWorkspaceService', () => {
       });
       expect(preheatAcpChild).toHaveBeenCalledTimes(2);
       expect(mockWriteStderrLine).toHaveBeenCalledWith(
-        'qwen serve: ACP preheat timed out after 1ms',
+        'mariadb-shell-agent serve: ACP preheat timed out after 1ms',
       );
     });
 
@@ -4081,7 +4085,7 @@ describe('createDaemonWorkspaceService', () => {
         error: 'ACP preheat did not produce a live channel',
       });
       expect(mockWriteStderrLine).toHaveBeenCalledWith(
-        'qwen serve: ACP preheat resolved without a live channel',
+        'mariadb-shell-agent serve: ACP preheat resolved without a live channel',
       );
     });
 
@@ -4104,7 +4108,7 @@ describe('createDaemonWorkspaceService', () => {
       expect(Number.isInteger(result.durationMs)).toBe(true);
       expect(result.durationMs).toBeGreaterThanOrEqual(0);
       expect(mockWriteStderrLine).toHaveBeenCalledWith(
-        'qwen serve: ACP preheat failed: preheat failed',
+        'mariadb-shell-agent serve: ACP preheat failed: preheat failed',
       );
     });
 
@@ -4122,7 +4126,7 @@ describe('createDaemonWorkspaceService', () => {
       await pending.promise.catch(() => undefined);
 
       expect(mockWriteStderrLine).toHaveBeenCalledWith(
-        'qwen serve: ACP preheat failed: late preheat failure',
+        'mariadb-shell-agent serve: ACP preheat failed: late preheat failure',
       );
     });
 
@@ -4142,7 +4146,7 @@ describe('createDaemonWorkspaceService', () => {
 
       expect(mockWriteStderrLine).toHaveBeenCalledTimes(1);
       expect(mockWriteStderrLine).toHaveBeenCalledWith(
-        'qwen serve: ACP preheat failed: shared preheat failure',
+        'mariadb-shell-agent serve: ACP preheat failed: shared preheat failure',
       );
     });
 
@@ -4163,7 +4167,7 @@ describe('createDaemonWorkspaceService', () => {
         error: 'ACP preheat failed',
       });
       expect(mockWriteStderrLine).toHaveBeenCalledWith(
-        'qwen serve: ACP preheat failed: child command contained a secret',
+        'mariadb-shell-agent serve: ACP preheat failed: child command contained a secret',
       );
     });
   });
@@ -4647,7 +4651,7 @@ describe('createDaemonWorkspaceService', () => {
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'QWEN.md',
+          contextFilename: 'MARIADB-SHELL-AGENT.md',
           publishWorkspaceEvent,
         }),
       );
@@ -4658,7 +4662,7 @@ describe('createDaemonWorkspaceService', () => {
       );
 
       expect(result.action).toBe('created');
-      expect(result.path).toBe(path.join(tmpDir, 'QWEN.md'));
+      expect(result.path).toBe(path.join(tmpDir, 'MARIADB-SHELL-AGENT.md'));
       const stat = await fs.stat(result.path);
       expect(stat.isFile()).toBe(true);
     });
@@ -4668,7 +4672,7 @@ describe('createDaemonWorkspaceService', () => {
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'QWEN.md',
+          contextFilename: 'MARIADB-SHELL-AGENT.md',
           assertGenerationOpen: () => {
             checks += 1;
             if (checks === 2) throw new Error('generation closed');
@@ -4680,11 +4684,11 @@ describe('createDaemonWorkspaceService', () => {
         svc.initWorkspace(makeCtx({ workspaceCwd: tmpDir }), {}),
       ).rejects.toThrow('generation closed');
       expect(checks).toBe(2);
-      await expect(fs.stat(path.join(tmpDir, 'QWEN.md'))).rejects.toMatchObject(
-        {
-          code: 'ENOENT',
-        },
-      );
+      await expect(
+        fs.stat(path.join(tmpDir, 'MARIADB-SHELL-AGENT.md')),
+      ).rejects.toMatchObject({
+        code: 'ENOENT',
+      });
     });
 
     it('publishes workspace_initialized event on create', async () => {
@@ -4692,7 +4696,7 @@ describe('createDaemonWorkspaceService', () => {
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'QWEN.md',
+          contextFilename: 'MARIADB-SHELL-AGENT.md',
           publishWorkspaceEvent,
         }),
       );
@@ -4701,19 +4705,22 @@ describe('createDaemonWorkspaceService', () => {
 
       expect(publishWorkspaceEvent).toHaveBeenCalledWith({
         type: 'workspace_initialized',
-        data: { path: path.join(tmpDir, 'QWEN.md'), action: 'created' },
+        data: {
+          path: path.join(tmpDir, 'MARIADB-SHELL-AGENT.md'),
+          action: 'created',
+        },
         originatorClientId: 'c-9',
       });
     });
 
     it('returns noop when file exists but is whitespace-only', async () => {
-      const target = path.join(tmpDir, 'QWEN.md');
+      const target = path.join(tmpDir, 'MARIADB-SHELL-AGENT.md');
       await fs.writeFile(target, '   \n  ', 'utf8');
 
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'QWEN.md',
+          contextFilename: 'MARIADB-SHELL-AGENT.md',
         }),
       );
 
@@ -4723,13 +4730,13 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('throws when file has content and force is not set', async () => {
-      const target = path.join(tmpDir, 'QWEN.md');
+      const target = path.join(tmpDir, 'MARIADB-SHELL-AGENT.md');
       await fs.writeFile(target, '# Hello', 'utf8');
 
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'QWEN.md',
+          contextFilename: 'MARIADB-SHELL-AGENT.md',
         }),
       );
 
@@ -4739,13 +4746,13 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('overwrites existing file when force=true', async () => {
-      const target = path.join(tmpDir, 'QWEN.md');
+      const target = path.join(tmpDir, 'MARIADB-SHELL-AGENT.md');
       await fs.writeFile(target, '# Existing content', 'utf8');
 
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'QWEN.md',
+          contextFilename: 'MARIADB-SHELL-AGENT.md',
         }),
       );
 
@@ -4771,14 +4778,14 @@ describe('createDaemonWorkspaceService', () => {
 
     it('throws when target is a symlink', async () => {
       const realFile = path.join(tmpDir, 'real.md');
-      const linkFile = path.join(tmpDir, 'QWEN.md');
+      const linkFile = path.join(tmpDir, 'MARIADB-SHELL-AGENT.md');
       await fs.writeFile(realFile, '', 'utf8');
       await fs.symlink(realFile, linkFile);
 
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'QWEN.md',
+          contextFilename: 'MARIADB-SHELL-AGENT.md',
         }),
       );
 
@@ -4786,7 +4793,7 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('throws when target is a non-regular file', async () => {
-      const target = path.join(tmpDir, 'QWEN.md');
+      const target = path.join(tmpDir, 'MARIADB-SHELL-AGENT.md');
       await fs.writeFile(target, '', 'utf8');
 
       const origLstat = fs.lstat;
@@ -4805,7 +4812,7 @@ describe('createDaemonWorkspaceService', () => {
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'QWEN.md',
+          contextFilename: 'MARIADB-SHELL-AGENT.md',
         }),
       );
 
@@ -4822,13 +4829,17 @@ describe('createDaemonWorkspaceService', () => {
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'QWEN.md',
+          contextFilename: 'MARIADB-SHELL-AGENT.md',
         }),
       );
 
       // Create the file between the readFile ENOENT and the open('wx')
       // by pre-creating it — the 'wx' flag throws EEXIST atomically.
-      await fs.writeFile(path.join(tmpDir, 'QWEN.md'), '# content', 'utf8');
+      await fs.writeFile(
+        path.join(tmpDir, 'MARIADB-SHELL-AGENT.md'),
+        '# content',
+        'utf8',
+      );
 
       // Since the file has content and force is not set, it throws
       // WorkspaceInitConflictError (not the race). To test the EEXIST
@@ -4843,7 +4854,7 @@ describe('createDaemonWorkspaceService', () => {
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'QWEN.md',
+          contextFilename: 'MARIADB-SHELL-AGENT.md',
         }),
       );
 
@@ -4853,7 +4864,10 @@ describe('createDaemonWorkspaceService', () => {
           filePath: Parameters<typeof origOpen>[0],
           flags?: Parameters<typeof origOpen>[1],
         ) => {
-          if (String(flags) === 'wx' && String(filePath).endsWith('QWEN.md')) {
+          if (
+            String(flags) === 'wx' &&
+            String(filePath).endsWith('MARIADB-SHELL-AGENT.md')
+          ) {
             const err = new Error('EEXIST') as NodeJS.ErrnoException;
             err.code = 'EEXIST';
             throw err;
@@ -4872,13 +4886,13 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('throws WorkspaceInitSymlinkError when overwrite open hits ELOOP', async () => {
-      const target = path.join(tmpDir, 'QWEN.md');
+      const target = path.join(tmpDir, 'MARIADB-SHELL-AGENT.md');
       await fs.writeFile(target, '# existing content', 'utf8');
 
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'QWEN.md',
+          contextFilename: 'MARIADB-SHELL-AGENT.md',
         }),
       );
 
@@ -4890,7 +4904,7 @@ describe('createDaemonWorkspaceService', () => {
         ) => {
           if (
             typeof flags === 'number' &&
-            String(filePath).endsWith('QWEN.md')
+            String(filePath).endsWith('MARIADB-SHELL-AGENT.md')
           ) {
             const err = new Error('ELOOP') as NodeJS.ErrnoException;
             err.code = 'ELOOP';
@@ -4910,13 +4924,13 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('throws WorkspaceInitRaceError when overwrite open hits ENOENT', async () => {
-      const target = path.join(tmpDir, 'QWEN.md');
+      const target = path.join(tmpDir, 'MARIADB-SHELL-AGENT.md');
       await fs.writeFile(target, '# existing content', 'utf8');
 
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'QWEN.md',
+          contextFilename: 'MARIADB-SHELL-AGENT.md',
         }),
       );
 
@@ -4928,7 +4942,7 @@ describe('createDaemonWorkspaceService', () => {
         ) => {
           if (
             typeof flags === 'number' &&
-            String(filePath).endsWith('QWEN.md')
+            String(filePath).endsWith('MARIADB-SHELL-AGENT.md')
           ) {
             const err = new Error('ENOENT') as NodeJS.ErrnoException;
             err.code = 'ENOENT';
@@ -4955,7 +4969,7 @@ describe('createDaemonWorkspaceService', () => {
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'docs/QWEN.md',
+          contextFilename: 'docs/MARIADB-SHELL-AGENT.md',
         }),
       );
 

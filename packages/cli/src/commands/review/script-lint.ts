@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review script-lint`: run the deterministic linters over the executable
+// `mariadb-shell-agent review script-lint`: run the deterministic linters over the executable
 // code a diff adds or changes, and report what they say.
 //
 // A diff's shell — a `.sh`/`.bash` file, a Dockerfile `RUN`, a GitHub Actions
@@ -329,7 +330,7 @@ function emptyHadolintConfig(): string | undefined {
     try {
       const d = mkdtempSync(join(tmpdir(), 'qwen-review-hadolint-'));
       // Register cleanup RIGHT AFTER mkdtemp, before the write: `cleanup.ts` only
-      // sweeps `.qwen/tmp`, so we remove `d` ourselves at exit — and registering it
+      // sweeps `.mariadb-shell-agent/tmp`, so we remove `d` ourselves at exit — and registering it
       // first means a `writeFileSync` that throws still leaves `d` swept, not leaked.
       process.on('exit', () => {
         try {

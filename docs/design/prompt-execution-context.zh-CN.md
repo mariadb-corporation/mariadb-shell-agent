@@ -22,7 +22,7 @@ Web Shell 会记录用户 prompt，但没有在每条 prompt 上附带开始执�
 
 修改 `packages/core/src/services/chatRecordingService.ts` 中的聊天记录类型和两个记录入口。扩展相邻的记录器测试，并为需要 getter 的已有记录器测试 Config fixture 补齐方法。若记录器测试尚未覆盖，再增加针对 transcript 保留元数据与 API 历史隔离的兼容测试。
 
-先运行全局 CLI 基线，再运行本地 build、typecheck、bundle、定向单测，以及使用模拟 OpenAI 供应商的隔离 daemon/API E2E。检查持久化的用户记录，而不仅是流式响应元数据。供应商为模拟，daemon 和记录后端必须真实运行。测试脚本与结果存放于 `.qwen/e2e-tests/`。
+先运行全局 CLI 基线，再运行本地 build、typecheck、bundle、定向单测，以及使用模拟 OpenAI 供应商的隔离 daemon/API E2E。检查持久化的用户记录，而不仅是流式响应元数据。供应商为模拟，daemon 和记录后端必须真实运行。测试脚本与结果存放于 `.mariadb-shell-agent/e2e-tests/`。
 
 ## 验收标准与风险
 

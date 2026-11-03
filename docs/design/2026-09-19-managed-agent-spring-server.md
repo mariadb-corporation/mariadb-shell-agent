@@ -9,11 +9,11 @@ Date: 2026-09-19
 
 ## 1. Problem
 
-Qwen Code already has a Hosted Harness profile and Java libraries for its
+MariaDB Shell Agent already has a Hosted Harness profile and Java libraries for its
 private HTTP/SSE protocol and Runtime Broker. It does not yet have a runnable,
 product-neutral Java control plane in this repository. The existing product
 integration depends on DataWorks identity, storage, and deployment code and
-cannot be used as a standalone Qwen Code service.
+cannot be used as a standalone MariaDB Shell Agent service.
 
 The new server must provide a low-latency, multi-tenant Session API while the
 TypeScript Hosted Harness continues to own the model loop. It must run without
@@ -67,7 +67,7 @@ Spring Managed Agent Server (one logical multi-tenant service)
   |-- asynchronous Harness coordinator
   |-- private Runtime Broker listener (optional)
   |
-  +---- HTTP/SSE ----> qwen serve --profile hosted-harness
+  +---- HTTP/SSE ----> mariadb-shell-agent serve --profile hosted-harness
   |                         |-- model loop and context
   |                         `-- BrokerManagedRuntimeProvider
   |                                      |
@@ -248,7 +248,7 @@ MySQL; H2 in MySQL mode is test-only.
   identities.
 - Run module tests and Checkstyle on Java 21.
 - Build the executable jar and start it with MySQL plus a real
-  `qwen serve --profile hosted-harness` before declaring the production gate
+  `mariadb-shell-agent serve --profile hosted-harness` before declaring the production gate
   complete.
 
 The repository test fixture now covers thirteen tests for tenant enforcement,
@@ -287,7 +287,7 @@ Phase 1 is complete when:
 4. A client can reconnect from a public Event sequence without duplicates.
 5. A deterministic Harness fixture completes an actual asynchronous Turn.
 6. No public response or log contains a Harness, Broker, or Runtime secret.
-7. The existing TypeScript Hosted Harness and legacy `qwen serve` routes remain
+7. The existing TypeScript Hosted Harness and legacy `mariadb-shell-agent serve` routes remain
    unchanged.
 
 The production multi-replica gate additionally requires real MySQL concurrency,

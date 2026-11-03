@@ -4,7 +4,7 @@
 
 ## Behavior
 
-An Agent belongs to an existing sidebar project. Its execution location is either the coordinator's local Qwen Code runtime or a registered Qwen Host with its own checkout. Local and remote files are not synchronized.
+An Agent belongs to an existing sidebar project. Its execution location is either the coordinator's local MariaDB Shell Agent runtime or a registered Qwen Host with its own checkout. Local and remote files are not synchronized.
 
 The sidebar Agent entry opens the roster, task board, and runtime list. Collaboration threads appear with ordinary project conversations and open in shared Chat. Run details use the existing right panel. Closing the panel does not stop execution or hide streamed replies.
 
@@ -14,7 +14,7 @@ Restarted or taken-over executions receive a new attempt and lease so their spen
 
 If a running Host lease expires, another assigned Host can reclaim the run. The coordinator leaves two default lease periods of recovery grace after the latest lease expiry (currently 120 seconds), then fails an unreclaimed run and releases the Agent. A renewed or reclaimed lease starts its own recovery window. Cancelling work settles as cancelled once its lease expires, without waiting for this additional grace.
 
-This increment exposes only Qwen Code on a managed Host. It neither probes for nor launches Codex or Claude. Those providers require a separate isolated profile that can confine reads to the selected workspace and exclude ambient user MCP servers, plugins, hooks, skills, and credentials.
+This increment exposes only MariaDB Shell Agent on a managed Host. It neither probes for nor launches Codex or Claude. Those providers require a separate isolated profile that can confine reads to the selected workspace and exclude ambient user MCP servers, plugins, hooks, skills, and credentials.
 
 ## Isolation and connection
 
@@ -30,4 +30,4 @@ Enrollment, heartbeat, pickup, lease renewal, progress, and result submission al
 
 Attachment lasts for the daemon process lifetime; this is not an OS service installer. A Host handles assignments sequentially. The feature does not synchronize files, open a relay, traverse NAT, or adopt an existing desktop session.
 
-Acceptance reports in [the PR review thread](https://github.com/QwenLM/qwen-code/pull/12582) identify the tested source head, environments, model type, and UI evidence. Cross-machine evidence from an earlier head does not validate later source changes.
+Acceptance reports in [the PR review thread](https://github.invalid/QwenLM/qwen-code/pull/12582) identify the tested source head, environments, model type, and UI evidence. Cross-machine evidence from an earlier head does not validate later source changes.

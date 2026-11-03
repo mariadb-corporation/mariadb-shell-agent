@@ -2,7 +2,7 @@
 
 [English](browser-use-concurrent-sessions.md) | [简体中文](browser-use-concurrent-sessions.zh-CN.md)
 
-状态：已实现，验证中，2026-09-18。对应 [#11609](https://github.com/QwenLM/qwen-code/issues/11609)。
+状态：已实现，验证中，2026-09-18。对应 [#11609](https://github.invalid/QwenLM/qwen-code/issues/11609)。
 
 ## 目标与现状
 
@@ -76,11 +76,11 @@ Native Messaging 连接关闭后，Host 退出，断开其客户端，并仅移�
 
 本次通过协议 v3 改变连接方向并增加会话路由，在 CLI、Native Host 和扩展之间提供可操作的版本不匹配提示。本文列明具体协议和安装约定。
 
-Host 文件位于每个用户的安装目录中，生命周期独立于单个 CLI 安装目录或 worktree。发起 Browser Use 任务即同意自动完成本机配置。SDK 无需读取 Chrome 扩展配置；若尚未安装 Host、启动入口早于安装记录或不可用、其协议较旧或 Host 修订号较低，SDK 会安装自带的 Host。修订号是一个整数，每当 Host 在协议不变的情况下发生变化时递增；没有它，Host 的修复将永远无法到达已安装过 Host 的用户。协议相同、修订号不低于自带版本且可用的 Host 直接复用：SDK 只补齐缺失的浏览器注册，不会把启动入口改指向自己自带的副本，因此不同 checkout 的 CLI 不会轮流替换它。由更新版 Qwen Code 安装的 Host 永不降级，较旧的 CLI 会提示需要更新 Qwen Code。
+Host 文件位于每个用户的安装目录中，生命周期独立于单个 CLI 安装目录或 worktree。发起 Browser Use 任务即同意自动完成本机配置。SDK 无需读取 Chrome 扩展配置；若尚未安装 Host、启动入口早于安装记录或不可用、其协议较旧或 Host 修订号较低，SDK 会安装自带的 Host。修订号是一个整数，每当 Host 在协议不变的情况下发生变化时递增；没有它，Host 的修复将永远无法到达已安装过 Host 的用户。协议相同、修订号不低于自带版本且可用的 Host 直接复用：SDK 只补齐缺失的浏览器注册，不会把启动入口改指向自己自带的副本，因此不同 checkout 的 CLI 不会轮流替换它。由更新版 MariaDB Shell Agent 安装的 Host 永不降级，较旧的 CLI 会提示需要更新 MariaDB Shell Agent。
 
-协议 3 以 `com.qwen.browser_use` 注册，启动入口为 `~/.qwen/browser-use/host.sh`。已发布的协议 2 CLI 每次首次使用都会重新注册 `com.qwen.browser` 和 `~/.qwen/browser-use/native-host.sh`。若共用该名称，任何较旧的 CLI 都能让 Chrome 重新指向协议 2 的 Host。使用不同名称可使两套注册互不影响；协议 3 的安装器不会读取、改写或删除协议 2 的文件。
+协议 3 以 `com.qwen.browser_use` 注册，启动入口为 `~/.mariadb-shell-agent/browser-use/host.sh`。已发布的协议 2 CLI 每次首次使用都会重新注册 `com.qwen.browser` 和 `~/.mariadb-shell-agent/browser-use/native-host.sh`。若共用该名称，任何较旧的 CLI 都能让 Chrome 重新指向协议 2 的 Host。使用不同名称可使两套注册互不影响；协议 3 的安装器不会读取、改写或删除协议 2 的文件。
 
-安装时将自带的 Host 复制到按内容寻址的 `~/.qwen/browser-use/hosts/<sha256>/native-host.mjs`，随后原子更新启动入口。启动入口记录协议版本、Host 修订号和所选 Node 可执行文件，该 Node 路径须持续可用。已有 Host 文件和进程继续保留；更新在下一次 Host 启动时生效，安装过程不重启运行中的 Host，也不重连扩展。显式的 `native-host-setup.js install` 命令会把同协议的安装切换为调用方 CLI 自带的 Host。活跃会话期间更新的真实 Chrome 验证仍待完成。
+安装时将自带的 Host 复制到按内容寻址的 `~/.mariadb-shell-agent/browser-use/hosts/<sha256>/native-host.mjs`，随后原子更新启动入口。启动入口记录协议版本、Host 修订号和所选 Node 可执行文件，该 Node 路径须持续可用。已有 Host 文件和进程继续保留；更新在下一次 Host 启动时生效，安装过程不重启运行中的 Host，也不重连扩展。显式的 `native-host-setup.js install` 命令会把同协议的安装切换为调用方 CLI 自带的 Host。活跃会话期间更新的真实 Chrome 验证仍待完成。
 
 第二个普通会话成为受支持的客户端。原有“第二个 runtime 返回 `BROWSER_USE_BUSY`”的回归测试已改为检查并发接入；保留防止替换活跃 endpoint、抢占 profile 的保护。保留单会话 SDK 行为，以及 `tabs.list()`、claim 和 finalize 的会话内契约。
 
@@ -117,7 +117,7 @@ socket 路径限制在 103 字节以内，而 `/private/tmp` 下的每用户基�
 
 协议 2 的 CLI 会在该 socket 基础目录中监听 `bridge.sock`，等待它自己的 Native Host，
 而协议 3 的扩展不会再启动那个 Host。协议 3 的 Host 对每个新出现、属于当前用户的此类
-监听只连接一次并发送自己的 `hello`，旧版 CLI 因此会提示需要更新 Qwen Code，而不是
+监听只连接一次并发送自己的 `hello`，旧版 CLI 因此会提示需要更新 MariaDB Shell Agent，而不是
 报告笼统的连接超时。为旧版扩展服务的 Host 不发送该 hello。
 
 请求、响应和事件均携带 `browserSessionId`。Host 将其绑定到 socket，并重映射请求 ID；

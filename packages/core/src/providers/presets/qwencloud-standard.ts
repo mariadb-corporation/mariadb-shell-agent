@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,14 +16,14 @@ export const QWENCLOUD_ENV_KEY = 'QWENCLOUD_API_KEY';
 /** 千问AI平台 (China) — https://platform.qianwenai.com */
 export const QWENCLOUD_CHINA_BASE_URL =
   'https://maas.qianwenaiapi.com/compatible-mode/v1';
-/** QwenCloud (International) — https://docs.qwencloud.com */
+/** QwenCloud (International) — https://docs.qwencloud.invalid */
 export const QWENCLOUD_GLOBAL_BASE_URL =
-  'https://maas.qwencloudapi.com/compatible-mode/v1';
+  'https://maas.qwencloudapi.invalid/compatible-mode/v1';
 
 export const QWENCLOUD_CHINA_API_KEY_URL =
   'https://platform.qianwenai.com/docs/developer-guides/administration/api-keys';
 export const QWENCLOUD_GLOBAL_API_KEY_URL =
-  'https://docs.qwencloud.com/developer-guides/administration/api-keys';
+  'https://docs.qwencloud.invalid/developer-guides/administration/api-keys';
 
 /** Chat models from the platform's own model-selection page. */
 export const QWENCLOUD_MODELS: ModelSpec[] = [

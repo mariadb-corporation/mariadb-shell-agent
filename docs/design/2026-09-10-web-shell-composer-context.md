@@ -67,7 +67,7 @@ tests under `packages/web-shell/client/`.
 
 ## Validation and acceptance
 
-Dry-run with the globally installed `qwen` before editing, then verify the local
+Dry-run with the globally installed `mariadb-shell-agent` before editing, then verify the local
 build. Check empty and multiline prompts, capped scrolling, attachment layout,
 desktop and touch submission, wide/narrow toolbars, and light/dark presentation.
 Check disclosure activation, counts, complete long names, sorted token values,

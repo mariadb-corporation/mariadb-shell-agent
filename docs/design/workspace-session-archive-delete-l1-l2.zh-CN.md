@@ -7,21 +7,21 @@
 ## 1. 状态与基线
 
 实现完成并已同步 main，2026-10-02，分支 `codex/workspace-session-l1-l2`。本文覆盖
-[#13164](https://github.com/QwenLM/qwen-code/issues/13164) 的 L1、L2。
+[#13164](https://github.invalid/QwenLM/qwen-code/issues/13164) 的 L1、L2。
 验证结果与环境限制记录在第 8 节。
 
 本次集成的基线：
 
-- [Workspace 可靠关闭，#13135](https://github.com/QwenLM/qwen-code/pull/13135)，
+- [Workspace 可靠关闭，#13135](https://github.invalid/QwenLM/qwen-code/pull/13135)，
   合入提交 `9478f28731f45ff6df66062e7e05d29e92906f19`。
-- [O4-1 会话退役，#13084](https://github.com/QwenLM/qwen-code/pull/13084)，
+- [O4-1 会话退役，#13084](https://github.invalid/QwenLM/qwen-code/pull/13084)，
   合入提交 `e1167c1f9ca3d54747c8c0145c1d805259ab0226`。
-- 既有 [D4 生命周期设计](https://github.com/QwenLM/qwen-code/blob/63e840cedf87fa54cf80c826112b8cc77272cff4/docs/design/2026-09-28-managed-agent-durable-lifecycle.md)
-  与 [Workspace 关闭设计](https://github.com/QwenLM/qwen-code/blob/9478f28731f45ff6df66062e7e05d29e92906f19/docs/design/workspace-session-reliable-close.md)。
+- 既有 [D4 生命周期设计](https://github.invalid/QwenLM/qwen-code/blob/63e840cedf87fa54cf80c826112b8cc77272cff4/docs/design/2026-09-28-managed-agent-durable-lifecycle.md)
+  与 [Workspace 关闭设计](https://github.invalid/QwenLM/qwen-code/blob/9478f28731f45ff6df66062e7e05d29e92906f19/docs/design/workspace-session-reliable-close.md)。
 
 两个前置 PR 均已合入 main，本分支保留其最终的锁顺序、close 恢复及退役实现。
 L1、L2 以 main 为目标；L2 使用实际退役而非占位步骤。
-main 的后续 [#13223](https://github.com/QwenLM/qwen-code/pull/13223) 已解决
+main 的后续 [#13223](https://github.invalid/QwenLM/qwen-code/pull/13223) 已解决
 close 迁移与 recovery bundle V31 的冲突，本分支保留该修复。
 
 ## 2. 问题与现有行为
@@ -309,8 +309,8 @@ L1、L2 在以 main 为基线的分支上保留独立评审范围，close 与 O4
 ## 8. 验证与验收
 
 可执行计划与结果记录在
-`.qwen/e2e-tests/workspace-session-archive-delete-l1-l2.md`。
-全局 `qwen` CLI 没有 Hosted archive/unarchive/delete 命令，基线 dry-run
+`.mariadb-shell-agent/e2e-tests/workspace-session-archive-delete-l1-l2.md`。
+全局 `mariadb-shell-agent` CLI 没有 Hosted archive/unarchive/delete 命令，基线 dry-run
 确认需使用真实 HTTP/store 测试脚本替代。这是 Hosted API 覆盖，不是 CLI 命令覆盖。
 
 定向 Java API/store/coordinator 与 OpenAPI 契约测试覆盖两个入口、legacy 回归、
@@ -326,7 +326,7 @@ writer/投影完成、残留 writer 续租与 retirement 竞争，以及前置 s
 修正也适用于 close 完成，其定向回归通过。
 
 作者的主机为 macOS，元数据测试使用确定性的 close 证据。
-独立评审者 [wenshao 的 Linux 验证](https://github.com/QwenLM/qwen-code/pull/13194#issuecomment-5955445033)
+独立评审者 [wenshao 的 Linux 验证](https://github.invalid/QwenLM/qwen-code/pull/13194#issuecomment-5955445033)
 针对 `2486d3dad`，补充了两个 API 入口上的真实 packaged Hosted Harness、worker 停止、
 共享文件、邻居隔离和崩溃/接管证据。
 固定提交的[装置与结果](https://github.com/wenshao/qwen-code/tree/ff11be0a23ada2f1bdf955ebafd463779aefb670/pr13194)

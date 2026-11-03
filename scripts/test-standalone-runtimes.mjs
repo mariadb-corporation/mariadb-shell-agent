@@ -115,7 +115,7 @@ async function worker(root, node, bun, expectedHost) {
   for (const dir of [tmp, home]) fs.mkdirSync(dir);
   Object.assign(process.env, {
     HOME: home,
-    QWEN_HOME: path.join(home, '.qwen'),
+    QWEN_HOME: path.join(home, '.mariadb-shell-agent'),
     NODE_COMPILE_CACHE: compileCache,
     TMPDIR: tmp,
     TMP: tmp,

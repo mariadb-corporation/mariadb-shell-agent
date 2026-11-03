@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -440,11 +441,15 @@ describe('WriteFileTool', () => {
       try {
         const permissionFor = (filePath: string) =>
           build(filePath, 'c').getDefaultPermission();
-        expect(await permissionFor(p('.qwen', 'memory', 'user', 'x.md'))).toBe(
-          'allow',
-        );
         expect(
-          await permissionFor(p('.qwen', 'team-memory', 'feedback', 'x.md')),
+          await permissionFor(
+            p('.mariadb-shell-agent', 'memory', 'user', 'x.md'),
+          ),
+        ).toBe('allow');
+        expect(
+          await permissionFor(
+            p('.mariadb-shell-agent', 'team-memory', 'feedback', 'x.md'),
+          ),
         ).toBe('ask');
       } finally {
         if (prev === undefined) {
@@ -458,7 +463,7 @@ describe('WriteFileTool', () => {
 
     it('blocks writing a secret to a team-memory path', () => {
       const params = {
-        file_path: p('.qwen', 'team-memory', 'feedback.md'),
+        file_path: p('.mariadb-shell-agent', 'team-memory', 'feedback.md'),
         content: `token = ghp_${'a'.repeat(36)}`,
       };
       expect(() => tool.build(params)).toThrow(
@@ -467,7 +472,7 @@ describe('WriteFileTool', () => {
     });
 
     it('blocks a secret added to team-memory content before execute', async () => {
-      const filePath = p('.qwen', 'team-memory', 'feedback.md');
+      const filePath = p('.mariadb-shell-agent', 'team-memory', 'feedback.md');
       const invocation = build(filePath, 'clean content');
       invocation.params.content = `token = ghp_${'a'.repeat(36)}`;
 
@@ -685,9 +690,9 @@ describe('WriteFileTool', () => {
       expectUpdateOnly(result, 'alibaba.html');
     });
 
-    it('does not record intermediate files written under .qwen/tmp', async () => {
+    it('does not record intermediate files written under .mariadb-shell-agent/tmp', async () => {
       const result = await writeArtifact(
-        p('.qwen', 'tmp', 'alibaba.html'),
+        p('.mariadb-shell-agent', 'tmp', 'alibaba.html'),
         html('Alibaba'),
       );
       expectNotRecorded(result, true);
@@ -741,7 +746,7 @@ describe('WriteFileTool', () => {
     });
 
     it('records workspace-root-relative path inside a worktree', async () => {
-      const worktreeDir = p('.qwen', 'worktrees', 'my-feature');
+      const worktreeDir = p('.mariadb-shell-agent', 'worktrees', 'my-feature');
       fs.mkdirSync(worktreeDir, { recursive: true });
       const originalGetTargetDir = mockConfigInternal.getTargetDir;
       mockConfigInternal.getTargetDir = () => worktreeDir;
@@ -751,12 +756,16 @@ describe('WriteFileTool', () => {
           html('Report'),
         );
 
-        expectRecordedHint(result, '.qwen/worktrees/my-feature/report.html');
+        expectRecordedHint(
+          result,
+          '.mariadb-shell-agent/worktrees/my-feature/report.html',
+        );
         expect(result.artifacts?.[0]).toMatchObject({
           title: 'report.html',
           kind: 'html',
           storage: 'workspace',
-          workspacePath: '.qwen/worktrees/my-feature/report.html',
+          workspacePath:
+            '.mariadb-shell-agent/worktrees/my-feature/report.html',
           mimeType: 'text/html',
         });
       } finally {

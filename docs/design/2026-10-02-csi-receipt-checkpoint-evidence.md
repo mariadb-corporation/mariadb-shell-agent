@@ -210,7 +210,7 @@ parser fix and were refused in the final full-chain rerun. Observations left all
 16 tracked tables and object bytes unchanged; owned processes, port and temporary
 directory were reclaimed, and 870 inputs plus 121 dependencies stayed unchanged.
 
-Reports are retained under `.qwen/e2e-tests/`: the native/CLI post report and the
+Reports are retained under `.mariadb-shell-agent/e2e-tests/`: the native/CLI post report and the
 2026-10-03 independent SQL report. Earlier 39-case/16-group runs and failed
 reproductions remain historical evidence. This qualifies one explicitly selected
 original publication under the fixed inline profile. Workspace-wide inventory,

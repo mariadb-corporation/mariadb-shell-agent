@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -50,11 +51,11 @@ function isHostOrSubdomain(hostname: string, domain: string): boolean {
 
 function providerFromHostname(hostname: string): string | undefined {
   if (
-    isHostOrSubdomain(hostname, 'dashscope.aliyuncs.com') ||
-    isHostOrSubdomain(hostname, 'dashscope-intl.aliyuncs.com') ||
-    isHostOrSubdomain(hostname, 'dashscope-us.aliyuncs.com') ||
+    isHostOrSubdomain(hostname, 'dashscope.aliyuncs.invalid') ||
+    isHostOrSubdomain(hostname, 'dashscope-intl.aliyuncs.invalid') ||
+    isHostOrSubdomain(hostname, 'dashscope-us.aliyuncs.invalid') ||
     (hostname.startsWith('token-plan.') &&
-      isHostOrSubdomain(hostname, 'maas.aliyuncs.com')) ||
+      isHostOrSubdomain(hostname, 'maas.aliyuncs.invalid')) ||
     // QwenCloud MaaS hosts; the subdomain match also covers their
     // `token-plan.` subscription endpoints. Imported from the attribution leaf
     // rather than repeated here: that leaf has no imports of its own, so it
@@ -62,8 +63,8 @@ function providerFromHostname(hostname: string): string | undefined {
     QWENCLOUD_MAAS_HOSTS.some((domain) =>
       isHostOrSubdomain(hostname, domain),
     ) ||
-    hostname.endsWith('.alibaba-inc.com') ||
-    hostname.endsWith('.aliyun-inc.com')
+    hostname.endsWith('.alibaba-inc.invalid') ||
+    hostname.endsWith('.aliyun-inc.invalid')
   ) {
     return 'dashscope';
   }
@@ -94,7 +95,7 @@ function providerFromHostname(hostname: string): string | undefined {
   ) {
     return 'z_ai';
   }
-  if (isHostOrSubdomain(hostname, 'modelscope.cn')) return 'modelscope';
+  if (isHostOrSubdomain(hostname, 'modelscope.invalid')) return 'modelscope';
   if (isHostOrSubdomain(hostname, 'xiaomimimo.com')) return 'mimo';
   if (isHostOrSubdomain(hostname, 'openrouter.ai')) return 'openrouter';
   if (isHostOrSubdomain(hostname, 'requesty.ai')) return 'requesty';

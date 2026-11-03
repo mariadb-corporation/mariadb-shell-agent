@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -67,7 +68,7 @@ const debugLogger = createDebugLogger('TOOL_REGISTRY');
  * The free-text `description` is deliberately excluded. Shipped deferred tools
  * rebuild it from mutable state on every `schema` access — `WebSearchTool`
  * interpolates the current month/year and `ReadFileTool` the effective input
- * modalities — intentionally, so a long-lived `qwen serve`/ACP process is not
+ * modalities — intentionally, so a long-lived `mariadb-shell-agent serve`/ACP process is not
  * stale across a month boundary or a mid-session `/model` switch. Hashing that
  * prose made an unchanged tool's fingerprint drift and refuse a legitimate call
  * whose parameters still matched the reviewed schema.
@@ -1045,7 +1046,7 @@ export class ToolRegistry {
       return this.getCodeModeFunctionDeclarations();
     }
     const includeDeferred = options?.includeDeferred === true;
-    return Array.from(this.tools.values())
+    const declared = Array.from(this.tools.values())
       .filter((tool) => this.isToolAvailable(tool.name))
       .filter((tool) => this.isToolDeclared(tool.name))
       .filter((tool) => this.isMemoryRecallToolDeclared(tool.name))
@@ -1055,9 +1056,27 @@ export class ToolRegistry {
           !this.isEffectivelyDeferred(tool) ||
           tool.alwaysLoad ||
           !this.isDeferredAndHidden(tool.name),
-      )
-      .sort(ToolRegistry.compareToolsByDeclarationName)
-      .map((tool) => tool.schema);
+      );
+    // Deferred tools revealed during the session (tool_search, plan setup,
+    // preload) follow the name-sorted rest in reveal order: a reveal then only
+    // appends to the tools block, and a provider's prompt cache keeps the
+    // declarations before it.
+    const isAppended = (tool: AnyDeclarativeTool) =>
+      !includeDeferred &&
+      !tool.alwaysLoad &&
+      this.isEffectivelyDeferred(tool) &&
+      this.revealedDeferred.has(tool.name);
+    const revealOrder = Array.from(this.revealedDeferred);
+    return [
+      ...declared
+        .filter((tool) => !isAppended(tool))
+        .sort(ToolRegistry.compareToolsByDeclarationName),
+      ...declared
+        .filter(isAppended)
+        .sort(
+          (a, b) => revealOrder.indexOf(a.name) - revealOrder.indexOf(b.name),
+        ),
+    ].map((tool) => tool.schema);
   }
 
   /**

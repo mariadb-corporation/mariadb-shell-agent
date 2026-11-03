@@ -83,7 +83,11 @@ function saveEvidence(name: string, body: unknown): void {
 const argumentsList = process.argv.slice(2);
 let model = 'moonshot/kimi-k3';
 let runtimeDelayMs = 0;
-let settingsPath = path.join(homedir(), '.qwen', 'settings.json');
+let settingsPath = path.join(
+  homedir(),
+  '.mariadb-shell-agent',
+  'settings.json',
+);
 let sessionFailover = false;
 let inflightFailover = false;
 let continuationFailover = false;
@@ -186,14 +190,14 @@ if (approvalFault && verificationMode !== 'allow') {
 const verificationDirectory = path.resolve(
   root,
   process.env['G3_VERIFY_REPORT_DIR'] ??
-    `.qwen/investigations/g3-step3-implementation/packaged-${verificationMode}-${Date.now()}`,
+    `.mariadb-shell-agent/investigations/g3-step3-implementation/packaged-${verificationMode}-${Date.now()}`,
 );
 // The model-round arm has no gate mode; name its evidence explicitly instead
 // of borrowing a packaged-undefined-<epoch> directory (R1-10).
 const modelRoundEvidenceDirectory = path.resolve(
   root,
   process.env['G3_VERIFY_REPORT_DIR'] ??
-    `.qwen/investigations/g3-step3-implementation/model-round-${Date.now()}`,
+    `.mariadb-shell-agent/investigations/g3-step3-implementation/model-round-${Date.now()}`,
 );
 
 if (
@@ -382,15 +386,15 @@ const workspaceId = createHash('sha256')
 try {
   for (const directory of [
     workspace,
-    path.join(harnessHome, '.qwen'),
+    path.join(harnessHome, '.mariadb-shell-agent'),
     ...(durableFailover
       ? [
-          path.join(replacementHarnessHome, '.qwen'),
-          path.join(replacementRuntimeHome, '.qwen'),
+          path.join(replacementHarnessHome, '.mariadb-shell-agent'),
+          path.join(replacementRuntimeHome, '.mariadb-shell-agent'),
         ]
       : []),
     workspaceMount,
-    path.join(runtimeHome, '.qwen'),
+    path.join(runtimeHome, '.mariadb-shell-agent'),
     runtimeState,
     ...(frozenControlPlane ? [replacementRuntimeState] : []),
     mysqlData,
@@ -405,7 +409,7 @@ try {
   if (durableFailover) {
     for (const home of [harnessHome, replacementHarnessHome]) {
       writeFileSync(
-        path.join(home, '.qwen', 'settings.json'),
+        path.join(home, '.mariadb-shell-agent', 'settings.json'),
         JSON.stringify({ ui: { enableFollowupSuggestions: false } }),
         { mode: 0o600 },
       );
@@ -475,19 +479,23 @@ try {
       ui: { enableFollowupSuggestions: false },
     };
     writeFileSync(
-      path.join(harnessHome, '.qwen', 'settings.json'),
+      path.join(harnessHome, '.mariadb-shell-agent', 'settings.json'),
       JSON.stringify(harnessSettings),
       { mode: 0o600 },
     );
   }
   writeFileSync(
-    path.join(runtimeHome, '.qwen', 'settings.json'),
+    path.join(runtimeHome, '.mariadb-shell-agent', 'settings.json'),
     JSON.stringify({ ui: { enableFollowupSuggestions: false } }),
     { mode: 0o600 },
   );
   if (durableFailover) {
     writeFileSync(
-      path.join(replacementRuntimeHome, '.qwen', 'settings.json'),
+      path.join(
+        replacementRuntimeHome,
+        '.mariadb-shell-agent',
+        'settings.json',
+      ),
       JSON.stringify({ ui: { enableFollowupSuggestions: false } }),
       { mode: 0o600 },
     );
@@ -2322,7 +2330,7 @@ try {
         LANG: process.env['LANG'] ?? 'C',
         LC_ALL: process.env['LC_ALL'] ?? 'C',
         NO_PROXY: '127.0.0.1,localhost',
-        QWEN_HOME: path.join(runtimeHome, '.qwen'),
+        QWEN_HOME: path.join(runtimeHome, '.mariadb-shell-agent'),
         TMPDIR: temporary,
         no_proxy: '127.0.0.1,localhost',
         SERVER_PORT: String(springPort),
@@ -2484,7 +2492,7 @@ try {
         HOME: harnessHome,
         LANG: process.env['LANG'] ?? 'C',
         LC_ALL: process.env['LC_ALL'] ?? 'C',
-        QWEN_HOME: path.join(harnessHome, '.qwen'),
+        QWEN_HOME: path.join(harnessHome, '.mariadb-shell-agent'),
         QWEN_CODE_TRUSTED_FOLDERS_PATH: trustedFolders,
         QWEN_HOSTED_HARNESS_CAPABILITY_DIGEST: capabilityDigest,
         QWEN_SERVER_TOKEN: harnessToken,
@@ -3096,7 +3104,10 @@ try {
             LANG: process.env['LANG'] ?? 'C',
             LC_ALL: process.env['LC_ALL'] ?? 'C',
             NO_PROXY: '127.0.0.1,localhost',
-            QWEN_HOME: path.join(replacementRuntimeHome, '.qwen'),
+            QWEN_HOME: path.join(
+              replacementRuntimeHome,
+              '.mariadb-shell-agent',
+            ),
             TMPDIR: temporary,
             no_proxy: '127.0.0.1,localhost',
             SERVER_PORT: String(replacementSpringPort),
@@ -3214,7 +3225,10 @@ try {
             HOME: replacementHarnessHome,
             LANG: process.env['LANG'] ?? 'C',
             LC_ALL: process.env['LC_ALL'] ?? 'C',
-            QWEN_HOME: path.join(replacementHarnessHome, '.qwen'),
+            QWEN_HOME: path.join(
+              replacementHarnessHome,
+              '.mariadb-shell-agent',
+            ),
             QWEN_CODE_TRUSTED_FOLDERS_PATH: trustedFolders,
             QWEN_HOSTED_HARNESS_CAPABILITY_DIGEST: capabilityDigest,
             QWEN_SERVER_TOKEN: harnessToken,
@@ -3841,11 +3855,15 @@ try {
         // The crashed generation's disk is scrapped like every replaced
         // Harness home; the fresh one must recover from MySQL alone.
         rmSync(replacementHarnessHome, { recursive: true, force: true });
-        mkdirSync(path.join(replacementHarnessHome, '.qwen'), {
+        mkdirSync(path.join(replacementHarnessHome, '.mariadb-shell-agent'), {
           recursive: true,
         });
         writeFileSync(
-          path.join(replacementHarnessHome, '.qwen', 'settings.json'),
+          path.join(
+            replacementHarnessHome,
+            '.mariadb-shell-agent',
+            'settings.json',
+          ),
           JSON.stringify({ ui: { enableFollowupSuggestions: false } }),
           { mode: 0o600 },
         );
@@ -4914,11 +4932,15 @@ try {
         advanceModelRound();
         // The second generation's disk is scrapped like the first one's.
         rmSync(replacementHarnessHome, { recursive: true, force: true });
-        mkdirSync(path.join(replacementHarnessHome, '.qwen'), {
+        mkdirSync(path.join(replacementHarnessHome, '.mariadb-shell-agent'), {
           recursive: true,
         });
         writeFileSync(
-          path.join(replacementHarnessHome, '.qwen', 'settings.json'),
+          path.join(
+            replacementHarnessHome,
+            '.mariadb-shell-agent',
+            'settings.json',
+          ),
           JSON.stringify({ ui: { enableFollowupSuggestions: false } }),
           { mode: 0o600 },
         );

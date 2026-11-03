@@ -1,13 +1,13 @@
 # Agent Skills
 
-> Create, manage, and share Skills to extend Qwen Code's capabilities.
+> Create, manage, and share Skills to extend MariaDB Shell Agent's capabilities.
 
-This guide shows you how to create, use, and manage Agent Skills in **Qwen Code**. Skills are modular capabilities that extend the model's effectiveness through organized folders containing instructions (and optionally scripts/resources).
+This guide shows you how to create, use, and manage Agent Skills in **MariaDB Shell Agent**. Skills are modular capabilities that extend the model's effectiveness through organized folders containing instructions (and optionally scripts/resources).
 
 ## Prerequisites
 
-- Qwen Code (recent version)
-- Basic familiarity with Qwen Code ([Quickstart](../quickstart.md))
+- MariaDB Shell Agent (recent version)
+- Basic familiarity with MariaDB Shell Agent ([Quickstart](../quickstart.md))
 
 ## What are Agent Skills?
 
@@ -31,7 +31,7 @@ Start typing `/` to autocomplete and browse available Skills alongside their des
 
 ### Benefits
 
-- Extend Qwen Code for your workflows
+- Extend MariaDB Shell Agent for your workflows
 - Share expertise across your team via git
 - Reduce repetitive prompting
 - Compose multiple Skills for complex tasks
@@ -52,7 +52,7 @@ Skill:
 ```
 
 The command runs as a normal agent turn and creates the result under
-`.qwen/skills/learned-skill-<name>/SKILL.md` with `source: learned` in its
+`.mariadb-shell-agent/skills/learned-skill-<name>/SKILL.md` with `source: learned` in its
 frontmatter. Review the generated instructions before using or sharing them.
 
 `/learn` also accepts local or direct-link `.mp4`, `.webm`, `.mov`, and `.m4v`
@@ -69,13 +69,13 @@ workspace and pass its local path instead.
 
 ### Personal Skills
 
-Personal Skills are available across all your projects. Store them in `~/.qwen/skills/`:
+Personal Skills are available across all your projects. Store them in `~/.mariadb-shell-agent/skills/`:
 
 ```bash
-mkdir -p ~/.qwen/skills/my-skill-name
+mkdir -p ~/.mariadb-shell-agent/skills/my-skill-name
 ```
 
-Qwen Code also reads personal Skills from `~/.agents/skills/`. If both folders contain a Skill with the same name, the one in `~/.qwen/skills/` wins.
+MariaDB Shell Agent also reads personal Skills from `~/.agents/skills/`. If both folders contain a Skill with the same name, the one in `~/.mariadb-shell-agent/skills/` wins.
 
 Use personal Skills for:
 
@@ -85,13 +85,13 @@ Use personal Skills for:
 
 ### Project Skills
 
-Project Skills are shared with your team. Store them in `.qwen/skills/` within your project:
+Project Skills are shared with your team. Store them in `.mariadb-shell-agent/skills/` within your project:
 
 ```bash
-mkdir -p .qwen/skills/my-skill-name
+mkdir -p .mariadb-shell-agent/skills/my-skill-name
 ```
 
-Qwen Code also reads project Skills from `.agents/skills/`. If both folders contain a Skill with the same name, the one in `.qwen/skills/` wins.
+MariaDB Shell Agent also reads project Skills from `.agents/skills/`. If both folders contain a Skill with the same name, the one in `.mariadb-shell-agent/skills/` wins.
 
 Use project Skills for:
 
@@ -103,10 +103,10 @@ Project Skills can be checked into git and automatically become available to tea
 
 ### Maintain auto-generated project Skills
 
-Qwen Code tracks successful uses of generated project Skills locally, including while new Auto Skill generation is disabled, so re-enabling maintenance cannot mistake a recently used skill for an inactive one. When **Auto Skill** is enabled, it periodically moves inactive generated Skills out of the active library. Only directories named `.qwen/skills/auto-skill-*` whose `SKILL.md` frontmatter contains `source: auto-skill` are managed; personal, extension, bundled, and hand-authored Skills are never selected.
+MariaDB Shell Agent tracks successful uses of generated project Skills locally, including while new Auto Skill generation is disabled, so re-enabling maintenance cannot mistake a recently used skill for an inactive one. When **Auto Skill** is enabled, it periodically moves inactive generated Skills out of the active library. Only directories named `.mariadb-shell-agent/skills/auto-skill-*` whose `SKILL.md` frontmatter contains `source: auto-skill` are managed; personal, extension, bundled, and hand-authored Skills are never selected.
 
 - After 30 days without a successful use or `SKILL.md` edit, an auto-skill is marked stale.
-- After 90 days, its complete directory is moved to `.qwen/archived-skills/`. Nothing is permanently deleted.
+- After 90 days, its complete directory is moved to `.mariadb-shell-agent/archived-skills/`. Nothing is permanently deleted.
 - Automatic maintenance runs at most once every 7 days in trusted workspaces. Each newly observed auto-skill gets a full grace period before maintenance begins.
 - A pinned auto-skill is excluded from automatic stale and archive transitions until it is unpinned.
 - Archived directory names remain reserved, and an existing archive destination skips only that collision rather than stopping maintenance for other skills.
@@ -129,7 +129,7 @@ priority: 10
 # Your Skill Name
 
 ## Instructions
-Provide clear, step-by-step guidance for Qwen Code.
+Provide clear, step-by-step guidance for MariaDB Shell Agent.
 
 ## Examples
 Show concrete examples of using this Skill.
@@ -137,7 +137,7 @@ Show concrete examples of using this Skill.
 
 ### Field requirements
 
-Qwen Code currently validates that:
+MariaDB Shell Agent currently validates that:
 
 - `name` is a non-empty string matching `/^[\p{L}\p{N}_:.-]+$/u` — Unicode letters and digits (CJK / Cyrillic / accented Latin all OK), plus `_`, `:`, `.`, `-`. Whitespace, slashes, brackets and other structurally unsafe characters are rejected at parse time. The admitted `:` is what lets a Skill registered by an extension (`rust:pdf`) and an author who chooses a colon themselves (`rust:chat`, written inside the `rust` extension) share one pattern, so a colon in a registered name is not proof of an owner — see [How extension Skills are named](#how-extension-skills-are-named).
 - `description` is a non-empty string
@@ -266,24 +266,24 @@ python scripts/helper.py input.txt
 
 ## View available Skills
 
-Qwen Code discovers Skills from:
+MariaDB Shell Agent discovers Skills from:
 
-- Personal Skills: `~/.qwen/skills/` and `~/.agents/skills/`
-- Project Skills: `.qwen/skills/` and `.agents/skills/`
+- Personal Skills: `~/.mariadb-shell-agent/skills/` and `~/.agents/skills/`
+- Project Skills: `.mariadb-shell-agent/skills/` and `.agents/skills/`
 - Custom directories: paths listed in [`skills.directories`](../configuration/settings#skills), loaded as personal Skills
 - Extension Skills: Skills provided by installed extensions
-- Bundled Skills: Skills shipped with Qwen Code
+- Bundled Skills: Skills shipped with MariaDB Shell Agent
 
 When two Skills share a name, the first one found wins: project, then personal (including custom directories), then extension, then bundled.
 
 ### Share Skills with other tools
 
-If you also use another agent, you can keep a single skills folder instead of copying Skills into `~/.qwen/skills/`:
+If you also use another agent, you can keep a single skills folder instead of copying Skills into `~/.mariadb-shell-agent/skills/`:
 
 - Add the other agent's folder to `skills.directories`, for example `["~/.claude/skills"]`. Use an absolute or `~`-prefixed path: a relative path resolves against the working directory, not the project root. These Skills load as personal Skills, so their `allowedTools` and hooks are not gated by folder trust, even when a trusted project's settings add the directory: only point this at folders you control.
-- Or keep shared Skills in `~/.agents/skills/` or `.agents/skills/`, which Qwen Code reads without any configuration. Symlinked Skill folders are followed, and their target can live anywhere on disk.
+- Or keep shared Skills in `~/.agents/skills/` or `.agents/skills/`, which MariaDB Shell Agent reads without any configuration. Symlinked Skill folders are followed, and their target can live anywhere on disk.
 
-Qwen Code reads the `allowedTools` frontmatter field. An `allowed-tools` field written for another agent is ignored.
+MariaDB Shell Agent reads the `allowedTools` frontmatter field. An `allowed-tools` field written for another agent is ignored.
 
 ### Extension Skills
 
@@ -295,9 +295,9 @@ To see which extensions provide skills, check the extension's `qwen-extension.js
 
 #### How extension Skills are named
 
-Qwen Code registers a Skill from an installed extension as `<extensionName>:<name>`, where `<extensionName>` is the `name` field of that extension's `qwen-extension.json` and `<name>` is the Skill's own frontmatter `name`. A Skill named `pdf` in the `rust` extension is registered as `rust:pdf`.
+MariaDB Shell Agent registers a Skill from an installed extension as `<extensionName>:<name>`, where `<extensionName>` is the `name` field of that extension's `qwen-extension.json` and `<name>` is the Skill's own frontmatter `name`. A Skill named `pdf` in the `rust` extension is registered as `rust:pdf`.
 
-The prefix is added while the Skill is loaded, not written into the file: your `SKILL.md` keeps the name you authored, and Qwen Code never recovers the authored name by splitting the registered one apart (an author may legitimately write `rust:chat` inside `rust`). Only extension Skills are prefixed — personal, project, and bundled Skills keep the single spelling you authored.
+The prefix is added while the Skill is loaded, not written into the file: your `SKILL.md` keeps the name you authored, and MariaDB Shell Agent never recovers the authored name by splitting the registered one apart (an author may legitimately write `rust:chat` inside `rust`). Only extension Skills are prefixed — personal, project, and bundled Skills keep the single spelling you authored.
 
 Use the registered name everywhere you refer to the Skill:
 
@@ -320,7 +320,7 @@ Two limits worth knowing:
 - Cross-level precedence is unchanged and still compares registered names exactly (`project` > `user` > `extension` > `bundled`), so a personal or project Skill you author as `rust:pdf` outranks the extension's `pdf`. Bare-name collisions between a personal or project Skill and a bundled Skill are likewise still settled by that precedence, not by the prefix. A Skill that collides with a custom command is not — on the slash surface the last loader wins, and custom commands load after Skills, so `/pdf` runs the custom command while the Skill stays available to the model.
 - Skill names are also used as filenames: the file a Skill reads its invocation arguments from replaces every character outside `[A-Za-z0-9._-]` with `_`, so an extension Skill registered as `rust:pdf` and a personal or project Skill authored `rust_pdf` both resolve to `qwen-skill-args-rust_pdf.txt` and share one arguments file. (The prefix rarely collides with itself — `rust:rust_pdf` becomes `rust_rust_pdf` — but extension names may contain `_`, so `rust_pdf:x` and `rust:pdf_x` fold to the same filename.) Non-ASCII letters fold the same way, so an authored `café` and an authored `caf_` land on `caf_` too — a limitation that predates the prefix, which only makes it easier to hit. Avoid a Skill name that is another name with `:` turned into `_`.
 
-To view available Skills, ask Qwen Code directly:
+To view available Skills, ask MariaDB Shell Agent directly:
 
 ```text
 What Skills are available?
@@ -338,13 +338,13 @@ Or inspect the filesystem:
 
 ```bash
 # List personal Skills
-ls ~/.qwen/skills/ ~/.agents/skills/
+ls ~/.mariadb-shell-agent/skills/ ~/.agents/skills/
 
 # List project Skills (if in a project directory)
-ls .qwen/skills/ .agents/skills/
+ls .mariadb-shell-agent/skills/ .agents/skills/
 
 # View a specific Skill's content
-cat ~/.qwen/skills/my-skill/SKILL.md
+cat ~/.mariadb-shell-agent/skills/my-skill/SKILL.md
 ```
 
 ## Test a Skill
@@ -361,7 +361,7 @@ The model autonomously decides to use your Skill if it matches the request — y
 
 ## Debug a Skill
 
-If Qwen Code doesn't use your Skill, check these common issues:
+If MariaDB Shell Agent doesn't use your Skill, check these common issues:
 
 ### Make the description specific
 
@@ -379,16 +379,16 @@ description: Extract text and tables from PDF files, fill forms, merge documents
 
 ### Verify file path
 
-- Personal Skills: `~/.qwen/skills/<skill-name>/SKILL.md` or `~/.agents/skills/<skill-name>/SKILL.md`
-- Project Skills: `.qwen/skills/<skill-name>/SKILL.md` or `.agents/skills/<skill-name>/SKILL.md`
+- Personal Skills: `~/.mariadb-shell-agent/skills/<skill-name>/SKILL.md` or `~/.agents/skills/<skill-name>/SKILL.md`
+- Project Skills: `.mariadb-shell-agent/skills/<skill-name>/SKILL.md` or `.agents/skills/<skill-name>/SKILL.md`
 - Custom directories: `<directory>/<skill-name>/SKILL.md` for each entry in `skills.directories`. A Skill nested deeper is not found.
 
 ```bash
 # Personal
-ls ~/.qwen/skills/my-skill/SKILL.md ~/.agents/skills/my-skill/SKILL.md
+ls ~/.mariadb-shell-agent/skills/my-skill/SKILL.md ~/.agents/skills/my-skill/SKILL.md
 
 # Project
-ls .qwen/skills/my-skill/SKILL.md .agents/skills/my-skill/SKILL.md
+ls .mariadb-shell-agent/skills/my-skill/SKILL.md .agents/skills/my-skill/SKILL.md
 
 # Custom directory listed in skills.directories
 ls ~/shared-skills/my-skill/SKILL.md
@@ -410,22 +410,22 @@ Ensure:
 
 ### View errors
 
-Run Qwen Code with debug mode to see Skill loading errors:
+Run MariaDB Shell Agent with debug mode to see Skill loading errors:
 
 ```bash
-qwen --debug
+mariadb-shell-agent --debug
 ```
 
 ## Share Skills with your team
 
 You can share Skills through project repositories:
 
-1. Add the Skill under `.qwen/skills/`
+1. Add the Skill under `.mariadb-shell-agent/skills/`
 2. Commit and push
 3. Teammates pull the changes
 
 ```bash
-git add .qwen/skills/
+git add .mariadb-shell-agent/skills/
 git commit -m "Add team Skill for PDF processing"
 git push
 ```
@@ -436,16 +436,16 @@ Edit `SKILL.md` directly:
 
 ```bash
 # Personal Skill
-code ~/.qwen/skills/my-skill/SKILL.md
+code ~/.mariadb-shell-agent/skills/my-skill/SKILL.md
 
 # Project Skill
-code .qwen/skills/my-skill/SKILL.md
+code .mariadb-shell-agent/skills/my-skill/SKILL.md
 ```
 
-During a normal session, Qwen Code watches personal and project Skill
+During a normal session, MariaDB Shell Agent watches personal and project Skill
 directories. Adding, editing, or removing a Skill refreshes the Skill list and
 invocation state automatically after a short delay. Bare mode does not start
-these watchers, so restart Qwen Code to load Skill changes in that mode.
+these watchers, so restart MariaDB Shell Agent to load Skill changes in that mode.
 
 ## Remove a Skill
 
@@ -453,10 +453,10 @@ Delete the Skill directory:
 
 ```bash
 # Personal
-rm -rf ~/.qwen/skills/my-skill
+rm -rf ~/.mariadb-shell-agent/skills/my-skill
 
 # Project
-rm -rf .qwen/skills/my-skill
+rm -rf .mariadb-shell-agent/skills/my-skill
 git commit -m "Remove unused Skill"
 ```
 

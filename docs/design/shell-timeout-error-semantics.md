@@ -74,4 +74,4 @@ Partial command output can contain sensitive data. It remains available to the m
 
 ## Verification
 
-Unit coverage exercises pre-aborted and PTY-discovery races, Shell timeout/cancel/promote ordering, sed simulation, short-versus-detailed scheduler channels, Core global timeout ordering, ACP and speculative direct invocation, Anthropic conversion, JSON content selection, error-size estimation, and batch offload. The E2E plan is recorded in `.qwen/e2e-tests/shell-timeout-semantics.md`.
+Unit coverage exercises pre-aborted and PTY-discovery races, Shell timeout/cancel/promote ordering, sed simulation, short-versus-detailed scheduler channels, Core global timeout ordering, ACP and speculative direct invocation, Anthropic conversion, JSON content selection, error-size estimation, and batch offload. The E2E plan is recorded in `.mariadb-shell-agent/e2e-tests/shell-timeout-semantics.md`.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -217,7 +218,7 @@ describe('LiveSetupController', () => {
     const route = {
       id: 'qwen3.5-omni-plus-realtime',
       name: 'Omni Realtime',
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       envKey: 'DASHSCOPE_API_KEY',
       realtimeOnly: true,
     };
@@ -332,7 +333,7 @@ describe('LiveSetupController', () => {
       await harness.controller.update({ enabled: true });
       expect(harness.validateCredential).toHaveBeenCalledWith(
         expect.objectContaining({
-          endpoint: 'wss://dashscope.aliyuncs.com/api-ws/v1/realtime',
+          endpoint: 'wss://dashscope.aliyuncs.invalid/api-ws/v1/realtime',
           realtimeModel: route.id,
         }),
       );
@@ -539,8 +540,10 @@ describe('LiveSetupController', () => {
   });
 
   describe('endpoint', () => {
-    const intlBase = 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1';
-    const intlRealtime = 'wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime';
+    const intlBase =
+      'https://dashscope-intl.aliyuncs.invalid/compatible-mode/v1';
+    const intlRealtime =
+      'wss://dashscope-intl.aliyuncs.invalid/api-ws/v1/realtime';
 
     it('reports an empty endpoint while the default is in use', async () => {
       const harness = createHarness({ apiKey: 'realtime-secret' });
@@ -569,14 +572,14 @@ describe('LiveSetupController', () => {
       const harness = createHarness({ apiKey: 'realtime-secret' });
       const status = await harness.controller.update({
         endpoint:
-          '  https://llm-abc.cn-beijing.maas.aliyuncs.com/compatible-mode/v1 ',
+          '  https://llm-abc.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1 ',
       });
 
       expect(harness.settings().experimental?.liveVoice?.endpoint).toBe(
-        'https://llm-abc.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+        'https://llm-abc.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
       );
       expect(status.endpoint).toBe(
-        'https://llm-abc.cn-beijing.maas.aliyuncs.com/compatible-mode/v1',
+        'https://llm-abc.cn-beijing.maas.aliyuncs.invalid/compatible-mode/v1',
       );
       // Live is off: nothing to validate until it is turned on.
       expect(harness.validateCredential).not.toHaveBeenCalled();
@@ -658,7 +661,7 @@ describe('LiveSetupController', () => {
           openai: [
             {
               id: 'qwen3.5-omni-plus-realtime',
-              baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+              baseUrl: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
               envKey: 'DASHSCOPE_API_KEY',
               realtimeOnly: true,
             },
@@ -668,7 +671,7 @@ describe('LiveSetupController', () => {
       });
       expect(await harness.controller.getStatus()).toMatchObject({
         keySource: 'route',
-        endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        endpoint: 'https://dashscope.aliyuncs.invalid/compatible-mode/v1',
       });
       await expect(
         harness.controller.update({ endpoint: intlBase }),

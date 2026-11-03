@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -186,7 +187,11 @@ describe('WorkspaceChannelSettingsStore', () => {
     originalQwenHome = process.env['QWEN_HOME'];
     testRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'channel-settings-'));
     workspace = path.join(testRoot, 'workspace');
-    settingsPath = path.join(workspace, '.qwen', 'settings.json');
+    settingsPath = path.join(
+      workspace,
+      '.mariadb-shell-agent',
+      'settings.json',
+    );
     process.env['QWEN_HOME'] = path.join(testRoot, 'home');
     mockHomeDir = path.join(testRoot, 'unused-home');
     fs.mkdirSync(mockHomeDir, { recursive: true });
@@ -2829,7 +2834,7 @@ describe('WorkspaceChannelSettingsStore', () => {
     const otherWorkspace = path.join(testRoot, 'other-workspace');
     const otherSettingsPath = path.join(
       otherWorkspace,
-      '.qwen',
+      '.mariadb-shell-agent',
       'settings.json',
     );
     fs.mkdirSync(path.dirname(otherSettingsPath), { recursive: true });
@@ -2955,7 +2960,7 @@ describe('WorkspaceChannelSettingsStore', () => {
 
   describe('home-directory workspace', () => {
     // The home-directory layout with the user scope redirected away from
-    // `<workspace>/.qwen`, so a write that targets the workspace scope lands in
+    // `<workspace>/.mariadb-shell-agent`, so a write that targets the workspace scope lands in
     // a file no scope reads. `mockHomeDir` has to be a directory that exists:
     // the loader calls `realpathSync` on the home directory unguarded.
     const useRedirectedUserScope = (userSettings: Record<string, unknown>) => {
@@ -2996,7 +3001,7 @@ describe('WorkspaceChannelSettingsStore', () => {
         // settings file to the user scope. Mocking `os.homedir()` alone does not
         // prove that — if the mock ever stops reaching the loader, this test
         // would silently exercise the workspace-scope branch against the real
-        // `~/.qwen/settings.json` and still pass.
+        // `~/.mariadb-shell-agent/settings.json` and still pass.
         expect(
           loadSettings(workspace, { skipLoadEnvironment: true })
             .workspaceSettingsActive,
@@ -3041,7 +3046,7 @@ describe('WorkspaceChannelSettingsStore', () => {
     it('writes channel configs to the scope it reads them from', async () => {
       // Same home-directory layout, but QWEN_HOME redirects the user scope to
       // another directory. Reads come from the redirected file, so writes have
-      // to land there too instead of `<workspace>/.qwen/settings.json`, which
+      // to land there too instead of `<workspace>/.mariadb-shell-agent/settings.json`, which
       // no scope reads in this layout.
       const userSettingsPath = useRedirectedUserScope({
         $version: 4,

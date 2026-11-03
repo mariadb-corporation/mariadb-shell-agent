@@ -2138,7 +2138,7 @@ describe('WebShellSidebar collapsed session group persistence', () => {
     await flushSidebar();
     const preview = document.querySelector('[data-web-shell-home-popover]');
     expect(preview).not.toBeNull();
-    expect(preview!.textContent).toContain('Qwen Code');
+    expect(preview!.textContent).toContain('MariaDB Shell Agent');
     expect(preview!.textContent).toContain('New session');
     expect(preview!.textContent).toContain('Release notes');
     expect(

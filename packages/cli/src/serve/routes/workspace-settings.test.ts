@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -677,7 +678,7 @@ describe('POST /workspace/settings', () => {
     );
   });
 
-  it('persists to the user scope (~/.qwen/settings.json)', async () => {
+  it('persists to the user scope (~/.mariadb-shell-agent/settings.json)', async () => {
     const { app, persistSetting, broadcastSettingsChanged } = makeApp();
 
     const res = await request(app).post('/workspace/settings').send({
@@ -693,7 +694,7 @@ describe('POST /workspace/settings', () => {
       value: 7,
     });
     // 'user' must map to SettingScope.User ('User') so the value lands in
-    // ~/.qwen/settings.json rather than the workspace file.
+    // ~/.mariadb-shell-agent/settings.json rather than the workspace file.
     expect(persistSetting).toHaveBeenCalledWith(
       '/workspace',
       'User',
@@ -724,7 +725,7 @@ describe('POST /workspace/settings', () => {
 
   // R8-1: `stripWorkspaceRestrictedSettings` drops these before every merge, so
   // a workspace-scope write persists a committable dead entry into the repo's
-  // .qwen/settings.json and answers 200 + requiresRestart while the feature
+  // .mariadb-shell-agent/settings.json and answers 200 + requiresRestart while the feature
   // never turns on. The TUI dialog already filters them; the API did not.
   it('rejects a workspace-restricted key at workspace scope', async () => {
     const { app, persistSetting } = makeApp();

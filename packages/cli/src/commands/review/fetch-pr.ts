@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review fetch-pr`: prepare a PR review's working state in a single
+// `mariadb-shell-agent review fetch-pr`: prepare a PR review's working state in a single
 // deterministic pass.
 //
 //   1. Clean any stale worktree / branch from a previously interrupted run
@@ -15,8 +16,8 @@
 //   3. `gh pr view ...` to fetch metadata (head/base ref names, head SHA,
 //      diff stats, cross-repo flag).
 //   4. `git worktree add` to create an ephemeral worktree at
-//      `.qwen/tmp/review-pr-<n>` so subsequent steps can run in isolation.
-//   5. Capture the review diff to `.qwen/tmp/qwen-review-pr-<n>-diff.txt` and
+//      `.mariadb-shell-agent/tmp/review-pr-<n>` so subsequent steps can run in isolation.
+//   5. Capture the review diff to `.mariadb-shell-agent/tmp/qwen-review-pr-<n>-diff.txt` and
 //      partition it into chunks. Review agents `read_file` a chunk's line
 //      range instead of running `git diff` themselves: Shell keeps a 30 000
 //      character persistence trigger but returns an approximately 4 000
@@ -203,7 +204,7 @@ type FetchPrResult = PlanReport & {
   /**
    * When this review window opened (ISO-8601). `cleanup` audits the PR for
    * writes by the current user inside [fetchedAt, cleanup) that did not go
-   * through `qwen review submit` — the submit-only contract's tripwire.
+   * through `mariadb-shell-agent review submit` — the submit-only contract's tripwire.
    */
   fetchedAt: string;
   /**
@@ -998,7 +999,7 @@ async function runFetchPr(args: FetchPrArgs): Promise<void> {
   // through the same pointer.
   //
   // Says nothing outside a mount (`mountRootFor` answers null), so an ordinary
-  // `qwen review` from a normal checkout never reaches the question.
+  // `mariadb-shell-agent review` from a normal checkout never reaches the question.
   const launchUntrusted = untrustedRepositoryFrom(process.cwd());
   if (launchUntrusted !== null) {
     throw new Error(
@@ -1013,12 +1014,12 @@ async function runFetchPr(args: FetchPrArgs): Promise<void> {
   // The scratch directory, refused outright when the workspace redirected
   // it — before the worktree, the diff and the plan land there (see
   // `ensureReviewTmpDir`). AFTER the launch-directory gate, not ahead of it:
-  // the guard lists the index (`gitRaw`) and creates `.qwen/tmp`, and the gate
+  // the guard lists the index (`gitRaw`) and creates `.mariadb-shell-agent/tmp`, and the gate
   // above promises that no git call and no state change precedes it. The
   // wrapper would refuse the listing on its own, but the guard's `catch`
   // rewords that refusal as a listing failure, and outside a repository it
   // goes on to create the directory. BEFORE the lease gate: the lease no
-  // longer lives under `.qwen/tmp`, but a round that cannot write its side
+  // longer lives under `.mariadb-shell-agent/tmp`, but a round that cannot write its side
   // files must not take the lock either.
   ensureReviewTmpDir('fetch-pr');
 
@@ -1042,7 +1043,7 @@ async function runFetchPr(args: FetchPrArgs): Promise<void> {
     throw new Error(
       `fetch-pr: QWEN_CODE_SESSION_ID and QWEN_CODE_PROMPT_ID must both ` +
         `be set to register the review worktree lease. Run fetch-pr from ` +
-        `a Qwen Code session (the /review skill sets both); without the ` +
+        `a MariaDB Shell Agent session (the /review skill sets both); without the ` +
         `lease nothing locks the shared worktree path against a ` +
         `concurrent session.`,
     );
@@ -1285,7 +1286,7 @@ async function runFetchPr(args: FetchPrArgs): Promise<void> {
     // The walk starts AT `wt`, not at its parent. A link at the leaf is the
     // cheaper plant of the two: `releaseWorktree` unlinks one it can reach,
     // but `cleanStale` only WARNS when that release reports `freed: false`
-    // (an EACCES on `.qwen/tmp` is enough) and runs on to here, and `git
+    // (an EACCES on `.mariadb-shell-agent/tmp` is enough) and runs on to here, and `git
     // worktree add` through a leaf link creates and checks out at the link's
     // target — measured on git 2.43, exit 0 with the tree in the external
     // directory. `redirectedAncestor` lstats its first component before any
@@ -1350,7 +1351,7 @@ async function runFetchPr(args: FetchPrArgs): Promise<void> {
     // review-lease directory nothing mounts.
     //
     // `base-tree` builds and certifies the A/B's BASE side at this sha, and
-    // the plan it reads is written into `.qwen/tmp` — the directory the
+    // the plan it reads is written into `.mariadb-shell-agent/tmp` — the directory the
     // sandbox hands the reviewed code read-write, minutes before the first
     // `base-tree` ask exists. Without a host-side copy, the value the fence
     // pins is whatever the plan says at that first ask, and the pin then
@@ -2068,7 +2069,7 @@ async function runFetchPr(args: FetchPrArgs): Promise<void> {
           // `noFollow` guards the final element: a planted symlink at this
           // deterministic path would redirect the write onto its target. The
           // directory above it is the entry guard's — a redirected
-          // `.qwen/tmp` refused the round before anything was written.
+          // `.mariadb-shell-agent/tmp` refused the round before anything was written.
           atomicWriteFileSync(
             cacheCandidatePath,
             JSON.stringify(
@@ -2500,7 +2501,7 @@ export const fetchPrCommand: CommandModule = {
       .option('host', {
         type: 'string',
         describe:
-          "The host the target lives on — it selects the platform, i.e. whether the fetch uses pull/<n>/head or refs/merge-requests/<id>/head. An Aone host (*.alibaba-inc.com) selects the Aone backend; omitted: detected from the remote under review, else the clone's origin, else GitHub.",
+          "The host the target lives on — it selects the platform, i.e. whether the fetch uses pull/<n>/head or refs/merge-requests/<id>/head. An Aone host (*.alibaba-inc.invalid) selects the Aone backend; omitted: detected from the remote under review, else the clone's origin, else GitHub.",
       })
       .option('max-chunk-lines', {
         type: 'number',

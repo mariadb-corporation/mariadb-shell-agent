@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -56,7 +57,7 @@ function entry(
 ): SavedWorkflowEntry {
   return {
     name: 'deep-research',
-    scriptPath: '/proj/.qwen/workflows/deep-research.js',
+    scriptPath: '/proj/.mariadb-shell-agent/workflows/deep-research.js',
     source: 'project',
     ...overrides,
   };
@@ -73,7 +74,7 @@ describe('SavedWorkflowLoader', () => {
       entry({ name: 'deep-research', source: 'project' }),
       entry({
         name: 'triage',
-        scriptPath: '/home/.qwen/workflows/triage.js',
+        scriptPath: '/home/.mariadb-shell-agent/workflows/triage.js',
         source: 'user',
       }),
     ]);
@@ -94,7 +95,8 @@ describe('SavedWorkflowLoader', () => {
     listMock.mockResolvedValue([
       entry({
         name: 'gcp:audit',
-        scriptPath: '/home/.qwen/extensions/gcp/workflows/audit.js',
+        scriptPath:
+          '/home/.mariadb-shell-agent/extensions/gcp/workflows/audit.js',
         source: 'extension',
         extensionName: 'gcp',
         extensionDisplayName: 'Google Cloud',
@@ -134,7 +136,10 @@ describe('SavedWorkflowLoader', () => {
     expect(await extensionCmd.action!(ctx, '')).toEqual({
       type: 'tool',
       toolName: 'workflow',
-      toolArgs: { scriptPath: '/home/.qwen/extensions/gcp/workflows/audit.js' },
+      toolArgs: {
+        scriptPath:
+          '/home/.mariadb-shell-agent/extensions/gcp/workflows/audit.js',
+      },
     });
     // Project and user workflows keep their existing shape.
     expect(projectCmd.description).toBe(
@@ -192,7 +197,9 @@ describe('SavedWorkflowLoader', () => {
     expect(result).toEqual({
       type: 'tool',
       toolName: 'workflow',
-      toolArgs: { scriptPath: '/proj/.qwen/workflows/deep-research.js' },
+      toolArgs: {
+        scriptPath: '/proj/.mariadb-shell-agent/workflows/deep-research.js',
+      },
     });
   });
 
@@ -206,7 +213,7 @@ describe('SavedWorkflowLoader', () => {
       type: 'tool',
       toolName: 'workflow',
       toolArgs: {
-        scriptPath: '/proj/.qwen/workflows/deep-research.js',
+        scriptPath: '/proj/.mariadb-shell-agent/workflows/deep-research.js',
         args: { topic: 'llms', depth: 3 },
       },
     });
@@ -242,7 +249,8 @@ describe('SavedWorkflowLoader', () => {
       entry({
         name: 'gcp:audit',
         source: 'extension',
-        scriptPath: '/home/.qwen/extensions/gcp/workflows/audit.js',
+        scriptPath:
+          '/home/.mariadb-shell-agent/extensions/gcp/workflows/audit.js',
         extensionName: 'gcp',
       }),
     ]);
@@ -262,7 +270,8 @@ describe('SavedWorkflowLoader', () => {
       type: 'tool',
       toolName: 'workflow',
       toolArgs: {
-        scriptPath: '/home/.qwen/extensions/gcp/workflows/audit.js',
+        scriptPath:
+          '/home/.mariadb-shell-agent/extensions/gcp/workflows/audit.js',
       },
     });
   });
@@ -281,7 +290,8 @@ describe('SavedWorkflowLoader', () => {
     const audit = () =>
       entry({
         name: 'gcp:audit',
-        scriptPath: '/home/.qwen/extensions/gcp/workflows/audit.js',
+        scriptPath:
+          '/home/.mariadb-shell-agent/extensions/gcp/workflows/audit.js',
         source: 'extension',
         extensionName: 'gcp',
         description: 'Audits the project',
@@ -428,7 +438,7 @@ describe('SavedWorkflowLoader', () => {
         await mkdtemp(path.join(tmpdir(), 'qwen-workflow-list-')),
       );
       const target = path.join(directory, 'project');
-      const project = path.join(target, '.qwen', 'workflows');
+      const project = path.join(target, '.mariadb-shell-agent', 'workflows');
       const user = path.join(directory, 'user');
       const extensionFile = path.join(directory, 'extension', 'check.js');
       const userDirectory = vi
@@ -515,7 +525,12 @@ describe('SavedWorkflowLoader', () => {
     const repo = path.join(directory, 'repo');
     const target = path.join(repo, 'packages', 'app');
     const user = path.join(directory, 'user');
-    const scriptPath = path.join(repo, '.qwen', 'workflows', 'shared.js');
+    const scriptPath = path.join(
+      repo,
+      '.mariadb-shell-agent',
+      'workflows',
+      'shared.js',
+    );
     const userDirectory = vi
       .spyOn(Storage, 'getUserWorkflowsDir')
       .mockReturnValue(user);

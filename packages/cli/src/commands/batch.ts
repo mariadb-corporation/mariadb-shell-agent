@@ -1,10 +1,11 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// File for 'qwen batch' — the deterministic executor behind `/batch-api`.
+// File for 'mariadb-shell-agent batch' — the deterministic executor behind `/batch-api`.
 // Batch runs at half the realtime price with a >=24h completion window, so it
 // is a fan-out tool for many independent single-turn requests, not a path for
 // the agent loop. Design: docs/design/2026-09-23-batch-api-design.md
@@ -35,7 +36,8 @@ import {
 } from './batch-workflow.js';
 import type { GenerationConfigLike } from './batch-docs.js';
 
-const DEFAULT_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+const DEFAULT_BASE_URL =
+  'https://dashscope.aliyuncs.invalid/compatible-mode/v1';
 
 export interface BatchEndpoint {
   apiKey: string;
@@ -120,7 +122,7 @@ export function resolveEndpoint(
     settings.security?.auth?.selectedType ?? getAuthTypeFromEnv(env);
   if (selectedAuthType !== AuthType.USE_OPENAI) {
     throw new Error(
-      `qwen batch needs an API key (auth type "openai") for a DashScope endpoint; current auth type is "${selectedAuthType ?? 'none'}".`,
+      `mariadb-shell-agent batch needs an API key (auth type "openai") for a DashScope endpoint; current auth type is "${selectedAuthType ?? 'none'}".`,
     );
   }
   const { apiKey, baseUrl, model, warnings, authType, generationConfig } =
@@ -136,7 +138,7 @@ export function resolveEndpoint(
   // upload succeeds and every line is rejected by the provider hours later.
   if (authType !== AuthType.USE_OPENAI) {
     throw new Error(
-      `qwen batch needs a model on the OpenAI-compatible chat-completions wire; ` +
+      `mariadb-shell-agent batch needs a model on the OpenAI-compatible chat-completions wire; ` +
         `"${model || 'the configured model'}" resolves to auth type "${authType ?? 'none'}".`,
     );
   }
@@ -162,7 +164,7 @@ export function resolveEndpoint(
   };
 }
 
-/** What the parsed `qwen batch …` invocation asked for, minus the subcommand. */
+/** What the parsed `mariadb-shell-agent batch …` invocation asked for, minus the subcommand. */
 export interface BatchCliOptions {
   proxy?: string;
   insecure?: boolean;
@@ -287,7 +289,7 @@ const collectWorkflowCommand: CommandModule = {
   builder: (yargs) =>
     yargs
       .positional('task-id', {
-        describe: 'Task id printed by `qwen batch run`',
+        describe: 'Task id printed by `mariadb-shell-agent batch run`',
         type: 'string',
         demandOption: true,
       })

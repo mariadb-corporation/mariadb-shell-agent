@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -169,9 +170,9 @@ describe('crawler', () => {
   const crawlTmp = (ignore: Ignore, extra?: Partial<CrawlOptions>) =>
     crawl(opts(tmpDir, ignore, extra));
 
-  it('should use .qwenignore rules', async () => {
+  it('should use .mariadb-shell-agentignore rules', async () => {
     tmpDir = await createTmpDir({
-      '.qwenignore': 'dist/',
+      '.mariadb-shell-agentignore': 'dist/',
       dist: ['ignored.js'],
       src: ['not-ignored.js'],
     });
@@ -182,16 +183,16 @@ describe('crawler', () => {
       expect.arrayContaining([
         '.',
         'src/',
-        '.qwenignore',
+        '.mariadb-shell-agentignore',
         'src/not-ignored.js',
       ]),
     );
   });
 
-  it('should combine .gitignore and .qwenignore rules', async () => {
+  it('should combine .gitignore and .mariadb-shell-agentignore rules', async () => {
     tmpDir = await createTmpDir({
       '.gitignore': 'dist/',
-      '.qwenignore': 'build/',
+      '.mariadb-shell-agentignore': 'build/',
       dist: ['ignored-by-git.js'],
       build: ['ignored-by-gemini.js'],
       src: ['not-ignored.js'],
@@ -203,7 +204,7 @@ describe('crawler', () => {
       expect.arrayContaining([
         '.',
         'src/',
-        '.qwenignore',
+        '.mariadb-shell-agentignore',
         '.gitignore',
         'src/not-ignored.js',
       ]),

@@ -1,7 +1,7 @@
 # Telemetry: Custom Resource Attributes + Metric Cardinality Controls
 
-> 配套 issue: [#4365](https://github.com/QwenLM/qwen-code/issues/4365)
-> 父 issue: [#3731](https://github.com/QwenLM/qwen-code/issues/3731)
+> 配套 issue: [#4365](https://github.invalid/QwenLM/qwen-code/issues/4365)
+> 父 issue: [#3731](https://github.invalid/QwenLM/qwen-code/issues/3731)
 > 基于 2026-05-21 对 qwen-code main 分支的代码复核
 
 ## 1. 背景
@@ -675,7 +675,7 @@ export OTEL_SERVICE_NAME=qwen-code-ci
 
 ### 10.3 Fleet baseline + 单机 override
 
-公司 fleet 的 `~/.qwen/settings.json`（GitOps 分发）：
+公司 fleet 的 `~/.mariadb-shell-agent/settings.json`（GitOps 分发）：
 
 ```json
 {

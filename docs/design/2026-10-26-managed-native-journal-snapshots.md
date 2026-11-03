@@ -4,7 +4,7 @@
 
 ## Problem and current state
 
-Issue [#13184](https://github.com/QwenLM/qwen-code/issues/13184) needs a native restore boundary before journal deletion or authority eviction is safe. The Java public message snapshot cannot restore a Harness. Before the protocol and HTTP recovery increments, the native journal exposed a head and transaction pages starting at revision zero. Its `compacted_through_revision` remains zero for live Sessions.
+Issue [#13184](https://github.invalid/QwenLM/qwen-code/issues/13184) needs a native restore boundary before journal deletion or authority eviction is safe. The Java public message snapshot cannot restore a Harness. Before the protocol and HTTP recovery increments, the native journal exposed a head and transaction pages starting at revision zero. Its `compacted_through_revision` remains zero for live Sessions.
 
 The authority reconstructs command replay, event identities, receipts, checkpoints, Actions, domain revisions, extension uniqueness, Hook once keys and occurrences, and child continuations from the native committed prefix. Neither a Harness checkpoint nor Java's latest-record projections contain all these facts.
 
@@ -12,7 +12,7 @@ The authority reconstructs command replay, event identities, receipts, checkpoin
 
 PR1 (activation/inbox identity lookup) and this PR2 can be developed independently. PR3 (Hosted HTTP recovery) and PR4 (local lease-aware replacement) depend on the snapshot contract; PR5 enables resident windows only after durable identity lookup and both restore paths are verified. This updates the earlier serial development recommendation in the [bounded-retention design](2026-10-19-managed-session-bounded-retention.md).
 
-PR3 [#15599](https://github.com/QwenLM/qwen-code/pull/15599) is merged into the PR2 branch. [#15569](https://github.com/QwenLM/qwen-code/pull/15569) delivers both increments together to main. This document describes the protocol/storage slice; the linked [HTTP recovery design](2026-10-26-managed-http-snapshot-recovery.md) describes its production consumer. Acceptance of the combined PR requires both slices.
+PR3 [#15599](https://github.invalid/QwenLM/qwen-code/pull/15599) is merged into the PR2 branch. [#15569](https://github.invalid/QwenLM/qwen-code/pull/15569) delivers both increments together to main. This document describes the protocol/storage slice; the linked [HTTP recovery design](2026-10-26-managed-http-snapshot-recovery.md) describes its production consumer. Acceptance of the combined PR requires both slices.
 
 The storage slice provides publishing, immutable storage, integrity checks, resource ownership, and bounded page reads. The HTTP slice connects Core journal restoration to an already-published snapshot and its continuous tail, while preserving head-only settlement and legacy restoration when no eligible snapshot is advertised. Automatic publishing, native transaction deletion, public event snapshot changes, local journal replacement, and authority eviction remain out of scope. The first payload format is explicitly `committed-prefix-v1`: a lossless replay image, rather than a claim of compact authority state. Its size and replay work remain proportional to history. A future compact format must explicitly preserve every authority index and historical query contract; it cannot reinterpret this version.
 
@@ -62,7 +62,7 @@ HTTP snapshot reconstruction does not authorize journal deletion. Before any fut
 
 ## Validation and acceptance
 
-- Baseline: inspect global `qwen` capabilities and directly exercise the internal store where the CLI does not expose the API.
+- Baseline: inspect global `mariadb-shell-agent` capabilities and directly exercise the internal store where the CLI does not expose the API.
 - Round-trip genesis and multiple committed transactions, exact command replay metadata, resource references, stable old snapshots after append, and takeover reads.
 - Reject stale writer/generation, wrong scope/token, wrong revision/sequence/digest, blocked or retired Sessions, missing/corrupt transactions/pages/resources, and ID conflicts.
 - Inject failures during resource and ownership insertion; reopening must see either the original state or the entire snapshot, with no partial pins.

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +16,7 @@ const output =
   process.argv[2] ??
   path.resolve(
     path.dirname(fileURLToPath(import.meta.url)),
-    '../../.qwen/e2e-tests/runtime-shell-sandbox',
+    '../../.mariadb-shell-agent/e2e-tests/runtime-shell-sandbox',
   );
 await fs.mkdir(output, { recursive: true });
 const root = await fs.mkdtemp(

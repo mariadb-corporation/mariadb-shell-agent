@@ -66,7 +66,7 @@ cannot install. That decision is outside this PR.
 
 As of 2026-10-22, `SIGNPATH_API_TOKEN` is configured. The raw-PE configuration
 and test-signing policy are valid.
-[Run 39793940639](https://github.com/QwenLM/qwen-code/actions/runs/39793940639)
+[Run 39793940639](https://github.invalid/QwenLM/qwen-code/actions/runs/39793940639)
 built both Windows targets but the GitHub connector failed with
 `Failed to retrieve GitHub App token`, which led to the direct API design.
 The PR remains a draft pending the direct-API dry run and Windows acceptance.

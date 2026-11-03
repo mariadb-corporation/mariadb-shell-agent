@@ -4,7 +4,7 @@
 
 ## 基线与测试分层
 
-全局 `qwen --version` 和 `qwen serve --help` 用于识别已安装 Runtime，不能证明 Java WebShell 行为。变更前，绑定 Session 没有 cwd 控件。从 `packages/web-shell` 运行聚焦测试。浏览器接口模拟、真实 Java/Hosted 执行与真实模型规则采用分别记录证据。
+全局 `mariadb-shell-agent --version` 和 `mariadb-shell-agent serve --help` 用于识别已安装 Runtime，不能证明 Java WebShell 行为。变更前，绑定 Session 没有 cwd 控件。从 `packages/web-shell` 运行聚焦测试。浏览器接口模拟、真实 Java/Hosted 执行与真实模型规则采用分别记录证据。
 
 ## 浏览器行为
 
@@ -23,8 +23,8 @@
 
 ## 发布验收与兼容性
 
-前端与 BFF 通过一个 draft PR 交付。前端与 BFF 合并而成的 PR 合入/部署前，#13564 必须通过同 Hosted attachment A→B 验收：下一轮写入 B 并采用 B 的 QWEN.md/AGENTS.md，无需重建 Session。还需验证真实文件系统 Unicode/空格/边界与执行中/审批 admission、React 18/19 键盘/ref-sensitive 弹窗行为及 portal 主题。运行时对缺少能力的服务端仍须隐藏入口。确定性模型不能作为真实规则测试的证据。
+前端与 BFF 通过一个 draft PR 交付。前端与 BFF 合并而成的 PR 合入/部署前，#13564 必须通过同 Hosted attachment A→B 验收：下一轮写入 B 并采用 B 的 MARIADB-SHELL-AGENT.md/AGENTS.md，无需重建 Session。还需验证真实文件系统 Unicode/空格/边界与执行中/审批 admission、React 18/19 键盘/ref-sensitive 弹窗行为及 portal 主题。运行时对缺少能力的服务端仍须隐藏入口。确定性模型不能作为真实规则测试的证据。
 
 ## 验证记录
 
-本地材料与精确命令/结果放在 `.qwen/e2e-tests/`，在 PR 中单独报告。此版本浏览器十组、真实 H2 cwd 进程用例与聚焦测试通过；另有十七项 React 18.3.1 hook/控件测试在隔离单 Runtime 的 jsdom 环境通过。真实模型 #13564 门槛、MySQL 全家族与 React 18 浏览器执行仍未验证。后续运行继续记录，不能用假设替换这些限制。
+本地材料与精确命令/结果放在 `.mariadb-shell-agent/e2e-tests/`，在 PR 中单独报告。此版本浏览器十组、真实 H2 cwd 进程用例与聚焦测试通过；另有十七项 React 18.3.1 hook/控件测试在隔离单 Runtime 的 jsdom 环境通过。真实模型 #13564 门槛、MySQL 全家族与 React 18 浏览器执行仍未验证。后续运行继续记录，不能用假设替换这些限制。

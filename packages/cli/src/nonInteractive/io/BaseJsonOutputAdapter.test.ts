@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1802,7 +1803,7 @@ describe('BaseJsonOutputAdapter', () => {
             type: 'vision_bridge_notice' as const,
             summary: 'Transcribed PDF pages 20-23; remaining pages 24-25',
             notice:
-              'Converted 4 images via qwen3-vl-plus (dashscope.aliyuncs.com).',
+              'Converted 4 images via qwen3-vl-plus (dashscope.aliyuncs.invalid).',
           },
           responseParts: [
             {
@@ -1817,7 +1818,7 @@ describe('BaseJsonOutputAdapter', () => {
 
         expect(toolResultContent(response)).toBe(
           'Transcribed PDF pages 20-23; remaining pages 24-25\n' +
-            'Converted 4 images via qwen3-vl-plus (dashscope.aliyuncs.com).\n' +
+            'Converted 4 images via qwen3-vl-plus (dashscope.aliyuncs.invalid).\n' +
             'Page 20: transcribed content',
         );
       });
@@ -1827,7 +1828,7 @@ describe('BaseJsonOutputAdapter', () => {
           callId: 'image-tool',
           resultDisplay: 'captured screen',
           visionBridgeNotice:
-            'Converted 1 image via qwen3-vl-plus (dashscope.aliyuncs.com).',
+            'Converted 1 image via qwen3-vl-plus (dashscope.aliyuncs.invalid).',
           responseParts: [
             {
               functionResponse: {
@@ -1840,7 +1841,7 @@ describe('BaseJsonOutputAdapter', () => {
         };
 
         expect(toolResultContent(response)).toBe(
-          'Converted 1 image via qwen3-vl-plus (dashscope.aliyuncs.com).\n' +
+          'Converted 1 image via qwen3-vl-plus (dashscope.aliyuncs.invalid).\n' +
             'captured screen',
         );
       });

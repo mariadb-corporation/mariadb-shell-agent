@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -122,7 +123,7 @@ describe('Configuration Integration Tests', () => {
         '.cursorignore',
       ]);
       expect(config.getFileService().getQwenIgnoreFileNamesDisplay()).toBe(
-        '.qwenignore, .cursorignore',
+        '.mariadb-shell-agentignore, .cursorignore',
       );
     });
 

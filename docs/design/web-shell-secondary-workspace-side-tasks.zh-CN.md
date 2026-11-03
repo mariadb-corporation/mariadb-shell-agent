@@ -48,7 +48,7 @@ standalone 拒绝语义，或将创建、列表、恢复操作分发到其他工
   仅在解析所得的工作区内清理。
 - 主工作区和内部工作区仍可创建。Standalone 仍不支持；branch、fork 和切换目录
   的限制保持不变。
-- 使用全局 `qwen` 验证基线，再使用 `node dist/cli.js` 验证修改；执行构建、
+- 使用全局 `mariadb-shell-agent` 验证基线，再使用 `node dist/cli.js` 验证修改；执行构建、
   类型检查，以及针对 daemon 和 Web Shell 的单元测试。
 
 ## 未决问题

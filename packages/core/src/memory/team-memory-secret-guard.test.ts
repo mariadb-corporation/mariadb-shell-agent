@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -62,7 +63,10 @@ describe('checkTeamMemorySecrets', () => {
   });
 
   it('classifies no-follow workspace paths without pathname I/O or a host git root', () => {
-    const file = path.join(projectRoot, '.qwen/team-memory/note.md');
+    const file = path.join(
+      projectRoot,
+      '.mariadb-shell-agent/team-memory/note.md',
+    );
     const exists = vi.spyOn(fs, 'existsSync');
     const realpath = vi.spyOn(fs, 'realpathSync');
     syncBuiltinESMExports();
@@ -74,8 +78,8 @@ describe('checkTeamMemorySecrets', () => {
         checkWorkspaceTeamMemorySecrets(file, 'safe note', projectRoot),
       ).toBeNull();
       for (const relative of [
-        '.qwen/team-memory-other/note.md',
-        '.qwen/team-memory/../outside.md',
+        '.mariadb-shell-agent/team-memory-other/note.md',
+        '.mariadb-shell-agent/team-memory/../outside.md',
         'src/note.md',
       ])
         expect(
@@ -97,10 +101,13 @@ describe('checkTeamMemorySecrets', () => {
   it('anchors private team memory inside a workspace below a git root', () => {
     const workspace = path.join(projectRoot, 'session');
     fs.mkdirSync(workspace);
-    const file = path.join(workspace, '.qwen/team-memory/note.md');
+    const file = path.join(
+      workspace,
+      '.mariadb-shell-agent/team-memory/note.md',
+    );
 
     expect(getTeamAutoMemoryRoot(workspace)).toBe(
-      path.join(projectRoot, '.qwen/team-memory'),
+      path.join(projectRoot, '.mariadb-shell-agent/team-memory'),
     );
     expect(checkTeamMemorySecrets(file, secret, workspace)).toBeNull();
     expect(checkWorkspaceTeamMemorySecrets(file, secret, workspace)).toMatch(

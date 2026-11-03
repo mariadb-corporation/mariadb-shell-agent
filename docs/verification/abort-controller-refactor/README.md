@@ -45,7 +45,7 @@ when done; `tmux kill-session -t qwen-verify-XX` to stop the pane.
 
 ### 02 — Long-session, prod mode (this branch)
 
-- **Setup:** `qwen` (no debug env).
+- **Setup:** `mariadb-shell-agent` (no debug env).
 - **Input:** same 50-round script.
 - **Expected:** clean output; a temporary `console.error` probe inside the handler (added then removed) confirms the filter fires.
 - **Log:** `02-long-session-prod.log`.
@@ -73,7 +73,7 @@ when done; `tmux kill-session -t qwen-verify-XX` to stop the pane.
 
 ### 06 — Headless / non-interactive abort
 
-- **Setup:** `qwen --prompt "do a long task"`; send `SIGINT` from outside via `kill -INT <pid>`.
+- **Setup:** `mariadb-shell-agent --prompt "do a long task"`; send `SIGINT` from outside via `kill -INT <pid>`.
 - **Expected:** clean shutdown, exit code 130, no warnings.
 - **Log:** `06-headless-abort.log`.
 
@@ -86,7 +86,7 @@ when done; `tmux kill-session -t qwen-verify-XX` to stop the pane.
 
 ### 08 — Memory baseline
 
-- **Setup:** `qwen --inspect`, attach Chrome devtools.
+- **Setup:** `mariadb-shell-agent --inspect`, attach Chrome devtools.
 - **Input:** 100-round session.
 - **Expected:** heap snapshots at round 0/50/100. `AbortSignal` instance count and per-signal listener count stable (no monotonic growth).
 - **Log:** `08-memory-snapshots/`.

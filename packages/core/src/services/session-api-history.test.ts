@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1357,5 +1358,71 @@ describe('prompt resolution across tool-loop continuations', () => {
     markApiHistoryPrompt(history[1]!, 'session########1');
 
     expect(findApiHistoryPromptIndex(history, 'session########1')).toBe(-1);
+  });
+});
+
+describe('sent user content', () => {
+  const base = {
+    parentUuid: null,
+    sessionId: 's',
+    timestamp: 't',
+    cwd: '/',
+    version: 'v',
+  };
+  const user = (promptId?: string, subtype?: 'cron'): ChatRecord => ({
+    ...base,
+    uuid: `user-${promptId}`,
+    type: 'user',
+    ...(subtype ? { subtype } : {}),
+    ...(promptId ? { promptId } : {}),
+    message: { role: 'user', parts: [{ text: 'question' }] },
+  });
+  const sent = (promptId?: string): ChatRecord => ({
+    ...base,
+    uuid: `sent-${promptId}`,
+    type: 'system',
+    subtype: 'sent_user_content',
+    ...(promptId ? { promptId } : {}),
+    systemPayload: {
+      parts: [{ text: 'reminder' }, { recordedPart: 0 }, { text: 'recall' }],
+    },
+  });
+  const reply: ChatRecord = {
+    ...base,
+    uuid: 'reply',
+    type: 'assistant',
+    message: { role: 'model', parts: [{ text: 'answer' }] },
+  };
+  const texts = (records: ChatRecord[]) =>
+    buildApiHistoryFromConversation({ messages: records }).map((content) =>
+      content.parts?.map((part) => part.text),
+    );
+
+  it('restores the user entry as it was sent', () => {
+    expect(texts([user('p1'), sent('p1'), reply])).toEqual([
+      ['reminder', 'question', 'recall'],
+      ['answer'],
+    ]);
+    expect(texts([user(undefined, 'cron'), sent('p1')])).toEqual([
+      ['reminder', 'question', 'recall'],
+    ]);
+  });
+
+  it('keeps the recorded entry when the record belongs to another prompt', () => {
+    expect(texts([user('p1'), sent('p2')])).toEqual([['question']]);
+  });
+
+  it('keeps the recorded entry when the user entry is not the latest', () => {
+    expect(texts([user('p1'), reply, sent('p1')])).toEqual([
+      ['question'],
+      ['answer'],
+    ]);
+  });
+
+  it('keeps the prompt identity of the restored entry', () => {
+    const [entry] = buildApiHistoryFromConversation({
+      messages: [user('p1'), sent('p1')],
+    });
+    expect(getApiHistoryPromptId(entry!)).toBe('p1');
   });
 });

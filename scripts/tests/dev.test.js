@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -157,7 +158,7 @@ describe('scripts/dev.js launcher', () => {
   });
 
   it('stamps QWEN_CODE_CLI with its own path, overriding an inherited one', async () => {
-    // A dev CLI started from inside another qwen session's shell inherits that
+    // A dev CLI started from inside another mariadb-shell-agent session's shell inherits that
     // session's QWEN_CODE_CLI. Honouring it points every `qwen …` subprocess of
     // THIS session at the OUTER session's build — the exact version skew the
     // variable exists to prevent, one level up and silent. Each entry stamps

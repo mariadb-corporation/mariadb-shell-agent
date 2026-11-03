@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -57,7 +58,7 @@ describe('settingsWriter', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-vscode-settings-'));
-    settingsPath = path.join(tempDir, '.qwen', 'settings.json');
+    settingsPath = path.join(tempDir, '.mariadb-shell-agent', 'settings.json');
     mockGetGlobalSettingsPath.mockReturnValue(settingsPath);
   });
 

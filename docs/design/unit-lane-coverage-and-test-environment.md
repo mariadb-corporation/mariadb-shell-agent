@@ -8,7 +8,7 @@ runs under node by default with the DOM-dependent files opting into jsdom.
 ## Context
 
 Over a 21-hour window (2026-09-02 10:00 → 09-03 07:00 UTC, 3,016 runs and
-4,724 jobs sampled through the Actions API) the `Qwen Code CI` Test job was
+4,724 jobs sampled through the Actions API) the `MariaDB Shell Agent CI` Test job was
 the largest single consumer of the shared ECS pool: 42% of the pool's
 slot-minutes, and the job that hits `timeout-minutes: 120` whenever a host is
 contended. Its duration tracked the number of concurrent jobs on the same host

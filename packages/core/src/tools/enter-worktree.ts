@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,7 +27,7 @@ export interface EnterWorktreeParams {
   name?: string;
 }
 
-const enterWorktreeDescription = `Creates an isolated git worktree at \`<projectRoot>/.qwen/worktrees/<slug>\` and returns its absolute path so subsequent file edits, shell commands, and other tools can operate inside it.
+const enterWorktreeDescription = `Creates an isolated git worktree at \`<projectRoot>/.mariadb-shell-agent/worktrees/<slug>\` and returns its absolute path so subsequent file edits, shell commands, and other tools can operate inside it.
 
 ## When to Use
 
@@ -71,17 +72,17 @@ class EnterWorktreeInvocation extends BaseToolInvocation<
     const cwd = this.config.getTargetDir();
 
     // Refuse nested worktree creation. If the caller's cwd is itself
-    // already inside `.qwen/worktrees/<slug>/`, a fresh worktree would
-    // be provisioned at `<repo>/.qwen/worktrees/<new>/` — but the
+    // already inside `.mariadb-shell-agent/worktrees/<slug>/`, a fresh worktree would
+    // be provisioned at `<repo>/.mariadb-shell-agent/worktrees/<new>/` — but the
     // model's mental model and inherited file paths would still
     // reference the outer worktree. The resulting handle confusion
     // typically leaves the inner worktree orphaned on exit.
     //
     // The check is conservative: any path component named
-    // `.qwen/worktrees` somewhere in cwd qualifies. We also forbid
+    // `.mariadb-shell-agent/worktrees` somewhere in cwd qualifies. We also forbid
     // sentinel "inside a worktree" markers that an `enter_worktree`
     // session leaves behind (writeSessionMarker, below).
-    if (/\.qwen[\\/]worktrees[\\/]/.test(cwd)) {
+    if (/\.mariadb-shell-agent[\\/]worktrees[\\/]/.test(cwd)) {
       const reason =
         'Already inside a git worktree. Call exit_worktree first, ' +
         'or return to the main repository checkout before creating a ' +
@@ -92,7 +93,7 @@ class EnterWorktreeInvocation extends BaseToolInvocation<
 
     // First-pass service rooted at cwd, only to find the repo top-level.
     // We can't use cwd as the worktree anchor because launching from a
-    // monorepo subdirectory would scatter `.qwen/worktrees/` under each
+    // monorepo subdirectory would scatter `.mariadb-shell-agent/worktrees/` under each
     // package's directory, and the startup sweep at `Config.initialize`
     // would never find them.
     const probe = new GitWorktreeService(cwd);
@@ -112,7 +113,7 @@ class EnterWorktreeInvocation extends BaseToolInvocation<
     }
 
     // Resolve to the repo's top-level so worktrees always live under
-    // `<repoRoot>/.qwen/worktrees/`, regardless of which subdirectory
+    // `<repoRoot>/.mariadb-shell-agent/worktrees/`, regardless of which subdirectory
     // the user invoked the tool from.
     const projectRoot = (await probe.getRepoTopLevel()) ?? cwd;
     const service =

@@ -2,7 +2,7 @@
 
 [English](2026-09-21-workflow-slash-completion.md) | [简体中文](2026-09-21-workflow-slash-completion.zh-CN.md)
 
-状态：实现处于 [#12415](https://github.com/QwenLM/qwen-code/pull/12415) 的评审阶段，处理 [#12176](https://github.com/QwenLM/qwen-code/issues/12176)。
+状态：实现处于 [#12415](https://github.invalid/QwenLM/qwen-code/pull/12415) 的评审阶段，处理 [#12176](https://github.invalid/QwenLM/qwen-code/issues/12176)。
 
 ## 问题
 

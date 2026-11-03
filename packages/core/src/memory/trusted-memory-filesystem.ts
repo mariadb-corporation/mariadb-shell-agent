@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,7 +26,7 @@ function comparable(filePath: string): string {
 export interface TrustedMemoryAccessOptions {
   /**
    * Read/scan paths follow a symlinked memory ROOT: it is the user's own
-   * layout (e.g. `~/.qwen/memories` linked into a synced dotfiles dir), which
+   * layout (e.g. `~/.mariadb-shell-agent/memories` linked into a synced dotfiles dir), which
    * the pre-trust scans followed. Migration and write-commit callers omit
    * this and keep the strict rejection. Within-root entries stay
    * symlink-screened either way.

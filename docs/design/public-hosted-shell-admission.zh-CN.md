@@ -133,7 +133,7 @@ Deny 零副作用、丢失响应与重试不重复执行。冷 attachment 保持
 FG6f publisher/receipt 故障要求真实 worker 与 SQL 证据；macOS 替代和 H2 不证明
 Linux 物理静默。完成前执行 build、bundle、typecheck、定向包测试、Java 打包和
 Checkstyle、两轮干净自审及独立审查。结果记录于
-`.qwen/e2e-tests/public-hosted-shell-admission.md`。
+`.mariadb-shell-agent/e2e-tests/public-hosted-shell-admission.md`。
 
 历史提交 `9c5e2817` 合入 main bb66a52c 后验证通过 181 项定向 Java 测试、30 项 WebShell adapter 测试、
 341 项 CLI Harness/恢复测试与六项真实 MySQL/Broker/Harness 公开集成测试。receipt 事务失败和已提交 receipt 丢失响应

@@ -4,7 +4,7 @@
 
 ## Scope
 
-This is a test-only follow-up to [#13191](https://github.com/QwenLM/qwen-code/issues/13191), checked against main `5ddd43815b`. It does not change stored digests, migrations, API responses, or the execution implementation in [#13530](https://github.com/QwenLM/qwen-code/pull/13530).
+This is a test-only follow-up to [#13191](https://github.invalid/QwenLM/qwen-code/issues/13191), checked against main `5ddd43815b`. It does not change stored digests, migrations, API responses, or the execution implementation in [#13530](https://github.invalid/QwenLM/qwen-code/pull/13530).
 
 The original issue includes historical claims. R1-4, R1-7, R1-11, R1-13 and R2-3 were handled in #13142. Its proposed R2-1 locking change was reverted after real MySQL testing found deadlocks; the reported interleaving was accepted as a legal serial history. This change adds no replacement lock or stronger concurrency guarantee.
 

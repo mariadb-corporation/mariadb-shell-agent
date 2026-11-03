@@ -398,7 +398,7 @@ the cap lives only inside that staging directory.
 **Rejected installs may leave the base directory.** The skills base
 directory is created before the source is acquired, so a missing source
 folder, a GitHub 404, or a ZIP that fails to decode fails after
-`<workspace>/.qwen/skills` (or the global equivalent) exists. Only the
+`<workspace>/.mariadb-shell-agent/skills` (or the global equivalent) exists. Only the
 invalid-base64 ZIP shape is rejected before the directory is created.
 The leftover empty directory is deliberate: staging must live beside the
 destination so the final rename stays on one filesystem.
@@ -409,7 +409,7 @@ already wrong for GitHub, folder, and per-file failures. Pointing it at
 
 **Generation close.** `does not create Skill directories after the
 generation closes` throws on the third `assertGenerationOpen` and expects
-no `.qwen` directory. Reordering writes must not leave `.qwen` or a
+no `.mariadb-shell-agent` directory. Reordering writes must not leave `.mariadb-shell-agent` or a
 staging directory behind. Update the check index if the call sequence
 changes; keep the observable.
 

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -94,6 +95,7 @@ import {
   getArenaSystemReminder,
   getCoreSystemPrompt,
   getCustomSystemPrompt,
+  getMainSessionInteractionModeReminder,
   getPlanModeSystemReminder,
   resolveInteractionMode,
   resolveMainSessionOutputStyle,
@@ -568,6 +570,7 @@ export function getMainSessionBaseSystemPrompt(
           executionSandboxBackend:
             config.getShellExecutionSandbox?.()?.effectiveBackend,
           executionSandboxNetwork: config.getShellExecutionSandbox?.()?.network,
+          interactionModeReminderInPrelude: true,
         },
       );
 }
@@ -2267,7 +2270,12 @@ export class LlmClient {
     const [[startupContext], snapshotEntries] = await getInitialChatHistory(
       this.config,
       undefined,
-      { gitStatus: this.getCachedGitStatus() },
+      {
+        gitStatus: this.getCachedGitStatus(),
+        interactionModeReminder: getMainSessionInteractionModeReminder(
+          this.config,
+        ),
+      },
     );
     this.seedSkillReminderDedupFromSnapshot(snapshotEntries);
     await this.seedAgentReminderDedupFromCurrent();
@@ -2307,7 +2315,12 @@ export class LlmClient {
     const [[startupContext], snapshotEntries] = await getInitialChatHistory(
       this.config,
       undefined,
-      { gitStatus: this.getCachedGitStatus() },
+      {
+        gitStatus: this.getCachedGitStatus(),
+        interactionModeReminder: getMainSessionInteractionModeReminder(
+          this.config,
+        ),
+      },
     );
     this.seedSkillReminderDedupFromSnapshot(snapshotEntries);
     await this.seedAgentReminderDedupFromCurrent();
@@ -2993,6 +3006,9 @@ export class LlmClient {
         () =>
           getInitialChatHistory(this.config, extraHistory, {
             gitStatus: this.getCachedGitStatus(),
+            interactionModeReminder: getMainSessionInteractionModeReminder(
+              this.config,
+            ),
           }),
       );
       this.config
@@ -3398,6 +3414,19 @@ export class LlmClient {
     if (messageType !== SendMessageType.UserQuery) {
       return;
     }
+    this.scheduleManagedMemoryRun();
+  }
+
+  /**
+   * Starts managed-memory extraction and dream for the finished user turn,
+   * once the session has been idle (see managedMemoryIdleDelayMs). Hosts that
+   * end a turn without runManagedAutoMemoryBackgroundTasks (the ACP session)
+   * call it directly, so all paths share one pending start.
+   */
+  scheduleManagedMemoryRun(): void {
+    if (this.shutdownRequested) {
+      return;
+    }
     // A session agent's hidden session is agent-to-agent work, not the
     // person's conversation: extracting from it would add a model call to
     // every agent turn and feed agent chatter into the person's memory.
@@ -3405,58 +3434,110 @@ export class LlmClient {
       return;
     }
 
-    const sessionId = this.config.getSessionId();
-    const history = this.getHistoryShallow();
-    const extractPromise = mgr
-      .scheduleExtract({
-        projectRoot,
-        sessionId,
-        history,
-        config: this.config,
-        ...(getExtractNoopSkipTurns() > 0 && {
-          // The next prompt's known base; see isBelowCompactionWarn.
-          belowCompactionWarn: isBelowCompactionWarn(
-            this.config,
-            this.getChat().getLastPromptTokenCount() +
-              this.getChat().getLastOutputTokenCount(),
-          ),
-        }),
-      })
-      .then((result) => result.touchedTopics.length)
-      .catch((error: unknown) => {
-        debugLogger.warn(
-          'Failed to schedule managed auto-memory extraction.',
-          error,
-        );
-        return 0;
-      });
-    this.pendingMemoryTaskPromises.push(extractPromise);
+    const projectRoot = this.config.getProjectRoot();
+    const mgr = this.config.getMemoryManager();
+    const run = () => {
+      const sessionId = this.config.getSessionId();
+      const history = this.getHistoryShallow();
+      const extractPromise = mgr
+        .scheduleExtract({
+          projectRoot,
+          sessionId,
+          history,
+          config: this.config,
+          ...(getExtractNoopSkipTurns() > 0 && {
+            // The next prompt's known base; see isBelowCompactionWarn.
+            belowCompactionWarn: isBelowCompactionWarn(
+              this.config,
+              this.getChat().getLastPromptTokenCount() +
+                this.getChat().getLastOutputTokenCount(),
+            ),
+          }),
+        })
+        .then((result) => result.touchedTopics.length)
+        .catch((error: unknown) => {
+          debugLogger.warn(
+            'Failed to schedule managed auto-memory extraction.',
+            error,
+          );
+          return 0;
+        });
+      this.pendingMemoryTaskPromises.push(extractPromise);
 
-    const dreamPromise = mgr
-      .scheduleDream({
-        projectRoot,
-        sessionId,
-        config: this.config,
-      })
-      .then((schedResult) => {
-        if (schedResult.status === 'scheduled' && schedResult.promise) {
-          return schedResult.promise.then((state) => {
-            const topics = state.metadata?.['touchedTopics'] as
-              | string[]
-              | undefined;
-            return topics ? topics.length : 0;
-          });
-        }
-        return 0;
-      })
-      .catch((error: unknown) => {
-        debugLogger.warn(
-          'Failed to schedule managed auto-memory dream.',
-          error,
-        );
-        return 0;
-      });
-    this.pendingMemoryTaskPromises.push(dreamPromise);
+      const dreamPromise = mgr
+        .scheduleDream({
+          projectRoot,
+          sessionId,
+          config: this.config,
+        })
+        .then((schedResult) => {
+          if (schedResult.status === 'scheduled' && schedResult.promise) {
+            return schedResult.promise.then((state) => {
+              const topics = state.metadata?.['touchedTopics'] as
+                | string[]
+                | undefined;
+              return topics ? topics.length : 0;
+            });
+          }
+          return 0;
+        })
+        .catch((error: unknown) => {
+          debugLogger.warn(
+            'Failed to schedule managed auto-memory dream.',
+            error,
+          );
+          return 0;
+        });
+      this.pendingMemoryTaskPromises.push(dreamPromise);
+    };
+    // Extraction and dream are model calls of their own. Started right after
+    // the answer, they run in parallel with the user's next question and slow
+    // both down on a single-stream server; their side prompt can also take
+    // the conversation's place in a provider's prompt cache. Where a next
+    // question can come, they start only once the session has been idle for a
+    // while; a new question cancels the wait, and the next idle period covers
+    // both turns (extraction resumes from its cursor).
+    const idleMs = this.managedMemoryIdleDelayMs();
+    this.clearPendingManagedMemoryRun();
+    if (idleMs <= 0) {
+      run();
+      return;
+    }
+    this.pendingManagedMemoryRun = setTimeout(() => {
+      this.pendingManagedMemoryRun = undefined;
+      if (!this.shutdownRequested) run();
+    }, idleMs);
+    this.pendingManagedMemoryRun.unref?.();
+  }
+
+  private pendingManagedMemoryRun: ReturnType<typeof setTimeout> | undefined;
+
+  /**
+   * Drops a pending idle start of extraction and dream: a new question makes
+   * the session busy again. Hosts that send a question without
+   * sendMessageStream (the ACP session) call it themselves.
+   */
+  clearPendingManagedMemoryRun(): void {
+    if (this.pendingManagedMemoryRun) {
+      clearTimeout(this.pendingManagedMemoryRun);
+      this.pendingManagedMemoryRun = undefined;
+    }
+  }
+
+  /**
+   * How long the session must be idle before extraction and dream start:
+   * 0 for a headless run (no next question can come), otherwise
+   * QWEN_CODE_MEMORY_EXTRACT_IDLE_MS or 10 seconds.
+   */
+  private managedMemoryIdleDelayMs(): number {
+    if (
+      !this.config.isInteractive() &&
+      resolveInteractionMode(this.config) !== 'acp'
+    ) {
+      return 0;
+    }
+    const configured = Number(process.env['QWEN_CODE_MEMORY_EXTRACT_IDLE_MS']);
+    return Number.isFinite(configured) && configured >= 0 ? configured : 10_000;
   }
 
   /**
@@ -3821,6 +3902,10 @@ export class LlmClient {
       SendMessageType.UserQuery,
   ): AsyncGenerator<ServerLlmStreamEvent, Turn> {
     const messageType = options?.type ?? SendMessageType.UserQuery;
+    // A new question while extraction waits for an idle session: wait again.
+    if (messageType === SendMessageType.UserQuery) {
+      this.clearPendingManagedMemoryRun();
+    }
     const humanInput =
       messageType === SendMessageType.UserQuery &&
       !options?.isConcurrentSideQuery &&
@@ -5462,6 +5547,17 @@ export class LlmClient {
       // actual history push (see `userContentPushSnapshotKey`); a
       // client-side snapshot taken here would still cover the send-lock
       // and compression awaits between `turn.run` and that push.
+      if (
+        messageType === SendMessageType.UserQuery ||
+        messageType === SendMessageType.Cron
+      ) {
+        // The user record holds the request without the reminders and context
+        // added above; record what the model receives so a resumed session
+        // replays the same prompt.
+        this.config
+          .getChatRecordingService()
+          ?.recordSentUserContent?.(requestToSend, request, prompt_id);
+      }
       attachedSnapshotSource = requestToSend;
       pushInitiated = true;
       agentOutput.beginResponse();

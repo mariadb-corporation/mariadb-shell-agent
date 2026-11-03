@@ -405,7 +405,7 @@ the source capability is absent or an operation fails.
 
 The acceptance matrix below defines the implementation checks. The global CLI
 baseline, focused regression results, actual daemon and browser runs, and
-self-audit notes are recorded locally under `.qwen/e2e-tests/session-sources.md`.
+self-audit notes are recorded locally under `.mariadb-shell-agent/e2e-tests/session-sources.md`.
 See the implementation notes for the tested boundaries.
 
 | Area                   | Required evidence                                                                                                                                                                                                      |

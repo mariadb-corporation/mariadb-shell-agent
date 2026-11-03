@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -878,7 +879,9 @@ function logSessionArchiveResult(
     `notFound=${result.notFound.length} notFoundIds=${formatSessionIds(result.notFound)}`,
     `errors=${result.errors.length} errorIds=${formatSessionErrors(result.errors)}`,
   ].join(' ');
-  writeStderrLine(`qwen serve: sessions ${action} result ${details}`);
+  writeStderrLine(
+    `mariadb-shell-agent serve: sessions ${action} result ${details}`,
+  );
 }
 
 function formatSessionIds(sessionIds: string[]): string {
@@ -901,7 +904,7 @@ function errorMessage(error: unknown): string {
 }
 
 export function logSessionArchiveWarning(message: string): void {
-  writeStderrLine(`qwen serve: ${sanitizeLogLine(message)}`);
+  writeStderrLine(`mariadb-shell-agent serve: ${sanitizeLogLine(message)}`);
 }
 
 function sanitizeLogLine(message: string): string {

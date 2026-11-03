@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -109,7 +110,7 @@ describe('worktreeResidue', () => {
     writeFileSync(join(repo, 'a.ts'), 'export const x = 1;\n');
     gitRepo('add', '-A');
     gitRepo('commit', '-qm', 'head');
-    tree = join(repo, '.qwen', 'tmp', 'review-wt');
+    tree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-wt');
     mkdirSync(dirname(tree), { recursive: true });
     gitRepo('worktree', 'add', '--detach', '-q', tree, 'HEAD');
   });
@@ -390,7 +391,7 @@ describe('worktreeResidue', () => {
     // a `.git` gitfile that does not exist — and would refuse a directory the
     // caller's own error path already owns.
     const root = mkdtempSync(join(tmpdir(), 'qwen-plain-'));
-    const plain = join(root, '.qwen', 'tmp', 'x');
+    const plain = join(root, '.mariadb-shell-agent', 'tmp', 'x');
     mkdirSync(plain, { recursive: true });
     try {
       const got = worktreeResidue(plain);
@@ -528,7 +529,7 @@ describe('worktreeResidue', () => {
     // one. Either way the verdict is a refusal, and removing the round trip
     // from both layers turns this red — measured, the gate then passes and
     // certifies a tree measured against the sibling's index.
-    const sibling = join(repo, '.qwen', 'tmp', 'sibling-wt');
+    const sibling = join(repo, '.mariadb-shell-agent', 'tmp', 'sibling-wt');
     gitRepo('worktree', 'add', '--detach', '-q', sibling, 'HEAD');
     const admin = readFileSync(join(sibling, '.git'), 'utf8')
       .trim()
@@ -584,7 +585,7 @@ describe('worktreeResidue', () => {
   });
 
   it('says UNMEASURED when an ancestor of the tree is a symlink into forge territory', () => {
-    // A link planted at any ancestor below the checkout — here `.qwen/tmp`,
+    // A link planted at any ancestor below the checkout — here `.mariadb-shell-agent/tmp`,
     // the directory the pipeline itself names — redirects the chdir into
     // territory holding a completely genuine `git init` + `worktree add`
     // pair with the contamination COMMITTED: no forged admin entry, the
@@ -610,7 +611,7 @@ describe('worktreeResidue', () => {
 
       expect(got.paths).toEqual([]);
       // The location gate answers this shape FIRST now: a symlinked
-      // `.qwen/tmp` is a REFUSED mount, and "inside the review temp dir by
+      // `.mariadb-shell-agent/tmp` is a REFUSED mount, and "inside the review temp dir by
       // spelling with no mount root" fails closed — reading the refusal as
       // "nothing to police" was the fail-open inversion that let the
       // measurement run through the redirect. (The walk below refuses it
@@ -635,7 +636,13 @@ describe('worktreeResidue', () => {
     const aliasHome = mkdtempSync(join(tmpdir(), 'qwen-spell-'));
     const alias = join(aliasHome, 'alias');
     symlinkSync(dirname(repo), alias);
-    const spelled = join(alias, basename(repo), '.qwen', 'tmp', 'review-wt');
+    const spelled = join(
+      alias,
+      basename(repo),
+      '.mariadb-shell-agent',
+      'tmp',
+      'review-wt',
+    );
     try {
       expect(worktreeResidue(spelled, 12, head)).toEqual({
         paths: [],
@@ -654,10 +661,10 @@ describe('worktreeResidue', () => {
 
   it('says UNMEASURED when an INTERMEDIATE ancestor is a symlink the earlier gates cannot see', () => {
     // The walk's own witness. The sibling redirect shape (a link AT
-    // `.qwen/tmp`) is now refused by the location gate before the walk runs —
+    // `.mariadb-shell-agent/tmp`) is now refused by the location gate before the walk runs —
     // a refused mount fails closed — and the leaf-link shape refuses at the
     // leaf lstat. What remains the walk's alone is a link BETWEEN the mount
-    // root and the leaf: `.qwen/tmp` itself stays real, so the mount answers
+    // root and the leaf: `.mariadb-shell-agent/tmp` itself stays real, so the mount answers
     // and the gate passes, and deleting the walk turns this test red. The
     // shape passes every other check: the leaf is a real directory, the
     // self-equality holds because both sides resolve through the same link,
@@ -1126,7 +1133,7 @@ describe('worktreeResidue', () => {
         writeFileSync(join(nlRepo, 'a.ts'), 'x\n');
         execFileSync('git', ['add', '-A'], { cwd: nlRepo });
         execFileSync('git', ['commit', '-qm', 'head'], { cwd: nlRepo });
-        const wt = join(nlRepo, '.qwen', 'tmp', 'review-wt');
+        const wt = join(nlRepo, '.mariadb-shell-agent', 'tmp', 'review-wt');
         mkdirSync(dirname(wt), { recursive: true });
         execFileSync('git', ['worktree', 'add', '--detach', '-q', wt, 'HEAD'], {
           cwd: nlRepo,
@@ -1167,7 +1174,7 @@ describe('worktreeResidue', () => {
       execFileSync('git', ['worktree', 'add', '--detach', '-q', sib, 'HEAD'], {
         cwd: main,
       });
-      const wt = join(sib, '.qwen', 'tmp', 'review-wt');
+      const wt = join(sib, '.mariadb-shell-agent', 'tmp', 'review-wt');
       mkdirSync(dirname(wt), { recursive: true });
       execFileSync('git', ['worktree', 'add', '--detach', '-q', wt, 'HEAD'], {
         cwd: sib,
@@ -1213,7 +1220,7 @@ describe('worktreeResidue', () => {
       writeFileSync(join(checkout, 'a.ts'), 'x\n');
       execFileSync('git', ['add', '-A'], { cwd: checkout });
       execFileSync('git', ['commit', '-qm', 'head'], { cwd: checkout });
-      const wt = join(checkout, '.qwen', 'tmp', 'review-wt');
+      const wt = join(checkout, '.mariadb-shell-agent', 'tmp', 'review-wt');
       mkdirSync(dirname(wt), { recursive: true });
       execFileSync('git', ['worktree', 'add', '--detach', '-q', wt, 'HEAD'], {
         cwd: checkout,
@@ -2242,7 +2249,7 @@ describe('filterCommandsIn — the include walk', () => {
       writeFileSync(join(repo, 'a.ts'), 'x\n');
       g('add', '-A');
       g('commit', '-qm', 'head');
-      const wt = join(repo, '.qwen', 'tmp', 'wt');
+      const wt = join(repo, '.mariadb-shell-agent', 'tmp', 'wt');
       mkdirSync(dirname(wt), { recursive: true });
       g('worktree', 'add', '--detach', '-q', wt, 'HEAD');
       g('config', 'filter.evil.smudge', 'touch PWNED');
@@ -2516,7 +2523,7 @@ describe('worktreeCreateFailureDetail', () => {
   });
 });
 
-// Every case in this block builds a layout under `.qwen/tmp` and asks a
+// Every case in this block builds a layout under `.mariadb-shell-agent/tmp` and asks a
 // question that only has an answer where containment can exist. On Windows
 // `mountRootFor` refuses every absolute path (a drive letter is a colon), so
 // the gate never speaks — and the fixtures cannot even be built there: a
@@ -2546,7 +2553,7 @@ describe('untrustedGitfile', () => {
   });
 
   /**
-   * A REAL repository with a real linked worktree under `.qwen/tmp` — the
+   * A REAL repository with a real linked worktree under `.mariadb-shell-agent/tmp` — the
    * pipeline's own geometry. Real, because the gate asks git to resolve the
    * pointer rather than parsing it, so a fixture git cannot read proves
    * nothing about either answer. `repo` is parameterised so one case can
@@ -2563,10 +2570,14 @@ describe('untrustedGitfile', () => {
     writeFileSync(join(repo, 'a.txt'), 'a\n');
     g(repo, 'add', 'a.txt');
     g(repo, 'commit', '-q', '-m', 'init');
-    const tree = join(repo, '.qwen', 'tmp', 'review-pr-1');
+    const tree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
     mkdirSync(dirname(tree), { recursive: true });
     g(repo, 'worktree', 'add', '-q', '--detach', tree, 'HEAD');
-    return { repo, tree, mount: () => join(repo, '.qwen', 'tmp') };
+    return {
+      repo,
+      tree,
+      mount: () => join(repo, '.mariadb-shell-agent', 'tmp'),
+    };
   };
 
   itWhereContainmentExists('ADMITS an intact pipeline gitfile', () => {
@@ -2587,7 +2598,7 @@ describe('untrustedGitfile', () => {
       // mattering: whatever git answers is what gets located.
       const { repo, tree, mount } = pipelineTree();
       plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-git'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
         adminEntryOf(tree),
         tree,
         join(repo, '.git'),
@@ -2607,7 +2618,7 @@ describe('untrustedGitfile', () => {
       // that speaks here: removed, this tree is admitted and the assertion
       // goes red.
       const { repo, tree, mount } = pipelineTree();
-      const sibling = join(repo, '.qwen', 'tmp', 'review-pr-2');
+      const sibling = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-2');
       execFileSync(
         'git',
         ['worktree', 'add', '-q', '--detach', sibling, 'HEAD'],
@@ -2638,7 +2649,7 @@ describe('untrustedGitfile', () => {
       // U+FFFD guard every question below passes (the round-trip included —
       // the decoy's backpointer is the real entry's) and this returns null.
       const { repo, tree, mount } = pipelineTree();
-      const tmpRoot = join(repo, '.qwen', 'tmp');
+      const tmpRoot = join(repo, '.mariadb-shell-agent', 'tmp');
       const common = join(tmpRoot, '.evil-common');
       execFileSync('git', ['init', '-q', common]);
       const evil = Buffer.concat([
@@ -2709,11 +2720,11 @@ describe('untrustedGitfile', () => {
       // that name minus the character, symlinked outside the mount, is what
       // the judgment then lands on. Only the terminator may be stripped.
       const { repo, tree, mount } = pipelineTree();
-      const twin = join(repo, '.qwen', 'tmp', 'entry');
+      const twin = join(repo, '.mariadb-shell-agent', 'tmp', 'entry');
       // The twin points OUTSIDE the mount; trimming the NBSP lands here.
       symlinkSync(repo, twin);
       plantAdminEntry(
-        join(repo, '.qwen', 'tmp', 'entry\u00a0'),
+        join(repo, '.mariadb-shell-agent', 'tmp', 'entry\u00a0'),
         adminEntryOf(tree),
         tree,
         join(repo, '.git'),
@@ -2734,9 +2745,9 @@ describe('untrustedGitfile', () => {
       // plant. The gitfile's trailing `/` is load-bearing: git trims C-locale
       // whitespace off a gitdir line, which would eat the `\r` first.
       const { repo, tree, mount } = pipelineTree();
-      const planted = join(repo, '.qwen', 'tmp', 'entry\r');
+      const planted = join(repo, '.mariadb-shell-agent', 'tmp', 'entry\r');
       // The twin points OUTSIDE the mount; stripping the CR lands here.
-      symlinkSync(repo, join(repo, '.qwen', 'tmp', 'entry'));
+      symlinkSync(repo, join(repo, '.mariadb-shell-agent', 'tmp', 'entry'));
       plantAdminEntry(planted, adminEntryOf(tree), tree, join(repo, '.git'));
       overwriteGitfile(join(tree, '.git'), `gitdir: ${planted}/\n`);
 
@@ -2751,7 +2762,7 @@ describe('untrustedGitfile', () => {
       // worktree launches from, say, `<tree>/packages/cli`, which has no
       // `.git` of its own — git walks up. Demanding one there refused every
       // worktree creation in that geometry, and a repository NOT under
-      // `.qwen/tmp` (mine) never reaches the question at all, so the suite
+      // `.mariadb-shell-agent/tmp` (mine) never reaches the question at all, so the suite
       // stayed green while the pipeline's own dogfood lane broke.
       const { tree, mount } = pipelineTree();
       const sub = join(tree, 'packages', 'cli');
@@ -2806,7 +2817,7 @@ describe('untrustedGitfile', () => {
       // A suite that mocks `node:fs.realpathSync` as a bare `vi.fn` gives it
       // no `.native`, and reaching through it threw a TypeError into the
       // fail-closed catch — refusing every worktree creation in any checkout
-      // sitting under `.qwen/tmp`. Deleting the property here asks that shape
+      // sitting under `.mariadb-shell-agent/tmp`. Deleting the property here asks that shape
       // directly, because the suite that HAS the mock never reaches this gate
       // from an unmounted checkout.
       const { tree, mount } = pipelineTree();
@@ -2849,7 +2860,10 @@ describe('untrustedGitfile', () => {
     // ordinary resume — 26 of them, measured.
     const { repo, mount } = pipelineTree();
     expect(
-      untrustedGitfile(join(repo, '.qwen', 'tmp', 'review-pr-999'), mount),
+      untrustedGitfile(
+        join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-999'),
+        mount,
+      ),
     ).toBeNull();
   });
 
@@ -2867,14 +2881,14 @@ describe('untrustedGitfile', () => {
       // `mountRootFor`'s null is overloaded: "outside any temp dir" and
       // "inside one but REFUSED" were the same value, and every gate read
       // both as "nothing to police" — the fail-open inversion, measured
-      // end-to-end with a symlinked `.qwen/tmp`. Lexically inside plus no
+      // end-to-end with a symlinked `.mariadb-shell-agent/tmp`. Lexically inside plus no
       // mount root is fail-closed, at each gate that consumes the mount.
       // Asked with the REAL `mountRootFor`, because an injected root can
       // only ever answer one of the two nulls.
       const { repo, tree } = pipelineTree();
       const elsewhere = join(repo, 'elsewhere');
-      renameSync(join(repo, '.qwen', 'tmp'), elsewhere);
-      symlinkSync(elsewhere, join(repo, '.qwen', 'tmp'));
+      renameSync(join(repo, '.mariadb-shell-agent', 'tmp'), elsewhere);
+      symlinkSync(elsewhere, join(repo, '.mariadb-shell-agent', 'tmp'));
       // The tree still resolves — through the link the mount refuses.
       expect(existsSync(tree)).toBe(true);
       expect(mountRootFor(tree)).toBeNull();
@@ -2891,14 +2905,14 @@ describe('untrustedGitfile', () => {
   itWhereContainmentExists(
     'refuses a launch directory that no longer exists at its spelling inside the review temp dir',
     () => {
-      // The rename attack's other half: `mv .qwen .qwen-real` from inside the
+      // The rename attack's other half: `mv .mariadb-shell-agent .qwen-real` from inside the
       // outer mount leaves the stale spelling matching lexically while the
       // directory is gone. "No objection" there is what the launch-dir memo
       // recorded TRUSTED over, so inside the spelling a non-existent cwd is
       // a refusal — while outside it absence stays the caller's own error
       // path, exactly as before.
       const { repo, mount } = pipelineTree();
-      const gone = join(repo, '.qwen', 'tmp', 'review-pr-2');
+      const gone = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-2');
       expect(untrustedRepositoryFrom(gone, mount)).toContain(
         'no directory exists',
       );
@@ -2955,7 +2969,7 @@ describe('untrustedGitfile', () => {
       // lstat walk per gate call.
       const { repo, tree, mount } = pipelineTree();
       plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-git'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
         adminEntryOf(tree),
         tree,
         join(repo, '.git'),
@@ -2977,14 +2991,14 @@ describe('untrustedGitfile', () => {
     () => {
       // The TOCTOU the threading closes: the entrance observes a healthy
       // root, and before the pointer check runs the outer mount's writer
-      // renames `.qwen/tmp` away and stands a link up at its spelling. A
+      // renames `.mariadb-shell-agent/tmp` away and stands a link up at its spelling. A
       // re-asked mount question answers null there, and a null read as
       // "nothing to police" admitted the planted entry the entrance had just
       // refused (measured: `status` through it ran the plant's clean
       // filter).
       const { repo, tree } = pipelineTree();
       plantAdminEntry(
-        join(repo, '.qwen', 'tmp', '.evil-git'),
+        join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git'),
         adminEntryOf(tree),
         tree,
         join(repo, '.git'),
@@ -2995,12 +3009,12 @@ describe('untrustedGitfile', () => {
         if (!flipped) {
           flipped = true;
           renameSync(
-            join(repo, '.qwen', 'tmp'),
-            join(repo, '.qwen', 'tmp-real'),
+            join(repo, '.mariadb-shell-agent', 'tmp'),
+            join(repo, '.mariadb-shell-agent', 'tmp-real'),
           );
           symlinkSync(
-            join(repo, '.qwen', 'tmp-real'),
-            join(repo, '.qwen', 'tmp'),
+            join(repo, '.mariadb-shell-agent', 'tmp-real'),
+            join(repo, '.mariadb-shell-agent', 'tmp'),
           );
         }
         return answer;
@@ -3021,7 +3035,7 @@ describe('untrustedGitfile', () => {
       // tree this pipeline builds, so a symlink on the way to it is the
       // plant; it is refused before anything resolves through it.
       const { repo, tree, mount } = pipelineTree();
-      const sibling = join(repo, '.qwen', 'tmp', 'review-pr-2');
+      const sibling = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-2');
       execFileSync(
         'git',
         ['worktree', 'add', '-q', '--detach', sibling, 'HEAD'],
@@ -3054,7 +3068,7 @@ describe('untrustedGitfile', () => {
       // (measured). An owner that cannot be resolved does not point back at
       // this tree, the same decision the residue probe makes for the shape.
       const { repo, tree, mount } = pipelineTree();
-      const sibling = join(repo, '.qwen', 'tmp', 'review-pr-2');
+      const sibling = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-2');
       execFileSync(
         'git',
         ['worktree', 'add', '-q', '--detach', sibling, 'HEAD'],
@@ -3083,9 +3097,9 @@ describe('untrustedGitfile', () => {
       // outside the containment test, the walk never ran, and the realpath
       // round trip agreed with the link and admitted the entry. The writer is
       // the one the widening exists for: the outer review's containerized
-      // phase held the outer `.qwen/tmp` read-write.
+      // phase held the outer `.mariadb-shell-agent/tmp` read-write.
       const { repo, tree: outer } = pipelineTree();
-      const inner = join(outer, '.qwen', 'tmp', 'review-pr-2');
+      const inner = join(outer, '.mariadb-shell-agent', 'tmp', 'review-pr-2');
       mkdirSync(dirname(inner), { recursive: true });
       execFileSync(
         'git',
@@ -3095,14 +3109,19 @@ describe('untrustedGitfile', () => {
       // The mount root is the INNER layer's, which is what `mountRootFor`
       // answers for this tree — injected so the case is about the gate and
       // not the platform's mount arithmetic.
-      const innerMount = () => join(outer, '.qwen', 'tmp');
+      const innerMount = () => join(outer, '.mariadb-shell-agent', 'tmp');
       // The honest nested layout admits — without this control a gate that
       // refuses everything passes too.
       expect(untrustedGitfile(inner, innerMount)).toBeNull();
 
       // The sibling lives one layer UP, beside the OUTER worktree, and its
       // admin entry is legitimate.
-      const upSibling = join(repo, '.qwen', 'tmp', 'review-pr-up');
+      const upSibling = join(
+        repo,
+        '.mariadb-shell-agent',
+        'tmp',
+        'review-pr-up',
+      );
       execFileSync(
         'git',
         ['worktree', 'add', '-q', '--detach', upSibling, 'HEAD'],
@@ -3199,7 +3218,7 @@ describe('untrustedGitfile', () => {
       // gitfile sits in even through the borrow (measured), the one answer
       // the borrow cannot bring into agreement.
       const { tree: outer } = pipelineTree();
-      const inner = join(outer, '.qwen', 'tmp', 'review-pr-2');
+      const inner = join(outer, '.mariadb-shell-agent', 'tmp', 'review-pr-2');
       mkdirSync(dirname(inner), { recursive: true });
       execFileSync(
         'git',
@@ -3210,7 +3229,7 @@ describe('untrustedGitfile', () => {
       );
       // Injected roots, so the case is about the GATE and not the platform's
       // mount arithmetic — the nested real-root admit is the canary's.
-      const outerMount = () => join(outer, '.qwen', 'tmp');
+      const outerMount = () => join(outer, '.mariadb-shell-agent', 'tmp');
       // The honest nested layout admits — the control without which a
       // refuse-everything gate passes this test too.
       expect(untrustedGitfile(inner, outerMount)).toBeNull();
@@ -3245,12 +3264,16 @@ describe('adminEntryInsideReviewTmp', () => {
     // symlink is involved, and `--show-toplevel` still names the tree. Only
     // the entry's location tells them apart.
     const repo = tmp();
-    const tree = join(repo, '.qwen', 'tmp', 'review-pr-1-probe');
-    const planted = join(repo, '.qwen', 'tmp', '.evil-git');
+    const tree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1-probe');
+    const planted = join(repo, '.mariadb-shell-agent', 'tmp', '.evil-git');
     mkdirSync(tree, { recursive: true });
     mkdirSync(planted, { recursive: true });
     expect(
-      adminEntryInsideReviewTmp(planted, join(repo, '.qwen', 'tmp'), tree),
+      adminEntryInsideReviewTmp(
+        planted,
+        join(repo, '.mariadb-shell-agent', 'tmp'),
+        tree,
+      ),
     ).toBe(true);
   });
 
@@ -3260,7 +3283,7 @@ describe('adminEntryInsideReviewTmp', () => {
     // anything under it, and `..evil-git` is a legal filename whose relative
     // path starts with the characters an escape would.
     const repo = tmp();
-    const mount = join(repo, '.qwen', 'tmp');
+    const mount = join(repo, '.mariadb-shell-agent', 'tmp');
     const tree = join(mount, 'review-pr-1-probe');
     const oddly = join(mount, '..evil-git');
     mkdirSync(tree, { recursive: true });
@@ -3268,19 +3291,23 @@ describe('adminEntryInsideReviewTmp', () => {
     expect(adminEntryInsideReviewTmp(mount, mount, tree)).toBe(true);
     expect(adminEntryInsideReviewTmp(oddly, mount, tree)).toBe(true);
     // ...while a genuine sibling of the mount is still outside.
-    const outside = join(repo, '.qwen', 'review-leases');
+    const outside = join(repo, '.mariadb-shell-agent', 'review-leases');
     mkdirSync(outside, { recursive: true });
     expect(adminEntryInsideReviewTmp(outside, mount, tree)).toBe(false);
   });
 
   it('admits the real admin entry, which lives under the repository git dir', () => {
     const repo = tmp();
-    const tree = join(repo, '.qwen', 'tmp', 'review-pr-1-probe');
+    const tree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1-probe');
     const real = join(repo, '.git', 'worktrees', 'review-pr-1-probe');
     mkdirSync(tree, { recursive: true });
     mkdirSync(real, { recursive: true });
     expect(
-      adminEntryInsideReviewTmp(real, join(repo, '.qwen', 'tmp'), tree),
+      adminEntryInsideReviewTmp(
+        real,
+        join(repo, '.mariadb-shell-agent', 'tmp'),
+        tree,
+      ),
     ).toBe(false);
   });
 
@@ -3288,12 +3315,12 @@ describe('adminEntryInsideReviewTmp', () => {
     // Fails CLOSED: "not inside" would be a guess, and the guess that lets a
     // planted entry through is the one that ends in host execution.
     const repo = tmp();
-    const tree = join(repo, '.qwen', 'tmp', 'review-pr-1-probe');
+    const tree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1-probe');
     mkdirSync(tree, { recursive: true });
     expect(
       adminEntryInsideReviewTmp(
         join(repo, 'gone'),
-        join(repo, '.qwen', 'tmp'),
+        join(repo, '.mariadb-shell-agent', 'tmp'),
         tree,
       ),
     ).toBe(true);
@@ -3316,19 +3343,35 @@ describe('adminEntryInsideReviewTmp', () => {
       // colon-bearing spelling standing in for Windows, which NTFS could not
       // even create — hence the block gate) the mount is no trust boundary,
       // and the question stays silent. The refused arm is a REAL refused
-      // mount — a link stood up at `.qwen/tmp` — because the kind is
+      // mount — a link stood up at `.mariadb-shell-agent/tmp` — because the kind is
       // re-derived from the filesystem, not from the null alone.
       const repo = tmp();
-      const tree = join(repo, '.qwen', 'tmp', 'review-pr-1-probe');
+      const tree = join(
+        repo,
+        '.mariadb-shell-agent',
+        'tmp',
+        'review-pr-1-probe',
+      );
       mkdirSync(tree, { recursive: true });
-      // A REAL refused mount: `.qwen/tmp` renamed aside and re-stood-up as a
+      // A REAL refused mount: `.mariadb-shell-agent/tmp` renamed aside and re-stood-up as a
       // link — the refusal kind survives a colon-bearing TMPDIR, where a
       // plain fixture would read as unmountable instead.
-      renameSync(join(repo, '.qwen', 'tmp'), join(repo, '.qwen', 'tmp-real'));
-      symlinkSync(join(repo, '.qwen', 'tmp-real'), join(repo, '.qwen', 'tmp'));
+      renameSync(
+        join(repo, '.mariadb-shell-agent', 'tmp'),
+        join(repo, '.mariadb-shell-agent', 'tmp-real'),
+      );
+      symlinkSync(
+        join(repo, '.mariadb-shell-agent', 'tmp-real'),
+        join(repo, '.mariadb-shell-agent', 'tmp'),
+      );
       expect(adminEntryInsideReviewTmp(repo, null, tree)).toBe(true);
       const colon = join(tmp(), 'my:checkout');
-      const colonTree = join(colon, '.qwen', 'tmp', 'review-pr-1');
+      const colonTree = join(
+        colon,
+        '.mariadb-shell-agent',
+        'tmp',
+        'review-pr-1',
+      );
       mkdirSync(colonTree, { recursive: true });
       expect(adminEntryInsideReviewTmp(repo, null, colonTree)).toBe(false);
     },
@@ -3341,12 +3384,20 @@ describe('unmountableRootSpelling', () => {
     // colon in a repository name is legal but rare: the refusal class is
     // pinned arm by arm here. Removing the colon arm turns the first and
     // third cases red; removing the UNC arm turns the second.
-    expect(unmountableRootSpelling('C:\\repo\\.qwen\\tmp')).toBe(true);
-    expect(unmountableRootSpelling('\\\\server\\share\\repo\\.qwen\\tmp')).toBe(
+    expect(unmountableRootSpelling('C:\\repo\\.mariadb-shell-agent\\tmp')).toBe(
       true,
     );
-    expect(unmountableRootSpelling('/repo/my:checkout/.qwen/tmp')).toBe(true);
-    expect(unmountableRootSpelling('/repo/.qwen/tmp')).toBe(false);
+    expect(
+      unmountableRootSpelling(
+        '\\\\server\\share\\repo\\.mariadb-shell-agent\\tmp',
+      ),
+    ).toBe(true);
+    expect(
+      unmountableRootSpelling('/repo/my:checkout/.mariadb-shell-agent/tmp'),
+    ).toBe(true);
+    expect(unmountableRootSpelling('/repo/.mariadb-shell-agent/tmp')).toBe(
+      false,
+    );
   });
 });
 
@@ -3356,15 +3407,19 @@ describe('insideReviewTmpLexically', () => {
     // `mountRootFor`'s overloaded null to tell "outside any temp dir" from
     // "inside one, but refused" without paying a syscall outside.
     const base = join(tmpdir(), 'qwen-lexical-no-such');
-    expect(insideReviewTmpLexically(join(base, '.qwen', 'tmp', 'wt'))).toBe(
-      true,
-    );
+    expect(
+      insideReviewTmpLexically(join(base, '.mariadb-shell-agent', 'tmp', 'wt')),
+    ).toBe(true);
     // The review temp dir ITSELF is inside, matching `mountRootFor`'s
     // `+ sep`.
-    expect(insideReviewTmpLexically(join(base, '.qwen', 'tmp'))).toBe(true);
+    expect(
+      insideReviewTmpLexically(join(base, '.mariadb-shell-agent', 'tmp')),
+    ).toBe(true);
     expect(insideReviewTmpLexically(join(base, 'checkout'))).toBe(false);
     // A marker that is not a whole component is not containment.
-    expect(insideReviewTmpLexically(join(base, '.qwen', 'tmpl'))).toBe(false);
+    expect(
+      insideReviewTmpLexically(join(base, '.mariadb-shell-agent', 'tmpl')),
+    ).toBe(false);
   });
 });
 
@@ -3381,11 +3436,11 @@ describe('mountRootFor — the walk bound is geometry-aware', () => {
   });
 
   itWhereContainmentExists(
-    'mounts nothing — and refuses — when `.qwen` links at a directory with no `tmp` inside',
+    'mounts nothing — and refuses — when `.mariadb-shell-agent` links at a directory with no `tmp` inside',
     () => {
       // The walk's old blanket catch read a leaf ENOENT as "nothing above to
-      // redirect through": with `.qwen` a symlink to a directory lacking
-      // `tmp`, lstatSync('<repo>/.qwen/tmp') throws before `.qwen` itself is
+      // redirect through": with `.mariadb-shell-agent` a symlink to a directory lacking
+      // `tmp`, lstatSync('<repo>/.mariadb-shell-agent/tmp') throws before `.mariadb-shell-agent` itself is
       // ever lstat'd, so the walk answered null — and everything built under
       // the link's target (mkdirSync through it, the checkout into it) was
       // the fetch-pr R27-9 gate's exact prey. The walk now keeps climbing on
@@ -3394,12 +3449,12 @@ describe('mountRootFor — the walk bound is geometry-aware', () => {
       const elsewhere = tmp(); // a real directory WITHOUT `tmp` inside
       const repo = join(anchor, 'repo');
       mkdirSync(repo);
-      symlinkSync(elsewhere, join(repo, '.qwen'));
-      expect(redirectedAncestor(join(repo, '.qwen', 'tmp'))).toBe(
-        join(repo, '.qwen'),
-      );
+      symlinkSync(elsewhere, join(repo, '.mariadb-shell-agent'));
       expect(
-        mountRootFor(join(repo, '.qwen', 'tmp', 'review-pr-1')),
+        redirectedAncestor(join(repo, '.mariadb-shell-agent', 'tmp')),
+      ).toBe(join(repo, '.mariadb-shell-agent'));
+      expect(
+        mountRootFor(join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1')),
       ).toBeNull();
     },
   );
@@ -3412,15 +3467,17 @@ describe('mountRootFor — the walk bound is geometry-aware', () => {
       // fires — so a link at the checkout's direct parent (a checkout one
       // hop below a linked directory) was read as a redirect in a path the
       // pipeline owns, and `--sandbox=auto` silently degraded to unsandboxed
-      // execution over the false refusal. Bounded at `.qwen`, the walk never
+      // execution over the false refusal. Bounded at `.mariadb-shell-agent`, the walk never
       // looks at the checkout's own spelling or the user's layout above it.
       const anchor = tmp();
       const realParent = tmp();
       symlinkSync(realParent, join(anchor, 'link'));
       const repo = join(anchor, 'link', 'repo');
-      const tree = join(repo, '.qwen', 'tmp', 'review-pr-1');
+      const tree = join(repo, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
       mkdirSync(tree, { recursive: true });
-      expect(mountRootFor(tree)).toBe(realpathSync(join(repo, '.qwen', 'tmp')));
+      expect(mountRootFor(tree)).toBe(
+        realpathSync(join(repo, '.mariadb-shell-agent', 'tmp')),
+      );
     },
   );
 
@@ -3437,24 +3494,32 @@ describe('mountRootFor — the walk bound is geometry-aware', () => {
       // input applied on the base and refused on the PR). The mount answer is
       // canonicalised by `realpathSync`, so the link redirects nothing the
       // mount trusts — the bound stops one component below the checkout, and
-      // `.qwen` stays inside the walk.
+      // `.mariadb-shell-agent` stays inside the walk.
       const anchor = tmp();
       const real = join(anchor, 'repo');
-      const tree = join(real, '.qwen', 'tmp', 'review-pr-1');
+      const tree = join(real, '.mariadb-shell-agent', 'tmp', 'review-pr-1');
       mkdirSync(tree, { recursive: true });
       symlinkSync(real, join(anchor, 'qwen-link'));
-      const spelled = join(anchor, 'qwen-link', '.qwen', 'tmp', 'review-pr-1');
-      expect(mountRootFor(spelled)).toBe(
-        realpathSync(join(real, '.qwen', 'tmp')),
+      const spelled = join(
+        anchor,
+        'qwen-link',
+        '.mariadb-shell-agent',
+        'tmp',
+        'review-pr-1',
       );
-      // ...and a link AT `.qwen` through the same spelling still refuses:
+      expect(mountRootFor(spelled)).toBe(
+        realpathSync(join(real, '.mariadb-shell-agent', 'tmp')),
+      );
+      // ...and a link AT `.mariadb-shell-agent` through the same spelling still refuses:
       // the narrowing stops at the checkout, not below it.
       const second = join(anchor, 'repo2');
-      mkdirSync(join(second, '.qwen'), { recursive: true });
+      mkdirSync(join(second, '.mariadb-shell-agent'), { recursive: true });
       const elsewhere = tmp();
-      symlinkSync(elsewhere, join(second, '.qwen', 'tmp'));
+      symlinkSync(elsewhere, join(second, '.mariadb-shell-agent', 'tmp'));
       expect(
-        mountRootFor(join(second, '.qwen', 'tmp', 'review-pr-1')),
+        mountRootFor(
+          join(second, '.mariadb-shell-agent', 'tmp', 'review-pr-1'),
+        ),
       ).toBeNull();
     },
   );
@@ -3468,13 +3533,33 @@ describe('mountRootFor — the walk bound is geometry-aware', () => {
       // a writable surface, not the user's own layout.
       const anchor = tmp();
       const elsewhere = tmp();
-      mkdirSync(join(elsewhere, 'tmp', 'outer-wt', '.qwen', 'tmp', 'wt2'), {
-        recursive: true,
-      });
+      mkdirSync(
+        join(
+          elsewhere,
+          'tmp',
+          'outer-wt',
+          '.mariadb-shell-agent',
+          'tmp',
+          'wt2',
+        ),
+        {
+          recursive: true,
+        },
+      );
       const repo = join(anchor, 'repo');
-      mkdirSync(join(repo, '.qwen'), { recursive: true });
-      symlinkSync(join(elsewhere, 'tmp'), join(repo, '.qwen', 'tmp'));
-      const inner = join(repo, '.qwen', 'tmp', 'outer-wt', '.qwen', 'tmp');
+      mkdirSync(join(repo, '.mariadb-shell-agent'), { recursive: true });
+      symlinkSync(
+        join(elsewhere, 'tmp'),
+        join(repo, '.mariadb-shell-agent', 'tmp'),
+      );
+      const inner = join(
+        repo,
+        '.mariadb-shell-agent',
+        'tmp',
+        'outer-wt',
+        '.mariadb-shell-agent',
+        'tmp',
+      );
       expect(mountRootFor(join(inner, 'wt2'))).toBeNull();
 
       // ...and the same nested shape without the link mounts at the DEEPEST
@@ -3482,10 +3567,10 @@ describe('mountRootFor — the walk bound is geometry-aware', () => {
       const honest = tmp();
       const honestInner = join(
         honest,
-        '.qwen',
+        '.mariadb-shell-agent',
         'tmp',
         'outer-wt',
-        '.qwen',
+        '.mariadb-shell-agent',
         'tmp',
       );
       mkdirSync(join(honestInner, 'wt2'), { recursive: true });

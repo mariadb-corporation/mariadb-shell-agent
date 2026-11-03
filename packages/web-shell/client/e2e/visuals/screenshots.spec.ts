@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -537,7 +538,9 @@ for (const theme of THEMES) {
               },
               builtinTools: [{ name: 'read_file', tokens: 10_000 }],
               mcpTools: [{ name: 'mcp__github__create_issue', tokens: 5_000 }],
-              memoryFiles: [{ path: '/workspace/QWEN.md', tokens: 5_000 }],
+              memoryFiles: [
+                { path: '/workspace/MARIADB-SHELL-AGENT.md', tokens: 5_000 },
+              ],
               skills: [
                 {
                   name: 'review',
@@ -2307,7 +2310,7 @@ for (const theme of THEMES) {
       // `code_review`, and a readable workspace file behind it. Without a
       // scenario seeding all three, the whole detail view stays invisible to
       // the before/after preview.
-      const reviewPath = '.qwen/reviews/pr-1234.json';
+      const reviewPath = '.mariadb-shell-agent/reviews/pr-1234.json';
       const reviewDocument = {
         schemaVersion: 1,
         target: 'local',
@@ -2371,7 +2374,7 @@ for (const theme of THEMES) {
           held: 0,
         },
         outcomesRecorded: true,
-        markdownReportPath: '.qwen/reviews/pr-1234.md',
+        markdownReportPath: '.mariadb-shell-agent/reviews/pr-1234.md',
       };
       const reviewDocumentJson = JSON.stringify(reviewDocument);
       const scenario = createWebShellDaemonScenario({

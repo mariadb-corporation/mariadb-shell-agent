@@ -4,7 +4,7 @@
 
 ## Status and problem
 
-Proposed implementation for [#14460](https://github.com/QwenLM/qwen-code/issues/14460), based on main `b3c5d3ed1e67`. Automation runs appear as tasks, but cannot advertise or accept cancellation. Existing run settlement already maps the committed Turn outcome to `cancelled`.
+Proposed implementation for [#14460](https://github.invalid/QwenLM/qwen-code/issues/14460), based on main `b3c5d3ed1e67`. Automation runs appear as tasks, but cannot advertise or accept cancellation. Existing run settlement already maps the committed Turn outcome to `cancelled`.
 
 ## Goals and boundaries
 
@@ -34,9 +34,9 @@ The control-plane task projection, cancel coordinator and Hosted connector route
 
 ## Validation and acceptance
 
-First attempt the E2E plan with the global `qwen` baseline; then verify the local bundle and Java service. Cover claim-only and queued cancellation, active matching cancellation, sibling and foreground isolation, natural-completion races, repeat/reopen, unknown recovery, authorization, public/WebShell idempotency and parked reconciliation. Run affected TypeScript tests, root build/typecheck/bundle, Java focused tests and `mvn verify`; use disposable MySQL 8.4 and matching Hosted profiles for integration evidence. Record unavailable platform or deployed-environment acceptance explicitly.
+First attempt the E2E plan with the global `mariadb-shell-agent` baseline; then verify the local bundle and Java service. Cover claim-only and queued cancellation, active matching cancellation, sibling and foreground isolation, natural-completion races, repeat/reopen, unknown recovery, authorization, public/WebShell idempotency and parked reconciliation. Run affected TypeScript tests, root build/typecheck/bundle, Java focused tests and `mvn verify`; use disposable MySQL 8.4 and matching Hosted profiles for integration evidence. Record unavailable platform or deployed-environment acceptance explicitly.
 
-For [#14446](https://github.com/QwenLM/qwen-code/issues/14446), FG11d must now expect per-run task cancellation and an unchanged schedule, rather than `task_action_unavailable`. That tracker update accompanies the PR; it does not claim the complete fault round has run.
+For [#14446](https://github.invalid/QwenLM/qwen-code/issues/14446), FG11d must now expect per-run task cancellation and an unchanged schedule, rather than `task_action_unavailable`. That tracker update accompanies the PR; it does not claim the complete fault round has run.
 
 ## Risks and open questions
 

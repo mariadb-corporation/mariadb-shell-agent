@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,7 +13,7 @@ import { arePermissionBitsEnforced } from './test-utils/permission-bits.js';
 
 const installer = vi.hoisted(() => ({
   ensure: vi.fn(async () => ({
-    launcherPath: '/tmp/qwen-home/.qwen/browser-use/host.sh',
+    launcherPath: '/tmp/qwen-home/.mariadb-shell-agent/browser-use/host.sh',
     manifestPaths: [] as string[],
     installedPaths: [] as string[],
     ready: true,

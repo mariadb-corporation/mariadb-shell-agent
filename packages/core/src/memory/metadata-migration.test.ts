@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -312,9 +313,17 @@ describe('memory metadata migration', () => {
   );
 
   it('requires every visible project, user, and enabled team file to be structured', async () => {
-    const localProjectRoot = path.join(projectRoot, '.qwen', 'memory');
+    const localProjectRoot = path.join(
+      projectRoot,
+      '.mariadb-shell-agent',
+      'memory',
+    );
     const userRoot = path.join(tempDir, 'global', 'memories');
-    const teamRoot = path.join(projectRoot, '.qwen', 'team-memory');
+    const teamRoot = path.join(
+      projectRoot,
+      '.mariadb-shell-agent',
+      'team-memory',
+    );
     await write(
       'project/structured.md',
       [
@@ -366,7 +375,11 @@ describe('memory metadata migration', () => {
   });
 
   it('does not count disabled or untrusted team memory in readiness', async () => {
-    const teamRoot = path.join(projectRoot, '.qwen', 'team-memory');
+    const teamRoot = path.join(
+      projectRoot,
+      '.mariadb-shell-agent',
+      'team-memory',
+    );
     await fs.mkdir(teamRoot, { recursive: true });
     await fs.writeFile(
       path.join(teamRoot, 'legacy.md'),
@@ -1124,7 +1137,7 @@ describe('memory metadata migration', () => {
     delete process.env['QWEN_CODE_MEMORY_LOCAL'];
     clearAutoMemoryRootCache();
     const configuredRoot = getAutoMemoryRoot(projectRoot);
-    const localRoot = path.join(projectRoot, '.qwen', 'memory');
+    const localRoot = path.join(projectRoot, '.mariadb-shell-agent', 'memory');
     const configuredFile = path.join(configuredRoot, 'project', 'legacy.md');
     const localFile = path.join(localRoot, 'project', 'attacker.md');
     await fs.mkdir(path.dirname(configuredFile), { recursive: true });

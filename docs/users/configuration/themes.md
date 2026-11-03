@@ -1,10 +1,10 @@
 # Themes
 
-Qwen Code supports a variety of themes to customize its color scheme and appearance. You can change the theme to suit your preferences via the `/theme` command or the `"ui.theme"` configuration setting.
+MariaDB Shell Agent supports a variety of themes to customize its color scheme and appearance. You can change the theme to suit your preferences via the `/theme` command or the `"ui.theme"` configuration setting.
 
 ## Available Themes
 
-Qwen Code comes with a selection of pre-defined themes, which you can list using the `/theme` command within the CLI:
+MariaDB Shell Agent comes with a selection of pre-defined themes, which you can list using the `/theme` command within the CLI:
 
 - **Dark Themes:**
   - `ANSI`
@@ -26,7 +26,7 @@ Qwen Code comes with a selection of pre-defined themes, which you can list using
 
 ### Changing Themes
 
-1.  Enter `/theme` into Qwen Code.
+1.  Enter `/theme` into MariaDB Shell Agent.
 2.  A dialog or selection prompt appears, listing the available themes.
 3.  Using the arrow keys, select a theme. Some interfaces might offer a live preview or highlight as you select.
 4.  Confirm your selection to apply the theme.
@@ -35,13 +35,13 @@ Qwen Code comes with a selection of pre-defined themes, which you can list using
 
 ### Theme Persistence
 
-Selected themes are saved in Qwen Code's [configuration](../configuration/settings) so your preference is remembered across sessions.
+Selected themes are saved in MariaDB Shell Agent's [configuration](../configuration/settings) so your preference is remembered across sessions.
 
 ---
 
 ## Auto Theme Detection
 
-When the theme is set to `"auto"` (or left unset), Qwen Code automatically detects whether your terminal uses a dark or light background and selects the matching Qwen theme (`Qwen Dark` or `Qwen Light`).
+When the theme is set to `"auto"` (or left unset), MariaDB Shell Agent automatically detects whether your terminal uses a dark or light background and selects the matching Qwen theme (`Qwen Dark` or `Qwen Light`).
 
 ### How to enable
 
@@ -59,7 +59,7 @@ Or select **Auto** in the `/theme` dialog. This is the default behavior when no 
 
 ### Detection methods
 
-Qwen Code uses multiple detection methods in a fallback chain. At startup (async path), the order is:
+MariaDB Shell Agent uses multiple detection methods in a fallback chain. At startup (async path), the order is:
 
 | Priority | Method                  | Platform   | How it works                                                                                         |
 | -------- | ----------------------- | ---------- | ---------------------------------------------------------------------------------------------------- |
@@ -80,7 +80,7 @@ The first method that returns a result wins. The detected value is cached for th
 
 ## Custom Color Themes
 
-Qwen Code allows you to create your own custom color themes by specifying them in your `settings.json` file. This gives you full control over the color palette used in the CLI.
+MariaDB Shell Agent allows you to create your own custom color themes by specifying them in your `settings.json` file. This gives you full control over the color palette used in the CLI.
 
 ### How to Define a Custom Theme
 
@@ -178,25 +178,25 @@ The theme file must be a valid JSON file that follows the same structure as a cu
 }
 ```
 
-**Security Note:** For your safety, Qwen Code will only load theme files that are located within your home directory. If you attempt to load a theme from outside your home directory, a warning will be displayed and the theme will not be loaded. This is to prevent loading potentially malicious theme files from untrusted sources.
+**Security Note:** For your safety, MariaDB Shell Agent will only load theme files that are located within your home directory. If you attempt to load a theme from outside your home directory, a warning will be displayed and the theme will not be loaded. This is to prevent loading potentially malicious theme files from untrusted sources.
 
 ### Example Custom Theme
 
-<img src="https://gw.alicdn.com/imgextra/i1/O1CN01Em30Hc1jYXAdIgls3_!!6000000004560-2-tps-1009-629.png" alt=" " style="zoom:100%;text-align:center;margin: 0 auto;" />
+<img src="https://gw.alicdn.invalid/imgextra/i1/O1CN01Em30Hc1jYXAdIgls3_!!6000000004560-2-tps-1009-629.png" alt=" " style="zoom:100%;text-align:center;margin: 0 auto;" />
 
 ### Using Your Custom Theme
 
-- Select your custom theme using the `/theme` command in Qwen Code. Your custom theme will appear in the theme selection dialog.
+- Select your custom theme using the `/theme` command in MariaDB Shell Agent. Your custom theme will appear in the theme selection dialog.
 - Or, set it as the default by adding `"theme": "MyCustomTheme"` to the `ui` object in your `settings.json`.
 - Custom themes can be set at the user, project, or system level, and follow the same [configuration precedence](../configuration/settings) as other settings.
 
 ## Themes Preview
 
-|  Dark Theme  |                                                                                Preview                                                                                |  Light Theme  |                                                                                Preview                                                                                |
-| :----------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-|     ANSI     |     <img src="https://gw.alicdn.com/imgextra/i2/O1CN01ZInJiq1GdSZc9gHsI_!!6000000000645-2-tps-1140-934.png" style="zoom:30%;text-align:center;margin: 0 auto;" />     |  ANSI Light   |     <img src="https://gw.alicdn.com/imgextra/i2/O1CN01IiJQFC1h9E3MXQj6W_!!6000000004234-2-tps-1140-934.png" style="zoom:30%;text-align:center;margin: 0 auto;" />     |
-| Atom OneDark |     <img src="https://gw.alicdn.com/imgextra/i2/O1CN01Zlx1SO1Sw21SkTKV3_!!6000000002310-2-tps-1140-934.png" style="zoom:30%;text-align:center;margin: 0 auto;" />     |   Ayu Light   | <img src="https://gw.alicdn.com/imgextra/i3/O1CN01zEUc1V1jeUJsnCgQb_!!6000000004573-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> |
-|     Ayu      | <img src="https://gw.alicdn.com/imgextra/i3/O1CN019upo6v1SmPhmRjzfN_!!6000000002289-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> | Default Light | <img src="https://gw.alicdn.com/imgextra/i4/O1CN01RHjrEs1u7TXq3M6l3_!!6000000005990-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> |
-|   Default    |     <img src="https://gw.alicdn.com/imgextra/i4/O1CN016pIeXz1pFC8owmR4Q_!!6000000005330-2-tps-1140-934.png" style="zoom:30%;text-align:center;margin: 0 auto;" />     | GitHub Light  | <img src="https://gw.alicdn.com/imgextra/i4/O1CN01US2b0g1VETCPAVWLA_!!6000000002621-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> |
-|   Dracula    |     <img src="https://gw.alicdn.com/imgextra/i4/O1CN016htnWH20c3gd2LpUR_!!6000000006869-2-tps-1140-934.png" style="zoom:30%;text-align:center;margin: 0 auto;" />     |  Google Code  | <img src="https://gw.alicdn.com/imgextra/i1/O1CN01Ng29ab23iQ2BuYKz8_!!6000000007289-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> |
-|    GitHub    | <img src="https://gw.alicdn.com/imgextra/i4/O1CN01fFCRda1IQIQ9qDNqv_!!6000000000887-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> |     Xcode     | <img src="https://gw.alicdn.com/imgextra/i1/O1CN010E3QAi1Huh5o1E9LN_!!6000000000818-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> |
+|  Dark Theme  |                                                                                  Preview                                                                                  |  Light Theme  |                                                                                  Preview                                                                                  |
+| :----------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|     ANSI     |     <img src="https://gw.alicdn.invalid/imgextra/i2/O1CN01ZInJiq1GdSZc9gHsI_!!6000000000645-2-tps-1140-934.png" style="zoom:30%;text-align:center;margin: 0 auto;" />     |  ANSI Light   |     <img src="https://gw.alicdn.invalid/imgextra/i2/O1CN01IiJQFC1h9E3MXQj6W_!!6000000004234-2-tps-1140-934.png" style="zoom:30%;text-align:center;margin: 0 auto;" />     |
+| Atom OneDark |     <img src="https://gw.alicdn.invalid/imgextra/i2/O1CN01Zlx1SO1Sw21SkTKV3_!!6000000002310-2-tps-1140-934.png" style="zoom:30%;text-align:center;margin: 0 auto;" />     |   Ayu Light   | <img src="https://gw.alicdn.invalid/imgextra/i3/O1CN01zEUc1V1jeUJsnCgQb_!!6000000004573-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> |
+|     Ayu      | <img src="https://gw.alicdn.invalid/imgextra/i3/O1CN019upo6v1SmPhmRjzfN_!!6000000002289-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> | Default Light | <img src="https://gw.alicdn.invalid/imgextra/i4/O1CN01RHjrEs1u7TXq3M6l3_!!6000000005990-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> |
+|   Default    |     <img src="https://gw.alicdn.invalid/imgextra/i4/O1CN016pIeXz1pFC8owmR4Q_!!6000000005330-2-tps-1140-934.png" style="zoom:30%;text-align:center;margin: 0 auto;" />     | GitHub Light  | <img src="https://gw.alicdn.invalid/imgextra/i4/O1CN01US2b0g1VETCPAVWLA_!!6000000002621-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> |
+|   Dracula    |     <img src="https://gw.alicdn.invalid/imgextra/i4/O1CN016htnWH20c3gd2LpUR_!!6000000006869-2-tps-1140-934.png" style="zoom:30%;text-align:center;margin: 0 auto;" />     |  Google Code  | <img src="https://gw.alicdn.invalid/imgextra/i1/O1CN01Ng29ab23iQ2BuYKz8_!!6000000007289-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> |
+|    GitHub    | <img src="https://gw.alicdn.invalid/imgextra/i4/O1CN01fFCRda1IQIQ9qDNqv_!!6000000000887-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> |     Xcode     | <img src="https://gw.alicdn.invalid/imgextra/i1/O1CN010E3QAi1Huh5o1E9LN_!!6000000000818-2-tps-1140-934.png" alt=" " style="zoom:30%;text-align:center;margin: 0 auto;" /> |

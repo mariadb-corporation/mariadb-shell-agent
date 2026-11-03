@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -72,7 +73,7 @@ function sendContacts(
   } catch (error) {
     if (sendGenerationClosedError(res, error)) return;
     process.stderr.write(
-      'qwen serve: observed channel contacts unavailable.\n',
+      'mariadb-shell-agent serve: observed channel contacts unavailable.\n',
     );
     res.status(500).json({
       error: 'Observed channel contacts are unavailable.',

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -61,18 +62,21 @@ afterEach(() => {
 
 describe('plan-diff — the scratch directory guard', () => {
   it.skipIf(process.platform === 'win32')(
-    'refuses a symlinked .qwen/tmp before writing the plan',
+    'refuses a symlinked .mariadb-shell-agent/tmp before writing the plan',
     () => {
-      // A standalone plan-diff is a round's first writer into `.qwen/tmp`;
+      // A standalone plan-diff is a round's first writer into `.mariadb-shell-agent/tmp`;
       // the shared entry guard runs here too, so a workspace-planted link
       // refuses the command with nothing landed through it.
       const victim = realpathSync(mkdtempSync(join(tmpdir(), 'victim-')));
       try {
         writeFileSync(join(dir, 'diff.txt'), makeDiff('src/a.ts', 3));
-        mkdirSync(join(dir, '.qwen'), { recursive: true });
-        symlinkSync(victim, join(dir, '.qwen', 'tmp'));
+        mkdirSync(join(dir, '.mariadb-shell-agent'), { recursive: true });
+        symlinkSync(victim, join(dir, '.mariadb-shell-agent', 'tmp'));
         // The handler reports refusals as a non-zero exit code, not a throw.
-        run(join(dir, 'diff.txt'), join('.qwen', 'tmp', 'plan.json'));
+        run(
+          join(dir, 'diff.txt'),
+          join('.mariadb-shell-agent', 'tmp', 'plan.json'),
+        );
         expect(process.exitCode).toBe(1);
         expect(readdirSync(victim)).toEqual([]);
 

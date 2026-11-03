@@ -32,7 +32,7 @@ not authenticate other processes running as the same OS user.
 During discovery, an incompatible Qwen extension does not prevent a compatible
 profile from connecting within the normal connection timeout. If none connects,
 the request fails with `EXTENSION_VERSION_MISMATCH`, whose message identifies
-whether the extension or Qwen Code needs updating. Browser discovery surfaces
+whether the extension or MariaDB Shell Agent needs updating. Browser discovery surfaces
 this error instead of reporting an empty browser list, which it reports only
 for a plain `BROWSER_DISCONNECTED`. After a profile is selected, only that
 disconnected profile can supply this diagnostic; unrelated profiles cannot
@@ -80,7 +80,7 @@ persistent instance identity is not cleared by stopping a Browser Use session.
 
 ## Concurrent-session follow-up
 
-Tracked in [#11609](https://github.com/QwenLM/qwen-code/issues/11609).
+Tracked in [#11609](https://github.invalid/QwenLM/qwen-code/issues/11609).
 
 The [concurrent-session design](browser-use-concurrent-sessions.md), implemented
 with validation in progress, defines the shared Native Host topology and session

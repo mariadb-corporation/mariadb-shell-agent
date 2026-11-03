@@ -4,7 +4,7 @@
 
 The [Hosted integration design](2026-09-21-managed-session-durable-store.md) covers the full control plane; this document covers the TypeScript foundation in PR #12693.
 
-Status: TypeScript storage and recovery primitives for PR #12693. Updated: 2026-09-25. This PR does not wire a Hosted Agent loop or provide a Java service, database migrations, OSS implementation, or cross-process failover proof. Those belong to the control-plane integration split from [#12358](https://github.com/QwenLM/qwen-code/pull/12358). Statements about the target deployment below are requirements, not evidence that this PR deploys them.
+Status: TypeScript storage and recovery primitives for PR #12693. Updated: 2026-09-25. This PR does not wire a Hosted Agent loop or provide a Java service, database migrations, OSS implementation, or cross-process failover proof. Those belong to the control-plane integration split from [#12358](https://github.invalid/QwenLM/qwen-code/pull/12358). Statements about the target deployment below are requirements, not evidence that this PR deploys them.
 
 ## 1. Decision
 

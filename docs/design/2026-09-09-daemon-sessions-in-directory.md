@@ -2,13 +2,13 @@
 
 [English](2026-09-09-daemon-sessions-in-directory.md) | [简体中文](2026-09-09-daemon-sessions-in-directory.zh-CN.md)
 
-Status: implemented alongside this document. Lets a session `qwen serve`
+Status: implemented alongside this document. Lets a session `mariadb-shell-agent serve`
 drives be discovered and addressed like any other, and lets it send.
 
 ## Problem
 
 Only the interactive UI registered. A session the daemon drives was
-invisible to `qwen sessions ps`, absent from every peer's `list_agents`,
+invisible to `mariadb-shell-agent sessions ps`, absent from every peer's `list_agents`,
 and unable to send: `sendToPeer` reads this process's own registry record
 to learn its reply address, and with no record it reported the feature
 disabled. A user with a terminal open and a daemon session working in the
@@ -19,7 +19,7 @@ Three things stood in the way.
 ### One process, several sessions — one record
 
 The registry is keyed by PID, one `<pid>.json` per process. That was
-exactly right while a process meant a session. The `qwen --acp` child the
+exactly right while a process meant a session. The `mariadb-shell-agent --acp` child the
 daemon spawns hosts up to 32 sessions at once, each with its own id, name
 and working directory, and one record cannot describe them.
 
@@ -73,7 +73,7 @@ already carries the discriminator.
 **Exclude self by session id, re-read on a shared address.** The
 address is no longer evidence of identity, so it is out of the filter.
 A twin — the same session id under a second process, which
-`qwen --resume` creates — is still excluded, because that is what the id
+`mariadb-shell-agent --resume` creates — is still excluded, because that is what the id
 catches. One window remains: the id filter reads this session's record
 before the directory, and a re-id patch (`/clear`, or the re-assert a
 misaddressed frame triggers) can land in between, re-admitting this
@@ -134,7 +134,7 @@ from a process-wide capture.
 sweeps it, which is the same guarantee every other session has had; a
 graceful shutdown removes it immediately.
 
-**`qwen -p` still does not register.** A one-shot run measured in seconds
+**`mariadb-shell-agent -p` still does not register.** A one-shot run measured in seconds
 would mostly contribute stale records.
 
 **Outbound only.** A hosted session can send and receives its own

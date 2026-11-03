@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -45,6 +46,10 @@ import {
 } from '../../services/qwenDaemonProcess.js';
 import { isLoopbackHostname } from '../../services/daemonIdeConnection.js';
 import { probePreAuthHostGateRejection } from './preAuthHostGateProbe.js';
+import {
+  DaemonFetchBridge,
+  shouldBridgeDaemon,
+} from '../../services/daemonFetchBridge.js';
 
 /** Threshold (ms) before a completed task triggers a notification. */
 const LONG_TASK_THRESHOLD_MS = 20_000;
@@ -78,9 +83,9 @@ const DOT_ICON: Record<DotColor | 'default', string> = {
 };
 
 const AUTH_RELATED_QWEN_SETTINGS = [
-  'qwen-code.provider',
-  'qwen-code.apiKey',
-  'qwen-code.codingPlanRegion',
+  'mariadb-shell-agent.provider',
+  'mariadb-shell-agent.apiKey',
+  'mariadb-shell-agent.codingPlanRegion',
 ] as const;
 
 export function resolveQwenCliEntryPath(
@@ -145,6 +150,11 @@ export class WebViewProvider {
   private agentInitialized = false; // Track if agent has been initialized
   private isSyncingToVSCode = false; // Guard to prevent config change loop
   private readonly webShellPermissionOwners = new Map<vscode.Webview, string>();
+  // Browser-based hosts: the webview reaches the daemon through this bridge.
+  private bridgedDaemonBaseUrl: string | undefined;
+  private readonly daemonFetchBridge = new DaemonFetchBridge(
+    () => this.bridgedDaemonBaseUrl,
+  );
   // Track current ACP mode id to influence permission/diff behavior
   private currentModeId: ApprovalModeValue | null = null;
   private authState: boolean | null = null;
@@ -169,10 +179,11 @@ export class WebViewProvider {
   /** Guards against concurrent auth-restore / connection init */
   private initializationPromise: Promise<void> | null = null;
   private isReconnecting = false;
-  /** Timer for the deferred auto-auth launch inside doInitializeAgentConnection */
-  private autoAuthTimer: ReturnType<typeof setTimeout> | null = null;
-  /** Whether an explicit interactive auth flow is currently active */
-  private authFlowActive = false;
+  /**
+   * The provider setup wizard the webview shows (the last `authWizard`
+   * message), replayed when the webview reloads; null when it is closed.
+   */
+  private openAuthWizard: unknown = null;
   /** Timestamp (ms) when the current agent task started (first stream chunk) */
   private agentStartTime: number | null = null;
   /** Current tab-dot state: null = no dot, 'orange' = task done. */
@@ -204,7 +215,7 @@ export class WebViewProvider {
       (message) => this.sendMessageToWebView(message),
     );
 
-    // Set auth interactive handler — interactive auth flow (QuickPick → InputBox → write settings → reconnect)
+    // Set auth interactive handler — the setup wizard's answers (wizard → write settings → reconnect)
     this.messageHandler.setAuthInteractiveHandler(
       async (providerConfig, inputs) => {
         await this.handleAuthInteractive(providerConfig, inputs);
@@ -242,9 +253,9 @@ export class WebViewProvider {
           } else if (
             !synced &&
             this.agentInitialized &&
-            e.affectsConfiguration('qwen-code.apiKey')
+            e.affectsConfiguration('mariadb-shell-agent.apiKey')
           ) {
-            // Only de-auth when qwen-code.apiKey itself was cleared.
+            // Only de-auth when mariadb-shell-agent.apiKey itself was cleared.
             // Other auth-related settings (provider, codingPlanRegion) returning
             // synced=false is normal for api-key providers — those are managed by
             // the interactive auth flow, not VS Code Settings sync.
@@ -768,7 +779,9 @@ export class WebViewProvider {
           ).trim();
           const panelRef = this.panelManager.getPanel();
           if (panelRef) {
-            panelRef.title = title ? truncatePanelTitle(title) : 'Qwen Code';
+            panelRef.title = title
+              ? truncatePanelTitle(title)
+              : 'MariaDB Shell Agent';
           }
           return;
         }
@@ -885,26 +898,11 @@ export class WebViewProvider {
   }
 
   /**
-   * Launch the interactive auth flow (QuickPick → InputBox → write settings → reconnect).
-   * Guards against concurrent launches: if auto-auth was scheduled by
-   * doInitializeAgentConnection's deferred timeout, it is cancelled first.
+   * Open the provider setup wizard in the webview (wizard → write settings →
+   * reconnect). Opening it again while it is open restarts it.
    */
   async startInteractiveAuth(): Promise<void> {
-    // Cancel any pending auto-auth from doInitializeAgentConnection so we
-    // don't end up with two overlapping auth flows.
-    if (this.autoAuthTimer) {
-      clearTimeout(this.autoAuthTimer);
-      this.autoAuthTimer = null;
-    }
-    if (this.authFlowActive) {
-      return;
-    }
-    this.authFlowActive = true;
-    try {
-      await this.messageHandler.route({ type: 'auth' });
-    } finally {
-      this.authFlowActive = false;
-    }
+    await this.messageHandler.route({ type: 'auth' });
   }
 
   setInitialModelId(modelId: string | null | undefined): void {
@@ -915,7 +913,7 @@ export class WebViewProvider {
   }
 
   /**
-   * Sync VSCode extension settings (qwen-code.*) to ~/.qwen/settings.json
+   * Sync VSCode extension settings (mariadb-shell-agent.*) to ~/.mariadb-shell-agent/settings.json
    * if an API key is configured. This enables auto-connect on startup
    * without requiring the user to click "Connect" each time.
    *
@@ -946,7 +944,7 @@ export class WebViewProvider {
       writeCodingPlanConfig(region, apiKey);
 
       logger.log(
-        `[WebViewProvider] Synced VSCode settings → ~/.qwen/settings.json (provider=${provider})`,
+        `[WebViewProvider] Synced VSCode settings → ~/.mariadb-shell-agent/settings.json (provider=${provider})`,
       );
       return true;
     } catch (error) {
@@ -956,7 +954,7 @@ export class WebViewProvider {
   }
 
   /**
-   * Sync ~/.qwen/settings.json values back to VSCode Settings UI.
+   * Sync ~/.mariadb-shell-agent/settings.json values back to VSCode Settings UI.
    * This makes existing CLI-configured non-secret metadata visible in the
    * VSCode Settings page without mirroring credentials into settings.json.
    */
@@ -968,7 +966,7 @@ export class WebViewProvider {
       }
 
       logger.log(
-        '[WebViewProvider] Syncing ~/.qwen/settings.json → VSCode settings',
+        '[WebViewProvider] Syncing ~/.mariadb-shell-agent/settings.json → VSCode settings',
       );
 
       // Set guard to prevent onDidChangeConfiguration from triggering a write-back
@@ -996,7 +994,7 @@ export class WebViewProvider {
 
       if (updates.length === 0) {
         logger.log(
-          '[WebViewProvider] VSCode settings already match ~/.qwen/settings.json',
+          '[WebViewProvider] VSCode settings already match ~/.mariadb-shell-agent/settings.json',
         );
         return;
       }
@@ -1010,7 +1008,7 @@ export class WebViewProvider {
       }
     } catch (error) {
       logger.error(
-        '[WebViewProvider] Failed to sync qwen config to VSCode settings:',
+        '[WebViewProvider] Failed to sync mariadb-shell-agent config to VSCode settings:',
         error,
       );
     }
@@ -1018,9 +1016,9 @@ export class WebViewProvider {
 
   /**
    * Attempt to restore authentication state and initialize connection.
-   * On startup, sync ~/.qwen/settings.json → VSCode settings so the Settings UI
+   * On startup, sync ~/.mariadb-shell-agent/settings.json → VSCode settings so the Settings UI
    * reflects existing non-secret CLI config, then attempt a connection.
-   * Writing back to ~/.qwen/settings.json happens through the auth flow and
+   * Writing back to ~/.mariadb-shell-agent/settings.json happens through the auth flow and
    * auth-related VSCode setting changes.
    */
   private async attemptAuthStateRestoration(): Promise<void> {
@@ -1100,7 +1098,7 @@ export class WebViewProvider {
         // send authState message and return without creating session
         if (connectResult.requiresAuth && !autoAuthenticate) {
           logger.log(
-            '[WebViewProvider] Authentication required, launching auth flow...',
+            '[WebViewProvider] Authentication required, showing onboarding...',
           );
           this.sendMessageToWebView({
             type: 'authState',
@@ -1109,21 +1107,8 @@ export class WebViewProvider {
           // Initialize empty conversation to allow browsing history
           await this.initializeEmptyConversation();
 
-          // Auto-launch the interactive auth flow (QuickPick → InputBox)
-          // so the user is immediately guided to configure their provider,
-          // mirroring CLI's behavior of showing AuthDialog on first run.
-          // Deferred to avoid conflicting with the current connection init.
-          // The timer is stored so startInteractiveAuth() can cancel it
-          // to prevent two overlapping auth flows.
-          this.autoAuthTimer = setTimeout(() => {
-            this.autoAuthTimer = null;
-            if (!this.authFlowActive) {
-              this.authFlowActive = true;
-              void this.messageHandler.route({ type: 'auth' }).finally(() => {
-                this.authFlowActive = false;
-              });
-            }
-          }, 100);
+          // The onboarding screen's Get Started button opens the setup
+          // wizard; nothing starts on its own.
           return;
         }
 
@@ -1172,8 +1157,8 @@ export class WebViewProvider {
 
   /**
    * Handle auth interactive — interactive auth flow result.
-   * Writes provider config to ~/.qwen/settings.json and reconnects.
-   * Mirrors the CLI's `qwen auth coding-plan` / `qwen auth` flow.
+   * Writes provider config to ~/.mariadb-shell-agent/settings.json and reconnects.
+   * Mirrors the CLI's `mariadb-shell-agent auth coding-plan` / `mariadb-shell-agent auth` flow.
    */
   private async handleAuthInteractive(
     providerConfig: import('@qwen-code/qwen-code-core').ProviderConfig,
@@ -1584,6 +1569,19 @@ export class WebViewProvider {
     };
 
     switch (msg.type) {
+      case 'authWizard':
+        this.openAuthWizard = message;
+        break;
+      case 'authWizardDone':
+      case 'authSuccess':
+      case 'authCancelled':
+        this.openAuthWizard = null;
+        break;
+      default:
+        break;
+    }
+
+    switch (msg.type) {
       case 'authState':
         if (typeof msg.data?.authenticated === 'boolean') {
           this.authState = msg.data.authenticated;
@@ -1613,6 +1611,10 @@ export class WebViewProvider {
    * Sync important initialization state when the webview signals readiness.
    */
   private handleWebviewReady(): void {
+    if (this.openAuthWizard) {
+      this.sendMessageToWebView(this.openAuthWizard);
+    }
+
     if (this.currentModeId) {
       this.sendMessageToWebView({
         type: 'modeChanged',
@@ -1738,7 +1740,7 @@ export class WebViewProvider {
     const hostname = new URL(externalUrl).hostname;
     if (hostname.startsWith('[')) {
       throw new Error(
-        `Qwen Code cannot reach its daemon from this window: VS Code resolved it to "${externalUrl}", but the webview cannot connect to an IPv6 literal under its content security policy.`,
+        `MariaDB Shell Agent cannot reach its daemon from this window: VS Code resolved it to "${externalUrl}", but the webview cannot connect to an IPv6 literal under its content security policy.`,
       );
     }
     // This URL shares its payload with the daemon's bearer token. A
@@ -1747,7 +1749,7 @@ export class WebViewProvider {
     // that token away from a third-party host — so refuse here instead.
     if (!isLoopbackHostname(hostname)) {
       throw new Error(
-        `Qwen Code cannot reach its daemon from this window: VS Code resolved it to "${externalUrl}", which is not a forwarded loopback address.`,
+        `MariaDB Shell Agent cannot reach its daemon from this window: VS Code resolved it to "${externalUrl}", which is not a forwarded loopback address.`,
       );
     }
     return externalUrl;
@@ -1766,6 +1768,9 @@ export class WebViewProvider {
     message: { type: string; data?: unknown },
     webview: vscode.Webview,
   ): Promise<boolean> {
+    if (this.daemonFetchBridge.handle(message, webview)) {
+      return true;
+    }
     if (message.type === 'webShellPermissionState') {
       const data = message.data as
         | { pending?: unknown; requestId?: unknown }
@@ -1806,7 +1811,7 @@ export class WebViewProvider {
       if (!workspaceCwd) {
         await webview.postMessage({
           type: 'webShellBootstrapError',
-          data: { message: 'Open a folder to use Qwen Code.' },
+          data: { message: 'Open a folder to use MariaDB Shell Agent.' },
         });
         return true;
       }
@@ -1826,6 +1831,11 @@ export class WebViewProvider {
             this.context.extensionMode,
           ),
           canonicalWorkspaceCwd,
+          vscode.workspace
+            .getConfiguration('qwen-code')
+            .get<boolean>('experimentalLsp')
+            ? ['--experimental-lsp']
+            : [],
         );
         const serializedSessionId = getRestorableDaemonSessionId(
           this.messageHandler.getCurrentConversationId(),
@@ -1899,9 +1909,13 @@ export class WebViewProvider {
         const restoredSessionId = this.isViewHost
           ? viewSessionId
           : serializedSessionId;
-        const webviewBaseUrl = await this.resolveWebviewDaemonBaseUrl(
-          runtime.baseUrl,
-        );
+        // In a browser-based host the webview cannot reach this machine's
+        // loopback; it sends daemon requests through the extension host.
+        const daemonBridge = shouldBridgeDaemon();
+        this.bridgedDaemonBaseUrl = daemonBridge ? runtime.baseUrl : undefined;
+        const webviewBaseUrl = daemonBridge
+          ? runtime.baseUrl
+          : await this.resolveWebviewDaemonBaseUrl(runtime.baseUrl);
         // A remote window whose client-side forwarded port differs from the
         // daemon's bound port gets a pre-auth 403 from the Host gate on every
         // daemon call — bootstrapping would hand the shell a baseUrl whose
@@ -1911,6 +1925,7 @@ export class WebViewProvider {
         // browser can never read the 403; the extension host can, and the
         // probe never rejects.
         if (
+          !daemonBridge &&
           vscode.env.remoteName &&
           (await probePreAuthHostGateRejection(
             runtime.baseUrl,
@@ -1928,6 +1943,7 @@ export class WebViewProvider {
           data: {
             ...runtime,
             baseUrl: webviewBaseUrl,
+            daemonBridge,
             clientId: this.daemonClientId,
             workspaceCwd: canonicalWorkspaceCwd,
             // The daemon matches workspaces by canonical path, but every
@@ -1959,12 +1975,12 @@ export class WebViewProvider {
         this.daemonListenerHandles.push(
           this.daemonProcess.addExitListener(() =>
             postDaemonFailure(
-              'Qwen Code stopped unexpectedly. Reload the panel to restart it.',
+              'MariaDB Shell Agent stopped unexpectedly. Reload the panel to restart it.',
             ),
           ),
           this.daemonProcess.addSupersededListener(() =>
             postDaemonFailure(
-              'Qwen Code restarted against a different folder. Reload the panel to reconnect.',
+              'MariaDB Shell Agent restarted against a different folder. Reload the panel to reconnect.',
             ),
           ),
         );
@@ -2157,11 +2173,11 @@ export class WebViewProvider {
 
   /**
    * Show a VS Code notification with sound and a "Show" button that focuses
-   * the Qwen Code panel (or sidebar view) when clicked.
+   * the MariaDB Shell Agent panel (or sidebar view) when clicked.
    */
   private notifyUser(message: string): void {
     void vscode.window
-      .showInformationMessage(`Qwen Code: ${message}`, 'Show')
+      .showInformationMessage(`MariaDB Shell Agent: ${message}`, 'Show')
       .then((action) => {
         if (action === 'Show') {
           const panel = this.panelManager.getPanel();
@@ -2169,7 +2185,9 @@ export class WebViewProvider {
             panel.reveal();
           } else if (this.isViewHost) {
             // Sidebar view host: focus the view via its command.
-            void vscode.commands.executeCommand('qwen-code.focusChat');
+            void vscode.commands.executeCommand(
+              'mariadb-shell-agent.focusChat',
+            );
           }
         }
       });
@@ -2177,7 +2195,7 @@ export class WebViewProvider {
   }
 
   /**
-   * Whether the user can currently see the Qwen Code panel.
+   * Whether the user can currently see the MariaDB Shell Agent panel.
    * Only true when VS Code is the foreground app AND the panel tab is visible.
    * If either condition is false the user needs a notification.
    */
@@ -2188,7 +2206,7 @@ export class WebViewProvider {
     return windowFocused && panelVisible;
   }
 
-  /** Whether the qwen-code.notifications setting is enabled. */
+  /** Whether the mariadb-shell-agent.notifications setting is enabled. */
   private isNotificationsEnabled(): boolean {
     return vscode.workspace
       .getConfiguration('qwen-code')
@@ -2365,7 +2383,7 @@ export class WebViewProvider {
     // Ensure restored tab starts from default label and icon
     this.dotState = null;
     try {
-      panel.title = 'Qwen Code';
+      panel.title = 'MariaDB Shell Agent';
       panel.iconPath = vscode.Uri.joinPath(
         this.extensionUri,
         'assets',
@@ -2395,7 +2413,9 @@ export class WebViewProvider {
           ).trim();
           const panelRef = this.panelManager.getPanel();
           if (panelRef) {
-            panelRef.title = title ? truncatePanelTitle(title) : 'Qwen Code';
+            panelRef.title = title
+              ? truncatePanelTitle(title)
+              : 'MariaDB Shell Agent';
           }
           return;
         }
@@ -2610,6 +2630,7 @@ export class WebViewProvider {
    * Dispose the WebView provider and clean up resources
    */
   dispose(): void {
+    this.daemonFetchBridge.dispose();
     if (WebViewProvider.lastContextMenuProvider === this) {
       WebViewProvider.lastContextMenuProvider = null;
     }

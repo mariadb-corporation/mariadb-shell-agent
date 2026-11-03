@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -275,7 +276,7 @@ function makeHarness(
     getProviderCredential: vi.fn(
       () =>
         ({
-          endpoint: 'wss://dashscope.aliyuncs.com/api-ws/v1/realtime',
+          endpoint: 'wss://dashscope.aliyuncs.invalid/api-ws/v1/realtime',
           apiKey: 'secret',
           realtimeModel: 'qwen3.5-omni-plus-realtime',
           voice: 'Tina',

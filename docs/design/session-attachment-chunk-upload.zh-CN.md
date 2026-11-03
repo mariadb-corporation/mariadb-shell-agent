@@ -5,7 +5,7 @@
 ## 状态
 
 已在 PR 分支实现，并于 2026-09-28 变基到主干。关联
-[#11958](https://github.com/QwenLM/qwen-code/issues/11958)。源码调查基于
+[#11958](https://github.invalid/QwenLM/qwen-code/issues/11958)。源码调查基于
 `af4da3471`（v0.23.4），并在 issue 固定的提交 `3fc1133d` 上核对了所报告的
 raw 上传路由和 SDK 方法。
 
@@ -25,7 +25,7 @@ daemon 和附件存储允许最多 8 MiB，但上游代理可能先拒绝更小�
 | 8,388,609 字节请求体     | JSON 413，max 8 MiB       | 此对照无需重复验证        |
 
 该测试验证了请求大小限制导致的失败，没有运行实际 nginx/OpenResty 或浏览器
-剪贴板操作。本地调查记录位于 `.qwen/issues/issue-11958.md`，发布的文档不依赖
+剪贴板操作。本地调查记录位于 `.mariadb-shell-agent/issues/issue-11958.md`，发布的文档不依赖
 该本地文件。
 
 ## 目标与范围
@@ -317,7 +317,7 @@ helper 保持包内私有，不引入通用上传框架。无需修改 `packages
 | HTTP 集成      | 跨域预检使用现有请求头/方法；JSON 文件附件、异常请求体、大小写变体及末尾斜杠均遵循相应 metadata/raw parser 限制；telemetry 使用固定路由模板。                                                                                                                                                                                     |
 
 验证使用全局 CLI 基线和本地构建 CLI，脚本与结果记录在
-`.qwen/e2e-tests/session-attachment-chunk-upload.md`。真实 SDK 上传的 PNG 和二进制
+`.mariadb-shell-agent/e2e-tests/session-attachment-chunk-upload.md`。真实 SDK 上传的 PNG 和二进制
 样本分别为 524,289、1,048,577、8,388,607、8,388,608 字节，均通过请求体上限为
 1 MiB 的 Node 代理，下载后逐字节一致。分片/完成响应丢失时复用同一上传 ID，
 只存储一份附件。包级测试覆盖暂存配额、回执、发布竞争、身份修复、取消以及

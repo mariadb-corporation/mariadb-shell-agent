@@ -156,7 +156,9 @@ describe('SDK Java self-hosted workflow guards', () => {
       (s) => s.name === 'Install Node.js dependencies',
     );
     expect(install.env?.QWEN_SKIP_PREPARE).toBe('1');
-    expect(steps.map((s) => s.name).indexOf('Build Qwen Code')).toBeGreaterThan(
+    expect(
+      steps.map((s) => s.name).indexOf('Build MariaDB Shell Agent'),
+    ).toBeGreaterThan(
       steps.map((s) => s.name).indexOf('Install Node.js dependencies'),
     );
   });
@@ -169,8 +171,8 @@ describe('SDK Java self-hosted workflow guards', () => {
     const names = steps.map((s) => s.name);
     let previous = -1;
     for (const [name, run] of [
-      ['Build Qwen Code', 'npm run build'],
-      ['Bundle Qwen Code', 'npm run bundle'],
+      ['Build MariaDB Shell Agent', 'npm run build'],
+      ['Bundle MariaDB Shell Agent', 'npm run bundle'],
       ['Run Java daemon E2E', 'npx tsx scripts/run-java-daemon-sdk-e2e.ts'],
     ]) {
       const index = names.indexOf(name);
@@ -2304,7 +2306,7 @@ describe('SDK Java pre-checkout hygiene on the ECS pool', () => {
   const ci = parse(readFileSync('.github/workflows/ci.yml', 'utf8'));
   const ciSteps = Object.values(ci.jobs).flatMap((job) => job.steps ?? []);
   const ciSweep = ciSteps.find(
-    (s) => s.name === 'Clean stale .qwen before checkout',
+    (s) => s.name === 'Clean stale .mariadb-shell-agent before checkout',
   )?.run;
   const ciRestore = ciSteps.find(
     (s) => s.name === 'Restore workspace ownership',
@@ -2323,12 +2325,14 @@ describe('SDK Java pre-checkout hygiene on the ECS pool', () => {
   ];
 
   it.each(poolJobs)(
-    'restores ownership, sweeps stale .qwen, then checks out in %s %s',
+    'restores ownership, sweeps stale .mariadb-shell-agent, then checks out in %s %s',
     (file, name) => {
       const steps = docs[file].jobs[name].steps;
       const names = steps.map((s) => s.name);
       const restoreIdx = names.indexOf('Restore workspace ownership');
-      const sweepIdx = names.indexOf('Clean stale .qwen before checkout');
+      const sweepIdx = names.indexOf(
+        'Clean stale .mariadb-shell-agent before checkout',
+      );
       const checkoutIdx = steps.findIndex((s) =>
         String(s.uses ?? '').includes('actions/checkout'),
       );
@@ -2351,7 +2355,7 @@ describe('SDK Java pre-checkout hygiene on the ECS pool', () => {
         (s) => s.name === 'Restore workspace ownership',
       )?.run;
       const sweep = steps.find(
-        (s) => s.name === 'Clean stale .qwen before checkout',
+        (s) => s.name === 'Clean stale .mariadb-shell-agent before checkout',
       )?.run;
       expect(ciRestore).toBeDefined();
       expect(ciSweep).toBeDefined();

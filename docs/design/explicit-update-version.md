@@ -4,7 +4,7 @@ Issue: #11484
 
 [English](explicit-update-version.md) | [简体中文](explicit-update-version.zh-CN.md)
 
-`qwen update` currently discovers a release through npm before downloading it. An operator who already selected an exact release cannot install it when registry access is unavailable, even if release artifacts are reachable.
+`mariadb-shell-agent update` currently discovers a release through npm before downloading it. An operator who already selected an exact release cannot install it when registry access is unavailable, even if release artifacts are reachable.
 
 Add `--target-version` to the CLI update command. Validate and normalize the concrete version locally, skip version discovery, and reuse the standalone updater with that target. Without the option, preserve discovery and existing installation instructions. The existing `--version` option keeps its display-only meaning.
 

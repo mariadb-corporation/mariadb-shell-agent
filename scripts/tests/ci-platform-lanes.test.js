@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -982,7 +983,7 @@ describe('post-merge push lane', () => {
       'npm run generate:notices --workspace=@qwen-code/web-shell',
     );
     expect(generateNotices).toContain(
-      'npm run generate:notices --workspace=qwen-code-vscode-ide-companion',
+      'npm run generate:notices --workspace=mariadb-shell-agent',
     );
     expect(
       stepByName.get(
@@ -1432,11 +1433,11 @@ describe('platform lanes — a failing nightly is visible', () => {
     // produced: the run goes red on a branch nobody watches and the lane is
     // effectively off again.
     const wr = (failureIssue[true] ?? failureIssue['on']).workflow_run;
-    expect(wr.workflows).toContain('Qwen Code CI');
+    expect(wr.workflows).toContain('MariaDB Shell Agent CI');
     // Both sides of the binding: `workflow_run.workflows` matches the watched
     // workflow's `name:`, so renaming ci.yml silently unhooks the watcher and
     // the nightly goes back to failing where nobody is told.
-    expect(ci.name).toBe('Qwen Code CI');
+    expect(ci.name).toBe('MariaDB Shell Agent CI');
     // `workflow_run.workflows` matches the watched workflow's `name:` key:
     // pin the coupling itself, so renaming ci.yml's name fails here instead
     // of silently stopping the nightly's workflow_run events.

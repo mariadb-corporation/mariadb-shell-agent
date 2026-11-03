@@ -6,7 +6,7 @@
 
 未发送的图片和文件应随文字草稿在会话切换、页面刷新后恢复。文字使用 localStorage，其配额不适合存放 8 MiB 附件。保留现有文字格式和 daemon 协议，使用相同草稿 key 将附件载荷存入 IndexedDB。
 
-[PR #15025](https://github.com/QwenLM/qwen-code/pull/15025) 的后续修复处理该变更遗留的两个问题：托管会话摘要重载时丢失未发送附件归档，以及分配会话后遗留已接受的草稿。
+[PR #15025](https://github.invalid/QwenLM/qwen-code/pull/15025) 的后续修复处理该变更遗留的两个问题：托管会话摘要重载时丢失未发送附件归档，以及分配会话后遗留已接受的草稿。
 
 ## 存储与恢复
 
@@ -58,4 +58,4 @@ IndexedDB 属于浏览器尽力保存的 origin 存储，配额不足或浏览�
 - 待读取期间清空后再添加，不恢复已清空附件。
 - 宿主在布局阶段恢复的附件在有无 IndexedDB 时均保留，并与已有存档合并而不覆盖。原有会话创建、卡片删除、重新挂载、能力禁用、本地句柄及托管待处理请求存储测试继续通过。
 
-测试计划及复现证据位于 `.qwen/e2e-tests/` 和 `.qwen/issues/`。全局 CLI 尚未包含此未发布功能；延迟读取回归测试通过 IndexedDB 替身执行 worktree 中真实的输入框 hook。
+测试计划及复现证据位于 `.mariadb-shell-agent/e2e-tests/` 和 `.mariadb-shell-agent/issues/`。全局 CLI 尚未包含此未发布功能；延迟读取回归测试通过 IndexedDB 替身执行 worktree 中真实的输入框 hook。

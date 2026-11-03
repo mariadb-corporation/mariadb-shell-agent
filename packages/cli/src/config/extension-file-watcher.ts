@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -170,7 +171,7 @@ export class ExtensionFileWatcher {
       const configured = extension.config.contextFileName;
       const names =
         configured === undefined
-          ? ['QWEN.md']
+          ? ['MARIADB-SHELL-AGENT.md']
           : Array.isArray(configured)
             ? configured
             : [configured];

@@ -177,7 +177,7 @@ The bridge handler:
    `external_tool_guard/prepare` binding pattern;
 5. applies the same exact source allow-list as the form: no parent, no
    `sourceId`, and `sourceType` absent or `default`; and
-6. delegates to a host callback installed only by `qwen serve` runtimes that
+6. delegates to a host callback installed only by `mariadb-shell-agent serve` runtimes that
    manage scheduled-task sessions.
 
 The prompt match prevents an accidental busy-sibling binding on a connection
@@ -333,7 +333,7 @@ for every API client.
 ### Write the task file directly from `cron_create`
 
 This bypasses daemon runtime ownership, capacity and generation checks, and
-cannot safely promise keepalive outside `qwen serve`.
+cannot safely promise keepalive outside `mariadb-shell-agent serve`.
 
 ### Defer creation until the tool turn ends
 

@@ -2,7 +2,7 @@
 
 [English](2026-09-18-web-shell-git-worktree-manager.md) | [简体中文](2026-09-18-web-shell-git-worktree-manager.zh-CN.md)
 
-状态：已实现。属于 [#11941](https://github.com/QwenLM/qwen-code/issues/11941)；同一 issue 中的提交历史泳道图与搜索见 [2026-09-18-web-shell-git-history-graph.zh-CN.md](2026-09-18-web-shell-git-history-graph.zh-CN.md)。
+状态：已实现。属于 [#11941](https://github.invalid/QwenLM/qwen-code/issues/11941)；同一 issue 中的提交历史泳道图与搜索见 [2026-09-18-web-shell-git-history-graph.zh-CN.md](2026-09-18-web-shell-git-history-graph.zh-CN.md)。
 
 ## 问题
 
@@ -10,7 +10,7 @@ Web Shell 用户可以在 worktree 中开会话，但 Web Shell 里没有任何�
 
 ## 现状
 
-- `packages/core/src/services/gitWorktreeService.ts` 中的 `GitWorktreeService` 为会话在 `<workspace>/.qwen/worktrees/<slug>` 下创建与删除托管 worktree，daemon 的 `POST /session` 在请求要求 worktree 时创建一个。没有任何 daemon 路由列出 worktree。
+- `packages/core/src/services/gitWorktreeService.ts` 中的 `GitWorktreeService` 为会话在 `<workspace>/.mariadb-shell-agent/worktrees/<slug>` 下创建与删除托管 worktree，daemon 的 `POST /session` 在请求要求 worktree 时创建一个。没有任何 daemon 路由列出 worktree。
 - 住在托管 worktree 里的会话，其摘要（无论活跃还是持久化）都带 `worktree: { slug, path, branch }`。
 - `packages/web-shell/client/components/dialogs/GitDialog.tsx` 中的 `GitDialog` 承载「变更」「提交历史」「拉取请求」三个标签页；拉取请求标签页由 daemon 能力特性门控。
 - `exit_worktree` 拒绝删除有未提交改动的 worktree，除非调用方明确选择丢弃。
@@ -38,7 +38,7 @@ Web Shell 用户可以在 worktree 中开会话，但 Web Shell 里没有任何�
 
 三条工作区限定路由，全部为 **selected-runtime 作用域**：为 `:workspace` 解析受信任的 runtime，断言其 generation 打开，只对该 runtime 的 `workspaceCwd` 操作。没有任何一条回退到主 runtime。唯一一处刻意的例外是删除拒绝里的会话计数，见下文。
 
-- `GET /workspaces/:workspace/git/worktrees` 列出条目并附两个派生标记：`isWorkspace`（runtime 自己的检出，按真实路径比较）与 `slug`（位于该 runtime `.qwen/worktrees/` 下的条目的目录名）。非仓库返回 `available: false`。
+- `GET /workspaces/:workspace/git/worktrees` 列出条目并附两个派生标记：`isWorkspace`（runtime 自己的检出，按真实路径比较）与 `slug`（位于该 runtime `.mariadb-shell-agent/worktrees/` 下的条目的目录名）。非仓库返回 `available: false`。
 - `GET /workspaces/:workspace/git/worktrees/status?path=` 返回某个已列出 worktree 的工作树计数。path 必须与列表条目精确匹配，否则 404，因此客户端无法把这个探测指向别处。真正的边界是这份列表本身，而仓库可以塑造它：`git worktree list` 由本仓库自己的 `.git/worktrees/*/gitdir` 文件构成，因此能写入该目录的人可以让工作区之外的某个路径出现在列表里。可读性判定把这种泄露收窄到“`.git` 是 gitfile”的路径，其它一律答 `available: false`。代价是仓库 admin 目录的写权限，泄露的是该路径的分支、是否游离、改动计数与 ahead/behind。这些计数就是 git 自己显示的那一组，不带删除闸门对 `status.showUntrackedFiles` 的覆盖，也不带它那一项未完成操作，因此某一行可能显示「干净」而第一次点击仍被拒——这个方向是安全的，拒绝本身会解释原因。
 - `POST /workspaces/:workspace/git/worktrees/remove`，请求体 `{ path, force? }`，走严格变更门。无论 `force` 与否都拒绝主工作树，以及根在该 worktree 上或其下的任何已注册工作区（409 `worktree_is_main` / `worktree_is_workspace`，后者在 `workspaceCwd` 里点名是哪个工作区——它可能就扎在这个 worktree 底下）。不带 `force` 时，还会在该 worktree 有活跃会话（409 `worktree_in_use`，附 `sessions`；有运行中会话的 worktree 记录读不了时另附 `sessionsUnknown`）、工作树有暂存/未暂存/未跟踪/冲突条目（409 `worktree_dirty`，附 `changes`；读取时覆盖 `status.showUntrackedFiles`，因为把未跟踪文件藏起来的仓库同样把它们对 git 自身的安全检查藏了起来）、有未完成的 rebase/merge/cherry-pick/revert/bisect（409 `worktree_operation_in_progress`，这种情况四个计数全为零）、游离 HEAD 的 worktree 是其自身提交最后的指向者（409 `worktree_unmerged_commits`，附 `unmergedHead`）、worktree 已加锁（409 `worktree_locked`，git 记录了理由时附 `reason`，并像其它 git 文本一样脱敏与截断——这段理由是任何能在该仓库里跑 git 的人写的）无法读取工作树（409 `worktree_status_unknown`），或该 worktree 自己持有嵌套仓库（409 `worktree_nested_repository`，子模块的仓库会随删除一起消失——git 只在检出还在时才拒绝，检出没了就一声不响地拿走）时拒绝。是否有嵌套仓库查不清时——探测超时、git 读不了索引、daemon 无权列出某个目录、路径不是 UTF-8——同一个代码返回，但带的是 `submodulesUnknown` 而不是 `submodules`：探测失败不等于看过，第二次点击由用户在知情下决定。每一条拒绝都从同一个出口返回，由它附上第二次点击还会拿走的其余部分——计数、未完成的操作、没有引用保住的提交、嵌套的仓库，或者「这些根本数不出来」这件事：第二次点击会一次性覆盖全部拒绝，而未提交的工作是回不来的那部分。锁是从列表里读出来的，因此根本不会去问 git——但仅限 `--force --force` 真能清掉的情形，也就是 git 仍够得着的检出、或路径上什么都不剩的条目。悬空的符号链接不算「什么都不剩」：git 会找到这个链接并在它上面校验失败，因此这一形态与「目录尚在而 gitfile 丢失」一样交回给 git，因为在那里给出第二次点击根本落不了地；git 自己做出的其它拒绝，只要什么都没发生且 git 仍够得着该检出，就以 409 `worktree_remove_refused` 返回，`detail` 里是 git 脱敏后的原话；该 worktree 自己持有嵌套仓库时——检出里已初始化的子模块，或者没有检出可问时子模块留在 admin 目录下的那个仓库（检出还在时 git 正是据此拒绝，检出没了它就一声不响地删掉）——每一条拒绝都附 `submodules`；检出那一半读的是索引，git 自己也看那里，而且是一条一条读的：索引有多大取决于仓库有多大，一次读爆缓冲区的读取会答成「这里没有东西可丢」——因为强制删除会把它一并删掉，而没有任何计数看得见它。git 已经够不着的条目跳过工作树探测，状态路由对它直接返回 `available: false`。判据是 `<path>/.git` 是不是一个 gitfile——git 正是通过它找到链接 worktree，而这也正是那条会出错的向上搜索的第一步：`getGitWorkingTreeStatus` 从给定路径一路*向上*解析仓库，对托管 worktree 来说会越过这个坏掉的条目，答出**主**工作树的分支与计数，并挂在被询问的那个 worktree 名下。那里如果是一个 `.git` **目录**，则是别人在原地新建的另一个仓库，答出它的分支同样是归错了对象，因此只有主工作树的那个算数。git 自己的 prunable 标记也不能当判据，因为**加锁**的 worktree 即使 gitfile 已经丢失也不会被标记。删除按路径进行——`git worktree remove` 只摘掉一条注册，仓库里其它过期注册不受影响。git 先删检出、再摘注册，而删不掉检出（只读子目录、被别的进程占着的文件）并不会阻止摘注册，因此一次报错并不意味着什么都没发生——注册可能已经被摘掉，而本路由删的就是注册。所以删除报错时会对照列表再查一次：本路由删的就是注册，注册已经没了就是办成了，而不是报一个重试会得到 404 的失败。回退对任何已被 git 标记为 prunable 的注册生效——这个标记正是「prune 能清掉它」的唯一依据。能走到这里的有两种形态：目录尚在、只是 gitfile 丢失的那种，以及路径上已经不是目录的那种（可达的例子是悬空符号链接）。git 对这两种都按路径、在任何 force 级别拒绝，而 prune 对两者都能清掉。git 拒绝却**不**标记 prunable 的那些形态见「约束」，回退对它们不生效。prune 是仓库级的（git 没有按路径的形式），因此路由在其间给其它所有过期注册加锁——git 会跳过加锁的 worktree，并且不再把加锁的条目标记为 prunable——事后再解锁。但列表与 prune 会清掉的并不是同一个集合：gitdir 文件丢失或为空的注册不出现在列表里、也无法加锁，却照样会被清掉。因此保护是对着 `git worktree prune -n -v` 验证的——它会点名 prune 将要拿走的每一个 admin 目录；除非它回来时恰好只点名一条注册、并且点的就是被询问的那一条——每个条目都带着它 admin 侧记录的 worktree，而这份记录在 worktree 自己的 gitfile 丢失之后依然在——否则路由就报出 git 的拒绝而不执行 prune：删除失败可以重试，旁观者的提交不能。本身是链接的 admin 条目永不归属，并且一律算作阻止 prune 的理由：prune 会跟随指向目录的链接、把它指向的目录清空，而链接指向哪里只有 dry run 看的那一刻才知道——在 prune 运行之前于其目标处建起的目录，就是 prune 会清空的那个。这句话说的是 dry run 看到的东西；在 dry run 与 prune 之间改动 `.git/worktrees` 的写入者是在与 git 本身赛跑，git 之外的任何东西都关不上这个窗口。中途夭折的删除留下的锁带着标明本路由的理由，下一次删除该条目时会将其释放——git 在任何 force 级别都拒绝加锁的 worktree，prune 也会跳过它。prune 不删除工作树里的任何文件；但它确实会删掉 admin 目录，而过期条目的 HEAD、reflog 以及子模块留下的仓库都住在那里——这正是保护机制要避免落到旁观者头上的事。又因为在本次请求读取列表之后才加上的锁会让 prune 静默跳过该条目，路由在 prune 之后重新列举一次，宁可把 git 自己的拒绝抛出，也不谎报一次并未发生的删除。成功响应在路径上还剩着任何东西时带 `directoryRemains`——用 `lstat` 判断，因此留下的符号链接也算；而当 daemon 根本看不到该路径时，一律按「还剩着」回报，因为它看不住的那次删除，恰恰就是会留下整份检出的那次。prune 回退与没做完的删除留下的都是这种局面。git 失败经共享的脱敏 git 错误路径返回。这些路由启动的 git 进程——状态探测也在内——都在该工作区自己的环境里运行，并去掉会把 git 指向别的仓库的那些变量；generation 也会在让 git 删除或 prune 之前立即再问一次，而不只是在回答之前。
 
@@ -63,7 +63,7 @@ Web Shell 用户可以在 worktree 中开会话，但 Web Shell 里没有任何�
 ## 约束
 
 - 删除 worktree 时，运行 git 会剥掉仓库可指定为程序的那些配置键，与 core 里其它 git 辅助函数一致。worktree 自己的 `.git/config` 可以指定 `core.fsmonitor`，而未强制删除所做的状态检查会触发索引刷新、进而运行它。
-- worktree 列表是仓库级的，因此包含在 Qwen Code 之外创建的 worktree。它们可以像其它条目一样删除，受同样的拒绝规则约束。
+- worktree 列表是仓库级的，因此包含在 MariaDB Shell Agent 之外创建的 worktree。它们可以像其它条目一样删除，受同样的拒绝规则约束。
 - 作为另一个已注册工作区根的 worktree 仍会显示删除按钮，因为行上的 `isWorkspace` 标记回答的是“是不是当前工作区”，而拒绝覆盖所有已注册工作区。daemon 在任何 force 级别都拒绝它，所以这个按钮不会破坏任何东西，但也永远不会成功。在协议上标记它属于后续工作。
 - 有几种损坏形态在标签页里根本清不掉，因为 git 在任何 force 级别都拒绝，而 prune 要么跳过、要么不适用：加锁且 gitfile 丢失的、`.git` 是目录的（有人在原地新建了仓库）、以及 `.git` 虽是普通文件但并非有效 gitfile 的——内容 git 读不懂、指向的目录不存在、或回指到另一个仓库。git 不会把它们标记为 prunable，因此回退不会触发。锁那条分支会先判断强制能不能奏效再给出第二次点击，但它判断的是 `.git` 的**形态**而非内容，因此最后那一组里若同时加了锁，仍会拿到一次注定失败的强制。出路是到终端里手动处理。仅仅加锁、其余健康的 worktree **不**属于这一类：`--force --force` 能清掉锁，这正是加锁拒绝可被强制覆盖的原因。
 - 并非每一种拒绝都能被路由预先判断。git 拒绝删除含已初始化子模块的 worktree，同时又把这个 worktree 判为干净，因此没有任何计数或列表标记能提前看出来；它在 `--force --force` 下可以清掉。与其逐条枚举 git 的拒绝，不如：未强制的删除若失败且注册仍在，一律回 `worktree_remove_refused` 并带上 git 自己的那句话，标签页给出与脏检出相同的第二次点击。已经 force 过的失败不再提供，git 够不着的检出也不提供。

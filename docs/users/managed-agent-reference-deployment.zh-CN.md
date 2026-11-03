@@ -37,13 +37,13 @@ sha256sum --check SHA256SUMS
 
 - 可信应用主机使用 Linux。
 - JDK 21 或更高版本。
-- Node.js 满足 `compatibility.node`，Qwen Code 匹配 `compatibility.qwenCodeVersion`。
+- Node.js 满足 `compatibility.node`，MariaDB Shell Agent 匹配 `compatibility.qwenCodeVersion`。
 - MySQL 8，使用空数据库或由旧版兼容参考分发产物管理的数据库。
 - Harness 使用的模型服务，例如兼容 OpenAI 的服务端点及其模型 ID 和 API key。
 - 私有、持久的 Workspace 目录；第 2 档还需要 Runtime state 目录。
 - 稳定保存于压缩包之外的数据库凭据和 Harness token；第 2 档还需要 Runtime credential key ring。
 
-Java 压缩包不包含 npm CLI。请单独安装或构建精确兼容的 Qwen Code revision：Harness 以 `qwen serve` 运行它，第 2 档的 Runtime worker 运行它的 `dist/cli.js`。
+Java 压缩包不包含 npm CLI。请单独安装或构建精确兼容的 MariaDB Shell Agent revision：Harness 以 `mariadb-shell-agent serve` 运行它，第 2 档的 Runtime worker 运行它的 `dist/cli.js`。
 
 ### 生成凭据
 
@@ -57,20 +57,20 @@ token 与 digest，以及工具路径所需的 Broker URL 和 token，只写入 
 
 `server.env` 在 `QWEN_MANAGED_AGENT_WORKSPACE_CWD` 中把 `/srv/qwen-workspace` 写为 Workspace 目录；请创建该目录，或把该变量改为一个已存在的目录。Session Store 从该目录推导 workspace ID，因此已有 Session 后不要再改。
 
-`mysql-setup.sql` 创建 `qwen_managed_agent` 数据库和 `server.env` 中写明的 `qwen` 账号（`localhost` 与 `127.0.0.1` 各一个），并授予 Flyway 需要的 `performance_schema` 权限。以 MySQL 管理员身份运行一次，例如 `mysql -u root < config/mysql-setup.sql`，然后删除它；密码保存在 `server.env` 中。它遇到第一条失败的语句就停止，因此不会改动已有的数据库或账号。容器中的 MySQL 看到的是网关地址而不是 `127.0.0.1`，此时请为那个主机创建账号。
+`mysql-setup.sql` 创建 `qwen_managed_agent` 数据库和 `server.env` 中写明的 `mariadb-shell-agent` 账号（`localhost` 与 `127.0.0.1` 各一个），并授予 Flyway 需要的 `performance_schema` 权限。以 MySQL 管理员身份运行一次，例如 `mysql -u root < config/mysql-setup.sql`，然后删除它；密码保存在 `server.env` 中。它遇到第一条失败的语句就停止，因此不会改动已有的数据库或账号。容器中的 MySQL 看到的是网关地址而不是 `127.0.0.1`，此时请为那个主机创建账号。
 
 systemd 布局下，以 root 身份运行并传入 `--directory /etc/qwen-managed-agent --service-user qwen-managed-agent`。此时 `harness.env` 与 `application.yml` 归服务账号所有，`server.env` 为 `0640 root:qwen-managed-agent`，新建的目录为 `0750 root:qwen-managed-agent`，`mysql-setup.sql` 仍归 root。账号不存在、或账号无法进入该目录时，bootstrap 拒绝执行。`server.env` 还会记录 `QWEN_MANAGED_AGENT_SERVICE_USER`，因此即使以 root 身份运行预检，它也会按该账号检查文件访问权限。
 
 ### 启动 Hosted Harness
 
-用 `config/harness.env` 启动 Harness，并配置它调用的模型。该文件包含 Harness 的 token、capability digest 和 Broker 配置。Qwen Code 从 `OPENAI_API_KEY`、`OPENAI_BASE_URL` 和 `OPENAI_MODEL` 读取兼容 OpenAI 的模型服务；其他服务见[认证说明](https://github.com/QwenLM/qwen-code/blob/main/docs/users/configuration/auth.md)。
+用 `config/harness.env` 启动 Harness，并配置它调用的模型。该文件包含 Harness 的 token、capability digest 和 Broker 配置。MariaDB Shell Agent 从 `OPENAI_API_KEY`、`OPENAI_BASE_URL` 和 `OPENAI_MODEL` 读取兼容 OpenAI 的模型服务；其他服务见[认证说明](https://github.invalid/QwenLM/qwen-code/blob/main/docs/users/configuration/auth.md)。
 
 ```bash
 set -a; . config/harness.env; set +a
 export OPENAI_API_KEY='<model-api-key>'
 export OPENAI_BASE_URL='https://<openai-compatible-endpoint>/v1'
 export OPENAI_MODEL='<model-id>'
-qwen serve --profile hosted-harness --port 4170 --hostname 127.0.0.1 --no-web
+mariadb-shell-agent serve --profile hosted-harness --port 4170 --hostname 127.0.0.1 --no-web
 ```
 
 systemd 布局下，改为把这三个模型变量以纯 `KEY=value` 行写入 `harness.env`。
@@ -85,7 +85,7 @@ export QWEN_MANAGED_AGENT_CAPABILITY_DIGEST='sha256:<64-hex-digest>'
 
 QWEN_SERVER_TOKEN="$QWEN_MANAGED_AGENT_HARNESS_TOKEN" \
 QWEN_HOSTED_HARNESS_CAPABILITY_DIGEST="$QWEN_MANAGED_AGENT_CAPABILITY_DIGEST" \
-qwen serve --profile hosted-harness --port 4170 --hostname 127.0.0.1 --no-web
+mariadb-shell-agent serve --profile hosted-harness --port 4170 --hostname 127.0.0.1 --no-web
 ```
 
 ### 预检
@@ -99,7 +99,7 @@ bin/qwen-managed-agent-server --check
 
 检查范围包括 JDK、服务账号、配置文件及其权限、凭据密钥环、启动期属性校验、auth 与绑定组合、Harness、Workspace files 与 Shell 的交叉配置（含 mount、creation root 或 SSH 节点要求）、Broker 凭据与目录、Workspace `cwd`、端口占用、上次运行遗留的 Runtime worker，以及 MySQL 连通性、`performance_schema` 授权和 Flyway 版本与 `manifest.json` 的一致性。`WARN` 与 `SKIP` 不导致失败；任一 `FAIL` 退出码为 1。
 
-`harness` 行会像第一个 Session 那样与单个配置的 Harness 协商；使用 Harness pool 时，只有在 Session Store 已启用且配置了 binding key 后，才对 pool 的端点跳过，否则报 FAIL。capability digest 不一致、缺少协议或必需的 feature、或者 Harness 缺少某个已配置 Workspace profile 所需的 lifecycle 时报 FAIL；Harness 运行的 Qwen Code 版本与 `manifest.json` 写明的不同，或者 Harness 没有说明版本时报 WARN。端口检查会像服务端一样实际绑定配置地址，因此刚停止的服务端留在 `TIME_WAIT` 的端口算作空闲；`workers` 行会对仍在 Runtime 状态目录中运行的 worker 给出警告，因此应先停止服务。服务运行期间请加上 `--online`：端口相关的行改为检查是否有进程在监听；`workers` 行只报告已停止的服务端遗留的 worker，对持久模式的 Broker 则跳过，因为它会接管这些 worker。该命令不校验原生 Workspace storage 注册。
+`harness` 行会像第一个 Session 那样与单个配置的 Harness 协商；使用 Harness pool 时，只有在 Session Store 已启用且配置了 binding key 后，才对 pool 的端点跳过，否则报 FAIL。capability digest 不一致、缺少协议或必需的 feature、或者 Harness 缺少某个已配置 Workspace profile 所需的 lifecycle 时报 FAIL；Harness 运行的 MariaDB Shell Agent 版本与 `manifest.json` 写明的不同，或者 Harness 没有说明版本时报 WARN。端口检查会像服务端一样实际绑定配置地址，因此刚停止的服务端留在 `TIME_WAIT` 的端口算作空闲；`workers` 行会对仍在 Runtime 状态目录中运行的 worker 给出警告，因此应先停止服务。服务运行期间请加上 `--online`：端口相关的行改为检查是否有进程在监听；`workers` 行只报告已停止的服务端遗留的 worker，对持久模式的 Broker 则跳过，因为它会接管这些 worker。该命令不校验原生 Workspace storage 注册。
 
 首次启动前数据库是空的：`database` 行报告 schema 尚未迁移，`capacity` 行报 WARN，提示它要读的表不存在。首次启动会建好这些表，之后两行都通过。
 
@@ -188,13 +188,13 @@ export QWEN_MANAGED_AGENT_RUNTIME_WORKER_ENTRY='/opt/qwen-code/dist/cli.js'
 export QWEN_MANAGED_AGENT_RUNTIME_VERIFIED_WORKSPACE_RECOVERY_ENABLED='true'
 ```
 
-Hosted Harness 通过它自己的环境访问同一个 Broker，既不经命令行，也不经上面这些控制面变量：在 `harness.env`（或启动 Harness 的环境）中设置 `QWEN_MANAGED_RUNTIME_BROKER_URL='http://127.0.0.1:4182'`，并把 `QWEN_MANAGED_RUNTIME_BROKER_TOKEN` 设为 Broker token。`qwen serve` 读取后会把这两个变量从自己的环境中删除，因此 Harness 启动的进程都不会继承该 token；控制面也会把 `QWEN_MANAGED_RUNTIME_BROKER_` 开头的变量挡在 Runtime worker 之外。使用 bootstrap 生成的文件时，`harness.env` 已包含这两项，控制面也从该文件读取 Broker token，因此不要设置 `QWEN_MANAGED_AGENT_RUNTIME_BROKER_TOKEN`；两份都设置时拒绝启动。Harness 的这两行要么同时设置，要么都不设置，并且每行都写成普通的 `KEY=value`：只有其中一行或其中一行为空的文件（Harness 同样会拒绝），以及 systemd 会忽略的 `export KEY=value` 这类写法，都会拒绝启动。预检的 `broker-url` 行按 Harness 的 URL 解析器的方式读取文件中的 URL，因此 `http://127.1:4182` 等同于 `http://127.0.0.1:4182`。该 URL 以 `http` 直接指向 Broker 自己的监听时，该行通过。以下两种情况报 FAIL：Harness 会拒绝这个 URL（URL 必须是 `http` 或 `https` 的 origin，且只有在回环接口上才可以用明文 `http`）；或者以 `https` 指向这个监听，而明文 HTTP 的 Broker 无法接受。URL 指向其他地址或端口时报 WARN，因为只有代理才可能转发过去；Broker 绑定在回环以外的具体地址时（需要 `QWEN_MANAGED_AGENT_RUNTIME_BROKER_ALLOW_NON_LOOPBACK=true`），总是通过这种方式访问。绑定 `0.0.0.0` 同样需要这项设置，但它仍在回环上提供服务，Harness 直接经 `http://127.0.0.1:4182` 访问，该行通过。此时 `http://[::1]:4182` 这类 IPv6 URL 报 WARN，因为只有控制面 JVM 同时监听两个地址族时，该绑定才接受 IPv6，而在 `-Djava.net.preferIPv4Stack=true` 下并非如此。文件中没有 Broker URL 时也报 WARN：通过自身环境或命令行拿到这两个变量的 Harness，在预检看来就是这样，此时该告警属于预期；若要把这两个变量移进文件，就要从 `server.env` 中删除 `QWEN_MANAGED_AGENT_RUNTIME_BROKER_TOKEN`。
+Hosted Harness 通过它自己的环境访问同一个 Broker，既不经命令行，也不经上面这些控制面变量：在 `harness.env`（或启动 Harness 的环境）中设置 `QWEN_MANAGED_RUNTIME_BROKER_URL='http://127.0.0.1:4182'`，并把 `QWEN_MANAGED_RUNTIME_BROKER_TOKEN` 设为 Broker token。`mariadb-shell-agent serve` 读取后会把这两个变量从自己的环境中删除，因此 Harness 启动的进程都不会继承该 token；控制面也会把 `QWEN_MANAGED_RUNTIME_BROKER_` 开头的变量挡在 Runtime worker 之外。使用 bootstrap 生成的文件时，`harness.env` 已包含这两项，控制面也从该文件读取 Broker token，因此不要设置 `QWEN_MANAGED_AGENT_RUNTIME_BROKER_TOKEN`；两份都设置时拒绝启动。Harness 的这两行要么同时设置，要么都不设置，并且每行都写成普通的 `KEY=value`：只有其中一行或其中一行为空的文件（Harness 同样会拒绝），以及 systemd 会忽略的 `export KEY=value` 这类写法，都会拒绝启动。预检的 `broker-url` 行按 Harness 的 URL 解析器的方式读取文件中的 URL，因此 `http://127.1:4182` 等同于 `http://127.0.0.1:4182`。该 URL 以 `http` 直接指向 Broker 自己的监听时，该行通过。以下两种情况报 FAIL：Harness 会拒绝这个 URL（URL 必须是 `http` 或 `https` 的 origin，且只有在回环接口上才可以用明文 `http`）；或者以 `https` 指向这个监听，而明文 HTTP 的 Broker 无法接受。URL 指向其他地址或端口时报 WARN，因为只有代理才可能转发过去；Broker 绑定在回环以外的具体地址时（需要 `QWEN_MANAGED_AGENT_RUNTIME_BROKER_ALLOW_NON_LOOPBACK=true`），总是通过这种方式访问。绑定 `0.0.0.0` 同样需要这项设置，但它仍在回环上提供服务，Harness 直接经 `http://127.0.0.1:4182` 访问，该行通过。此时 `http://[::1]:4182` 这类 IPv6 URL 报 WARN，因为只有控制面 JVM 同时监听两个地址族时，该绑定才接受 IPv6，而在 `-Djava.net.preferIPv4Stack=true` 下并非如此。文件中没有 Broker URL 时也报 WARN：通过自身环境或命令行拿到这两个变量的 Harness，在预检看来就是这样，此时该告警属于预期；若要把这两个变量移进文件，就要从 `server.env` 中删除 `QWEN_MANAGED_AGENT_RUNTIME_BROKER_TOKEN`。
 
 在准入文件、Shell 或 child Git 工作前，必须完成 `docs/server-reference.md` 中 “Verified physical Workspace recovery” 所述的原生 storage 注册与 mount identity 校验。未注册或有歧义的 mount 必须保持不可用。Public Shell 执行仍默认关闭。Shell lifecycle v2 默认声明；显式生命周期列表替换默认值，空列表禁用它。MCP 生命周期仍须显式加入。能力声明不等于部署资格验收。
 
 ## 第 3 档：Kubernetes
 
-[Helm chart](https://github.com/QwenLM/qwen-code/tree/main/deploy/kubernetes) 用你在已评审源码 revision 上构建的镜像，在一个 Pod 中安装签名认证的 Managed Agent API 和私有 Hosted Harness，并在持久卷上运行 MySQL 8.4。默认支持文本 Session；可选设置可开启可信单节点的 Workspace 文件和前台 Shell，以及 Managed WebShell 网关。它从源码安装，而不是从本压缩包安装，遵循自己的说明文档，也不扩大本分发产物的验收范围。K2 CSI 常驻 Workspace 是另一种独立部署，见 [`deploy/k2-resident`](https://github.com/QwenLM/qwen-code/tree/main/deploy/k2-resident)。
+[Helm chart](https://github.invalid/QwenLM/qwen-code/tree/main/deploy/kubernetes) 用你在已评审源码 revision 上构建的镜像，在一个 Pod 中安装签名认证的 Managed Agent API 和私有 Hosted Harness，并在持久卷上运行 MySQL 8.4。默认支持文本 Session；可选设置可开启可信单节点的 Workspace 文件和前台 Shell，以及 Managed WebShell 网关。它从源码安装，而不是从本压缩包安装，遵循自己的说明文档，也不扩大本分发产物的验收范围。K2 CSI 常驻 Workspace 是另一种独立部署，见 [`deploy/k2-resident`](https://github.invalid/QwenLM/qwen-code/tree/main/deploy/k2-resident)。
 
 ## 运维部署
 
@@ -214,7 +214,7 @@ bin/qwen-managed-agent-upgrade check
 bin/qwen-managed-agent-upgrade stop
 bin/qwen-managed-agent-upgrade backup --to /var/backups/qwen-managed-agent/<date>
 bin/qwen-managed-agent-upgrade install --backup /var/backups/qwen-managed-agent/<date>
-# 执行 check 打印的人工步骤，例如为 Harness 安装 Qwen Code。
+# 执行 check 打印的人工步骤，例如为 Harness 安装 MariaDB Shell Agent。
 bin/qwen-managed-agent-upgrade start
 bin/qwen-managed-agent-upgrade verify --tenant <tenant> --turn
 # 恢复入口流量。
@@ -222,7 +222,7 @@ bin/qwen-managed-agent-upgrade verify --tenant <tenant> --turn
 
 每个阶段都会重新读取 unit、其环境文件和已安装的版本；上一阶段留下的状态不符合预期时就拒绝执行，因此中断的升级可以从失败的阶段继续。unit 名不是 `qwen-managed-agent-server` 和 `qwen-hosted-harness` 时，用 `--server-unit` 和 `--harness-unit` 指定；命令通过这两个 unit 找到已安装的版本、环境文件和服务账号。
 
-- `check` 不做任何改动。它按 `SHA256SUMS` 校验新分发产物，比较新旧两个版本（版本号、服务端 jar 中的 Flyway 脚本、Java、Node.js 与 Qwen Code），并读取 Harness 的 Broker 配置、unit 模板、已安装版本 `config/` 中的运维文件以及版本目录布局。它的 `backup-tools` 和 `runtime-state` 两行说明 `backup` 在给定选项下能否执行，因此备份用的选项也要传给 `check`；打印出的计划会带上这些选项。它为每项输入打印一行，再打印一份计划，把人工步骤放在对应位置；任一 FAIL 时退出码为 1。如果新版本修改或删除了已安装数据库执行过的脚本，`database` 行报 FAIL：在首个正式版发布之前，版本可能会原地重写 schema 基线，这样的版本无法在现有数据库上启动。新版本新增的 versioned 脚本如果没有排在已安装数据库执行过的最新脚本之后，该行同样报 FAIL，因为 Flyway 会拒绝执行它。
+- `check` 不做任何改动。它按 `SHA256SUMS` 校验新分发产物，比较新旧两个版本（版本号、服务端 jar 中的 Flyway 脚本、Java、Node.js 与 MariaDB Shell Agent），并读取 Harness 的 Broker 配置、unit 模板、已安装版本 `config/` 中的运维文件以及版本目录布局。它的 `backup-tools` 和 `runtime-state` 两行说明 `backup` 在给定选项下能否执行，因此备份用的选项也要传给 `check`；打印出的计划会带上这些选项。它为每项输入打印一行，再打印一份计划，把人工步骤放在对应位置；任一 FAIL 时退出码为 1。如果新版本修改或删除了已安装数据库执行过的脚本，`database` 行报 FAIL：在首个正式版发布之前，版本可能会原地重写 schema 基线，这样的版本无法在现有数据库上启动。新版本新增的 versioned 脚本如果没有排在已安装数据库执行过的最新脚本之后，该行同样报 FAIL，因为 Flyway 会拒绝执行它。
 - `stop` 重新执行 `backup-tools` 之前的各项检查，检查不通过就什么都不停。`backup-tools` 和 `runtime-state` 两行只约束 `backup`，因此请在 `stop` 之前先用 `check` 让它们通过。它先停止控制面，再停止 `KillMode=process` 留在其 cgroup 中的 Runtime worker 并等待它们退出（`--timeout`，默认 60 秒），最后停止 Harness。它在 systemd 给出的 cgroup 中清点 worker：unified 层级下直接读取，cgroup v1 下读取 systemd 自己的层级；读不到该 cgroup 时拒绝执行。新版本安装之后，`stop` 不再执行这些检查，因此也能停止 `start` 留下仍在运行的控制面。JVM 收到 `SIGTERM` 后以 143 退出，因此没有模板中 `SuccessExitStatus=143` 的已安装控制面 unit 在停止后会显示为 `failed`；`stop` 会说明这一点，把模板的改动同步过去之后，`systemctl reset-failed` 可以清除该状态。
 - `backup --to <新的空目录>` 要求两个 unit 都已停止且没有遗留 worker；新版本安装之后它会拒绝执行，因为这时备份的 `from.release` 会指向新版本。已存在的目录必须为空且属于 root。它用 `mysqldump` 写出 `database.sql`，unit 中的 `SPRING_DATASOURCE_*` 凭据通过备份目录之外某个临时目录里的选项文件传入，而不是放在命令行上；`mysqldump` 不读其他选项文件，root 的 `~/.my.cnf` 因此无法替换这些凭据。它写出 Runtime 状态目录的 `runtime-state.tar`；`configuration.tar`，其中包含 unit 文件、它们的环境文件、Harness 凭据文件和 `SPRING_CONFIG_ADDITIONAL_LOCATION` 指向的文件；以及 `release-config.tar`，其中包含已安装版本的 `config/` 和上述文件中位于版本目录内的部分，按它们在版本目录中的路径记录。符号链接形式的文件既以链接本身归档，也归档它指向的文件。所有文件都是 `0600`，所在目录为 `0700`；最后写入的 `backup.json` 记录各文件的校验和、导出的是哪个数据库，以及 `install` 会把旧版本放在哪里。`--mysqldump <path>` 指定其他客户端；数据库已用其他方式备份时，用 `--skip-database` 跳过导出。备份失败，或被 `SIGINT`、`SIGTERM`、`SIGHUP` 中止时，会删除已写出的内容和选项文件。`SIGKILL` 不会删除任何东西；它留下的 `${TMPDIR:-/tmp}/qwen-managed-agent-upgrade-*` 目录里有凭据，请删除该目录。
   - `check` 和 `backup` 从服务端自己的配置中取得 Runtime 状态目录。它们按控制面 unit 运行服务端的方式运行新版本的服务端 jar：使用该 unit 的账号、工作目录和环境；`SPRING_CONFIG_ADDITIONAL_LOCATION` 未设置或为空时，与 launcher 一样默认使用 `config/application.yml`。该 jar 按服务端的方式准备 Spring 环境，因此所有配置文件、import 和 profile 都会生效，`SPRING_APPLICATION_JSON`、`JAVA_TOOL_OPTIONS` 中的系统属性和 relaxed binding 形式的名称也一样；相对路径的目录按 unit 的工作目录解析。它不启动任何组件，也不建立任何连接。如果无法解析配置，或者 unit 给 launcher 传了参数（`systemctl` 打印的参数无法准确还原），`backup` 会拒绝执行，直到用 `--runtime-state <目录>` 指明服务端实际使用的目录，或用 `--runtime-state none` 说明不保存 Runtime 状态。没有配置状态目录时（例如未开启工具路径的部署），`backup` 不归档 Runtime 状态，并明确说明。
@@ -231,17 +231,17 @@ bin/qwen-managed-agent-upgrade verify --tenant <tenant> --turn
   - `start` 和 `verify` 以同样的方式确定 Harness、控制面及其健康端点的位置，因此在 `server.env` 看不到的地方设置的端口或地址也会生效：配置文件、命令行或 `SPRING_APPLICATION_JSON`。Harness 的位置由 `qwen.managed-agent.harness.base-url` 决定。控制面的位置由 `server.port`、`server.address` 和 `server.ssl` 决定，通配地址经回环接口访问；健康端点遵循 Spring Boot 的 management 设置：单独设置的 `management.server.port` 会把它移到该端口，绑定 `management.server.address`，并位于 `management.server.base-path` 之下。`--server-url <url>` 可改为指定控制面的地址，例如位于代理之后，此时健康端点为 `<url>/actuator/health`。端口为 0 或负数时没有可等待的 URL，因此两个阶段都会拒绝执行，直到用 `--server-url` 指定一个；URL 无法表示的监听（例如带 zone 的 IPv6 链路本地地址）同样会被拒绝。无法解析配置，或者 unit 给 launcher 传了参数时，它们使用 `server.env` 中给出的 URL，并打印一行说明。
 - `verify` 以同样方式运行 `--check --online` 并读取 actuator，最多等待 `--timeout`（默认 300 秒）让它应答。指定 `--tenant <id>` 时，它在 `--turn` 创建 Session 之前读取该租户最近的 Session 及其 Item；`--turn` 会创建一个 Session 并等待一个 Turn 完成，这会调用模型，轮询遇到 `5xx` 应答或连接中断时会继续；跳过 Session 读取时，`turn` 行会说明这一点。任何请求都不会超过 `--timeout`。不带 actor 的请求只能列出 Workspace 之外的 Session；`--actor <id>` 通过 `QWEN_MANAGED_AGENT_TRUSTED_ACTOR_HEADER` 指定的请求头带上一个 actor。`verify` 按 `backup` 读取 Runtime 状态目录的方式读取认证模式；使用签名认证时两项读取都跳过，请通过入口读取 Session。
 
-该命令只启动和停止 unit，不会停止入口流量、安装 Qwen Code、修改环境文件或 unit 文件，也不会删除任何版本。`check` 提示 unit 模板有变化时，请在 `start` 之前把变化同步到已安装的 unit，并执行 `systemctl daemon-reload`。
+该命令只启动和停止 unit，不会停止入口流量、安装 MariaDB Shell Agent、修改环境文件或 unit 文件，也不会删除任何版本。`check` 提示 unit 模板有变化时，请在 `start` 之前把变化同步到已安装的 unit，并执行 `systemctl daemon-reload`。
 
 #### 手工流程
 
-其他布局按以下步骤操作。在 systemd 布局下，命令执行 `stop`、`backup`、`install`、`start` 和 `verify`，并由 `check` 把留给运维的步骤打印在对应位置：停止和恢复入口流量、第 5 步中安装 Qwen Code 并修改 `harness.env`，以及把有变化的 unit 模板同步到已安装的 unit。
+其他布局按以下步骤操作。在 systemd 布局下，命令执行 `stop`、`backup`、`install`、`start` 和 `verify`，并由 `check` 把留给运维的步骤打印在对应位置：停止和恢复入口流量、第 5 步中安装 MariaDB Shell Agent 并修改 `harness.env`，以及把有变化的 unit 模板同步到已安装的 unit。
 
-1. 下载并校验新压缩包，读取新旧两个 manifest。在改动运行中部署前，确认新的 Qwen Code/Harness、Java、协议与数据库要求。
+1. 下载并校验新压缩包，读取新旧两个 manifest。在改动运行中部署前，确认新的 MariaDB Shell Agent/Harness、Java、协议与数据库要求。
 2. 停止新的入口准入，按照部署既有 drain 流程等待已准入工作完成结算。
 3. 备份 MySQL、Runtime 状态目录、完整 Runtime credential key ring、运维自有的 `server.env` 与 `harness.env`，以及精确旧版分发产物。分发产物升级期间不要轮换 credential key。载入 `server.env` 后运行 `bin/qwen-managed-agent-admin resolved-configuration`，可以打印配置解析出的 Runtime 状态目录。
 4. 停止 Java 服务与 Hosted Harness，保留 Workspace 和 durable Runtime state。随包的控制面 unit 使用 `KillMode=process`，`systemctl stop` 不会终止 Runtime worker；启动新版本前先用 `systemctl kill --kill-whom=all -s TERM qwen-managed-agent-server` 回收。
-5. 安装与 manifest 匹配的 Qwen Code/Harness，并使用既有 token 与 capability digest 启动。工具路径的主机需先把 `harness.env` 中的 `QWEN_HOSTED_HARNESS_BROKER_ARGS` 行换成 `QWEN_MANAGED_RUNTIME_BROKER_URL` 和 `QWEN_MANAGED_RUNTIME_BROKER_TOKEN`：已经没有组件读取那一行，不替换的话 Harness 启动时没有 Broker。如果 `server.env` 启用了 Harness 并把 `harness.env` 指定为凭据文件（bootstrap 生成的文件就是这样），还要从 `server.env` 中删除 `QWEN_MANAGED_AGENT_RUNTIME_BROKER_TOKEN`：此后控制面从 `harness.env` 读取 token，两份都保留会拒绝启动。旧版分发产物不读取这两个新键，缺少被删除的 token 时也不会启动其 Broker，因此回滚到旧版时要从第 3 步的备份恢复这两个文件。新版发行产物的 `--check` 会在 `workers` 行列出现在仍存活的 worker；请在此处以离线模式运行——服务仍停止、Harness 已启动——因为在线模式下持久模式的 Broker 会让该行 SKIP。
+5. 安装与 manifest 匹配的 MariaDB Shell Agent/Harness，并使用既有 token 与 capability digest 启动。工具路径的主机需先把 `harness.env` 中的 `QWEN_HOSTED_HARNESS_BROKER_ARGS` 行换成 `QWEN_MANAGED_RUNTIME_BROKER_URL` 和 `QWEN_MANAGED_RUNTIME_BROKER_TOKEN`：已经没有组件读取那一行，不替换的话 Harness 启动时没有 Broker。如果 `server.env` 启用了 Harness 并把 `harness.env` 指定为凭据文件（bootstrap 生成的文件就是这样），还要从 `server.env` 中删除 `QWEN_MANAGED_AGENT_RUNTIME_BROKER_TOKEN`：此后控制面从 `harness.env` 读取 token，两份都保留会拒绝启动。旧版分发产物不读取这两个新键，缺少被删除的 token 时也不会启动其 Broker，因此回滚到旧版时要从第 3 步的备份恢复这两个文件。新版发行产物的 `--check` 会在 `workers` 行列出现在仍存活的 worker；请在此处以离线模式运行——服务仍停止、Harness 已启动——因为在线模式下持久模式的 Broker 会让该行 SKIP。
 6. 使用相同数据库和 durable 配置启动新版 `bin/qwen-managed-agent-server`，由 Flyway 向前迁移 schema。
 7. 要求 actuator 健康检查通过，读取一个既有 Session 与历史，再完成一个新的无工具 Turn，之后才能恢复入口流量。任何可选工具 capability 都必须在重新验收后才能开启。
 

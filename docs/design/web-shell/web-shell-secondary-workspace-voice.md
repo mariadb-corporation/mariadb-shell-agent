@@ -336,7 +336,7 @@ This ordering keeps each step reviewable and allows the capture safety work to b
 - Primary token/no-token bearer-subprotocol compatibility.
 - Development Vite proxy upgrades both legacy and qualified Voice sockets without proxying `/voice/voiceModels.ts`.
 
-The detailed execution plan lives in `.qwen/e2e-tests/web-shell-secondary-workspace-voice.md`.
+The detailed execution plan lives in `.mariadb-shell-agent/e2e-tests/web-shell-secondary-workspace-voice.md`.
 
 ## Compatibility and rollout
 

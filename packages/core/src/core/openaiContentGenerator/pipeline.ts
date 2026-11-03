@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1453,7 +1454,7 @@ export class ContentGenerationPipeline {
       // `request.model || contentGeneratorConfig.model` — the same value
       // baseRequest.model is built from above), not on the config model. A
       // request-level model override would otherwise desync the gate from
-      // what actually ships: a qwen config with a non-qwen request model
+      // what actually ships: a mariadb-shell-agent config with a non-qwen request model
       // would leak the field, and a non-qwen config with a qwen request
       // model would miss the disable signal (the regression).
       if (!thinkingMandatory && isQwenFamilyWireModel(model)) {
@@ -1474,7 +1475,7 @@ export class ContentGenerationPipeline {
           // Non-DashScope OpenAI-compatible servers (vLLM, SGLang, ...) render
           // the model's chat template server-side and read the thinking switch
           // from `chat_template_kwargs`, not a top-level `enable_thinking`
-          // (which they silently ignore). Send it there so hybrid qwen models
+          // (which they silently ignore). Send it there so hybrid mariadb-shell-agent models
           // actually stop emitting <think> when reasoning is disabled — e.g.
           // the auto-mode permission classifier's short structured-output
           // calls, which otherwise spend their small token budget on thinking

@@ -2,7 +2,7 @@
 
 Status: Draft
 
-Depends on [#9719](https://github.com/QwenLM/qwen-code/pull/9719).
+Depends on [#9719](https://github.invalid/QwenLM/qwen-code/pull/9719).
 
 ## Goal
 
@@ -44,7 +44,7 @@ state Web Shell already derives from the daemon — transcript, streaming,
 permissions, questions, session history — and the reimplementation is what kept
 regressing. The chat now runs on `WebShellWithProviders` instead.
 
-The extension spawns `qwen serve` on a loopback port bound to the workspace,
+The extension spawns `mariadb-shell-agent serve` on a loopback port bound to the workspace,
 with `--require-auth` and a per-process token passed through the environment,
 and hands the webview its base URL. The webview talks to that daemon directly;
 Web Shell's own session, transcript, and permission machinery is the single

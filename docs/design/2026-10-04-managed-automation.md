@@ -12,8 +12,8 @@ target mode only (`MANAGED_SESSION_ENABLED_SCHEDULE_SESSION_MODES`); the
 runtime slices land, and the control plane's scanner and mutation routes
 stay behind the `qwen.managed-agent.automation.enabled` deployment opt-in.
 This is the design for slice H6 of
-[#12827](https://github.com/QwenLM/qwen-code/issues/12827), stage H of the
-Managed Agent proposal [#12380](https://github.com/QwenLM/qwen-code/issues/12380).
+[#12827](https://github.invalid/QwenLM/qwen-code/issues/12827), stage H of the
+Managed Agent proposal [#12380](https://github.invalid/QwenLM/qwen-code/issues/12380).
 It builds on the task contract of H0a
 ([design](2026-09-27-managed-agent-task-contract.md)), the record contract of
 H0b ([design](2026-09-27-managed-extension-record-contract.md)) and the

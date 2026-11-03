@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -294,13 +295,13 @@ describe('OAuthUtils', () => {
       expect(resourceFor('https://example.com/')).toBe('https://example.com');
     });
 
-    // Regression test for https://github.com/QwenLM/qwen-code/issues/1749
+    // Regression test for https://github.invalid/QwenLM/qwen-code/issues/1749
     // Per MCP spec, resource is the canonical URI including the path, so
     // multi-tenant servers can tell different MCP servers apart: it must
     // include the full path, not just the host.
     it('should preserve full path for multi-tenant MCP servers (issue #1749)', () => {
-      expect(resourceFor('https://mcp.alibaba-inc.com/yuque/mcp')).toBe(
-        'https://mcp.alibaba-inc.com/yuque/mcp',
+      expect(resourceFor('https://mcp.alibaba-inc.invalid/yuque/mcp')).toBe(
+        'https://mcp.alibaba-inc.invalid/yuque/mcp',
       );
     });
   });
@@ -320,8 +321,8 @@ describe('OAuthUtils', () => {
       // being used.
       serveMetadata(
         {
-          resource: 'https://www.modelscope.cn/mcp-server',
-          authorization_servers: ['https://www.modelscope.cn'],
+          resource: 'https://www.modelscope.invalid/mcp-server',
+          authorization_servers: ['https://www.modelscope.invalid'],
           scopes_supported: [
             'openid',
             'profile',
@@ -330,15 +331,16 @@ describe('OAuthUtils', () => {
           ],
         },
         {
-          issuer: 'https://www.modelscope.cn',
-          authorization_endpoint: 'https://www.modelscope.cn/oauth/authorize',
-          token_endpoint: 'https://www.modelscope.cn/oauth/token',
+          issuer: 'https://www.modelscope.invalid',
+          authorization_endpoint:
+            'https://www.modelscope.invalid/oauth/authorize',
+          token_endpoint: 'https://www.modelscope.invalid/oauth/token',
           // Note: scopes_supported is NOT present in auth server metadata
         },
       );
 
       const result = await OAuthUtils.discoverOAuthConfig(
-        'https://www.modelscope.cn/mcp-server',
+        'https://www.modelscope.invalid/mcp-server',
       );
 
       expect(result).not.toBeNull();

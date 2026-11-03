@@ -16,8 +16,8 @@
 
 ## 0. TL;DR
 
-The daemon (`qwen serve`) today speaks a **bespoke REST + SSE** dialect to web/SDK
-clients, while speaking **real ACP JSON-RPC over stdio** to the spawned `qwen --acp`
+The daemon (`mariadb-shell-agent serve`) today speaks a **bespoke REST + SSE** dialect to web/SDK
+clients, while speaking **real ACP JSON-RPC over stdio** to the spawned `mariadb-shell-agent --acp`
 child. This proposal adds a **second northbound transport** that implements the
 **official ACP Streamable HTTP transport** (RFD #721) at a single `/acp` endpoint,
 so any ACP-native client (Zed, Goose, future SDKs) can drive the daemon directly
@@ -44,7 +44,7 @@ Three tiers (verified at commit `0c0430939`):
 
 ```
 ┌──────────────┐  bespoke REST + SSE (HTTP/1.1)   ┌────────────┐  ACP JSON-RPC   ┌──────────────┐
-│ web / SDK    │ ───────────────────────────────► │  qwen      │  (stdio NDJSON) │ qwen --acp   │
+│ web / SDK    │ ───────────────────────────────► │  qwen      │  (stdio NDJSON) │ mariadb-shell-agent --acp   │
 │ client       │ ◄─── GET /session/:id/events ──── │  serve     │ ◄─────────────► │ child (Agent)│
 │ (ACP client) │       (text/event-stream)        │  (daemon)  │  ndJsonStream   │              │
 └──────────────┘                                   └────────────┘                 └──────────────┘
@@ -70,7 +70,7 @@ Three tiers (verified at commit `0c0430939`):
 
 ### 1.2 Southbound (daemon ↔ child) — already ACP
 
-- `acp-bridge/src/spawnChannel.ts` spawns `qwen --acp`, wraps stdin/stdout with
+- `acp-bridge/src/spawnChannel.ts` spawns `mariadb-shell-agent --acp`, wraps stdin/stdout with
   `ndJsonStream` from `@agentclientprotocol/sdk` (`^0.14.1`).
 - `acp-bridge/src/bridge.ts:729` `new ClientSideConnection(() => client, channel.stream)`
   — the daemon is the ACP **client**, the child is the ACP **agent**.
@@ -156,7 +156,7 @@ client  ────────────────────────
                                                           │  HttpAcpBridge + EventBus  │  (unchanged)
                                                           └────────────┬──────────────┘
                                                                        │ ACP stdio (unchanged)
-                                                                 qwen --acp child
+                                                                 mariadb-shell-agent --acp child
 ```
 
 ### 3.1 New module layout (`packages/cli/src/serve/acp-http/`)
@@ -308,7 +308,7 @@ thin compat shim over `/acp` (separate, later PR).
 ## 8. Local verification plan
 
 1. `npm run build` (or workspace build of `cli` + `acp-bridge`).
-2. Start daemon: `qwen serve --listen 127.0.0.1:0 --token <t>` (or env token).
+2. Start daemon: `mariadb-shell-agent serve --listen 127.0.0.1:0 --token <t>` (or env token).
 3. Run `node scripts/acp-http-smoke.mjs`:
    - `POST /acp {initialize}` → assert `200` + `Acp-Connection-Id`.
    - Open connection SSE; `POST {session/new}` → assert response on stream.
@@ -349,8 +349,8 @@ agent round-trip; `_qwen/session/set_model`; method-not-found; `DELETE` teardown
 
 ### Live daemon (real model)
 
-Booted `qwen serve --port 8767 --token … --workspace …` (bundle entry so the
-spawned `qwen --acp` child is self-contained) and ran `scripts/acp-http-smoke.mjs`:
+Booted `mariadb-shell-agent serve --port 8767 --token … --workspace …` (bundle entry so the
+spawned `mariadb-shell-agent --acp` child is self-contained) and ran `scripts/acp-http-smoke.mjs`:
 
 ```
 ✓ initialize: connectionId=… protocolVersion=1
@@ -576,5 +576,5 @@ Deferred 硬化项见 PR 描述「已知 deferred」。
 
 ## 20. Extension-namespace rename + SDK-transport analysis (round 11)
 
-- **Namespace `_qwen.ai/` → `_qwen/`**: ACP's only hard rule is the leading `_`; the `_zed.dev/` domain segment is convention-by-example, not a MUST. Since `qwen` is distinctive, we use the shorter bare form. `_meta` key likewise `"qwen"`. (Survey of real agents: Zed/gemini-cli mostly use `_meta`-on-standard-methods + ACP's own `unstable_*`; bare custom `_` methods are rare — our `_qwen/*` are genuinely-new workspace/session ops with no standard equivalent, so a `_` method is the right tool.)
+- **Namespace `_qwen.invalid/` → `_qwen/`**: ACP's only hard rule is the leading `_`; the `_zed.dev/` domain segment is convention-by-example, not a MUST. Since `mariadb-shell-agent` is distinctive, we use the shorter bare form. `_meta` key likewise `"qwen"`. (Survey of real agents: Zed/gemini-cli mostly use `_meta`-on-standard-methods + ACP's own `unstable_*`; bare custom `_` methods are rare — our `_qwen/*` are genuinely-new workspace/session ops with no standard equivalent, so a `_` method is the right tool.)
 - **Why hand-rolled transport (not SDK-based)**: the TS SDK ships only `ndJsonStream` (stdio); RFD #721 HTTP is SDK Phase-3 (not implemented). The SDK `Connection` is single-duplex-stream; our transport is multi-stream (POSTs + connection-SSE + per-session-SSE) and needs outbound demux by sessionId — which our dispatcher already knows at routing time. A full SDK rewrite fights that model and wouldn't remove the bulk (bridge translation, SSE lifecycle, ownership, EventBus→JSON-RPC). **Pragmatic improvement (candidate follow-up): adopt the SDK's Zod schema validators + types for param validation while keeping the hand-rolled transport.** SDK clients using `extMethod('_qwen/…')` interoperate with our handlers (identical wire shape).

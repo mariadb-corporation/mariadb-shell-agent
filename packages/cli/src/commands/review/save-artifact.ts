@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -85,7 +86,7 @@ interface PersistedVerdict
    * and the deferral display. What they share is that both CAN go, and the
    * body is then not a copy of either. "The advisory rides the persisted body" is true of every round
    * except the ones that most need the durable copy — a maintainer reading
-   * `.qwen/reviews` to make the `land-with-residual-risk` call would find a
+   * `.mariadb-shell-agent/reviews` to make the `land-with-residual-risk` call would find a
    * "did not fit" breadcrumb and no facts. The validator carries and
    * shape-checks it below, so the type advertises nothing the artifact does
    * not hold.
@@ -149,7 +150,7 @@ interface SaveArtifactArgs {
 // as trustworthy as wherever the command happened to run. Cwd is the fallback
 // when the flag is absent, right whenever the caller runs from the main
 // checkout — in PR worktree mode the worktree-resident inputs arrive as
-// absolute paths that still sit under the main project's `.qwen/tmp/`.
+// absolute paths that still sit under the main project's `.mariadb-shell-agent/tmp/`.
 //
 // This used to prefer `QWEN_CODE_PROJECT_DIR`, believing it named that
 // checkout. It never does: the harness exports it as the session-storage
@@ -747,7 +748,7 @@ export const saveArtifactCommand: CommandModule = {
       .option('out', {
         type: 'string',
         demandOption: true,
-        describe: 'Output path under .qwen/reviews/',
+        describe: 'Output path under .mariadb-shell-agent/reviews/',
       })
       .option('workspace-root', {
         type: 'string',

@@ -1,8 +1,8 @@
-# Local launch templates for `qwen serve`
+# Local launch templates for `mariadb-shell-agent serve`
 
-Reference templates for running `qwen serve` as a long-lived background process on a developer workstation. For ordinary local background use, start with the built-in `qwen daemon start` lifecycle commands in the [main guide](./qwen-serve.md#inspect-and-control-a-local-daemon). Use these templates when you need service-manager supervision, startup after reboot, or a custom logging setup. Review the [deployment and security notes](./qwen-serve.md#deployment-and-security-notes) before exposing the listener beyond loopback.
+Reference templates for running `mariadb-shell-agent serve` as a long-lived background process on a developer workstation. For ordinary local background use, start with the built-in `mariadb-shell-agent daemon start` lifecycle commands in the [main guide](./qwen-serve.md#inspect-and-control-a-local-daemon). Use these templates when you need service-manager supervision, startup after reboot, or a custom logging setup. Review the [deployment and security notes](./qwen-serve.md#deployment-and-security-notes) before exposing the listener beyond loopback.
 
-> **Audience**: developers who want the daemon up across reboots, with logs going somewhere durable, and a clean `restart-on-failure` story. If you only need the daemon for the duration of a single shell session, plain `qwen serve` (foreground, Ctrl-C to stop) is fine; if you only need a detached local process, `qwen daemon start` is simpler.
+> **Audience**: developers who want the daemon up across reboots, with logs going somewhere durable, and a clean `restart-on-failure` story. If you only need the daemon for the duration of a single shell session, plain `mariadb-shell-agent serve` (foreground, Ctrl-C to stop) is fine; if you only need a detached local process, `mariadb-shell-agent daemon start` is simpler.
 
 ## Generate a bearer token (once)
 
@@ -12,7 +12,7 @@ chmod 600 ~/.qwen-serve-token
 export QWEN_SERVER_TOKEN="$(cat ~/.qwen-serve-token)"
 ```
 
-The path and filename above are examples for these service-manager templates, not a built-in location that Qwen Code discovers automatically. Daemons started through `qwen daemon start` can instead opt into the built-in `--save-token` sidecar and `qwen daemon token` command; see [Inspect and control a local daemon](./qwen-serve.md#inspect-and-control-a-local-daemon). The systemd and launchd templates below still pass the token explicitly because they invoke `qwen serve` directly. See [Authentication](./qwen-serve.md#authentication) for the token-selection rules.
+The path and filename above are examples for these service-manager templates, not a built-in location that MariaDB Shell Agent discovers automatically. Daemons started through `mariadb-shell-agent daemon start` can instead opt into the built-in `--save-token` sidecar and `mariadb-shell-agent daemon token` command; see [Inspect and control a local daemon](./qwen-serve.md#inspect-and-control-a-local-daemon). The systemd and launchd templates below still pass the token explicitly because they invoke `mariadb-shell-agent serve` directly. See [Authentication](./qwen-serve.md#authentication) for the token-selection rules.
 
 > **Scope this `export` to the current shell session only.** Don't add it to `~/.bashrc` / `~/.zshrc` — a profile-level export exposes the bearer token to every process spawned from that shell (IDE subprocesses, browser debuggers, `npm` scripts from unrelated projects). For long-running setups, use the systemd `EnvironmentFile=` / launchd `EnvironmentVariables` mechanisms below — both scope the token to just the daemon process.
 
@@ -51,13 +51,13 @@ independent.
 
 ## Linux: systemd user unit
 
-> **Find your `qwen` binary and trusted tool directories first.** The unit file's `ExecStart=` must hold an **absolute path**, and its explicit `PATH` must include trusted directories for tools that daemon sessions need, such as `gh`, `git`, `npm`, and the `node` interpreter used by a script-based `qwen` launcher. Service managers don't read your shell profile. Run `which qwen gh git npm node` in your normal shell, then substitute the actual executable and directories everywhere the template below shows `/PATH/TO/qwen` and `/PATH/TO/USER/BIN`.
+> **Find your `mariadb-shell-agent` binary and trusted tool directories first.** The unit file's `ExecStart=` must hold an **absolute path**, and its explicit `PATH` must include trusted directories for tools that daemon sessions need, such as `gh`, `git`, `npm`, and the `node` interpreter used by a script-based `mariadb-shell-agent` launcher. Service managers don't read your shell profile. Run `which qwen gh git npm node` in your normal shell, then substitute the actual executable and directories everywhere the template below shows `/PATH/TO/qwen` and `/PATH/TO/USER/BIN`.
 
 `~/.config/systemd/user/qwen-serve.service`:
 
 ```ini
 [Unit]
-Description=Qwen Code daemon (loopback HTTP + SSE)
+Description=MariaDB Shell Agent daemon (loopback HTTP + SSE)
 After=network.target
 
 [Service]
@@ -107,7 +107,7 @@ Without `loginctl enable-linger`, the user-level systemd instance shuts down whe
 
 ## macOS: launchd user agent
 
-> **Find your `qwen` binary and trusted tool directories first.** Same constraint as systemd: `ProgramArguments` must hold an **absolute path**, while `EnvironmentVariables.PATH` must include trusted directories containing tools daemon sessions need. Run `which qwen gh git npm node` in your normal shell. Common locations on macOS include `/opt/homebrew/bin` (Homebrew on Apple Silicon), `/usr/local/bin` (Homebrew on Intel and manual installs), `~/.nvm/versions/node/vX.Y.Z/bin` (nvm), and `~/.volta/bin` (Volta). Substitute the actual absolute paths below; launchd does not expand `~` or shell variables.
+> **Find your `mariadb-shell-agent` binary and trusted tool directories first.** Same constraint as systemd: `ProgramArguments` must hold an **absolute path**, while `EnvironmentVariables.PATH` must include trusted directories containing tools daemon sessions need. Run `which qwen gh git npm node` in your normal shell. Common locations on macOS include `/opt/homebrew/bin` (Homebrew on Apple Silicon), `/usr/local/bin` (Homebrew on Intel and manual installs), `~/.nvm/versions/node/vX.Y.Z/bin` (nvm), and `~/.volta/bin` (Volta). Substitute the actual absolute paths below; launchd does not expand `~` or shell variables.
 
 `~/Library/LaunchAgents/com.qwenlm.qwen-serve.plist`:
 
@@ -195,7 +195,7 @@ After starting or restarting either service, open a new daemon session and verif
 Assumes `QWEN_SERVER_TOKEN` is already exported in your shell (see the setup section above):
 
 ```bash
-tmux new -d -s qwen-serve "qwen serve --hostname 127.0.0.1 --workspace /absolute/path/project-a --workspace /absolute/path/project-b"
+tmux new -d -s qwen-serve "mariadb-shell-agent serve --hostname 127.0.0.1 --workspace /absolute/path/project-a --workspace /absolute/path/project-b"
 tmux attach -t qwen-serve   # see live logs; Ctrl-b d to detach
 tmux kill-session -t qwen-serve
 ```
@@ -207,7 +207,7 @@ tmux kill-session -t qwen-serve
 Assumes `QWEN_SERVER_TOKEN` is already exported in your shell:
 
 ```bash
-nohup qwen serve --hostname 127.0.0.1 \
+nohup mariadb-shell-agent serve --hostname 127.0.0.1 \
   --workspace /absolute/path/project-a \
   --workspace /absolute/path/project-b \
   > qwen-serve.log 2>&1 &
@@ -226,7 +226,7 @@ curl -H "Authorization: Bearer $QWEN_SERVER_TOKEN" \
   http://127.0.0.1:4170/capabilities | jq .protocolVersions         # daemon's feature set
 ```
 
-When auth is configured (`--token` or `QWEN_SERVER_TOKEN`), every normal API route except `/health` on an ordinary loopback bind requires `Authorization: Bearer <token>`; channel webhook ingress always uses its configured `x-qwen-webhook-secret`, and Web Shell document and asset routes remain pre-auth. `--require-auth=true` requires a token at boot and additionally moves loopback `/health` behind the bearer gate without changing webhook authentication. If you started the daemon without a token on the loopback default (the `qwen serve` zero-config path), neither call requires a header and any local process that can reach the primary listener receives full operator API authority, including code execution as the daemon user. The templates above all configure a token, so the `Authorization` header is needed in practice. If `/capabilities` returns `401`, the unit / plist token doesn't match the env-exported token your `curl` is using.
+When auth is configured (`--token` or `QWEN_SERVER_TOKEN`), every normal API route except `/health` on an ordinary loopback bind requires `Authorization: Bearer <token>`; channel webhook ingress always uses its configured `x-qwen-webhook-secret`, and Web Shell document and asset routes remain pre-auth. `--require-auth=true` requires a token at boot and additionally moves loopback `/health` behind the bearer gate without changing webhook authentication. If you started the daemon without a token on the loopback default (the `mariadb-shell-agent serve` zero-config path), neither call requires a header and any local process that can reach the primary listener receives full operator API authority, including code execution as the daemon user. The templates above all configure a token, so the `Authorization` header is needed in practice. If `/capabilities` returns `401`, the unit / plist token doesn't match the env-exported token your `curl` is using.
 
 ## Token rotation
 

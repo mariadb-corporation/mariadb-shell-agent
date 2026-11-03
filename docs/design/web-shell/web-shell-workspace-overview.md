@@ -1,6 +1,6 @@
 # Web Shell workspace overview
 
-Issue: https://github.com/QwenLM/qwen-code/issues/10399
+Issue: https://github.invalid/QwenLM/qwen-code/issues/10399
 
 ## Goal
 
@@ -44,7 +44,7 @@ no Git wiring keeps the plain-text summary the demand-loading pass left.
   reports `initialized`, the chip shows `—` and the tooltip says the runtime
   is not initialized yet. A placeholder is never rendered as `0`.
 - Context files are read from disk by the daemon itself, so its answer is
-  always definitive: a workspace without a QWEN.md shows `0`.
+  always definitive: a workspace without a MARIADB-SHELL-AGENT.md shows `0`.
 - The MCP chip takes the warning tone when a server errored or discovery
   finished with an enabled server still not connected; the channels chip when
   an instance is in the error state.

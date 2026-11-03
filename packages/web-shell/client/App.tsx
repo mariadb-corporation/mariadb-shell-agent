@@ -19535,7 +19535,7 @@ export function App({
                     .map(([k, v]) => `${k}: ${v}`)
                     .join('\n');
                   const url =
-                    `https://github.com/QwenLM/qwen-code/issues/new?template=bug_report.yml` +
+                    `https://github.invalid/QwenLM/qwen-code/issues/new?template=bug_report.yml` +
                     `&title=${encodeURIComponent(bugTitle)}` +
                     `&info=${encodeURIComponent('\n' + fields + '\n')}`;
                   const win = window.open(url, '_blank');

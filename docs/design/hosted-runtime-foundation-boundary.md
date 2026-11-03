@@ -12,7 +12,7 @@ fail closed, without importing the preview architecture.
 
 A later integration split lifted the fail-closed boundary this document
 records: credentialed with a bearer token, `--no-web`, and the capability
-digest, `qwen serve --profile hosted-harness` now boots on loopback and
+digest, `mariadb-shell-agent serve --profile hosted-harness` now boots on loopback and
 serves the private no-tool Managed Session API, and of the Broker routes
 only `executions/{id}:resolve` still returns a non-retryable 501. The
 statements below describe the foundation PR's shipped state.
@@ -21,7 +21,7 @@ records the current boundary.
 
 ## Scope and decisions
 
-`qwen serve --profile hosted-harness` fails before opening a listener, even with
+`mariadb-shell-agent serve --profile hosted-harness` fails before opening a listener, even with
 valid credentials. Experimental Managed Gateway/worker/auto-local settings also
 fail. Default serve remains available; explicit broker options require the
 unavailable hosted profile. Environment-only broker settings have no effect in

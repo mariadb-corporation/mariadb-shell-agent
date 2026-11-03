@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -99,7 +100,7 @@ const sessionRegistryConfigStub = {
   unregisterSessionRegistry: async () => {},
 };
 
-// main() writes best-effort state under ~/.qwen; some runners — including
+// main() writes best-effort state under ~/.mariadb-shell-agent; some runners — including
 // the review-address verification gate's clean child — inherit a HOME the
 // test process cannot write to. Ordinary CI already overrides HOME, so
 // point it at a scratch directory for this whole file.
@@ -850,7 +851,7 @@ describe('llm.tsx main function', () => {
       for (const [key, value] of Object.entries(env)) vi.stubEnv(key, value);
       try {
         await expect(main()).rejects.toThrow(
-          '--acp-execution-engine is reserved for hosts spawned by qwen serve.',
+          '--acp-execution-engine is reserved for hosts spawned by mariadb-shell-agent serve.',
         );
         expect(loadSettings).not.toHaveBeenCalled();
       } finally {
@@ -1067,7 +1068,7 @@ describe('llm.tsx main function', () => {
     } as never);
     vi.mocked(loadSandboxConfig).mockResolvedValue({
       command: 'sandbox-exec',
-      image: 'ghcr.io/qwenlm/qwen-code:1.0.0',
+      image: 'ghcr.invalid/qwenlm/qwen-code:1.0.0',
     });
     vi.mocked(loadCliConfig).mockImplementation(async () => {
       // Auth validation re-runs the environment load after the post-settings
@@ -1144,7 +1145,7 @@ describe('llm.tsx main function', () => {
     } as never);
     vi.mocked(loadSandboxConfig).mockResolvedValue({
       command: 'sandbox-exec',
-      image: 'ghcr.io/qwenlm/qwen-code:1.0.0',
+      image: 'ghcr.invalid/qwenlm/qwen-code:1.0.0',
     });
     vi.mocked(loadCliConfig).mockImplementation(
       async () =>
@@ -2448,7 +2449,7 @@ describe('llm.tsx main function', () => {
     } as never);
     vi.mocked(loadSandboxConfig).mockResolvedValue({
       command,
-      image: 'ghcr.io/qwenlm/qwen-code:1.0.0',
+      image: 'ghcr.invalid/qwenlm/qwen-code:1.0.0',
     });
     vi.mocked(loadCliConfig).mockResolvedValue({
       getModelsConfig: () => ({ getCurrentAuthType: () => null }),
@@ -4800,7 +4801,7 @@ describe('startInteractiveUI', () => {
         // tests run the real initializeI18n('auto') and leave the machine
         // locale's dictionary in the i18n module state.
         expect(mockWriteStdoutLine).toHaveBeenCalledWith(
-          expect.stringContaining(`qwen --resume ${sessionId}`),
+          expect.stringContaining(`mariadb-shell-agent --resume ${sessionId}`),
         );
       } finally {
         rmSync(projectDir, { recursive: true, force: true });
@@ -4818,7 +4819,7 @@ describe('startInteractiveUI', () => {
         await runCleanup(makeRecordingConfig(sessionId, sessionFile));
 
         expect(mockWriteStdoutLine).not.toHaveBeenCalledWith(
-          expect.stringContaining('qwen --resume'),
+          expect.stringContaining('mariadb-shell-agent --resume'),
         );
       } finally {
         rmSync(projectDir, { recursive: true, force: true });
@@ -4834,7 +4835,7 @@ describe('startInteractiveUI', () => {
         await runCleanup(makeRecordingConfig(sessionId, sessionFile));
 
         expect(mockWriteStdoutLine).not.toHaveBeenCalledWith(
-          expect.stringContaining('qwen --resume'),
+          expect.stringContaining('mariadb-shell-agent --resume'),
         );
       } finally {
         rmSync(projectDir, { recursive: true, force: true });
@@ -4862,7 +4863,7 @@ describe('startInteractiveUI', () => {
         await runCleanup(makeRecordingConfig(sessionId, sessionFile));
 
         expect(mockWriteStdoutLine).not.toHaveBeenCalledWith(
-          expect.stringContaining('qwen --resume'),
+          expect.stringContaining('mariadb-shell-agent --resume'),
         );
       } finally {
         rmSync(projectDir, { recursive: true, force: true });
@@ -4883,7 +4884,7 @@ describe('startInteractiveUI', () => {
         } as unknown as Config);
 
         expect(mockWriteStdoutLine).not.toHaveBeenCalledWith(
-          expect.stringContaining('qwen --resume'),
+          expect.stringContaining('mariadb-shell-agent --resume'),
         );
       } finally {
         rmSync(projectDir, { recursive: true, force: true });
@@ -4905,7 +4906,7 @@ describe('startInteractiveUI', () => {
         await runCleanup(makeRecordingConfig(sessionId, sessionFile));
 
         expect(mockWriteStdoutLine).not.toHaveBeenCalledWith(
-          expect.stringContaining('qwen --resume'),
+          expect.stringContaining('mariadb-shell-agent --resume'),
         );
       } finally {
         rmSync(projectDir, { recursive: true, force: true });

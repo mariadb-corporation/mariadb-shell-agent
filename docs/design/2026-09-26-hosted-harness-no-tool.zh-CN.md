@@ -4,7 +4,7 @@
 
 ## 问题与范围
 
-Spring 控制面已经能创建 Managed Session 并调用私有 Hosted Harness 客户端，但 `qwen serve --profile hosted-harness` 目前拒绝启动。本切片基于 #12693 的持久化 Managed Session 权威，打通一个仅含文本、无工具的端到端回合。本切片不启用 Runtime 工具、依赖审批的工作、worker 生命周期或自动崩溃恢复。
+Spring 控制面已经能创建 Managed Session 并调用私有 Hosted Harness 客户端，但 `mariadb-shell-agent serve --profile hosted-harness` 目前拒绝启动。本切片基于 #12693 的持久化 Managed Session 权威，打通一个仅含文本、无工具的端到端回合。本切片不启用 Runtime 工具、依赖审批的工作、worker 生命周期或自动崩溃恢复。
 
 ## 设计
 
@@ -20,4 +20,4 @@ Spring 控制面已经能创建 Managed Session 并调用私有 Hosted Harness �
 
 ## 验证与验收
 
-运行仓库构建与类型检查、定向 Managed Session 和 Hosted Harness 测试，以及使用 Java、MySQL 和真实 `qwen serve` 进程的测试。进程测试必须证明唯一 Session ID、成功的无工具文本回合、重连后的已提交事件回放，以及普通 daemon 行为不变。负例覆盖缺失认证、冲突的 Prompt 身份、存储失败、过大的持久化记录、工具请求没有本地副作用。一个或多个回合失败或取消后，下一次模型请求必须包含新 Prompt 并保留已完成的对话历史，不重新提交未得到回答的 Prompt，包括失败回合之后已有成功回合的情况。Hosted 启动不得恢复已保存的 channel 或定时任务会话；停止读取的 SSE 客户端不得导致 daemon 崩溃。本切片不宣称完成 #12380 的完整 Hosted Runtime 或崩溃恢复门槛。
+运行仓库构建与类型检查、定向 Managed Session 和 Hosted Harness 测试，以及使用 Java、MySQL 和真实 `mariadb-shell-agent serve` 进程的测试。进程测试必须证明唯一 Session ID、成功的无工具文本回合、重连后的已提交事件回放，以及普通 daemon 行为不变。负例覆盖缺失认证、冲突的 Prompt 身份、存储失败、过大的持久化记录、工具请求没有本地副作用。一个或多个回合失败或取消后，下一次模型请求必须包含新 Prompt 并保留已完成的对话历史，不重新提交未得到回答的 Prompt，包括失败回合之后已有成功回合的情况。Hosted 启动不得恢复已保存的 channel 或定时任务会话；停止读取的 SSE 客户端不得导致 daemon 崩溃。本切片不宣称完成 #12380 的完整 Hosted Runtime 或崩溃恢复门槛。

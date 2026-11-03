@@ -3,6 +3,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +39,7 @@ function getProjectHash(projectRoot) {
 const projectHash = getProjectHash(projectRoot);
 
 // Runtime base directory for ephemeral data (tmp, otel, etc.)
-// Priority: QWEN_RUNTIME_DIR > QWEN_HOME > ~/.qwen
+// Priority: QWEN_RUNTIME_DIR > QWEN_HOME > ~/.mariadb-shell-agent
 function getRuntimeBaseDir() {
   const runtimeDir = process.env.QWEN_RUNTIME_DIR;
   if (runtimeDir) {
@@ -48,11 +49,11 @@ function getRuntimeBaseDir() {
   if (homeEnv) {
     return resolvePath(homeEnv);
   }
-  return path.join(os.homedir(), '.qwen');
+  return path.join(os.homedir(), '.mariadb-shell-agent');
 }
 
-// Project-level .qwen directory in the workspace
-const WORKSPACE_QWEN_DIR = path.join(projectRoot, '.qwen');
+// Project-level .mariadb-shell-agent directory in the workspace
+const WORKSPACE_QWEN_DIR = path.join(projectRoot, '.mariadb-shell-agent');
 
 // Telemetry artifacts are stored in a hashed directory under the runtime dir
 export const OTEL_DIR = path.join(
