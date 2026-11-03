@@ -103,6 +103,15 @@ export function write(file, content) {
   changedFiles++;
 }
 
+/** Deletes an upstream file; a file an earlier run already deleted is fine. */
+export function remove(rule, file) {
+  const abs = path.join(root, file);
+  if (!fs.existsSync(abs)) return;
+  fs.rmSync(abs);
+  count(rule);
+  changedFiles++;
+}
+
 export function copyAsset(from, to) {
   const src = path.join(assets, from);
   const dest = path.join(root, to);

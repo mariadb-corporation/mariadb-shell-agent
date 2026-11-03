@@ -1,0 +1,40 @@
+# Copyright (c) 2026, MariaDB plc.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Installed as .github/actions/bypass-ci by mariadb/rebrand/github.mjs.
+name: 'bypass-ci'
+description: >-
+  Whether the checks of this run may be skipped: a pull request from a branch of this repository
+  whose title or newest commit message contains [bypass-ci]. Pull requests from forks, pushes,
+  tags and manual runs always run. Jobs skip with `if: needs.<gate>.outputs.run == 'true'`; a
+  job skipped that way counts as passed for required status checks (GitHub's own [skip ci]
+  skips the whole workflow instead, which leaves required checks waiting).
+outputs:
+  run:
+    description: "'false' when [bypass-ci] applies, else 'true'"
+    value: '${{ steps.gate.outputs.run }}'
+runs:
+  using: 'composite'
+  steps:
+    - id: 'gate'
+      shell: 'bash'
+      env:
+        GH_TOKEN: '${{ github.token }}'
+        EVENT: '${{ github.event_name }}'
+        REPO: '${{ github.repository }}'
+        HEAD_REPO: '${{ github.event.pull_request.head.repo.full_name }}'
+        HEAD_SHA: '${{ github.event.pull_request.head.sha }}'
+        TITLE: '${{ github.event.pull_request.title }}'
+      run: |
+        run=true
+        # Only people who can push branches here (not fork authors) can bypass.
+        if [ "$EVENT" = pull_request ] && [ "$HEAD_REPO" = "$REPO" ]; then
+          message=$(gh api "repos/$REPO/commits/$HEAD_SHA" --jq .commit.message)
+          case "$TITLE $message" in
+            *'[bypass-ci]'*)
+              run=false
+              echo '::notice::[bypass-ci] in the pull request title or the newest commit message: checks skipped'
+              ;;
+          esac
+        fi
+        echo "run=$run" >> "$GITHUB_OUTPUT"

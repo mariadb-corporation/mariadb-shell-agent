@@ -32,6 +32,7 @@ import * as extensionIds from './rebrand/extension-ids.mjs';
 import * as review from './rebrand/review.mjs';
 import * as outbound from './rebrand/outbound.mjs';
 import * as skippedTests from './rebrand/skipped-tests.mjs';
+import * as github from './rebrand/github.mjs';
 import * as copyright from './rebrand/copyright.mjs';
 
 // Order matters where rules overlap: later rules see the output of earlier ones.
@@ -49,6 +50,7 @@ for (const rule of [
   review,
   outbound,
   skippedTests,
+  github,
   // Last: it marks every file the rules above changed.
   copyright,
 ])

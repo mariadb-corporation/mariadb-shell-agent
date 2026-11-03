@@ -8,12 +8,15 @@
 /**
  * Test gate for the branded tree: which unit test failures does the branding cause?
  *
- *   node mariadb/verify.mjs [--quick]
+ *   node mariadb/verify.mjs [--quick] [--package <dir>]... [--shard <i>/<n>]
  *
- * 1. Runs the unit tests of the packages the rebrand touches (--quick: all but the CLI's).
+ * 1. Runs the unit tests of the packages the rebrand touches (--quick: all but the CLI's;
+ *    --package: only these; --shard: vitest's share i of n of each package's test files, so CI
+ *    can spread a package over several jobs).
  * 2. Reruns each failing test file on its own, twice, to drop failures that only happen under load.
- * 3. Reruns what still fails against the pristine upstream sources main is built on (temporarily checked out over the
- *    working tree, then restored), so failures upstream has as well are not blamed on us.
+ * 3. Reruns what still fails against the pristine upstream sources the branch is built on
+ *    (mariadb/UPSTREAM, temporarily checked out over the working tree, then restored), so
+ *    failures upstream has as well are not blamed on us.
  *
  * Needs a clean working tree (it restores from HEAD). Exits 1 if failures remain that only the
  * branded tree has.
@@ -32,10 +35,24 @@ const PACKAGES = [
   'packages/core',
   'packages/cli',
 ];
-const quick = process.argv.includes('--quick');
-const packages = quick
-  ? PACKAGES.filter((p) => p !== 'packages/cli')
-  : PACKAGES;
+const args = process.argv.slice(2);
+const optionValues = (name) =>
+  args.flatMap((a, i) => (a === name ? [args[i + 1]] : []));
+const quick = args.includes('--quick');
+const only = optionValues('--package').map((p) => p.replace(/\/$/, ''));
+const shard = optionValues('--shard')[0];
+for (const p of only)
+  if (!PACKAGES.includes(p)) {
+    console.error(
+      `verify: unknown package ${p} (one of ${PACKAGES.join(', ')})`,
+    );
+    process.exit(1);
+  }
+const packages = only.length
+  ? only
+  : quick
+    ? PACKAGES.filter((p) => p !== 'packages/cli')
+    : PACKAGES;
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'mariadb-verify-'));
 
 const git = (...args) =>
@@ -48,12 +65,16 @@ if (git('status', '--porcelain')) {
   process.exit(1);
 }
 
-/** Runs vitest in `pkg` (optionally only `files`); returns the failing tests as "file > name". */
+/**
+ * Runs vitest in `pkg` (only `files`, or the --shard share of all); returns the failing tests as
+ * "file > name".
+ */
 function failingTests(pkg, files = []) {
   const out = path.join(tmp, `${pkg.replaceAll('/', '_')}-${Date.now()}.json`);
+  const select = files.length ? files : shard ? [`--shard=${shard}`] : [];
   spawnSync(
     'npx',
-    ['vitest', 'run', '--reporter=json', `--outputFile=${out}`, ...files],
+    ['vitest', 'run', '--reporter=json', `--outputFile=${out}`, ...select],
     {
       cwd: path.join(root, pkg),
       stdio: 'ignore',
@@ -77,8 +98,10 @@ function failingTests(pkg, files = []) {
   return failed;
 }
 
-// The upstream commit main is built on (it can be older than upstream/main, see --to).
-const base = git('merge-base', 'HEAD', 'upstream/main');
+// The upstream commit the branch is built on (mariadb/sync-upstream.sh records it).
+const base = fs
+  .readFileSync(path.join(root, 'mariadb', 'UPSTREAM'), 'utf8')
+  .trim();
 
 const filesOf = (tests) => [
   ...new Set([...tests].map((t) => t.split(' > ')[0])),

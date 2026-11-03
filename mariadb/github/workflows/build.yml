@@ -1,0 +1,87 @@
+# Copyright (c) 2026, MariaDB plc.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Installed as .github/workflows/build.yml by mariadb/rebrand/github.mjs. Builds the universal
+# VS Code extension (mariadb/build-vsix.sh universal: no native node-pty, so one package runs on
+# every platform, including the MariaDB Cloud Workbench on linux-arm64). Pull requests and manual
+# runs keep it as a workflow artifact; a tag v<mariadb/VERSION> also publishes it as a GitHub
+# Release, which the MariaDB Cloud Workbench bundles. [bypass-ci] skips pull request builds.
+name: 'Build'
+
+on:
+  pull_request:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+concurrency:
+  group: 'build-${{ github.event.pull_request.number || github.ref }}'
+  cancel-in-progress: true
+
+permissions:
+  contents: 'read'
+
+jobs:
+  gate:
+    name: 'bypass-ci gate'
+    runs-on: 'ubuntu-latest'
+    outputs:
+      run: '${{ steps.bypass.outputs.run }}'
+    steps:
+      - uses: 'actions/checkout@v4'
+        with:
+          sparse-checkout: '.github/actions'
+      - id: 'bypass'
+        uses: './.github/actions/bypass-ci'
+
+  vsix:
+    name: 'Universal VSIX'
+    needs: 'gate'
+    if: "needs.gate.outputs.run == 'true'"
+    runs-on: 'ubuntu-latest'
+    timeout-minutes: 60
+    steps:
+      - uses: 'actions/checkout@v4'
+        with:
+          ref: '${{ github.event.pull_request.head.sha || github.sha }}'
+      - uses: 'actions/setup-node@v4'
+        with:
+          node-version: '22'
+      - name: 'Install dependencies'
+        run: 'corepack pnpm install --frozen-lockfile'
+      - name: 'Release tag matches mariadb/VERSION'
+        if: "startsWith(github.ref, 'refs/tags/')"
+        run: |
+          version=$(tr -d '[:space:]' < mariadb/VERSION)
+          [ "$GITHUB_REF_NAME" = "v$version" ] || {
+            echo "::error::tag $GITHUB_REF_NAME does not match mariadb/VERSION ($version); tag v$version"
+            exit 1
+          }
+      - name: 'Build'
+        run: 'mariadb/build-vsix.sh universal'
+      - uses: 'actions/upload-artifact@v4'
+        with:
+          name: 'mariadb-shell-agent-universal'
+          path: 'mariadb/dist/*.vsix'
+          if-no-files-found: 'error'
+
+  release:
+    name: 'GitHub Release'
+    needs: 'vsix'
+    if: "startsWith(github.ref, 'refs/tags/v')"
+    runs-on: 'ubuntu-latest'
+    permissions:
+      contents: 'write'
+    steps:
+      - uses: 'actions/download-artifact@v4'
+        with:
+          name: 'mariadb-shell-agent-universal'
+          path: 'dist'
+      - name: 'Publish'
+        env:
+          GH_TOKEN: '${{ github.token }}'
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/*.vsix \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "MariaDB Shell Agent ${GITHUB_REF_NAME#v}" \
+            --generate-notes

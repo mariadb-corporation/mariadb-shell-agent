@@ -1,0 +1,119 @@
+# Copyright (c) 2026, MariaDB plc.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Installed as .github/workflows/ci.yml by mariadb/rebrand/github.mjs (upstream's workflows are
+# removed). Pull requests: branding check, leak scan and the unit test gate (mariadb/verify.mjs,
+# one job per package or shard). Pushes to main: branding check and leak scan only (the pull
+# request ran the tests), which also catches a squash-merged sync. [bypass-ci] in a pull
+# request's title or newest commit message skips the checks (.github/actions/bypass-ci).
+name: 'CI'
+
+on:
+  pull_request:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+concurrency:
+  group: 'ci-${{ github.event.pull_request.number || github.ref }}'
+  cancel-in-progress: true
+
+permissions:
+  contents: 'read'
+
+jobs:
+  gate:
+    name: 'bypass-ci gate'
+    runs-on: 'ubuntu-latest'
+    outputs:
+      run: '${{ steps.bypass.outputs.run }}'
+    steps:
+      - uses: 'actions/checkout@v4'
+        with:
+          sparse-checkout: '.github/actions'
+      - id: 'bypass'
+        uses: './.github/actions/bypass-ci'
+
+  branding:
+    name: 'Branding and leak scan'
+    needs: 'gate'
+    if: "needs.gate.outputs.run == 'true'"
+    runs-on: 'ubuntu-latest'
+    timeout-minutes: 60
+    steps:
+      # Full history (without file contents until needed): the upstream commit must be an
+      # ancestor, and the rebrand starts from its files.
+      - uses: 'actions/checkout@v4'
+        with:
+          ref: '${{ github.event.pull_request.head.sha || github.sha }}'
+          fetch-depth: 0
+          filter: 'blob:none'
+      - uses: 'actions/setup-node@v4'
+        with:
+          node-version: '22'
+      - name: 'Install dependencies'
+        run: 'corepack pnpm install --frozen-lockfile'
+      - name: 'Upstream commit is in the history'
+        run: |
+          upstream=$(tr -d '[:space:]' < mariadb/UPSTREAM)
+          git merge-base --is-ancestor "$upstream" HEAD || {
+            echo "::error::mariadb/UPSTREAM ($upstream) is not an ancestor of HEAD: a sync was squashed or rebased instead of merged with a merge commit"
+            exit 1
+          }
+      - name: 'Generated files match the rebrand'
+        run: |
+          git config user.name 'MariaDB Shell Agent CI'
+          git config user.email 'ci@localhost'
+          mariadb/sync-upstream.sh --check
+      - name: 'Leak scan'
+        run: 'node mariadb/check-leaks.mjs'
+
+  tests:
+    name: "Tests ${{ matrix.package }}${{ matrix.shard && format(' ({0})', matrix.shard) || '' }}"
+    needs: 'gate'
+    if: "needs.gate.outputs.run == 'true' && github.event_name != 'push'"
+    runs-on: 'ubuntu-latest'
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: 'packages/vscode-ide-companion'
+          - package: 'packages/web-shell'
+          - package: 'packages/acp-bridge'
+          - package: 'packages/sdk-typescript'
+          - package: 'packages/core'
+            shard: '1/2'
+          - package: 'packages/core'
+            shard: '2/2'
+          - package: 'packages/cli'
+            shard: '1/3'
+          - package: 'packages/cli'
+            shard: '2/3'
+          - package: 'packages/cli'
+            shard: '3/3'
+    env:
+      NO_COLOR: 'true'
+      # The tests must not reach a real model provider.
+      OPENAI_API_KEY: ''
+      DASHSCOPE_API_KEY: ''
+      QWEN_API_KEY: ''
+      GEMINI_API_KEY: ''
+      QWEN_DEFAULT_AUTH_TYPE: ''
+    steps:
+      # Full history: verify.mjs reruns failing tests on the upstream commit's sources.
+      - uses: 'actions/checkout@v4'
+        with:
+          ref: '${{ github.event.pull_request.head.sha || github.sha }}'
+          fetch-depth: 0
+          filter: 'blob:none'
+      - uses: 'actions/setup-node@v4'
+        with:
+          node-version: '22'
+      - name: 'Install dependencies'
+        run: 'corepack pnpm install --frozen-lockfile'
+      - name: 'Unit tests (failures upstream also has are not counted)'
+        env:
+          PACKAGE: '${{ matrix.package }}'
+          SHARD: '${{ matrix.shard }}'
+        run: 'node mariadb/verify.mjs --package "$PACKAGE" ${SHARD:+--shard "$SHARD"}'
