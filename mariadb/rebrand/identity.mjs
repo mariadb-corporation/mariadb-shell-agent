@@ -21,6 +21,8 @@ import {
 
 export const EXTENSION_ID = 'MariaDB.mariadb-shell-agent';
 export const EXTENSION_NAME = 'mariadb-shell-agent';
+export const REPOSITORY_URL =
+  'git+https://github.com/mariadb-corporation/mariadb-shell-agent.git';
 
 export function apply() {
   // The npm workspace name is the extension name, so build scripts that address the workspace
@@ -65,12 +67,16 @@ export function apply() {
           'ide companion',
         ],
       });
-      pkg.repository = {
-        ...pkg.repository,
-        url: 'https://github.com/mariadb-corporation/mariadb-shell-agent',
-      };
+      pkg.repository = { ...pkg.repository, url: REPOSITORY_URL };
     },
   );
+
+  // The workspace root's repository is also the dist CLI package's (scripts/prepare-package.js).
+  for (const file of ['package.json', 'packages/cli/package.json'])
+    patchJson('repository', file, (pkg) => {
+      if (!pkg.repository) return false;
+      pkg.repository = { ...pkg.repository, url: REPOSITORY_URL };
+    });
 
   // The repository README, also packaged with the CLI (dist/README.md, the npm page).
   write(

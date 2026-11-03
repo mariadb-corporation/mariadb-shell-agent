@@ -121,7 +121,7 @@ These are good candidates for upstream pull requests, which would retire the pat
 
 | Remote     | URL                                                          | Use                        |
 | ---------- | ------------------------------------------------------------ | -------------------------- |
-| `NAS`      | `https://github.com/mariadb-corporation/mariadb-shell-agent` | our fork; `main` tracks it |
+| `origin`   | `https://github.com/mariadb-corporation/mariadb-shell-agent` | our fork; `main` tracks it |
 | `upstream` | `https://github.com/QwenLM/qwen-code`                        | fetch only (push disabled) |
 
 ## Sync with upstream
