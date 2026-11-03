@@ -31,7 +31,7 @@ OpenAI-compatible endpoint (including local servers):
 }
 ```
 
-Usage statistics and self-update are off, and MariaDB Shell Agent contacts no Alibaba services.
+Usage statistics and self-update are off, and MariaDB Shell Agent contacts no upstream services.
 
 How this fork is maintained (syncing with upstream, branding rules, checks, releases):
 `mariadb/README.md`.
