@@ -8,6 +8,12 @@ description: >-
   corepack), with pnpm's content-addressable store cached by the lockfile's hash. A lockfile
   change restores the newest older store, so only the changed packages are downloaded. Caches
   saved on main are shared with every pull request; a pull request's own cache stays with it.
+inputs:
+  build:
+    description: >-
+      'false' skips the build the root prepare script runs after the install (QWEN_SKIP_PREPARE),
+      for jobs that only read sources: about 9 of the install's 10 minutes.
+    default: 'true'
 runs:
   using: 'composite'
   steps:
@@ -28,4 +34,6 @@ runs:
         key: "pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}"
         restore-keys: 'pnpm-store-${{ runner.os }}-'
     - shell: 'bash'
+      env:
+        QWEN_SKIP_PREPARE: "${{ inputs.build == 'false' && '1' || '' }}"
       run: 'pnpm install --frozen-lockfile'
