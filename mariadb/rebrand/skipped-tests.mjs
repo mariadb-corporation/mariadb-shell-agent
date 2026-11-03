@@ -140,6 +140,15 @@ const SKIPPED = [
       ],
     },
   },
+  {
+    reason:
+      "Upstream's GitHub workflows are removed (github.mjs): the autofix workflow's census filter is not there to agree with.",
+    tests: {
+      'packages/cli/src/commands/review/lib/review-footer.test.ts': [
+        'agrees with the autofix census filter, which is a second spelling of the same shape',
+      ],
+    },
+  },
 ];
 
 export function apply() {

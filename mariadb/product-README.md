@@ -31,6 +31,7 @@ OpenAI-compatible endpoint (including local servers):
 
 Usage statistics and self-update are off, and MariaDB Shell Agent contacts no Alibaba services.
 
-How this fork is maintained (rebasing on upstream, branding rules, checks): `mariadb/README.md`.
+How this fork is maintained (syncing with upstream, branding rules, checks, releases):
+`mariadb/README.md`.
 
 Apache-2.0, like upstream Qwen Code.
