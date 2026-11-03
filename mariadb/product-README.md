@@ -1,6 +1,8 @@
 # MariaDB Shell Agent
 
-MariaDB Shell Agent is an AI agent for MariaDB in the terminal and in VS Code, built by MariaDB on
+MariaDB Shell Agent is an AI agent for MariaDB in the terminal and in VS Code,
+built by MariaDB on
+[Gemini CLI](https://github.com/google-gemini/gemini-cli) and
 [Qwen Code](https://github.com/QwenLM/qwen-code).
 
 - Command: `mariadb-shell-agent` (short: `msa`)
@@ -34,4 +36,4 @@ Usage statistics and self-update are off, and MariaDB Shell Agent contacts no Al
 How this fork is maintained (syncing with upstream, branding rules, checks, releases):
 `mariadb/README.md`.
 
-Apache-2.0, like upstream Qwen Code.
+Apache-2.0, like upstream Gemini CLI and Qwen Code.
