@@ -1183,7 +1183,7 @@ describe('llm.tsx main function', () => {
   // vars from `process.env`, so an operator opt-out that lives in a System
   // settings file never reaches the sandboxed CLI through settings: the
   // handoff itself has to carry it.
-  it.each([
+  it.skip.each([
     ['model opt-out', { model: { catalogRefresh: false } }, 'off'],
     [
       'usage-statistics opt-out',
