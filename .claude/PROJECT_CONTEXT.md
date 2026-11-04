@@ -1,5 +1,14 @@
 # Project context: mariadb-code
 
+> **IMPORTANT — never edit a file outside `mariadb/` and `.claude/` by hand**, not even editor or
+> tool config (`.vscode/`, `package.json`, `.github/`). Those files are generated from upstream by
+> `mariadb/rebrand.mjs`: a hand edit is wiped by the next `mariadb/sync-upstream.sh` run and fails
+> CI's "Generated files match the rebrand" (`--check`) on the push to `main`. Make the change as a
+> rule in `mariadb/rebrand/` (`patch`/`patchJson`) or a patch in `mariadb/patches/`, commit it, then
+> run `mariadb/sync-upstream.sh --regenerate`. Such a PR must not carry `[bypass-ci]`: the PR would
+> skip the check that `main` then fails. When something in a generated file "came back" after a
+> sync, the cause is a missing rule, not a merge.
+
 ## Project
 
 A fork of [Qwen Code](https://github.com/QwenLM/qwen-code) rebranded as **MariaDB Shell Agent** (former name MariaDB Code / `mariadb-code` / `mdbc`;
@@ -326,11 +335,12 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   16 KiB-page kernels such as the Raspberry Pi 5; the CLI falls back to a system `rg` (apt `ripgrep`),
   else to its built-in grep.
 - The CLI bundle for quick tests: `npm run bundle` produces `dist/cli.js` (no `cli-entry.js`).
-- `.vscode/settings.json` carries a fork-only `npm.exclude` (packages, integrations, integration-tests,
-  docs-site, scripts, `dist/`) so VS Code's NPM Scripts view lists only the root `package.json`;
-  `dist/examples/*/package.json` is build output. It is a plain commit on an upstream file (no rule or
-  patch): keep it when a sync merge conflicts there. Earlier local-only edits of this file were lost, so
-  commit such workspace settings.
+- Every file outside `mariadb/` and `.claude/` is generated, editor config included: a hand edit is
+  reset by `sync-upstream.sh --regenerate` and fails CI's "Generated files match the rebrand"
+  (`--check`) on the push to `main`. Change it through a rule or patch. A diff that touches a
+  generated file is not `[bypass-ci]`: the pull request would skip the check that `main` then fails.
+  Example: `rebrand/vscode-settings.mjs` adds `npm.exclude` to `.vscode/settings.json` so VS Code's
+  NPM Scripts view lists only the root `package.json` (`dist/examples/*/package.json` is build output).
 - `.claude/` is ignored by upstream's `.gitignore`; its files are tracked, but changes need `git add -f`.
 - Measuring prompt caching: point a provider's `baseUrl` (in a temporary HOME's
   `.mariadb-shell-agent/settings.json`) at a recording stub, run the CLI (`-p`, `--continue`, or `--acp` with a
