@@ -48,7 +48,7 @@
         {
           "id": "mariadb-shell-agent-sidebar",
           "title": "MariaDB Shell Agent",
-          "icon": "assets/activity-bar-78bbfacd.svg"
+          "icon": "assets/activity-bar-2f7602b5.svg"
         }
       ]
     },
@@ -58,7 +58,7 @@
           "type": "webview",
           "id": "mariadb-shell-agent.chatView.sidebar",
           "name": "MariaDB Shell Agent",
-          "icon": "assets/activity-bar-78bbfacd.svg"
+          "icon": "assets/activity-bar-2f7602b5.svg"
         }
       ]
     },

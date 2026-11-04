@@ -36,18 +36,35 @@ function declarations(css = '') {
     .filter(([key, value]) => key && value);
 }
 
+/** Root attributes of an SVG that are not presentation properties. */
+const NON_PRESENTATION = new Set([
+  'xmlns',
+  'width',
+  'height',
+  'viewBox',
+  'version',
+  'id',
+  'style',
+]);
+
 /**
  * A monochrome SVG as exported by a design tool (Affinity: XML prolog, DOCTYPE, editor ids and
- * namespaces, presentation properties in style attributes): its viewBox, the root's presentation
- * properties as attributes, and the drawing with its own as attributes. Only plain shapes are
- * supported; links, images or references inside the drawing stop the run.
+ * namespaces, presentation properties in style attributes) or an optimizer (presentation
+ * attributes on the root): its viewBox, the root's presentation properties as attributes, and the
+ * drawing with its own as attributes. Only plain shapes are supported; links, images or
+ * references inside the drawing stop the run.
  */
 function svgParts(svg, name) {
   const rootTag = svg.match(/<svg\b[^>]*>/)?.[0];
   if (!rootTag) throw new Error(`${name}: no <svg> element`);
   const viewBox = rootTag.match(/viewBox="([^"]+)"/)?.[1];
   if (!viewBox) throw new Error(`${name}: the <svg> element has no viewBox`);
-  const rootAttributes = declarations(rootTag.match(/style="([^"]*)"/)?.[1]);
+  const rootAttributes = [
+    ...[...rootTag.matchAll(/\s([\w-]+)="([^"]*)"/g)]
+      .map(([, key, value]) => [key, value])
+      .filter(([key]) => !NON_PRESENTATION.has(key)),
+    ...declarations(rootTag.match(/style="([^"]*)"/)?.[1]),
+  ];
   const drawing = svg
     .slice(svg.indexOf(rootTag) + rootTag.length, svg.lastIndexOf('</svg>'))
     .replace(/<!--[\s\S]*?-->/g, '')
@@ -83,7 +100,8 @@ function drawingJsx(drawing, indent) {
     );
     const end = selfClosing ? ' />' : '>';
     const oneLine = `${pad}<${tag}${attrs.map((a) => ` ${a}`).join('')}${end}`;
-    if (oneLine.length <= 80) lines.push(oneLine);
+    // Prettier never breaks an element whose only attribute is a string.
+    if (oneLine.length <= 80 || attrs.length === 1) lines.push(oneLine);
     else
       lines.push(
         `${pad}<${tag}`,
@@ -113,13 +131,11 @@ export function apply() {
   // shipped under a content-hashed name: VS Code caches the icon by URL, and installing the same
   // extension version again would keep showing the previous artwork.
   copyAsset(
-    'mariadb-shell-agent-ext.svg',
+    'activityBar-agent.svg',
     'packages/vscode-ide-companion/assets/sidebar-icon.svg',
   );
   {
-    const svg = fs.readFileSync(
-      path.join(assets, 'mariadb-shell-agent-ext.svg'),
-    );
+    const svg = fs.readFileSync(path.join(assets, 'activityBar-agent.svg'));
     const hash = crypto
       .createHash('sha256')
       .update(svg)
@@ -287,24 +303,23 @@ export function apply() {
       (_, a) => `${a}line-height: 30px;`,
       (t) => t.includes('line-height: 30px;'),
     );
-    // The product name in the welcome title takes the gradient of mariadb.com's "Agentic
-    // Enterprise" heading (class text-sublime-gradient), shown there on a dark background. The dark
-    // theme (first definition) uses its colors, the light theme (second) fully saturated, darker
-    // shades of cyan, green and lime (contrast at least 3:1 on the white panel, the minimum for large
-    // text; the originals are 1.2-1.6:1).
-    const gradient = (cyan, green, lime) =>
+    // The product name in the welcome title takes the gradient the MariaDB VS Code extension's
+    // Overview draws its "Workbench" title in (`.overview-title-workbench` in its
+    // overviewStyles.css): the dark theme (first definition) cyan, green and yellow, the light
+    // theme (second) purple, cyan and green. The VS Code extension's welcome and provider setup
+    // pages carry the same two (`TITLE_GRADIENT`, patch 0016).
+    const gradient = (first, middle, last) =>
       [
         '--agent-logo-gradient: linear-gradient(',
         '    90deg,',
-        `    ${cyan} 0%,`,
-        '    25%,',
-        `    ${green} 50%,`,
+        `    ${first} 25%,`,
+        `    ${middle} 50%,`,
         '    75%,',
-        `    ${lime} 100%`,
+        `    ${last}`,
         '  );',
       ].join('\n');
-    const darkGradient = gradient('#51d9f7', '#8ce786', '#cdf70a');
-    const lightGradient = gradient('#0093c4', '#00a37a', '#5c9f00');
+    const darkGradient = gradient('#3dd3ee', '#8ce783', '#ffd401');
+    const lightGradient = gradient('#8f3bfc', '#3dd3ee', '#26d044');
     let definition = 0;
     patch(
       'welcome title gradient',
