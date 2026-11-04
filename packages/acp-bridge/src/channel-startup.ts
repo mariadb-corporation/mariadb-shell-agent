@@ -33,7 +33,7 @@ import {
 } from './channel-handshake.js';
 import {
   terminateChannel,
-  channelUnavailableReject,
+  raceChannelUnavailable,
 } from './channel-transport.js';
 import {
   startChannelLivenessMonitor,
@@ -296,15 +296,16 @@ export function createChannelStartup({
             initTimeoutMs - (Date.now() - startupStartedAt),
           );
           const response = await withTimeout(
-            Promise.race([
+            raceChannelUnavailable(
+              channel,
               connection.initialize(
                 createChannelInitializeRequest(
                   privateParentCapability,
                   delegateReadTextFileToClient,
                 ),
               ),
-              channelUnavailableReject(channel, 'during initialize'),
-            ]),
+              'during initialize',
+            ),
             remainingStartupMs,
             'initialize',
           );

@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// The trees a `ui.render` hook draws, judged by Claude Code 2.1.310's rules.
+// The trees a `ui.render` hook draws, judged by Claude Code 2.1.318's rules.
 // The worker checks each hook's answer and the host the tree the chain settles
 // on, so a tree MariaDB Shell Agent accepts is one Claude Code accepts.
 

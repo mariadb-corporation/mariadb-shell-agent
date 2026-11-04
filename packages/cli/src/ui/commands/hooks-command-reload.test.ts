@@ -72,6 +72,7 @@ describe('/hooks reload with real settings files', () => {
       settingsFile(path.join(directory, 'defaults.json'), {}),
       settingsFile(path.join(directory, 'user/settings.json'), {
         hooks: { Stop: hook('echo user') },
+        security: { folderTrust: { enabled: true } },
       }),
       settingsFile(path.join(repo, '.mariadb-shell-agent/settings.json'), {
         hooks: { PreToolUse: hook('echo project') },
@@ -88,6 +89,7 @@ describe('/hooks reload with real settings files', () => {
       targetDir: cwd,
       cwd,
       debugMode: false,
+      folderTrust: true,
       trustedFolder: trusted,
       usageStatisticsEnabled: false,
       ...resolveHookSettingsForConfig(

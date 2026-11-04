@@ -45,7 +45,11 @@ import {
   type ToolConfirmationPayload,
 } from '../tools/tools.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
-import { todoWorkChainContext } from '../utils/promptIdContext.js';
+import { getInvocationContext } from '../utils/invocation-context.js';
+import {
+  promptIdContext,
+  todoWorkChainContext,
+} from '../utils/promptIdContext.js';
 import { stripAnsiAndControl } from '../utils/textUtils.js';
 import {
   buildFailureLines,
@@ -318,6 +322,8 @@ export type WorkflowEvent = WorkflowEventPayload & { id: string };
  * the most recent `phase()` call.
  */
 export interface WorkflowTask extends TaskBase<WorkflowStatus> {
+  /** Turn that registered this workflow run. */
+  sourceTurnId?: string;
   sourceRef?: WorkflowSourceRef;
   workflowCalls?: WorkflowCallTrace[];
   workflowCallsTruncated?: boolean;
@@ -532,6 +538,7 @@ export interface WorkflowRunCompletionMeta {
   runId: string;
   status: Extract<WorkflowStatus, 'completed' | 'failed'>;
   todoWorkChainId?: string;
+  sourceTurnId?: string;
 }
 export type WorkflowRunCompletionCallback = (
   displayText: string,
@@ -780,6 +787,7 @@ export class WorkflowRunRegistry {
       runId: entry.runId,
       status: entry.status,
       todoWorkChainId: entry.todoWorkChainId,
+      sourceTurnId: entry.sourceTurnId,
     };
     try {
       runOutsideAgentContext(() =>
@@ -908,6 +916,8 @@ export class WorkflowRunRegistry {
     entry.notified = false;
     entry.isBackgrounded = registration.isBackgrounded ?? false;
     entry.todoWorkChainId ??= todoWorkChainContext.getStore();
+    entry.sourceTurnId ??=
+      getInvocationContext()?.promptId ?? promptIdContext.getStore();
     entry.currentPhase = null;
     entry.phases = [];
     entry.phaseVisits = [];
