@@ -156,6 +156,9 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
     (`docs/users/configuration/settings.md`, checked by `settings-docs-sync.test`); the
     analytics endpoint is `usage-statistics.invalid` with an empty app id; dist npm name
     `@mariadb/mariadb-shell-agent` (npm self-update finds nothing); no OpenRouter/Requesty attribution headers.
+    Upstream's background models.dev catalog refresh (#16066, operator settings switch, env-var off switch
+    wins) runs only with usage statistics on, so it is off by default here too; the CLI's sandbox handoff
+    always carries the refresh switch "off".
 - **Names**: `~/.mariadb-shell-agent` and `<project>/.mariadb-shell-agent` (the repo's own project dir is renamed too),
   `MARIADB-SHELL-AGENT.md`, `.mariadb-shell-agentignore`, commands `mariadb-shell-agent`/`msa` (also in help text and logs),
   extension ids `mariadb-shell-agent.*`, terminal title "MariaDB Shell Agent - <folder>", `/review` footer.
@@ -309,7 +312,8 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   which carries the same fixes (check with `git log <base>..upstream/main --grep='(#<PR>)'`).
 - Upstream tests can rely on auto-update or usage statistics defaulting on without saying so, e.g. a
   concurrent dynamic import that misses the test's settings mock and reads empty real settings
-  (`daemon-update.test`): skip them in `skipped-tests.mjs` under the default-off reasons, don't
+  (`daemon-update.test`), or a "no opt-out" case expecting no switch in the sandbox handoff
+  (`llm.test`'s catalog refresh handoff test): skip them in `skipped-tests.mjs` under the default-off reasons, don't
   change the default.
 - macOS has no `timeout` command; bound test runs inside the Node script instead.
 - Claude plugins install from a local clone used as marketplace: `extensions install <repo>:<plugin>
@@ -322,6 +326,11 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   16 KiB-page kernels such as the Raspberry Pi 5; the CLI falls back to a system `rg` (apt `ripgrep`),
   else to its built-in grep.
 - The CLI bundle for quick tests: `npm run bundle` produces `dist/cli.js` (no `cli-entry.js`).
+- `.vscode/settings.json` carries a fork-only `npm.exclude` (packages, integrations, integration-tests,
+  docs-site, scripts, `dist/`) so VS Code's NPM Scripts view lists only the root `package.json`;
+  `dist/examples/*/package.json` is build output. It is a plain commit on an upstream file (no rule or
+  patch): keep it when a sync merge conflicts there. Earlier local-only edits of this file were lost, so
+  commit such workspace settings.
 - `.claude/` is ignored by upstream's `.gitignore`; its files are tracked, but changes need `git add -f`.
 - Measuring prompt caching: point a provider's `baseUrl` (in a temporary HOME's
   `.mariadb-shell-agent/settings.json`) at a recording stub, run the CLI (`-p`, `--continue`, or `--acp` with a
