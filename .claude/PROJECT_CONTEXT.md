@@ -326,11 +326,12 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   16 KiB-page kernels such as the Raspberry Pi 5; the CLI falls back to a system `rg` (apt `ripgrep`),
   else to its built-in grep.
 - The CLI bundle for quick tests: `npm run bundle` produces `dist/cli.js` (no `cli-entry.js`).
-- `.vscode/settings.json` carries a fork-only `npm.exclude` (packages, integrations, integration-tests,
-  docs-site, scripts, `dist/`) so VS Code's NPM Scripts view lists only the root `package.json`;
-  `dist/examples/*/package.json` is build output. It is a plain commit on an upstream file (no rule or
-  patch): keep it when a sync merge conflicts there. Earlier local-only edits of this file were lost, so
-  commit such workspace settings.
+- Every file outside `mariadb/` and `.claude/` is generated, editor config included: a hand edit is
+  reset by `sync-upstream.sh --regenerate` and fails CI's "Generated files match the rebrand"
+  (`--check`) on the push to `main`. Change it through a rule or patch. A diff that touches a
+  generated file is not `[bypass-ci]`: the pull request would skip the check that `main` then fails.
+  Example: `rebrand/vscode-settings.mjs` adds `npm.exclude` to `.vscode/settings.json` so VS Code's
+  NPM Scripts view lists only the root `package.json` (`dist/examples/*/package.json` is build output).
 - `.claude/` is ignored by upstream's `.gitignore`; its files are tracked, but changes need `git add -f`.
 - Measuring prompt caching: point a provider's `baseUrl` (in a temporary HOME's
   `.mariadb-shell-agent/settings.json`) at a recording stub, run the CLI (`-p`, `--continue`, or `--acp` with a

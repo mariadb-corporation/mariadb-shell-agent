@@ -56,7 +56,7 @@ upstream: ─ U1 ─────────────────── U2
   upstream commit, so a pull request shows the rule change and its effect on the code.
 - `mariadb/rebrand.mjs` runs the rules in `mariadb/rebrand/`, one module per topic (identity,
   version, product name, name length, alibaba, paths, cli-name, extension-ids, review, skipped-tests,
-  github, copyright). Each rule fails loudly when upstream moves its anchor.
+  github, vscode-settings, copyright). Each rule fails loudly when upstream moves its anchor.
 - `mariadb/rebrand/github.mjs` removes upstream's GitHub workflows, Dependabot config and code
   owners (they belong to QwenLM's repository) and installs ours from `mariadb/github/`.
 - `mariadb/rebrand/copyright.mjs` runs last. It adds `Copyright (c) 2026, MariaDB plc.` to the
