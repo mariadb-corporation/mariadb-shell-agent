@@ -174,15 +174,15 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   images; the brand tests tell it from an operator logo by the data URI type); Affinity exports
   are fine as they are (`svgParts` in `artwork.mjs` strips prolog, editor ids/namespaces, turns
   styles into attributes; `seal-mono.svg` must be plain shapes, else the run stops); activity
-  bar = `mariadb/assets/mariadb-shell-agent-ext.svg`, shipped as `assets/activity-bar-<sha8>.svg` because VS Code
+  bar = `mariadb/assets/activityBar-agent.svg`, shipped as `assets/activity-bar-<sha8>.svg` because VS Code
   caches icons by URL and a same-version reinstall would keep the old one; MARIADB ASCII banner in
   `mariadb/assets/ascii-logo.txt`. Web Shell welcome screen (artwork rule): `WelcomeSeal.tsx` is
   generated from `mariadb/assets/seal-mono.svg` and shown above the title (text color), the wrapped
   title has no row gap, its subtitle (`welcome.prompt`) reads "What would you like to work on?"
-  (`product-name.mjs`, anchored to the key); the product name uses mariadb.com's "Agentic Enterprise" gradient
-  (`--agent-logo-gradient` in `App.module.css`: `.themeDark` #51d9f7 → #8ce786 → #cdf70a, `.themeLight`
-  #0093c4 → #00a37a → #5c9f00, saturated shades with at least 3:1 contrast on white; the originals
-  are unreadable there).
+  (`product-name.mjs`, anchored to the key); the product name uses the gradient the MariaDB VS Code
+  extension's Overview draws its "Workbench" title in (`--agent-logo-gradient` in `App.module.css`:
+  `.themeDark` #3dd3ee → #8ce783 → #ffd401, `.themeLight` #8f3bfc → #3dd3ee → #26d044; patch 0016's
+  `TITLE_GRADIENT` carries the same two).
 - **Checks**: `mariadb/check-leaks.mjs [paths|.vsix]` scans source or build output for old names (also the
   former MariaDB Code names), Alibaba and QwenLM hosts, outbound identifiers; exceptions with reasons in `mariadb/leak-allowlist.json`.
   `mariadb/verify.mjs [--quick] [--package <dir>]… [--shard i/n]` runs vitest in vscode-ide-companion, web-shell, acp-bridge,
