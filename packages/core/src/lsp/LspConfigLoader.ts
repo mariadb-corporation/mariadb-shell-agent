@@ -374,6 +374,7 @@ export class LspConfigLoader {
       command,
       args,
       transport,
+      source: options.forceTrustRequired ? 'workspace' : 'extension',
       env,
       initializationOptions,
       settings,
