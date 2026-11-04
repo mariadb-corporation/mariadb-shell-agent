@@ -188,6 +188,11 @@ Our workflows live in `mariadb/github/` and are installed into `.github/` by the
 skipped, which counts as passed for required checks). It only works for branches of this
 repository, not for pull requests from forks.
 
+Branch protection on main requires the checks `Branding and leak scan` and `Tests`. `Tests` is a
+summary job that passes when every test shard passed or `[bypass-ci]` skipped them; a skipped
+matrix job reports under its unexpanded name, so requiring the shards themselves would leave a
+`[bypass-ci]` pull request waiting forever. Changing the shards needs no protection change.
+
 ## Build the VS Code extension
 
 Releases are built by GitHub Actions: bump `mariadb/VERSION` in a pull request, then tag the

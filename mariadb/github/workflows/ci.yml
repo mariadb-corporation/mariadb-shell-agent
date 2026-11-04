@@ -5,7 +5,8 @@
 # removed). Pull requests: branding check, leak scan and the unit test gate (mariadb/verify.mjs,
 # one job per package or shard). Pushes to main: branding check and leak scan only (the pull
 # request ran the tests), which also catches a squash-merged sync. [bypass-ci] in a pull
-# request's title or newest commit message skips the checks (.github/actions/bypass-ci).
+# request's title or newest commit message skips the checks (.github/actions/bypass-ci). Branch
+# protection requires "Branding and leak scan" and "Tests" (the result of every test shard).
 name: 'CI'
 
 on:
@@ -114,3 +115,19 @@ jobs:
           PACKAGE: '${{ matrix.package }}'
           SHARD: '${{ matrix.shard }}'
         run: 'node mariadb/verify.mjs --package "$PACKAGE" ${SHARD:+--shard "$SHARD"}'
+
+  # The one test check branch protection requires. A skipped matrix job reports a single check
+  # under its unexpanded name ("Tests ${{ matrix.package }}..."), so requiring the shards by name
+  # would leave a [bypass-ci] pull request waiting forever; this job always reports as "Tests".
+  tests-result:
+    name: 'Tests'
+    needs: ['gate', 'tests']
+    if: "always() && github.event_name != 'push'"
+    runs-on: 'ubuntu-latest'
+    steps:
+      - env:
+          GATE: '${{ needs.gate.result }}'
+          TESTS: '${{ needs.tests.result }}'
+        run: |
+          echo "gate: $GATE, tests: $TESTS"
+          [ "$GATE" = success ] && { [ "$TESTS" = success ] || [ "$TESTS" = skipped ]; }
