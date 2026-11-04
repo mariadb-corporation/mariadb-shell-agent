@@ -16,6 +16,11 @@ const SKIPPED = [
   {
     reason: 'Usage statistics are off by default (alibaba.mjs).',
     tests: {
+      // Its "no opt-out" case expects no refresh switch in the sandbox handoff; with statistics
+      // off by default the handoff always carries "off" (the catalog refresh needs statistics on).
+      'packages/cli/src/llm.test.tsx': [
+        'carries the operator catalog refresh opt-out into the sandbox handoff (%s)',
+      ],
       'packages/core/src/config/config.test.ts': [
         'defaults usage statistics to enabled if not specified',
       ],
