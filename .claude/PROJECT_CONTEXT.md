@@ -1,5 +1,14 @@
 # Project context: mariadb-code
 
+> **IMPORTANT — never edit a file outside `mariadb/` and `.claude/` by hand**, not even editor or
+> tool config (`.vscode/`, `package.json`, `.github/`). Those files are generated from upstream by
+> `mariadb/rebrand.mjs`: a hand edit is wiped by the next `mariadb/sync-upstream.sh` run and fails
+> CI's "Generated files match the rebrand" (`--check`) on the push to `main`. Make the change as a
+> rule in `mariadb/rebrand/` (`patch`/`patchJson`) or a patch in `mariadb/patches/`, commit it, then
+> run `mariadb/sync-upstream.sh --regenerate`. Such a PR must not carry `[bypass-ci]`: the PR would
+> skip the check that `main` then fails. When something in a generated file "came back" after a
+> sync, the cause is a missing rule, not a merge.
+
 ## Project
 
 A fork of [Qwen Code](https://github.com/QwenLM/qwen-code) rebranded as **MariaDB Shell Agent** (former name MariaDB Code / `mariadb-code` / `mdbc`;
