@@ -8,7 +8,7 @@
   {
     "check": "product-name",
     "file": "README\\.md$",
-    "text": "MariaDB build of \\[Qwen Code\\]|upstream Qwen Code",
+    "text": "MariaDB build of \\[Qwen Code\\]|upstream (?:Gemini CLI and )?Qwen Code",
     "reason": "Our README credits the upstream project."
   },
   {
@@ -84,7 +84,7 @@
   {
     "check": "product-name",
     "file": "(^|/)[Rr][Ee][Aa][Dd][Mm][Ee]\\.md$",
-    "text": "\\[Qwen Code\\]|upstream Qwen Code",
+    "text": "\\[Qwen Code\\]|upstream (?:Gemini CLI and )?Qwen Code",
     "reason": "Our READMEs credit the upstream project."
   },
   {

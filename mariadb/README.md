@@ -180,6 +180,9 @@ Our workflows live in `mariadb/github/` and are installed into `.github/` by the
   tag, and give the `release` job `environment: 'release-build'`, as the shell's release does.
 - `CODEOWNERS`: the devtools team reviews every pull request; the branch protection on main
   only lets its members merge one.
+- `actions/pnpm-install`: Node.js 22 and `pnpm install --frozen-lockfile` for every job, with
+  pnpm's store cached by the lockfile's hash (caches saved on main are shared with pull requests).
+  `build: 'false'` skips the monorepo build the install otherwise runs (the branding job).
 
 `[bypass-ci]` in a pull request's title or newest commit message skips both (the jobs report as
 skipped, which counts as passed for required checks). It only works for branches of this
