@@ -5,7 +5,9 @@
 # VS Code extension (mariadb/build-vsix.sh universal: no native node-pty, so one package runs on
 # every platform, including the MariaDB Cloud Workbench on linux-arm64). Pull requests and manual
 # runs keep it as a workflow artifact; a tag v<mariadb/VERSION> also publishes it as a GitHub
-# Release, which the MariaDB Cloud Workbench bundles. [bypass-ci] skips pull request builds.
+# Release, which the MariaDB Cloud Workbench bundles. Only repository admins can push such a tag
+# (the Create Release ruleset), so a release is always started by hand; this private repository
+# cannot use environment reviewers. [bypass-ci] skips pull request builds.
 name: 'Build'
 
 on:

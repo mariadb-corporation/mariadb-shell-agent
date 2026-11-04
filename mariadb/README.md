@@ -173,7 +173,13 @@ Our workflows live in `mariadb/github/` and are installed into `.github/` by the
   the unit test gate (`verify.mjs`, one job per package or shard); on main, the branding check
   and leak scan (which also catch a squashed sync).
 - `build.yml`: the universal VS Code extension, as a workflow artifact on pull requests and manual
-  runs; a tag `v<mariadb/VERSION>` also publishes it as a GitHub Release.
+  runs; a tag `v<mariadb/VERSION>`, which only repository admins can push, also publishes it as
+  a GitHub Release. A release therefore always starts by hand (environment reviewers are not
+  available on a private repository with our GitHub plan). Once the repository is public, add a
+  `release-build` environment with the devtools team as required reviewer and `v*` as its only
+  tag, and give the `release` job `environment: 'release-build'`, as the shell's release does.
+- `CODEOWNERS`: the devtools team reviews every pull request; the branch protection on main
+  only lets its members merge one.
 - `actions/pnpm-install`: Node.js 22 and `pnpm install --frozen-lockfile` for every job, with
   pnpm's store cached by the lockfile's hash (caches saved on main are shared with pull requests).
   `build: 'false'` skips the monorepo build the install otherwise runs (the branding job).
@@ -185,7 +191,8 @@ repository, not for pull requests from forks.
 ## Build the VS Code extension
 
 Releases are built by GitHub Actions: bump `mariadb/VERSION` in a pull request, then tag the
-merged commit.
+merged commit. Only repository admins can push a `v*` tag, and pushing it is what publishes
+the release.
 
 ```sh
 git tag v$(cat mariadb/VERSION) && git push origin v$(cat mariadb/VERSION)   # GitHub Release with the universal .vsix
