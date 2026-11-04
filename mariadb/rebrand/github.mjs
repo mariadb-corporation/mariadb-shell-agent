@@ -8,8 +8,9 @@
  * GitHub setup. Upstream's Actions workflows, Dependabot config and code owners belong to QwenLM's
  * repository: here they would run against secrets and runners we don't have, open dependency
  * pull requests and request reviews from upstream's maintainers. They are removed, and our own
- * workflows and actions from mariadb/github/ take their place. Upstream's .github/scripts and
- * .github/actions stay (upstream tests read some of them, our workflows don't use them).
+ * workflows, actions and code owners from mariadb/github/ take their place. Upstream's
+ * .github/scripts and .github/actions stay (upstream tests read some of them, our workflows don't
+ * use them).
  */
 import fs from 'node:fs';
 import path from 'node:path';
