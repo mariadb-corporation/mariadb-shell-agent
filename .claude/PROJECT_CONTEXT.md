@@ -56,6 +56,8 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   GitHub Release). `[bypass-ci]` in a PR title or newest commit message skips their jobs via the
   `bypass-ci` composite action (job-level `if`, so required checks count as passed; GitHub's `[skip ci]`
   would leave them pending); only for branches of this repository, not fork PRs.
+  Branch protection requires `Branding and leak scan` and `Tests` only: `Tests` is a summary job over
+  the matrix (a skipped matrix reports under its unexpanded name, so required shard names would hang).
   Every job installs through the `pnpm-install` composite action (setup-node without its own
   cache, `corepack enable`, `actions/cache` of `pnpm store path` keyed by `pnpm-lock.yaml`). The
   install's root `prepare` builds the whole monorepo (~9 min); `build: 'false'` sets `QWEN_SKIP_PREPARE`
