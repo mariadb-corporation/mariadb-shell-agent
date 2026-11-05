@@ -43,8 +43,8 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   (that drops the upstream parent; CI on main checks `mariadb/UPSTREAM` is an ancestor). If main moved
   meanwhile, rerun the sync on the branch instead of "Update branch".
 - **`mariadb/rebrand.mjs`** runs rule modules from `mariadb/rebrand/` in order: `patches`, `identity`,
-  `version`, `product-name`, `name-length`, `artwork`, `alibaba`, `paths`, `cli-name`, `extension-ids`, `review`, `outbound`,
-  `skipped-tests`, `github`, `vscode-settings`, `notices`, `copyright`. Helpers in `lib.mjs`: `patch()` must find its anchor (skips when `alreadyDone`),
+  `version`, `product-name`, `name-length`, `artwork`, `alibaba`, `channels`, `paths`, `cli-name`, `extension-ids`, `review`,
+  `outbound`, `skipped-tests`, `github`, `vscode-settings`, `notices`, `copyright`. Helpers in `lib.mjs`: `patch()` must find its anchor (skips when `alreadyDone`),
   `replaceInTracked()` (string or RegExp pairs, never touches lines containing "copyright"), `rename()`
   (moves files and maps git-listed paths; `renamedFiles()` lists the targets), `remove()`, `skipTests()`.
   A rule whose anchor upstream removed stops the run. The script is idempotent (a second run changes
@@ -181,6 +181,11 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
     Upstream's background models.dev catalog refresh (#16066, operator settings switch, env-var off switch
     wins) runs only with usage statistics on, so it is off by default here too; the CLI's sandbox handoff
     always carries the refresh switch "off".
+- **Channels (`channels.mjs`)**: the QQ Bot channel leaves the CLI bundle (its connector is
+  `UNLICENSED`, see gotchas): registry entry in `channel-registry.ts`, `@qwen-code/channel-qqbot` in
+  `packages/cli/package.json` and the matching lines of the `packages/cli` importer in
+  `pnpm-lock.yaml` (so `--frozen-lockfile` still matches), `docs/users/features/channels/qqbot.md`
+  with its `_meta.ts` entry and overview links. `packages/channels/qqbot` stays in the workspace.
 - **Names**: `~/.mariadb-shell-agent` and `<project>/.mariadb-shell-agent` (the repo's own project dir is renamed too),
   `MARIADB-SHELL-AGENT.md`, `.mariadb-shell-agentignore`, commands `mariadb-shell-agent`/`msa` (also in help text and logs),
   extension ids `mariadb-shell-agent.*`, terminal title "MariaDB Shell Agent - <folder>", `/review` footer.
@@ -340,9 +345,12 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   (`daemon-update.test`), or a "no opt-out" case expecting no switch in the sandbox handoff
   (`llm.test`'s catalog refresh handoff test): skip them in `skipped-tests.mjs` under the default-off reasons, don't
   change the default.
-- `@tencent-connect/qqbot-connector` (QQ bot channel, in the CLI bundle) declares `UNLICENSED` and
-  ships no license file or repository; upstream bundles it as is. It is listed as declared in the
-  notices; a decision on shipping it is open.
+- `@tencent-connect/qqbot-connector` (QQ Bot channel) declares `UNLICENSED` and ships no license file
+  or repository; upstream bundles it as is. `rebrand/channels.mjs` removes the channel from the CLI
+  bundle (registry entry, `packages/cli` dependency and its lockfile importer line, user guide); the
+  workspace package stays so upstream's workspace lists and tests keep working. A new upstream
+  dependency without a license text shows up in the notices' trailing section: check it before
+  shipping.
 - macOS has no `timeout` command; bound test runs inside the Node script instead.
 - Claude plugins install from a local clone used as marketplace: `extensions install <repo>:<plugin>
   --consent` (MariaDB's `ai-plugins` repo: plugin `dev`). Hooks come from `hooks/hooks.json`, a `Bash`

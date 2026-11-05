@@ -26,6 +26,7 @@ import * as productName from './rebrand/product-name.mjs';
 import * as nameLength from './rebrand/name-length.mjs';
 import * as artwork from './rebrand/artwork.mjs';
 import * as alibaba from './rebrand/alibaba.mjs';
+import * as channels from './rebrand/channels.mjs';
 import * as paths from './rebrand/paths.mjs';
 import * as cliName from './rebrand/cli-name.mjs';
 import * as extensionIds from './rebrand/extension-ids.mjs';
@@ -46,6 +47,7 @@ for (const rule of [
   nameLength,
   artwork,
   alibaba,
+  channels,
   paths,
   cliName,
   extensionIds,

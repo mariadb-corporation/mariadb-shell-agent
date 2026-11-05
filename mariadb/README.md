@@ -18,6 +18,7 @@ upstream closely: the fork syncs with upstream as soon as upstream moves.
 | Model providers offered             | OpenRouter, Requesty, OpenAI, Grok, custom (CLI, Web Shell, VS Code extension) | DeepSeek, MiniMax, Z.AI, Kimi, QwenCloud, Alibaba ModelStudio, Idealab, ModelScope, OpenRouter, Requesty, Grok, custom |
 | Alibaba endpoints                   | none: every Alibaba and QwenLM host is made unresolvable (`.invalid`)          | self-update, telemetry, Qwen OAuth, …                                                                                  |
 | Usage statistics, self-update       | off by default, and nowhere to send to or download from                        | on                                                                                                                     |
+| Channels                            | upstream's, without QQ Bot (its connector is `UNLICENSED`)                     | Telegram, WeChat, DingTalk, WeCom, Feishu, QQ Bot, Email, GitHub, GitLab                                               |
 
 Not renamed: the `QWEN_*` variable names themselves (169 of them; use the `MARIADB_SHELL_AGENT_*`
 aliases), internal file names inside the config directory, `qwen-extension.json` (the extension
@@ -55,10 +56,13 @@ upstream: ─ U1 ─────────────────── U2
 - A change to `mariadb/` is followed by a commit that regenerates the branding with the same
   upstream commit, so a pull request shows the rule change and its effect on the code.
 - `mariadb/rebrand.mjs` runs the rules in `mariadb/rebrand/`, one module per topic (identity,
-  version, product name, name length, alibaba, paths, cli-name, extension-ids, review, skipped-tests,
-  github, vscode-settings, notices, copyright). Each rule fails loudly when upstream moves its anchor.
+  version, product name, name length, alibaba, channels, paths, cli-name, extension-ids, review,
+  skipped-tests, github, vscode-settings, notices, copyright). Each rule fails loudly when upstream moves its anchor.
 - `mariadb/rebrand/github.mjs` removes upstream's GitHub workflows, Dependabot config and code
   owners (they belong to QwenLM's repository) and installs ours from `mariadb/github/`.
+- `mariadb/rebrand/channels.mjs` drops the QQ Bot channel from the CLI bundle: its connector,
+  `@tencent-connect/qqbot-connector`, declares `UNLICENSED` and ships no license text, so we cannot
+  distribute it. The workspace package `packages/channels/qqbot` stays, unbundled.
 - `mariadb/rebrand/copyright.mjs` runs last. It adds `Copyright (c) 2026, MariaDB plc.` to the
   shipped LICENSE files and to the header of every source file the run changed, below upstream's
   copyright lines (Apache-2.0 §4(b): modified files say so). Files we wrote (added by a patch or
@@ -244,7 +248,7 @@ The license lookup is upstream's (`packages/vscode-ide-companion/scripts/generat
 license and NOTICE files, a package's `licenses/` directory, the MIT fallback, ExcelJS's browser
 bundle). A package that ships no license file gets its project's text from
 `mariadb/licenses/npm/<name>@<version>` (`/` in a scoped name written as `+`) when we added
-one; the rest are listed at the end with the license they declare.
+one; the rest are listed at the end with the license they declare (none at the moment).
 
 `CONTRIBUTING.md` is ours too (`mariadb/CONTRIBUTING.md`, installed by `rebrand/identity.mjs`):
 MariaDB's contribution page and the Jira project MSH replace upstream's process.
