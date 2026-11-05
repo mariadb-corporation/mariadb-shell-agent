@@ -36,4 +36,5 @@ Usage statistics and self-update are off, and MariaDB Shell Agent contacts no up
 How this fork is maintained (syncing with upstream, branding rules, checks, releases):
 `mariadb/README.md`.
 
-Apache-2.0, like upstream Gemini CLI and Qwen Code.
+Apache-2.0, like upstream Gemini CLI and Qwen Code. The third-party components it ships and their
+license terms are listed in `THIRD-PARTY-NOTICES.txt`.

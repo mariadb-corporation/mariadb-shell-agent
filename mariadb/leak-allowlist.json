@@ -48,6 +48,24 @@
     "reason": "Third-party notices credit upstream's modifications of bundled packages."
   },
   {
+    "check": "product-name",
+    "file": "NOTICES\\.txt$",
+    "text": "fork of Qwen Code \\(https://github\\.com/QwenLM/qwen-code, Apache-2\\.0\\)",
+    "reason": "The third-party notices credit the upstream project (mariadb/generate-notices.mjs)."
+  },
+  {
+    "check": "qwenlm-url",
+    "file": "NOTICES\\.txt$",
+    "text": "fork of Qwen Code \\(https://github\\.com/QwenLM/qwen-code, Apache-2\\.0\\)",
+    "reason": "The third-party notices credit the upstream project (mariadb/generate-notices.mjs)."
+  },
+  {
+    "check": "alibaba-host",
+    "file": "NOTICES\\.txt$",
+    "text": "@alibaba-inc\\.com",
+    "reason": "Author address in a third-party license notice (dingtalk-stream-sdk-nodejs); license texts are shipped as they are."
+  },
+  {
     "check": "alibaba-host",
     "file": ".",
     "text": "diskplugin\\.csi\\.alibabacloud\\.com",

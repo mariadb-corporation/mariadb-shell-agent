@@ -6,8 +6,7 @@
  */
 
 import type { CSSProperties } from 'react';
-// eslint-disable-next-line import/no-internal-modules -- bundle the extension icon into the webview
-import iconUrl from '../../../assets/icon.png';
+import { WelcomeSeal } from './WelcomeSeal.js';
 import type { ChromeStrings } from '../strings.js';
 
 interface QwenOnboardingProps {
@@ -72,13 +71,7 @@ export function QwenOnboarding({
           textAlign: 'center',
         }}
       >
-        <img
-          src={iconUrl}
-          alt="MariaDB Shell Agent"
-          width={48}
-          height={48}
-          style={{ objectFit: 'contain' }}
-        />
+        <WelcomeSeal size={48} />
         <div>
           <div
             style={{

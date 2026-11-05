@@ -43,15 +43,28 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   (that drops the upstream parent; CI on main checks `mariadb/UPSTREAM` is an ancestor). If main moved
   meanwhile, rerun the sync on the branch instead of "Update branch".
 - **`mariadb/rebrand.mjs`** runs rule modules from `mariadb/rebrand/` in order: `patches`, `identity`,
-  `version`, `product-name`, `name-length`, `artwork`, `alibaba`, `paths`, `cli-name`, `extension-ids`, `review`, `outbound`,
-  `skipped-tests`, `github`, `copyright`. Helpers in `lib.mjs`: `patch()` must find its anchor (skips when `alreadyDone`),
+  `version`, `product-name`, `name-length`, `artwork`, `alibaba`, `channels`, `paths`, `cli-name`, `extension-ids`, `review`,
+  `outbound`, `skipped-tests`, `github`, `vscode-settings`, `notices`, `copyright`. Helpers in `lib.mjs`: `patch()` must find its anchor (skips when `alreadyDone`),
   `replaceInTracked()` (string or RegExp pairs, never touches lines containing "copyright"), `rename()`
   (moves files and maps git-listed paths; `renamedFiles()` lists the targets), `remove()`, `skipTests()`.
   A rule whose anchor upstream removed stops the run. The script is idempotent (a second run changes
   0 files): a rule must not rewrite a file another rule then changes back (a generated file carries its
   copyright header itself).
+- **Third-party notices (`notices.mjs`)**: `mariadb/THIRD-PARTY-NOTICES.txt` (committed; written by
+  `node mariadb/generate-notices.mjs` from the installed tree, so the rebrand cannot generate it) is
+  copied to the root `THIRD-PARTY-NOTICES.txt` and to `packages/vscode-ide-companion/NOTICES.txt`
+  (the name the `.vsix` ships and the Workbench's notices look for). The generator walks the
+  extension's and `packages/cli`'s dependencies with upstream's exported helpers (upstream seeds
+  from the extension only and misses ~180 CLI-bundle packages, an upstream bug) and prints the
+  Workbench format (header, package list, one section per distinct license text, packages
+  without a license file last; project texts supplied in `mariadb/licenses/npm/<name>@<version>`).
+  The extension's `generate:notices` script (run by `prepackage.js` before vsce packs) becomes
+  `generate-notices.mjs --check`; the same check runs in CI's branding job and after the install
+  in `sync-upstream.sh` (regenerates and stops: commit, `--regenerate`). `CONTRIBUTING.md` is
+  `mariadb/CONTRIBUTING.md` (identity rule; Jira project MSH).
 - **Copyright (`copyright.mjs`, last rule)**: `Copyright (c) 2026, MariaDB plc.` below the last
-  copyright line of the root and the extension's LICENSE (both ship); in every `.ts/.tsx/.js/.mjs/.cjs/.css`
+  copyright line of the root and the extension's LICENSE (both ship), followed by a pointer to
+  the third-party notices (`THIRD-PARTY-NOTICES.txt` / the extension's `NOTICES.txt`); in every `.ts/.tsx/.js/.mjs/.cjs/.css`
   file the run changed (from `git status` against the pristine HEAD; renamed files count as changed),
   below the copyright lines of the first leading comment block that has them (pragma comments may come
   first; headers below the imports are left alone); files the fork added carry only our notice (or get
@@ -168,6 +181,11 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
     Upstream's background models.dev catalog refresh (#16066, operator settings switch, env-var off switch
     wins) runs only with usage statistics on, so it is off by default here too; the CLI's sandbox handoff
     always carries the refresh switch "off".
+- **Channels (`channels.mjs`)**: the QQ Bot channel leaves the CLI bundle (its connector is
+  `UNLICENSED`, see gotchas): registry entry in `channel-registry.ts`, `@qwen-code/channel-qqbot` in
+  `packages/cli/package.json` and the matching lines of the `packages/cli` importer in
+  `pnpm-lock.yaml` (so `--frozen-lockfile` still matches), `docs/users/features/channels/qqbot.md`
+  with its `_meta.ts` entry and overview links. `packages/channels/qqbot` stays in the workspace.
 - **Names**: `~/.mariadb-shell-agent` and `<project>/.mariadb-shell-agent` (the repo's own project dir is renamed too),
   `MARIADB-SHELL-AGENT.md`, `.mariadb-shell-agentignore`, commands `mariadb-shell-agent`/`msa` (also in help text and logs),
   extension ids `mariadb-shell-agent.*`, terminal title "MariaDB Shell Agent - <folder>", `/review` footer.
@@ -242,6 +260,7 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 - `mariadb/github/` — our workflows and the `bypass-ci` action (installed into `.github/`)
 - `mariadb/patches/*.patch` — own code changes
 - `mariadb/check-leaks.mjs`, `mariadb/leak-allowlist.json`, `mariadb/verify.mjs` — checks
+- `mariadb/generate-notices.mjs`, `mariadb/THIRD-PARTY-NOTICES.txt`, `mariadb/licenses/npm/`, `mariadb/CONTRIBUTING.md` — notices and contribution guide
 - `mariadb/build-vsix.sh`, `mariadb/assets/`, `mariadb/vscode-extension/README.md` (extension README),
   `mariadb/product-README.md` (becomes the root `README.md` and the CLI package README)
 - Upstream code the rules or patches hook into: `packages/core/src/providers/all-providers.ts`,
@@ -275,7 +294,9 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
      differs at the cwd in the environment block (~75%); the first message after switching between
      headless and ACP is cold (different tool lists).
 2. Bridge the Web Shell WebSockets (terminal etc.) if the Cloud Workbench needs them.
-3. Patches 0001–0007, 0011–0014 and 0017 are candidates for upstream pull requests (0009/0010/0015/0016 are product
+3. Upstream PR candidate without a patch: the extension's NOTICES.txt omits the bundled CLI's
+   dependencies (`generate-notices.js` seeds from the extension's `dependencies` only).
+   Patches 0001–0007, 0011–0014 and 0017 are candidates for upstream pull requests (0009/0010/0015/0016 are product
    choices) (QwenLM requires an approved issue
    first, small Conventional-Commits PRs, an E2E report comment; clean MariaDB wording and copyright
    headers out first); accepted ones retire the patches.
@@ -324,6 +345,12 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   (`daemon-update.test`), or a "no opt-out" case expecting no switch in the sandbox handoff
   (`llm.test`'s catalog refresh handoff test): skip them in `skipped-tests.mjs` under the default-off reasons, don't
   change the default.
+- `@tencent-connect/qqbot-connector` (QQ Bot channel) declares `UNLICENSED` and ships no license file
+  or repository; upstream bundles it as is. `rebrand/channels.mjs` removes the channel from the CLI
+  bundle (registry entry, `packages/cli` dependency and its lockfile importer line, user guide); the
+  workspace package stays so upstream's workspace lists and tests keep working. A new upstream
+  dependency without a license text shows up in the notices' trailing section: check it before
+  shipping.
 - macOS has no `timeout` command; bound test runs inside the Node script instead.
 - Claude plugins install from a local clone used as marketplace: `extensions install <repo>:<plugin>
   --consent` (MariaDB's `ai-plugins` repo: plugin `dev`). Hooks come from `hooks/hooks.json`, a `Bash`
@@ -342,6 +369,10 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   Example: `rebrand/vscode-settings.mjs` adds `npm.exclude` to `.vscode/settings.json` so VS Code's
   NPM Scripts view lists only the root `package.json` (`dist/examples/*/package.json` is build output).
 - `.claude/` is ignored by upstream's `.gitignore`; its files are tracked, but changes need `git add -f`.
+  With a `.claude/` file staged, the pre-commit hook's lint-staged ends with "FAILED … paths are
+  ignored" at "Applying modifications" (it re-adds the staged paths without `-f`); the commit is
+  still made, but formatting the hook would have applied is lost, so run `npx prettier --write`
+  on the `mariadb/` files first (or commit `.claude/` separately).
 - Measuring prompt caching: point a provider's `baseUrl` (in a temporary HOME's
   `.mariadb-shell-agent/settings.json`) at a recording stub, run the CLI (`-p`, `--continue`, or `--acp` with a
   small JSON-RPC client) to capture real requests, then replay them against the server with

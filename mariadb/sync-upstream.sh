@@ -129,6 +129,13 @@ DONE=true
 echo "$BRANCH is now $(git log -1 --format='%h %s')"
 
 corepack pnpm install --frozen-lockfile
+# The third-party notices are generated from the installed tree and committed in mariadb/; a sync
+# that changes dependencies makes them stale.
+node mariadb/generate-notices.mjs --check || {
+  node mariadb/generate-notices.mjs
+  echo "mariadb/THIRD-PARTY-NOTICES.txt regenerated: commit it on $BRANCH and run $0 --regenerate" >&2
+  exit 1
+}
 node mariadb/check-leaks.mjs
 if $VERIFY; then
   node mariadb/verify.mjs

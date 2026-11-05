@@ -370,7 +370,6 @@ function ensureBuiltins(): Promise<void> {
           ),
         },
         { name: 'feishu', promise: import('@qwen-code/channel-feishu') },
-        { name: 'qqbot', promise: import('@qwen-code/channel-qqbot') },
         { name: 'github', promise: import('@qwen-code/channel-github') },
         { name: 'gitlab', promise: import('@qwen-code/channel-gitlab') },
       ];

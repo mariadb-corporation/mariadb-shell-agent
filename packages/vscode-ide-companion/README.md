@@ -34,4 +34,5 @@ instructions in `MARIADB-SHELL-AGENT.md` (`AGENTS.md` is read too), and ignore r
 
 ## License
 
-Apache-2.0, like upstream Qwen Code.
+Apache-2.0, like upstream Qwen Code. The third-party packages the extension bundles and their
+license terms are listed in its `NOTICES.txt`.

@@ -696,9 +696,6 @@ importers:
       '@qwen-code/channel-gitlab':
         specifier: workspace:*
         version: link:../channels/gitlab
-      '@qwen-code/channel-qqbot':
-        specifier: workspace:*
-        version: link:../channels/qqbot
       '@qwen-code/channel-telegram':
         specifier: workspace:*
         version: link:../channels/telegram
