@@ -14,9 +14,8 @@ import {
   type AuthWizardWireApi,
 } from '../authWizardTypes.js';
 import type { ChromeStrings } from '../strings.js';
-// eslint-disable-next-line import/no-internal-modules -- bundle the extension icon into the webview
-import iconUrl from '../../../assets/icon.png';
 import { TITLE_GRADIENT } from './QwenOnboarding.js';
+import { WelcomeSeal } from './WelcomeSeal.js';
 
 type WizardStep =
   | 'provider'
@@ -432,13 +431,7 @@ export function AuthWizard({
             textAlign: 'center',
           }}
         >
-          <img
-            src={iconUrl}
-            alt=""
-            width={40}
-            height={40}
-            style={{ objectFit: 'contain' }}
-          />
+          <WelcomeSeal size={40} />
           <div>
             <div
               style={{
