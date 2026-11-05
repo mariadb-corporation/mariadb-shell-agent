@@ -361,6 +361,10 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   Example: `rebrand/vscode-settings.mjs` adds `npm.exclude` to `.vscode/settings.json` so VS Code's
   NPM Scripts view lists only the root `package.json` (`dist/examples/*/package.json` is build output).
 - `.claude/` is ignored by upstream's `.gitignore`; its files are tracked, but changes need `git add -f`.
+  With a `.claude/` file staged, the pre-commit hook's lint-staged ends with "FAILED … paths are
+  ignored" at "Applying modifications" (it re-adds the staged paths without `-f`); the commit is
+  still made, but formatting the hook would have applied is lost, so run `npx prettier --write`
+  on the `mariadb/` files first (or commit `.claude/` separately).
 - Measuring prompt caching: point a provider's `baseUrl` (in a temporary HOME's
   `.mariadb-shell-agent/settings.json`) at a recording stub, run the CLI (`-p`, `--continue`, or `--acp` with a
   small JSON-RPC client) to capture real requests, then replay them against the server with
