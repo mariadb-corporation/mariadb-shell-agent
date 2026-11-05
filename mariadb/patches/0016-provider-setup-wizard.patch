@@ -932,10 +932,10 @@ index 0000000000..1d27942894
 +});
 diff --git a/packages/vscode-ide-companion/src/webview/components/AuthWizard.tsx b/packages/vscode-ide-companion/src/webview/components/AuthWizard.tsx
 new file mode 100644
-index 0000000000..e269e560b7
+index 0000000000..360b73d70d
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/webview/components/AuthWizard.tsx
-@@ -0,0 +1,638 @@
+@@ -0,0 +1,631 @@
 +/**
 + * @license
 + * Copyright (c) 2026, MariaDB plc.
@@ -952,9 +952,8 @@ index 0000000000..e269e560b7
 +  type AuthWizardWireApi,
 +} from '../authWizardTypes.js';
 +import type { ChromeStrings } from '../strings.js';
-+// eslint-disable-next-line import/no-internal-modules -- bundle the extension icon into the webview
-+import iconUrl from '../../../assets/icon.png';
 +import { TITLE_GRADIENT } from './QwenOnboarding.js';
++import { WelcomeSeal } from './WelcomeSeal.js';
 +
 +type WizardStep =
 +  | 'provider'
@@ -1370,13 +1369,7 @@ index 0000000000..e269e560b7
 +            textAlign: 'center',
 +          }}
 +        >
-+          <img
-+            src={iconUrl}
-+            alt=""
-+            width={40}
-+            height={40}
-+            style={{ objectFit: 'contain' }}
-+          />
++          <WelcomeSeal size={40} />
 +          <div>
 +            <div
 +              style={{

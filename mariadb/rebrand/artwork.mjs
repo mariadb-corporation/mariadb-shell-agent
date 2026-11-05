@@ -263,23 +263,53 @@ export function apply() {
       sealMono,
       'seal-mono.svg',
     );
+    // The seal as a React component: `props` is the parameter list, `attributes` the JSX
+    // attributes that forward them.
+    const sealComponent = (props, attributes) =>
+      `/**\n * @license\n * Copyright (c) 2026, MariaDB plc.\n * SPDX-License-Identifier: Apache-2.0\n */\n\n` +
+      `/** The MariaDB seal (mariadb/assets/seal-mono.svg), in the text color. */\n` +
+      `export function WelcomeSeal(${props}) {\n` +
+      `  return (\n` +
+      `    <svg\n` +
+      attributes.map((attribute) => `      ${attribute}\n`).join('') +
+      `      viewBox="${viewBox}"\n` +
+      `      fill="currentColor"\n` +
+      rootAttributes.map(([k, v]) => `      ${camel(k)}="${v}"\n`).join('') +
+      `      aria-hidden="true"\n` +
+      `    >\n` +
+      `${drawingJsx(drawing, 6)}\n` +
+      `    </svg>\n` +
+      `  );\n` +
+      `}\n`;
     write(
       'packages/web-shell/client/components/WelcomeSeal.tsx',
-      `/**\n * @license\n * Copyright (c) 2026, MariaDB plc.\n * SPDX-License-Identifier: Apache-2.0\n */\n\n` +
-        `/** The MariaDB seal (mariadb/assets/seal-mono.svg), in the text color. */\n` +
-        `export function WelcomeSeal({ className }: { className?: string }) {\n` +
-        `  return (\n` +
-        `    <svg\n` +
-        `      className={className}\n` +
-        `      viewBox="${viewBox}"\n` +
-        `      fill="currentColor"\n` +
-        rootAttributes.map(([k, v]) => `      ${camel(k)}="${v}"\n`).join('') +
-        `      aria-hidden="true"\n` +
-        `    >\n` +
-        `${drawingJsx(drawing, 6)}\n` +
-        `    </svg>\n` +
-        `  );\n` +
-        `}\n`,
+      sealComponent('{ className }: { className?: string }', [
+        'className={className}',
+      ]),
+    );
+    // VS Code extension: the welcome view ("Connect a model provider to get started.") and the
+    // provider setup wizard (patch 0016) show the seal, not the extension's PNG icon, which stays
+    // for the marketplace, the editor tab and the activity-bar badge.
+    write(
+      'packages/vscode-ide-companion/src/webview/components/WelcomeSeal.tsx',
+      sealComponent('{ size }: { size: number }', [
+        'width={size}',
+        'height={size}',
+      ]),
+    );
+    patch(
+      'extension welcome seal',
+      'packages/vscode-ide-companion/src/webview/components/QwenOnboarding.tsx',
+      /\/\/ eslint-disable-next-line import\/no-internal-modules -- bundle the extension icon into the webview\nimport iconUrl from '\.\.\/\.\.\/\.\.\/assets\/icon\.png';\n/,
+      "import { WelcomeSeal } from './WelcomeSeal.js';\n",
+      (t) => t.includes("from './WelcomeSeal.js'"),
+    );
+    patch(
+      'extension welcome seal',
+      'packages/vscode-ide-companion/src/webview/components/QwenOnboarding.tsx',
+      /<img\n\s+src=\{iconUrl\}\n\s+alt="[^"]*"\n\s+width=\{48\}\n\s+height=\{48\}\n\s+style=\{\{ objectFit: 'contain' \}\}\n\s+\/>/,
+      '<WelcomeSeal size={48} />',
+      (t) => t.includes('<WelcomeSeal size={48} />'),
     );
     patch(
       'welcome seal',
