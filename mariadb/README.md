@@ -56,7 +56,7 @@ upstream: ─ U1 ─────────────────── U2
   upstream commit, so a pull request shows the rule change and its effect on the code.
 - `mariadb/rebrand.mjs` runs the rules in `mariadb/rebrand/`, one module per topic (identity,
   version, product name, name length, alibaba, paths, cli-name, extension-ids, review, skipped-tests,
-  github, vscode-settings, copyright). Each rule fails loudly when upstream moves its anchor.
+  github, vscode-settings, notices, copyright). Each rule fails loudly when upstream moves its anchor.
 - `mariadb/rebrand/github.mjs` removes upstream's GitHub workflows, Dependabot config and code
   owners (they belong to QwenLM's repository) and installs ours from `mariadb/github/`.
 - `mariadb/rebrand/copyright.mjs` runs last. It adds `Copyright (c) 2026, MariaDB plc.` to the
@@ -222,6 +222,32 @@ Each build is leak-scanned after packaging. The universal build leaves out the o
 modules (node-pty, audio capture): shell commands run without a terminal, and voice input is
 unavailable. In `../mariadb-workbench`: `npm run plugin:mariadb-shell-agent` unpacks the newest
 universal build into `plugins/`, then `npm run deploy:pi`.
+
+## Third-party notices and contribution guide
+
+`THIRD-PARTY-NOTICES.txt` at the repository root lists the npm packages the extension ships
+with their license texts, grouped by distinct text as in the MariaDB Shell Workbench. The same
+file goes into the extension as `NOTICES.txt` (next to `LICENSE.txt` in the `.vsix`; the
+Workbench's own notices find it by that name), and both LICENSE files point to it.
+
+The source of the file is `mariadb/THIRD-PARTY-NOTICES.txt`, written by
+`node mariadb/generate-notices.mjs` from the installed dependencies of the extension _and_ of
+the CLI it bundles (`packages/cli`; upstream's generator walks the extension's dependencies only
+and so misses some 180 packages of the CLI bundle). The rebrand copies it into place
+(`mariadb/rebrand/notices.mjs`) and points the extension's `generate:notices` script, which
+upstream's packaging runs, at `generate-notices.mjs --check`, so a stale file fails the build
+instead of being overwritten with the shorter list. The same `--check` runs in CI and after the
+install in `sync-upstream.sh`: when a sync changes dependencies, the script regenerates the
+file and stops; commit it on the sync branch and run `--regenerate`.
+
+The license lookup is upstream's (`packages/vscode-ide-companion/scripts/generate-notices.js`:
+license and NOTICE files, a package's `licenses/` directory, the MIT fallback, ExcelJS's browser
+bundle). A package that ships no license file gets its project's text from
+`mariadb/licenses/npm/<name>@<version>` (`/` in a scoped name written as `+`) when we added
+one; the rest are listed at the end with the license they declare.
+
+`CONTRIBUTING.md` is ours too (`mariadb/CONTRIBUTING.md`, installed by `rebrand/identity.mjs`):
+MariaDB's contribution page and the Jira project MSH replace upstream's process.
 
 ## Icons
 

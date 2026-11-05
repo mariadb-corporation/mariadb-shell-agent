@@ -1,0 +1,20 @@
+From the package's README (the package ships no license file); declared license: CC-BY-3.0.
+
+Copyright and Licensing
+
+SPDX
+
+"SPDX" is a federally registered United States trademark of The Linux
+Foundation Corporation.
+
+From version 2.0 of the SPDX specification (https://spdx.org):
+
+> Copyright (c) 2010-2015 Linux Foundation and its Contributors. Licensed
+> under the Creative Commons Attribution License 3.0 Unported. All other
+> rights are expressly reserved.
+
+This Package
+
+> I created this package by copying exception identifiers out of the
+> SPDX specification. That work was mechanical, routine, and required no
+> creativity whatsoever. - Kyle Mitchell, package author

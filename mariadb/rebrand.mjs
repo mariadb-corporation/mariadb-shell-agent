@@ -34,6 +34,7 @@ import * as outbound from './rebrand/outbound.mjs';
 import * as skippedTests from './rebrand/skipped-tests.mjs';
 import * as github from './rebrand/github.mjs';
 import * as vscodeSettings from './rebrand/vscode-settings.mjs';
+import * as notices from './rebrand/notices.mjs';
 import * as copyright from './rebrand/copyright.mjs';
 
 // Order matters where rules overlap: later rules see the output of earlier ones.
@@ -53,6 +54,7 @@ for (const rule of [
   skippedTests,
   github,
   vscodeSettings,
+  notices,
   // Last: it marks every file the rules above changed.
   copyright,
 ])

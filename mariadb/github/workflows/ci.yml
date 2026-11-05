@@ -66,6 +66,8 @@ jobs:
           git config user.name 'MariaDB Shell Agent CI'
           git config user.email 'ci@localhost'
           mariadb/sync-upstream.sh --check
+      - name: 'Third-party notices match the installed dependencies'
+        run: 'node mariadb/generate-notices.mjs --check'
       - name: 'Leak scan'
         run: 'node mariadb/check-leaks.mjs'
 

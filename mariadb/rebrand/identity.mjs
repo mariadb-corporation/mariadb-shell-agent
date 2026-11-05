@@ -90,4 +90,9 @@ export function apply() {
       'utf8',
     ),
   );
+  // Upstream's contribution guide is QwenLM's process; ours points to MariaDB's.
+  write(
+    'CONTRIBUTING.md',
+    fs.readFileSync(path.join(mariadbDir, 'CONTRIBUTING.md'), 'utf8'),
+  );
 }

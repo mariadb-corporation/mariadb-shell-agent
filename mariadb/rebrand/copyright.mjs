@@ -18,6 +18,8 @@ import path from 'node:path';
 import { count, patch, read, renamedFiles, root, write } from './lib.mjs';
 
 const NOTICE = 'Copyright (c) 2026, MariaDB plc.';
+const THIRD_PARTY = (file) =>
+  `Third-party components and their license terms: see ${file}.`;
 
 /** Sources whose header is a comment block; JSON, Markdown and assets have none. */
 const HEADER_EXTENSIONS = new Set([
@@ -137,13 +139,18 @@ function ownNotice(file) {
 }
 
 export function apply() {
-  // Below the last copyright line of the license's appendix.
-  for (const file of ['LICENSE', 'packages/vscode-ide-companion/LICENSE'])
+  // Below the last copyright line of the license's appendix, with a pointer to the third-party
+  // notices (rebrand/notices.mjs): THIRD-PARTY-NOTICES.txt in the repository and the CLI package,
+  // NOTICES.txt in the extension.
+  for (const [file, notices] of [
+    ['LICENSE', 'THIRD-PARTY-NOTICES.txt'],
+    ['packages/vscode-ide-companion/LICENSE', 'NOTICES.txt'],
+  ])
     patch(
       'copyright',
       file,
       /^( *)Copyright \d{4} .*\n(?! *Copyright \d)/m,
-      `$&$1${NOTICE}\n`,
+      `$&$1${NOTICE}\n\n$1${THIRD_PARTY(notices)}\n`,
       (s) => s.includes(NOTICE),
     );
 
