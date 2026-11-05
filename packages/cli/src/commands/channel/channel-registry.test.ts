@@ -845,7 +845,6 @@ describe('channel registry', () => {
       'wecom',
       'wecom-callback',
       'feishu',
-      'qq',
       'github',
       'gitlab',
     ]);

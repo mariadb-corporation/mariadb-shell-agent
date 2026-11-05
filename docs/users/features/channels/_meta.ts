@@ -7,7 +7,6 @@ export default {
   wecom: 'WeCom',
   'wecom-callback': 'WeCom Callback',
   feishu: 'Feishu',
-  qqbot: 'QQ Bot',
   email: 'Email',
   github: 'GitHub',
   gitlab: 'GitLab',
