@@ -224,7 +224,7 @@
     "build": "npm run build:dev",
     "build:dev": "npm run check-types && npm run lint && node esbuild.js",
     "build:prod": "node esbuild.js --production",
-    "generate:notices": "node ./scripts/generate-notices.js",
+    "generate:notices": "node ../../mariadb/generate-notices.mjs --check",
     "prepare": "npm run generate:notices",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
