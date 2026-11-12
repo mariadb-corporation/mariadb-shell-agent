@@ -714,6 +714,24 @@ export function EmbeddedApp() {
     return () => document.removeEventListener('click', openWorkspaceFile, true);
   }, [vscode]);
 
+  // Links into the MariaDB extension (`<scheme>://mariadb.mariadb-shell/…`):
+  // the transcript's Markdown dispatches them as this event (web-shell's
+  // EXTENSION_LINK_EVENT), and the extension host opens them with the editor's
+  // own URI scheme.
+  useEffect(() => {
+    const openExtensionLink = (event: Event) => {
+      const url = (event as CustomEvent<unknown>).detail;
+      if (typeof url !== 'string') return;
+      vscode.postMessage({ type: 'openExtensionLink', data: { url } });
+    };
+    window.addEventListener('mariadb:open-extension-link', openExtensionLink);
+    return () =>
+      window.removeEventListener(
+        'mariadb:open-extension-link',
+        openExtensionLink,
+      );
+  }, [vscode]);
+
   useEffect(() => {
     const trackContextMenu = (event: MouseEvent) => {
       const target = event.target instanceof Element ? event.target : null;

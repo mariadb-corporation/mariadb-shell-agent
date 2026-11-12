@@ -20,6 +20,8 @@ import {
   getCodeHighlighter,
 } from './codeHighlighter';
 import {
+  EXTENSION_LINK_EVENT,
+  isExtensionLink,
   isSafeHref,
   isSafeImageSrc,
   Markdown,
@@ -2103,5 +2105,79 @@ describe('Markdown CJK emphasis', () => {
     expect(strong?.textContent).toBe('"示例"文本');
     expect(container.textContent).not.toContain('**');
     cleanup(container);
+  });
+});
+
+describe('MariaDB extension links', () => {
+  const link =
+    'vscode://mariadb.mariadb-shell/msm/openDiagram?project=%2Ftmp%2Fa%26b&diagram=main';
+
+  it('accepts only the mariadb.mariadb-shell authority, with any scheme', () => {
+    expect(isExtensionLink(link)).toBe(true);
+    expect(isExtensionLink('theia://MariaDB.mariadb-shell/x')).toBe(true);
+    expect(isExtensionLink('vscode-insiders://mariadb.mariadb-shell')).toBe(
+      true,
+    );
+    expect(isExtensionLink('vscode://mariadb.mariadb-shell-agent/x')).toBe(
+      false,
+    );
+    expect(isExtensionLink('vscode://mariadb.mariadb-shell.evil/x')).toBe(
+      false,
+    );
+    expect(isExtensionLink('vscode://other.ext/x')).toBe(false);
+    expect(isExtensionLink('https://mariadb.mariadb-shell/x')).toBe(true);
+    expect(isExtensionLink(undefined)).toBe(false);
+  });
+
+  it('lets extension links through the url transform', () => {
+    expect(markdownUrlTransform(link)).toBe(link);
+    expect(markdownUrlTransform('vscode://other.ext/x')).toBe('');
+  });
+
+  it('dispatches the link on click without putting it in the DOM', () => {
+    const seen: unknown[] = [];
+    const handler = (e: Event) => seen.push((e as CustomEvent).detail);
+    window.addEventListener(EXTENSION_LINK_EVENT, handler);
+    const c = renderMd(`[Open the diagram](${link})`);
+    const a = c.querySelector('a')!;
+    expect(a.getAttribute('href')).toBe('#');
+    expect(a.getAttribute('role')).toBe('button');
+    act(() => {
+      a.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true }),
+      );
+    });
+    window.removeEventListener(EXTENSION_LINK_EVENT, handler);
+    expect(seen).toEqual([link]);
+    cleanup(c);
+  });
+
+  it('renders inert text outside interactive mode', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+    const handler = vi.fn();
+    window.addEventListener(EXTENSION_LINK_EVENT, handler);
+    act(() => {
+      root.render(
+        createElement(
+          TranscriptRenderModeProvider,
+          { value: 'readonly' },
+          createElement(Markdown, { content: `[diagram](${link})` }),
+        ),
+      );
+    });
+    expect(container.querySelector('a')).toBeNull();
+    expect(container.querySelector('span')?.textContent).toBe('diagram');
+    expect(handler).not.toHaveBeenCalled();
+    window.removeEventListener(EXTENSION_LINK_EVENT, handler);
+    act(() => root.unmount());
+    container.remove();
+  });
+
+  it('leaves links to other extensions sanitized', () => {
+    const c = renderMd('[x](vscode://other.ext/run)');
+    expect(c.querySelector('a')!.getAttribute('href')).toBeNull();
+    cleanup(c);
   });
 });

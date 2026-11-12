@@ -1783,6 +1783,23 @@ describe('EmbeddedApp permission diff request-id wiring', () => {
     ]);
   });
 
+  it('forwards MariaDB extension links to the extension host', async () => {
+    await renderApp();
+    const url =
+      'vscode://mariadb.mariadb-shell/msm/openDiagram?project=%2Fp&diagram=d';
+
+    await act(async () => {
+      window.dispatchEvent(
+        new CustomEvent('mariadb:open-extension-link', { detail: url }),
+      );
+      await Promise.resolve();
+    });
+
+    expect(postMessagesOfType('openExtensionLink')).toEqual([
+      { type: 'openExtensionLink', data: { url } },
+    ]);
+  });
+
   // R3-4: the cleanup loop closes by (path, requestId) rather than by path, so
   // a resolved approval cannot close a diff another request owns.
   it('closes the diff scoped to the request that no longer needs it', async () => {
