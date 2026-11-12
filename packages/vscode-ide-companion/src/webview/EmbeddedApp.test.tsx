@@ -105,6 +105,7 @@ vi.mock('@qwen-code/sdk/daemon', async (importOriginal) => ({
 vi.mock('@qwen-code/web-shell', async () => {
   const { useEffect, useMemo, useRef, useState } = await import('react');
   return {
+    EXTENSION_LINK_EVENT: 'mariadb:open-extension-link',
     WebShellWithProviders: (props: CapturedProps) => {
       mocks.embeddedProps.current = props;
       // Mirror App.tsx's error-notification effect: while a connection error

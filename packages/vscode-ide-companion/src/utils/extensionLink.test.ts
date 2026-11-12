@@ -57,11 +57,6 @@ describe('rewriteExtensionLink', () => {
       expect(rewriteExtensionLink(url, 'vscode')).toBeNull();
     }
   });
-
-  it('rejects an unusable editor scheme', () => {
-    expect(rewriteExtensionLink(LINK, '')).toBeNull();
-    expect(rewriteExtensionLink(LINK, 'a b')).toBeNull();
-  });
 });
 
 describe('openExtensionLink', () => {

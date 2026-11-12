@@ -37,15 +37,7 @@ export class EditorMessageHandler extends BaseMessageHandler {
 
       case 'openExtensionLink': {
         const url = (message.data as { url?: unknown } | undefined)?.url;
-        if (typeof url !== 'string') break;
-        try {
-          await openExtensionLink(url);
-        } catch (error) {
-          logger.error(
-            '[EditorMessageHandler] Failed to open extension link:',
-            error,
-          );
-        }
+        if (typeof url === 'string') await openExtensionLink(url);
         break;
       }
 

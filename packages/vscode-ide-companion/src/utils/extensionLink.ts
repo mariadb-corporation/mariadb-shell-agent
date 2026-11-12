@@ -19,11 +19,10 @@ import { logger } from './logger.js';
  * handler is registered for it (the extension is missing or too old) the click
  * does nothing; there is deliberately no other way of opening the link.
  */
-export const EXTENSION_LINK_AUTHORITY = 'mariadb.mariadb-shell';
+const EXTENSION_LINK_AUTHORITY = 'mariadb.mariadb-shell';
 
 const EXTENSION_LINK =
   /^[a-z][a-z0-9+.-]*:\/\/mariadb\.mariadb-shell(?=[/?#]|$)/i;
-const URI_SCHEME = /^[a-z][a-z0-9+.-]*$/i;
 
 /**
  * The link with the editor's scheme and the authority in lower case (handlers
@@ -36,7 +35,7 @@ export function rewriteExtensionLink(
 ): string | null {
   const trimmed = url.trim();
   const match = EXTENSION_LINK.exec(trimmed);
-  if (!match || !URI_SCHEME.test(uriScheme)) return null;
+  if (!match) return null;
   return `${uriScheme}://${EXTENSION_LINK_AUTHORITY}${trimmed.slice(match[0].length)}`;
 }
 
