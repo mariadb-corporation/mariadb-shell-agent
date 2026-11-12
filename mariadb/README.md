@@ -1,7 +1,7 @@
 # MariaDB Shell Agent
 
 MariaDB Shell Agent (formerly MariaDB Code) is a fork of [Qwen Code](https://github.com/QwenLM/qwen-code) with MariaDB branding,
-including the VS Code extension (used in local VS Code and in `../mariadb-workbench`). It follows
+including the VS Code extension (used in local VS Code and in the Theia app `../mariadb-shell-workbench`). It follows
 upstream closely: the fork syncs with upstream as soon as upstream moves.
 
 ## What differs from upstream
@@ -126,6 +126,11 @@ explanation on top) and commit the new patch.
 - `0017-gpt-6-model-limits.patch`: reasoning controls for `gpt-6.1-sol`, `gpt-6.1-terra` and
   `gpt-6-luna` (next to upstream's `gpt-6-astra`), and the GPT-6 token limits (922K input, 128K
   output) instead of the generic GPT fallback
+- `0018-mariadb-extension-links.patch`: links into the MariaDB extension
+  (`<scheme>://mariadb.mariadb-shell/…`, e.g. its MSM diagram links) are clickable in the chat and
+  open with the editor's own URI scheme: `env.openExternal` in VS Code, `vscode.open` in Theia
+  (whose `openExternal` hands its own scheme to the operating system). Other authorities stay
+  sanitized
 
 These are good candidates for upstream pull requests, which would retire the patches.
 
@@ -224,8 +229,8 @@ tests keep upstream's version; the upstream base is recorded in `mariadb/UPSTREA
 
 Each build is leak-scanned after packaging. The universal build leaves out the optional native
 modules (node-pty, audio capture): shell commands run without a terminal, and voice input is
-unavailable. In `../mariadb-workbench`: `npm run plugin:mariadb-shell-agent` unpacks the newest
-universal build into `plugins/`, then `npm run deploy:pi`.
+unavailable. In `../mariadb-shell-workbench`: `npm run plugin:mariadb-shell-agent` unpacks the
+newest universal build into `plugins/`.
 
 ## Third-party notices and contribution guide
 

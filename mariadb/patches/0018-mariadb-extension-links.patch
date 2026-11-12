@@ -1,0 +1,471 @@
+Links into the MariaDB extension open in the editor
+
+Agents link to the MariaDB VS Code extension (MariaDB.mariadb-shell), for
+example vscode://mariadb.mariadb-shell/msm/openDiagram?project=…&diagram=…
+after creating an MSM project, so the user can open the result in one click.
+The chat's Markdown blanked every href except http(s)/mailto, so the link was
+dead.
+
+Markdown lets an href through when its authority is mariadb.mariadb-shell,
+whatever its scheme, and renders it like a session link: href="#" plus a
+window event (mariadb:open-extension-link), inert outside interactive mode.
+The VS Code companion forwards the event to the extension host
+(openExtensionLink), which accepts only that authority, lower-cases it,
+replaces the scheme with vscode.env.uriScheme (the agent can't know whether
+the host is vscode, vscode-insiders or a Theia app) and keeps the rest of the
+link as written. VS Code opens it with env.openExternal; Theia with
+vscode.open, because Theia's openExternal hands its own scheme to the
+operating system instead of the plugin's URI handler. Without an installed
+handler the click does nothing, on purpose.
+
+diff --git a/packages/vscode-ide-companion/src/utils/extensionLink.test.ts b/packages/vscode-ide-companion/src/utils/extensionLink.test.ts
+new file mode 100644
+index 0000000000..4b19d5cb5b
+--- /dev/null
++++ b/packages/vscode-ide-companion/src/utils/extensionLink.test.ts
+@@ -0,0 +1,103 @@
++/**
++ * @license
++ * Copyright (c) 2026, MariaDB plc.
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++import { beforeEach, describe, expect, it, vi } from 'vitest';
++
++const vscodeMock = vi.hoisted(() => ({
++  env: {
++    uriScheme: 'vscode',
++    openExternal: vi.fn(async () => true),
++  },
++  commands: {
++    getCommands: vi.fn(async (): Promise<string[]> => []),
++    executeCommand: vi.fn(async () => undefined),
++  },
++  Uri: { parse: vi.fn((value: string) => ({ parsed: value })) },
++}));
++
++vi.mock('vscode', () => vscodeMock);
++
++import {
++  openExtensionLink,
++  resetExtensionLinkHostForTesting,
++  rewriteExtensionLink,
++} from './extensionLink.js';
++
++const LINK =
++  'vscode://mariadb.mariadb-shell/msm/openDiagram?project=%2Ftmp%2Fa%26b%3Dc&diagram=my%20diagram';
++
++describe('rewriteExtensionLink', () => {
++  it('puts in the editor scheme and keeps the rest byte for byte', () => {
++    expect(rewriteExtensionLink(LINK, 'theia')).toBe(
++      'theia://mariadb.mariadb-shell/msm/openDiagram?project=%2Ftmp%2Fa%26b%3Dc&diagram=my%20diagram',
++    );
++    expect(rewriteExtensionLink(LINK, 'vscode-insiders')).toBe(
++      LINK.replace('vscode:', 'vscode-insiders:'),
++    );
++  });
++
++  it('lower-cases the authority', () => {
++    expect(
++      rewriteExtensionLink('VSCODE://MariaDB.Mariadb-Shell/x?a=B', 'vscode'),
++    ).toBe('vscode://mariadb.mariadb-shell/x?a=B');
++  });
++
++  it('rejects every other authority', () => {
++    for (const url of [
++      'vscode://other.extension/x',
++      'vscode://mariadb.mariadb-shell-agent/x',
++      'vscode://mariadb.mariadb-shell.evil/x',
++      'vscode://user@mariadb.mariadb-shell/x',
++      'https://example.com/?u=vscode://mariadb.mariadb-shell/x',
++      'mariadb.mariadb-shell/x',
++    ]) {
++      expect(rewriteExtensionLink(url, 'vscode')).toBeNull();
++    }
++  });
++
++  it('rejects an unusable editor scheme', () => {
++    expect(rewriteExtensionLink(LINK, '')).toBeNull();
++    expect(rewriteExtensionLink(LINK, 'a b')).toBeNull();
++  });
++});
++
++describe('openExtensionLink', () => {
++  beforeEach(() => {
++    vi.clearAllMocks();
++    resetExtensionLinkHostForTesting();
++  });
++
++  it('opens it externally in VS Code', async () => {
++    vscodeMock.env.uriScheme = 'vscode-insiders';
++    vscodeMock.commands.getCommands.mockResolvedValue([
++      'workbench.action.showAboutDialog',
++    ]);
++    await openExtensionLink(LINK);
++    const expected = LINK.replace('vscode:', 'vscode-insiders:');
++    expect(vscodeMock.Uri.parse).toHaveBeenCalledWith(expected);
++    expect(vscodeMock.env.openExternal).toHaveBeenCalledWith({
++      parsed: expected,
++    });
++    expect(vscodeMock.commands.executeCommand).not.toHaveBeenCalled();
++  });
++
++  it('opens it with vscode.open in Theia', async () => {
++    vscodeMock.env.uriScheme = 'theia';
++    vscodeMock.commands.getCommands.mockResolvedValue(['core.about']);
++    await openExtensionLink(LINK);
++    expect(vscodeMock.commands.executeCommand).toHaveBeenCalledWith(
++      'vscode.open',
++      { parsed: LINK.replace('vscode:', 'theia:') },
++    );
++    expect(vscodeMock.env.openExternal).not.toHaveBeenCalled();
++  });
++
++  it('opens nothing for another link', async () => {
++    await openExtensionLink('vscode://other.extension/run');
++    expect(vscodeMock.env.openExternal).not.toHaveBeenCalled();
++    expect(vscodeMock.commands.executeCommand).not.toHaveBeenCalled();
++  });
++});
+diff --git a/packages/vscode-ide-companion/src/utils/extensionLink.ts b/packages/vscode-ide-companion/src/utils/extensionLink.ts
+new file mode 100644
+index 0000000000..fc97cdc0f5
+--- /dev/null
++++ b/packages/vscode-ide-companion/src/utils/extensionLink.ts
+@@ -0,0 +1,77 @@
++/**
++ * @license
++ * Copyright (c) 2026, MariaDB plc.
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++import * as vscode from 'vscode';
++import { logger } from './logger.js';
++
++/**
++ * Opens links into the MariaDB VS Code extension (`MariaDB.mariadb-shell`) that
++ * agents put in their answers, such as
++ * `vscode://mariadb.mariadb-shell/msm/openDiagram?project=…&diagram=…`.
++ *
++ * The agent writes `vscode://` because it can't know the host editor's URI
++ * scheme, so the scheme is replaced with the editor's own (`vscode`,
++ * `vscode-insiders`, a Theia app's `electron.uriScheme`), which routes the link
++ * to the extension's URI handler. Only this authority is opened, and when no
++ * handler is registered for it (the extension is missing or too old) the click
++ * does nothing; there is deliberately no other way of opening the link.
++ */
++export const EXTENSION_LINK_AUTHORITY = 'mariadb.mariadb-shell';
++
++const EXTENSION_LINK =
++  /^[a-z][a-z0-9+.-]*:\/\/mariadb\.mariadb-shell(?=[/?#]|$)/i;
++const URI_SCHEME = /^[a-z][a-z0-9+.-]*$/i;
++
++/**
++ * The link with the editor's scheme and the authority in lower case (handlers
++ * are looked up by the lower-case extension id), the rest kept byte for byte.
++ * `null` for any other link.
++ */
++export function rewriteExtensionLink(
++  url: string,
++  uriScheme: string,
++): string | null {
++  const trimmed = url.trim();
++  const match = EXTENSION_LINK.exec(trimmed);
++  if (!match || !URI_SCHEME.test(uriScheme)) return null;
++  return `${uriScheme}://${EXTENSION_LINK_AUTHORITY}${trimmed.slice(match[0].length)}`;
++}
++
++let theiaHost: Promise<boolean> | undefined;
++
++/**
++ * Theia's `env.openExternal` gives a URI with the app's own scheme to the
++ * operating system rather than to the plugin's URI handler, while `vscode.open`
++ * goes through Theia's opener service, where the handler is. VS Code's
++ * `openExternal` handles its own scheme in the app. `core.about` is a command
++ * of Theia's core and not one of VS Code's.
++ */
++function isTheiaHost(): Promise<boolean> {
++  theiaHost ??= Promise.resolve(vscode.commands.getCommands()).then(
++    (commands) => commands.includes('core.about'),
++    () => false,
++  );
++  return theiaHost;
++}
++
++export async function openExtensionLink(url: string): Promise<void> {
++  const target = rewriteExtensionLink(url, vscode.env.uriScheme);
++  if (!target) {
++    logger.warn('[extensionLink] Not a MariaDB extension link:', url);
++    return;
++  }
++  const uri = vscode.Uri.parse(target);
++  if (await isTheiaHost()) {
++    await vscode.commands.executeCommand('vscode.open', uri);
++  } else {
++    await vscode.env.openExternal(uri);
++  }
++}
++
++/** For tests: forget the detected host. */
++export function resetExtensionLinkHostForTesting(): void {
++  theiaHost = undefined;
++}
+diff --git a/packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx b/packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx
+index 4f69865313..46a23f3258 100644
+--- a/packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx
++++ b/packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx
+@@ -1782,6 +1782,23 @@ describe('EmbeddedApp permission diff request-id wiring', () => {
+     ]);
+   });
+ 
++  it('forwards MariaDB extension links to the extension host', async () => {
++    await renderApp();
++    const url =
++      'vscode://mariadb.mariadb-shell/msm/openDiagram?project=%2Fp&diagram=d';
++
++    await act(async () => {
++      window.dispatchEvent(
++        new CustomEvent('mariadb:open-extension-link', { detail: url }),
++      );
++      await Promise.resolve();
++    });
++
++    expect(postMessagesOfType('openExtensionLink')).toEqual([
++      { type: 'openExtensionLink', data: { url } },
++    ]);
++  });
++
+   // R3-4: the cleanup loop closes by (path, requestId) rather than by path, so
+   // a resolved approval cannot close a diff another request owns.
+   it('closes the diff scoped to the request that no longer needs it', async () => {
+diff --git a/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx b/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
+index 6c8fdce078..41c19eaf2c 100644
+--- a/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
++++ b/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
+@@ -713,6 +713,24 @@ export function EmbeddedApp() {
+     return () => document.removeEventListener('click', openWorkspaceFile, true);
+   }, [vscode]);
+ 
++  // Links into the MariaDB extension (`<scheme>://mariadb.mariadb-shell/…`):
++  // the transcript's Markdown dispatches them as this event (web-shell's
++  // EXTENSION_LINK_EVENT), and the extension host opens them with the editor's
++  // own URI scheme.
++  useEffect(() => {
++    const openExtensionLink = (event: Event) => {
++      const url = (event as CustomEvent<unknown>).detail;
++      if (typeof url !== 'string') return;
++      vscode.postMessage({ type: 'openExtensionLink', data: { url } });
++    };
++    window.addEventListener('mariadb:open-extension-link', openExtensionLink);
++    return () =>
++      window.removeEventListener(
++        'mariadb:open-extension-link',
++        openExtensionLink,
++      );
++  }, [vscode]);
++
+   useEffect(() => {
+     const trackContextMenu = (event: MouseEvent) => {
+       const target = event.target instanceof Element ? event.target : null;
+diff --git a/packages/vscode-ide-companion/src/webview/handlers/EditorMessageHandler.ts b/packages/vscode-ide-companion/src/webview/handlers/EditorMessageHandler.ts
+index e7a8924024..624124b138 100644
+--- a/packages/vscode-ide-companion/src/webview/handlers/EditorMessageHandler.ts
++++ b/packages/vscode-ide-companion/src/webview/handlers/EditorMessageHandler.ts
+@@ -9,6 +9,7 @@ import * as vscode from 'vscode';
+ import { BaseMessageHandler } from './BaseMessageHandler.js';
+ import { getFileName } from '../utils/webviewUtils.js';
+ import { getErrorMessage } from '../../utils/errorMessage.js';
++import { openExtensionLink } from '../../utils/extensionLink.js';
+ 
+ /**
+  * Editor message handler
+@@ -16,7 +17,11 @@ import { getErrorMessage } from '../../utils/errorMessage.js';
+  */
+ export class EditorMessageHandler extends BaseMessageHandler {
+   canHandle(messageType: string): boolean {
+-    return ['getActiveEditor', 'focusActiveEditor'].includes(messageType);
++    return [
++      'getActiveEditor',
++      'focusActiveEditor',
++      'openExtensionLink',
++    ].includes(messageType);
+   }
+ 
+   async handle(message: { type: string; data?: unknown }): Promise<void> {
+@@ -29,6 +34,20 @@ export class EditorMessageHandler extends BaseMessageHandler {
+         await this.handleFocusActiveEditor();
+         break;
+ 
++      case 'openExtensionLink': {
++        const url = (message.data as { url?: unknown } | undefined)?.url;
++        if (typeof url !== 'string') break;
++        try {
++          await openExtensionLink(url);
++        } catch (error) {
++          logger.error(
++            '[EditorMessageHandler] Failed to open extension link:',
++            error,
++          );
++        }
++        break;
++      }
++
+       default:
+         logger.warn(
+           '[EditorMessageHandler] Unknown message type:',
+diff --git a/packages/web-shell/client/components/messages/Markdown.test.ts b/packages/web-shell/client/components/messages/Markdown.test.ts
+index dce741b554..7fe0eb9fdf 100644
+--- a/packages/web-shell/client/components/messages/Markdown.test.ts
++++ b/packages/web-shell/client/components/messages/Markdown.test.ts
+@@ -20,6 +20,8 @@ import {
+   getCodeHighlighter,
+ } from './codeHighlighter';
+ import {
++  EXTENSION_LINK_EVENT,
++  isExtensionLink,
+   isSafeHref,
+   isSafeImageSrc,
+   Markdown,
+@@ -2105,3 +2107,77 @@ describe('Markdown CJK emphasis', () => {
+     cleanup(container);
+   });
+ });
++
++describe('MariaDB extension links', () => {
++  const link =
++    'vscode://mariadb.mariadb-shell/msm/openDiagram?project=%2Ftmp%2Fa%26b&diagram=main';
++
++  it('accepts only the mariadb.mariadb-shell authority, with any scheme', () => {
++    expect(isExtensionLink(link)).toBe(true);
++    expect(isExtensionLink('theia://MariaDB.mariadb-shell/x')).toBe(true);
++    expect(isExtensionLink('vscode-insiders://mariadb.mariadb-shell')).toBe(
++      true,
++    );
++    expect(isExtensionLink('vscode://mariadb.mariadb-shell-agent/x')).toBe(
++      false,
++    );
++    expect(isExtensionLink('vscode://mariadb.mariadb-shell.evil/x')).toBe(
++      false,
++    );
++    expect(isExtensionLink('vscode://other.ext/x')).toBe(false);
++    expect(isExtensionLink('https://mariadb.mariadb-shell/x')).toBe(true);
++    expect(isExtensionLink(undefined)).toBe(false);
++  });
++
++  it('lets extension links through the url transform', () => {
++    expect(markdownUrlTransform(link)).toBe(link);
++    expect(markdownUrlTransform('vscode://other.ext/x')).toBe('');
++  });
++
++  it('dispatches the link on click without putting it in the DOM', () => {
++    const seen: unknown[] = [];
++    const handler = (e: Event) => seen.push((e as CustomEvent).detail);
++    window.addEventListener(EXTENSION_LINK_EVENT, handler);
++    const c = renderMd(`[Open the diagram](${link})`);
++    const a = c.querySelector('a')!;
++    expect(a.getAttribute('href')).toBe('#');
++    expect(a.getAttribute('role')).toBe('button');
++    act(() => {
++      a.dispatchEvent(
++        new MouseEvent('click', { bubbles: true, cancelable: true }),
++      );
++    });
++    window.removeEventListener(EXTENSION_LINK_EVENT, handler);
++    expect(seen).toEqual([link]);
++    cleanup(c);
++  });
++
++  it('renders inert text outside interactive mode', () => {
++    const container = document.createElement('div');
++    document.body.appendChild(container);
++    const root = createRoot(container);
++    const handler = vi.fn();
++    window.addEventListener(EXTENSION_LINK_EVENT, handler);
++    act(() => {
++      root.render(
++        createElement(
++          TranscriptRenderModeProvider,
++          { value: 'readonly' },
++          createElement(Markdown, { content: `[diagram](${link})` }),
++        ),
++      );
++    });
++    expect(container.querySelector('a')).toBeNull();
++    expect(container.querySelector('span')?.textContent).toBe('diagram');
++    expect(handler).not.toHaveBeenCalled();
++    window.removeEventListener(EXTENSION_LINK_EVENT, handler);
++    act(() => root.unmount());
++    container.remove();
++  });
++
++  it('leaves links to other extensions sanitized', () => {
++    const c = renderMd('[x](vscode://other.ext/run)');
++    expect(c.querySelector('a')!.getAttribute('href')).toBeNull();
++    cleanup(c);
++  });
++});
+diff --git a/packages/web-shell/client/components/messages/Markdown.tsx b/packages/web-shell/client/components/messages/Markdown.tsx
+index 5755914787..9e28ec362b 100644
+--- a/packages/web-shell/client/components/messages/Markdown.tsx
++++ b/packages/web-shell/client/components/messages/Markdown.tsx
+@@ -879,7 +879,29 @@ export function markdownUrlTransform(
+   if (documentMode && SAFE_DOCUMENT_IMAGE_DATA_URI.test(url.trim())) {
+     return url;
+   }
+-  return QWEN_SESSION_SCHEME.test(url.trim()) ? url : defaultUrlTransform(url);
++  return QWEN_SESSION_SCHEME.test(url.trim()) || isExtensionLink(url)
++    ? url
++    : defaultUrlTransform(url);
++}
++
++/**
++ * Links into the MariaDB VS Code extension (`MariaDB.mariadb-shell`), such as
++ * `vscode://mariadb.mariadb-shell/msm/openDiagram?project=…&diagram=…`, which
++ * agents put in their answers. Any scheme is accepted, because the agent can't
++ * know the host editor's (`vscode`, `vscode-insiders`, a Theia app's own); the
++ * extension host replaces it with the editor's URI scheme and opens the link
++ * there. Only this authority gets through, so no other link from model output
++ * is opened that way.
++ */
++const EXTENSION_LINK =
++  /^[a-z][a-z0-9+.-]*:\/\/mariadb\.mariadb-shell(?:[/?#]|$)/i;
++
++/** The window event an extension link's click dispatches, with the link as
++ * `detail`; the VS Code companion forwards it to the extension host. */
++export const EXTENSION_LINK_EVENT = 'mariadb:open-extension-link';
++
++export function isExtensionLink(url: string | undefined): boolean {
++  return !!url && EXTENSION_LINK.test(url.trim());
+ }
+ 
+ function MarkdownLink({
+@@ -948,6 +970,29 @@ function MarkdownLink({
+       </a>
+     );
+   }
++  if (href && isExtensionLink(href)) {
++    if (renderMode !== 'interactive') {
++      return <span className={styles.link}>{children}</span>;
++    }
++    // Like session links, the scheme never reaches the DOM.
++    const url = href.trim();
++    return (
++      <a
++        href="#"
++        role="button"
++        className={styles.link}
++        onClick={(e) => {
++          e.preventDefault();
++          e.stopPropagation();
++          window.dispatchEvent(
++            new CustomEvent(EXTENSION_LINK_EVENT, { detail: url }),
++          );
++        }}
++      >
++        {children}
++      </a>
++    );
++  }
+   const safeHref = isSafeHref(href) ? href : undefined;
+   return (
+     <a
