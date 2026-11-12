@@ -20,10 +20,10 @@ handler the click does nothing, on purpose.
 
 diff --git a/packages/vscode-ide-companion/src/utils/extensionLink.test.ts b/packages/vscode-ide-companion/src/utils/extensionLink.test.ts
 new file mode 100644
-index 0000000000..4b19d5cb5b
+index 0000000000..7429742e9f
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/utils/extensionLink.test.ts
-@@ -0,0 +1,103 @@
+@@ -0,0 +1,98 @@
 +/**
 + * @license
 + * Copyright (c) 2026, MariaDB plc.
@@ -83,11 +83,6 @@ index 0000000000..4b19d5cb5b
 +      expect(rewriteExtensionLink(url, 'vscode')).toBeNull();
 +    }
 +  });
-+
-+  it('rejects an unusable editor scheme', () => {
-+    expect(rewriteExtensionLink(LINK, '')).toBeNull();
-+    expect(rewriteExtensionLink(LINK, 'a b')).toBeNull();
-+  });
 +});
 +
 +describe('openExtensionLink', () => {
@@ -129,10 +124,10 @@ index 0000000000..4b19d5cb5b
 +});
 diff --git a/packages/vscode-ide-companion/src/utils/extensionLink.ts b/packages/vscode-ide-companion/src/utils/extensionLink.ts
 new file mode 100644
-index 0000000000..fc97cdc0f5
+index 0000000000..382063532f
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/utils/extensionLink.ts
-@@ -0,0 +1,77 @@
+@@ -0,0 +1,76 @@
 +/**
 + * @license
 + * Copyright (c) 2026, MariaDB plc.
@@ -154,11 +149,10 @@ index 0000000000..fc97cdc0f5
 + * handler is registered for it (the extension is missing or too old) the click
 + * does nothing; there is deliberately no other way of opening the link.
 + */
-+export const EXTENSION_LINK_AUTHORITY = 'mariadb.mariadb-shell';
++const EXTENSION_LINK_AUTHORITY = 'mariadb.mariadb-shell';
 +
 +const EXTENSION_LINK =
 +  /^[a-z][a-z0-9+.-]*:\/\/mariadb\.mariadb-shell(?=[/?#]|$)/i;
-+const URI_SCHEME = /^[a-z][a-z0-9+.-]*$/i;
 +
 +/**
 + * The link with the editor's scheme and the authority in lower case (handlers
@@ -171,7 +165,7 @@ index 0000000000..fc97cdc0f5
 +): string | null {
 +  const trimmed = url.trim();
 +  const match = EXTENSION_LINK.exec(trimmed);
-+  if (!match || !URI_SCHEME.test(uriScheme)) return null;
++  if (!match) return null;
 +  return `${uriScheme}://${EXTENSION_LINK_AUTHORITY}${trimmed.slice(match[0].length)}`;
 +}
 +
@@ -211,10 +205,18 @@ index 0000000000..fc97cdc0f5
 +  theiaHost = undefined;
 +}
 diff --git a/packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx b/packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx
-index 4f69865313..46a23f3258 100644
+index 4f69865313..3bbcfd88b5 100644
 --- a/packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx
 +++ b/packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx
-@@ -1782,6 +1782,23 @@ describe('EmbeddedApp permission diff request-id wiring', () => {
+@@ -104,6 +104,7 @@ vi.mock('@qwen-code/sdk/daemon', async (importOriginal) => ({
+ vi.mock('@qwen-code/web-shell', async () => {
+   const { useEffect, useMemo, useRef, useState } = await import('react');
+   return {
++    EXTENSION_LINK_EVENT: 'mariadb:open-extension-link',
+     WebShellWithProviders: (props: CapturedProps) => {
+       mocks.embeddedProps.current = props;
+       // Mirror App.tsx's error-notification effect: while a connection error
+@@ -1782,6 +1783,23 @@ describe('EmbeddedApp permission diff request-id wiring', () => {
      ]);
    });
  
@@ -239,36 +241,40 @@ index 4f69865313..46a23f3258 100644
    // a resolved approval cannot close a diff another request owns.
    it('closes the diff scoped to the request that no longer needs it', async () => {
 diff --git a/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx b/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
-index 6c8fdce078..41c19eaf2c 100644
+index 6c8fdce078..f0f87fad0b 100644
 --- a/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
 +++ b/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
-@@ -713,6 +713,24 @@ export function EmbeddedApp() {
+@@ -7,6 +7,7 @@
+ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+ import type { CSSProperties } from 'react';
+ import {
++  EXTENSION_LINK_EVENT,
+   WebShellWithProviders,
+   type ComposerToolbarAction,
+   type TurnOutputOpenRequest,
+@@ -713,6 +714,20 @@ export function EmbeddedApp() {
      return () => document.removeEventListener('click', openWorkspaceFile, true);
    }, [vscode]);
  
 +  // Links into the MariaDB extension (`<scheme>://mariadb.mariadb-shell/…`):
-+  // the transcript's Markdown dispatches them as this event (web-shell's
-+  // EXTENSION_LINK_EVENT), and the extension host opens them with the editor's
-+  // own URI scheme.
++  // the transcript's Markdown dispatches them as this event, and the extension
++  // host opens them with the editor's own URI scheme.
 +  useEffect(() => {
 +    const openExtensionLink = (event: Event) => {
 +      const url = (event as CustomEvent<unknown>).detail;
 +      if (typeof url !== 'string') return;
 +      vscode.postMessage({ type: 'openExtensionLink', data: { url } });
 +    };
-+    window.addEventListener('mariadb:open-extension-link', openExtensionLink);
++    window.addEventListener(EXTENSION_LINK_EVENT, openExtensionLink);
 +    return () =>
-+      window.removeEventListener(
-+        'mariadb:open-extension-link',
-+        openExtensionLink,
-+      );
++      window.removeEventListener(EXTENSION_LINK_EVENT, openExtensionLink);
 +  }, [vscode]);
 +
    useEffect(() => {
      const trackContextMenu = (event: MouseEvent) => {
        const target = event.target instanceof Element ? event.target : null;
 diff --git a/packages/vscode-ide-companion/src/webview/handlers/EditorMessageHandler.ts b/packages/vscode-ide-companion/src/webview/handlers/EditorMessageHandler.ts
-index e7a8924024..624124b138 100644
+index e7a8924024..44add16420 100644
 --- a/packages/vscode-ide-companion/src/webview/handlers/EditorMessageHandler.ts
 +++ b/packages/vscode-ide-companion/src/webview/handlers/EditorMessageHandler.ts
 @@ -9,6 +9,7 @@ import * as vscode from 'vscode';
@@ -292,21 +298,13 @@ index e7a8924024..624124b138 100644
    }
  
    async handle(message: { type: string; data?: unknown }): Promise<void> {
-@@ -29,6 +34,20 @@ export class EditorMessageHandler extends BaseMessageHandler {
+@@ -29,6 +34,12 @@ export class EditorMessageHandler extends BaseMessageHandler {
          await this.handleFocusActiveEditor();
          break;
  
 +      case 'openExtensionLink': {
 +        const url = (message.data as { url?: unknown } | undefined)?.url;
-+        if (typeof url !== 'string') break;
-+        try {
-+          await openExtensionLink(url);
-+        } catch (error) {
-+          logger.error(
-+            '[EditorMessageHandler] Failed to open extension link:',
-+            error,
-+          );
-+        }
++        if (typeof url === 'string') await openExtensionLink(url);
 +        break;
 +      }
 +
@@ -469,3 +467,13 @@ index 5755914787..9e28ec362b 100644
    const safeHref = isSafeHref(href) ? href : undefined;
    return (
      <a
+diff --git a/packages/web-shell/client/index.tsx b/packages/web-shell/client/index.tsx
+index b7ddaad431..45243159c1 100644
+--- a/packages/web-shell/client/index.tsx
++++ b/packages/web-shell/client/index.tsx
+@@ -382,4 +382,5 @@ export type {
+   WebShellMessageNavigationResult,
+ } from './hooks/useMessageNavigation';
+ export { highlightCode } from './components/messages/codeHighlighter';
++export { EXTENSION_LINK_EVENT } from './components/messages/Markdown';
+ export type { CodeHighlightRequest } from './components/messages/codeHighlighter';
