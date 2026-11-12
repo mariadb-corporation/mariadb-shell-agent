@@ -891,10 +891,10 @@ export function markdownUrlTransform(
  * know the host editor's (`vscode`, `vscode-insiders`, a Theia app's own); the
  * extension host replaces it with the editor's URI scheme and opens the link
  * there. Only this authority gets through, so no other link from model output
- * is opened that way.
+ * is opened that way, and script schemes (`javascript:`) never are.
  */
 const EXTENSION_LINK =
-  /^[a-z][a-z0-9+.-]*:\/\/mariadb\.mariadb-shell(?:[/?#]|$)/i;
+  /^(?!(?:javascript|vbscript|data):)[a-z][a-z0-9+.-]*:\/\/mariadb\.mariadb-shell(?:[/?#]|$)/i;
 
 /** The window event an extension link's click dispatches, with the link as
  * `detail`; the VS Code companion forwards it to the extension host. */

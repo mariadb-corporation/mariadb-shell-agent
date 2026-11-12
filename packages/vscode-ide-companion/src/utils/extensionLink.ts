@@ -63,10 +63,14 @@ export async function openExtensionLink(url: string): Promise<void> {
     return;
   }
   const uri = vscode.Uri.parse(target);
-  if (await isTheiaHost()) {
-    await vscode.commands.executeCommand('vscode.open', uri);
-  } else {
-    await vscode.env.openExternal(uri);
+  try {
+    if (await isTheiaHost()) {
+      await vscode.commands.executeCommand('vscode.open', uri);
+    } else {
+      await vscode.env.openExternal(uri);
+    }
+  } catch (error) {
+    logger.error('[extensionLink] Failed to open', target, error);
   }
 }
 

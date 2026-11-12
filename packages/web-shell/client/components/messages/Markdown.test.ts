@@ -2126,6 +2126,9 @@ describe('MariaDB extension links', () => {
     );
     expect(isExtensionLink('vscode://other.ext/x')).toBe(false);
     expect(isExtensionLink('https://mariadb.mariadb-shell/x')).toBe(true);
+    expect(
+      isExtensionLink('javascript://mariadb.mariadb-shell/%0Aalert(1)'),
+    ).toBe(false);
     expect(isExtensionLink(undefined)).toBe(false);
   });
 
