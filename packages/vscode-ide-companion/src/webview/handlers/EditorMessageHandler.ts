@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,6 +10,7 @@ import * as vscode from 'vscode';
 import { BaseMessageHandler } from './BaseMessageHandler.js';
 import { getFileName } from '../utils/webviewUtils.js';
 import { getErrorMessage } from '../../utils/errorMessage.js';
+import { openExtensionLink } from '../../utils/extensionLink.js';
 
 /**
  * Editor message handler
@@ -16,7 +18,11 @@ import { getErrorMessage } from '../../utils/errorMessage.js';
  */
 export class EditorMessageHandler extends BaseMessageHandler {
   canHandle(messageType: string): boolean {
-    return ['getActiveEditor', 'focusActiveEditor'].includes(messageType);
+    return [
+      'getActiveEditor',
+      'focusActiveEditor',
+      'openExtensionLink',
+    ].includes(messageType);
   }
 
   async handle(message: { type: string; data?: unknown }): Promise<void> {
@@ -28,6 +34,12 @@ export class EditorMessageHandler extends BaseMessageHandler {
       case 'focusActiveEditor':
         await this.handleFocusActiveEditor();
         break;
+
+      case 'openExtensionLink': {
+        const url = (message.data as { url?: unknown } | undefined)?.url;
+        if (typeof url === 'string') await openExtensionLink(url);
+        break;
+      }
 
       default:
         logger.warn(

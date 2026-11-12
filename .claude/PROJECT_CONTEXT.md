@@ -15,7 +15,7 @@ A fork of [Qwen Code](https://github.com/QwenLM/qwen-code) rebranded as **MariaD
 nothing migrates from `~/.mariadb-code`; repository
 `github.com/mariadb-corporation/mariadb-shell-agent`, private for now, to go public): the CLI
 (`mariadb-shell-agent`, short `msa`), the VS Code extension `MariaDB.mariadb-shell-agent` (used in desktop VS Code and
-in the Theia-based MariaDB Cloud Workbench of the sibling `mariadb-workbench` repository) and the daemon's Web
+in the Theia app of the sibling `mariadb-shell-workbench` repository, the MariaDB Cloud Workbench) and the daemon's Web
 Shell. The fork follows upstream closely (synced as soon as upstream moves), ships no Alibaba endpoints and
 does not identify itself as Qwen Code to anyone. The maintenance workflow is documented for humans in
 `mariadb/README.md`.
@@ -160,6 +160,18 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
     `gpt-6.1-sol` (thinking mandatory, like upstream's `gpt-6-astra`), `gpt-6.1-terra` and
     `gpt-6-luna` (accept `none`, so thinking can be switched off); `/^gpt-6/` token limits 922K input,
     128K output (were the generic GPT fallback, 128K/16K).
+  - `0018` links into the MariaDB extension (`MariaDB.mariadb-shell`, the vscode-extension repo):
+    web-shell `Markdown.tsx` lets an href through the sanitizer when its authority is
+    `mariadb.mariadb-shell` (any scheme except javascript/vbscript/data), renders it like a
+    `qwen-session` link (`href="#"`, window event `EXTENSION_LINK_EVENT` =
+    `mariadb:open-extension-link`, exported from web-shell's index; inert text outside interactive
+    mode). `EmbeddedApp.tsx` posts `openExtensionLink`; `EditorMessageHandler` →
+    `utils/extensionLink.ts` re-checks the authority, lower-cases it, swaps in `vscode.env.uriScheme`,
+    keeps the rest byte for byte, and opens with `env.openExternal` (VS Code) or
+    `vscode.open` (Theia, detected by its `core.about` command). No fallback by agreement with the
+    extension's side: without its URI handler a click does nothing (failures are logged). Used for
+    the extension's `/msm/openDiagram?project=<abs *.msm.project folder>&diagram=<name>` links
+    (handler in vscode-extension#44), which an ai-plugins skill tells agents to write.
 - **Alibaba removal (`alibaba.mjs`)**:
   - Alibaba-run hosts (aliyuncs, aliyun, alibabacloud, alibaba-inc, qwen.ai/.com, qwencloud(api),
     modelscope, …) get TLD `.invalid` in shipped code, tests and docs (also escaped regex spellings,
@@ -233,8 +245,8 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
   hashed chunks that would be packaged) and leak-scans the `.vsix`. The universal build installs the
   bundled CLI's dependencies with `--omit=optional` (upstream's `prepackage.js`): no node-pty (shell
   commands run through `child_process`, without a terminal) and no audio capture (voice); ripgrep and
-  OpenTUI assets for all platforms stay. In `mariadb-workbench`,
-  `npm run plugin:mariadb-shell-agent` unpacks the newest universal build, `npm run deploy:pi` builds there.
+  OpenTUI assets for all platforms stay. In `mariadb-shell-workbench`,
+  `npm run plugin:mariadb-shell-agent` unpacks the newest universal build into `plugins/`.
 
 ## Current state
 
@@ -296,13 +308,17 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 2. Bridge the Web Shell WebSockets (terminal etc.) if the Cloud Workbench needs them.
 3. Upstream PR candidate without a patch: the extension's NOTICES.txt omits the bundled CLI's
    dependencies (`generate-notices.js` seeds from the extension's `dependencies` only).
-   Patches 0001–0007, 0011–0014 and 0017 are candidates for upstream pull requests (0009/0010/0015/0016 are product
+   Patches 0001–0007, 0011–0014 and 0017 are candidates for upstream pull requests (0009/0010/0015/0016/0018 are product
    choices) (QwenLM requires an approved issue
    first, small Conventional-Commits PRs, an E2E report comment; clean MariaDB wording and copyright
    headers out first); accepted ones retire the patches.
 4. Sync with upstream `main` regularly: `mariadb/sync-upstream.sh --verify` (about an hour), fix what the
    gate attributes to the fork, rebuild both `.vsix`, then the user pushes.
-5. Multi-user Cloud Workbench: one IDE instance per user (shared workspace, `~/.mariadb-shell-agent` and OS account
+5. Extension links (`0018`): untested end to end. Check a `vscode://mariadb.mariadb-shell/msm/openDiagram…`
+   link in VS Code and in `mariadb-shell-workbench` with a MariaDB extension build that has the URI
+   handler; whoever tests first tells the vscode-extension side. If VS Code's `vscode.open` also
+   reaches the URL handler, the Theia detection could go.
+6. Multi-user Cloud Workbench: one IDE instance per user (shared workspace, `~/.mariadb-shell-agent` and OS account
    otherwise); the bridge already works per extension host.
 
 ## Gotchas / things not to repeat
@@ -330,6 +346,11 @@ does not identify itself as Qwen Code to anyone. The maintenance workflow is doc
 - Release VS Code builds refuse Playwright's Electron mode (inspect fuse); drive an isolated instance with
   `--remote-debugging-port` + `chromium.connectOverCDP`, with a short `--user-data-dir` path (Unix socket
   limit ~103 chars).
+- Theia (1.76) `env.openExternal` passes `openExternalApp: true`, so the external-app opener (priority 600)
+  beats the plugin URI handler (500) and an own-scheme URI goes to the OS; it also round-trips the URI
+  through `toString(true)` + `encodeURI`, decoding `%26`/`%23` in the query. `vscode.open` goes through
+  the opener service to the handler with the encoding intact. Handlers are keyed by the lower-case
+  plugin id; plain `onUri` activation becomes `onUri:<uriScheme>://<id>`.
 - Theia webviews: open Theia on `localhost` (webviews use `<uuid>.webview.localhost`); Playwright's Firefox
   renders them blank, use Chrome (`channel: 'chrome'`). Locally the browser can reach the daemon anyway,
   so test the bridge by asserting zero direct browser requests to the daemon port.

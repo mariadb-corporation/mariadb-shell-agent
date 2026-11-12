@@ -105,6 +105,7 @@ vi.mock('@qwen-code/sdk/daemon', async (importOriginal) => ({
 vi.mock('@qwen-code/web-shell', async () => {
   const { useEffect, useMemo, useRef, useState } = await import('react');
   return {
+    EXTENSION_LINK_EVENT: 'mariadb:open-extension-link',
     WebShellWithProviders: (props: CapturedProps) => {
       mocks.embeddedProps.current = props;
       // Mirror App.tsx's error-notification effect: while a connection error
@@ -1780,6 +1781,23 @@ describe('EmbeddedApp permission diff request-id wiring', () => {
 
     expect(postMessagesOfType('openFile')).toEqual([
       { type: 'openFile', data: { path: 'src/app.ts' } },
+    ]);
+  });
+
+  it('forwards MariaDB extension links to the extension host', async () => {
+    await renderApp();
+    const url =
+      'vscode://mariadb.mariadb-shell/msm/openDiagram?project=%2Fp&diagram=d';
+
+    await act(async () => {
+      window.dispatchEvent(
+        new CustomEvent('mariadb:open-extension-link', { detail: url }),
+      );
+      await Promise.resolve();
+    });
+
+    expect(postMessagesOfType('openExtensionLink')).toEqual([
+      { type: 'openExtensionLink', data: { url } },
     ]);
   });
 

@@ -879,7 +879,29 @@ export function markdownUrlTransform(
   if (documentMode && SAFE_DOCUMENT_IMAGE_DATA_URI.test(url.trim())) {
     return url;
   }
-  return QWEN_SESSION_SCHEME.test(url.trim()) ? url : defaultUrlTransform(url);
+  return QWEN_SESSION_SCHEME.test(url.trim()) || isExtensionLink(url)
+    ? url
+    : defaultUrlTransform(url);
+}
+
+/**
+ * Links into the MariaDB VS Code extension (`MariaDB.mariadb-shell`), such as
+ * `vscode://mariadb.mariadb-shell/msm/openDiagram?project=…&diagram=…`, which
+ * agents put in their answers. Any scheme is accepted, because the agent can't
+ * know the host editor's (`vscode`, `vscode-insiders`, a Theia app's own); the
+ * extension host replaces it with the editor's URI scheme and opens the link
+ * there. Only this authority gets through, so no other link from model output
+ * is opened that way, and script schemes (`javascript:`) never are.
+ */
+const EXTENSION_LINK =
+  /^(?!(?:javascript|vbscript|data):)[a-z][a-z0-9+.-]*:\/\/mariadb\.mariadb-shell(?:[/?#]|$)/i;
+
+/** The window event an extension link's click dispatches, with the link as
+ * `detail`; the VS Code companion forwards it to the extension host. */
+export const EXTENSION_LINK_EVENT = 'mariadb:open-extension-link';
+
+export function isExtensionLink(url: string | undefined): boolean {
+  return !!url && EXTENSION_LINK.test(url.trim());
 }
 
 function MarkdownLink({
@@ -941,6 +963,29 @@ function MarkdownLink({
           e.stopPropagation();
           window.dispatchEvent(
             new CustomEvent('qwen:open-session', { detail: sessionId }),
+          );
+        }}
+      >
+        {children}
+      </a>
+    );
+  }
+  if (href && isExtensionLink(href)) {
+    if (renderMode !== 'interactive') {
+      return <span className={styles.link}>{children}</span>;
+    }
+    // Like session links, the scheme never reaches the DOM.
+    const url = href.trim();
+    return (
+      <a
+        href="#"
+        role="button"
+        className={styles.link}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          window.dispatchEvent(
+            new CustomEvent(EXTENSION_LINK_EVENT, { detail: url }),
           );
         }}
       >

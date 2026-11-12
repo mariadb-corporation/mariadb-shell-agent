@@ -382,4 +382,5 @@ export type {
   WebShellMessageNavigationResult,
 } from './hooks/useMessageNavigation';
 export { highlightCode } from './components/messages/codeHighlighter';
+export { EXTENSION_LINK_EVENT } from './components/messages/Markdown';
 export type { CodeHighlightRequest } from './components/messages/codeHighlighter';

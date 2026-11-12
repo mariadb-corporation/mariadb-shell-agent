@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import {
+  EXTENSION_LINK_EVENT,
   WebShellWithProviders,
   type ComposerToolbarAction,
   type TurnOutputOpenRequest,
@@ -712,6 +713,20 @@ export function EmbeddedApp() {
     };
     document.addEventListener('click', openWorkspaceFile, true);
     return () => document.removeEventListener('click', openWorkspaceFile, true);
+  }, [vscode]);
+
+  // Links into the MariaDB extension (`<scheme>://mariadb.mariadb-shell/…`):
+  // the transcript's Markdown dispatches them as this event, and the extension
+  // host opens them with the editor's own URI scheme.
+  useEffect(() => {
+    const openExtensionLink = (event: Event) => {
+      const url = (event as CustomEvent<unknown>).detail;
+      if (typeof url !== 'string') return;
+      vscode.postMessage({ type: 'openExtensionLink', data: { url } });
+    };
+    window.addEventListener(EXTENSION_LINK_EVENT, openExtensionLink);
+    return () =>
+      window.removeEventListener(EXTENSION_LINK_EVENT, openExtensionLink);
   }, [vscode]);
 
   useEffect(() => {
