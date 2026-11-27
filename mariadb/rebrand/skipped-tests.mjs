@@ -82,6 +82,10 @@ const SKIPPED = [
       'packages/cli/src/serve/server/auth-provider-helpers.test.ts': [
         'lists QwenCloud first and pins every group membership',
       ],
+      // The provider menu they pin starts with QwenCloud.
+      'packages/cli/src/ui/components/DialogManager.test.tsx': [
+        'keeps the full provider menu at %i rows',
+      ],
       'packages/core/src/providers/__tests__/presets/qwencloud-standard.test.ts':
         ['is registered, and the qwencloud group excludes Coding Plan'],
       'packages/core/src/providers/__tests__/presets/qwencloud-token-plan.test.ts':
@@ -160,6 +164,18 @@ const SKIPPED = [
           'keeps the original blue mark in the light theme',
           'falls back after a logo decode failure in $theme',
         ],
+    },
+  },
+  {
+    reason:
+      'The daemon reports the Qwen subscription as disabled (alibaba.mjs): its hosts (qwen.ai) do not resolve here.',
+    tests: {
+      'packages/cli/src/serve/routes/subscription-auth.test.ts': [
+        'reports account login independently of the subscription capability',
+        'enables login when DEV=%s',
+        'enables login without OAuth environment configuration',
+        'returns production links for %s and never exposes the device secret',
+      ],
     },
   },
   {

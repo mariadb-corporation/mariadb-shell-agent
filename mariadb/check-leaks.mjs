@@ -41,7 +41,7 @@ const CHECKS = [
   { id: 'ignore-file', re: /\.qwenignore\b/g },
   {
     id: 'regex-alternation',
-    re: /\((?:[\w-]+\|)*(?:qwen|QWEN)(?:\|[\w-]+)*\)\\\.(?:md|MD)|\\\.\((?:[\w-]+\|)*qwen(?:\|[\w-]+)*\)/g,
+    re: /\((?:[\w-]+\|)*(?:qwen|QWEN)(?:\|[\w-]+)*\)\\\.(?:md|MD)|\\\.\((?:\?:)?(?:[\w-]+\|)*qwen(?:\|[\w-]+)*\)/g,
   },
   { id: 'product-name', re: /\bQwen Code\b/g },
   // The fork's former name (MariaDB Code, mariadb-code / mdbc, ~/.mariadb-code, MARIADB_CODE_*).

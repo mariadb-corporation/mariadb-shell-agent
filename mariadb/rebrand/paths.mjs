@@ -35,12 +35,15 @@ const PAIRS = [
       `${name === 'QWEN' ? CONTEXT_FILE : CONTEXT_FILE.toLowerCase()}${rest}`,
   ],
   // Alternation members in regexes: `(AGENTS|CLAUDE|QWEN|GEMINI)\.md`, `(qwen|agents)\.md`,
-  // `\.(claude|qwen)\/`.
+  // `\.(claude|qwen)\/`, `\.(?:qwen|agents)\/`.
   [
     /(?<=\((?:[\w-]+\|)*)(qwen|QWEN)(?=(?:\|[\w-]+)*\)\\\.(?:md|MD))/g,
     (name) => (name === 'QWEN' ? CONTEXT_FILE : CONTEXT_FILE.toLowerCase()),
   ],
-  [/(?<=\\\.\((?:[\w-]+\|)*)qwen(?=(?:\|[\w-]+)*\))/g, CONFIG_DIR.slice(1)],
+  [
+    /(?<=\\\.\((?:\?:)?(?:[\w-]+\|)*)qwen(?=(?:\|[\w-]+)*\))/g,
+    CONFIG_DIR.slice(1),
+  ],
   // Whole-stem meta file names (`...|qwen|agents|claude)$/i`).
   ['|qwen|agents|', `|${CONTEXT_FILE.toLowerCase()}|agents|`],
   // ".qwen" as a whole path segment. Not a property (`manifest?.qwen`, `x!.qwen`), part of a
