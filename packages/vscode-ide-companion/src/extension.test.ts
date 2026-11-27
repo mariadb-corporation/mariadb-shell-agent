@@ -66,7 +66,7 @@ vi.mock('vscode', () => ({
     executeCommand: vi.fn(),
   },
   Uri: {
-    joinPath: vi.fn(),
+    joinPath: vi.fn(() => ({ fsPath: '/ext/dist/qwen-cli/cli.js' })),
   },
   ExtensionMode: {
     Development: 1,

@@ -15,7 +15,10 @@ const { execFileMock, getSetting } = vi.hoisted(() => ({
   getSetting: vi.fn(),
 }));
 
-vi.mock('node:child_process', () => ({ execFile: execFileMock }));
+vi.mock('node:child_process', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('node:child_process')>()),
+  execFile: execFileMock,
+}));
 vi.mock('vscode', () => ({
   workspace: {
     getConfiguration: () => ({ get: getSetting }),
