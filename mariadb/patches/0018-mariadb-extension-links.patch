@@ -245,7 +245,7 @@ index 94a247471f..c4bbd2f2e1 100644
    // a resolved approval cannot close a diff another request owns.
    it('closes the diff scoped to the request that no longer needs it', async () => {
 diff --git a/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx b/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
-index 6b00b91d21..9f7f8c7678 100644
+index 1537718acd..a49e5718b7 100644
 --- a/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
 +++ b/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
 @@ -7,6 +7,7 @@
@@ -256,7 +256,7 @@ index 6b00b91d21..9f7f8c7678 100644
    WebShellWithProviders,
    QwenSubscriptionPanel,
    type ComposerToolbarAction,
-@@ -835,6 +836,20 @@ export function EmbeddedApp() {
+@@ -833,6 +834,20 @@ export function EmbeddedApp() {
      return () => document.removeEventListener('click', openWorkspaceFile, true);
    }, [vscode]);
  

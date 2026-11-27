@@ -373,7 +373,7 @@ index 20caa02f2c..94a247471f 100644
      await renderApp();
  
 diff --git a/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx b/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
-index 7560642df7..6b00b91d21 100644
+index 7560642df7..1537718acd 100644
 --- a/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
 +++ b/packages/vscode-ide-companion/src/webview/EmbeddedApp.tsx
 @@ -26,6 +26,11 @@ import {
@@ -417,7 +417,23 @@ index 7560642df7..6b00b91d21 100644
    const [hostNotice, setHostNotice] = useState<HostNotice>();
    const [accountInfo, setAccountInfo] = useState<AccountInfo>();
    const [insightProgress, setInsightProgress] = useState<InsightProgress>();
-@@ -491,33 +511,10 @@ export function EmbeddedApp() {
+@@ -452,7 +472,6 @@ export function EmbeddedApp() {
+     [daemonBaseUrl, daemonToken],
+   );
+ 
+-  const authRequest = useRef<AbortController | null>(null);
+   const subscriptionTransport = useMemo(
+     () =>
+       daemonClient && {
+@@ -477,7 +496,6 @@ export function EmbeddedApp() {
+     setSubscriptionFlowId(undefined);
+     setSubscriptionDraft(undefined);
+     return () => {
+-      authRequest.current?.abort();
+       subscriptionActivation.current?.reject(
+         new DOMException('Cancelled', 'AbortError'),
+       );
+@@ -491,33 +509,10 @@ export function EmbeddedApp() {
      };
    }, [daemonClient, runtime?.workspaceCwd, vscode]);
  
@@ -454,7 +470,7 @@ index 7560642df7..6b00b91d21 100644
    };
  
    const activateSubscription = (signal: AbortSignal) =>
-@@ -1067,6 +1064,25 @@ export function EmbeddedApp() {
+@@ -1067,6 +1062,25 @@ export function EmbeddedApp() {
          }
        } else if (message.type === 'accountInfo' && message.data) {
          setAccountInfo(message.data as AccountInfo);
@@ -480,7 +496,7 @@ index 7560642df7..6b00b91d21 100644
        } else if (message.type === 'authState') {
          const state = (message.data as { authenticated?: unknown } | null)
            ?.authenticated;
-@@ -1100,6 +1116,7 @@ export function EmbeddedApp() {
+@@ -1100,6 +1114,7 @@ export function EmbeddedApp() {
          setAuthConnecting(false);
          setAuthError(undefined);
          if (message.type === 'authSuccess') {
@@ -488,7 +504,7 @@ index 7560642df7..6b00b91d21 100644
            if (subscriptionData?.chatProviderConfigured === true) {
              setSubscriptionDraft(undefined);
            }
-@@ -1121,6 +1138,7 @@ export function EmbeddedApp() {
+@@ -1121,6 +1136,7 @@ export function EmbeddedApp() {
          setAuthenticated((current) => current ?? false);
          setAuthConnecting(false);
          setAuthError(undefined);
@@ -496,7 +512,7 @@ index 7560642df7..6b00b91d21 100644
          clearInsight();
        } else if (
          message.type === 'authError' ||
-@@ -1148,6 +1166,13 @@ export function EmbeddedApp() {
+@@ -1148,6 +1164,13 @@ export function EmbeddedApp() {
          }
          setAuthConnecting(false);
          setAuthError(text);
@@ -510,7 +526,7 @@ index 7560642df7..6b00b91d21 100644
          clearInsight();
        } else if (message.type === 'insightProgress' && message.data) {
          const data = message.data as {
-@@ -1728,6 +1753,7 @@ export function EmbeddedApp() {
+@@ -1728,6 +1751,7 @@ export function EmbeddedApp() {
          <QwenOnboarding
            connecting={false}
            t={t}
@@ -518,7 +534,7 @@ index 7560642df7..6b00b91d21 100644
            onGetStarted={() => {
              void openAuthentication();
            }}
-@@ -1791,6 +1817,7 @@ export function EmbeddedApp() {
+@@ -1791,6 +1815,7 @@ export function EmbeddedApp() {
              connecting={authConnecting}
              error={authError}
              t={t}
@@ -526,7 +542,7 @@ index 7560642df7..6b00b91d21 100644
              onGetStarted={() => {
                void openAuthentication();
              }}
-@@ -2392,6 +2419,28 @@ export function EmbeddedApp() {
+@@ -2392,6 +2417,28 @@ export function EmbeddedApp() {
            </div>
          </div>
        )}
