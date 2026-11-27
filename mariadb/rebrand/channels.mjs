@@ -37,14 +37,12 @@ export function apply() {
     (s) => !s.includes(`'${QQBOT}':`),
   );
 
-  // The registry test enumerates the built-in channel types.
-  patch(
-    RULE,
+  // The registry tests enumerate the built-in channel types.
+  for (const file of [
     'packages/cli/src/commands/channel/channel-registry.test.ts',
-    /^      'qq',\n/gm,
-    '',
-    (s) => !s.includes("'qq',"),
-  );
+    'packages/cli/src/commands/channel/channel-registry-builtins.test.ts',
+  ])
+    patch(RULE, file, /^      'qq',\n/gm, '', (s) => !s.includes("'qq',"));
 
   remove(RULE, 'docs/users/features/channels/qqbot.md');
   patch(

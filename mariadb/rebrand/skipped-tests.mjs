@@ -165,7 +165,20 @@ const SKIPPED = [
         [
           'uses the compact dark-theme artwork with theme-aware color',
           'keeps the original blue mark in the light theme',
+          'falls back after a logo decode failure in $theme',
         ],
+    },
+  },
+  {
+    reason:
+      'No Qwen subscription sign-in (alibaba.mjs, patch 0016): the extension opens the setup wizard without asking the daemon for the subscription, and never shows the subscription panel.',
+    tests: {
+      'packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx': [
+        'shows selected Qwen in the sidebar with VS Code theme tokens and host-owned activation',
+        'opens the native provider picker from %s even when subscription OAuth is enabled',
+        'waits for capability before opening auth and never falls back to a preview',
+        'shows the existing error on capability failure and allows another attempt',
+      ],
     },
   },
 ];
