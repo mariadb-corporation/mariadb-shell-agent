@@ -11,12 +11,16 @@ import semver from 'semver';
 import { DiffContentProvider, DiffManager } from './diff-manager.js';
 import { createLogger, logger, resetLoggerSink } from './utils/logger.js';
 import { redactLogCredentials } from '@qwen-code/acp-bridge/logRedaction';
-import { WebViewProvider } from './webview/providers/WebViewProvider.js';
+import {
+  resolveQwenCliEntryPath,
+  WebViewProvider,
+} from './webview/providers/WebViewProvider.js';
 import { ChatProviderRegistry } from './webview/providers/ChatProviderRegistry.js';
 import { registerChatViewProviders } from './webview/providers/chatViewRegistration.js';
 import { registerNewCommands } from './commands/index.js';
 import { ReadonlyFileSystemProvider } from './services/readonlyFileSystemProvider.js';
 import { isWindows } from './utils/platform.js';
+import { installAndUpdateMariaDbPlugin } from './services/mariadbPlugin.js';
 
 // Keep the dormant daemon IDE adapter on the VSIX bundle path without wiring it
 // into the active extension flow yet.
@@ -104,6 +108,10 @@ export async function activate(context: vscode.ExtensionContext) {
   logger.info('Extension activated');
 
   checkForUpdates(context, logger.info);
+  installAndUpdateMariaDbPlugin(
+    context,
+    resolveQwenCliEntryPath(context.extensionUri, context.extensionMode),
+  );
 
   // Create and register readonly file system provider
   // The provider registers itself as a singleton in the constructor

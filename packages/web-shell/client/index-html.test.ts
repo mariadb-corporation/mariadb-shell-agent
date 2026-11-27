@@ -313,7 +313,7 @@ describe('built-in brand document contract', () => {
 
     expect(href?.startsWith('data:image/svg+xml,')).toBe(true);
     // The Qwen mark's blue, percent-encoded.
-    expect(href).toContain('viewBox%3D%220%200%201024%201024%22');
+    expect(href).toContain('viewBox%3D%220%200%20256%20256%22');
   });
 
   // The brand script swaps the icon link's href, so it must run after that

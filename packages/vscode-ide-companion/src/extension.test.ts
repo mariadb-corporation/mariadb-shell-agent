@@ -21,6 +21,10 @@ vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
   };
 });
 
+vi.mock('./services/mariadbPlugin.js', () => ({
+  installAndUpdateMariaDbPlugin: vi.fn(),
+}));
+
 vi.mock('vscode', () => ({
   version: '1.94.0',
   window: {
@@ -62,7 +66,7 @@ vi.mock('vscode', () => ({
     executeCommand: vi.fn(),
   },
   Uri: {
-    joinPath: vi.fn(),
+    joinPath: vi.fn(() => ({ fsPath: '/ext/dist/qwen-cli/cli.js' })),
   },
   ExtensionMode: {
     Development: 1,

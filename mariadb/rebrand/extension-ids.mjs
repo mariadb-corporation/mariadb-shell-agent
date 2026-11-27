@@ -18,6 +18,11 @@ export function apply() {
     [
       ['qwen-code-sidebar', 'mariadb-shell-agent-sidebar'],
       ['qwen-code.', 'mariadb-shell-agent.'],
+      // The settings section, read without the dot.
+      [
+        "getConfiguration('qwen-code')",
+        "getConfiguration('mariadb-shell-agent')",
+      ],
       ['qwen.diff.', 'mariadb-shell-agent.diff.'],
       // Diff URI scheme and the editable-diff language id.
       ['qwen-diff', 'mariadb-shell-agent-diff'],

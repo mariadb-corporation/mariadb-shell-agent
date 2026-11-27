@@ -22,6 +22,7 @@ import {
   extractSessionModelState,
 } from '../utils/acpModelInfo.js';
 import { getErrorMessage } from '../utils/errorMessage.js';
+import { mariaDbPluginSettled } from './mariadbPlugin.js';
 import type { ModelInfo } from '@agentclientprotocol/sdk';
 import type { ApprovalModeValue } from '../types/approvalModeValueTypes.js';
 
@@ -89,11 +90,13 @@ export class QwenConnectionHandler {
     }
     if (
       vscode.workspace
-        .getConfiguration('qwen-code')
+        .getConfiguration('mariadb-shell-agent')
         .get<boolean>('experimentalLsp')
     ) {
       extraArgs.push('--experimental-lsp');
     }
+
+    await mariaDbPluginSettled();
 
     // Retry loop for connection.connect() to handle transient spawn failures
     // (e.g., SIGTERM during the 1-second startup grace period)

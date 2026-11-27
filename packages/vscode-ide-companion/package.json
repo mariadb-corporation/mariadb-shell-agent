@@ -196,6 +196,12 @@
           "type": "boolean",
           "default": false,
           "description": "Start language servers (from .lsp.json files and extensions) for the agent's code intelligence. Experimental; takes effect for newly started sessions (reload the window)."
+        },
+        "mariadb-shell-agent.installMariaDbPlugin": {
+          "order": 6,
+          "type": "boolean",
+          "default": true,
+          "description": "Install MariaDB's dev plugin (https://github.com/mariadb/ai-plugins) on the first start (only once: an uninstalled plugin stays uninstalled), and update extensions with auto-update on each start."
         }
       }
     },

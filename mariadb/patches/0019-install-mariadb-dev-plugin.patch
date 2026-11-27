@@ -1,0 +1,555 @@
+Install and update MariaDB's dev plugin
+
+On its first start the extension installs MariaDB's dev plugin
+(github.com/mariadb/ai-plugins, folder dev) with the bundled CLI:
+`extensions install https://github.com/mariadb/ai-plugins:dev --consent
+--auto-update`. A plugin already in <QWEN_HOME or ~/.qwen>/extensions/dev
+counts as installed; if it came from that repository without an autoUpdate
+field, it gets autoUpdate: true once. Done is recorded in globalState
+(mariadbDevPluginInstalled), so an uninstalled plugin stays uninstalled; a
+failed install (offline) is only logged and retried on the next start.
+
+On every start the extension then runs `extensions update <name> --consent`
+for each user extension whose install metadata has autoUpdate: true (as the
+terminal UI does at startup). `extensions update` gets --consent for that,
+like `extensions install`. Failures are logged and retried on the next start.
+
+All of it runs in the background; the daemon and the ACP process wait for it
+before they start, so they load the installed or updated plugin. The setting
+qwen-code.installMariaDbPlugin (on by default) turns off install and updates.
+
+diff --git a/packages/cli/src/commands/extensions/update.test.ts b/packages/cli/src/commands/extensions/update.test.ts
+index df95fbbe69..4f74ef70a3 100644
+--- a/packages/cli/src/commands/extensions/update.test.ts
++++ b/packages/cli/src/commands/extensions/update.test.ts
+@@ -8,6 +8,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
+ import { updateCommand, handleUpdate } from './update.js';
+ import yargs from 'yargs';
+ import { ExtensionUpdateState } from '@qwen-code/qwen-code-core';
++import { getExtensionManager } from './utils.js';
+ 
+ const mockGetLoadedExtensions = vi.hoisted(() => vi.fn());
+ const mockUpdateExtension = vi.hoisted(() => vi.fn());
+@@ -82,6 +83,14 @@ describe('handleUpdate', () => {
+     vi.clearAllMocks();
+   });
+ 
++  it('skips the confirmation prompt with --consent', async () => {
++    mockGetLoadedExtensions.mockReturnValueOnce([]);
++
++    await handleUpdate({ name: 'test-extension', consent: true });
++
++    expect(getExtensionManager).toHaveBeenCalledWith(true);
++  });
++
+   describe('update by name', () => {
+     it('should show message when extension is not found', async () => {
+       mockGetLoadedExtensions.mockReturnValueOnce([]);
+diff --git a/packages/cli/src/commands/extensions/update.ts b/packages/cli/src/commands/extensions/update.ts
+index f6d22f8f1a..8e0c1ef07e 100644
+--- a/packages/cli/src/commands/extensions/update.ts
++++ b/packages/cli/src/commands/extensions/update.ts
+@@ -18,6 +18,7 @@ import { t } from '../../i18n/index.js';
+ interface UpdateArgs {
+   name?: string;
+   all?: boolean;
++  consent?: boolean;
+ }
+ 
+ const updateOutput = (info: ExtensionUpdateInfo) =>
+@@ -42,7 +43,7 @@ const updateWarningOutput = (info: ExtensionUpdateInfo) =>
+     .join('\n');
+ 
+ export async function handleUpdate(args: UpdateArgs) {
+-  const extensionManager = await getExtensionManager();
++  const extensionManager = await getExtensionManager(args.consent);
+   const extensions = extensionManager.getLoadedExtensions();
+ 
+   if (args.name) {
+@@ -155,6 +156,13 @@ export const updateCommand: CommandModule = {
+         describe: t('Update all extensions.'),
+         type: 'boolean',
+       })
++      .option('consent', {
++        describe: t(
++          'Acknowledge the security risks of installing an extension and skip the confirmation prompt.',
++        ),
++        type: 'boolean',
++        default: false,
++      })
+       .conflicts('name', 'all')
+       .check((argv) => {
+         if (!argv.all && !argv.name) {
+@@ -168,6 +176,7 @@ export const updateCommand: CommandModule = {
+     await handleUpdate({
+       name: argv['name'] as string | undefined,
+       all: argv['all'] as boolean | undefined,
++      consent: argv['consent'] as boolean | undefined,
+     });
+   },
+ };
+diff --git a/packages/cli/src/commands/extensions/utils.ts b/packages/cli/src/commands/extensions/utils.ts
+index 80cba6cb44..334c699c6e 100644
+--- a/packages/cli/src/commands/extensions/utils.ts
++++ b/packages/cli/src/commands/extensions/utils.ts
+@@ -25,16 +25,17 @@ import chalk from 'chalk';
+ import stripAnsi from 'strip-ansi';
+ import { t, getCurrentLanguage } from '../../i18n/index.js';
+ 
+-export async function getExtensionManager(): Promise<ExtensionManager> {
++export async function getExtensionManager(
++  consent = false,
++): Promise<ExtensionManager> {
+   const workspaceDir = process.cwd();
+   const settings = loadSettings(workspaceDir).merged;
+   const extensionManager = new ExtensionManager({
+     workspaceDir,
+     locale: getCurrentLanguage(),
+-    requestConsent: requestConsentOrFail.bind(
+-      null,
+-      requestConsentNonInteractive,
+-    ),
++    requestConsent: consent
++      ? () => Promise.resolve()
++      : requestConsentOrFail.bind(null, requestConsentNonInteractive),
+     requestChoicePlugin: requestChoicePluginNonInteractive,
+     isWorkspaceTrusted: isWorkspaceTrusted(settings).isTrusted ?? true,
+     usageStatisticsEnabled: resolveUsageStatisticsEnabled(
+diff --git a/packages/vscode-ide-companion/package.json b/packages/vscode-ide-companion/package.json
+index 8b026667c6..54741b181a 100644
+--- a/packages/vscode-ide-companion/package.json
++++ b/packages/vscode-ide-companion/package.json
+@@ -230,6 +230,12 @@
+           "type": "boolean",
+           "default": false,
+           "description": "Start language servers (from .lsp.json files and extensions) for the agent's code intelligence. Experimental; takes effect for newly started sessions (reload the window)."
++        },
++        "qwen-code.installMariaDbPlugin": {
++          "order": 6,
++          "type": "boolean",
++          "default": true,
++          "description": "Install MariaDB's dev plugin (https://github.com/mariadb/ai-plugins) on the first start (only once: an uninstalled plugin stays uninstalled), and update extensions with auto-update on each start."
+         }
+       }
+     },
+diff --git a/packages/vscode-ide-companion/src/extension.test.ts b/packages/vscode-ide-companion/src/extension.test.ts
+index 05cdd705c3..10e4cfe1f0 100644
+--- a/packages/vscode-ide-companion/src/extension.test.ts
++++ b/packages/vscode-ide-companion/src/extension.test.ts
+@@ -20,6 +20,10 @@ vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
+   };
+ });
+ 
++vi.mock('./services/mariadbPlugin.js', () => ({
++  installAndUpdateMariaDbPlugin: vi.fn(),
++}));
++
+ vi.mock('vscode', () => ({
+   version: '1.94.0',
+   window: {
+@@ -61,7 +65,7 @@ vi.mock('vscode', () => ({
+     executeCommand: vi.fn(),
+   },
+   Uri: {
+-    joinPath: vi.fn(),
++    joinPath: vi.fn(() => ({ fsPath: '/ext/dist/qwen-cli/cli.js' })),
+   },
+   ExtensionMode: {
+     Development: 1,
+diff --git a/packages/vscode-ide-companion/src/extension.ts b/packages/vscode-ide-companion/src/extension.ts
+index 6b146623d8..ef6f28251a 100644
+--- a/packages/vscode-ide-companion/src/extension.ts
++++ b/packages/vscode-ide-companion/src/extension.ts
+@@ -10,12 +10,16 @@ import semver from 'semver';
+ import { DiffContentProvider, DiffManager } from './diff-manager.js';
+ import { createLogger, logger, resetLoggerSink } from './utils/logger.js';
+ import { redactLogCredentials } from '@qwen-code/acp-bridge/logRedaction';
+-import { WebViewProvider } from './webview/providers/WebViewProvider.js';
++import {
++  resolveQwenCliEntryPath,
++  WebViewProvider,
++} from './webview/providers/WebViewProvider.js';
+ import { ChatProviderRegistry } from './webview/providers/ChatProviderRegistry.js';
+ import { registerChatViewProviders } from './webview/providers/chatViewRegistration.js';
+ import { registerNewCommands } from './commands/index.js';
+ import { ReadonlyFileSystemProvider } from './services/readonlyFileSystemProvider.js';
+ import { isWindows } from './utils/platform.js';
++import { installAndUpdateMariaDbPlugin } from './services/mariadbPlugin.js';
+ 
+ // Keep the dormant daemon IDE adapter on the VSIX bundle path without wiring it
+ // into the active extension flow yet.
+@@ -101,6 +105,10 @@ export async function activate(context: vscode.ExtensionContext) {
+   logger.info('Extension activated');
+ 
+   checkForUpdates(context, logger.info);
++  installAndUpdateMariaDbPlugin(
++    context,
++    resolveQwenCliEntryPath(context.extensionUri, context.extensionMode),
++  );
+ 
+   // Create and register readonly file system provider
+   // The provider registers itself as a singleton in the constructor
+diff --git a/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
+new file mode 100644
+index 0000000000..68d18e2657
+--- /dev/null
++++ b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
+@@ -0,0 +1,167 @@
++/**
++ * @license
++ * Copyright (c) 2026, MariaDB plc.
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++import * as fs from 'node:fs';
++import * as os from 'node:os';
++import * as path from 'node:path';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import type * as vscode from 'vscode';
++
++const { execFileMock, getSetting } = vi.hoisted(() => ({
++  execFileMock: vi.fn(),
++  getSetting: vi.fn(),
++}));
++
++vi.mock('node:child_process', async (importOriginal) => ({
++  ...(await importOriginal<typeof import('node:child_process')>()),
++  execFile: execFileMock,
++}));
++vi.mock('vscode', () => ({
++  workspace: {
++    getConfiguration: () => ({ get: getSetting }),
++  },
++}));
++
++import {
++  installAndUpdateMariaDbPlugin,
++  mariaDbPluginSettled,
++  PLUGIN_INSTALLED_KEY,
++} from './mariadbPlugin.js';
++
++const SOURCE = 'https://github.com/mariadb/ai-plugins';
++
++describe('installAndUpdateMariaDbPlugin', () => {
++  let home: string;
++  let state: Map<string, unknown>;
++  let context: vscode.ExtensionContext;
++
++  beforeEach(() => {
++    home = fs.mkdtempSync(path.join(os.tmpdir(), 'mariadb-plugin-'));
++    vi.stubEnv('MARIADB_SHELL_AGENT_HOME', home);
++    state = new Map();
++    context = {
++      globalState: {
++        get: (key: string) => state.get(key),
++        update: async (key: string, value: unknown) => {
++          state.set(key, value);
++        },
++      },
++    } as unknown as vscode.ExtensionContext;
++    getSetting.mockImplementation(
++      (_key: string, fallback: unknown) => fallback,
++    );
++    execFileMock.mockReset();
++    execFileMock.mockImplementation((_file, _args, _options, callback) =>
++      callback(null, { stdout: '', stderr: '' }),
++    );
++  });
++
++  afterEach(() => {
++    vi.unstubAllEnvs();
++    fs.rmSync(home, { recursive: true, force: true });
++  });
++
++  function installExtension(name: string, metadata: object) {
++    const dir = path.join(home, 'extensions', name);
++    fs.mkdirSync(dir, { recursive: true });
++    fs.writeFileSync(
++      path.join(dir, '.qwen-extension-install.json'),
++      JSON.stringify(metadata),
++    );
++  }
++
++  function metadataOf(name: string) {
++    return JSON.parse(
++      fs.readFileSync(
++        path.join(home, 'extensions', name, '.qwen-extension-install.json'),
++        'utf8',
++      ),
++    );
++  }
++
++  function cliCalls() {
++    return execFileMock.mock.calls.map(([, args]) => args.slice(1));
++  }
++
++  async function run() {
++    installAndUpdateMariaDbPlugin(context, 'cli.js');
++    await mariaDbPluginSettled();
++  }
++
++  it('installs the plugin with auto-update through the bundled CLI and records it', async () => {
++    await run();
++    expect(execFileMock).toHaveBeenCalledWith(
++      process.execPath,
++      [
++        'cli.js',
++        'extensions',
++        'install',
++        `${SOURCE}:dev`,
++        '--consent',
++        '--auto-update',
++      ],
++      expect.anything(),
++      expect.any(Function),
++    );
++    expect(state.get(PLUGIN_INSTALLED_KEY)).toBe(true);
++  });
++
++  it('turns on auto-update for an installed plugin without reinstalling it', async () => {
++    installExtension('dev', { source: SOURCE, type: 'git' });
++    await run();
++    expect(metadataOf('dev')).toEqual({
++      source: SOURCE,
++      type: 'git',
++      autoUpdate: true,
++    });
++    expect(cliCalls()).toEqual([['extensions', 'update', 'dev', '--consent']]);
++    expect(state.get(PLUGIN_INSTALLED_KEY)).toBe(true);
++  });
++
++  it('keeps auto-update off when it was turned off', async () => {
++    installExtension('dev', { source: SOURCE, autoUpdate: false });
++    await run();
++    expect(metadataOf('dev').autoUpdate).toBe(false);
++    expect(execFileMock).not.toHaveBeenCalled();
++  });
++
++  it('does not record a failed install, so the next start retries', async () => {
++    execFileMock.mockImplementation((_file, _args, _options, callback) =>
++      callback(new Error('offline')),
++    );
++    await run();
++    expect(state.has(PLUGIN_INSTALLED_KEY)).toBe(false);
++  });
++
++  it('only updates on later starts, also when the plugin was uninstalled', async () => {
++    state.set(PLUGIN_INSTALLED_KEY, true);
++    installExtension('other', { source: 'x', autoUpdate: true });
++    installExtension('manual', { source: 'y' });
++    await run();
++    expect(cliCalls()).toEqual([
++      ['extensions', 'update', 'other', '--consent'],
++    ]);
++  });
++
++  it('keeps going when an update fails', async () => {
++    state.set(PLUGIN_INSTALLED_KEY, true);
++    installExtension('a', { autoUpdate: true });
++    installExtension('b', { autoUpdate: true });
++    execFileMock.mockImplementationOnce((_file, _args, _options, callback) =>
++      callback(new Error('offline')),
++    );
++    await run();
++    expect(cliCalls()).toHaveLength(2);
++  });
++
++  it('does nothing when the setting is off', async () => {
++    getSetting.mockReturnValue(false);
++    installExtension('dev', { source: SOURCE, autoUpdate: true });
++    await run();
++    expect(execFileMock).not.toHaveBeenCalled();
++    expect(state.has(PLUGIN_INSTALLED_KEY)).toBe(false);
++  });
++});
+diff --git a/packages/vscode-ide-companion/src/services/mariadbPlugin.ts b/packages/vscode-ide-companion/src/services/mariadbPlugin.ts
+new file mode 100644
+index 0000000000..1789884796
+--- /dev/null
++++ b/packages/vscode-ide-companion/src/services/mariadbPlugin.ts
+@@ -0,0 +1,144 @@
++/**
++ * @license
++ * Copyright (c) 2026, MariaDB plc.
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++import { execFile } from 'node:child_process';
++import * as fs from 'node:fs';
++import * as os from 'node:os';
++import * as path from 'node:path';
++import { promisify } from 'node:util';
++import * as vscode from 'vscode';
++import { Storage } from '@qwen-code/qwen-code-core';
++import { getErrorMessage } from '../utils/errorMessage.js';
++import { logger } from '../utils/logger.js';
++
++const PLUGIN_REPOSITORY = 'https://github.com/mariadb/ai-plugins';
++const PLUGIN_NAME = 'dev';
++const INSTALL_METADATA_FILE = '.qwen-extension-install.json';
++export const PLUGIN_INSTALLED_KEY = 'mariadbDevPluginInstalled';
++const CLI_TIMEOUT_MS = 60_000;
++
++let pending: Promise<void> = Promise.resolve();
++
++// The CLI applies MARIADB_SHELL_AGENT_HOME over QWEN_HOME at startup; the
++// extension host does not run that alias module.
++function userExtensionsDir(): string {
++  const home = process.env['MARIADB_SHELL_AGENT_HOME'];
++  if (!home) return Storage.getUserExtensionsDir();
++  return path.join(
++    path.resolve(home.replace(/^~(?=$|[/\\])/, os.homedir())),
++    'extensions',
++  );
++}
++
++async function runCli(cliEntryPath: string, args: string[]): Promise<string> {
++  const { stdout, stderr } = await promisify(execFile)(
++    process.execPath,
++    [cliEntryPath, 'extensions', ...args],
++    {
++      env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
++      timeout: CLI_TIMEOUT_MS,
++    },
++  );
++  return `${stdout}${stderr}`.trim();
++}
++
++function readInstallMetadata(dir: string): Record<string, unknown> | null {
++  try {
++    return JSON.parse(
++      fs.readFileSync(path.join(dir, INSTALL_METADATA_FILE), 'utf8'),
++    ) as Record<string, unknown>;
++  } catch {
++    return null;
++  }
++}
++
++/** Installs the plugin, or turns on auto-update for one installed without it. */
++async function installOnce(
++  context: vscode.ExtensionContext,
++  cliEntryPath: string,
++): Promise<void> {
++  const dir = path.join(userExtensionsDir(), PLUGIN_NAME);
++  const metadata = readInstallMetadata(dir);
++  if (!fs.existsSync(dir)) {
++    try {
++      await runCli(cliEntryPath, [
++        'install',
++        `${PLUGIN_REPOSITORY}:${PLUGIN_NAME}`,
++        '--consent',
++        '--auto-update',
++      ]);
++      logger.info('Installed the MariaDB dev plugin');
++    } catch (error) {
++      logger.warn(
++        `Installing the MariaDB dev plugin failed; retrying on the next start: ${getErrorMessage(error)}`,
++      );
++      return;
++    }
++  } else if (
++    metadata?.['source'] === PLUGIN_REPOSITORY &&
++    metadata['autoUpdate'] === undefined
++  ) {
++    fs.writeFileSync(
++      path.join(dir, INSTALL_METADATA_FILE),
++      JSON.stringify({ ...metadata, autoUpdate: true }, null, 2),
++    );
++  }
++  await context.globalState.update(PLUGIN_INSTALLED_KEY, true);
++}
++
++/** Updates the user's extensions that have auto-update turned on. */
++async function updateAutoUpdating(cliEntryPath: string): Promise<void> {
++  const root = userExtensionsDir();
++  if (!fs.existsSync(root)) return;
++  for (const name of fs.readdirSync(root)) {
++    if (readInstallMetadata(path.join(root, name))?.['autoUpdate'] !== true) {
++      continue;
++    }
++    try {
++      logger.info(await runCli(cliEntryPath, ['update', name, '--consent']));
++    } catch (error) {
++      logger.warn(
++        `Updating extension "${name}" failed; retrying on the next start: ${getErrorMessage(error)}`,
++      );
++    }
++  }
++}
++
++/**
++ * In the background: installs MariaDB's dev plugin on the first start (a
++ * plugin already there counts; a failed install is retried on the next start),
++ * then updates the extensions that have auto-update turned on.
++ */
++export function installAndUpdateMariaDbPlugin(
++  context: vscode.ExtensionContext,
++  cliEntryPath: string,
++): void {
++  if (
++    !vscode.workspace
++      .getConfiguration('qwen-code')
++      .get<boolean>('installMariaDbPlugin', true)
++  ) {
++    return;
++  }
++  pending = (async () => {
++    if (!context.globalState.get(PLUGIN_INSTALLED_KEY)) {
++      await installOnce(context, cliEntryPath);
++    }
++    await updateAutoUpdating(cliEntryPath);
++  })().catch((error: unknown) =>
++    logger.warn(
++      `Installing or updating the MariaDB dev plugin failed: ${getErrorMessage(error)}`,
++    ),
++  );
++}
++
++/**
++ * Settles when this activation's install and updates have finished, so the
++ * daemon and ACP process start with the current plugin.
++ */
++export function mariaDbPluginSettled(): Promise<void> {
++  return pending;
++}
+diff --git a/packages/vscode-ide-companion/src/services/qwenConnectionHandler.ts b/packages/vscode-ide-companion/src/services/qwenConnectionHandler.ts
+index 83801f646f..29d5a04214 100644
+--- a/packages/vscode-ide-companion/src/services/qwenConnectionHandler.ts
++++ b/packages/vscode-ide-companion/src/services/qwenConnectionHandler.ts
+@@ -21,6 +21,7 @@ import {
+   extractSessionModelState,
+ } from '../utils/acpModelInfo.js';
+ import { getErrorMessage } from '../utils/errorMessage.js';
++import { mariaDbPluginSettled } from './mariadbPlugin.js';
+ import type { ModelInfo } from '@agentclientprotocol/sdk';
+ import type { ApprovalModeValue } from '../types/approvalModeValueTypes.js';
+ 
+@@ -94,6 +95,8 @@ export class QwenConnectionHandler {
+       extraArgs.push('--experimental-lsp');
+     }
+ 
++    await mariaDbPluginSettled();
++
+     // Retry loop for connection.connect() to handle transient spawn failures
+     // (e.g., SIGTERM during the 1-second startup grace period)
+     const maxConnectAttempts = 3;
+diff --git a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
+index d0bc5fc8ae..30782052bd 100644
+--- a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
++++ b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
+@@ -44,6 +44,7 @@ import {
+   type QwenDaemonListenerHandle,
+ } from '../../services/qwenDaemonProcess.js';
+ import { isLoopbackHostname } from '../../services/daemonIdeConnection.js';
++import { mariaDbPluginSettled } from '../../services/mariadbPlugin.js';
+ import { probePreAuthHostGateRejection } from './preAuthHostGateProbe.js';
+ import {
+   DaemonFetchBridge,
+@@ -1822,6 +1823,7 @@ export class WebViewProvider {
+         const canonicalWorkspaceCwd = existsSync(workspaceCwd)
+           ? realpathSync.native(workspaceCwd)
+           : workspaceCwd;
++        await mariaDbPluginSettled();
+         const runtime = await this.daemonProcess.start(
+           resolveQwenCliEntryPath(
+             this.extensionUri,

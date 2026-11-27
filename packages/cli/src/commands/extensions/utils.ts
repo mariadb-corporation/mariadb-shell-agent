@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,16 +26,17 @@ import chalk from 'chalk';
 import stripAnsi from 'strip-ansi';
 import { t, getCurrentLanguage } from '../../i18n/index.js';
 
-export async function getExtensionManager(): Promise<ExtensionManager> {
+export async function getExtensionManager(
+  consent = false,
+): Promise<ExtensionManager> {
   const workspaceDir = process.cwd();
   const settings = loadSettings(workspaceDir).merged;
   const extensionManager = new ExtensionManager({
     workspaceDir,
     locale: getCurrentLanguage(),
-    requestConsent: requestConsentOrFail.bind(
-      null,
-      requestConsentNonInteractive,
-    ),
+    requestConsent: consent
+      ? () => Promise.resolve()
+      : requestConsentOrFail.bind(null, requestConsentNonInteractive),
     requestChoicePlugin: requestChoicePluginNonInteractive,
     isWorkspaceTrusted: isWorkspaceTrusted(settings).isTrusted ?? true,
     usageStatisticsEnabled: resolveUsageStatisticsEnabled(

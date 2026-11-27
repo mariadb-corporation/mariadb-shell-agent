@@ -32,6 +32,21 @@ Settings live in `~/.mariadb-shell-agent/settings.json` (per project: `.mariadb-
 instructions in `MARIADB-SHELL-AGENT.md` (`AGENTS.md` is read too), and ignore rules in
 `.mariadb-shell-agentignore`. The bundled CLI is available as `mariadb-shell-agent` (short: `msa`).
 
+## MariaDB dev plugin
+
+On its first start the extension installs MariaDB's `dev` plugin
+([mariadb/ai-plugins](https://github.com/mariadb/ai-plugins)) into
+`~/.mariadb-shell-agent/extensions/dev`: MariaDB skills and the MariaDB MCP server for the agent.
+It does this once: if you uninstall the plugin, it stays uninstalled. If the install fails (for
+example offline), the next start tries again.
+
+On every start the extension also updates the plugin, and any other extension installed with
+auto-update. A failed update is retried on the next start. To turn off both the install and the
+updates, turn off `mariadb-shell-agent.installMariaDbPlugin`.
+
+The plugin also brings a language server for `.sql` files. Language servers only start with the
+experimental LSP support: turn on `mariadb-shell-agent.experimentalLsp` and reload the window.
+
 ## License
 
 Apache-2.0, like upstream Qwen Code. The third-party packages the extension bundles and their
