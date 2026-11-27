@@ -234,6 +234,15 @@ export function apply() {
     ['packages/cli/src', 'packages/core/src'],
     [[/(usageStatisticsEnabled\s*\?\?\s*)true\b/g, '$1false']],
   );
+  // The RocketMQ dev broker downloads from Apache only: no Aliyun mirror first. Its 5.5.1
+  // archive is still checked against the pinned SHA-512.
+  patch(
+    'rocketmq mirror',
+    'scripts/rocketmq-lite-broker.sh',
+    /\n {4}if \[ "\$\{RMQ_VERSION\}" = "5\.5\.1" \]; then\n {6}bases=\("https:\/\/mirrors\.aliyun\.com\/[^\n]*\n {4}fi/,
+    '',
+    (t) => !t.includes('mirrors.aliyun.com'),
+  );
   // Standalone entry points resolve the default through their own helper.
   patch(
     'telemetry default (resolver)',
