@@ -133,7 +133,7 @@ index 8b026667c6..54741b181a 100644
        }
      },
 diff --git a/packages/vscode-ide-companion/src/extension.test.ts b/packages/vscode-ide-companion/src/extension.test.ts
-index 05cdd705c3..053c008597 100644
+index 05cdd705c3..10e4cfe1f0 100644
 --- a/packages/vscode-ide-companion/src/extension.test.ts
 +++ b/packages/vscode-ide-companion/src/extension.test.ts
 @@ -20,6 +20,10 @@ vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
@@ -147,6 +147,15 @@ index 05cdd705c3..053c008597 100644
  vi.mock('vscode', () => ({
    version: '1.94.0',
    window: {
+@@ -61,7 +65,7 @@ vi.mock('vscode', () => ({
+     executeCommand: vi.fn(),
+   },
+   Uri: {
+-    joinPath: vi.fn(),
++    joinPath: vi.fn(() => ({ fsPath: '/ext/dist/qwen-cli/cli.js' })),
+   },
+   ExtensionMode: {
+     Development: 1,
 diff --git a/packages/vscode-ide-companion/src/extension.ts b/packages/vscode-ide-companion/src/extension.ts
 index 6b146623d8..ef6f28251a 100644
 --- a/packages/vscode-ide-companion/src/extension.ts
@@ -182,10 +191,10 @@ index 6b146623d8..ef6f28251a 100644
    // The provider registers itself as a singleton in the constructor
 diff --git a/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
 new file mode 100644
-index 0000000000..761b96951a
+index 0000000000..68d18e2657
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
-@@ -0,0 +1,162 @@
+@@ -0,0 +1,167 @@
 +/**
 + * @license
 + * Copyright (c) 2026, MariaDB plc.
@@ -203,7 +212,10 @@ index 0000000000..761b96951a
 +  getSetting: vi.fn(),
 +}));
 +
-+vi.mock('node:child_process', () => ({ execFile: execFileMock }));
++vi.mock('node:child_process', async (importOriginal) => ({
++  ...(await importOriginal<typeof import('node:child_process')>()),
++  execFile: execFileMock,
++}));
 +vi.mock('vscode', () => ({
 +  workspace: {
 +    getConfiguration: () => ({ get: getSetting }),
@@ -235,7 +247,9 @@ index 0000000000..761b96951a
 +        },
 +      },
 +    } as unknown as vscode.ExtensionContext;
-+    getSetting.mockImplementation((_key: string, fallback: unknown) => fallback);
++    getSetting.mockImplementation(
++      (_key: string, fallback: unknown) => fallback,
++    );
 +    execFileMock.mockReset();
 +    execFileMock.mockImplementation((_file, _args, _options, callback) =>
 +      callback(null, { stdout: '', stderr: '' }),
