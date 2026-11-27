@@ -337,10 +337,7 @@ async function runCustomProviderToModels(
   notify: ReturnType<typeof vi.fn>;
 }> {
   const { onClose, notify } = renderDialog();
-  await press('down');
-  await press('down');
-  await press('down');
-  await press('down');
+  await press('up');
   await press('return'); // main: CUSTOM_PROVIDER → provider-setup (protocol)
   if (protocol !== AuthType.USE_OPENAI) await press('down');
   if (protocol === AuthType.USE_GEMINI) await press('down');

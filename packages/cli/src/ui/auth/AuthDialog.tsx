@@ -222,19 +222,7 @@ export function AuthDialog(): React.JSX.Element {
   } = useUIActions();
   const config = useConfig();
   const settings = useSettings();
-  const mainItems = [
-    {
-      key: 'QWEN_SUBSCRIPTION',
-      title: t('Qwen Account with Subscription'),
-      isNew: true,
-      label: t('Qwen Account with Subscription'),
-      description: t(
-        'Unlock MariaDB Shell Agent + Agent with Plus/Pro Plan at chat.qwen.invalid',
-      ),
-      value: 'QWEN_SUBSCRIPTION' as MainOption,
-    },
-    ...MAIN_ITEMS,
-  ];
+  const mainItems = [...MAIN_ITEMS];
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [viewLevel, setViewLevel] = useState<ViewLevel>('main');

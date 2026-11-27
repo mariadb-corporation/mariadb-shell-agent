@@ -1735,18 +1735,7 @@ function AuthDialogFlow({
   const [errorMessage, setErrorMessage] = useState<string | null>(
     initialError ?? null,
   );
-  const mainItems: RadioItem[] = [
-    {
-      key: 'QWEN_SUBSCRIPTION',
-      label: t('Qwen Account with Subscription'),
-      isNew: true,
-      description: t(
-        'Unlock MariaDB Shell Agent + Agent with Plus/Pro Plan at chat.qwen.invalid',
-      ),
-      value: 'QWEN_SUBSCRIPTION',
-    },
-    ...MAIN_ITEMS,
-  ];
+  const mainItems: RadioItem[] = [...MAIN_ITEMS];
 
   // Every text field latches itself shut on the Enter that submits it, and only
   // a mount-key change clears that latch. On the last step the submit is async,

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -99,7 +100,7 @@ export function registerSubscriptionAuthRoutes(
 
   app.get('/auth/subscription', (req, res) => {
     res.json({
-      enabled: !disposed,
+      enabled: false,
       signedIn: !disposed && new QwenSubscriptionSession().isSignedIn(),
       plansUrl: getQwenSubscriptionPlansUrl(
         paywallScene(req.query['paywallScene']),
