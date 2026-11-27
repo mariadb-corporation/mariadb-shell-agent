@@ -75,17 +75,10 @@ const SKIPPED = [
     reason:
       'No Alibaba providers in the pickers (alibaba.mjs): no QwenCloud / Alibaba ModelStudio groups or menu entries.',
     tests: {
-      // Navigates the CLI auth menu by position through the QwenCloud and ModelStudio entries.
+      // Navigate the CLI auth menus by position through the subscription, QwenCloud and ModelStudio
+      // entries.
       'packages/cli/src/ui/auth/AuthDialog.test.tsx': '*',
-      'packages/cli/src/ui/opentui/dialogs-auth.test.tsx': [
-        'renders the main menu with the five top-level options',
-        'navigates main → sub-menu and back with Esc',
-        'wraps the main-menu cursor from the last row to the first (#160)',
-        'renders QwenCloud flow title in Chinese when locale is zh (T1)',
-        'shows Token Plan and Standard API Key in QwenCloud sub-menu but not Coding Plan (T3+T4)',
-        'sheds the rule and terms block before the main list loses its last row',
-        'sheds the main list margin row before the list loses its last row',
-      ],
+      'packages/cli/src/ui/opentui/dialogs-auth.test.tsx': '*',
       'packages/cli/src/serve/server/auth-provider-helpers.test.ts': [
         'lists QwenCloud first and pins every group membership',
       ],

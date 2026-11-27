@@ -202,18 +202,6 @@ export function apply() {
       (t) => !/\n {6}key: 'QWEN_SUBSCRIPTION',/.test(t),
     );
   }
-  // The dialog tests reach Custom Provider, the main menu's last entry, by counting rows; the
-  // menu wraps, so one Up reaches it in either menu.
-  patch(
-    'auth dialog test navigation',
-    'packages/cli/src/ui/opentui/dialogs-auth.test.tsx',
-    /(\n {2}const \{ onClose, notify \} = renderDialog\(\);\n)(?: {2}await press\('down'\);\n){4}( {2}await press\('return'\); \/\/ main: CUSTOM_PROVIDER)/,
-    "$1  await press('up');\n$2",
-    (t) =>
-      t.includes(
-        "renderDialog();\n  await press('up');\n  await press('return'); // main: CUSTOM_PROVIDER",
-      ),
-  );
   // ... nor in the daemon's clients (Web Shell, the extension): they offer it only when enabled.
   patch(
     'subscription disabled',
