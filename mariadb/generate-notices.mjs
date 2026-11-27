@@ -17,7 +17,7 @@
  * extension's dependencies only; the CLI bundle the extension carries (dist/qwen-cli/cli.js and
  * its chunks, built from packages/cli) adds some 180 packages it never lists. This script walks
  * both trees with upstream's exported helpers, so the license lookup (license and NOTICE files,
- * a package's licenses/ directory, the MIT fallback, ExcelJS's browser bundle) stays upstream's,
+ * a package's licenses/ directory, the MIT fallback) stays upstream's,
  * and prints the result grouped by distinct license text, as the MariaDB Shell Workbench does.
  * Needs node_modules installed (corepack pnpm install --frozen-lockfile).
  */
@@ -29,7 +29,6 @@ import {
   findLicenseFile,
   findNoticeFile,
   findSupplementaryLicenseFiles,
-  getExceljsBrowserNotices,
   getFallbackLicenseText,
   normalizeRepositoryUrl,
 } from '../packages/vscode-ide-companion/scripts/generate-notices.js';
@@ -158,28 +157,13 @@ async function generate() {
       text: await licenseText(name, version, dir, manifest),
     });
   }
-  // ExcelJS's prebuilt browser bundle embeds packages its package.json does not depend on.
-  const exceljs = [...found.values()].find(({ name }) => name === 'exceljs');
-  if (exceljs)
-    for (const embedded of await getExceljsBrowserNotices(exceljs.dir)) {
-      if (found.has(`${embedded.name}@${embedded.version}`)) continue;
-      packages.push({
-        name: embedded.name,
-        version: embedded.version,
-        license: embedded.licenseId ?? 'see license text',
-        repository: embedded.repository,
-        text: lf(embedded.license),
-        embeddedIn: 'exceljs',
-      });
-    }
   packages.sort(
     (a, b) =>
       a.name.localeCompare(b.name) ||
       a.version.localeCompare(b.version, undefined, { numeric: true }),
   );
 
-  const label = (p) =>
-    `${p.name} ${p.version}${p.embeddedIn ? ` (in ${p.embeddedIn})` : ''}`;
+  const label = (p) => `${p.name} ${p.version}`;
   const byText = new Map();
   const withoutText = [];
   for (const p of packages)
@@ -208,9 +192,8 @@ it with mariadb/generate-notices.mjs.
 
 npm packages
 
-   Each package with the license it declares (a package ExcelJS's browser
-   bundle embeds is marked with it). Their license texts follow, one section
-   per distinct text.
+   Each package with the license it declares. Their license texts follow, one
+   section per distinct text.
 
 ${packages.map((p) => `   - ${label(p)}: ${p.license}`).join('\n')}
 `);
