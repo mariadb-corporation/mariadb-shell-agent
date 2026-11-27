@@ -89,12 +89,13 @@ export function apply() {
     },
   );
 
-  // The longer directory name pushes two workflow tool descriptions past their size budgets.
+  // The longer directory and product names push three workflow tool descriptions past their
+  // size budgets.
   patch(
     'workflow description budgets',
     'packages/core/src/tools/workflow/workflow.test.ts',
-    /\['scriptPath', 950\]|toBeLessThanOrEqual\(29_500\)/g,
-    (m) => m.replace(/(950|29_500)/, '$1 + 64'),
-    (t) => t.includes("['scriptPath', 950 + 64]"),
+    /\['scriptPath', 950\]|\['the description', 4_800\]|toBeLessThanOrEqual\(29_500\)/g,
+    (m) => m.replace(/(950|4_800|29_500)/, '$1 + 128'),
+    (t) => t.includes("['scriptPath', 950 + 128]"),
   );
 }

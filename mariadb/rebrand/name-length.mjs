@@ -73,28 +73,13 @@ export function apply() {
     (t) => t.includes('const BUNDLED_LISTING_BUDGET = 6_900;'),
   );
 
-  // The resident memory policy and the workflow tool name the config directory and the product:
-  // their per-turn budgets grow by 50 characters too.
+  // The resident memory policy names the config directory and the product: its per-turn budget
+  // grows by 50 characters too.
   patch(
     'name length',
     'packages/core/src/memory/prompt.test.ts',
     'expect(solo.length).toBeLessThanOrEqual(3_000);',
     'expect(solo.length).toBeLessThanOrEqual(3_050);',
     (t) => t.includes('expect(solo.length).toBeLessThanOrEqual(3_050);'),
-  );
-  const workflowTest = 'packages/core/src/tools/workflow/workflow.test.ts';
-  patch(
-    'name length',
-    workflowTest,
-    "['the description', 4_800],",
-    "['the description', 4_850],",
-    (t) => t.includes("['the description', 4_850],"),
-  );
-  patch(
-    'name length',
-    workflowTest,
-    'toBeLessThanOrEqual(29_500 + 64);',
-    'toBeLessThanOrEqual(29_500 + 64 + 50);',
-    (t) => t.includes('toBeLessThanOrEqual(29_500 + 64 + 50);'),
   );
 }
