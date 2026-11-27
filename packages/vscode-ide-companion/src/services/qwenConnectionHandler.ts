@@ -90,7 +90,7 @@ export class QwenConnectionHandler {
     }
     if (
       vscode.workspace
-        .getConfiguration('qwen-code')
+        .getConfiguration('mariadb-shell-agent')
         .get<boolean>('experimentalLsp')
     ) {
       extraArgs.push('--experimental-lsp');

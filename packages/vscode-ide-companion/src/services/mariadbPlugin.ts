@@ -69,7 +69,7 @@ export function installMariaDbPluginOnce(
   if (
     context.globalState.get(PLUGIN_INSTALLED_KEY) ||
     !vscode.workspace
-      .getConfiguration('qwen-code')
+      .getConfiguration('mariadb-shell-agent')
       .get<boolean>('installMariaDbPlugin', true)
   ) {
     return;

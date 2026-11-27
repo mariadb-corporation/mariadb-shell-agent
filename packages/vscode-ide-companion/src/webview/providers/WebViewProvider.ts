@@ -261,7 +261,7 @@ export class WebViewProvider {
             // synced=false is normal for api-key providers — those are managed by
             // the interactive auth flow, not VS Code Settings sync.
             const apiKey = vscode.workspace
-              .getConfiguration('qwen-code')
+              .getConfiguration('mariadb-shell-agent')
               .get<string>('apiKey', '');
             if (!apiKey) {
               logger.log(
@@ -921,7 +921,7 @@ export class WebViewProvider {
    * @returns true if settings were synced (apiKey is configured), false otherwise
    */
   private async syncVSCodeSettingsToQwenConfig(): Promise<boolean> {
-    const config = vscode.workspace.getConfiguration('qwen-code');
+    const config = vscode.workspace.getConfiguration('mariadb-shell-agent');
     const apiKey = config.get<string>('apiKey', '');
 
     if (!apiKey) {
@@ -971,7 +971,7 @@ export class WebViewProvider {
       );
 
       // Set guard to prevent onDidChangeConfiguration from triggering a write-back
-      const config = vscode.workspace.getConfiguration('qwen-code');
+      const config = vscode.workspace.getConfiguration('mariadb-shell-agent');
       const target = vscode.ConfigurationTarget.Global;
       const updates: Array<Thenable<void>> = [];
 
@@ -1834,7 +1834,7 @@ export class WebViewProvider {
           ),
           canonicalWorkspaceCwd,
           vscode.workspace
-            .getConfiguration('qwen-code')
+            .getConfiguration('mariadb-shell-agent')
             .get<boolean>('experimentalLsp')
             ? ['--experimental-lsp']
             : [],
@@ -2094,7 +2094,7 @@ export class WebViewProvider {
 
   /** Update the tab-dot icon. */
   private setTabDot(color: DotColor): void {
-    const config = vscode.workspace.getConfiguration('qwen-code');
+    const config = vscode.workspace.getConfiguration('mariadb-shell-agent');
     if (!config.get<boolean>('dotIndicator', true)) {
       return;
     }
@@ -2211,7 +2211,7 @@ export class WebViewProvider {
   /** Whether the mariadb-shell-agent.notifications setting is enabled. */
   private isNotificationsEnabled(): boolean {
     return vscode.workspace
-      .getConfiguration('qwen-code')
+      .getConfiguration('mariadb-shell-agent')
       .get<boolean>('notifications', true);
   }
 
