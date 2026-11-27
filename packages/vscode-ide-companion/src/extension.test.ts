@@ -21,6 +21,10 @@ vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
   };
 });
 
+vi.mock('./services/mariadbPlugin.js', () => ({
+  installMariaDbPluginOnce: vi.fn(),
+}));
+
 vi.mock('vscode', () => ({
   version: '1.94.0',
   window: {
