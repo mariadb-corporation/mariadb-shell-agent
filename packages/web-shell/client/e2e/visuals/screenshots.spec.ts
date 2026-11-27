@@ -6,6 +6,7 @@
  */
 
 import { devices, expect, test, type Page } from '@playwright/test';
+import { plugin as githubChannelPlugin } from '@qwen-code/channel-github';
 import type {
   DaemonEvent,
   DaemonSessionSummary,
@@ -38,6 +39,13 @@ import {
 } from './harness';
 
 const THEMES: readonly VisualTheme[] = ['dark', 'light'];
+
+// The action-template editor captures use the plugin's own descriptor so the
+// screenshots show the production key vocabulary, not a hand-pruned fixture.
+const githubManagement = githubChannelPlugin.management;
+if (!githubManagement) {
+  throw new Error('@qwen-code/channel-github declares no management metadata.');
+}
 
 test.use({ viewport: { ...VISUAL_VIEWPORT } });
 
@@ -762,6 +770,179 @@ for (const theme of THEMES) {
       await captureScreenshot(page, `session-overview-details-${theme}`);
     });
 
+    test('sidebar continuation badge', async ({ page }, testInfo) => {
+      const workspaceCwd = '/workspace/continuation-badge';
+      const scenario = createWebShellDaemonScenario({
+        workspaceCwd,
+        sessions: [
+          {
+            sessionId: 'cut-off',
+            displayName: 'Refactor the config loader',
+            needsContinuation: true,
+          },
+          {
+            sessionId: 'running',
+            displayName: 'Run the browser tests',
+            hasActivePrompt: true,
+          },
+          { sessionId: 'clean', displayName: 'Update session documentation' },
+        ].map((session) => ({
+          ...session,
+          workspaceCwd,
+          updatedAt: '2026-07-01T12:00:00.000Z',
+        })),
+      });
+      const daemon = await installScenario(
+        page,
+        scenario,
+        resolveBaseURL(testInfo),
+      );
+      await gotoSession(page, scenario, daemon, theme);
+      const badge = page
+        .locator(`[data-sidebar-workspace="${workspaceCwd}"]`)
+        .locator('[data-web-shell-session-continuation]');
+      await expect(badge).toBeVisible();
+      await expect(badge).toHaveText('Continue');
+      await captureScreenshot(page, `sidebar-continuation-badge-${theme}`);
+    });
+
+    test('session overview bulk delete batches at the route limit', async ({
+      page,
+    }, testInfo) => {
+      const workspaceCwd = '/workspace/session-overview-bulk-delete';
+      // The mock catalog deliberately exceeds the real daemon's 100-row page cap.
+      const sessions = Array.from({ length: 101 }, (_, index) => ({
+        sessionId: `bulk-delete-${index}`,
+        displayName: `Bulk delete fixture ${index}`,
+        workspaceCwd,
+        clientCount: 0,
+        hasActivePrompt: false,
+        updatedAt: '2026-07-01T12:00:00.000Z',
+      }));
+      const scenario = createWebShellDaemonScenario({
+        workspaceCwd,
+        sessions: [
+          ...sessions,
+          {
+            sessionId: 'web-shell-e2e-session',
+            displayName: 'Current session to keep',
+            workspaceCwd,
+            clientCount: 1,
+            hasActivePrompt: true,
+          },
+        ],
+      });
+      const daemon = await installScenario(
+        page,
+        scenario,
+        resolveBaseURL(testInfo),
+      );
+      const batches: string[][] = [];
+      const browserErrors: string[] = [];
+      page.on('pageerror', (error) => browserErrors.push(error.message));
+      page.on('console', (message) => {
+        if (['error', 'warning'].includes(message.type())) {
+          browserErrors.push(message.text());
+        }
+      });
+      await page.route('**/workspace/models', (route) =>
+        route.fulfill({ json: { models: [] } }),
+      );
+      await page.route('**/daemon/status?*', (route) =>
+        route.fulfill({
+          json: {
+            v: 1,
+            detail: 'full',
+            generatedAt: '2026-07-01T12:00:00.000Z',
+            status: 'ok',
+            issues: [],
+            daemon: { pid: 0, uptimeMs: 0, mode: 'http-bridge', workspaceCwd },
+            full: {
+              sessions: scenario.sessions.map((session) => ({
+                ...session,
+                subscriberCount: 0,
+                attachCount: 0,
+                pendingPromptCount: 0,
+                pendingPermissionCount: 0,
+                lastEventId: 0,
+              })),
+            },
+          },
+        }),
+      );
+      await page.route('**/sessions/delete', async (route) => {
+        const { sessionIds } = route.request().postDataJSON() as {
+          sessionIds: string[];
+        };
+        batches.push(sessionIds);
+        if (sessionIds.length > 100) {
+          await route.fulfill({
+            status: 400,
+            json: { error: 'max 100 session IDs', code: 'invalid_request' },
+          });
+          return;
+        }
+        const removed = scenario.sessions
+          .filter((session) => sessionIds.includes(session.sessionId))
+          .map((session) => session.sessionId);
+        scenario.sessions = scenario.sessions.filter(
+          (session) => !removed.includes(session.sessionId),
+        );
+        await route.fulfill({
+          json: {
+            removed,
+            notFound: sessionIds.filter((id) => !removed.includes(id)),
+            errors: [],
+          },
+        });
+      });
+      await gotoSession(page, scenario, daemon, theme);
+      await page.getByRole('button', { name: 'More', exact: true }).click();
+      await page
+        .getByRole('button', { name: 'Session Overview', exact: true })
+        .click();
+      const panel = page.locator('[data-web-shell-session-panel]');
+      await panel
+        .getByRole('textbox', { name: 'Search title, branch, PR or ID…' })
+        .fill('Bulk delete fixture');
+      await expect(panel).toContainText('101 session(s)');
+      await panel
+        .getByRole('checkbox', { name: 'Select all', exact: true })
+        .check();
+      await expect(panel).toContainText('101 of 101 row(s) selected');
+      await panel
+        .locator('[data-web-shell-session-footer]')
+        .getByRole('button', { name: 'Delete', exact: true })
+        .click();
+      await expect(page.getByRole('alertdialog')).toContainText(
+        'Delete 101 sessions?',
+      );
+      await captureScreenshot(
+        page,
+        `session-overview-bulk-delete-confirm-${theme}`,
+      );
+      await page.locator('[data-slot="alert-dialog-action"]').click();
+      await expect(
+        panel
+          .getByText('No data', { exact: true })
+          .or(panel.getByText(/Failed to delete session/)),
+      ).toBeVisible();
+      await captureScreenshot(
+        page,
+        `session-overview-bulk-delete-result-${theme}`,
+      );
+      expect(batches.map((ids) => ids.length)).toEqual([100, 1]);
+      expect(batches.flat().sort()).toEqual(
+        sessions.map((session) => session.sessionId).sort(),
+      );
+      expect(scenario.sessions.map((session) => session.sessionId)).toEqual([
+        scenario.sessionId,
+      ]);
+      await expect(panel.getByText('No data', { exact: true })).toBeVisible();
+      await expect(panel).not.toContainText('Failed to delete session');
+      expect(browserErrors).toEqual([]);
+    });
+
     test('conversation search', async ({ page }, testInfo) => {
       const events = Array.from({ length: 12 }, (_, index) => [
         userTextEvent(`Explain synthetic example ${index + 1}.`, {
@@ -828,6 +1009,104 @@ for (const theme of THEMES) {
       await captureScreenshot(page, `session-transcript-${theme}`);
     });
 
+    test(`bidirectional Markdown`, async ({ page }, testInfo) => {
+      const response = [
+        'שלום, פתחו את `/workspace/docs/readme.md` ואת https://example.com/docs.',
+        '',
+        '```ts',
+        '// שלום path = "/workspace/logs/app.log";',
+        'const status = "ready";',
+        '```',
+      ].join('\n');
+      const scenario = createWebShellDaemonScenario();
+      const daemon = await installScenario(
+        page,
+        scenario,
+        resolveBaseURL(testInfo),
+      );
+      await gotoSession(page, scenario, daemon, theme);
+
+      await fillComposer(page, 'Render mixed-direction Markdown.');
+      await page.locator('[data-web-shell-composer-submit]').click();
+      await expect.poll(() => daemon.promptRequests().length).toBe(1);
+      await daemon.sse.split(assistantTextEvent(response, { id: 10 }));
+
+      const markdown = page.locator(
+        '[data-web-shell-message-list] [data-markdown-source="assistant"]',
+      );
+      const inlineCode = markdown.locator('p code').first();
+      const streamingCode = markdown.locator('pre').first();
+      await expect(markdown).toHaveAttribute('dir', 'auto');
+      await expect(inlineCode).toHaveAttribute('dir', 'auto');
+      await expect(streamingCode).toHaveAttribute('dir', 'auto');
+      await expect(markdown.locator('pre.shiki')).toHaveCount(0);
+      await expect
+        .poll(async () => ({
+          message: await markdown.evaluate(
+            (element) => window.getComputedStyle(element).unicodeBidi,
+          ),
+          messageDirection: await markdown.evaluate(
+            (element) => window.getComputedStyle(element).direction,
+          ),
+          inline: await inlineCode.evaluate(
+            (element) => window.getComputedStyle(element).unicodeBidi,
+          ),
+          inlineDirection: await inlineCode.evaluate(
+            (element) => window.getComputedStyle(element).direction,
+          ),
+          code: await streamingCode.evaluate(
+            (element) => window.getComputedStyle(element).unicodeBidi,
+          ),
+        }))
+        .toEqual({
+          message: 'plaintext',
+          messageDirection: 'rtl',
+          inline: 'isolate',
+          inlineDirection: 'ltr',
+          code: 'plaintext',
+        });
+      await captureScreenshot(
+        page,
+        `markdown-bidirectional-streaming-${theme}`,
+      );
+
+      await daemon.sendEvent(turnCompleteEvent('prompt-e2e', { id: 11 }));
+      const highlightedCode = markdown.locator('pre.shiki').first();
+      await expect(highlightedCode).toBeVisible();
+      const highlightedWrapper = highlightedCode.locator('..');
+      await expect(highlightedWrapper).toHaveAttribute('dir', 'auto');
+      await expect
+        .poll(async () => ({
+          wrapper: await highlightedWrapper.evaluate(
+            (element) => window.getComputedStyle(element).unicodeBidi,
+          ),
+          code: await highlightedCode.evaluate(
+            (element) => window.getComputedStyle(element).unicodeBidi,
+          ),
+        }))
+        .toEqual({ wrapper: 'plaintext', code: 'plaintext' });
+      const lineInsets = await highlightedCode
+        .locator('code .line')
+        .evaluateAll((lines) => {
+          const container = lines[0]?.closest('pre');
+          if (!container) return [];
+          const containerRect = container.getBoundingClientRect();
+          return lines.slice(0, 2).map((line) => {
+            const range = document.createRange();
+            range.selectNodeContents(line);
+            const lineRect = range.getBoundingClientRect();
+            return {
+              left: lineRect.left - containerRect.left,
+              right: containerRect.right - lineRect.right,
+            };
+          });
+        });
+      expect(lineInsets).toHaveLength(2);
+      expect(lineInsets[0]!.right).toBeLessThanOrEqual(1);
+      expect(lineInsets[1]!.left).toBeLessThanOrEqual(1);
+      await captureScreenshot(page, `markdown-bidirectional-settled-${theme}`);
+    });
+
     test(`usage-limited goal status`, async ({ page }, testInfo) => {
       // Seed the compatibility card together with its canonical V2 state, as
       // emitted by both live goal updates and transcript replay.
@@ -852,6 +1131,10 @@ for (const theme of THEMES) {
 
       const messageList = page.locator('[data-web-shell-message-list]');
       await expect(messageList).toContainText('Goal usage limited');
+      await expect(messageList).not.toContainText('Token budget reached');
+      await messageList
+        .getByRole('button', { name: 'Expand details', exact: true })
+        .click();
       await expect(messageList).toContainText('Token budget reached');
       await captureScreenshot(page, `goal-usage-limited-${theme}`);
     });
@@ -878,6 +1161,10 @@ for (const theme of THEMES) {
 
       const messageList = page.locator('[data-web-shell-message-list]');
       await expect(messageList).toContainText('Goal blocked');
+      await expect(messageList).not.toContainText('User authority is required');
+      await messageList
+        .getByRole('button', { name: 'Expand details', exact: true })
+        .click();
       await expect(messageList).toContainText('User authority is required');
       await expect(messageList).not.toContainText('Goal aborted');
       await captureScreenshot(page, `goal-blocked-${theme}`);
@@ -1366,6 +1653,338 @@ for (const theme of THEMES) {
       await captureScreenshot(page, `channel-editor-existing-${theme}`);
     });
 
+    test(`Channel action template editor`, async ({ page }, testInfo) => {
+      const scenario = createWebShellDaemonScenario({
+        capabilities: {
+          features: [
+            'session_events',
+            'permission_vote',
+            'session_permission_vote',
+            'session_scope_override',
+            'session_source_metadata',
+            'channel_management',
+          ],
+        },
+        channelTypes: [
+          {
+            type: 'github',
+            displayName: 'GitHub',
+            manageable: true,
+            fields: githubManagement.fields,
+          },
+        ],
+      });
+      await page.addInitScript(() => {
+        window.sessionStorage.setItem('qwen-daemon-token', 'visual-token');
+      });
+      const daemon = await installScenario(
+        page,
+        scenario,
+        resolveBaseURL(testInfo),
+      );
+      await gotoSession(page, scenario, daemon, theme);
+
+      await page.getByRole('button', { name: 'Channels' }).click();
+      await page.getByRole('button', { name: 'Configure GitHub' }).click();
+      const editor = page.getByRole('dialog');
+      await expect(
+        editor.getByRole('heading', { name: 'Configure GitHub' }),
+      ).toBeVisible();
+      await editor
+        .getByRole('switch', { name: 'Use Local GitHub CLI Authentication' })
+        .click();
+      await editor
+        .getByRole('switch', { name: 'Deliver To PR-Bound Sessions' })
+        .click();
+
+      // Anchors: the on-demand editor shows the add picker and zero rows on a
+      // fresh draft. The pre-change renderer (one input per key, no picker
+      // control behind the label) fails here instead of silently shipping an
+      // old-UI capture.
+      const addPicker = editor.getByLabel('Bound Session Actions');
+      await addPicker.scrollIntoViewIfNeeded();
+      await expect(addPicker).toBeVisible();
+      await expect(editor.locator('textarea')).toHaveCount(0);
+      await captureScreenshot(page, `channel-action-templates-empty-${theme}`);
+
+      await addPicker.click();
+      const reviewOption = page.getByRole('option', {
+        name: /review:watch:ci_failure/,
+      });
+      await expect(reviewOption).toBeVisible();
+      await captureScreenshot(page, `channel-action-templates-picker-${theme}`);
+      await reviewOption.click();
+      await editor
+        .getByRole('textbox', { name: 'review:watch:ci_failure' })
+        .fill('Review the CI failure on %repo%#%pr% and propose a fix.');
+      await addPicker.click();
+      await page.getByRole('option', { name: /^fix:comment/ }).click();
+      await editor
+        .getByRole('textbox', { name: 'fix:comment' })
+        .fill('Address the new comments on %repo%#%pr%.');
+      await expect(editor.locator('textarea')).toHaveCount(2);
+      await editor
+        .getByRole('textbox', { name: 'review:watch:ci_failure' })
+        .scrollIntoViewIfNeeded();
+      await captureScreenshot(
+        page,
+        `channel-action-templates-configured-${theme}`,
+      );
+
+      const fullscreenToggle = editor.locator('button[aria-pressed]');
+      await fullscreenToggle.click();
+      await expect(fullscreenToggle).toHaveAttribute('aria-pressed', 'true');
+      await captureScreenshot(
+        page,
+        `channel-action-templates-fullscreen-${theme}`,
+      );
+    });
+
+    test(`Channel repository filter editor`, async ({ page }, testInfo) => {
+      const scenario = createWebShellDaemonScenario({
+        capabilities: {
+          features: [
+            'session_events',
+            'permission_vote',
+            'session_permission_vote',
+            'session_scope_override',
+            'session_source_metadata',
+            'channel_management',
+          ],
+        },
+        channelTypes: [
+          {
+            type: 'github',
+            displayName: 'GitHub',
+            manageable: true,
+            fields: githubManagement.fields,
+          },
+        ],
+      });
+      await page.addInitScript(() => {
+        window.sessionStorage.setItem('qwen-daemon-token', 'visual-token');
+      });
+      const daemon = await installScenario(
+        page,
+        scenario,
+        resolveBaseURL(testInfo),
+      );
+      await gotoSession(page, scenario, daemon, theme);
+
+      await page.getByRole('button', { name: 'Channels' }).click();
+      await page.getByRole('button', { name: 'Configure GitHub' }).click();
+      const editor = page.getByRole('dialog');
+      await expect(
+        editor.getByRole('heading', { name: 'Configure GitHub' }),
+      ).toBeVisible();
+      await editor
+        .getByRole('switch', { name: 'Use Local GitHub CLI Authentication' })
+        .click();
+
+      // Anchors: the filter defaults to Off and the repository list stays
+      // hidden until a mode is chosen. A renderer that always shows the list
+      // (or lacks the field) fails here instead of shipping a stale capture.
+      const modeSelect = editor.getByLabel('Repository Filter');
+      await modeSelect.scrollIntoViewIfNeeded();
+      await expect(editor.getByLabel('Filtered Repositories')).toHaveCount(0);
+      await captureScreenshot(page, `channel-repo-filter-off-${theme}`);
+
+      await modeSelect.click();
+      await page
+        .getByRole('option', {
+          name: 'Blocklist — all except listed repositories',
+        })
+        .click();
+      const repositories = editor.getByLabel('Filtered Repositories');
+      await expect(repositories).toBeVisible();
+      await repositories.fill(
+        'https://github.invalid/QwenLM/qwen-code/pull/16117, octo/noisy-repo',
+      );
+      await captureScreenshot(page, `channel-repo-filter-blocklist-${theme}`);
+    });
+
+    test(`Channel events`, async ({ page }, testInfo) => {
+      const scenario = createWebShellDaemonScenario({
+        capabilities: {
+          features: [
+            'session_events',
+            'permission_vote',
+            'session_permission_vote',
+            'session_scope_override',
+            'session_source_metadata',
+            'workspace_settings',
+            'workspace_voice',
+            'channel_management',
+          ],
+        },
+        channels: {
+          revision: '1',
+          instances: {
+            'github-bot': {
+              name: 'github-bot',
+              config: { type: 'github' },
+              secrets: { token: { present: true, source: 'environment' } },
+              startsWithServe: true,
+              runtime: { state: 'connected' },
+            },
+            dingtalk: {
+              name: 'dingtalk',
+              config: { type: 'dingtalk' },
+              secrets: {},
+              startsWithServe: false,
+              runtime: { state: 'stopped' },
+            },
+          },
+        },
+      });
+      await page.addInitScript(() => {
+        window.sessionStorage.setItem('qwen-daemon-token', 'visual-token');
+      });
+      const daemon = await installScenario(
+        page,
+        scenario,
+        resolveBaseURL(testInfo),
+      );
+      // The shared mock daemon does not serve the journal route yet; fulfill
+      // it with a fixed GitHub-heavy journal registered after the catch-all
+      // so this route wins. `user-gh` is deliberately absent from the channel
+      // listing: it mirrors a channel inherited from user settings, whose
+      // link metadata rides on the journal response instead.
+      await page.route('**/channels/events*', async (route) => {
+        await route.fulfill({
+          json: {
+            truncated: false,
+            channelLinkMeta: { 'user-gh': { type: 'github' } },
+            events: [
+              {
+                at: '2026-11-02T01:58:00.000Z',
+                channel: 'github-bot',
+                type: 'poll',
+                outcome: 'ok',
+                durationMs: 840,
+                detail: { notifications: 4 },
+              },
+              {
+                at: '2026-11-02T01:58:05.000Z',
+                channel: 'github-bot',
+                type: 'inbound',
+                outcome: 'accepted',
+                triggerKind: 'comment',
+                repository: 'QwenLM/qwen-code',
+                thread: 'pr:16117',
+                number: 16117,
+                actor: 'wenshao',
+              },
+              {
+                at: '2026-11-02T01:58:30.000Z',
+                channel: 'github-bot',
+                type: 'task',
+                outcome: 'running',
+                repository: 'QwenLM/qwen-code',
+                thread: 'pr:16117',
+                number: 16117,
+              },
+              {
+                at: '2026-11-02T01:59:10.000Z',
+                channel: 'github-bot',
+                type: 'outbound',
+                outcome: 'posted',
+                triggerKind: 'comment',
+                repository: 'QwenLM/qwen-code',
+                thread: 'pr:16117',
+                number: 16117,
+              },
+              {
+                at: '2026-11-02T02:00:00.000Z',
+                channel: 'github-bot',
+                type: 'inbound',
+                outcome: 'skipped',
+                reason: 'reason_filter',
+                triggerKind: 'ci_activity',
+                repository: 'QwenLM/qwen-code',
+                thread: 'issue:16171',
+                number: 16171,
+              },
+              {
+                at: '2026-11-02T02:01:00.000Z',
+                channel: 'github-bot',
+                type: 'inbound',
+                outcome: 'accepted',
+                triggerKind: 'mention',
+                repository: 'QwenLM/qwen-code',
+                thread: 'issue:16171',
+                number: 16171,
+                actor: 'contributor',
+              },
+              {
+                at: '2026-11-02T02:02:00.000Z',
+                channel: 'dingtalk',
+                type: 'inbound',
+                outcome: 'accepted',
+                thread: 'group-42',
+                actor: 'ada',
+              },
+              {
+                at: '2026-11-02T02:03:00.000Z',
+                channel: 'user-gh',
+                type: 'inbound',
+                outcome: 'accepted',
+                triggerKind: 'review_requested',
+                repository: 'QwenLM/qwen-code',
+                thread: 'pr:16226',
+                number: 16226,
+                actor: 'wenshao',
+              },
+            ],
+          },
+        });
+      });
+      await gotoSession(page, scenario, daemon, theme);
+
+      await page.getByRole('button', { name: 'Channel events' }).click();
+      await expect(
+        page.getByRole('heading', { name: 'Channel events', level: 1 }),
+      ).toBeVisible();
+      const list = page.getByTestId('channel-events-list');
+      await expect(list).toBeVisible();
+      // Anchored assertions: the GitHub targets must render as links with the
+      // right web URLs, and the non-GitHub row must stay plain text.
+      await expect(
+        list
+          .getByRole('link', {
+            name: 'Open QwenLM/qwen-code#16117 on GitHub',
+          })
+          .first(),
+      ).toHaveAttribute(
+        'href',
+        'https://github.invalid/QwenLM/qwen-code/pull/16117',
+      );
+      await expect(
+        list
+          .getByRole('link', {
+            name: 'Open QwenLM/qwen-code#16171 on GitHub',
+          })
+          .first(),
+      ).toHaveAttribute(
+        'href',
+        'https://github.invalid/QwenLM/qwen-code/issues/16171',
+      );
+      // The inherited user-scope channel links through journal metadata.
+      await expect(
+        list
+          .getByRole('link', {
+            name: 'Open QwenLM/qwen-code#16226 on GitHub',
+          })
+          .first(),
+      ).toHaveAttribute(
+        'href',
+        'https://github.invalid/QwenLM/qwen-code/pull/16226',
+      );
+      await expect(list.getByRole('link')).toHaveCount(6);
+      await expect(list.getByText('group-42')).toBeVisible();
+      await captureScreenshot(page, `channel-events-github-links-${theme}`);
+    });
+
     test(`GitHub channel editor`, async ({ page }, testInfo) => {
       const scenario = createWebShellDaemonScenario({
         capabilities: {
@@ -1424,6 +2043,22 @@ for (const theme of THEMES) {
                   { value: 'review_requested', label: 'review_requested' },
                   { value: 'assign', label: 'assign' },
                   { value: 'ci_activity', label: 'ci_activity' },
+                ],
+              },
+              {
+                key: 'deliverToBoundSessions',
+                label: 'Deliver To PR-Bound Sessions',
+                kind: 'boolean',
+              },
+              {
+                key: 'prWatchEvents',
+                label: 'PR Watch Events',
+                kind: 'string-list',
+                options: [
+                  { value: 'ci_failure', label: 'ci_failure' },
+                  { value: 'merge_conflict', label: 'merge_conflict' },
+                  { value: 'head_change', label: 'head_change' },
+                  { value: 'state_change', label: 'state_change' },
                 ],
               },
               {
@@ -1505,6 +2140,29 @@ for (const theme of THEMES) {
         .scrollIntoViewIfNeeded();
       await expect(reasonFilter).toBeInViewport({ ratio: 1 });
       await captureScreenshot(page, `github-channel-editor-reasons-${theme}`);
+      // The bound-session panel gates watch events on delivery. Capture the
+      // gated state (disabled boxes + hint), then enabled with a selection,
+      // so the published pictures document the dependency itself.
+      const watchGroup = page.getByRole('group', { name: 'PR Watch Events' });
+      await watchGroup.scrollIntoViewIfNeeded();
+      await expect(watchGroup).toBeInViewport({ ratio: 1 });
+      await expect(watchGroup.getByRole('checkbox')).toHaveCount(4);
+      const ciFailure = watchGroup.getByRole('checkbox', {
+        name: /ci_failure/,
+      });
+      await expect(ciFailure).toBeDisabled();
+      await captureScreenshot(
+        page,
+        `github-channel-editor-watch-gated-${theme}`,
+      );
+      await page
+        .getByRole('switch', { name: 'Deliver To PR-Bound Sessions' })
+        .click();
+      await expect(ciFailure).toBeEnabled();
+      await ciFailure.check();
+      await watchGroup.scrollIntoViewIfNeeded();
+      await expect(watchGroup).toBeInViewport({ ratio: 1 });
+      await captureScreenshot(page, `github-channel-editor-watch-on-${theme}`);
       await page.getByLabel('Instance name').fill('github-bot');
       await page.getByRole('button', { name: 'Save' }).click();
       await expect(
@@ -1716,7 +2374,9 @@ for (const theme of THEMES) {
       // row is required to fit — at this viewport the two rows together are
       // taller than the dialog body, so demanding both would fail on geometry
       // rather than on a regression.
-      await inheriting.scrollIntoViewIfNeeded();
+      await inheriting.evaluate((element) =>
+        element.scrollIntoView({ block: 'center', inline: 'nearest' }),
+      );
       await expect(inheriting).toBeInViewport({ ratio: 1 });
       await captureScreenshot(page, `github-channel-repositories-${theme}`);
     });

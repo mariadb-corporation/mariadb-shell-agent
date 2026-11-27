@@ -5,11 +5,13 @@
  */
 
 /**
- * An ACP session runs each scripted scenario twice, with
- * `QWEN_CODE_ENABLE_UNIFIED_AGENT_LOOP` unset and set, and the two runs must
- * send the model the same requests, send the client the same
- * `session/update` notifications and end each prompt the same way.
- * Differences the shared loop makes on purpose are asserted separately below.
+ * An ACP session runs each scripted scenario three times: with
+ * `QWEN_CODE_ENABLE_UNIFIED_AGENT_LOOP` unset, set, and set together with
+ * `QWEN_CODE_ENABLE_EVENT_BUS_AGENT_LOOP`. The runs must send the model the
+ * same requests, send the client the same `session/update` notifications and
+ * end each prompt the same way, and the third must run each of the session's
+ * rounds on the event-bus kernel. Differences the shared loop makes on
+ * purpose are asserted separately below.
  */
 
 import { spawn } from 'node:child_process';
@@ -28,6 +30,7 @@ import {
   CONTAINER_SANDBOX_NO_PROXY,
   fakeServerHostOptions,
   IS_CONTAINER_SANDBOX,
+  readDebugLogs,
   TestRig,
 } from '../test-helper.js';
 import {
@@ -37,6 +40,7 @@ import {
   type FakeOpenAIServer,
 } from '../fake-openai-server.js';
 import { ACP_HOME_PREFIX, removeScratchDir } from '../scratch-dir.js';
+import { approveProjectHooks } from '../project-hook-approval.js';
 
 // The agent trusts a client that presents the capability it was started with.
 const PRIVATE_ACP_CAPABILITY_ENV = 'QWEN_CODE_PRIVATE_ACP_CAPABILITY';
@@ -104,9 +108,65 @@ interface Run {
   goalTurnEnds: unknown[];
   /** The stop reason of each background-notification turn, in order. */
   backgroundTurnEnds: unknown[];
+  /** The session's rounds that ran in a `runAgentLoop` call of their own. */
+  sharedRounds: number;
+  /** Those of them the event-bus kernel ran. */
+  kernelRounds: number;
 }
 
 const PROMPT_TIMEOUT_MS = 60_000;
+
+/** What the session logs for each round it runs in a `runAgentLoop` call. */
+const SHARED_ROUND_LOG =
+  /round in its own runAgentLoop call \(prompt ([^)]+)\)/g;
+
+/**
+ * The session's rounds the event-bus adapter ran, matched to the session's
+ * own by prompt ID. A subagent's rounds, which run on the kernel too, have
+ * prompt IDs of their own.
+ */
+function countKernelRounds(debugLog: string): number {
+  const promptIds = new Set(
+    Array.from(debugLog.matchAll(SHARED_ROUND_LOG), ([, promptId]) => promptId),
+  );
+  return Array.from(
+    debugLog.matchAll(
+      /\[EVENT_BUS\][^\n]* runAgentLoopOnBus started \S+ \(prompt ([^)]+)\)/g,
+    ),
+  ).filter(([, promptId]) => promptIds.has(promptId)).length;
+}
+
+/** The debug logs a run wrote under its runtime directory. */
+function readDebugLog(runtimeDir: string): string {
+  return readDebugLogs(runtimeDir);
+}
+
+/** How long the debug log must stop growing before its writes have landed. */
+const DEBUG_LOG_QUIET_MS = 250;
+
+/**
+ * The CLI runs ACP behind a relaunch supervisor, so the process this test
+ * signals is not the agent: the supervised child sees its input close and
+ * spends its shutdown writing the debug log. Its lines are appended
+ * fire-and-forget, and a round's marker can still be in flight when the
+ * supervisor exits. Read the log once it has stopped growing.
+ */
+async function readSettledDebugLog(runtimeDir: string): Promise<string> {
+  const deadline = Date.now() + 5_000;
+  let quietSince = Date.now();
+  let log = readDebugLog(runtimeDir);
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const next = readDebugLog(runtimeDir);
+    if (next !== log) {
+      log = next;
+      quietSince = Date.now();
+    } else if (Date.now() - quietSince >= DEBUG_LOG_QUIET_MS) {
+      break;
+    }
+  }
+  return log;
+}
 
 // A Goal's id and the record ids it cites are random in each run.
 const RANDOM_ID =
@@ -141,7 +201,8 @@ const VOLATILE_KEYS = new Set([
 const CONTINUATION_PROMPT_ID =
   /(########\d+)_(?:stop_hook|todo_stop_guard)_\d+/g;
 
-const DATE_REMINDER = '<system-reminder>\nThe current date is:';
+const DATE_REMINDER =
+  /^<system-reminder>\n(?:Today's date is |The date has changed since earlier in this conversation\. )/;
 
 const toolResults = (messages: JsonObject[]) =>
   messages.filter((message) => message['role'] === 'tool').length;
@@ -155,7 +216,7 @@ const userTurns = (messages: JsonObject[]) =>
 
 const isDateReminder = (part: unknown) =>
   typeof (part as JsonObject)?.['text'] === 'string' &&
-  ((part as JsonObject)['text'] as string).startsWith(DATE_REMINDER);
+  DATE_REMINDER.test((part as JsonObject)['text'] as string);
 
 /** Removes the date reminder the client adds when the date changed. */
 function withoutDateReminder(content: unknown): unknown {
@@ -224,9 +285,15 @@ function modelRequests(server: FakeOpenAIServer, dir: string): unknown[] {
   );
 }
 
-/** Leaves out `available_commands_update`, sent on its own schedule. */
-const isPromptUpdate = (update: unknown) =>
-  (update as JsonObject)?.['sessionUpdate'] !== 'available_commands_update';
+/** Leaves out scheduled command updates and loop-specific Hook diagnostics. */
+const isPromptUpdate = (update: unknown) => {
+  const frame = update as JsonObject | undefined;
+  const meta = frame?.['_meta'] as JsonObject | undefined;
+  return (
+    frame?.['sessionUpdate'] !== 'available_commands_update' &&
+    meta?.['hookLifecycle'] === undefined
+  );
+};
 
 /** The usage and the request end a finished response reports. */
 const isResponseEnd = (update: unknown) => {
@@ -267,7 +334,11 @@ const allowOnce = () => ({
       rig = undefined;
     });
 
-    async function run(scenario: Scenario, shared: boolean): Promise<Run> {
+    async function run(
+      scenario: Scenario,
+      shared: boolean,
+      kernel = false,
+    ): Promise<Run> {
       await server?.close();
       await rig?.cleanup();
       rig = new TestRig();
@@ -301,6 +372,16 @@ const allowOnce = () => ({
         ? CONTAINER_SANDBOX_NO_PROXY
         : '127.0.0.1,localhost';
       const qwenHome = mkdtempSync(join(tmpdir(), ACP_HOME_PREFIX));
+      // Project hooks need both authorities available: enable the trust
+      // feature (the inherited rig trust store grants the workspace; no
+      // trust-store file here because the request snapshot encodes this
+      // directory's tree) and record the approval an interactive user
+      // would give for scenarios that declare hooks.
+      writeFileSync(
+        join(qwenHome, 'settings.json'),
+        JSON.stringify({ security: { folderTrust: { enabled: true } } }),
+      );
+      if (scenario.settings?.['hooks']) approveProjectHooks(qwenHome, dir);
       const env: NodeJS.ProcessEnv = {
         ...process.env,
         OPENAI_API_KEY: 'fake-key',
@@ -315,9 +396,14 @@ const allowOnce = () => ({
         // each run's request snapshot encodes, so give each run its own
         // scratch runtime outside the workspace.
         QWEN_RUNTIME_DIR: qwenHome,
+        // The debug log records the rounds each loop ran.
+        QWEN_DEBUG_LOG_FILE: '1',
       };
-      delete env['QWEN_CODE_ENABLE_UNIFIED_AGENT_LOOP'];
-      if (shared) env['QWEN_CODE_ENABLE_UNIFIED_AGENT_LOOP'] = '1';
+      // Force both directions explicitly so an off arm stays off even after a
+      // future surface-default flip, and each arm forces every surface together
+      // (whole-value env) so the process-wide round count is a valid identity.
+      env['QWEN_CODE_ENABLE_UNIFIED_AGENT_LOOP'] = shared ? '1' : '0';
+      env['QWEN_CODE_ENABLE_EVENT_BUS_AGENT_LOOP'] = kernel ? '1' : '0';
       delete env[PRIVATE_ACP_CAPABILITY_ENV];
       if (scenario.trustedParent) {
         env[PRIVATE_ACP_CAPABILITY_ENV] = PARENT_CAPABILITY;
@@ -451,6 +537,7 @@ const allowOnce = () => ({
 
       const stopReasons: unknown[] = [];
       let sessionId = '';
+      let debugLog = '';
       try {
         await request('initialize', {
           protocolVersion: 1,
@@ -503,6 +590,8 @@ const allowOnce = () => ({
         ) {
           await new Promise((resolve) => setTimeout(resolve, 50));
         }
+        // Every round has logged its marker; let those writes land first.
+        debugLog = await readSettledDebugLog(qwenHome);
       } finally {
         agent.kill();
         await new Promise((resolve) => {
@@ -539,25 +628,38 @@ const allowOnce = () => ({
         permissionsAt,
         goalTurnEnds,
         backgroundTurnEnds,
+        sharedRounds: (debugLog.match(SHARED_ROUND_LOG) ?? []).length,
+        kernelRounds: countKernelRounds(debugLog),
       };
     }
 
-    async function both(scenario: Scenario) {
+    /** The current loop, the shared loop, and the shared loop on the kernel. */
+    async function arms(scenario: Scenario) {
       const current = await run(scenario, false);
       const shared = await run(scenario, true);
+      const kernel = await run(scenario, true, true);
       const dump = process.env['ACP_PARITY_DUMP'];
       if (dump) {
         const slug = scenario.name.replace(/[^a-z0-9]+/gi, '-');
-        writeFileSync(
-          join(dump, `${slug}.current.json`),
-          JSON.stringify(current, null, 1),
-        );
-        writeFileSync(
-          join(dump, `${slug}.shared.json`),
-          JSON.stringify(shared, null, 1),
-        );
+        for (const [arm, result] of Object.entries({
+          current,
+          shared,
+          kernel,
+        })) {
+          writeFileSync(
+            join(dump, `${slug}.${arm}.json`),
+            JSON.stringify(result, null, 1),
+          );
+        }
       }
-      return { current, shared };
+      expect(current.sharedRounds + current.kernelRounds).toBe(0);
+      expect(shared.kernelRounds).toBe(0);
+      // Each of the session's rounds runs in its own `runAgentLoop` call,
+      // which the kernel runs when it is on.
+      expect(shared.sharedRounds).toBeGreaterThan(0);
+      expect(kernel.sharedRounds).toBe(shared.sharedRounds);
+      expect(kernel.kernelRounds).toBe(kernel.sharedRounds);
+      return { current, shared, kernel };
     }
 
     const read = (file: string, id: string) =>
@@ -863,12 +965,8 @@ const allowOnce = () => ({
     it.each(scenarios.map((scenario) => [scenario.name, scenario] as const))(
       '%s: same requests, updates and stop reasons',
       async (_name, scenario) => {
-        const { current, shared } = await both(scenario);
+        const { current, shared, kernel } = await arms(scenario);
 
-        expect(shared.stopReasons).toEqual(current.stopReasons);
-        expect(shared.requests).toEqual(current.requests);
-        expect(shared.goalTurnEnds).toEqual(current.goalTurnEnds);
-        expect(shared.backgroundTurnEnds).toEqual(current.backgroundTurnEnds);
         expect(current.backgroundTurnEnds).toHaveLength(
           scenario.backgroundTurns ?? 0,
         );
@@ -879,30 +977,36 @@ const allowOnce = () => ({
           scenario.cutByLoopGuard
             ? run.updates.filter((update) => !isResponseEnd(update))
             : run.updates;
-        if (scenario.concurrent) {
-          expect(byToolCall(updates(shared))).toEqual(
-            byToolCall(updates(current)),
-          );
-        } else {
-          expect(updates(shared)).toEqual(updates(current));
+        for (const arm of [shared, kernel]) {
+          expect(arm.stopReasons).toEqual(current.stopReasons);
+          expect(arm.requests).toEqual(current.requests);
+          expect(arm.goalTurnEnds).toEqual(current.goalTurnEnds);
+          expect(arm.backgroundTurnEnds).toEqual(current.backgroundTurnEnds);
+          if (scenario.concurrent) {
+            expect(byToolCall(updates(arm))).toEqual(
+              byToolCall(updates(current)),
+            );
+          } else {
+            expect(updates(arm)).toEqual(updates(current));
+          }
+          if (scenario.cutByLoopGuard) {
+            const lastEnd = arm.updates.findLast(isResponseEnd) as JsonObject;
+            expect(
+              (
+                (lastEnd['_meta'] as JsonObject)[
+                  'executionLifecycle'
+                ] as JsonObject
+              )['outcome'],
+            ).toBe('interrupted');
+          }
+          expect(arm.permissions).toEqual(current.permissions);
         }
-        if (scenario.cutByLoopGuard) {
-          const lastEnd = shared.updates.findLast(isResponseEnd) as JsonObject;
-          expect(
-            (
-              (lastEnd['_meta'] as JsonObject)[
-                'executionLifecycle'
-              ] as JsonObject
-            )['outcome'],
-          ).toBe('interrupted');
-        }
-        expect(shared.permissions).toEqual(current.permissions);
       },
       120_000,
     );
 
     it('asks for every approval of a batch before running any of its calls, as other surfaces do', async () => {
-      const { current, shared } = await both(
+      const { current, shared, kernel } = await arms(
         scenarios.find(
           ({ name }) => name === 'an approved write between reads',
         )!,
@@ -918,95 +1022,184 @@ const allowOnce = () => ({
       expect(current.permissionsAt[0]).toBeGreaterThan(
         started(current, 'call_in'),
       );
-      expect(shared.permissionsAt[0]).toBeLessThanOrEqual(
-        started(shared, 'call_in'),
-      );
+      for (const arm of [shared, kernel]) {
+        expect(arm.permissionsAt[0]).toBeLessThanOrEqual(
+          started(arm, 'call_in'),
+        );
+      }
     }, 120_000);
 
-    it('runs UserPromptSubmit on tool-result requests too, as other surfaces do', async () => {
-      const hookCalls: number[] = [];
+    it('runs UserPromptSubmit once per new message across tool-result requests', async () => {
+      const submitCalls: number[] = [];
+      const postCalls: number[] = [];
+      const results: number[] = [];
       const scenario: Scenario = {
-        name: 'UserPromptSubmit on tool results',
-        prompts: ['Read the readme.'],
-        settings: { hooks: hooks('UserPromptSubmit', 'count-prompts.mjs') },
-        prepare: (r) => {
-          r.createFile('readme.txt', 'readme body\n');
-          r.createFile(
-            'count-prompts.mjs',
-            [
-              "import { appendFileSync } from 'node:fs';",
-              "appendFileSync('prompt-hook-calls', 'x');",
-              'process.stdout.write("{}");',
-              '',
-            ].join('\n'),
-          );
+        name: 'UserPromptSubmit on new messages',
+        prompts: ['Read the two files.', 'Summarize them.'],
+        settings: {
+          hooks: {
+            ...hooks('UserPromptSubmit', 'count-prompts.mjs'),
+            ...hooks('PostToolUse', 'count-tools.mjs'),
+          },
         },
-        reply: (messages, dir, index) => {
-          if (index === 1) {
-            hookCalls.push(
-              readFileSync(join(dir, 'prompt-hook-calls'), 'utf8').length,
+        prepare: (r) => {
+          r.createFile('first.txt', 'first body\n');
+          r.createFile('second.txt', 'second body\n');
+          for (const name of ['prompts', 'tools']) {
+            r.createFile(`${name}.log`, '');
+            r.createFile(
+              `count-${name}.mjs`,
+              [
+                "import { appendFileSync } from 'node:fs';",
+                `appendFileSync('${name}.log', 'x');`,
+                'process.stdout.write("{}");',
+                '',
+              ].join('\n'),
             );
           }
-          return toolResults(messages) === 0
-            ? { toolCalls: [read(join(dir, 'readme.txt'), 'call_read')] }
-            : { content: 'It says readme body.' };
+        },
+        reply: (messages, dir, index) => {
+          submitCalls.push(
+            readFileSync(join(dir, 'prompts.log'), 'utf8').length,
+          );
+          postCalls.push(readFileSync(join(dir, 'tools.log'), 'utf8').length);
+          results.push(toolResults(messages));
+          if (index === 0)
+            return { toolCalls: [read(join(dir, 'first.txt'), 'call_first')] };
+          if (index === 1)
+            return {
+              toolCalls: [read(join(dir, 'second.txt'), 'call_second')],
+            };
+          return { content: 'Both files were read.' };
         },
       };
 
-      const { current, shared } = await both(scenario);
+      const { current, shared, kernel } = await arms(scenario);
 
       expect(shared.updates).toEqual(current.updates);
-      // Hook calls by each run's second model request, the tool result's.
-      expect(hookCalls).toEqual([1, 2]);
+      expect(kernel.updates).toEqual(current.updates);
+      expect(submitCalls).toEqual([1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2]);
+      expect(postCalls).toEqual([0, 1, 2, 2, 0, 1, 2, 2, 0, 1, 2, 2]);
+      expect(results).toEqual(postCalls);
     }, 120_000);
 
-    it('cancels a tool-result request whose UserPromptSubmit hook is still running', async () => {
+    it('cancels a fresh request whose UserPromptSubmit hook is still running', async () => {
       const scenario: Scenario = {
-        name: 'cancel during a tool-result hook',
+        name: 'cancel during user prompt admission',
         prompts: ['Read the readme.'],
         settings: { hooks: hooks('UserPromptSubmit', 'slow-hook.mjs') },
         cancelOnFile: 'hook-waiting',
         prepare: (r) => {
-          r.createFile('readme.txt', 'readme body\n');
           r.createFile(
             'slow-hook.mjs',
             [
               "import { writeFileSync } from 'node:fs';",
-              "let input = ''; for await (const chunk of process.stdin) input += chunk;",
-              // The tool-result request's hook has no prompt text.
-              'if (JSON.parse(input).prompt === "") {',
-              "  writeFileSync('hook-waiting', '');",
-              '  await new Promise((resolve) => setTimeout(resolve, 45_000));',
-              '}',
+              "writeFileSync('hook-waiting', '');",
+              'await new Promise((resolve) => setTimeout(resolve, 45_000));',
               'process.stdout.write("{}");',
               '',
             ].join('\n'),
           );
         },
-        reply: (messages, dir) =>
-          toolResults(messages) === 0
-            ? { toolCalls: [read(join(dir, 'readme.txt'), 'call_read')] }
-            : { content: 'It says readme body.' },
+        reply: () => ({ content: 'Model request was not expected.' }),
       };
 
-      const started = Date.now();
-      const shared = await run(scenario, true);
-
-      expect(shared.stopReasons).toEqual(['cancelled']);
-      // The tool result never reached the model.
-      expect(shared.requests).toHaveLength(1);
-      expect(Date.now() - started).toBeLessThan(30_000);
+      for (const [shared, kernel] of [
+        [false, false],
+        [true, false],
+        [true, true],
+      ]) {
+        const started = Date.now();
+        const arm = await run(scenario, shared, kernel);
+        expect(arm.stopReasons).toEqual(['cancelled']);
+        expect(arm.requests).toHaveLength(0);
+        expect(arm.sharedRounds).toBe(0);
+        expect(Date.now() - started).toBeLessThan(30_000);
+      }
     }, 120_000);
 
-    it('sends the date reminder with a prompt, as other surfaces do', async () => {
-      const { current, shared } = await both({
+    it("blocks a write in plan mode with the scheduler's notice, as other surfaces do", async () => {
+      const written: boolean[] = [];
+      const { current, shared, kernel } = await arms({
+        name: 'a write in plan mode',
+        prompts: ['Write the file.'],
+        settings: { tools: { approvalMode: 'plan' } },
+        reply: (messages, dir) => {
+          if (toolResults(messages) === 0)
+            return {
+              toolCalls: [write(join(dir, 'out.txt'), 'no\n', 'call_no')],
+            };
+          // The batch has settled by the time its results are sent back.
+          written.push(existsSync(join(dir, 'out.txt')));
+          return { content: 'Understood.' };
+        },
+      });
+      // The notice is the text of the blocked call's failed update.
+      const notice = (run: Run) => {
+        const failed = run.updates.filter(
+          (update) =>
+            (update as JsonObject)['toolCallId'] === 'call_no' &&
+            (update as JsonObject)['status'] === 'failed',
+        ) as JsonObject[];
+        expect(failed).toHaveLength(1);
+        const content = failed[0]['content'] as JsonObject[];
+        expect(content).toHaveLength(1);
+        return (content[0]['content'] as JsonObject)['text'] as string;
+      };
+      /** Puts a placeholder wherever a string value is the notice. */
+      const withoutNotice = (value: unknown, text: string): unknown =>
+        JSON.parse(JSON.stringify(value), (_key, child: unknown) =>
+          child === text ? '<PLAN MODE NOTICE>' : child,
+        );
+      const currentNotice = notice(current);
+      const sharedNotice = notice(shared);
+
+      expect(currentNotice).toMatch(
+        /^Plan mode is active\. The tool "write_file" cannot be executed because it modifies the system\. .*exit_plan_mode/,
+      );
+      expect(sharedNotice).toMatch(
+        /^Tool blocked by plan mode: "write_file" is not a read-only tool\. .*call exit_plan_mode/,
+      );
+      expect(shared.stopReasons).toEqual(current.stopReasons);
+      // Both loops block the write before it runs and ask nothing; only the
+      // notice the model and the client see differs.
+      expect(current.permissions).toEqual([]);
+      expect(shared.permissions).toEqual([]);
+      expect(current.requests).toHaveLength(2);
+      expect(withoutNotice(shared.requests, sharedNotice)).toEqual(
+        withoutNotice(current.requests, currentNotice),
+      );
+      expect(withoutNotice(shared.updates, sharedNotice)).toEqual(
+        withoutNotice(current.updates, currentNotice),
+      );
+      // The model gets the notice as the call's result on each loop.
+      expect(JSON.stringify(current.requests[1])).toContain(
+        JSON.stringify(currentNotice),
+      );
+      expect(JSON.stringify(shared.requests[1])).toContain(
+        JSON.stringify(sharedNotice),
+      );
+      // The kernel runs as the shared loop does.
+      expect(kernel.stopReasons).toEqual(shared.stopReasons);
+      expect(kernel.permissions).toEqual([]);
+      expect(kernel.requests).toEqual(shared.requests);
+      expect(kernel.updates).toEqual(shared.updates);
+      // One reading per run, current first, and none wrote the file.
+      expect(written).toEqual([false, false, false]);
+    }, 120_000);
+
+    it('adds no date reminder to a first prompt, as other surfaces do', async () => {
+      // The startup context already carries today's date; the client adds a
+      // reminder only once the date changes.
+      const { current, shared, kernel } = await arms({
         name: 'date reminder',
         prompts: ['Say hello.'],
         reply: () => ({ content: 'Hello there.' }),
       });
 
       expect(current.dateReminders).toBe(0);
-      expect(shared.dateReminders).toBe(1);
+      expect(shared.dateReminders).toBe(0);
+      expect(kernel.dateReminders).toBe(0);
     }, 120_000);
   },
 );

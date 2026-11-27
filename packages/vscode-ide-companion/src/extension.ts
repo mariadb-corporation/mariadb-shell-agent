@@ -101,6 +101,11 @@ async function checkForUpdates(
 }
 
 export async function activate(context: vscode.ExtensionContext) {
+  await vscode.commands.executeCommand(
+    'setContext',
+    'mariadb-shell-agent.subscriptionEnabled',
+    true,
+  );
   outputChannel = vscode.window.createOutputChannel(
     'MariaDB Shell Agent Companion',
   );

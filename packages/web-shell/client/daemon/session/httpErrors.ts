@@ -41,6 +41,26 @@ export function isAcpChildCapacityError(error: unknown): boolean {
   ].includes('acp_child_capacity_exhausted');
 }
 
+export function isSessionLimitExceededError(error: unknown): boolean {
+  if (!(error instanceof DaemonHttpError) || !isRecord(error.body))
+    return false;
+  const body = error.body;
+  const data = isRecord(body['data']) ? body['data'] : undefined;
+  return [body['code'], data?.['errorKind'], data?.['code']].includes(
+    'session_limit_exceeded',
+  );
+}
+
+export function isSystemOverloadedError(error: unknown): boolean {
+  if (!(error instanceof DaemonHttpError) || !isRecord(error.body))
+    return false;
+  const body = error.body;
+  const data = isRecord(body['data']) ? body['data'] : undefined;
+  return [body['code'], data?.['errorKind'], data?.['code']].includes(
+    'system_overloaded',
+  );
+}
+
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

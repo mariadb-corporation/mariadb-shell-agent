@@ -58,6 +58,19 @@ describe('AuthMessageHandler', () => {
     vi.clearAllMocks();
   });
 
+  it.each(['logout', 'upgrade'] as const)(
+    'routes %s directly to the native subscription action',
+    async (action) => {
+      const { handler, sendToWebView } = createHandler();
+      const subscription = vi.fn(async () => undefined);
+      handler.setSubscriptionAuthHandler(subscription);
+      expect(handler.canHandle(action)).toBe(true);
+      await handler.handle({ type: action });
+      expect(subscription).toHaveBeenCalledWith(action);
+      expect(sendToWebView).not.toHaveBeenCalled();
+    },
+  );
+
   describe('opening the wizard', () => {
     it('sends the wizard instead of starting a flow of its own', async () => {
       const { handler, sendToWebView, submit } = createHandler();

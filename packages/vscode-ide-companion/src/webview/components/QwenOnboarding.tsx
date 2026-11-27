@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { WelcomeSeal } from './WelcomeSeal.js';
 import type { ChromeStrings } from '../strings.js';
 
@@ -15,6 +15,7 @@ interface QwenOnboardingProps {
   t: ChromeStrings;
   theme: 'light' | 'dark';
   onGetStarted: () => void;
+  children?: ReactNode;
 }
 
 /**
@@ -47,6 +48,7 @@ export function QwenOnboarding({
   t,
   theme,
   onGetStarted,
+  children,
 }: QwenOnboardingProps) {
   return (
     <div
@@ -55,8 +57,9 @@ export function QwenOnboarding({
         minWidth: 0,
         minHeight: 0,
         flex: '1 1 auto',
-        alignItems: 'center',
+        alignItems: 'stretch',
         justifyContent: 'center',
+        overflowY: 'auto',
         padding: 24,
         color: 'var(--vscode-foreground)',
       }}
@@ -65,6 +68,8 @@ export function QwenOnboarding({
         style={{
           display: 'flex',
           width: 'min(100%, 300px)',
+          flexShrink: 0,
+          marginBlock: 'auto',
           flexDirection: 'column',
           alignItems: 'center',
           gap: 14,
@@ -99,72 +104,69 @@ export function QwenOnboarding({
             {t('onboarding.subtitle')}
           </div>
         </div>
-        <div
-          style={{
-            boxSizing: 'border-box',
-            width: '100%',
-            padding: 14,
-            border:
-              '1px solid var(--vscode-widget-border, var(--vscode-panel-border))',
-            borderRadius: 6,
-            background: 'var(--vscode-editorWidget-background)',
-          }}
-        >
-          <button
-            type="button"
-            disabled={connecting}
-            onClick={onGetStarted}
-            style={{
-              ...BUTTON_STYLE,
-              background: connecting
-                ? 'var(--vscode-button-secondaryBackground)'
-                : 'var(--vscode-button-background)',
-              color: connecting
-                ? 'var(--vscode-button-secondaryForeground)'
-                : 'var(--vscode-button-foreground)',
-              cursor: connecting ? 'wait' : 'pointer',
-              opacity: connecting ? 0.75 : 1,
-            }}
-          >
-            {connecting && (
-              <span
-                aria-hidden="true"
-                style={{
-                  width: 13,
-                  height: 13,
-                  border: '2px solid currentColor',
-                  borderTopColor: 'transparent',
-                  borderRadius: '50%',
-                  animation: 'qwen-vscode-spin 0.8s linear infinite',
-                }}
-              />
-            )}
-            {connecting ? t('onboarding.connecting') : t('onboarding.cta')}
-          </button>
-          {error && (
+        {children ? (
+          <div style={{ width: '100%', textAlign: 'left' }}>{children}</div>
+        ) : (
+          <>
             <div
-              role="alert"
               style={{
-                marginTop: 10,
-                color: 'var(--vscode-errorForeground)',
-                fontSize: 11,
-                lineHeight: 1.45,
-                textAlign: 'left',
+                boxSizing: 'border-box',
+                width: '100%',
+                padding: 14,
+                border:
+                  '1px solid var(--vscode-widget-border, var(--vscode-panel-border))',
+                borderRadius: 6,
+                background: 'var(--vscode-editorWidget-background)',
               }}
             >
-              {error}
+              <button
+                type="button"
+                disabled={connecting}
+                onClick={onGetStarted}
+                style={{
+                  ...BUTTON_STYLE,
+                  background: connecting
+                    ? 'var(--vscode-button-secondaryBackground)'
+                    : 'var(--vscode-button-background)',
+                  color: connecting
+                    ? 'var(--vscode-button-secondaryForeground)'
+                    : 'var(--vscode-button-foreground)',
+                  cursor: connecting ? 'wait' : 'pointer',
+                  opacity: connecting ? 0.75 : 1,
+                }}
+              >
+                {connecting && (
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      width: 13,
+                      height: 13,
+                      border: '2px solid currentColor',
+                      borderTopColor: 'transparent',
+                      borderRadius: '50%',
+                      animation: 'qwen-vscode-spin 0.8s linear infinite',
+                    }}
+                  />
+                )}
+                {connecting ? t('onboarding.connecting') : t('onboarding.cta')}
+              </button>
+              {error && (
+                <div
+                  role="alert"
+                  style={{
+                    marginTop: 10,
+                    color: 'var(--vscode-errorForeground)',
+                    fontSize: 11,
+                    lineHeight: 1.45,
+                    textAlign: 'left',
+                  }}
+                >
+                  {error}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <div
-          style={{
-            color: 'var(--vscode-descriptionForeground)',
-            fontSize: 11,
-            lineHeight: 1.45,
-          }}
-        >
-          {t('onboarding.providers')}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

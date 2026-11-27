@@ -14,6 +14,7 @@ import type { WorkflowRunOutcome } from '@qwen-code/qwen-code-core/agents/runtim
 import { loadCliConfig, type CliArgs } from '../config/config.js';
 import type { HostedModelConfigReader } from './hosted-model-config.js';
 import { loadSettings } from '../config/settings.js';
+import { getSeparatedHookSettings } from '../config/hook-approvals.js';
 import { writeStderrLineSafe } from '../utils/stdioHelpers.js';
 import {
   applyHostedModelPin,
@@ -236,12 +237,15 @@ export async function runHostedWorkflowTurn(input: {
     argv,
     input.cwd,
     undefined,
-    undefined,
+    getSeparatedHookSettings(settings),
     undefined,
     undefined,
     undefined,
     true,
-    sessionModelConfig ? { modelConfiguration: sessionModelConfig } : undefined,
+    {
+      lspDisabled: true,
+      ...(sessionModelConfig ? { modelConfiguration: sessionModelConfig } : {}),
+    },
   );
   const model = sessionModelConfig
     ? { id: sessionModelConfig.model }

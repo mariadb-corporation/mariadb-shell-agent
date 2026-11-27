@@ -1153,6 +1153,7 @@ describe('workspace Skill management', () => {
       const nativeMkdir = fs.mkdir.bind(fs);
       const denied: string[] = [];
       const destroySpies: Array<MockInstance<(error?: Error) => Readable>> = [];
+      const entryStreams: Readable[] = [];
       const nativeOpenReadStream = ZipFile.prototype.openReadStream;
       vi.spyOn(ZipFile.prototype, 'openReadStream').mockImplementation(
         function (
@@ -1161,7 +1162,10 @@ describe('workspace Skill management', () => {
           callback: (error: Error | null, stream: Readable) => void,
         ) {
           return nativeOpenReadStream.call(this, entry, (error, stream) => {
-            if (stream) destroySpies.push(vi.spyOn(stream, 'destroy'));
+            if (stream) {
+              entryStreams.push(stream);
+              destroySpies.push(vi.spyOn(stream, 'destroy'));
+            }
             callback(error, stream);
           });
         } as typeof ZipFile.prototype.openReadStream,
@@ -1204,7 +1208,8 @@ describe('workspace Skill management', () => {
         }
       }
       expect(destroySpies).toHaveLength(1);
-      expect(destroySpies[0]).toHaveBeenCalledTimes(1);
+      expect(destroySpies[0]).toHaveBeenCalled();
+      expect(entryStreams[0].destroyed).toBe(true);
       await expectNoPartialInstall(workspace, 'zip-write-denied');
     },
   );
@@ -1496,7 +1501,7 @@ describe('workspace Skill management', () => {
     ).resolves.toEqual([]);
   });
 
-  it('removes legacy install artifacts before installing', async () => {
+  it('removes abandoned staging but preserves recovery backups before installing', async () => {
     const workspace = await temporaryDirectory('qwen-skill-workspace-');
     const source = await temporaryDirectory('qwen-skill-source-');
     const baseDir = path.join(workspace, '.mariadb-shell-agent', 'skills');
@@ -1537,9 +1542,9 @@ describe('workspace Skill management', () => {
       source: { type: 'folder', path: source },
     });
 
-    await expect(fs.access(legacyBackup)).rejects.toThrow();
-    await expect(fs.access(staleBackup)).rejects.toThrow();
-    await expect(fs.access(datedBackup)).rejects.toThrow();
+    await expect(fs.access(legacyBackup)).resolves.toBeUndefined();
+    await expect(fs.access(staleBackup)).resolves.toBeUndefined();
+    await expect(fs.access(datedBackup)).resolves.toBeUndefined();
     await expect(fs.access(randomStaging)).rejects.toThrow();
     await expect(fs.access(foreignBackup)).resolves.toBeUndefined();
   });

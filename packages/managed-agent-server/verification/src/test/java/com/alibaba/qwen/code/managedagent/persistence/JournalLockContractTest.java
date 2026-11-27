@@ -28,8 +28,8 @@ class JournalLockContractTest {
     private static final String SESSION = "journal-session";
     private static final String TOKEN = "a".repeat(32);
     protected StoreLockTrace trace;
-    private ManagedSessionStore raw;
-    private ManagedSessionStore proxy;
+    private JdbcManagedSessionStore raw;
+    private JdbcManagedSessionStore proxy;
     private TransactionTemplate transactions;
     private int notifications;
 
@@ -43,11 +43,11 @@ class JournalLockContractTest {
         trace = new StoreLockTrace(dataSource());
         ManagedSchema.initialize(trace);
         var jdbc = new ManagedSchemaJdbcTemplate(trace);
-        raw = VerificationFixtures.managedSessionStore(jdbc, new ManagedExtensionRecordStore(jdbc),
+        raw = VerificationFixtures.managedSessionStore(jdbc, new JdbcManagedExtensionRecordStore(jdbc),
                 null, null, null, null, null, bytes -> {
                     assertThat(trace.events()).anyMatch(event -> event.phase() == StoreLockTrace.Phase.COMMIT);
                     notifications++;
-                }, com.alibaba.qwen.code.managedagent.contracts.security.WriterCredentialPolicy.unbound(), null);
+                }, com.alibaba.qwen.code.managedagent.contracts.security.WriterCredentialPolicy.unbound());
         proxy = AgentLockContractTest.transactional(raw, trace);
         transactions = new TransactionTemplate(new DataSourceTransactionManager(trace));
         proxy.acquireWriter(TENANT, SESSION, TOKEN, new AcquireWriterRequest("workspace", "writer", 60_000L));
@@ -73,6 +73,54 @@ class JournalLockContractTest {
         trace.assertOneTransaction(TENANT, SESSION);
         assertThat(heads()).isEqualTo(1);
         assertThat(roots()).isEqualTo(1);
+    }
+
+    @Test
+    void guardFreePublicationWriterTakesNoTenantGuard() {
+        // An ordinary publication lane took the Session root instead of the
+        // guards; the writer must not take either after it (design
+        // 2026-11-04-managed-publication-placement).
+        transactions.execute(status -> raw.lockPublicationWriter(TENANT, "workspace", SESSION, "writer", 1, TOKEN,
+                false, false));
+        assertThat(trace.events().stream().filter(event -> event.phase() == StoreLockTrace.Phase.SUCCEEDED)
+                .map(StoreLockTrace.Event::sql)).noneMatch(sql -> sql.contains("ma_tenant_guard"));
+        trace.assertRootBeforeHead(TENANT, SESSION);
+        trace.assertOneTransaction(TENANT, SESSION);
+
+        trace.clear();
+        transactions.execute(status -> raw.lockPublicationWriter(TENANT, "workspace", SESSION, "writer", 1, TOKEN,
+                true, false));
+        assertThat(trace.events().stream().filter(event -> event.phase() == StoreLockTrace.Phase.SUCCEEDED)
+                .map(StoreLockTrace.Event::sql)).anyMatch(sql -> sql.contains("runtime_placement"))
+                .noneMatch(sql -> sql.contains("output_publication"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"publication", "placement-publication", "commit", "tool-result"})
+    void ordinaryJournalAndPublicationCheckStorageWithoutLocking(String route) {
+        var jdbc = new ManagedSchemaJdbcTemplate(trace);
+        String physical = "d".repeat(64);
+        jdbc.update("INSERT INTO ma_storage (tenant_id, storage_id, physical_id,"
+                        + " storage_kind, registration_state, registration_revision, registration_json)"
+                        + " VALUES (?, 'storage', ?, 'LOCAL', 'REGISTERED', 1, '{}')",
+                TENANT, physical);
+        jdbc.update("INSERT INTO ma_storage_owner (physical_id, storage_kind, mount_state)"
+                + " VALUES (?, 'LOCAL', 'READY')", physical);
+        jdbc.update("UPDATE ma_session SET workspace_storage_id = 'storage' WHERE tenant_id = ?", TENANT);
+        trace.clear();
+        boolean placement = "placement-publication".equals(route);
+        switch (route) {
+            case "commit" -> proxy.commit(TENANT, SESSION, TOKEN, genesis());
+            case "tool-result" -> proxy.publishToolResult(TENANT, SESSION, TOKEN, toolResult(new byte[] {1}));
+            default -> transactions.execute(status -> raw.lockPublicationWriter(TENANT, "workspace", SESSION, "writer", 1, TOKEN,
+                    placement, false));
+        }
+        var reads = trace.events().stream().filter(event -> event.phase() == StoreLockTrace.Phase.SUCCEEDED)
+                .map(StoreLockTrace.Event::sql).filter(sql -> sql.contains(" from ma_storage ")
+                        || sql.contains(" from ma_storage_owner ")).toList();
+        assertThat(reads).hasSize(2).allSatisfy(sql -> assertThat(sql.contains("for update") || sql.contains("for share")).isEqualTo(placement));
+        trace.assertRootBeforeHead(TENANT, SESSION);
+        trace.assertOneTransaction(TENANT, SESSION);
     }
 
     @Test
@@ -143,7 +191,11 @@ class JournalLockContractTest {
         var external = new TransactionTemplate(new DataSourceTransactionManager(business));
         external.executeWithoutResult(status -> raw.sealWriter(TENANT, SESSION, TOKEN,
                 new SealWriterRequest("workspace", "writer", 1)));
-        assertThat(roots()).isEqualTo(2);
+        // The unrelated transaction is not on this DataSource, so the standalone
+        // path still takes its own root lock on the autocommit connection ahead
+        // of the head row; it must not skip that lock just because a transaction
+        // is active elsewhere.
+        assertThat(roots()).isEqualTo(1);
         assertThat(heads()).isEqualTo(1);
         assertThat(trace.successful(TENANT, SESSION)).allMatch(StoreLockTrace.Event::autoCommit);
     }
@@ -168,7 +220,7 @@ class JournalLockContractTest {
     }
 
     private long roots() {
-        return trace.successful(TENANT, SESSION).stream().filter(event -> event.sql().startsWith("select tenant_id, session_id, is_csi_guard from ma_session ")).count();
+        return trace.successful(TENANT, SESSION).stream().filter(event -> event.sql().startsWith("select tenant_id, session_id from ma_session ")).count();
     }
 
     private long heads() {

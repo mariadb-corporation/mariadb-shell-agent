@@ -331,6 +331,20 @@ describe('HookEventHandler', () => {
       });
     });
 
+    it('should include the sending session when provided', async () => {
+      const source = { session_id: 'sender', cwd: '/workspace/a' };
+      const input = await captureInput(() =>
+        hookEventHandler.fireUserPromptSubmitEvent(
+          'model prompt',
+          undefined,
+          undefined,
+          source,
+        ),
+      );
+      expect(input).toMatchObject({ prompt: 'model prompt', source });
+      expect(input).not.toHaveProperty('submitted_prompt');
+    });
+
     it.each(['', ' \t\n '])(
       'should omit an empty submitted prompt',
       async (submittedPrompt) => {
@@ -367,6 +381,25 @@ describe('HookEventHandler', () => {
         parent_file_path: '/repo/MARIADB-SHELL-AGENT.md',
       });
     });
+  });
+
+  describe('fireFileChangedEvent', () => {
+    it.each(['add', 'change', 'unlink'] as const)(
+      'includes the observed path and %s event',
+      async (event) => {
+        const input = await captureInput(() =>
+          hookEventHandler.fireFileChangedEvent(
+            '/outside/memory/topic.md',
+            event,
+          ),
+        );
+        expectPlanned(HookEventName.FileChanged, {
+          filePath: '/outside/memory/topic.md',
+        });
+        expectFields(input, { file_path: '/outside/memory/topic.md', event });
+        expect(input).not.toHaveProperty('tool_use_id');
+      },
+    );
   });
 
   describe('fireUserPromptExpansionEvent', () => {

@@ -38,6 +38,8 @@ import {
   readCronTasks,
   getCronFilePath,
   cronTaskSessionDeletionId,
+  cronTaskLegacyDeletionId,
+  isCronTaskDeletionObservationIntact,
   updateCronTasks,
   generateCronTaskId,
   appendCronRun,
@@ -57,10 +59,14 @@ import {
   type CronGateStatus,
   type CronRunSessionOutcome,
   type CronTaskDelivery,
+  type CronTaskDeletionObservation,
   type DurableCronTask,
   type CronTaskRun,
 } from '@qwen-code/qwen-code-core';
-import { SessionNotFoundError } from '@qwen-code/acp-bridge/bridgeErrors';
+import {
+  SessionNotFoundError,
+  SystemOverloadedError,
+} from '@qwen-code/acp-bridge/bridgeErrors';
 import type {
   BridgeClientRequestContext,
   CloseSessionOpts,
@@ -81,6 +87,7 @@ import {
   requireTrustedWorkspaceRuntime,
   resolveWorkspaceRuntimeWithLiveCompatibilityFromParam,
   sendConversationRuntimeUnavailable,
+  sendDaemonDrainingError as sendActivityGateError,
   sendGenerationClosedError,
 } from '../workspace-route-runtime.js';
 import type { ConversationRuntimeActivityGate } from '../conversations/conversation-runtime-activity.js';
@@ -466,6 +473,13 @@ export async function createScheduledTaskWithExistingSession(
           allowActivePrompt,
           assertCallerPromptActive,
         );
+        if (tasks.some((candidate) => candidate.id === task.id)) {
+          throw new ExistingSessionScheduledTaskCreateError(
+            409,
+            'scheduled_task_id_conflict',
+            'The generated scheduled-task id already exists; retry creation',
+          );
+        }
         if (
           tasks.some((candidate) => candidate.sessionId === input.sessionId)
         ) {
@@ -545,25 +559,56 @@ async function restoreConsumedOneShot(
   target: ScheduledTaskTarget,
   before: DurableCronTask[] | undefined,
   failedTask: DurableCronTask,
-  removalGenerations: ReadonlyMap<string, number> | undefined,
+  removalObservation: CronTaskDeletionObservation | undefined,
   route: string,
+  deletionGuardId?: string,
 ): Promise<void> {
   const id = failedTask.id;
-  const index = before?.findIndex((t) => t.id === id) ?? -1;
+  const guardId = deletionGuardId ?? cronTaskLegacyDeletionId(id);
+  const guardIds = [
+    ...new Set([
+      guardId,
+      scheduledTaskDeletionGuardId(id, {
+        provided: true,
+        sessionId: failedTask.sessionId ?? null,
+      }),
+      cronTaskLegacyDeletionId(id),
+      ...(failedTask.sessionId
+        ? [cronTaskSessionDeletionId(failedTask.sessionId)]
+        : []),
+    ]),
+  ];
+  const index =
+    before?.findIndex(
+      (task) =>
+        task.id === id &&
+        (task.sessionId ?? null) === (failedTask.sessionId ?? null),
+    ) ?? -1;
   const original = index === -1 ? undefined : before![index];
-  if (!original || !removalGenerations) return;
-  let restoreGenerations: ReadonlyMap<string, number> | undefined;
+  if (!original || !removalObservation) return;
+  let restoreObservation: CronTaskDeletionObservation | undefined;
   await runWithScheduledTaskTarget(target, () =>
     updateCronTasks(
       target.workspaceCwd,
       (tasks) => {
         if (
-          [...removalGenerations].some(
-            ([key, generation]) => restoreGenerations?.get(key) !== generation,
+          !isCronTaskDeletionObservationIntact(
+            removalObservation,
+            restoreObservation,
+            guardIds,
           )
-        )
+        ) {
           return tasks;
-        if (tasks.some((t) => t.id === id)) return tasks;
+        }
+        if (
+          tasks.some(
+            (task) =>
+              task.id === id &&
+              (task.sessionId ?? null) === (failedTask.sessionId ?? null),
+          )
+        ) {
+          return tasks;
+        }
         const restored = [...tasks];
         restored.splice(Math.min(index, restored.length), 0, {
           ...failedTask,
@@ -572,9 +617,9 @@ async function restoreConsumedOneShot(
         return restored;
       },
       {
-        observeDeletionIds: [...removalGenerations.keys()],
-        onDeletionGenerations: (generations) => {
-          restoreGenerations = generations;
+        observeDeletionIds: guardIds,
+        onDeletionGenerations: (generations, history) => {
+          restoreObservation = { generations, history };
         },
       },
     ),
@@ -773,21 +818,6 @@ async function runWithScheduledTaskTarget<T>(
   return (await result) as Awaited<T>;
 }
 
-function sendActivityGateError(res: Response, error: unknown): boolean {
-  if (
-    !error ||
-    typeof error !== 'object' ||
-    (error as { code?: unknown }).code !== 'daemon_draining'
-  ) {
-    return false;
-  }
-  res.status(503).json({
-    error: 'The daemon is draining and no longer accepts work.',
-    code: 'daemon_draining',
-  });
-  return true;
-}
-
 /** On-the-wire task shape — normalizes the optional on-disk fields so the
  * client never has to special-case `undefined` name/enabled/runs. */
 interface ScheduledTaskView {
@@ -904,6 +934,97 @@ function canonicalCron(cron: string): string | null {
   } catch {
     return null;
   }
+}
+
+interface ExpectedScheduledTaskOwner {
+  provided: boolean;
+  sessionId: string | null;
+}
+
+function readExpectedScheduledTaskOwner(
+  req: Request,
+  res: Response,
+): ExpectedScheduledTaskOwner | undefined {
+  const hasBracketedSelector = Object.keys(req.query).some((key) =>
+    key.startsWith('expectedSessionId['),
+  );
+  const value = req.query['expectedSessionId'];
+  if (hasBracketedSelector) {
+    res.status(400).json({
+      error: 'expectedSessionId must be a single session id or an empty value',
+      code: 'invalid_expected_session_id',
+    });
+    return undefined;
+  }
+  if (value === undefined) return { provided: false, sessionId: null };
+  if (typeof value !== 'string') {
+    res.status(400).json({
+      error: 'expectedSessionId must be a single session id or an empty value',
+      code: 'invalid_expected_session_id',
+    });
+    return undefined;
+  }
+  return { provided: true, sessionId: value || null };
+}
+
+function scheduledTaskDeletionGuardId(
+  id: string,
+  expectedOwner: ExpectedScheduledTaskOwner,
+): string {
+  return expectedOwner.provided
+    ? JSON.stringify([expectedOwner.sessionId, id])
+    : cronTaskLegacyDeletionId(id);
+}
+
+function findScheduledTaskIndex(
+  tasks: readonly DurableCronTask[],
+  id: string,
+  expectedOwner: ExpectedScheduledTaskOwner,
+): { index: number; ambiguous: boolean } {
+  let index = -1;
+  let matches = 0;
+  for (const [candidateIndex, task] of tasks.entries()) {
+    if (task.id !== id) continue;
+    if (
+      expectedOwner.provided &&
+      (task.sessionId ?? null) !== expectedOwner.sessionId
+    ) {
+      continue;
+    }
+    index = candidateIndex;
+    matches += 1;
+  }
+  return { index: matches === 1 ? index : -1, ambiguous: matches > 1 };
+}
+
+function sendAmbiguousScheduledTaskIdError(
+  res: Response,
+  ambiguous: boolean,
+): boolean {
+  if (!ambiguous) return false;
+  res.status(409).json({
+    error: 'Scheduled task id is ambiguous; retry with its expectedSessionId',
+    code: 'ambiguous_scheduled_task_id',
+  });
+  return true;
+}
+
+function sendScheduledTaskOverload(
+  res: Response,
+  error: SystemOverloadedError,
+  route: string,
+): void {
+  writeStderrLine(
+    `mariadb-shell-agent serve: ${route} load admission rejected (reason=${error.reason}, loadRatio=${error.loadRatio}, eventLoopLagP99Ms=${error.eventLoopLagP99Ms})`,
+  );
+  res.set('Retry-After', '15');
+  res.status(503).json({
+    error: error.message,
+    code: 'system_overloaded',
+    reason: error.reason,
+    loadRatio: error.loadRatio,
+    eventLoopLagP99Ms: error.eventLoopLagP99Ms,
+  });
 }
 
 function registerScheduledTaskCrudRoutes(
@@ -1264,6 +1385,10 @@ function registerScheduledTaskCrudRoutes(
         } catch (err) {
           if (sendActivityGateError(res, err)) return;
           if (sendGenerationClosedError(res, err)) return;
+          if (err instanceof SystemOverloadedError) {
+            sendScheduledTaskOverload(res, err, `POST ${base}`);
+            return;
+          }
           writeStderrLine(
             `mariadb-shell-agent serve: POST ${base} failed to create the task's session: ${err instanceof Error ? err.message : String(err)}`,
           );
@@ -1315,6 +1440,7 @@ function registerScheduledTaskCrudRoutes(
       };
 
       let overCap = false;
+      let duplicateId = false;
       let rollbackBefore: DurableCronTask[] | undefined;
       let rollbackAfter: DurableCronTask[] | undefined;
       try {
@@ -1322,6 +1448,10 @@ function registerScheduledTaskCrudRoutes(
           updateCronTasks(
             workspaceCwd,
             (tasks) => {
+              if (tasks.some((candidate) => candidate.id === task.id)) {
+                duplicateId = true;
+                return tasks;
+              }
               // Cap check under the write lock so two concurrent creates can't both
               // slip past a stale count. Returning the input unchanged is a no-op
               // (no write), which the flag below turns into a 409.
@@ -1364,6 +1494,15 @@ function registerScheduledTaskCrudRoutes(
           throw error;
         }
       }
+      if (duplicateId) {
+        await rollbackSession();
+        res.status(409).json({
+          error:
+            'The generated scheduled-task id already exists; retry creation',
+          code: 'scheduled_task_id_conflict',
+        });
+        return;
+      }
       if (overCap) {
         await rollbackSession();
         res.status(409).json({
@@ -1398,6 +1537,8 @@ function registerScheduledTaskCrudRoutes(
           .json({ error: 'Task id is required', code: 'invalid_id' });
         return;
       }
+      const expectedOwner = readExpectedScheduledTaskOwner(req, res);
+      if (!expectedOwner) return;
       const body = safeBody(req);
 
       // Pre-validate every provided field OUTSIDE the write lock — cron parsing
@@ -1577,6 +1718,7 @@ function registerScheduledTaskCrudRoutes(
       }
 
       let found = false;
+      let ambiguousId = false;
       let updated: DurableCronTask | undefined;
       let blockedByArchive = false;
       let blockedLegacy = false;
@@ -1592,7 +1734,12 @@ function registerScheduledTaskCrudRoutes(
           updateCronTasks(
             workspaceCwd,
             (tasks) => {
-              const idx = tasks.findIndex((t) => t.id === id);
+              const match = findScheduledTaskIndex(tasks, id, expectedOwner);
+              if (match.ambiguous) {
+                ambiguousId = true;
+                return tasks;
+              }
+              const idx = match.index;
               if (idx === -1) return tasks; // not found → no write
               found = true;
               const current = tasks[idx]!;
@@ -1773,6 +1920,7 @@ function registerScheduledTaskCrudRoutes(
         });
         return;
       }
+      if (sendAmbiguousScheduledTaskIdError(res, ambiguousId)) return;
       if (rollbackBefore && rollbackAfter) {
         try {
           target.assertGenerationOpen?.();
@@ -1915,6 +2063,8 @@ function registerScheduledTaskCrudRoutes(
           .json({ error: 'Task id is required', code: 'invalid_id' });
         return;
       }
+      const expectedOwner = readExpectedScheduledTaskOwner(req, res);
+      if (!expectedOwner) return;
       // Single atomic read-modify-write: capture the task's bound session AND
       // remove it in one cycle, closing the TOCTOU window a separate
       // read-then-remove would open (and cutting three file reads to one). A
@@ -1922,6 +2072,7 @@ function registerScheduledTaskCrudRoutes(
       let boundSessionId: string | undefined;
       let sessionOwnedByTask = true;
       let removed = false;
+      let ambiguousId = false;
       let rollbackBefore: DurableCronTask[] | undefined;
       let rollbackAfter: DurableCronTask[] | undefined;
       try {
@@ -1935,7 +2086,16 @@ function registerScheduledTaskCrudRoutes(
           await updateCronTasks(
             workspaceCwd,
             (tasks) => {
-              const idx = tasks.findIndex((t) => t.id === id);
+              const selection = findScheduledTaskIndex(
+                tasks,
+                id,
+                expectedOwner,
+              );
+              if (selection.ambiguous) {
+                ambiguousId = true;
+                return tasks;
+              }
+              const idx = selection.index;
               if (idx === -1) return tasks; // not found → no write
               const match = tasks[idx]!.sessionId;
               if (typeof match === 'string' && match.length > 0) {
@@ -1949,7 +2109,12 @@ function registerScheduledTaskCrudRoutes(
             },
             {
               assertCanCommit: target.assertGenerationOpen,
-              deletionIds: [id],
+              // Rejected owners and ambiguous ids cannot veto restoration.
+              // A bound-owner intent also records a consumed task's deletion.
+              deletionIds: () =>
+                ambiguousId
+                  ? []
+                  : [scheduledTaskDeletionGuardId(id, expectedOwner)],
             },
           );
         });
@@ -1965,6 +2130,7 @@ function registerScheduledTaskCrudRoutes(
         });
         return;
       }
+      if (sendAmbiguousScheduledTaskIdError(res, ambiguousId)) return;
       if (rollbackBefore && rollbackAfter) {
         try {
           target.assertGenerationOpen?.();
@@ -2027,25 +2193,34 @@ function registerScheduledTaskCrudRoutes(
           .json({ error: 'Task id is required', code: 'invalid_id' });
         return;
       }
+      const expectedOwner = readExpectedScheduledTaskOwner(req, res);
+      if (!expectedOwner) return;
       // A manual run is stamped at its exact instant (not minute-rounded like a
       // scheduler fire): the scheduler compares slots as `slot > lastFiredAt`, so
       // a precise timestamp behaves correctly, and — unlike rounding — it can't
       // collide with the creation-minute anchor that describeLastRun reads as
       // "never run" when a task is run manually within its creation minute.
       const now = Date.now();
+      const runId = generateCronTaskId();
       let found = false;
+      let ambiguousId = false;
       let blockedDisabled = false;
       let blockedLegacy = false;
       let updated: DurableCronTask | undefined;
       let rollbackBefore: DurableCronTask[] | undefined;
       let rollbackAfter: DurableCronTask[] | undefined;
-      let removalGenerations: ReadonlyMap<string, number> | undefined;
+      let removalObservation: CronTaskDeletionObservation | undefined;
       try {
         await runWithScheduledTaskTarget(target, () =>
           updateCronTasks(
             workspaceCwd,
             (tasks) => {
-              const idx = tasks.findIndex((t) => t.id === id);
+              const match = findScheduledTaskIndex(tasks, id, expectedOwner);
+              if (match.ambiguous) {
+                ambiguousId = true;
+                return tasks;
+              }
+              const idx = match.index;
               if (idx === -1) return tasks; // not found → no write
               found = true;
               const current = tasks[idx]!;
@@ -2073,6 +2248,7 @@ function registerScheduledTaskCrudRoutes(
                 lastFiredAt: now,
                 runs: appendCronRun(current.runs, {
                   at: now,
+                  runId,
                   kind: 'manual',
                   ...(current.sessionMode !== 'per_run' && current.sessionId
                     ? { sessionId: current.sessionId }
@@ -2094,13 +2270,27 @@ function registerScheduledTaskCrudRoutes(
             {
               assertCanCommit: target.assertGenerationOpen,
               observeDeletionIds: (tasks) => {
-                const task = tasks.find((task) => task.id === id);
-                return task?.sessionId
-                  ? [id, cronTaskSessionDeletionId(task.sessionId)]
-                  : [id];
+                const match = findScheduledTaskIndex(tasks, id, expectedOwner);
+                if (match.ambiguous || match.index < 0) return [];
+                const task = tasks[match.index]!;
+                const generationGuards = [
+                  ...new Set([
+                    scheduledTaskDeletionGuardId(id, {
+                      provided: true,
+                      sessionId: task.sessionId ?? null,
+                    }),
+                    cronTaskLegacyDeletionId(id),
+                  ]),
+                ];
+                if (task.sessionId) {
+                  generationGuards.push(
+                    cronTaskSessionDeletionId(task.sessionId),
+                  );
+                }
+                return generationGuards;
               },
-              onDeletionGenerations: (generations) => {
-                removalGenerations = generations;
+              onDeletionGenerations: (generations, history) => {
+                removalObservation = { generations, history };
               },
             },
           ),
@@ -2117,6 +2307,7 @@ function registerScheduledTaskCrudRoutes(
         });
         return;
       }
+      if (sendAmbiguousScheduledTaskIdError(res, ambiguousId)) return;
       if (rollbackBefore && rollbackAfter) {
         try {
           target.assertGenerationOpen?.();
@@ -2161,8 +2352,9 @@ function registerScheduledTaskCrudRoutes(
               workspaceCwd,
               (tasks) =>
                 tasks.map((task) =>
-                  task.id === id
-                    ? annotateCronRunSession(task, now, outcome)
+                  task.id === updated!.id &&
+                  (task.sessionId ?? null) === (updated!.sessionId ?? null)
+                    ? annotateCronRunSession(task, now, outcome, runId)
                     : task,
                 ),
               { assertCanCommit: target.assertGenerationOpen },
@@ -2173,9 +2365,12 @@ function registerScheduledTaskCrudRoutes(
         try {
           childSessionId = await dispatchTaskToFreshSession(target, updated);
         } catch (error) {
-          updated = annotateCronRunSession(updated, now, {
-            dispatchFailed: true,
-          });
+          updated = annotateCronRunSession(
+            updated,
+            now,
+            { dispatchFailed: true },
+            runId,
+          );
           if (updated.recurring) {
             await persistOutcome({ dispatchFailed: true }).catch(
               (persistError) => {
@@ -2196,9 +2391,14 @@ function registerScheduledTaskCrudRoutes(
               target,
               rollbackBefore,
               updated,
-              removalGenerations,
+              removalObservation,
               `POST ${base}/${id}/run fresh-session dispatch`,
+              scheduledTaskDeletionGuardId(id, expectedOwner),
             );
+          }
+          if (error instanceof SystemOverloadedError) {
+            sendScheduledTaskOverload(res, error, `POST ${base}/${id}/run`);
+            return;
           }
           writeStderrLine(
             `mariadb-shell-agent serve: POST ${base}/${id}/run could not create a fresh session: ${error instanceof Error ? error.message : String(error)}`,
@@ -2209,9 +2409,12 @@ function registerScheduledTaskCrudRoutes(
           });
           return;
         }
-        updated = annotateCronRunSession(updated, now, {
-          sessionId: childSessionId,
-        });
+        updated = annotateCronRunSession(
+          updated,
+          now,
+          { sessionId: childSessionId },
+          runId,
+        );
         await persistOutcome({ sessionId: childSessionId }).catch((error) => {
           writeStderrLine(
             `mariadb-shell-agent serve: POST ${base}/${id}/run could not attribute fresh session ${childSessionId}: ${error instanceof Error ? error.message : String(error)}`,

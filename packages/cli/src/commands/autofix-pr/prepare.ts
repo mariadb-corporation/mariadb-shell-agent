@@ -52,6 +52,7 @@ import {
 } from './state.js';
 import { assertNoFixInFlight, clearAbandonedFix } from './fix.js';
 import { checkoutHoldsWork, isAncestor, networkGit } from './worktree.js';
+import { AutofixPrRefusal } from './refusal.js';
 
 export interface PrView {
   number: number;
@@ -470,15 +471,6 @@ function runInPlacePrepare(
   host: string,
 ): void {
   const prNumber = args.pr;
-  // A watch of this PR in either mode is cleaned up first: an in-place
-  // start is always fresh (once-shaped), and a mode conversion goes the
-  // same way.
-  const found = findWatchRoot(prNumber);
-  if (found !== null) {
-    throw new Error(
-      `PR #${prNumber} already has a watch in this clone (${found}); run \`qwen autofix-pr cleanup ${prNumber}\` first.`,
-    );
-  }
   // The checkout the session sits in.
   const checkout = git('rev-parse', '--show-toplevel');
   const sessionDir = realpathNearestExisting(process.cwd());
@@ -497,6 +489,50 @@ function runInPlacePrepare(
     );
   }
 
+  const redirected = redirectedAncestor(
+    dirname(autofixPrPaths(checkout, prNumber).statePath),
+    checkout,
+  );
+  if (redirected !== null) {
+    throw new Error(
+      `refusing to prepare PR #${prNumber} in ${checkout}: ${redirected} is a symlink.`,
+    );
+  }
+
+  const sameInPlaceWatch = (state: AutofixPrState, where: string) => {
+    if (!state.inPlace) {
+      throw new Error(
+        `PR #${prNumber} already has a watch in this clone (${where}); run \`qwen autofix-pr cleanup ${prNumber}\` first.`,
+      );
+    }
+    if (!sameRepository(state, { host, owner, repo: repoName })) {
+      const watched = `${state.host}/${state.owner}/${state.repo}`;
+      throw new Error(
+        `PR #${prNumber} here is a watch of ${watched}, not ${host}/${args.repo}. ` +
+          `Run \`qwen autofix-pr cleanup ${prNumber}\` first.`,
+      );
+    }
+    if (realpathNearestExisting(where) !== checkoutReal) {
+      throw new Error(
+        `PR #${prNumber} already has an in-place watch in ${where}; run from there or run \`qwen autofix-pr cleanup ${prNumber}\` first.`,
+      );
+    }
+  };
+  const takesOver = (state: AutofixPrState) =>
+    args.takeOver === true && state.sessionId !== currentSessionId();
+
+  // A worktree watch or a watch in another checkout or repository is cleaned
+  // up first (never silently converted); an in-place watch of this PR in this
+  // checkout can be resumed or taken over with --take-over.
+  const found = findWatchRoot(prNumber);
+  const existingPaths = found === null ? null : autofixPrPaths(found, prNumber);
+  const existing =
+    existingPaths === null ? null : readState(existingPaths.statePath);
+  if (existing) {
+    sameInPlaceWatch(existing, found!);
+    if (!takesOver(existing)) assertOwnedBySession(existing);
+  }
+
   ensureAuthenticated();
   const pr = JSON.parse(
     gh('pr', 'view', String(prNumber), '-R', args.repo, '--json', PR_FIELDS),
@@ -512,7 +548,12 @@ function runInPlacePrepare(
   ) as RepoView;
   const viewer = currentUser();
   const refusal = eligibilityError(pr, repo, viewer);
-  if (refusal) throw new Error(refusal);
+  if (refusal) {
+    throw new AutofixPrRefusal(
+      pr.state === 'OPEN' ? 'failed' : 'pr_closed',
+      refusal,
+    );
+  }
   const canPush = authorCanPush(args.repo, pr.author?.login ?? '', viewer);
   const { remote, pushTarget } = remotesFor(
     host,
@@ -522,7 +563,7 @@ function runInPlacePrepare(
     pr.headRepository!.name,
   );
 
-  // The head branch is checked out, tracks the push target, and is clean.
+  // The head branch is checked out and tracks the push target.
   const head = gitOpt('-C', checkout, 'symbolic-ref', '-q', 'HEAD');
   if (head !== `refs/heads/${pr.headRefName}`) {
     throw new Error(
@@ -550,6 +591,61 @@ function runInPlacePrepare(
       `the branch ${pr.headRefName} must track ${pushTarget}/${pr.headRefName} for --in-place (it tracks ${upstream || 'nothing'}); set its upstream first.`,
     );
   }
+
+  const paths = existingPaths ?? autofixPrPaths(checkout, prNumber);
+  if (existing) {
+    // Fetch into the private ref without touching any branch or working tree,
+    // so localCopy can tell behind from unpushed local commits accurately.
+    networkGit([
+      '-C',
+      checkout,
+      'fetch',
+      '--quiet',
+      '--no-recurse-submodules',
+      remote,
+      `+refs/pull/${prNumber}/head:${paths.headRef}`,
+    ]);
+    const headSha = git(
+      '-C',
+      checkout,
+      'rev-parse',
+      `${paths.headRef}^{commit}`,
+    );
+    let tookOver = false;
+    const resumedState = withWatchLock(paths, prNumber, () => {
+      const current = requireState(paths.statePath, prNumber);
+      sameInPlaceWatch(current, found!);
+      if (takesOver(current)) tookOver = true;
+      else assertOwnedBySession(current);
+      const next: AutofixPrState = {
+        ...current,
+        sessionId: currentSessionId(),
+        authorCanPush: canPush,
+        remote,
+        pushTarget,
+        headRefName: pr.headRefName,
+        baseRefName: pr.baseRefName,
+        branch: pr.headRefName,
+        worktreePath: checkout,
+      };
+      writeAnchor(current, current.prNumber, repoRoot());
+      if (JSON.stringify(next) !== JSON.stringify(current)) {
+        writeState(paths.statePath, next);
+      }
+      return next;
+    });
+    report(resumedState, {
+      resumed: true,
+      inPlace: true,
+      url: pr.url,
+      isDraft: pr.isDraft,
+      isCrossRepository: pr.isCrossRepository,
+      ...localCopy({ ...resumedState, lastKnownHeadSha: headSha }),
+      ...(tookOver ? { tookOver } : {}),
+    });
+    return;
+  }
+
   const holds = checkoutHoldsWork(checkout);
   if (holds === null) {
     throw new Error(
@@ -561,7 +657,6 @@ function runInPlacePrepare(
       `${checkout} has uncommitted changes; commit or stash them before starting --in-place.`,
     );
   }
-  const paths = autofixPrPaths(checkout, prNumber);
   // The PR head, fetched into the watch's private ref without moving any
   // branch; the local tip is at it or behind it — never ahead, never
   // diverged. A behind branch is left for the first round's sync to
@@ -591,10 +686,11 @@ function runInPlacePrepare(
 
   mkdirSync(dirname(paths.lockPath), { recursive: true });
   const state = withWatchLock(paths, prNumber, () => {
-    // Another start may have raced the check above.
-    if (readState(paths.statePath)) {
+    // Another start (here or in a sibling worktree) may have raced the check above.
+    const raced = findWatchRoot(prNumber);
+    if (raced !== null) {
       throw new Error(
-        `PR #${prNumber} already has a watch in this clone; run \`qwen autofix-pr cleanup ${prNumber}\` first.`,
+        `PR #${prNumber} already has a watch in this clone (${raced}); run \`qwen autofix-pr cleanup ${prNumber}\` first.`,
       );
     }
     let history: AutofixPrHistory | null = null;
@@ -822,7 +918,12 @@ export function runPrepare(args: PrepareArgs): void {
   ) as RepoView;
   const viewer = currentUser();
   const refusal = eligibilityError(pr, repo, viewer);
-  if (refusal) throw new Error(refusal);
+  if (refusal) {
+    throw new AutofixPrRefusal(
+      pr.state === 'OPEN' ? 'failed' : 'pr_closed',
+      refusal,
+    );
+  }
   const headOwner = pr.headRepositoryOwner!.login;
   const headName = pr.headRepository!.name;
   // Asked before anything is fetched or made: a refusal leaves nothing

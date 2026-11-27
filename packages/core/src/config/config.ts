@@ -11,11 +11,18 @@ import {
   runWithHookExecutionOwner,
 } from '../hooks/hook-execution-context.js';
 import type { SessionSourceService } from '../services/session-sources.js';
+import type { GeneratedUiStateService } from '../services/generated-ui-state.js';
 import type { RequestLifecycleEvent } from '../telemetry/request-lifecycle.js';
 import { getInvocationContext } from '../utils/invocation-context.js';
 
 import { resolveProviderProtocol } from '../models/modelRegistry.js';
+import {
+  SUBSCRIPTION_MODELS_CACHED,
+  subscriptionModelUnavailable,
+} from '../qwen/subscription-models.js';
+import { QwenSubscriptionSession } from '../qwen/subscription-session.js';
 import { refreshModelCatalog } from '../models/model-catalog-refresh.js';
+import type { ModelPreferences } from '../models/model-preferences.js';
 import {
   captureReasoningSnapshot,
   validateReasoningCapabilities,
@@ -24,6 +31,7 @@ import {
 } from '../core/reasoning-overrides.js';
 import { getBuiltinDeepSeekReasoning } from '../core/deepseek-reasoning.js';
 import { getRequestModel } from '../core/request-model.js';
+import { ModelAvailabilityService } from '../core/model-availability-service.js';
 
 // Node built-ins
 import type { EventEmitter } from 'node:events';
@@ -40,16 +48,13 @@ import type {
 } from '../core/contentGenerator.js';
 import type { ContentGeneratorConfigSources } from '../core/contentGenerator.js';
 import {
+  normalizeReasoningEffort,
   setGeneratorReasoningEffort,
   type ReasoningEffort,
 } from '../core/reasoning-effort.js';
+import { stripRuntimeSnapshotPrefix } from '../utils/runtimeModelPrefix.js';
 import type { MCPOAuthConfig } from '../mcp/oauth-provider.js';
 import type { ShellExecutionConfig } from '../services/shellExecutionService.js';
-import {
-  DEFAULT_LOOP_PROTECTION,
-  isLoopProtectionMode,
-} from '../services/loop-protection.js';
-import type { LoopProtectionMode } from '../services/loop-protection.js';
 import type { VisionBridgeModelSelection } from '../services/visionBridge/vision-bridge-service.js';
 import {
   getQualifiedVisionModelId,
@@ -161,6 +166,13 @@ import type {
   LspStatusSnapshot,
 } from '../lsp/types.js';
 import type { InstructionLoadReason } from '../hooks/types.js';
+import {
+  resolveAgentLoopSwitch,
+  UNIFIED_SURFACE_DEFAULTS,
+  EVENT_BUS_SURFACE_DEFAULTS,
+  type AgentLoopSurface,
+  type AgentLoopPath,
+} from './agent-loop-rollout.js';
 import { ApprovalMode } from './approval-mode.js';
 
 // Other modules
@@ -169,6 +181,7 @@ import { InputFormat, OutputFormat } from '../output/types.js';
 import { PromptRegistry } from '../prompts/prompt-registry.js';
 import { ResourceRegistry } from '../resources/resource-registry.js';
 import { SkillManager } from '../skills/skill-manager.js';
+import { clearCollectedSkillEntriesCache } from '../tools/skill-utils.js';
 import { maybeRunAutoSkillCurator } from '../skills/skill-curator.js';
 import {
   authoredSkillName,
@@ -204,7 +217,6 @@ import {
 } from '../agents/runtime/workflow-size.js';
 import { FileReadCache } from '../services/fileReadCache.js';
 import { resolveStopHookBlockingCap } from '../hooks/stopHookCap.js';
-import { DEFAULT_MAX_TOOL_CALLS_PER_TURN } from '../services/loopDetectionService.js';
 import { buildContextUsage } from '../hooks/context-usage.js';
 import {
   DEFAULT_OTLP_ENDPOINT,
@@ -260,6 +272,7 @@ import {
   type StopFailureErrorType,
   type TodoItem,
   type TodoStatus,
+  type UserPromptSource,
 } from '../hooks/types.js';
 import { fireNotificationHook } from '../core/toolHookTriggers.js';
 import {
@@ -293,6 +306,7 @@ import { shouldAttemptBrowserLaunch } from '../utils/browser.js';
 import { FileExclusions } from '../utils/ignorePatterns.js';
 import { shouldDefaultToNodePty } from '../utils/shell-utils.js';
 import { WorkspaceContext } from '../utils/workspaceContext.js';
+import { isSubpath } from '../utils/paths.js';
 import { type ToolName } from '../tools/tool-utils.js';
 import { FatalConfigError, getErrorMessage } from '../utils/errors.js';
 import { normalizeProxyUrl } from '../utils/proxyUtils.js';
@@ -416,9 +430,11 @@ import {
 import {
   getAutoMemoryRoot,
   getAutoMemoryIndexPath,
+  getMemoryBaseDir,
   getTeamAutoMemoryRoot,
   getUserAutoMemoryIndexPath,
   getUserAutoMemoryRoot,
+  type ProjectMemoryOwner,
 } from '../memory/paths.js';
 import {
   type AutoMemoryIndexRead,
@@ -442,6 +458,7 @@ import {
 } from '../memory/metadata-migration.js';
 import {
   buildAutoMemoryIndexContext,
+  buildResidentAutoMemoryPrompt,
   buildStructuredAutoMemoryPrompt,
 } from '../memory/prompt.js';
 import { CommitAttributionService } from '../services/commitAttribution.js';
@@ -484,6 +501,17 @@ const DEFAULT_TOOL_SEARCH_THRESHOLD = 0;
 // lock, so the horizon only bounds how long a reader treats an activation
 // without a live lock as possibly current.
 const MANAGED_ACTIVATION_LEASE_MS = 5 * 60 * 1000;
+
+function normalizeVisionBridgeTimeoutMs(
+  timeoutMs: number | undefined,
+): number | undefined {
+  return timeoutMs !== undefined &&
+    Number.isInteger(timeoutMs) &&
+    timeoutMs > 0 &&
+    timeoutMs <= 2_147_483_647
+    ? timeoutMs
+    : undefined;
+}
 
 /** The recorder's view of a Managed Session log. */
 function managedRecordWriter(
@@ -536,6 +564,7 @@ import {
   type ResolvedModelConfig,
   type RuntimeModelSnapshot,
 } from '../models/index.js';
+import type { ModelSwitchOptions } from '../models/modelsConfig.js';
 import { resolveModelId } from '../utils/modelId.js';
 import type { WebSearchSettings } from '../tools/web-search.js';
 import type { ClaudeMarketplaceConfig } from '../extension/claude-converter.js';
@@ -1079,6 +1108,8 @@ export interface AgentsCollabSettings {
   modelGrades?: Record<string, string>;
   /** Optional whitelist of model grades exposed to the Agent tool. */
   allowedGrades?: string[];
+  /** Default background mode for top-level regular subagents (default: true). */
+  defaultBackground?: boolean;
   /**
    * Global maximum number of background sub-agents running concurrently.
    * When the cap is reached, additional launches wait for a slot.
@@ -1439,6 +1470,10 @@ export interface ConfigParameters {
   agentTeamEnabled?: boolean;
   /** Experimental: run migrated surfaces on the shared agent loop. */
   unifiedAgentLoopEnabled?: boolean;
+  /** Experimental: run the shared agent loop on the event bus. */
+  eventBusAgentLoopEnabled?: boolean;
+  /** Experimental: track model health across requests for the fallback chain. */
+  modelAvailabilityTracking?: boolean;
   /**
    * Opt-in for persistent workspace Agents answering @-mentions in chat
    * sessions. Separate from `agentTeamEnabled`: neither implies the other.
@@ -1551,6 +1586,42 @@ export interface ConfigParameters {
    * discovery layer must not connect them. See issue #4615.
    */
   pendingMcpServers?: string[];
+  /**
+   * Settings-file project hooks have no approval bound to their current
+   * configuration (pending or rejected); `getProjectHooks()` withholds them
+   * until `setProjectHooksPendingApproval(false)`. `undefined` means the
+   * session does not gate them (bare, safe, all hooks off).
+   */
+  projectHooksPendingApproval?: boolean;
+  /** The withheld block was rejected, not just left undecided. */
+  projectHooksRejected?: boolean;
+  /**
+   * The current project hooks block carries a stored approval. Unlike
+   * `projectHooksPendingApproval === false`, this never doubles as "nothing
+   * to approve": callers set it only for a genuine `approved` decision, so
+   * execution authority survives the YOLO exemption (where the pending flag
+   * is undefined) without mistaking an empty workspace for an approval.
+   */
+  projectHooksApproved?: boolean;
+  /**
+   * The raw workspace hooks block for display only, supplied when the
+   * settings layer withheld the workspace scope (feature on, folder
+   * untrusted). Never reaches the registry: `getProjectHooks()` reads
+   * `projectHooks`, this feeds only `getTrustWithheldProjectHooks()`.
+   */
+  projectHooksDisplayOnly?: Record<string, unknown>;
+  /**
+   * The exact hooks block this session's approval gate covers, with the
+   * workspace env that can change what those hooks do. Lets an embedder
+   * hash the reviewed subject itself (the approval store lives outside
+   * core) instead of trusting a block re-read later.
+   */
+  projectHooksApprovalSubject?: {
+    hooks: Record<string, unknown>;
+    env: { files: Record<string, unknown>; settings: unknown };
+  };
+  /** Started with `--yolo`: the gate is off only while the mode stays YOLO. */
+  projectHooksYoloExempt?: boolean;
   noBrowser?: boolean;
   folderTrustFeature?: boolean;
   folderTrust?: boolean;
@@ -1572,6 +1643,14 @@ export interface ConfigParameters {
   autoCompactThreshold?: number;
   interactive?: boolean;
   trustedFolder?: boolean;
+  /**
+   * The trust file's decision for `dir` when a rule set strictly inside the
+   * IDE workspace root `ideRoot` decides it; such a rule wins over the IDE.
+   */
+  trustFileDecisionBelowIdeRoot?: (
+    dir: string,
+    ideRoot: string,
+  ) => boolean | undefined;
   defaultFileEncoding?: FileEncodingType;
   useRipgrep?: boolean;
   useBuiltinRipgrep?: boolean;
@@ -1580,10 +1659,7 @@ export interface ConfigParameters {
   preventSystemSleep?: boolean;
   skipNextSpeakerCheck?: boolean;
   shellExecutionConfig?: ShellExecutionConfig;
-  skipLoopDetection?: boolean;
-  /** What a firing loop detector does; defaults to `warn`. */
-  loopProtection?: LoopProtectionMode;
-  /** Per-turn tool-call cap; <= 0 disables. See getMaxToolCallsPerTurn. */
+  /** Per-turn tool-call cap; unset or <= 0 means no cap. */
   maxToolCallsPerTurn?: number;
   truncateToolOutputThreshold?: number;
   truncateToolOutputLines?: number;
@@ -1640,6 +1716,8 @@ export interface ConfigParameters {
   inputFile?: string;
   /** Model providers configuration grouped by provider id */
   modelProvidersConfig?: ModelProvidersConfig;
+  modelPreferences?: ModelPreferences;
+  modelPreferenceDefaultEffort?: string;
   /** Maps custom provider ids to their SDK protocol (AuthType) */
   providerProtocolConfig?: ProviderProtocolConfig;
   /** Agent and multi-agent collaboration settings */
@@ -1782,17 +1860,19 @@ export interface ConfigParameters {
   allowPrivateNetworkHooks?: boolean;
   /**
    * Callback for persisting a permission rule to settings.
-   * Injected by the CLI layer; core uses this to write allow/ask/deny rules
-   * to project or user settings when the user clicks "Always Allow".
+   * Injected by the CLI layer to write allow/ask/deny rules for an approved
+   * tool call.
    *
    * @param scope - 'project' for workspace settings, 'user' for user settings.
    * @param ruleType - 'allow' | 'ask' | 'deny'.
    * @param rule - The raw rule string, e.g. "Bash(git *)" or "Edit".
+   * @param workspaceDir - The project root of the Config that owns the call.
    */
   onPersistPermissionRule?: (
     scope: 'project' | 'user',
     ruleType: 'allow' | 'ask' | 'deny',
     rule: string,
+    workspaceDir: string,
   ) => Promise<void>;
   /** Lifecycle handle for an external settings file watcher. Stopped during shutdown. */
   settingsWatcher?: { stopWatching(): void };
@@ -2021,13 +2101,13 @@ export function normalizeGoalMaxActiveMinutes(value: unknown): number {
 }
 
 function validateMaxToolCallsPerTurn(value: number | undefined): number {
-  const resolved = value ?? DEFAULT_MAX_TOOL_CALLS_PER_TURN;
-  if (!Number.isInteger(resolved)) {
+  if (value == null) return 0;
+  if (!Number.isInteger(value)) {
     throw new FatalConfigError(
-      `Invalid maxToolCallsPerTurn: must be an integer, got ${String(resolved)}`,
+      `Invalid maxToolCallsPerTurn: must be an integer, got ${String(value)}`,
     );
   }
-  return resolved;
+  return value;
 }
 
 /** Maximum number of fallback models allowed in the chain. */
@@ -2298,6 +2378,8 @@ export interface ConfigInitializeOptions {
    * need config services (hooks, tools, MCP) before a real session exists.
    */
   skipLlmInitialization?: boolean;
+  /** Load hooks without starting a filesystem subscription for bootstrap configs. */
+  skipFileWatching?: boolean;
   /** @deprecated Use `skipLlmInitialization`; retained until a future major release. */
   skipGeminiInitialization?: boolean;
   /**
@@ -2430,12 +2512,36 @@ export interface SubSessionSpawnRequest {
   model?: string;
   /** Optional display name for the sub-session in the session list. */
   name?: string;
+  /** Registered workspace (absolute path or id) to run the sub-session in;
+   * absent means the caller's workspace. */
+  workspace?: string;
+  workspaceGeneration?: string;
+  /** The named workspace was selected under YOLO without one-time approval. */
+  requiresYolo?: true;
+  /** The authorization was automatic under AUTO and requires that mode still. */
+  requiresAutoMode?: true;
+  /** An existing session in `workspace` to send the prompt to. */
+  sessionId?: string;
 }
+
+export interface SubSessionWorkspaceBinding {
+  workspaceId: string;
+  workspaceCwd: string;
+  workspaceGeneration: string;
+  /** Derived from launcher identity; used for approval, not launch authorization. */
+  sameWorkspace: boolean;
+}
+
+export type SubSessionWorkspaceResolver = (
+  workspace: string,
+) => Promise<SubSessionWorkspaceBinding>;
 
 /** Result returned to the `create_sub_session` tool. `result` (the sub-session's
  * first-turn output) is present only for `completion: 'first-turn'`. */
 export interface SubSessionSpawnResult {
   sessionId: string;
+  /** Canonical destination for a cross-workspace session link. */
+  workspaceCwd?: string;
   result?: string;
   stopReason?: string;
   /** Whether the parent lineage was durably persisted to the sub-session's
@@ -2486,6 +2592,14 @@ export type ReasoningEffortOverride = {
   field: 'enable_thinking' | 'reasoning_effort' | 'thinking_budget';
 };
 
+interface ModelPreferenceDefaults {
+  key: string;
+  reasoning: ContentGeneratorConfig['reasoning'];
+  contextWindowSize: number | undefined;
+  reasoningSource: ContentGeneratorConfigSources['reasoning'];
+  contextWindowSource: ContentGeneratorConfigSources['contextWindowSize'];
+}
+
 class SessionWriterShutdownError extends SessionWriterUnavailableError {}
 
 function containsErrorByIdentity(error: unknown, candidate: unknown): boolean {
@@ -2514,6 +2628,7 @@ export type DerivedConfigOverrides = Partial<
     | 'getCwd'
     | 'getWorkingDir'
     | 'getProjectRoot'
+    | 'getProjectMemoryOwner'
     | 'getPlanFilePath'
     | 'getWorkspaceContext'
     | 'getFileService'
@@ -2754,11 +2869,13 @@ export function deriveWorktreeConfig(
     options.customIgnoreFiles,
   );
   const workspaceContext = new WorkspaceContext(worktreePath);
+  const memoryOwner = base.getProjectMemoryOwner();
   const derived = deriveConfig(base, {
     getTargetDir: () => worktreePath,
     getCwd: () => worktreePath,
     getWorkingDir: () => worktreePath,
     getProjectRoot: () => worktreePath,
+    getProjectMemoryOwner: () => memoryOwner,
     getFileService: () => fileService,
     getWorkspaceContext: () => workspaceContext,
   });
@@ -2946,7 +3063,9 @@ export class Config {
   private fileSystemService: FileSystemService;
   private contentGeneratorConfig!: ContentGeneratorConfig;
   private contentGeneratorConfigSources: ContentGeneratorConfigSources = {};
-  private contentGenerator!: ContentGenerator;
+  private contentGenerator?: ContentGenerator;
+  private subscriptionPlan?: 'plus' | 'pro';
+  private subscriptionModelIdentity?: string;
   private readonly initialAuthType?: AuthType;
   private initialResolvedAuthType?: AuthType;
   private readonly embeddingModel: string;
@@ -2956,6 +3075,11 @@ export class Config {
   private readonly providerProtocolConfig?: ProviderProtocolConfig;
   private readonly sandbox: SandboxConfig | undefined;
   private targetDir: string;
+  private readonly projectMemoryBaseDir: string;
+  private projectMemoryBinding?: {
+    owner: ProjectMemoryOwner;
+    worktreeRoot?: string;
+  };
   private workspaceContext: WorkspaceContext;
   private readonly debugMode: boolean;
   private readonly inputFormat: InputFormat;
@@ -3037,6 +3161,12 @@ export class Config {
   private readonly cliAllowedMcpServerNames?: string[];
   private excludedMcpServers?: string[];
   private pendingMcpServers?: string[];
+  private projectHooksPendingApproval?: boolean;
+  private projectHooksRejected: boolean;
+  private projectHooksApproved: boolean;
+  private readonly projectHooksDisplayOnly?: Record<string, unknown>;
+  private readonly projectHooksApprovalSubject?: ConfigParameters['projectHooksApprovalSubject'];
+  private readonly projectHooksYoloExempt: boolean;
   private readonly mcpToolIdleTimeoutMs: number;
   /**
    * Guards against concurrent MCP reconcile passes (hot-reload watcher vs.
@@ -3109,7 +3239,7 @@ export class Config {
   private activeTodoReminderTurns = new Map<string, number>();
   private activeTodoPlanWriterOwner: string | undefined;
   private llmClient!: LlmClient;
-  private baseLlmClient!: BaseLlmClient;
+  private baseLlmClient?: BaseLlmClient;
   private cronScheduler: CronScheduler | null = null;
   private readonly fileFiltering: {
     respectGitIgnore: boolean;
@@ -3203,7 +3333,10 @@ export class Config {
   private readonly lsToolEnabled: boolean = false;
   private readonly todoWriteEnabled: boolean = false;
   private readonly agentTeamEnabled: boolean = false;
-  private readonly unifiedAgentLoopEnabled: boolean = false;
+  private readonly unifiedAgentLoopEnabled: boolean | undefined;
+  private readonly eventBusAgentLoopEnabled: boolean | undefined;
+  private readonly modelAvailabilityTracking: boolean;
+  private modelAvailabilityService: ModelAvailabilityService | undefined;
   private readonly agentCollaborationEnabled: boolean = false;
   private readonly artifactEnabled: boolean = true;
   private readonly artifactRecordingSupported: boolean = true;
@@ -3242,6 +3375,8 @@ export class Config {
    * lazily on first use, never persisted. */
   private omniMediaResourceRegistry?: MediaResourceRegistry;
   private workflowsEnabled: boolean | undefined;
+  /** Workflows are on because the bundled review skill turned them on. */
+  private workflowsEnabledByReviewSkill = false;
   private workflowKeywordTriggerEnabled: boolean;
   private readonly sessionWorkflowEnabled: boolean;
   private sessionWorkflowEnabledProvider?: () => boolean;
@@ -3272,6 +3407,9 @@ export class Config {
   private readonly autoCompactThreshold: number | undefined;
   private readonly interactive: boolean;
   private readonly trustedFolder: boolean | undefined;
+  private readonly trustFileDecisionBelowIdeRoot:
+    | ((dir: string, ideRoot: string) => boolean | undefined)
+    | undefined;
   private readonly useRipgrep: boolean;
   private readonly useBuiltinRipgrep: boolean;
   private readonly shouldUseNodePtyShell: boolean;
@@ -3290,10 +3428,7 @@ export class Config {
   private teamContext: TeamContext | null = null;
   private readonly agentsSettings: AgentsCollabSettings;
   private readonly worktreeSettings: WorktreeSettings;
-  private readonly skipLoopDetection: boolean;
-  private readonly loopProtection: LoopProtectionMode;
   private readonly maxToolCallsPerTurn: number;
-  private readonly maxToolCallsPerTurnExplicit: boolean;
   private readonly skipStartupContext: boolean;
   private readonly bareMode: boolean;
   private readonly safeMode: boolean;
@@ -3305,11 +3440,7 @@ export class Config {
   private ignoredExtensionRules: string[] = [];
   private readonly allowedHttpHookUrls: string[];
   private readonly allowPrivateNetworkHooks: boolean;
-  private readonly onPersistPermissionRuleCallback?: (
-    scope: 'project' | 'user',
-    ruleType: 'allow' | 'ask' | 'deny',
-    rule: string,
-  ) => Promise<void>;
+  private readonly onPersistPermissionRuleCallback: ConfigParameters['onPersistPermissionRule'];
   private initialized: boolean = false;
   private initializationPromise?: Promise<void>;
   private initializationSucceeded = false;
@@ -3367,9 +3498,16 @@ export class Config {
   private visionModel?: string;
   private compactionModel?: string;
   private reasoningSnapshot?: ReasoningSnapshot;
+  private modelPreferences?: ModelPreferences;
+  private readonly modelPreferenceDefaultEffort?: ReasoningEffort | 'none';
+  private modelPreferenceDefaults?: ModelPreferenceDefaults;
+  private modelPreferenceSessionEffort?: {
+    key: string;
+    effort: ReasoningEffort | undefined;
+  };
   private latestReasoningSnapshot?: ReasoningSnapshot;
   private imageModel?: string;
-  private readonly visionBridgeTimeoutMs: number | undefined;
+  private visionBridgeTimeoutMs: number | undefined;
   private readonly modelFallbacks: string[];
   private readonly disableAllHooks: boolean;
   private readonly stopHookBlockingCap: number;
@@ -3451,6 +3589,7 @@ export class Config {
     this.fileSystemService = new StandardFileSystemService();
     this.sandbox = params.sandbox;
     this.targetDir = path.resolve(params.targetDir);
+    this.projectMemoryBaseDir = getMemoryBaseDir(this.sessionRuntimeBaseDir);
     this.plansDirectoryConfigured = Boolean(params.plansDirectory?.trim());
     this.plansDir = Storage.getPlansDir(this.targetDir, params.plansDirectory);
     this.explicitIncludeDirectories = Array.from(
@@ -3524,6 +3663,12 @@ export class Config {
     this.cliAllowedMcpServerNames = params.cliAllowedMcpServerNames;
     this.excludedMcpServers = params.excludedMcpServers;
     this.pendingMcpServers = params.pendingMcpServers;
+    this.projectHooksPendingApproval = params.projectHooksPendingApproval;
+    this.projectHooksRejected = params.projectHooksRejected ?? false;
+    this.projectHooksApproved = params.projectHooksApproved ?? false;
+    this.projectHooksDisplayOnly = params.projectHooksDisplayOnly;
+    this.projectHooksApprovalSubject = params.projectHooksApprovalSubject;
+    this.projectHooksYoloExempt = params.projectHooksYoloExempt ?? false;
     const envTimeout = process.env['QWEN_CODE_MCP_TOOL_IDLE_TIMEOUT_MS'];
     const parsedEnv = envTimeout !== undefined ? Number(envTimeout) : NaN;
     this.mcpToolIdleTimeoutMs =
@@ -3660,7 +3805,13 @@ export class Config {
     this.lsToolEnabled = params.lsToolEnabled ?? false;
     this.todoWriteEnabled = params.todoWriteEnabled ?? false;
     this.agentTeamEnabled = params.agentTeamEnabled ?? false;
-    this.unifiedAgentLoopEnabled = params.unifiedAgentLoopEnabled ?? false;
+    // Deliberately not `?? false`: these are tri-state. Unset must stay
+    // undefined so the resolver falls through to the per-surface built-in
+    // default; collapsing to false here would make "not set" indistinguishable
+    // from "explicitly off" and block a later per-surface default flip.
+    this.unifiedAgentLoopEnabled = params.unifiedAgentLoopEnabled;
+    this.eventBusAgentLoopEnabled = params.eventBusAgentLoopEnabled;
+    this.modelAvailabilityTracking = params.modelAvailabilityTracking ?? false;
     this.agentCollaborationEnabled = params.agentCollaborationEnabled ?? false;
     this.artifactEnabled = params.artifactEnabled ?? true;
     this.artifactRecordingSupported = params.artifactRecordingSupported ?? true;
@@ -3712,6 +3863,11 @@ export class Config {
     this.folderTrust = params.folderTrust ?? false;
     this.ideMode = params.ideMode ?? false;
     this.modelProvidersConfig = params.modelProvidersConfig;
+    this.modelPreferences = params.modelPreferences;
+    this.modelPreferenceDefaultEffort =
+      params.modelPreferenceDefaultEffort === 'none'
+        ? 'none'
+        : normalizeReasoningEffort(params.modelPreferenceDefaultEffort);
     this.providerProtocolConfig = params.providerProtocolConfig;
     this.cliVersion = params.cliVersion;
 
@@ -3724,17 +3880,10 @@ export class Config {
     this.autoCompactThreshold = params.autoCompactThreshold;
     this.interactive = params.interactive ?? false;
     this.trustedFolder = params.trustedFolder;
-    this.skipLoopDetection = params.skipLoopDetection ?? false;
-    // Embedders bypass the CLI's check; an unknown mode would act as `off`.
-    this.loopProtection = isLoopProtectionMode(params.loopProtection)
-      ? params.loopProtection
-      : DEFAULT_LOOP_PROTECTION;
+    this.trustFileDecisionBelowIdeRoot = params.trustFileDecisionBelowIdeRoot;
     this.maxToolCallsPerTurn = validateMaxToolCallsPerTurn(
       params.maxToolCallsPerTurn,
     );
-    // Whether the user explicitly set the cap (vs. the resolved default). An
-    // explicit value is honored as a hard cap; the default is adaptive.
-    this.maxToolCallsPerTurnExplicit = params.maxToolCallsPerTurn !== undefined;
     this.skipStartupContext = params.skipStartupContext ?? false;
     this.bareMode = params.bareMode ?? false;
     this.safeMode = params.safeMode ?? isSafeModeEnv();
@@ -4006,13 +4155,9 @@ export class Config {
     // schema still accepts via /config) would throw RangeError or silently
     // degrade to a 1ms timeout, killing every bridge turn. Reject anything the
     // timer can't take and fall back to the built-in default.
-    this.visionBridgeTimeoutMs =
-      params.visionBridgeTimeoutMs !== undefined &&
-      Number.isInteger(params.visionBridgeTimeoutMs) &&
-      params.visionBridgeTimeoutMs > 0 &&
-      params.visionBridgeTimeoutMs <= 2_147_483_647
-        ? params.visionBridgeTimeoutMs
-        : undefined;
+    this.visionBridgeTimeoutMs = normalizeVisionBridgeTimeoutMs(
+      params.visionBridgeTimeoutMs,
+    );
     this.modelFallbacks = normalizeModelFallbacks(params.modelFallbacks);
     this.disableAllHooks = params.disableAllHooks ?? false;
     this.stopHookBlockingCap = resolveStopHookBlockingCap(
@@ -4153,6 +4298,8 @@ export class Config {
   private async initializeOnce(
     options?: ConfigInitializeOptions,
   ): Promise<void> {
+    const ripgrepAbort = new AbortController();
+    let ripgrepAvailability: Promise<boolean> | undefined;
     try {
       if (this.shellExecutionSandbox)
         this.shellExecutionSandbox = await probeShellSandbox(
@@ -4175,9 +4322,28 @@ export class Config {
           : undefined,
       );
       await this.bindSessionExecutionEngine();
+      // Overlap ACP's binary health check with resource I/O in this request.
+      if (
+        this.getExperimentalZedIntegration() &&
+        this.getUseRipgrep() &&
+        this.sessionExecutionEngine !== 'managed' &&
+        !this.getExecutionEnvironment() &&
+        !this.shellExecutionSandbox &&
+        !this.getBareMode()
+      ) {
+        ripgrepAvailability = canUseRipgrep(
+          this.getUseBuiltinRipgrep(),
+          AbortSignal.any([
+            ripgrepAbort.signal,
+            this.executionShutdown.signal,
+            ...(options?.signal ? [options.signal] : []),
+          ]),
+        );
+        void ripgrepAvailability.catch(() => undefined);
+      }
       registerSessionProjectDir(this.sessionId, this.storage.getProjectDir());
       this.sessionProjectDirRegistered = true;
-      await this.initializeInternal(options);
+      await this.initializeInternal(options, ripgrepAvailability);
       this.workflowModeReady = true;
       if (this.initialWorkflowMode !== undefined) {
         const enabled = this.initialWorkflowMode;
@@ -4215,6 +4381,9 @@ export class Config {
         });
       }
       throw error;
+    } finally {
+      ripgrepAbort.abort();
+      await ripgrepAvailability?.catch(() => undefined);
     }
   }
 
@@ -4241,6 +4410,7 @@ export class Config {
 
   private async initializeInternal(
     options?: ConfigInitializeOptions,
+    ripgrepAvailability?: Promise<boolean>,
   ): Promise<void> {
     this.debugLogger.info('Config initialization started');
     await this.proxyDispatcherReady;
@@ -4316,7 +4486,9 @@ export class Config {
         (!options?.skipHooks && !this.getDisableAllHooks()))
     ) {
       this.hookSystem = new HookSystem(this, options?.managedHookDispatcher);
-      await this.hookSystem.initialize();
+      await this.hookSystem.initialize({
+        skipFileWatching: options?.skipFileWatching,
+      });
       this.debugLogger.debug('Hook system initialized');
 
       // Initialize MessageBus for hook execution
@@ -4369,6 +4541,7 @@ export class Config {
                       input['submitted_prompt'].trim().length > 0
                       ? input['submitted_prompt']
                       : undefined,
+                    input['source'] as UserPromptSource | undefined,
                   );
                   break;
                 case 'UserPromptExpansion':
@@ -4379,6 +4552,28 @@ export class Config {
                     signal,
                   );
                   break;
+                case 'FileChanged': {
+                  const filePath = input['file_path'];
+                  const event = input['event'];
+                  if (
+                    typeof filePath !== 'string' ||
+                    !path.isAbsolute(filePath) ||
+                    (event !== 'add' &&
+                      event !== 'change' &&
+                      event !== 'unlink')
+                  ) {
+                    throw new Error('Invalid FileChanged hook input');
+                  }
+                  const changed = await hookSystem.fireFileChangedEvent(
+                    filePath,
+                    event,
+                    signal,
+                  );
+                  result = changed.finalOutput
+                    ? createHookOutput('FileChanged', changed.finalOutput)
+                    : undefined;
+                  break;
+                }
                 case 'Stop': {
                   // Extract context usage data from input with runtime validation
                   const contextUsageData = buildContextUsage(
@@ -4787,6 +4982,7 @@ export class Config {
     this.toolRegistry = await this.createToolRegistry(
       options?.sendSdkMcpMessage,
       skipInlineMcpDiscovery ? { skipDiscovery: true } : undefined,
+      ripgrepAvailability,
     );
     options?.signal?.throwIfAborted();
     recordStartupEvent('config_initialize_tool_registry_end');
@@ -5700,13 +5896,18 @@ export class Config {
         this.memoryCorpusRevision = corpusStatus?.revision ?? '';
         this.memoryRecallModeInitialized = true;
       }
+      const projectRoot = this.getProjectRoot();
+      const owner = this.getProjectMemoryOwner();
       const [managedAutoMemoryIndexRead, userAutoMemoryIndexRead] =
         await Promise.all([
-          readAutoMemoryIndexWithStats(this.getProjectRoot()),
+          readAutoMemoryIndexWithStats(projectRoot, owner).catch((error) => {
+            this.debugLogger.warn('Project memory index read failed', error);
+            return null;
+          }),
           readUserAutoMemoryIndexWithStats().catch(() => null),
         ]);
       this.recordAutoMemoryIndexRead(
-        getAutoMemoryIndexPath(this.getProjectRoot()),
+        getAutoMemoryIndexPath(projectRoot, owner),
         managedAutoMemoryIndexRead,
       );
       this.recordAutoMemoryIndexRead(
@@ -5722,7 +5923,7 @@ export class Config {
       // empty" placeholder — the same shape the per-project layer has used
       // since day one — so the cost is one extra index header.
       this.setUserMemory(memoryContent);
-      const memoryDir = getAutoMemoryRoot(this.getProjectRoot());
+      const memoryDir = getAutoMemoryRoot(projectRoot, owner);
       const userSection = {
         memoryDir: getUserAutoMemoryRoot(),
         indexContent: userAutoMemoryIndex,
@@ -5740,20 +5941,18 @@ export class Config {
           teamSection?.memoryDir,
         );
       } else {
-        const policy = this.memoryManager.buildAutoMemoryPrompt(
-          memoryDir,
-          managedAutoMemoryIndex,
-          userSection,
-          teamSection,
-          { includeIndexes: false },
-        );
         const catalog = buildAutoMemoryIndexContext(
           memoryDir,
           managedAutoMemoryIndex,
           userSection,
           teamSection,
+          this.getModelContextWindowSize(),
         );
-        this.autoMemoryPrompt = policy;
+        this.autoMemoryPrompt = buildResidentAutoMemoryPrompt(
+          memoryDir,
+          userSection,
+          teamSection,
+        );
         this.autoMemoryContext = catalog;
       }
     } else {
@@ -5783,11 +5982,16 @@ export class Config {
     });
   }
 
-  private buildMemoryContextWarning(memoryContent: string): string | undefined {
-    const contextWindowSize =
+  getModelContextWindowSize(): number {
+    return (
       this.getContentGeneratorConfig()?.contextWindowSize ??
       this.modelsConfig.getGenerationConfig().contextWindowSize ??
-      tokenLimit(this.getModel(), 'input');
+      tokenLimit(this.getModel(), 'input')
+    );
+  }
+
+  private buildMemoryContextWarning(memoryContent: string): string | undefined {
+    const contextWindowSize = this.getModelContextWindowSize();
     if (!contextWindowSize || contextWindowSize <= 0 || !memoryContent) {
       return undefined;
     }
@@ -5851,10 +6055,46 @@ export class Config {
     return this.contextRuleExcludes;
   }
 
-  getContentGenerator(): ContentGenerator {
-    return (
-      getRuntimeContentGenerator()?.contentGenerator ?? this.contentGenerator
-    );
+  getContentGenerator(options: {
+    allowUninitialized: true;
+  }): ContentGenerator | undefined;
+  getContentGenerator(): ContentGenerator;
+  getContentGenerator(options?: {
+    allowUninitialized: true;
+  }): ContentGenerator | undefined {
+    const generator =
+      getRuntimeContentGenerator()?.contentGenerator ?? this.contentGenerator;
+    if (!generator && !options?.allowUninitialized) {
+      throw new Error('Not signed in. Run /auth to sign in.');
+    }
+    return generator;
+  }
+
+  getSubscriptionPlan(): 'plus' | 'pro' | undefined {
+    return this.subscriptionPlan;
+  }
+
+  setSubscriptionPlan(plan: 'plus' | 'pro' | undefined): void {
+    this.subscriptionPlan = plan;
+  }
+
+  clearAuth(): void {
+    this.backgroundTaskRegistry.abortAll({
+      notify: false,
+      persistedStatus: 'cancelled',
+    });
+    resetPreloadedContentGenerator(this.contentGenerator);
+    this.baseLlmClient?.clearPerModelGeneratorCache();
+    this.contentGenerator = undefined;
+    this.baseLlmClient = undefined;
+    this.contentGeneratorConfig = { model: '' };
+    this.contentGeneratorConfigSources = {};
+    this.initialResolvedAuthType = undefined;
+    this.subscriptionPlan = undefined;
+    this.subscriptionModelIdentity = undefined;
+    this.modelsConfig.clearAuth();
+    this.toolRegistry?.unregisterTool(ToolNames.WEB_SEARCH);
+    this.notifyModelChangeListeners();
   }
 
   /**
@@ -6020,15 +6260,55 @@ export class Config {
     this.initialResolvedAuthType = undefined;
   }
 
+  async refreshSubscriptionModels(signal?: AbortSignal) {
+    const session = new QwenSubscriptionSession();
+    const identity = session.getIdentity();
+    this.subscriptionModelIdentity = undefined;
+    const result = await this.modelsConfig.refreshSubscriptionModels(
+      signal,
+      this.getCliVersion(),
+    );
+    if (identity && session.getIdentity() === identity) {
+      this.subscriptionModelIdentity = identity;
+    }
+    const previous = this.warnings.indexOf(SUBSCRIPTION_MODELS_CACHED);
+    if (previous !== -1) this.warnings.splice(previous, 1);
+    if (result.cached) this.warnings.push(SUBSCRIPTION_MODELS_CACHED);
+    this.notifyModelChangeListeners();
+    return result;
+  }
+
   /**
    * Refresh authentication and rebuild ContentGenerator.
    */
-  async refreshAuth(authMethod: AuthType, isInitialAuth?: boolean) {
+  async refreshAuth(
+    authMethod: AuthType,
+    isInitialAuth?: boolean,
+    subscriptionFallbackModel?: string,
+    allowUnlistedSubscriptionModel?: boolean,
+  ) {
+    return this.rebuildContentGenerator(
+      authMethod,
+      isInitialAuth,
+      true,
+      subscriptionFallbackModel,
+      allowUnlistedSubscriptionModel,
+    );
+  }
+
+  private async rebuildContentGenerator(
+    authMethod: AuthType,
+    isInitialAuth: boolean | undefined,
+    refreshSubscriptionModels: boolean,
+    subscriptionFallbackModel?: string,
+    allowUnlistedSubscriptionModel?: boolean,
+  ) {
     const hookOwner = captureHookExecutionOwner(this, null);
     if (!this.contentGenerator && authMethod === this.initialAuthType) {
       authMethod = this.initialResolvedAuthType ?? authMethod;
     }
-    // The global reasoning effort (settings.model.reasoningEffort, seeded into
+    // For callers without a model preference store, the global reasoning effort
+    // (settings.model.reasoningEffort, seeded into
     // the generation config by the CLI) is NOT a provider field, but
     // syncAfterAuthRefresh → applyResolvedModelDefaults overwrites every
     // MODEL_GENERATION_CONFIG_FIELDS entry — including `reasoning` — with the
@@ -6048,8 +6328,35 @@ export class Config {
       ? priorReasoning.effort
       : undefined;
 
-    // Sync modelsConfig state for this auth refresh.
-    const modelId = this.modelsConfig.getModel();
+    let fallbackModel: string | undefined;
+    if (authMethod === AuthType.QWEN_SUBSCRIPTION) {
+      const { models } = refreshSubscriptionModels
+        ? await this.refreshSubscriptionModels()
+        : {
+            models: this.modelsConfig
+              .getAvailableModelsForAuthType(authMethod)
+              .map((model) => model.id),
+          };
+      const selected = this.modelsConfig.getModel();
+      if (selected && !models.includes(selected)) {
+        if (
+          isInitialAuth &&
+          subscriptionFallbackModel &&
+          models.includes(subscriptionFallbackModel)
+        ) {
+          fallbackModel = subscriptionFallbackModel;
+        } else if (
+          !isInitialAuth ||
+          !allowUnlistedSubscriptionModel ||
+          priorGeneration.authType !== authMethod
+        ) {
+          throw new Error(subscriptionModelUnavailable(selected));
+        }
+      }
+    }
+
+    // The CLI's resolved subscription credentials preserve an unlisted model during sync.
+    const modelId = fallbackModel ?? this.modelsConfig.getModel();
     this.modelsConfig.syncAfterAuthRefresh(authMethod, modelId);
 
     // Check and consume cached credentials flag
@@ -6082,6 +6389,7 @@ export class Config {
       (priorReasoningSource?.kind === 'programmatic' &&
         priorReasoningSource.detail === 'reasoning selection');
     const preserveReasoningOff =
+      this.modelPreferences === undefined &&
       priorReasoning === false &&
       (requestModel !== newContentGeneratorConfig.model ||
         newContentGeneratorConfig.thinkingMandatory !== true) &&
@@ -6097,6 +6405,13 @@ export class Config {
       if (deepSeekRoute && priorReasoningSource)
         sources['reasoning'] = priorReasoningSource;
     }
+    const preferenceDefaults = this.captureModelPreferenceDefaults(
+      config,
+      sources,
+    );
+    if (preferenceDefaults) {
+      this.applyModelPreferences(config, sources, preferenceDefaults);
+    }
     this.contentGenerator = await createContentGenerator(
       newContentGeneratorConfig,
       this,
@@ -6105,12 +6420,14 @@ export class Config {
     // Only assign to instance properties after successful initialization
     this.contentGeneratorConfig = newContentGeneratorConfig;
     this.contentGeneratorConfigSources = sources;
+    this.modelPreferenceDefaults = preferenceDefaults;
     // Auth flows call refreshAuth directly — no model-change notification
     // fires — and the resolved model can differ from the pre-auth one.
     this.publishModelEnv();
 
     // Re-apply the user's reasoning preference that the provider sync wiped.
     if (
+      this.modelPreferences === undefined &&
       priorReasoning === false &&
       newContentGeneratorConfig.reasoning === false
     ) {
@@ -6120,12 +6437,22 @@ export class Config {
           priorReasoningSource;
       }
     }
-    if (priorReasoningEffort) {
+    if (this.modelPreferences === undefined && priorReasoningEffort) {
       this.setReasoningEffort(priorReasoningEffort);
     }
 
     // Initialize BaseLlmClient now that the ContentGenerator is available
     this.baseLlmClient = new BaseLlmClient(this.contentGenerator, this);
+
+    if (
+      this.initialized &&
+      this.toolRegistry &&
+      !this.shellExecutionSandbox &&
+      this.sessionExecutionEngine !== 'managed'
+    ) {
+      await this.syncWebSearchToolRegistration(this.toolRegistry);
+      await this.llmClient?.setTools();
+    }
 
     // Fire auth_success notification hook (supports both interactive & non-interactive)
     const messageBus = this.getMessageBus();
@@ -6457,9 +6784,11 @@ export class Config {
         `with every request, which is the cost a rule exists to avoid. Add ` +
         `\`paths:\` to it, or move the content into the extension's context file.`,
     );
-    const extra = memoryContextWarning
-      ? [...ruleWarnings, memoryContextWarning]
-      : ruleWarnings;
+    const extra = [
+      ...ruleWarnings,
+      ...(memoryContextWarning ? [memoryContextWarning] : []),
+      ...(this.getHookSystem()?.getConfigWarnings() ?? []),
+    ];
     return extra.length > 0 ? [...this.warnings, ...extra] : this.warnings;
   }
 
@@ -6570,6 +6899,7 @@ export class Config {
     this.workflowModePublishedState = undefined;
     this.refreshWorkflowMode();
     this.sessionSourceService = this.sessionSourceServiceFactory?.();
+    this.generatedUiStateService = this.generatedUiStateServiceFactory?.();
     this.initializeGoalRuntime(this.sessionData?.conversation.messages);
     // The file-read cache is session-scoped: its `file_unchanged`
     // placeholder relies on the model having seen the prior full read
@@ -6583,6 +6913,15 @@ export class Config {
     this.toolResultBudget.bytesWritten = 0;
     this.getMemoryPressureMonitor()?.resetForNewSession();
     this.fileHistoryService = undefined;
+    // The availability ledger and the background prompt-id registry belong to
+    // the outgoing conversation. A rewind/resume can reuse a prompt id (the
+    // transcript seeds the mint counter), so carrying either across the swap
+    // would let a stale mark skip a recovered fallback, or a reused notification
+    // id exclude a new foreground turn. Reset both unconditionally — even a
+    // same-id resume replaces the conversation (P2). Dropping the lazy service
+    // instance discards every mark and the last turn key.
+    this.modelAvailabilityService = undefined;
+    this.llmClient?.clearBackgroundInteractionPromptIds?.();
     refreshSessionContext(this.sessionId);
     // The commit-attribution singleton accumulates per-file AI edits
     // and a session-scoped prompt counter — both stop being meaningful
@@ -6936,6 +7275,120 @@ export class Config {
     return this.modelsConfig.getCurrentRegistryBaseUrl();
   }
 
+  getModelPreferenceKey(): string | undefined {
+    return this.modelPreferenceDefaults?.key;
+  }
+
+  getModelPreferenceContextLimit(): number {
+    return (
+      this.modelPreferenceDefaults?.contextWindowSize ??
+      tokenLimit(stripRuntimeSnapshotPrefix(this.getModel()), 'input')
+    );
+  }
+
+  setModelPreferences(
+    preferences: ModelPreferences,
+    changed?: 'reasoning' | 'contextWindow',
+  ): void {
+    if (this.modelPreferences === undefined) return;
+    this.modelPreferences = preferences;
+    if (!this.contentGeneratorConfig || !this.modelPreferenceDefaults) return;
+    if (changed === 'reasoning') this.modelPreferenceSessionEffort = undefined;
+    this.applyModelPreferences(
+      this.contentGeneratorConfig,
+      this.contentGeneratorConfigSources,
+      this.modelPreferenceDefaults,
+    );
+    this.notifyModelChangeListeners();
+  }
+
+  private captureModelPreferenceDefaults(
+    config: ContentGeneratorConfig,
+    sources: ContentGeneratorConfigSources,
+  ): ModelPreferenceDefaults | undefined {
+    if (
+      this.modelPreferences === undefined ||
+      !config.authType ||
+      !config.model
+    )
+      return undefined;
+    const registryEndpoint = this.getCurrentModelRegistryBaseUrl();
+    const endpointSource = sources['baseUrl']?.kind;
+    const endpoint =
+      endpointSource === 'cli' ||
+      endpointSource === 'env' ||
+      endpointSource === 'settings'
+        ? config.baseUrl
+        : (registryEndpoint ?? config.baseUrl);
+    const modelId = encodeURIComponent(
+      stripRuntimeSnapshotPrefix(config.model),
+    );
+    const suffix = endpoint
+      ? `#${createHash('sha256').update(endpoint).digest('hex')}`
+      : '';
+    return {
+      key: `${config.authType}/${modelId}${suffix}`,
+      reasoning: config.reasoning,
+      contextWindowSize: config.contextWindowSize,
+      reasoningSource: sources['reasoning'],
+      contextWindowSource: sources['contextWindowSize'],
+    };
+  }
+
+  private applyModelPreferences(
+    config: ContentGeneratorConfig,
+    sources: ContentGeneratorConfigSources,
+    defaults: ModelPreferenceDefaults,
+  ): void {
+    const preference = this.modelPreferences?.[defaults.key];
+    const contextWindow = preference?.contextWindow;
+    const contextLimit =
+      defaults.contextWindowSize ??
+      tokenLimit(stripRuntimeSnapshotPrefix(config.model), 'input');
+    config.contextWindowSize = defaults.contextWindowSize;
+    sources['contextWindowSize'] = defaults.contextWindowSource;
+    if (
+      contextWindow !== undefined &&
+      Number.isSafeInteger(contextWindow) &&
+      contextWindow > 0 &&
+      contextWindow <= contextLimit
+    ) {
+      config.contextWindowSize = contextWindow;
+      sources['contextWindowSize'] = {
+        kind: 'settings',
+        settingsPath: 'model.preferences',
+      };
+    }
+
+    config.reasoning = defaults.reasoning;
+    sources['reasoning'] = defaults.reasoningSource;
+    const sessionEffort = this.modelPreferenceSessionEffort;
+    const savedEffort = normalizeReasoningEffort(preference?.reasoning?.effort);
+    if (sessionEffort?.key === defaults.key) {
+      setGeneratorReasoningEffort(config, sessionEffort.effort);
+    } else if (savedEffort) {
+      if (setGeneratorReasoningEffort(config, savedEffort)) {
+        sources['reasoning'] = {
+          kind: 'settings',
+          settingsPath: 'model.preferences',
+        };
+      }
+    } else if (this.modelPreferenceDefaultEffort === 'none') {
+      if (
+        config.thinkingMandatory !== true &&
+        resolveReasoningForModel(this, config)?.canDisable !== false
+      ) {
+        config.reasoning = false;
+        sources['reasoning'] = {
+          kind: 'settings',
+          settingsPath: 'model.reasoningEffort',
+        };
+      }
+    } else if (this.modelPreferenceDefaultEffort) {
+      setGeneratorReasoningEffort(config, this.modelPreferenceDefaultEffort);
+    }
+  }
+
   /**
    * The auth type of the currently selected model, read from `ModelsConfig`
    * rather than the content generator config.
@@ -7085,13 +7538,30 @@ export class Config {
    * model. Bare selectors stay bare and authType-qualified selectors keep their
    * authType prefix so selector-aware runtime paths can route cross-auth calls.
    */
-  getFastModel(): string | undefined {
+  getFastModel({ requirePinnedEndpoint = false } = {}): string | undefined {
     const selector = this.resolveFastModelSelector();
     if (!selector) return undefined;
 
     const available = selector.authType
       ? this.getAllConfiguredModels([selector.authType])
       : this.getAllConfiguredModels();
+    const pinnedEndpoint = this.fastModel?.trim().split('\0')[1];
+    if (
+      requirePinnedEndpoint &&
+      pinnedEndpoint !== undefined &&
+      !available.some(
+        (model) =>
+          model.id === selector.modelId &&
+          model.baseUrl === pinnedEndpoint &&
+          !model.voiceOnly &&
+          !model.imageOnly &&
+          !model.visionOnly,
+      )
+    ) {
+      throw new Error(
+        'Fast model is no longer configured at the selected endpoint',
+      );
+    }
     if (
       !available.some(
         (model) =>
@@ -7345,6 +7815,24 @@ export class Config {
   }
 
   /**
+   * Whether the model fallback chain should consult the per-session model
+   * health ledger (experimental, opt-in). When false the chain behaves exactly
+   * as it did before the ledger existed.
+   */
+  isModelAvailabilityTrackingEnabled(): boolean {
+    return this.modelAvailabilityTracking;
+  }
+
+  /**
+   * Session-scoped model health ledger, created lazily. Only consulted when
+   * `isModelAvailabilityTrackingEnabled()` is true.
+   */
+  getModelAvailabilityService(): ModelAvailabilityService {
+    this.modelAvailabilityService ??= new ModelAvailabilityService();
+    return this.modelAvailabilityService;
+  }
+
+  /**
    * Read the active reasoning-effort tier from the live content-generator
    * config. Returns undefined when thinking is disabled (`reasoning: false`) or
    * no tier is set (the model/provider default applies).
@@ -7445,8 +7933,18 @@ export class Config {
     if (runtimeCfg && runtimeCfg !== this.contentGeneratorConfig) {
       applyEffort(runtimeCfg);
     }
-    // Keep the rebuildable source in sync so a later refreshAuth keeps the tier.
-    applyEffort(this.modelsConfig?.getGenerationConfig());
+    if (this.modelPreferences === undefined) {
+      // Keep the rebuildable source in sync so a later refreshAuth keeps the tier.
+      applyEffort(this.modelsConfig?.getGenerationConfig());
+    } else if (
+      this.modelPreferenceDefaults &&
+      this.contentGeneratorConfig?.reasoning !== false
+    ) {
+      this.modelPreferenceSessionEffort = {
+        key: this.modelPreferenceDefaults.key,
+        effort,
+      };
+    }
   }
 
   /**
@@ -7582,6 +8080,14 @@ export class Config {
   }
 
   /**
+   * Update the vision bridge timeout at runtime (`/model --vision --timeout`).
+   * Values the constructor would reject fall back to the built-in default.
+   */
+  setVisionBridgeTimeoutMs(timeoutMs: number | undefined): void {
+    this.visionBridgeTimeoutMs = normalizeVisionBridgeTimeoutMs(timeoutMs);
+  }
+
+  /**
    * Set model programmatically (e.g., VLM auto-switch, fallback).
    * Delegates to ModelsConfig.
    */
@@ -7604,18 +8110,21 @@ export class Config {
   private async handleModelChange(
     authType: AuthType,
     requiresRefresh: boolean,
+    initializeIfNeeded?: boolean,
   ): Promise<void> {
     this.initialResolvedAuthType = undefined;
     if (!this.contentGeneratorConfig) {
+      if (initializeIfNeeded || authType === AuthType.QWEN_SUBSCRIPTION)
+        await this.refreshAuth(authType);
       return;
     }
 
-    // Reasoning effort is a global, model-independent preference (set via
-    // /effort). Capture it before the rebuild and re-apply after, so switching
-    // models never silently drops the user's chosen effort — neither the
-    // hot-update path (which copies a fixed field set, not `reasoning`) nor the
-    // full refresh path (which rebuilds the config from scratch).
-    const priorReasoningEffort = this.getReasoningEffort();
+    // Callers without model preferences keep the legacy live effort across
+    // both the hot-update path and a full generator rebuild.
+    const priorReasoningEffort =
+      this.modelPreferences === undefined
+        ? this.getReasoningEffort()
+        : undefined;
 
     // Keep full history (including thought parts) on model switch.
     // Some OpenAI-compatible reasoning models (e.g. DeepSeek) require
@@ -7639,13 +8148,20 @@ export class Config {
             this.modelsConfig.isStrictModelProviderSelection(),
         },
       );
+      const preferenceDefaults = this.captureModelPreferenceDefaults(
+        config,
+        sources,
+      );
+      this.modelPreferenceDefaults = preferenceDefaults;
+      if (preferenceDefaults) {
+        this.applyModelPreferences(config, sources, preferenceDefaults);
+        this.contentGeneratorConfig.reasoning = config.reasoning;
+        this.contentGeneratorConfigSources['reasoning'] = sources['reasoning'];
+      }
 
       // Hot-update fields (qwen-oauth models share the same auth + client).
-      // Deliberately does NOT copy `reasoning`: it is a global, model-independent
-      // preference captured in `priorReasoningEffort` above and re-applied via
-      // setReasoningEffort() below. Do not add `reasoning` here — that would
-      // overwrite the live tier with the new model's default and make the
-      // restore a no-op.
+      // The reasoning update above is conditional so legacy callers retain
+      // their live tier when switching models.
       this.contentGeneratorConfig.reasoningRouteBaseUrl =
         config.reasoningRouteBaseUrl;
       this.contentGeneratorConfig.model = config.model;
@@ -7669,6 +8185,7 @@ export class Config {
       // different image support must update them, or the vision-bridge gate and
       // image-stripping read the previous model's modalities.
       this.contentGeneratorConfig.modalities = config.modalities;
+      this.contentGeneratorConfig.imageDetail = config.imageDetail;
 
       if ('model' in sources) {
         this.contentGeneratorConfigSources['model'] = sources['model'];
@@ -7676,6 +8193,10 @@ export class Config {
       if ('modalities' in sources) {
         this.contentGeneratorConfigSources['modalities'] =
           sources['modalities'];
+      }
+      if ('imageDetail' in sources) {
+        this.contentGeneratorConfigSources['imageDetail'] =
+          sources['imageDetail'];
       }
       if ('samplingParams' in sources) {
         this.contentGeneratorConfigSources['samplingParams'] =
@@ -7729,7 +8250,17 @@ export class Config {
     // we captured off the still-intact live contentGeneratorConfig above. This is
     // a no-op when the new model disables thinking (`reasoning: false`), since
     // setReasoningEffort() skips that case and never silently re-enables it.
-    await this.refreshAuth(authType);
+    const reuseSubscriptionModels =
+      authType === AuthType.QWEN_SUBSCRIPTION &&
+      this.contentGeneratorConfig.authType === authType &&
+      this.subscriptionModelIdentity !== undefined &&
+      new QwenSubscriptionSession().getIdentity() ===
+        this.subscriptionModelIdentity;
+    if (reuseSubscriptionModels) {
+      await this.rebuildContentGenerator(authType, undefined, false);
+    } else {
+      await this.refreshAuth(authType);
+    }
     if (priorReasoningEffort) {
       this.setReasoningEffort(priorReasoningEffort);
     }
@@ -7795,7 +8326,7 @@ export class Config {
   async switchModel(
     authType: AuthType,
     modelId: string,
-    options?: { requireCachedCredentials?: boolean; baseUrl?: string },
+    options?: ModelSwitchOptions,
   ): Promise<void> {
     await this.modelsConfig.switchModel(authType, modelId, options);
     this.notifyModelChangeListeners();
@@ -7883,9 +8414,14 @@ export class Config {
     const newChatsDir = path.join(newStorage.getProjectDir(), 'chats');
     return [
       `${this.sessionId}.jsonl`,
+      `${this.sessionId}.prompt-time.json`,
       `${this.sessionId}.runtime.json`,
       `${this.sessionId}.worktree.json`,
       `${this.sessionId}.pr.json`,
+      `${this.sessionId}.title.json`,
+      `${this.sessionId}.branch.json`,
+      `${this.sessionId}.artifacts.json`,
+      `${this.sessionId}.goal.json`,
     ].map((fileName) => ({
       from: path.join(oldChatsDir, fileName),
       to: path.join(newChatsDir, fileName),
@@ -8057,8 +8593,13 @@ export class Config {
     }
 
     this.backgroundTaskRegistry.disposeResidentAgents();
+    const worktreeRoot = this.projectMemoryBinding?.worktreeRoot;
+    if (worktreeRoot && !isSubpath(worktreeRoot, expected)) {
+      this.projectMemoryBinding = undefined;
+    }
     this.targetDir = expected;
     this.cwd = expected;
+    await this.hookSystem?.refreshFileWatchingForWorkingDirectory();
     resetPreloadedContentGenerator(this.contentGenerator);
     await this.refreshCurrentRuntimeStatus(expected);
     this.workspaceContext.applyRootDirectories(workspaceDirectories);
@@ -8068,10 +8609,17 @@ export class Config {
     // later `gh pr create` in this session must still reach the bridge.
     const sessionPrBoundCallback =
       this.sessionService?.getSessionPrBoundCallback();
+    const sessionGoalChangedCallback =
+      this.sessionService?.getSessionGoalChangedCallback();
     this.sessionService = undefined;
     if (sessionPrBoundCallback) {
       this.getSessionService().setSessionPrBoundCallback(
         sessionPrBoundCallback,
+      );
+    }
+    if (sessionGoalChangedCallback) {
+      this.getSessionService().setSessionGoalChangedCallback(
+        sessionGoalChangedCallback,
       );
     }
     this.fileHistoryService = undefined;
@@ -8132,6 +8680,34 @@ export class Config {
 
   getProjectRoot(): string {
     return this.targetDir;
+  }
+
+  bindProjectMemoryToWorkspace(
+    memoryBaseDir = this.projectMemoryBaseDir,
+  ): void {
+    this.projectMemoryBinding = {
+      owner: { cwd: this.storage.getProjectRoot(), memoryBaseDir },
+    };
+  }
+
+  bindProjectMemoryToWorktree(root: string, owner: ProjectMemoryOwner): void {
+    this.projectMemoryBinding = { owner, worktreeRoot: root };
+  }
+
+  getProjectMemoryOwner(): ProjectMemoryOwner {
+    return (
+      this.projectMemoryBinding?.owner ?? {
+        cwd: this.getProjectRoot(),
+        memoryBaseDir: this.projectMemoryBaseDir,
+      }
+    );
+  }
+
+  getProjectAutoMemoryRoot(): string {
+    return getAutoMemoryRoot(
+      this.getProjectRoot(),
+      this.getProjectMemoryOwner(),
+    );
   }
 
   getCwd(): string {
@@ -8278,6 +8854,9 @@ export class Config {
   private async shutdownResourcesOnce(): Promise<void> {
     let resourceError: unknown;
     try {
+      if (Object.hasOwn(this, 'hookSystem')) {
+        await this.hookSystem?.close();
+      }
       this.memoryManager.cancelMigrations();
       this.clearSessionRestoreProjection();
       // Drop this session's project-dir registry entry. It is registered during
@@ -8748,6 +9327,11 @@ export class Config {
           mcpServers[key] = {
             ...server,
             extensionName: extension.config.name,
+            ...(extension.artifactGeneration !== undefined
+              ? {
+                  extensionArtifactRevision: `${extension.id}:${extension.artifactGeneration}`,
+                }
+              : {}),
           };
         },
       );
@@ -8987,6 +9571,49 @@ export class Config {
     }
     this.pendingMcpServers = this.pendingMcpServers.filter(
       (name) => name !== serverName,
+    );
+  }
+
+  isProjectHooksPendingApproval(): boolean {
+    return this.projectHooksPendingApproval === true;
+  }
+
+  /**
+   * The hooks block this session's approval gate covers, as loaded at
+   * startup. An approval decision carrying a hash must match this exact
+   * subject; a different hash names a block nobody here reviewed.
+   */
+  getProjectHooksApprovalSubject():
+    | ConfigParameters['projectHooksApprovalSubject']
+    | undefined {
+    return this.projectHooksApprovalSubject;
+  }
+
+  isProjectHooksApprovalGated(): boolean {
+    return (
+      this.projectHooksPendingApproval !== undefined &&
+      !(
+        this.projectHooksYoloExempt &&
+        this.getApprovalMode() === ApprovalMode.YOLO
+      )
+    );
+  }
+
+  /**
+   * Set by the CLI when the user decides on the project hooks mid-session
+   * (approval dialog, `/hooks` reload). Takes effect on the next hook reload.
+   */
+  setProjectHooksPendingApproval(pending: boolean, rejected = false): void {
+    this.projectHooksPendingApproval = pending;
+    this.projectHooksRejected = rejected;
+    // A mid-session decision supersedes the startup approval state: clearing
+    // the gate here means the user just approved this exact block.
+    this.projectHooksApproved = !pending && !rejected;
+  }
+
+  isProjectHooksRejected(): boolean {
+    return (
+      this.projectHooksPendingApproval === true && this.projectHooksRejected
     );
   }
 
@@ -9476,8 +10103,9 @@ export class Config {
       return undefined;
     }
     const projectRoot = this.getProjectRoot();
+    const owner = this.getProjectMemoryOwner();
     const teamEnabled = this.getTeamMemoryEnabled() && this.isTrustedFolder();
-    const configuredProjectRoot = getAutoMemoryRoot(projectRoot);
+    const configuredProjectRoot = getAutoMemoryRoot(projectRoot, owner);
     // Index rebuilds refresh the legacy MEMORY.md artifacts; the structured
     // prompt is built from scans, not these indexes, so a tier that cannot be
     // read or written (EACCES, a rejected root) must not block the
@@ -9487,10 +10115,11 @@ export class Config {
         ...getProjectMetadataMigrationRoots(
           projectRoot,
           this.isTrustedFolder(),
+          owner,
         ).map((root) =>
           root === configuredProjectRoot
-            ? rebuildManagedAutoMemoryIndex(projectRoot)
-            : rebuildAutoMemoryIndexAtRoot(root, 'project'),
+            ? rebuildManagedAutoMemoryIndex(projectRoot, owner)
+            : rebuildAutoMemoryIndexAtRoot(root, 'project', owner),
         ),
         rebuildUserAutoMemoryIndex(),
         ...(teamEnabled ? [rebuildTeamAutoMemoryIndex(projectRoot)] : []),
@@ -9503,7 +10132,7 @@ export class Config {
       ),
     );
     const autoMemoryPrompt = await buildStructuredAutoMemoryPrompt(
-      getAutoMemoryRoot(projectRoot),
+      configuredProjectRoot,
       getUserAutoMemoryRoot(),
       teamEnabled ? getTeamAutoMemoryRoot(projectRoot) : undefined,
     );
@@ -9552,6 +10181,7 @@ export class Config {
   private scanMemoryRecallCorpusStatus(): Promise<MemoryMetadataCorpusStatus> {
     return scanMemoryMetadataCorpusStatus({
       projectRoot: this.getProjectRoot(),
+      projectMemoryOwner: this.getProjectMemoryOwner(),
       teamMemoryEnabled: this.getTeamMemoryEnabled(),
       trustedProject: this.isTrustedFolder(),
     });
@@ -9681,16 +10311,18 @@ export class Config {
     this.setTeamContext(null);
   }
 
+  /** The worktree settings for consumers beyond symlink-only callers. */
+  getWorktreeSettings(): Readonly<WorktreeSettings> {
+    return this.worktreeSettings;
+  }
+
   /**
    * Convenience accessor for `worktree.symlinkDirectories` — returns an
    * empty array when the setting is unset, so callers can pass the
    * result directly into the GitWorktreeService loop without nullchecks.
-   *
-   * (No general `getWorktreeSettings()` getter yet — add one when a
-   * second field on `WorktreeSettings` justifies the broader API.)
    */
   getWorktreeSymlinkDirectories(): readonly string[] {
-    return this.worktreeSettings.symlinkDirectories ?? [];
+    return this.getWorktreeSettings().symlinkDirectories ?? [];
   }
 
   /**
@@ -10566,9 +11198,38 @@ export class Config {
     return this.agentTeamEnabled;
   }
 
-  isUnifiedAgentLoopEnabled(): boolean {
-    if (process.env['QWEN_CODE_ENABLE_UNIFIED_AGENT_LOOP'] === '1') return true;
-    return this.unifiedAgentLoopEnabled;
+  isUnifiedAgentLoopEnabled(surface: AgentLoopSurface): boolean {
+    return resolveAgentLoopSwitch({
+      env: process.env['QWEN_CODE_ENABLE_UNIFIED_AGENT_LOOP'],
+      setting: this.unifiedAgentLoopEnabled,
+      surface,
+      surfaceDefault: UNIFIED_SURFACE_DEFAULTS[surface],
+      variable: 'QWEN_CODE_ENABLE_UNIFIED_AGENT_LOOP',
+    });
+  }
+
+  isEventBusAgentLoopEnabled(surface: AgentLoopSurface): boolean {
+    return resolveAgentLoopSwitch({
+      env: process.env['QWEN_CODE_ENABLE_EVENT_BUS_AGENT_LOOP'],
+      setting: this.eventBusAgentLoopEnabled,
+      surface,
+      surfaceDefault: EVENT_BUS_SURFACE_DEFAULTS[surface],
+      variable: 'QWEN_CODE_ENABLE_EVENT_BUS_AGENT_LOOP',
+    });
+  }
+
+  /**
+   * The loop path a surface runs: unified off -> legacy; otherwise the kernel
+   * only when the event-bus switch is on AND the surface's execution branch
+   * actually enters it, else shared. Speculation and the Hosted Harness never
+   * read the event-bus switch (their rounds always run on the shared loop), so
+   * both are capped at shared even with both switches on.
+   */
+  getAgentLoopPath(surface: AgentLoopSurface): AgentLoopPath {
+    if (!this.isUnifiedAgentLoopEnabled(surface)) return 'legacy';
+    if (!this.isEventBusAgentLoopEnabled(surface)) return 'shared';
+    if (surface === 'speculation' || surface === 'hosted') return 'shared';
+    return 'kernel';
   }
 
   /**
@@ -10612,6 +11273,22 @@ export class Config {
   getSessionSourceService(): SessionSourceService | undefined {
     return Object.hasOwn(this, 'sessionSourceService')
       ? this.sessionSourceService
+      : undefined;
+  }
+
+  private generatedUiStateService?: GeneratedUiStateService;
+  private generatedUiStateServiceFactory?: () => GeneratedUiStateService;
+
+  setGeneratedUiStateServiceFactory(
+    factory: () => GeneratedUiStateService,
+  ): void {
+    this.generatedUiStateServiceFactory = factory;
+    this.generatedUiStateService = factory();
+  }
+
+  getGeneratedUiStateService(): GeneratedUiStateService | undefined {
+    return Object.hasOwn(this, 'generatedUiStateService')
+      ? this.generatedUiStateService
       : undefined;
   }
 
@@ -10832,6 +11509,19 @@ export class Config {
     this.refreshWorkflowMode();
   }
 
+  /**
+   * Applies a reloaded `tools.workflowsEnabled`. When the settings leave it
+   * unset, workflows the bundled review skill turned on stay on: that enable
+   * never came from settings, and undoing it on an unrelated settings change
+   * would end the review's background runs. A value the settings do give
+   * replaces it.
+   */
+  applyWorkflowsEnabledSetting(enabled: boolean | undefined): void {
+    if (enabled === undefined && this.workflowsEnabledByReviewSkill) return;
+    this.workflowsEnabledByReviewSkill = false;
+    this.setWorkflowsEnabled(enabled);
+  }
+
   isWorkflowModeSupported(): boolean {
     return (
       !isDerivedConfig(this) &&
@@ -11050,6 +11740,7 @@ export class Config {
       return;
     }
     if (await this.registerWorkflowTool(this.getToolRegistry())) {
+      this.workflowsEnabledByReviewSkill ||= this.workflowsEnabled !== true;
       this.setWorkflowsEnabled(true);
       await this.getLlmClient().setTools();
     }
@@ -11790,19 +12481,111 @@ export class Config {
    * Used by HookRegistry to load project-specific hooks with proper source attribution.
    */
   getProjectHooks(): { [K in HookEventName]?: HookDefinition[] } | undefined {
+    return this.projectHooksPendingApproval === true
+      ? undefined
+      : this.readProjectHooks();
+  }
+
+  /**
+   * The project hooks block `getProjectHooks()` withholds while approval is
+   * pending or rejected. Reads the raw block, not the execution accessor, so
+   * the listing can name the approval reason even when the trust gate would
+   * also withhold it.
+   */
+  getWithheldProjectHooks():
+    | { [K in HookEventName]?: HookDefinition[] }
+    | undefined {
+    return this.projectHooksPendingApproval === true
+      ? this.readProjectHooksBlock()
+      : undefined;
+  }
+
+  /**
+   * The project hooks block the interactive trust gate withholds, for the
+   * `/hooks` listing only — it shows what is configured but switched off.
+   * Never feed this to the registry; `getProjectHooks()` is the execution
+   * accessor. `undefined` when the trust gate is not what withholds them.
+   */
+  getTrustWithheldProjectHooks():
+    | { [K in HookEventName]?: HookDefinition[] }
+    | undefined {
     if (this.getBareMode() || this.isSafeMode()) {
       return undefined;
     }
-    // Interactive sessions need explicit trust for repo-supplied hooks: a
-    // disabled folder-trust feature must not silently authorize them.
-    // Non-interactive invocations (`-p`, piped stdin, ACP/SDK embeddings)
-    // treat trust as implicit — the caller chose the directory and there is
-    // no prompt surface; only run them in directories you trust. An explicit
-    // refusal is already enforced upstream: an untrusted workspace
-    // contributes no settings, so it supplies no project hooks.
-    if (this.isInteractive() && !this.isExplicitlyTrustedFolder()) {
+    if (this.isExplicitlyTrustedFolder()) {
       return undefined;
     }
+    // A cleared approval gate serves the block (approved, or nothing to
+    // approve); the listing must not add a second, trust-disabled copy.
+    // Exception: when the settings layer withheld the whole workspace
+    // scope, the execution block is empty and the display-only copy is the
+    // only record of what is configured — it must surface even though the
+    // gate reads "cleared" for the empty block.
+    if (
+      this.isProjectHooksApprovalCleared() &&
+      this.readProjectHooksBlock() !== undefined
+    ) {
+      return undefined;
+    }
+    // The settings layer drops the workspace scope entirely when the feature
+    // is on and the folder untrusted; the display-only copy keeps the listing
+    // able to show what is configured but withheld.
+    return (
+      this.readProjectHooksBlock() ??
+      (this.projectHooksDisplayOnly as
+        | { [K in HookEventName]?: HookDefinition[] }
+        | undefined)
+    );
+  }
+
+  /**
+   * Whether the approval gate lets the project hooks block through: the gate
+   * is active and not withholding. `pending === false` covers BOTH a genuine
+   * approval and "no approvable object" (the CLI passes false when the
+   * workspace contributes no hooks, e.g. an untrusted folder with the trust
+   * feature on). In the latter case the block is empty, so execution is
+   * unaffected — but diagnostic surfaces must not read this as "approved";
+   * ask `getProjectHooks()` whether the hooks actually load.
+   */
+  private isProjectHooksApprovalCleared(): boolean {
+    // A genuine stored approval is execution authority on its own — it
+    // survives the YOLO exemption (where the pending flag is undefined).
+    // The legacy cleared-gate reading stays for callers that only clear the
+    // pending flag, but the explicit approved flag never doubles as
+    // "nothing to approve".
+    return (
+      this.projectHooksApproved ||
+      (this.isProjectHooksApprovalGated() &&
+        this.projectHooksPendingApproval === false)
+    );
+  }
+
+  private readProjectHooks():
+    | { [K in HookEventName]?: HookDefinition[] }
+    | undefined {
+    if (this.getBareMode() || this.isSafeMode()) {
+      return undefined;
+    }
+    // Repo-supplied hooks run with either authority: a cleared approval gate
+    // (an approved block, or no approvable object — then the block is empty),
+    // or explicit folder trust. Approval is the finer grant — it authorizes
+    // these hooks, not the folder's other executable settings — so the trust
+    // gate must not swallow it. Without an approval, explicit trust is
+    // required in EVERY mode: a disabled folder-trust feature never
+    // authorizes repo hooks, headless included. Embedders enable the feature
+    // and record their managed directories in the trust store, or approve.
+    if (
+      !this.isProjectHooksApprovalCleared() &&
+      !this.isExplicitlyTrustedFolder()
+    ) {
+      return undefined;
+    }
+    return this.readProjectHooksBlock();
+  }
+
+  private readProjectHooksBlock():
+    | { [K in HookEventName]?: HookDefinition[] }
+    | undefined {
     // The legacy merged `hooks` stands in only when no scope was supplied.
     const hooks =
       this.projectHooks ?? (this.hasScopedHooks() ? undefined : this.hooks);
@@ -11819,8 +12602,12 @@ export class Config {
       return undefined;
     }
     // The legacy merged `hooks` stands in only when no scope was supplied.
+    // It may carry workspace hooks, so it shares the project approval gate.
     const hooks =
-      this.userHooks ?? (this.hasScopedHooks() ? undefined : this.hooks);
+      this.userHooks ??
+      (this.hasScopedHooks() || this.projectHooksPendingApproval === true
+        ? undefined
+        : this.hooks);
     return hooks as { [K in HookEventName]?: HookDefinition[] } | undefined;
   }
 
@@ -11867,6 +12654,18 @@ export class Config {
     projectHooks?: Record<string, unknown>;
     hooks?: Record<string, unknown>;
   }): void {
+    // Under command-line YOLO the gate is exempt and the `/hooks` reload
+    // does not re-derive the decision, so a replaced block must not keep
+    // the old block's approval authority. Fail-closed by design: an
+    // approval-only block stops until the session leaves YOLO (the
+    // mode-change listener re-applies the store) or restarts.
+    if (
+      this.projectHooksYoloExempt &&
+      this.getApprovalMode() === ApprovalMode.YOLO &&
+      hooks.projectHooks !== this.projectHooks
+    ) {
+      this.projectHooksApproved = false;
+    }
     this.systemHooks = hooks.systemHooks;
     this.userHooks = hooks.userHooks;
     this.projectHooks = hooks.projectHooks;
@@ -11967,17 +12766,24 @@ export class Config {
       : this.allowPrivateNetworkHooks;
   }
 
-  isTrustedFolder(): boolean {
-    const context = ideContextStore.get();
-    if (context?.workspaceState?.isTrusted !== undefined) {
-      return context.workspaceState.isTrusted;
-    }
+  private getIdeWorkspaceTrust(): boolean | undefined {
+    const dir = this.getTargetDir();
+    const scope = ideContextStore.getWorkspaceTrustScope(dir);
+    const isTrusted = this.experimentalZedIntegration
+      ? scope?.isTrusted
+      : ideContextStore.get()?.workspaceState?.isTrusted;
+    if (isTrusted === undefined || scope?.root === undefined) return isTrusted;
+    return this.trustFileDecisionBelowIdeRoot?.(dir, scope.root) ?? isTrusted;
+  }
 
-    return this.trustedFolder ?? !this.folderTrust;
+  isTrustedFolder(): boolean {
+    return (
+      this.getIdeWorkspaceTrust() ?? this.trustedFolder ?? !this.folderTrust
+    );
   }
 
   isExplicitlyTrustedFolder(): boolean {
-    const ideTrust = ideContextStore.get()?.workspaceState?.isTrusted;
+    const ideTrust = this.getIdeWorkspaceTrust();
     return (
       (this.folderTrust || ideTrust !== undefined) && this.isTrustedFolder()
     );
@@ -12129,34 +12935,16 @@ export class Config {
     return this.accessibility.screenReader ?? false;
   }
 
-  getSkipLoopDetection(): boolean {
-    return this.skipLoopDetection;
-  }
-
-  getLoopProtection(): LoopProtectionMode {
-    return this.loopProtection;
-  }
-
   /**
-   * Effective per-turn tool-call cap. A configured value <= 0 disables the
-   * cap and is returned as Infinity so callers can compare unconditionally
-   * (mirrors getTruncateToolOutputThreshold).
+   * Effective per-turn tool-call cap. No cap (unset or a value <= 0) is
+   * returned as Infinity so callers can compare unconditionally (mirrors
+   * getTruncateToolOutputThreshold).
    */
   getMaxToolCallsPerTurn(): number {
     if (this.maxToolCallsPerTurn <= 0) {
       return Number.POSITIVE_INFINITY;
     }
     return this.maxToolCallsPerTurn;
-  }
-
-  /**
-   * Whether maxToolCallsPerTurn was explicitly configured (vs. the resolved
-   * default). An explicit value is treated as a hard cap (the released
-   * contract); the default is treated adaptively (see
-   * LoopDetectionService.checkTurnToolCallCap).
-   */
-  isMaxToolCallsPerTurnExplicit(): boolean {
-    return this.maxToolCallsPerTurnExplicit;
   }
 
   getSkipStartupContext(): boolean {
@@ -12440,7 +13228,14 @@ export class Config {
         .restore(records ?? [])
         .then(() => runtime);
     }
-    void this.goalRuntimeReady.catch(() => undefined);
+    // Restore itself writes nothing (the runtime's invariant); refresh the
+    // list-facing goal projection once it settles, so a session journaled
+    // before the sidecar existed gains its sidebar marker on this load.
+    void this.goalRuntimeReady
+      .then((restoredRuntime) => {
+        recorder.refreshGoalProjection(restoredRuntime.getSnapshot().goal);
+      })
+      .catch(() => undefined);
   }
 
   /**
@@ -12489,7 +13284,9 @@ export class Config {
     projection: SessionRestoreProjection | undefined,
   ): void {
     this.pendingSessionRestoreProjection = projection;
-    this.sessionRestoreRuntime = projection?.runtime;
+    this.sessionRestoreRuntime = projection
+      ? { ...projection.runtime, conversationStartTime: projection.startTime }
+      : undefined;
     this.restoredFileHistory = false;
   }
 
@@ -12842,6 +13639,9 @@ export class Config {
     provider: () => ReadonlyArray<{ name: string; description: string }>,
   ): void {
     this.modelInvocableCommandsProvider = provider;
+    if (this.skillManager) {
+      clearCollectedSkillEntriesCache(this.skillManager);
+    }
   }
 
   /**
@@ -12972,7 +13772,11 @@ export class Config {
         rule: string,
       ) => Promise<void>)
     | undefined {
-    return this.onPersistPermissionRuleCallback;
+    const persist = this.onPersistPermissionRuleCallback;
+    return persist
+      ? (scope, ruleType, rule) =>
+          persist(scope, ruleType, rule, this.getProjectRoot())
+      : undefined;
   }
 
   // Check permission then register a lazy factory; its import runs on first use.
@@ -13108,6 +13912,36 @@ export class Config {
     }
   }
 
+  private async syncWebSearchToolRegistration(
+    registry: ToolRegistry,
+    forSubAgent = false,
+  ): Promise<void> {
+    registry.unregisterTool(ToolNames.WEB_SEARCH);
+    const hasExplicitBackend =
+      !!this.webSearchSettings?.model?.trim() ||
+      !!this.webSearchSettings?.baseUrl;
+    if (
+      this.getBareMode() ||
+      this.isSafeMode() ||
+      this.getDisabledTools().has(ToolNames.WEB_SEARCH) ||
+      this.webSearchSettings?.enabled === false ||
+      (hasExplicitBackend && this.webSearchSettings?.enabled !== true)
+    )
+      return;
+    const { evaluateWebSearchGate } = await import('../tools/web-search.js');
+    const gate = evaluateWebSearchGate(this);
+    if (gate.ok) {
+      await this.registerLazyTool(registry, ToolNames.WEB_SEARCH, async () => {
+        const { WebSearchTool } = await import('../tools/web-search.js');
+        return new WebSearchTool(this);
+      });
+      await registry.ensureTool(ToolNames.WEB_SEARCH);
+    } else if (!gate.silent && !this.webSearchNoticeEmitted && !forSubAgent) {
+      this.webSearchNoticeEmitted = true;
+      this.warnings.push(gate.notice);
+    }
+  }
+
   private async syncAdvisorToolRegistration(
     registry: ToolRegistry,
   ): Promise<void> {
@@ -13171,6 +14005,7 @@ export class Config {
   async createToolRegistry(
     sendSdkMcpMessage?: SendSdkMcpMessage,
     options?: { skipDiscovery?: boolean; forSubAgent?: boolean },
+    ripgrepAvailability?: Promise<boolean>,
   ): Promise<ToolRegistry> {
     const registry = new ToolRegistry(
       this,
@@ -13270,34 +14105,7 @@ export class Config {
       // only when the tool was actually asked for; a provider with no search
       // backend fails silently (`gate.silent`), since warning about a feature
       // the user never configured is noise.
-      const hasExplicitWebSearchBackend =
-        !!this.webSearchSettings?.model?.trim() ||
-        !!this.webSearchSettings?.baseUrl;
-      if (
-        !this.getBareMode() &&
-        !this.isSafeMode() &&
-        this.webSearchSettings?.enabled !== false &&
-        (this.webSearchSettings?.enabled === true ||
-          !hasExplicitWebSearchBackend)
-      ) {
-        const { evaluateWebSearchGate } = await import(
-          '../tools/web-search.js'
-        );
-        const gate = evaluateWebSearchGate(this);
-        if (gate.ok) {
-          await registerLazy(ToolNames.WEB_SEARCH, async () => {
-            const { WebSearchTool } = await import('../tools/web-search.js');
-            return new WebSearchTool(this);
-          });
-        } else if (
-          !gate.silent &&
-          !this.webSearchNoticeEmitted &&
-          !options?.forSubAgent
-        ) {
-          this.webSearchNoticeEmitted = true;
-          this.warnings.push(gate.notice);
-        }
-      }
+      await this.syncWebSearchToolRegistration(registry, options?.forSubAgent);
     };
 
     const environment = this.getExecutionEnvironment();
@@ -13489,7 +14297,8 @@ export class Config {
       let errorString: undefined | string = undefined;
       recordStartupEvent('config_initialize_ripgrep_probe_start');
       try {
-        useRipgrep = await canUseRipgrep(this.getUseBuiltinRipgrep());
+        useRipgrep = await (ripgrepAvailability ??
+          canUseRipgrep(this.getUseBuiltinRipgrep()));
       } catch (error: unknown) {
         errorString = getErrorMessage(error);
       }
@@ -13938,6 +14747,7 @@ export class Config {
   }
 
   private subSessionSpawner?: SubSessionSpawner;
+  private subSessionWorkspaceResolver?: SubSessionWorkspaceResolver;
 
   private currentSessionScheduledTaskCreator?: CurrentSessionScheduledTaskCreator;
 
@@ -13947,8 +14757,16 @@ export class Config {
    * `extMethod`); left unset in interactive TUI / headless, where the tool is
    * therefore never registered. `undefined` clears it on session teardown.
    */
-  setSubSessionSpawner(spawner: SubSessionSpawner | undefined): void {
+  setSubSessionSpawner(
+    spawner: SubSessionSpawner | undefined,
+    resolveWorkspace?: SubSessionWorkspaceResolver,
+  ): void {
     this.subSessionSpawner = spawner;
+    this.subSessionWorkspaceResolver = resolveWorkspace;
+  }
+
+  getSubSessionWorkspaceResolver(): SubSessionWorkspaceResolver | undefined {
+    return this.subSessionWorkspaceResolver;
   }
 
   /** The injected sub-session spawner, or undefined outside daemon mode. */

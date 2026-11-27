@@ -329,13 +329,11 @@ describe('Type Guards', () => {
 
   describe('isDeviceAuthorizationSuccess', () => {
     it('should return true for successful authorization response', () => {
-      const expectedBaseUrl = process.env['DEBUG']
-        ? 'https://pre4-chat.qwen.invalid'
-        : 'https://chat.qwen.invalid';
       const successResponse = {
         ...deviceAuth(),
-        verification_uri: `${expectedBaseUrl}/device`,
-        verification_uri_complete: `${expectedBaseUrl}/device?code=TEST123`,
+        verification_uri: 'https://chat.qwen.invalid/device',
+        verification_uri_complete:
+          'https://chat.qwen.invalid/device?code=TEST123',
       };
       expect(isDeviceAuthorizationSuccess(successResponse)).toBe(true);
     });
@@ -949,14 +947,14 @@ describe('Browser Launch and Error Handling', () => {
 
     expect(await completeDeviceFlow(s.config)).toBeInstanceOf(Object);
     expect(mockOpenBrowserSecurely).toHaveBeenCalledWith(
-      'https://chat.qwen.invalid/device?code=TEST123',
+      'https://chat.qwen.invalid/device?code=TEST123&entry=qwen_code&paywallScene=cli',
     );
   });
 
   it('should launch the device flow URL through the shared browser helper', async () => {
     expect(await completeDeviceFlow(s.config)).toBeInstanceOf(Object);
     expect(mockOpenBrowserSecurely).toHaveBeenCalledWith(
-      'https://chat.qwen.invalid/device?code=TEST123',
+      'https://chat.qwen.invalid/device?code=TEST123&entry=qwen_code&paywallScene=cli',
     );
   });
 });

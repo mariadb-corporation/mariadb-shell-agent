@@ -17,6 +17,7 @@ import {
   type SetStateAction,
 } from 'react';
 import { type DOMElement, measureElement } from 'ink';
+import { prepareFileWatchersForProcessExit } from '@qwen-code/qwen-code-core/utils/file-watcher-cleanup.js';
 import { App } from './App.js';
 import { AppContext } from './contexts/AppContext.js';
 import { UIStateContext, type UIState } from './contexts/UIStateContext.js';
@@ -84,12 +85,14 @@ import {
   GitWorktreeService,
   readWorktreeSessionMarker,
   isSessionRuntimeActive,
+  worktreeBranchForSlug,
   type GoalTurnHost,
 } from '@qwen-code/qwen-code-core';
 import {
   applyCollapsePolicyAndSummary,
   buildResumedHistoryItems,
   computeResumedPromptCountSeed,
+  computeResumedUserTurnCount,
 } from './utils/resumeHistoryUtils.js';
 import { buildWakeRepaint } from './utils/terminal-resize-reflow.js';
 import { loadLowlight } from './utils/lowlightLoader.js';
@@ -210,8 +213,10 @@ import { useKeypress, type Key } from './hooks/useKeypress.js';
 import { keyMatchers, Command } from './keyMatchers.js';
 import { useLoadingIndicator } from './hooks/useLoadingIndicator.js';
 import { useTerminalProgress } from './hooks/useTerminalProgress.js';
+import { useProgramStatus } from './hooks/use-program-status.js';
 import { useFolderTrust } from './hooks/useFolderTrust.js';
 import { useMcpApproval } from './hooks/useMcpApproval.js';
+import { useProjectHooksApproval } from './hooks/use-project-hooks-approval.js';
 import { useIdeTrustListener } from './hooks/useIdeTrustListener.js';
 import { type IdeIntegrationNudgeResult } from './IdeIntegrationNudge.js';
 import { type CommandMigrationNudgeResult } from './CommandFormatMigrationNudge.js';
@@ -267,9 +272,11 @@ import { useHooksDialog } from './hooks/useHooksDialog.js';
 import { useStatsDialog } from './hooks/useStatsDialog.js';
 import { useMemoryDialog } from './hooks/useMemoryDialog.js';
 import { useAttentionNotifications } from './hooks/useAttentionNotifications.js';
+import { getPendingBackgroundApprovals } from './components/background-view/BackgroundTasksPill.js';
 import { buildTerminalNotification } from './hooks/useTerminalNotification.js';
 import { useContextualTips } from './hooks/useContextualTips.js';
 import { getTipHistory } from '../services/tips/index.js';
+import { shouldShowBtwTip } from './utils/btw-tip.js';
 import { restorePromptStash } from '../services/prompt-stash.js';
 import { useRemoteInput } from '../remoteInput/RemoteInputContext.js';
 import {
@@ -296,8 +303,8 @@ import {
   MAIN_CONTENT_HEIGHT_RESERVATION,
   STATIC_EXTRA_HEIGHT,
 } from './utils/layoutUtils.js';
+import { CTRL_EXIT_PROMPT_DURATION_MS } from './utils/platformConstants.js';
 
-const CTRL_EXIT_PROMPT_DURATION_MS = 1000;
 // Startup gate for the goal runtime: under session-writer lease contention
 // getGoalRuntimeReady() can stay pending forever; bound it so the command
 // registry still loads and the TUI stays usable (see waitForGoalRuntime).
@@ -579,6 +586,9 @@ export function useQueuedSubmissionDrain({
           userAdmission: { turnKey: submission.turnKey },
           displayText: submission.displayText,
           humanInput: submission.humanInput,
+          ...(submission.promptHook
+            ? { promptHook: submission.promptHook }
+            : {}),
           ...(submission.hasUnknownInput ? { hasUnknownInput: true } : {}),
           ...(submission.pasteExpansions?.size
             ? { pasteExpansions: submission.pasteExpansions }
@@ -593,10 +603,7 @@ export function useQueuedSubmissionDrain({
             : { shellMode: submission.shellMode }),
           onAdmissionFailed: () => {
             // Deferred until idle, the same recovery the direct /btw
-            // path uses: admission failed because a turn is active,
-            // and the mid-turn steer drain returns raw text only, which
-            // would steer an undeferred restore into that turn with its
-            // projection lost.
+            // path uses: admission failed because a turn is active.
             restoreMessages(
               [submission.modelText],
               submission.submittedPrompt,
@@ -604,11 +611,13 @@ export function useQueuedSubmissionDrain({
               submission.shellMode,
               ...(submission.displayText !== undefined ||
               submission.humanInput !== undefined ||
+              submission.promptHook !== undefined ||
               submission.pasteExpansions?.size
                 ? ([
                     {
                       displayText: submission.displayText,
                       humanInput: submission.humanInput,
+                      promptHook: submission.promptHook,
                       ...(submission.hasUnknownInput
                         ? { hasUnknownInput: true }
                         : {}),
@@ -869,7 +878,7 @@ export const AppContainer = (props: AppContainerProps) => {
     () => props.extensionRefreshState ?? new ExtensionRefreshState(),
     [props.extensionRefreshState],
   );
-  const historyManager = useHistory();
+  const historyManager = useHistory(config.getSessionId());
   const addHistoryItem = historyManager.addItem;
   useEffect(
     () =>
@@ -1104,8 +1113,8 @@ export const AppContainer = (props: AppContainerProps) => {
   // exactly that).
   const { loadHistory: rawLoadHistory } = historyManager;
   const loadHistoryWithLatchReconciliation = useCallback(
-    (newHistory: HistoryItem[]) => {
-      rawLoadHistory(newHistory);
+    (newHistory: HistoryItem[], ...owner: [sessionId?: string]) => {
+      rawLoadHistory(newHistory, ...owner);
       contextFilesAnnouncedRef.current = newHistory.some(
         isContextFilesAnnouncement,
       );
@@ -1122,6 +1131,7 @@ export const AppContainer = (props: AppContainerProps) => {
             originalCwd: worktreeSession.originalCwd,
             originalBranch: worktreeSession.originalBranch,
             originalHeadCommit: worktreeSession.originalHeadCommit,
+            worktreeBase: worktreeSession.worktreeBase,
           }
         : null,
     [worktreeSession],
@@ -1256,7 +1266,7 @@ export const AppContainer = (props: AppContainerProps) => {
           collapseOnResume,
           collapsePreviewCount,
         );
-        loadHistoryWithLatchReconciliation(historyItems);
+        loadHistoryWithLatchReconciliation(historyItems, config.getSessionId());
 
         // Seed past identities already claimed by the resumed transcript.
         seedPromptCount(
@@ -1264,13 +1274,21 @@ export const AppContainer = (props: AppContainerProps) => {
             resumedSessionData.conversation.messages,
             config.getSessionId(),
           ),
+          computeResumedUserTurnCount(resumedSessionData.conversation.messages),
         );
       }
 
       // Restore the transcript before Mod diagnostics, without making input
-      // or Mod startup wait for asynchronous session recovery.
+      // or Mod startup wait for asynchronous session recovery. Reply and
+      // thinking rows are offered only where the viewport can draw a committed
+      // row again; the terminal scrollback cannot.
       void getInteractiveModSession(config)
-        ?.initialize(['AbovePrompt'], { prompts: true })
+        ?.initialize(
+          useTerminalBuffer
+            ? ['AbovePrompt', 'AssistantMessage', 'Thinking']
+            : ['AbovePrompt'],
+          { prompts: true, runsPrompts: true },
+        )
         .catch(() => {});
 
       if (resumedSessionData) {
@@ -1846,17 +1864,30 @@ export const AppContainer = (props: AppContainerProps) => {
     handleOutputStyleSelect,
   } = useOutputStyleCommand(settings, config, historyManager.addItem);
 
+  const handleAuthChange = useCallback(() => {
+    const model = config.getModel();
+    lastNotifiedModelRef.current = model;
+    refreshStatic();
+    setCurrentModel(model);
+  }, [config, refreshStatic]);
+
   const auth = useAuthCommand(
     settings,
     config,
     historyManager.addItem,
-    refreshStatic,
+    handleAuthChange,
+    initializationResult.skipStartupAuthDialog,
   );
   const { state: authState, actions: authActions } = auth;
   const { onAuthError, openAuthDialog, closeAuthDialog } = authActions;
   const { isAuthDialogOpen, isAuthenticating, pendingAuthType } = authState;
 
-  useInitializationAuthError(initializationResult.authError, onAuthError);
+  useInitializationAuthError(
+    initializationResult.skipStartupAuthDialog
+      ? null
+      : initializationResult.authError,
+    onAuthError,
+  );
 
   // Sync user tier from config when authentication changes
   // TODO: Implement getUserTier() method on Config if needed
@@ -1987,7 +2018,13 @@ export const AppContainer = (props: AppContainerProps) => {
       config.getBareMode() ||
       config.isSafeMode() ||
       // With every hook disabled the trust gate is not why they are absent.
-      config.getDisableAllHooks()
+      config.getDisableAllHooks() ||
+      // Warn only when the hooks really are withheld: the execution accessor
+      // serves an approved block despite the trust gate. `pending === false`
+      // alone is not "approved" — it also means "nothing to approve" (an
+      // untrusted folder with the trust feature on), the case this warning
+      // exists for.
+      config.getProjectHooks() !== undefined
     ) {
       return;
     }
@@ -2002,9 +2039,15 @@ export const AppContainer = (props: AppContainerProps) => {
     addHistoryItem(
       {
         type: MessageType.WARNING,
-        text: t(
-          'Project hooks in .mariadb-shell-agent/settings.json were not loaded: this folder is not explicitly trusted. Enable security.folderTrust.enabled and trust the folder to run them.',
-        ),
+        text:
+          config.isProjectHooksApprovalGated() &&
+          config.isProjectHooksPendingApproval()
+            ? t(
+                'Project hooks in .mariadb-shell-agent/settings.json were not loaded. Approve them in the dialog, or enable security.folderTrust.enabled and trust the folder.',
+              )
+            : t(
+                'Project hooks in .mariadb-shell-agent/settings.json were not loaded: this folder is not explicitly trusted. Enable security.folderTrust.enabled and trust the folder to run them.',
+              ),
       },
       Date.now(),
     );
@@ -2236,6 +2279,7 @@ export const AppContainer = (props: AppContainerProps) => {
       openEffortDialog,
       openOutputStyleDialog,
       quit: (messages: HistoryItem[]) => {
+        prepareFileWatchersForProcessExit();
         try {
           cancelOngoingRequestRef.current();
         } catch (error) {
@@ -2313,6 +2357,10 @@ export const AppContainer = (props: AppContainerProps) => {
     btwItem,
     setBtwItem,
     cancelBtw,
+    cancelSlashCommand,
+    isCommandCancellationBlocked,
+    isCommandCommitting,
+    commandCancellationBlocked,
     commandContext,
     shellConfirmationRequest,
     confirmationRequest,
@@ -2326,7 +2374,6 @@ export const AppContainer = (props: AppContainerProps) => {
     loadHistoryWithLatchReconciliation,
     refreshStatic,
     toggleVimEnabled,
-    isProcessing,
     setIsProcessing,
     isIdleRef,
     setMemoryFileCount,
@@ -2417,6 +2464,12 @@ export const AppContainer = (props: AppContainerProps) => {
           const result = await svc.removeUserWorktree(activeWorktree.slug, {
             deleteBranch: true,
             forceDeleteBranch: true,
+            branchOwned:
+              activeWorktree.branch !== '' &&
+              activeWorktree.branch ===
+                worktreeBranchForSlug(activeWorktree.slug),
+            baseCommit:
+              activeWorktree.worktreeBase ?? activeWorktree.originalHeadCommit,
           });
           // removeUserWorktree returns {success, error} on failure — it
           // does NOT throw — so the previous try/catch never tripped on
@@ -2566,7 +2619,9 @@ export const AppContainer = (props: AppContainerProps) => {
   const midTurnDrainRef = useRef<UseMessageQueueReturn['drainQueue'] | null>(
     null,
   );
-  const midTurnRestoreRef = useRef<((messages: string[]) => void) | null>(null);
+  const midTurnRestoreRef = useRef<
+    UseMessageQueueReturn['restoreMessages'] | null
+  >(null);
   const goalQueueRef = useRef<
     | (Pick<
         UseMessageQueueReturn,
@@ -2605,11 +2660,11 @@ export const AppContainer = (props: AppContainerProps) => {
     retryLastPrompt,
     handleApprovalModeChange,
     activePtyId,
-    loopDetectionConfirmationRequest,
     pendingToolCalls,
     streamingResponseLengthRef,
     isReceivingContent,
     workflowKeywordActive,
+    turnCancelledRef,
   } = useLlmStream(
     config.getLlmClient(),
     historyManager.history,
@@ -2637,6 +2692,7 @@ export const AppContainer = (props: AppContainerProps) => {
     midTurnRestoreRef,
     goalQueueRef,
     returnPrompt,
+    isCommandCancellationBlocked,
   );
   cancelOngoingRequestRef.current = cancelOngoingRequest;
   clearPendingStateRef.current = clearPendingState;
@@ -2688,7 +2744,7 @@ export const AppContainer = (props: AppContainerProps) => {
   useContextualTips({
     streamingState,
     lastPromptTokenCount: sessionStats.lastPromptTokenCount,
-    sessionPromptCount: sessionStats.promptCount,
+    sessionPromptCount: sessionStats.userPromptCount,
     config,
     tipHistory,
     addItem: historyManager.addItem,
@@ -3778,10 +3834,12 @@ export const AppContainer = (props: AppContainerProps) => {
       // so the auto-restore branch below bails out before its orphan strip
       // runs. Strip the orphaned prompt here; otherwise appendCuratedContent
       // merges the user's NEXT real message into the "no new real user input"
-      // preamble. Safe even if the turn already produced a model response:
-      // the strip only pops trailing user entries, and a responded prompt is
-      // not trailing.
-      if (info?.wasGoalTurn) {
+      // preamble. A Mod's own prompt is stripped the same way: the person
+      // stopped it, so the next prompt must not reach the model behind it.
+      // Safe even if the turn already produced a model response: the strip
+      // only pops trailing user entries, and a responded prompt is not
+      // trailing.
+      if (info?.wasGoalTurn || info?.wasModPromptTurn) {
         llmClient?.stripOrphanedUserEntriesFromHistory?.(true);
       }
 
@@ -4145,7 +4203,6 @@ export const AppContainer = (props: AppContainerProps) => {
       !pendingLlmHistoryItems.some((item) => item.type === 'error') &&
       !shellConfirmationRequest &&
       !confirmationRequest &&
-      !loopDetectionConfirmationRequest &&
       !isPermissionsDialogOpen &&
       settingInputRequests.length === 0 &&
       config.getApprovalMode() !== ApprovalMode.PLAN
@@ -4234,7 +4291,6 @@ export const AppContainer = (props: AppContainerProps) => {
     followupSuggestionsEnabled,
     shellConfirmationRequest,
     confirmationRequest,
-    loopDetectionConfirmationRequest,
     isPermissionsDialogOpen,
     settingInputRequests,
   ]);
@@ -4338,6 +4394,13 @@ export const AppContainer = (props: AppContainerProps) => {
     handleMcpApprovalSelect,
   } = useMcpApproval(config);
   const {
+    isProjectHooksApprovalDialogOpen,
+    pendingProjectHooks,
+    handleProjectHooksApprovalSelect,
+  } = useProjectHooksApproval(config, settings, (notice) =>
+    addHistoryItem(notice, Date.now()),
+  );
+  const {
     needsRestart: ideNeedsRestart,
     restartReason: ideTrustRestartReason,
   } = useIdeTrustListener(!config.getShellExecutionSandbox?.());
@@ -4360,13 +4423,13 @@ export const AppContainer = (props: AppContainerProps) => {
     shouldShowCommandMigrationNudge ||
     isFolderTrustDialogOpen ||
     isMcpApprovalDialogOpen ||
+    isProjectHooksApprovalDialogOpen ||
     !!shellConfirmationRequest ||
     !!confirmationRequest ||
     confirmUpdateExtensionRequests.length > 0 ||
     !!providerUpdateRequest ||
     settingInputRequests.length > 0 ||
     pluginChoiceRequests.length > 0 ||
-    !!loopDetectionConfirmationRequest ||
     isThemeDialogOpen ||
     isSettingsDialogOpen ||
     isStatusLineDialogOpen ||
@@ -4814,6 +4877,20 @@ export const AppContainer = (props: AppContainerProps) => {
     hasExecutingTool,
   );
 
+  const loadingPhrase = shouldShowBtwTip({
+    tipHistory,
+    elapsedTime,
+    streamingState,
+  })
+    ? t(
+        'Tip: Use /btw to ask a quick side question without interrupting the current work',
+      )
+    : currentLoadingPhrase;
+
+  const backgroundApprovals = useMemo(
+    () => getPendingBackgroundApprovals(bgTaskEntries),
+    [bgTaskEntries],
+  );
   useAttentionNotifications({
     isFocused,
     streamingState,
@@ -4822,6 +4899,22 @@ export const AppContainer = (props: AppContainerProps) => {
     config,
     terminal,
     pendingToolCalls,
+    backgroundApprovals,
+  });
+
+  // Program status (OSC 7501) for terminal tabs and agent inboxes
+  useProgramStatus({
+    streamingState,
+    pendingToolCalls,
+    history: historyManager.history,
+    pendingHistoryItems,
+    turnCancelledRef,
+    authPending: isAuthDialogOpen || isAuthenticating,
+    shellConfirmationPending: !!shellConfirmationRequest,
+    startupApprovalPending:
+      isFolderTrustDialogOpen ||
+      isMcpApprovalDialogOpen ||
+      isProjectHooksApprovalDialogOpen,
   });
 
   // P-notif: terminal-bell when a workflow run finishes (completed / failed),
@@ -4923,7 +5016,7 @@ export const AppContainer = (props: AppContainerProps) => {
         setPressedOnce(true);
         timerRef.current = setTimeout(() => {
           setPressedOnce(false);
-        }, 500);
+        }, CTRL_EXIT_PROMPT_DURATION_MS);
         return;
       }
 
@@ -4933,15 +5026,29 @@ export const AppContainer = (props: AppContainerProps) => {
       }
 
       // 3. Cancel in-flight btw side-question
-      if (btwItem && btwItem.btw.isPending && !dialogsVisibleRef.current) {
+      if (
+        btwItem &&
+        (btwItem.btw.isPending || btwItem.btw.ownRequestPending) &&
+        !dialogsVisibleRef.current
+      ) {
         cancelBtw();
         return; // Btw cancelled, end processing
       }
 
       // 4. Cancel ongoing requests
-      if (streamingState === StreamingState.Responding) {
+      if (
+        streamingState === StreamingState.Responding &&
+        !isCommandCancellationBlocked()
+      ) {
         cancelOngoingRequest?.();
         return; // Request cancelled, end processing
+      }
+      if (
+        streamingState === StreamingState.Idle &&
+        submissionInFlightRef.current &&
+        cancelOngoingRequest?.()
+      ) {
+        return;
       }
 
       // 5. Clear input buffer (if has content)
@@ -4964,6 +5071,7 @@ export const AppContainer = (props: AppContainerProps) => {
       cancelBtw,
       streamingState,
       cancelOngoingRequest,
+      isCommandCancellationBlocked,
       buffer,
       activeWorktree,
     ],
@@ -4980,6 +5088,23 @@ export const AppContainer = (props: AppContainerProps) => {
       if (keyMatchers[Command.TOGGLE_THINKING_EXPANDED](key)) {
         setThoughtExpanded((prev) => !prev);
         refreshStatic();
+        return;
+      }
+
+      if (
+        isCommandCommitting() &&
+        (keyMatchers[Command.QUIT](key) ||
+          keyMatchers[Command.EXIT](key) ||
+          keyMatchers[Command.ESCAPE](key))
+      ) {
+        return;
+      }
+
+      if (
+        (shellConfirmationRequest || confirmationRequest) &&
+        (keyMatchers[Command.TOGGLE_TOOL_DESCRIPTIONS](key) ||
+          keyMatchers[Command.TOGGLE_IDE_CONTEXT_DETAIL](key))
+      ) {
         return;
       }
 
@@ -5002,7 +5127,11 @@ export const AppContainer = (props: AppContainerProps) => {
         return;
       } else if (keyMatchers[Command.EXIT](key)) {
         // Cancel in-flight btw even when buffer has text (Ctrl+D)
-        if (btwItem && btwItem.btw.isPending && !dialogsVisibleRef.current) {
+        if (
+          btwItem &&
+          (btwItem.btw.isPending || btwItem.btw.ownRequestPending) &&
+          !dialogsVisibleRef.current
+        ) {
           cancelBtw();
           return;
         }
@@ -5031,8 +5160,7 @@ export const AppContainer = (props: AppContainerProps) => {
           return;
         }
 
-        // Skip if shell is focused (to allow shell's own escape handling)
-        if (embeddedShellFocused) {
+        if (embeddedShellFocused || dialogsVisibleRef.current) {
           return;
         }
 
@@ -5052,28 +5180,24 @@ export const AppContainer = (props: AppContainerProps) => {
           return;
         }
 
-        // Input is empty, cancel request immediately (no double-press needed)
-        // Skip when a dialog (background tasks, etc.) is open — ESC should
-        // close the dialog, not cancel the running request.
-        if (
-          streamingState === StreamingState.Responding &&
-          !dialogsVisibleRef.current
-        ) {
+        const isResponding = streamingState === StreamingState.Responding;
+        const requestCancelled =
+          (isResponding ||
+            (streamingState === StreamingState.Idle &&
+              submissionInFlightRef.current)) &&
+          cancelOngoingRequest?.();
+        const commandCancelled = cancelSlashCommand();
+        if (isResponding || requestCancelled || commandCancelled) {
           if (escapeTimerRef.current) {
             clearTimeout(escapeTimerRef.current);
             escapeTimerRef.current = null;
           }
-          cancelOngoingRequest?.();
           setEscapePressedOnce(false);
           return;
         }
 
         // Input is empty and idle — double-ESC opens rewind selector
-        if (
-          streamingState === StreamingState.Idle &&
-          !dialogsVisibleRef.current &&
-          !config.getIdeMode()
-        ) {
+        if (streamingState === StreamingState.Idle && !config.getIdeMode()) {
           if (escapeTimerRef.current) {
             clearTimeout(escapeTimerRef.current);
             escapeTimerRef.current = null;
@@ -5090,21 +5214,6 @@ export const AppContainer = (props: AppContainerProps) => {
         }
         setEscapePressedOnce(false);
         return;
-      }
-
-      // Dismiss completed btw side-question on Space or Enter,
-      // but only when btw is visible and the input buffer is empty.
-      if (
-        btwItem &&
-        !btwItem.btw.isPending &&
-        !dialogsVisibleRef.current &&
-        !contextMenuOpenRef.current &&
-        buffer.text.length === 0
-      ) {
-        if (key.name === 'return' || key.sequence === ' ') {
-          setBtwItem(null);
-          return;
-        }
       }
 
       // Note: Ctrl+C/D btw cancellation is handled inside handleExit
@@ -5212,6 +5321,9 @@ export const AppContainer = (props: AppContainerProps) => {
       config,
       ideContextState,
       handleExit,
+      isCommandCommitting,
+      shellConfirmationRequest,
+      confirmationRequest,
       ctrlCPressedOnce,
       setCtrlCPressedOnce,
       ctrlCTimerRef,
@@ -5223,12 +5335,12 @@ export const AppContainer = (props: AppContainerProps) => {
       escapeTimerRef,
       streamingState,
       cancelOngoingRequest,
+      cancelSlashCommand,
       buffer,
       handleSlashCommand,
       activePtyId,
       embeddedShellFocused,
       btwItem,
-      setBtwItem,
       cancelBtw,
       // `settings` is a stable LoadedSettings instance (not recreated on render).
       // ESLint requires it here because the callback calls settings.setValue().
@@ -5360,9 +5472,9 @@ export const AppContainer = (props: AppContainerProps) => {
       providerUpdateRequest,
       settingInputRequests,
       pluginChoiceRequests,
-      loopDetectionConfirmationRequest,
       memoryFileCount,
       streamingState,
+      commandCancellationBlocked,
       initError,
       pendingLlmHistoryItems,
       thought,
@@ -5381,6 +5493,8 @@ export const AppContainer = (props: AppContainerProps) => {
       currentMcpApproval,
       pendingMcpApprovals,
       mcpApprovalRemaining,
+      isProjectHooksApprovalDialogOpen,
+      pendingProjectHooks,
       isTrustedFolder,
       constrainHeight,
       ideContextState,
@@ -5390,7 +5504,7 @@ export const AppContainer = (props: AppContainerProps) => {
       showEscapePrompt,
       isFocused,
       elapsedTime,
-      currentLoadingPhrase,
+      currentLoadingPhrase: loadingPhrase,
       historyRemountKey,
       messageQueue,
       showAutoAcceptIndicator,
@@ -5510,9 +5624,9 @@ export const AppContainer = (props: AppContainerProps) => {
       providerUpdateRequest,
       settingInputRequests,
       pluginChoiceRequests,
-      loopDetectionConfirmationRequest,
       memoryFileCount,
       streamingState,
+      commandCancellationBlocked,
       initError,
       pendingLlmHistoryItems,
       thought,
@@ -5531,6 +5645,8 @@ export const AppContainer = (props: AppContainerProps) => {
       currentMcpApproval,
       pendingMcpApprovals,
       mcpApprovalRemaining,
+      isProjectHooksApprovalDialogOpen,
+      pendingProjectHooks,
       isTrustedFolder,
       constrainHeight,
       ideContextState,
@@ -5540,7 +5656,7 @@ export const AppContainer = (props: AppContainerProps) => {
       showEscapePrompt,
       isFocused,
       elapsedTime,
-      currentLoadingPhrase,
+      loadingPhrase,
       historyRemountKey,
       messageQueue,
       showAutoAcceptIndicator,
@@ -5650,6 +5766,7 @@ export const AppContainer = (props: AppContainerProps) => {
       handleCommandMigrationComplete,
       handleFolderTrustSelect,
       handleMcpApprovalSelect,
+      handleProjectHooksApprovalSelect,
       setConstrainHeight,
       onEscapePromptChange: handleEscapePromptChange,
       onTabConsumerChange: setHasTabConsumer,
@@ -5744,6 +5861,7 @@ export const AppContainer = (props: AppContainerProps) => {
       handleCommandMigrationComplete,
       handleFolderTrustSelect,
       handleMcpApprovalSelect,
+      handleProjectHooksApprovalSelect,
       setConstrainHeight,
       handleEscapePromptChange,
       refreshStatic,

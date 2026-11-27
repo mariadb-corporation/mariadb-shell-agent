@@ -7,6 +7,7 @@
 
 import path from 'node:path';
 import type { Config } from '../config/config.js';
+import { getTurnSkillSourcePath } from '../skills/turn-skill-snapshot.js';
 import { Storage } from '../config/storage.js';
 import { isAnyAutoMemPath } from '../memory/paths.js';
 import type { PermissionDecision } from '../permissions/types.js';
@@ -21,7 +22,10 @@ export function getFileReadDefaultPermission(
   // with no prompt. Keep the leading path.resolve: it collapses `..` before any
   // link is followed, matching how the read tools resolve before opening, so
   // the decision and the open agree on which bytes are meant.
-  const filePath = realpathNearestExisting(path.resolve(requestedPath));
+  const request = path.resolve(requestedPath);
+  const filePath = realpathNearestExisting(
+    getTurnSkillSourcePath(request) ?? request,
+  );
   const workspaceContext = config.getWorkspaceContext();
 
   // SYNC: Keep these base roots and the auto-memory check below aligned with
@@ -69,7 +73,11 @@ export function getFileReadDefaultPermission(
     // `.mariadb-shell-agent -> /outside` relocate the allowed root — see
     // getAutoMemoryTrustedAnchor. Candidate-only is fail-closed and still
     // refuses a link planted inside the root.
-    isAnyAutoMemPath(filePath, config.getTargetDir())
+    isAnyAutoMemPath(
+      filePath,
+      config.getTargetDir(),
+      config.getProjectMemoryOwner?.(),
+    )
   ) {
     return 'allow';
   }

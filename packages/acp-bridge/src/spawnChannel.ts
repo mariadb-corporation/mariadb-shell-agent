@@ -27,6 +27,7 @@ import type { ChannelFactory } from './channel.js';
 import { markChannelFactoryForwardsChildEnv } from './child-env-forwarding.js';
 import { redactLogCredentials } from './logRedaction.js';
 import {
+  DAEMON_ACP_NDJSON_LIMITS,
   NdJsonQueueLimitError,
   ndJsonStream,
   type NdJsonMessageObservation,
@@ -44,12 +45,7 @@ import { estimateJsonStringBytes } from './json-string-bytes.js';
 import { detectAvailableMemoryMb } from './daemon-memory-budget.js';
 
 let cachedMemoryArgs: string[] | undefined;
-export const DAEMON_ACP_NDJSON_LIMITS: Readonly<NdJsonStreamLimits> =
-  Object.freeze({
-    maxFrameBytes: 64 * 1024 * 1024,
-    maxQueuedMessages: 256,
-    maxQueuedBytes: 64 * 1024 * 1024,
-  });
+export { DAEMON_ACP_NDJSON_LIMITS };
 
 const daemonClientParamValidators = new Map<
   string,
@@ -663,6 +659,7 @@ export function createSpawnChannelFactory(
 
     return {
       stream,
+      pid: child.pid,
       ...(transportFailed ? { transportFailed } : {}),
       ...(failTransport && options.pipeLimits
         ? {

@@ -113,6 +113,7 @@ import { createDebugLogger } from '../utils/debugLogger.js';
 import { refreshExtensionRuntime } from './extension-runtime-refresh.js';
 import {
   ExtensionStore,
+  ExtensionStoreInUseError,
   type ExtensionActivation,
   type ExtensionActivationResult,
   type ExtensionIdentity,
@@ -170,6 +171,8 @@ export interface ExtensionChannelConfig {
 }
 
 export interface Extension {
+  /** Revision of this installed artifact, independent of activation in other workspaces. */
+  artifactGeneration?: number;
   id: string;
   name: string;
   displayName?: string;
@@ -392,6 +395,13 @@ export interface ExtensionStoreMutationResult extends ExtensionStoreSnapshot {
 
 export type ExtensionCommitCallback = (generation: number) => void;
 
+export class UnsupportedTurnExtensionComponentError extends Error {
+  constructor() {
+    super('The active extension has no managed immutable artifact');
+    this.name = 'UnsupportedTurnExtensionComponentError';
+  }
+}
+
 export class PreparedExtensionConsumedError extends Error {
   readonly code = 'prepared_extension_consumed';
 
@@ -503,6 +513,10 @@ async function loadCommandsFromDir(dir: string): Promise<string[]> {
 export class ExtensionManager {
   private extensionCache: Map<string, Extension> | null = null;
   private storeSnapshot: ExtensionStoreSnapshot | undefined;
+  private runtimeGeneration: number | undefined;
+  private cacheInitialized = false;
+  private turnReaders = 0;
+  private refreshing = 0;
   private readonly mutationListeners = new Set<ExtensionMutationListener>();
   private nextMutationId = 0;
 
@@ -830,6 +844,46 @@ export class ExtensionManager {
       return warning ? { ...snapshot, warnings: [warning] } : snapshot;
     } finally {
       endMutation();
+    }
+  }
+
+  /** Keep installed artifacts and this session's tool graph on the verified generation. */
+  async acquireTurnExtensionLease(
+    generation: number,
+  ): Promise<() => Promise<void>> {
+    if (
+      this.refreshing ||
+      !this.extensionCache ||
+      this.runtimeGeneration !== generation ||
+      this.storeSnapshot?.generation !== generation
+    ) {
+      throw new Error('Extension runtime generation unavailable');
+    }
+    if (
+      this.getLoadedExtensions().some(
+        (ext) =>
+          ext.isActive &&
+          (!ext.installMetadata ||
+            ext.installMetadata.type === 'link' ||
+            this.storeSnapshot?.extensions[ext.id]?.artifactGeneration ===
+              undefined),
+      )
+    ) {
+      throw new UnsupportedTurnExtensionComponentError();
+    }
+    this.turnReaders++;
+    try {
+      const release = await this.extensionStore.acquireTurnReader(generation);
+      let held = true;
+      return async () => {
+        if (!held) return;
+        await release();
+        if (held) this.turnReaders--;
+        held = false;
+      };
+    } catch (error) {
+      this.turnReaders--;
+      throw error;
     }
   }
 
@@ -1186,6 +1240,8 @@ export class ExtensionManager {
   private applyStoreActivation(snapshot: ExtensionStoreSnapshot): void {
     this.storeSnapshot = snapshot;
     for (const extension of this.getLoadedExtensions()) {
+      extension.artifactGeneration =
+        snapshot.extensions[extension.id]?.artifactGeneration;
       if (this.enabledExtensionNamesOverride.length > 0) {
         extension.isActive = this.isEnabled(extension.name);
         continue;
@@ -1480,6 +1536,20 @@ export class ExtensionManager {
   async refreshCacheWithSnapshot(options?: {
     names?: string[];
   }): Promise<ExtensionStoreSnapshot> {
+    // A read-only refresh can reuse the cache while the Store is pinned.
+    // Replacing the Extension objects here would change an executing tool graph.
+    if (this.turnReaders && this.storeSnapshot) return this.storeSnapshot;
+    this.refreshing++;
+    try {
+      return await this.loadExtensionCache(options);
+    } finally {
+      this.refreshing--;
+    }
+  }
+
+  private async loadExtensionCache(options?: {
+    names?: string[];
+  }): Promise<ExtensionStoreSnapshot> {
     const requestedNames = options?.names?.filter(Boolean) ?? [];
     // Captured before the load, not after: an install landing mid-refresh must
     // leave the committed fingerprint stale so the next check still sees it.
@@ -1514,6 +1584,11 @@ export class ExtensionManager {
     extensions.forEach((extension) => {
       nextCache.set(extension.name, extension);
     });
+    if (!this.cacheInitialized) {
+      this.runtimeGeneration =
+        requestedNames.length === 0 ? snapshot.generation : undefined;
+      this.cacheInitialized = true;
+    }
     this.extensionCache = nextCache;
     this.applyStoreActivation(snapshot);
     // Only a full refresh establishes a baseline. A name-filtered refresh leaves
@@ -2000,29 +2075,43 @@ export class ExtensionManager {
         // The Agent Plugins v1 schema defines no workflows.
         extension.workflows = [];
       } else {
-        extension.commands = await loadCommandsFromDir(
-          `${effectiveExtensionPath}/commands`,
-        );
-        extension.contextFiles = getContextFileNames(config)
-          .map((contextFileName) =>
-            path.join(effectiveExtensionPath, contextFileName),
-          )
-          .filter((contextFilePath) => fs.existsSync(contextFilePath));
-        extension.skills = await loadSkillsFromDir(
-          `${effectiveExtensionPath}/skills`,
-          onSkillsDiscoveryError,
-        );
         const agentExecutorRefusals = new Map<string, SubagentError>();
-        extension.agents = await loadSubagentFromDir(
-          `${effectiveExtensionPath}/agents`,
-          agentExecutorRefusals,
-        );
-        extension.agentExecutorRefusals = agentExecutorRefusals;
-        extension.workflows = await loadExtensionWorkflows(
-          effectiveExtensionPath,
-          { name: config.name, displayName: config.displayName },
-          config.workflows,
-        );
+        const results = await Promise.allSettled([
+          loadCommandsFromDir(`${effectiveExtensionPath}/commands`).then(
+            (commands) => {
+              head.extension.commands = commands;
+              head.extension.contextFiles = getContextFileNames(config)
+                .map((contextFileName) =>
+                  path.join(effectiveExtensionPath, contextFileName),
+                )
+                .filter((contextFilePath) => fs.existsSync(contextFilePath));
+            },
+          ),
+          loadSkillsFromDir(
+            `${effectiveExtensionPath}/skills`,
+            onSkillsDiscoveryError,
+          ).then((skills) => {
+            head.extension.skills = skills;
+          }),
+          loadSubagentFromDir(
+            `${effectiveExtensionPath}/agents`,
+            agentExecutorRefusals,
+          ).then((agents) => {
+            head.extension.agents = agents;
+            head.extension.agentExecutorRefusals = agentExecutorRefusals;
+          }),
+          loadExtensionWorkflows(
+            effectiveExtensionPath,
+            { name: config.name, displayName: config.displayName },
+            config.workflows,
+          ).then((workflows) => {
+            head.extension.workflows = workflows;
+          }),
+        ]);
+        // Drain reads before a failure can release the store's read lock.
+        for (const result of results) {
+          if (result.status === 'rejected') throw result.reason;
+        }
       }
 
       if (
@@ -2060,7 +2149,7 @@ export class ExtensionManager {
 
           try {
             const hooksContent = fs.readFileSync(hooksFilePath, 'utf-8');
-            const parsedHooks = JSON.parse(hooksContent);
+            const parsedHooks = JSON.parse(hooksContent.replace(/^\uFEFF/, ''));
 
             let hooksData;
             if (parsedHooks.hooks && typeof parsedHooks.hooks === 'object') {
@@ -2150,7 +2239,7 @@ export class ExtensionManager {
     }
     try {
       const configContent = fs.readFileSync(configFilePath, 'utf-8');
-      const parsedConfig = JSON.parse(configContent);
+      const parsedConfig = JSON.parse(configContent.replace(/^\uFEFF/, ''));
       const skillStates = parseSkillStates(parsedConfig?.skillStates);
       const rawConfig = recursivelyHydrateStrings(parsedConfig, {
         extensionPath: extensionDir,
@@ -3595,7 +3684,22 @@ export class ExtensionManager {
   }
 
   async refreshTools(): Promise<void> {
-    await refreshExtensionRuntime(this.config);
+    if (this.turnReaders) throw new ExtensionStoreInUseError();
+    this.refreshing++;
+    this.runtimeGeneration = undefined;
+    const generation = this.storeSnapshot?.generation;
+    let complete = true;
+    try {
+      await refreshExtensionRuntime(this.config, () => {
+        complete = false;
+      });
+      this.runtimeGeneration =
+        complete && generation === this.storeSnapshot?.generation
+          ? generation
+          : undefined;
+    } finally {
+      this.refreshing--;
+    }
   }
 }
 

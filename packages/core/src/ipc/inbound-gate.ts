@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -383,6 +384,13 @@ export interface InboundGateOptions {
    * the session each is addressed to.
    */
   getHeldExpiryMs?: (sessionId?: string) => number | null;
+  /**
+   * False for a host with nowhere to show a held message, such as a
+   * `mariadb-shell-agent --acp` process. A message it would hold is refused instead:
+   * a `held` receipt promises a review nobody can give. Only hold
+   * decisions are converted. Defaults to true.
+   */
+  presentsHolds?: boolean;
   /** Called whenever the held set changes, for UI. */
   onHeldChange?: (held: readonly HeldMessage[]) => void;
 }
@@ -744,7 +752,10 @@ export class InboundGate {
     }
 
     const decision = this.resolvePolicy(frame, origin);
-    const { policy } = decision;
+    const policy =
+      decision.policy === 'hold' && this.options.presentsHolds === false
+        ? 'refuse'
+        : decision.policy;
 
     if (policy === 'refuse') {
       debugLogger.debug(`refused peer message ${frame.msgId}`);
