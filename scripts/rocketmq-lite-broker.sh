@@ -99,9 +99,6 @@ download() {
   if [ ! -s "${zip}" ] || { [ "${RMQ_VERSION}" != "5.5.1" ] && [ ! -s "${sum}" ]; }; then
     local bases=("https://dlcdn.apache.org/rocketmq/${RMQ_VERSION}"
       "https://archive.apache.org/dist/rocketmq/${RMQ_VERSION}")
-    if [ "${RMQ_VERSION}" = "5.5.1" ]; then
-      bases=("https://mirrors.aliyun.com/apache/rocketmq/${RMQ_VERSION}" "${bases[@]}")
-    fi
     for base in "${bases[@]}"; do
       if download_file "${zip}.part" "${base}/${DIST_NAME}.zip" &&
         { [ "${RMQ_VERSION}" = "5.5.1" ] ||
