@@ -131,6 +131,14 @@ explanation on top) and commit the new patch.
   open with the editor's own URI scheme: `env.openExternal` in VS Code, `vscode.open` in Theia
   (whose `openExternal` hands its own scheme to the operating system). Other authorities stay
   sanitized
+- `0019-install-mariadb-dev-plugin.patch`: the extension installs MariaDB's `dev` plugin
+  (`https://github.com/mariadb/ai-plugins:dev`) once, in the background, with the bundled CLI. A
+  plugin already in `~/.mariadb-shell-agent/extensions/dev` (or under `QWEN_HOME` /
+  `MARIADB_SHELL_AGENT_HOME`) counts as installed; success is recorded in the extension's
+  `globalState` (`mariadbDevPluginInstalled`), so an uninstalled plugin stays uninstalled; a failed
+  install is logged and retried on the next activation. The daemon and the ACP process wait for
+  that install before they start, so they load the plugin. Setting
+  `mariadb-shell-agent.installMariaDbPlugin` (on by default) turns it off
 
 These are good candidates for upstream pull requests, which would retire the patches.
 
