@@ -216,7 +216,7 @@ const ESCALATION_RULES = [
   },
   {
     reason: 'agent-control-config',
-    test: (p) => /(?:^|\/)\.(?:qwen|claude)\//i.test(p),
+    test: (p) => /(?:^|\/)\.(?:mariadb-shell-agent|claude)\//i.test(p),
   },
   {
     reason: 'executable-or-binary',

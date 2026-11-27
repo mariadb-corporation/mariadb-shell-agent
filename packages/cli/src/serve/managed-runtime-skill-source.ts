@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2026 Qwen Team
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -119,7 +120,9 @@ export function parseManagedRuntimeSkillControl(
     if (
       Object.keys(op).sort().join(',') !== 'digest,kind,operationId,path' ||
       typeof op['path'] !== 'string' ||
-      !/^\.(?:qwen|agents)\/skills\/[^/\\]+$/u.test(op['path']) ||
+      !/^\.(?:mariadb-shell-agent|agents)\/skills\/[^/\\]+$/u.test(
+        op['path'],
+      ) ||
       op['path'].includes('\0') ||
       op['path'].length > 4096 ||
       op['path'].split('/').some((part) => part === '..' || part === '.') ||

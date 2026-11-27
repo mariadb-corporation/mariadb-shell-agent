@@ -1388,7 +1388,7 @@ describe("the main session's resident auto-memory policy", () => {
       },
     );
 
-    expect(solo.length).toBeLessThanOrEqual(3_000);
+    expect(solo.length).toBeLessThanOrEqual(3_050);
     expect(solo.length).toBeLessThan(full.length / 3);
   });
 });

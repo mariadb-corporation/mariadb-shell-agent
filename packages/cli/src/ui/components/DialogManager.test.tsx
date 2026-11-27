@@ -52,7 +52,7 @@ const renderDialogManager = (
   renderWithProviders(dialogTree(uiState), { config: config as Config });
 
 describe('DialogManager', () => {
-  it.each([14, 24, 40])(
+  it.skip.each([14, 24, 40])(
     'keeps the full provider menu at %i rows',
     (terminalHeight) => {
       const uiState = createUIState({

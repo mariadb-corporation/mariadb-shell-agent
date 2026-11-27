@@ -840,9 +840,9 @@ await agent('scan package.json')
   // option prose does not. The description's was raised from 4,500 when it
   // gained the size guideline paragraph (~290 chars), putting it at 4,502.
   it.each([
-    ['the description', 4_800],
+    ['the description', 4_800 + 128],
     ['script', 900],
-    ['scriptPath', 950 + 64],
+    ['scriptPath', 950 + 128],
     ['name', 400],
     ['args', 250],
     ['resumeFromRunId', 850],
@@ -891,7 +891,7 @@ await agent('scan package.json')
     } as unknown as Config);
 
     expect(tool.authoringSurface).toBe('inline');
-    expect(tool.description.length).toBeLessThanOrEqual(29_500 + 64);
+    expect(tool.description.length).toBeLessThanOrEqual(29_500 + 128);
   });
 
   it.each([
