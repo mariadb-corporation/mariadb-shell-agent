@@ -45,7 +45,7 @@ import {
   type QwenDaemonListenerHandle,
 } from '../../services/qwenDaemonProcess.js';
 import { isLoopbackHostname } from '../../services/daemonIdeConnection.js';
-import { mariaDbPluginInstallSettled } from '../../services/mariadbPlugin.js';
+import { mariaDbPluginSettled } from '../../services/mariadbPlugin.js';
 import { probePreAuthHostGateRejection } from './preAuthHostGateProbe.js';
 import {
   DaemonFetchBridge,
@@ -1826,7 +1826,7 @@ export class WebViewProvider {
         const canonicalWorkspaceCwd = existsSync(workspaceCwd)
           ? realpathSync.native(workspaceCwd)
           : workspaceCwd;
-        await mariaDbPluginInstallSettled();
+        await mariaDbPluginSettled();
         const runtime = await this.daemonProcess.start(
           resolveQwenCliEntryPath(
             this.extensionUri,

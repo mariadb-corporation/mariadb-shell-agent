@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,6 +19,7 @@ import { t } from '../../i18n/index.js';
 interface UpdateArgs {
   name?: string;
   all?: boolean;
+  consent?: boolean;
 }
 
 const updateOutput = (info: ExtensionUpdateInfo) =>
@@ -42,7 +44,7 @@ const updateWarningOutput = (info: ExtensionUpdateInfo) =>
     .join('\n');
 
 export async function handleUpdate(args: UpdateArgs) {
-  const extensionManager = await getExtensionManager();
+  const extensionManager = await getExtensionManager(args.consent);
   const extensions = extensionManager.getLoadedExtensions();
 
   if (args.name) {
@@ -155,6 +157,13 @@ export const updateCommand: CommandModule = {
         describe: t('Update all extensions.'),
         type: 'boolean',
       })
+      .option('consent', {
+        describe: t(
+          'Acknowledge the security risks of installing an extension and skip the confirmation prompt.',
+        ),
+        type: 'boolean',
+        default: false,
+      })
       .conflicts('name', 'all')
       .check((argv) => {
         if (!argv.all && !argv.name) {
@@ -168,6 +177,7 @@ export const updateCommand: CommandModule = {
     await handleUpdate({
       name: argv['name'] as string | undefined,
       all: argv['all'] as boolean | undefined,
+      consent: argv['consent'] as boolean | undefined,
     });
   },
 };

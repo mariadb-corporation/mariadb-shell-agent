@@ -22,7 +22,7 @@ import {
   extractSessionModelState,
 } from '../utils/acpModelInfo.js';
 import { getErrorMessage } from '../utils/errorMessage.js';
-import { mariaDbPluginInstallSettled } from './mariadbPlugin.js';
+import { mariaDbPluginSettled } from './mariadbPlugin.js';
 import type { ModelInfo } from '@agentclientprotocol/sdk';
 import type { ApprovalModeValue } from '../types/approvalModeValueTypes.js';
 
@@ -96,7 +96,7 @@ export class QwenConnectionHandler {
       extraArgs.push('--experimental-lsp');
     }
 
-    await mariaDbPluginInstallSettled();
+    await mariaDbPluginSettled();
 
     // Retry loop for connection.connect() to handle transient spawn failures
     // (e.g., SIGTERM during the 1-second startup grace period)

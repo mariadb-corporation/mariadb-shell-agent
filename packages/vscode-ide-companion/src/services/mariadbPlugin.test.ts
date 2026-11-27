@@ -23,12 +23,14 @@ vi.mock('vscode', () => ({
 }));
 
 import {
-  installMariaDbPluginOnce,
-  mariaDbPluginInstallSettled,
+  installAndUpdateMariaDbPlugin,
+  mariaDbPluginSettled,
   PLUGIN_INSTALLED_KEY,
 } from './mariadbPlugin.js';
 
-describe('installMariaDbPluginOnce', () => {
+const SOURCE = 'https://github.com/mariadb/ai-plugins';
+
+describe('installAndUpdateMariaDbPlugin', () => {
   let home: string;
   let state: Map<string, unknown>;
   let context: vscode.ExtensionContext;
@@ -49,6 +51,9 @@ describe('installMariaDbPluginOnce', () => {
       (_key: string, fallback: unknown) => fallback,
     );
     execFileMock.mockReset();
+    execFileMock.mockImplementation((_file, _args, _options, callback) =>
+      callback(null, { stdout: '', stderr: '' }),
+    );
   });
 
   afterEach(() => {
@@ -56,24 +61,44 @@ describe('installMariaDbPluginOnce', () => {
     fs.rmSync(home, { recursive: true, force: true });
   });
 
-  function installSucceeds() {
-    execFileMock.mockImplementation((_file, _args, _options, callback) =>
-      callback(null, '', ''),
+  function installExtension(name: string, metadata: object) {
+    const dir = path.join(home, 'extensions', name);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(
+      path.join(dir, '.qwen-extension-install.json'),
+      JSON.stringify(metadata),
     );
   }
 
-  it('installs the plugin through the bundled CLI and records it', async () => {
-    installSucceeds();
-    installMariaDbPluginOnce(context, '/ext/dist/qwen-cli/cli.js');
-    await mariaDbPluginInstallSettled();
+  function metadataOf(name: string) {
+    return JSON.parse(
+      fs.readFileSync(
+        path.join(home, 'extensions', name, '.qwen-extension-install.json'),
+        'utf8',
+      ),
+    );
+  }
+
+  function cliCalls() {
+    return execFileMock.mock.calls.map(([, args]) => args.slice(1));
+  }
+
+  async function run() {
+    installAndUpdateMariaDbPlugin(context, 'cli.js');
+    await mariaDbPluginSettled();
+  }
+
+  it('installs the plugin with auto-update through the bundled CLI and records it', async () => {
+    await run();
     expect(execFileMock).toHaveBeenCalledWith(
       process.execPath,
       [
-        '/ext/dist/qwen-cli/cli.js',
+        'cli.js',
         'extensions',
         'install',
-        'https://github.com/mariadb/ai-plugins:dev',
+        `${SOURCE}:dev`,
         '--consent',
+        '--auto-update',
       ],
       expect.anything(),
       expect.any(Function),
@@ -81,34 +106,58 @@ describe('installMariaDbPluginOnce', () => {
     expect(state.get(PLUGIN_INSTALLED_KEY)).toBe(true);
   });
 
-  it('records a plugin that is already installed without reinstalling', async () => {
-    fs.mkdirSync(path.join(home, 'extensions', 'dev'), { recursive: true });
-    installMariaDbPluginOnce(context, 'cli.js');
-    await mariaDbPluginInstallSettled();
-    expect(execFileMock).not.toHaveBeenCalled();
+  it('turns on auto-update for an installed plugin without reinstalling it', async () => {
+    installExtension('dev', { source: SOURCE, type: 'git' });
+    await run();
+    expect(metadataOf('dev')).toEqual({
+      source: SOURCE,
+      type: 'git',
+      autoUpdate: true,
+    });
+    expect(cliCalls()).toEqual([['extensions', 'update', 'dev', '--consent']]);
     expect(state.get(PLUGIN_INSTALLED_KEY)).toBe(true);
+  });
+
+  it('keeps auto-update off when it was turned off', async () => {
+    installExtension('dev', { source: SOURCE, autoUpdate: false });
+    await run();
+    expect(metadataOf('dev').autoUpdate).toBe(false);
+    expect(execFileMock).not.toHaveBeenCalled();
   });
 
   it('does not record a failed install, so the next start retries', async () => {
     execFileMock.mockImplementation((_file, _args, _options, callback) =>
-      callback(new Error('offline'), '', ''),
+      callback(new Error('offline')),
     );
-    installMariaDbPluginOnce(context, 'cli.js');
-    await mariaDbPluginInstallSettled();
+    await run();
     expect(state.has(PLUGIN_INSTALLED_KEY)).toBe(false);
   });
 
-  it('does nothing once recorded, even when the plugin was uninstalled', async () => {
+  it('only updates on later starts, also when the plugin was uninstalled', async () => {
     state.set(PLUGIN_INSTALLED_KEY, true);
-    installMariaDbPluginOnce(context, 'cli.js');
-    await mariaDbPluginInstallSettled();
-    expect(execFileMock).not.toHaveBeenCalled();
+    installExtension('other', { source: 'x', autoUpdate: true });
+    installExtension('manual', { source: 'y' });
+    await run();
+    expect(cliCalls()).toEqual([
+      ['extensions', 'update', 'other', '--consent'],
+    ]);
+  });
+
+  it('keeps going when an update fails', async () => {
+    state.set(PLUGIN_INSTALLED_KEY, true);
+    installExtension('a', { autoUpdate: true });
+    installExtension('b', { autoUpdate: true });
+    execFileMock.mockImplementationOnce((_file, _args, _options, callback) =>
+      callback(new Error('offline')),
+    );
+    await run();
+    expect(cliCalls()).toHaveLength(2);
   });
 
   it('does nothing when the setting is off', async () => {
     getSetting.mockReturnValue(false);
-    installMariaDbPluginOnce(context, 'cli.js');
-    await mariaDbPluginInstallSettled();
+    installExtension('dev', { source: SOURCE, autoUpdate: true });
+    await run();
     expect(execFileMock).not.toHaveBeenCalled();
     expect(state.has(PLUGIN_INSTALLED_KEY)).toBe(false);
   });

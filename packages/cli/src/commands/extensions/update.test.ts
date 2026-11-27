@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,6 +9,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { updateCommand, handleUpdate } from './update.js';
 import yargs from 'yargs';
 import { ExtensionUpdateState } from '@qwen-code/qwen-code-core';
+import { getExtensionManager } from './utils.js';
 
 const mockGetLoadedExtensions = vi.hoisted(() => vi.fn());
 const mockUpdateExtension = vi.hoisted(() => vi.fn());
@@ -80,6 +82,14 @@ describe('extensions update command', () => {
 describe('handleUpdate', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it('skips the confirmation prompt with --consent', async () => {
+    mockGetLoadedExtensions.mockReturnValueOnce([]);
+
+    await handleUpdate({ name: 'test-extension', consent: true });
+
+    expect(getExtensionManager).toHaveBeenCalledWith(true);
   });
 
   describe('update by name', () => {

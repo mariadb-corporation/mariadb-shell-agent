@@ -22,7 +22,7 @@ vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
 });
 
 vi.mock('./services/mariadbPlugin.js', () => ({
-  installMariaDbPluginOnce: vi.fn(),
+  installAndUpdateMariaDbPlugin: vi.fn(),
 }));
 
 vi.mock('vscode', () => ({

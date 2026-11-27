@@ -38,8 +38,11 @@ On its first start the extension installs MariaDB's `dev` plugin
 ([mariadb/ai-plugins](https://github.com/mariadb/ai-plugins)) into
 `~/.mariadb-shell-agent/extensions/dev`: MariaDB skills and the MariaDB MCP server for the agent.
 It does this once: if you uninstall the plugin, it stays uninstalled. If the install fails (for
-example offline), the next start tries again. To skip it, turn off
-`mariadb-shell-agent.installMariaDbPlugin`.
+example offline), the next start tries again.
+
+On every start the extension also updates the plugin, and any other extension installed with
+auto-update. A failed update is retried on the next start. To turn off both the install and the
+updates, turn off `mariadb-shell-agent.installMariaDbPlugin`.
 
 The plugin also brings a language server for `.sql` files. Language servers only start with the
 experimental LSP support: turn on `mariadb-shell-agent.experimentalLsp` and reload the window.

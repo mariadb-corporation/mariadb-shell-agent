@@ -20,7 +20,7 @@ import { registerChatViewProviders } from './webview/providers/chatViewRegistrat
 import { registerNewCommands } from './commands/index.js';
 import { ReadonlyFileSystemProvider } from './services/readonlyFileSystemProvider.js';
 import { isWindows } from './utils/platform.js';
-import { installMariaDbPluginOnce } from './services/mariadbPlugin.js';
+import { installAndUpdateMariaDbPlugin } from './services/mariadbPlugin.js';
 
 // Keep the dormant daemon IDE adapter on the VSIX bundle path without wiring it
 // into the active extension flow yet.
@@ -108,7 +108,7 @@ export async function activate(context: vscode.ExtensionContext) {
   logger.info('Extension activated');
 
   checkForUpdates(context, logger.info);
-  installMariaDbPluginOnce(
+  installAndUpdateMariaDbPlugin(
     context,
     resolveQwenCliEntryPath(context.extensionUri, context.extensionMode),
   );
