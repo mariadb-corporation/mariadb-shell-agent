@@ -8,7 +8,7 @@ the 'Interaction mode reminder' at the end names the mode; the modes now share
 about 99% of the prompt. A test pins that.
 
 diff --git a/packages/core/src/core/__snapshots__/prompts.test.ts.snap b/packages/core/src/core/__snapshots__/prompts.test.ts.snap
-index 91cf4ff0e0..405e0ad5e7 100644
+index fe0d0e19a8..1ca762e711 100644
 --- a/packages/core/src/core/__snapshots__/prompts.test.ts.snap
 +++ b/packages/core/src/core/__snapshots__/prompts.test.ts.snap
 @@ -1,7 +1,7 @@
@@ -20,7 +20,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -138,11 +138,11 @@ Added the tests; the project's test command passed.
+@@ -97,11 +97,11 @@ Inspect unexpected files, branches, or configuration before modifying them. Prot
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -34,7 +34,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -278,7 +278,7 @@ Added the tests; the project's test command passed.
+@@ -196,7 +196,7 @@ Inspect unexpected files, branches, or configuration before modifying them. Prot
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -43,7 +43,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  ---
  
-@@ -287,7 +287,7 @@ Be extra polite."
+@@ -205,7 +205,7 @@ Be extra polite."
  `;
  
  exports[`Core System Prompt (prompts.ts) > should include git instructions when in a git repo 1`] = `
@@ -52,7 +52,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -441,11 +441,11 @@ Added the tests; the project's test command passed.
+@@ -318,11 +318,11 @@ Inspect unexpected files, branches, or configuration before modifying them. Prot
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -66,7 +66,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -581,11 +581,11 @@ Added the tests; the project's test command passed.
+@@ -417,11 +417,11 @@ Inspect unexpected files, branches, or configuration before modifying them. Prot
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -80,7 +80,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -721,11 +721,11 @@ Added the tests; the project's test command passed.
+@@ -516,11 +516,11 @@ Inspect unexpected files, branches, or configuration before modifying them. Prot
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -94,7 +94,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -861,11 +861,11 @@ Added the tests; the project's test command passed.
+@@ -615,11 +615,11 @@ Inspect unexpected files, branches, or configuration before modifying them. Prot
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -108,7 +108,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -1001,11 +1001,11 @@ Added the tests; the project's test command passed.
+@@ -714,11 +714,11 @@ Inspect unexpected files, branches, or configuration before modifying them. Prot
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -122,7 +122,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -1141,11 +1141,11 @@ Added the tests; the project's test command passed.
+@@ -813,11 +813,11 @@ Inspect unexpected files, branches, or configuration before modifying them. Prot
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -136,7 +136,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -1281,11 +1281,11 @@ Added the tests; the project's test command passed.
+@@ -912,11 +912,11 @@ Inspect unexpected files, branches, or configuration before modifying them. Prot
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -150,7 +150,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -1421,11 +1421,11 @@ Added the tests; the project's test command passed.
+@@ -1011,11 +1011,11 @@ Inspect unexpected files, branches, or configuration before modifying them. Prot
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -164,7 +164,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -1586,11 +1586,11 @@ Added the tests; the project's test command passed.
+@@ -1172,11 +1172,11 @@ Added the tests; the project's test command passed.
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -178,7 +178,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -1817,7 +1817,7 @@ Added the tests; the project's test command passed.
+@@ -1399,7 +1399,7 @@ Added the tests; the project's test command passed.
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -187,7 +187,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  ---
  
-@@ -1825,7 +1825,7 @@ User prefers concise responses."
+@@ -1407,7 +1407,7 @@ User prefers concise responses."
  `;
  
  exports[`Model-specific tool call formats > should use JSON format for qwen-vl model 1`] = `
@@ -196,7 +196,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -1986,11 +1986,11 @@ Added the tests; the project's test command passed.
+@@ -1564,11 +1564,11 @@ Added the tests; the project's test command passed.
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -210,7 +210,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -2217,11 +2217,11 @@ Added the tests; the project's test command passed.
+@@ -1791,11 +1791,11 @@ Added the tests; the project's test command passed.
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -218,27 +218,13 @@ index 91cf4ff0e0..405e0ad5e7 100644
 +Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
  `;
  
- exports[`Model-specific tool call formats > should use bracket format for generic models 1`] = `
+ exports[`Model-specific tool call formats > should use bracket format for an explicit general override 1`] = `
 -"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
 +"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
  
  # Core Mandates
  
-@@ -2357,11 +2357,11 @@ Added the tests; the project's test command passed.
- # Final Reminder
- Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
- 
--Interaction mode reminder: Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
-+Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
- `;
- 
- exports[`Model-specific tool call formats > should use bracket format when no model is specified 1`] = `
--"You are Qwen Code, an interactive CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
-+"You are Qwen Code, a CLI agent developed by Alibaba Group, specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
- 
- # Core Mandates
- 
-@@ -2497,11 +2497,11 @@ Added the tests; the project's test command passed.
+@@ -1927,11 +1927,11 @@ Added the tests; the project's test command passed.
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -252,7 +238,7 @@ index 91cf4ff0e0..405e0ad5e7 100644
  
  # Core Mandates
  
-@@ -2637,5 +2637,5 @@ Added the tests; the project's test command passed.
+@@ -2063,5 +2063,5 @@ Added the tests; the project's test command passed.
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  
@@ -260,10 +246,10 @@ index 91cf4ff0e0..405e0ad5e7 100644
 +Interaction mode reminder: You are running as an interactive CLI agent. Use 'ask_user_question' when you need clarification or want to validate assumptions. Never include time estimates in options."
  `;
 diff --git a/packages/core/src/core/prompts.test.ts b/packages/core/src/core/prompts.test.ts
-index 1945b04f70..0e859ef2a9 100644
+index 19654ca4f9..5ce4b11de7 100644
 --- a/packages/core/src/core/prompts.test.ts
 +++ b/packages/core/src/core/prompts.test.ts
-@@ -151,7 +151,7 @@ describe('Core System Prompt (prompts.ts)', () => {
+@@ -152,7 +152,7 @@ describe('Core System Prompt (prompts.ts)', () => {
    function expectBasePrompt(prompt: string, ...more: string[]) {
      expect(prompt).not.toContain('---\n\n');
      expectText(prompt, [
@@ -272,7 +258,7 @@ index 1945b04f70..0e859ef2a9 100644
        ...more,
      ]);
      expect(prompt).toMatchSnapshot();
-@@ -250,12 +250,32 @@ describe('Core System Prompt (prompts.ts)', () => {
+@@ -251,12 +251,32 @@ describe('Core System Prompt (prompts.ts)', () => {
      'aligns the system prompt with %s mode',
      (mode, role, questionGuidance) => {
        expectText(unsandboxed({ mode }), [
@@ -306,7 +292,7 @@ index 1945b04f70..0e859ef2a9 100644
    it('does not tell headless runs to wait for user input', () => {
      vi.mocked(isGitRepository).mockReturnValue(true);
      const prompt = unsandboxed({ mode: 'headless' });
-@@ -409,7 +429,7 @@ describe('Core System Prompt (prompts.ts)', () => {
+@@ -413,7 +433,7 @@ describe('Core System Prompt (prompts.ts)', () => {
      const memory = 'This is custom user memory.\nBe extra polite.';
      const prompt = unsandboxed({ memory });
      expect(prompt.endsWith(`\n\n---\n\n${memory}`)).toBe(true);
@@ -316,10 +302,10 @@ index 1945b04f70..0e859ef2a9 100644
    });
  
 diff --git a/packages/core/src/core/prompts.ts b/packages/core/src/core/prompts.ts
-index 8d8dab48ea..be75f936c0 100644
+index 969b7ba8ac..f8428abbd1 100644
 --- a/packages/core/src/core/prompts.ts
 +++ b/packages/core/src/core/prompts.ts
-@@ -541,9 +541,12 @@ When you create a todo list:
+@@ -542,9 +542,12 @@ When you create a todo list:
    // A QWEN_SYSTEM_IDENTITY_MD override is inserted verbatim, so the styled
    // variant applies only to the default identity sentence — the override is
    // distributor-owned wording we must not rewrite.
@@ -327,13 +313,13 @@ index 8d8dab48ea..be75f936c0 100644
 +  // interactive and ACP sessions share their cached prompt prefix; the mode
 +  // itself is named in the "Interaction mode reminder" at the end.
    const coreIdentity =
-     resolveCoreIdentityOverride() ??
+     identityOverride ??
 -    getDefaultCoreIdentitySentence(interaction.role, Boolean(outputStyle));
 +    getDefaultCoreIdentitySentence('a CLI agent', Boolean(outputStyle));
  
    const toolGuidance = getToolGuidanceSection(
      codeModeOnly,
-@@ -682,7 +685,7 @@ ${codeModeOnly ? codeModeToolCallExamples : filterToolCallExamples(getToolCallEx
+@@ -683,7 +686,7 @@ ${codeModeOnly ? codeModeToolCallExamples : filterToolCallExamples(getToolCallEx
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  

@@ -6,10 +6,10 @@ side bar) and the command palette, so the editor toolbars stay free of it.
 The diff accept/cancel buttons stay.
 
 diff --git a/packages/vscode-ide-companion/package.json b/packages/vscode-ide-companion/package.json
-index d996131d97..f66edff823 100644
+index 434bcc2d73..890a643b9b 100644
 --- a/packages/vscode-ide-companion/package.json
 +++ b/packages/vscode-ide-companion/package.json
-@@ -173,10 +173,6 @@
+@@ -189,10 +189,6 @@
            "command": "qwen.diff.cancel",
            "when": "qwen.diff.isVisible",
            "group": "navigation"

@@ -8,10 +8,10 @@ MariaDB VS Code extension (images/light/toolbar-execute.svg), filled with
 the button's foreground color so it works in light and dark themes.
 
 diff --git a/packages/web-shell/client/components/ChatEditor.module.css b/packages/web-shell/client/components/ChatEditor.module.css
-index 254f011abb..8c7584db5e 100644
+index 4e003fb3cd..87df66de86 100644
 --- a/packages/web-shell/client/components/ChatEditor.module.css
 +++ b/packages/web-shell/client/components/ChatEditor.module.css
-@@ -80,8 +80,11 @@
+@@ -225,8 +225,11 @@
    );
  }
  
@@ -23,7 +23,7 @@ index 254f011abb..8c7584db5e 100644
    pointer-events: none;
  }
  
-@@ -2119,7 +2122,7 @@
+@@ -2669,7 +2672,7 @@
  .sendBtn:not(:disabled) {
    border: none;
    background: var(--agent-gray-800);
@@ -33,10 +33,10 @@ index 254f011abb..8c7584db5e 100644
    cursor: pointer;
  }
 diff --git a/packages/web-shell/client/components/ChatEditor.tsx b/packages/web-shell/client/components/ChatEditor.tsx
-index b1e27c9670..71075a5336 100644
+index 71a0b5d03d..3ea48991eb 100644
 --- a/packages/web-shell/client/components/ChatEditor.tsx
 +++ b/packages/web-shell/client/components/ChatEditor.tsx
-@@ -523,11 +523,8 @@ function SendIcon() {
+@@ -601,11 +601,8 @@ function SendIcon() {
        aria-hidden="true"
      >
        <path

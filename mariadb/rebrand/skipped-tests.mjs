@@ -78,7 +78,7 @@ const SKIPPED = [
       // Navigates the CLI auth menu by position through the QwenCloud and ModelStudio entries.
       'packages/cli/src/ui/auth/AuthDialog.test.tsx': '*',
       'packages/cli/src/ui/opentui/dialogs-auth.test.tsx': [
-        'renders the main menu with the four top-level options',
+        'renders the main menu with the five top-level options',
         'navigates main → sub-menu and back with Esc',
         'wraps the main-menu cursor from the last row to the first (#160)',
         'renders QwenCloud flow title in Chinese when locale is zh (T1)',
@@ -155,6 +155,17 @@ const SKIPPED = [
       'packages/cli/src/commands/review/lib/deadline.test.ts': [
         'the workflow exports the exact env names the gate reads',
       ],
+    },
+  },
+  {
+    reason:
+      "The Web Shell sidebar shows the MariaDB Shell Agent icon in both themes (artwork.mjs): these tests pin upstream's dark and light Qwen marks.",
+    tests: {
+      'packages/web-shell/client/components/sidebar/WebShellSidebar.brand.test.tsx':
+        [
+          'uses the compact dark-theme artwork with theme-aware color',
+          'keeps the original blue mark in the light theme',
+        ],
     },
   },
 ];

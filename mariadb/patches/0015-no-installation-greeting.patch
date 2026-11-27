@@ -6,12 +6,12 @@ Firebase Studio and Cloud Shell). The extension is installed on purpose or
 comes preinstalled (MariaDB Cloud Workbench), so it stays quiet everywhere.
 
 diff --git a/packages/vscode-ide-companion/src/extension.test.ts b/packages/vscode-ide-companion/src/extension.test.ts
-index bc47efc5a3..05cdd705c3 100644
+index 0b7e42692a..86f81b737b 100644
 --- a/packages/vscode-ide-companion/src/extension.test.ts
 +++ b/packages/vscode-ide-companion/src/extension.test.ts
-@@ -115,18 +115,13 @@ describe('activate', () => {
-     vi.restoreAllMocks();
-   });
+@@ -139,18 +139,13 @@ describe('activate', () => {
+     },
+   );
  
 -  it('should show the info message on first activation', async () => {
 -    const showInformationMessageMock = vi
@@ -30,7 +30,7 @@ index bc47efc5a3..05cdd705c3 100644
    });
  
    it('writes production logs to the Qwen Code Companion output channel', async () => {
-@@ -188,15 +183,6 @@ describe('activate', () => {
+@@ -212,15 +207,6 @@ describe('activate', () => {
      );
    });
  
@@ -46,7 +46,7 @@ index bc47efc5a3..05cdd705c3 100644
    it('should register a handler for onDidGrantWorkspaceTrust', async () => {
      await activate(context);
      expect(vscode.workspace.onDidGrantWorkspaceTrust).toHaveBeenCalled();
-@@ -214,20 +200,6 @@ describe('activate', () => {
+@@ -238,20 +224,6 @@ describe('activate', () => {
      expect(viewIds).toContain('qwen-code.chatView.sidebar');
    });
  
@@ -68,7 +68,7 @@ index bc47efc5a3..05cdd705c3 100644
      beforeEach(() => {
        // Prevent the "installed" message from showing
 diff --git a/packages/vscode-ide-companion/src/extension.ts b/packages/vscode-ide-companion/src/extension.ts
-index fc3b0d13dd..6b146623d8 100644
+index f3e7525167..0e8e7b6bf6 100644
 --- a/packages/vscode-ide-companion/src/extension.ts
 +++ b/packages/vscode-ide-companion/src/extension.ts
 @@ -9,11 +9,6 @@ import { IDEServer } from './ide-server.js';
@@ -104,7 +104,7 @@ index fc3b0d13dd..6b146623d8 100644
  let ideServer: IDEServer;
  let outputChannel: vscode.OutputChannel;
  let chatProviderRegistry: ChatProviderRegistry<WebViewProvider> | null = null;
-@@ -357,17 +341,6 @@ export async function activate(context: vscode.ExtensionContext) {
+@@ -362,17 +346,6 @@ export async function activate(context: vscode.ExtensionContext) {
      logger.warn(`Failed to start IDE server: ${message}`);
    }
  

@@ -191,17 +191,18 @@ export function apply() {
   patch(
     'web-shell sidebar logo',
     'packages/web-shell/client/components/sidebar/WebShellSidebar.tsx',
-    /function IconQwenLogo\(\) \{\n {2}return \(\n {4}<svg viewBox="17\.5 27\.7 135\.6 135\.6"[\s\S]*?<\/svg>\n {2}\);\n\}/,
+    // Upstream draws a Qwen mark per theme; ours is the same in both.
+    /\/\*\*\n \* The dark theme uses the compact Qwen mark[\s\S]*?\*\/\nfunction IconQwenLogo\(\{ theme \}: \{ theme: WebShellTheme \}\) \{\n[\s\S]*?\n\}(?=\n)/,
     () =>
-      `function IconQwenLogo() {\n  return (\n    <img\n      src="${sidebarMark}"\n      alt=""\n      aria-hidden="true"\n    />\n  );\n}`,
+      `function IconQwenLogo(_props: { theme: WebShellTheme }) {\n  return (\n    <img\n      data-testid="qwen-brand-mark"\n      src="${sidebarMark}"\n      alt=""\n      aria-hidden="true"\n    />\n  );\n}`,
     (t) => t.includes(sidebarMark),
   );
   patch(
     'web-shell sidebar logo test',
     'packages/web-shell/client/components/sidebar/WebShellSidebar.brand.test.tsx',
-    `container.querySelector('svg[viewBox="17.5 27.7 135.6 135.6"]')`,
-    `container.querySelector('img[src^="data:image/png;base64,"]')`,
-    (t) => t.includes(`img[src^="data:image/png;base64,"]`),
+    `container.querySelector('svg[data-testid="qwen-brand-mark"]')`,
+    `container.querySelector('img[data-testid="qwen-brand-mark"]')`,
+    (t) => t.includes(`img[data-testid="qwen-brand-mark"]`),
   );
   // The favicon test pins a colour of the upstream mark; pin the app icon's viewBox instead.
   const faviconAnchor = `expect(href).toContain('${encodeURIComponent(
@@ -314,7 +315,7 @@ export function apply() {
     patch(
       'welcome seal',
       'packages/web-shell/client/components/WelcomeHeader.tsx',
-      /(import styles from '\.\/WelcomeHeader\.module\.css';\n)([\s\S]*?<div className=\{styles\.header\}>\n)/,
+      /(import styles from '\.\/WelcomeHeader\.module\.css';\n)([\s\S]*?<div className=\{styles\.header\}[^>\n]*>\n)/,
       (_, imp, body) =>
         `${imp}import { WelcomeSeal } from './WelcomeSeal';\n${body}      <WelcomeSeal className={styles.seal} />\n`,
       (t) => t.includes('<WelcomeSeal'),

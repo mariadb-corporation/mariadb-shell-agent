@@ -13,10 +13,10 @@ request. The memory catalog is not part of it (upstream keeps its snapshots
 in history and records them separately). Tool-result turns are not covered.
 
 diff --git a/packages/core/src/core/client.test.ts b/packages/core/src/core/client.test.ts
-index ce11efea1d..b8f97e948e 100644
+index 4910e59f6b..9f45697603 100644
 --- a/packages/core/src/core/client.test.ts
 +++ b/packages/core/src/core/client.test.ts
-@@ -13194,6 +13194,34 @@ Other open files:
+@@ -14017,6 +14017,34 @@ Other open files:
          );
        });
  
@@ -43,7 +43,7 @@ index ce11efea1d..b8f97e948e 100644
 +          typeof part === 'string' ? part : (part as { text?: string }).text;
 +        expect(
 +          sent.some((part: unknown) =>
-+            text(part)?.includes('The current date is:'),
++            text(part)?.includes("Today's date is"),
 +          ),
 +        ).toBe(true);
 +      });
@@ -52,10 +52,10 @@ index ce11efea1d..b8f97e948e 100644
          const mockMessageBus = promptSubmitBus({ output: undefined });
  
 diff --git a/packages/core/src/core/client.ts b/packages/core/src/core/client.ts
-index d1e4a93fe4..5375d149d8 100644
+index 91a64a6f0f..3bd8840323 100644
 --- a/packages/core/src/core/client.ts
 +++ b/packages/core/src/core/client.ts
-@@ -5420,6 +5420,17 @@ export class LlmClient {
+@@ -5876,6 +5876,17 @@ export class LlmClient {
        // actual history push (see `userContentPushSnapshotKey`); a
        // client-side snapshot taken here would still cover the send-lock
        // and compression awaits between `turn.run` and that push.
@@ -74,10 +74,10 @@ index d1e4a93fe4..5375d149d8 100644
        pushInitiated = true;
        agentOutput.beginResponse();
 diff --git a/packages/core/src/services/chatRecordingService.test.ts b/packages/core/src/services/chatRecordingService.test.ts
-index c2b5137c05..03cc515bdf 100644
+index 70aa3067d3..6dc13783ba 100644
 --- a/packages/core/src/services/chatRecordingService.test.ts
 +++ b/packages/core/src/services/chatRecordingService.test.ts
-@@ -36,6 +36,7 @@ import {
+@@ -39,6 +39,7 @@ import {
    collectSessionTurnState,
    computeInitialTurnFromHistory,
  } from './session-turn-state.js';
@@ -85,7 +85,7 @@ index c2b5137c05..03cc515bdf 100644
  import type { Content, Part } from '@google/genai';
  import type { FileDiff, McpAppResultDisplay } from '../tools/tools.js';
  import {
-@@ -408,6 +409,51 @@ describe('ChatRecordingService', () => {
+@@ -580,6 +581,51 @@ describe('ChatRecordingService', () => {
      });
    });
  
@@ -138,10 +138,10 @@ index c2b5137c05..03cc515bdf 100644
      const hookText = [
        '<qwen:user-prompt-submit-context>',
 diff --git a/packages/core/src/services/chatRecordingService.ts b/packages/core/src/services/chatRecordingService.ts
-index f1d5fdc44d..bf8715b7e8 100644
+index 4a35a386b7..26745fddab 100644
 --- a/packages/core/src/services/chatRecordingService.ts
 +++ b/packages/core/src/services/chatRecordingService.ts
-@@ -405,6 +405,7 @@ export interface ChatRecord {
+@@ -487,6 +487,7 @@ export interface ChatRecord {
      | 'session_source'
      | 'session_execution_engine'
      | 'omni_recall'
@@ -149,7 +149,7 @@ index f1d5fdc44d..bf8715b7e8 100644
      | 'session_model'
      | 'session_approval_mode'
      | 'session_workflow_mode'
-@@ -543,7 +544,8 @@ export interface ChatRecord {
+@@ -636,7 +637,8 @@ export interface ChatRecord {
      | GoalTurnEndRecordPayload
      | TurnResultRecordPayload
      | AgentMessageRecordPayload
@@ -159,7 +159,7 @@ index f1d5fdc44d..bf8715b7e8 100644
  
    /** Background subagent that produced this record (e.g. "explore-7f3c"). */
    agentId?: string;
-@@ -603,6 +605,15 @@ export interface NotificationRecordPayload {
+@@ -697,6 +699,15 @@ export interface NotificationRecordPayload {
    };
  }
  
@@ -175,7 +175,7 @@ index f1d5fdc44d..bf8715b7e8 100644
  export interface UserPromptRecordPayload {
    /**
     * Core/headless: submitted projection, otherwise expanded pre-hook text.
-@@ -3524,6 +3535,43 @@ export class ChatRecordingService {
+@@ -4745,6 +4756,43 @@ export class ChatRecordingService {
     * this record the transcript would never show what memory the model was
     * given — the trajectory exporter reads it back as `turn.recall`.
     */
@@ -220,10 +220,10 @@ index f1d5fdc44d..bf8715b7e8 100644
      try {
        const record: ChatRecord = {
 diff --git a/packages/core/src/services/session-api-history.test.ts b/packages/core/src/services/session-api-history.test.ts
-index d244a6d0a2..4eeeec3409 100644
+index b8c9aecca7..2e78ec9c0f 100644
 --- a/packages/core/src/services/session-api-history.test.ts
 +++ b/packages/core/src/services/session-api-history.test.ts
-@@ -1359,3 +1359,69 @@ describe('prompt resolution across tool-loop continuations', () => {
+@@ -1466,3 +1466,69 @@ describe('prompt resolution across tool-loop continuations', () => {
      expect(findApiHistoryPromptIndex(history, 'session########1')).toBe(-1);
    });
  });
@@ -294,7 +294,7 @@ index d244a6d0a2..4eeeec3409 100644
 +  });
 +});
 diff --git a/packages/core/src/services/session-api-history.ts b/packages/core/src/services/session-api-history.ts
-index da14663915..293f33f74e 100644
+index d0c0c1705d..ebc6f3a0ea 100644
 --- a/packages/core/src/services/session-api-history.ts
 +++ b/packages/core/src/services/session-api-history.ts
 @@ -10,6 +10,7 @@ import type {
@@ -305,7 +305,7 @@ index da14663915..293f33f74e 100644
    SlashCommandRecordPayload,
    TurnResultRecordPayload,
    UserPromptRecordPayload,
-@@ -425,6 +426,10 @@ export class SessionApiHistoryAccumulator {
+@@ -448,6 +449,10 @@ export class SessionApiHistoryAccumulator {
          }
          return;
        }
@@ -316,7 +316,7 @@ index da14663915..293f33f74e 100644
        if (!isApiHistoryCompressionCandidate(record)) return;
        const payload = record.systemPayload as ChatCompressionRecordPayload;
        this.compressionCandidate = payload.compressedHistory;
-@@ -483,6 +488,41 @@ export class SessionApiHistoryAccumulator {
+@@ -518,6 +523,41 @@ export class SessionApiHistoryAccumulator {
      this.lastMaterialRecord = record;
    }
  
@@ -359,10 +359,10 @@ index da14663915..293f33f74e 100644
      return [...this.completedToolCallIds];
    }
 diff --git a/packages/core/src/utils/message-group-deletion.ts b/packages/core/src/utils/message-group-deletion.ts
-index 69f15e73e4..5e09cd2bbc 100644
+index f8830ab0e5..bc3f2d0db0 100644
 --- a/packages/core/src/utils/message-group-deletion.ts
 +++ b/packages/core/src/utils/message-group-deletion.ts
-@@ -112,6 +112,7 @@ const GROUP_SYSTEM_SUBTYPES = new Set([
+@@ -118,6 +118,7 @@ const GROUP_SYSTEM_SUBTYPES = new Set([
    'ui_telemetry',
    'at_command',
    'omni_recall',
@@ -371,10 +371,10 @@ index 69f15e73e4..5e09cd2bbc 100644
    'turn_result',
    'turn_attempt',
 diff --git a/packages/core/src/utils/transcript-records.test.ts b/packages/core/src/utils/transcript-records.test.ts
-index b8dc29dcc3..4bca4796a8 100644
+index 3882f78d17..6a0d42727b 100644
 --- a/packages/core/src/utils/transcript-records.test.ts
 +++ b/packages/core/src/utils/transcript-records.test.ts
-@@ -477,6 +477,7 @@ describe('validateTranscriptRecord', () => {
+@@ -478,6 +478,7 @@ describe('validateTranscriptRecord', () => {
      session_source: true,
      session_execution_engine: true,
      omni_recall: true,
@@ -383,14 +383,14 @@ index b8dc29dcc3..4bca4796a8 100644
      session_approval_mode: true,
      session_workflow_mode: true,
 diff --git a/packages/core/src/utils/transcript-records.ts b/packages/core/src/utils/transcript-records.ts
-index 64618adf83..c168cb94df 100644
+index f1b8ce978d..9ae5bceb54 100644
 --- a/packages/core/src/utils/transcript-records.ts
 +++ b/packages/core/src/utils/transcript-records.ts
-@@ -144,6 +144,7 @@ const KNOWN_RECORD_SUBTYPES = new Set([
+@@ -148,6 +148,7 @@ const KNOWN_RECORD_SUBTYPES = new Set([
    'session_source',
    'session_model',
    'omni_recall',
 +  'sent_user_content',
    'session_execution_engine',
    'session_sources_snapshot',
-   'session_approval_mode',
+   GENERATED_UI_STATE_SUBTYPE,

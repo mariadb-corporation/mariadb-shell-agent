@@ -41,8 +41,8 @@ export function apply() {
   patch(
     RULE,
     'packages/cli/src/commands/channel/channel-registry.test.ts',
-    /^      'feishu',\n      'qq',\n      'github',\n/m,
-    "      'feishu',\n      'github',\n",
+    /^      'qq',\n/gm,
+    '',
     (s) => !s.includes("'qq',"),
   );
 

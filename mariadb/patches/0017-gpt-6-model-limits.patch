@@ -67,10 +67,10 @@ index 069db142bd..d8315a473e 100644
        return undefined;
    }
 diff --git a/packages/core/src/core/tokenLimits.test.ts b/packages/core/src/core/tokenLimits.test.ts
-index 67e758e963..a16a369e85 100644
+index 666e65ee04..4eb3775714 100644
 --- a/packages/core/src/core/tokenLimits.test.ts
 +++ b/packages/core/src/core/tokenLimits.test.ts
-@@ -185,6 +185,13 @@ describe('tokenLimit', () => {
+@@ -192,6 +192,13 @@ describe('tokenLimit', () => {
        expect(tokenLimit('gpt-5.2-pro')).toBe(272000);
      });
  
@@ -84,8 +84,8 @@ index 67e758e963..a16a369e85 100644
      it('should return 128K for legacy GPT (fallback)', () => {
        expect(tokenLimit('gpt-4o')).toBe(131072);
        expect(tokenLimit('gpt-4o-mini')).toBe(131072);
-@@ -467,6 +474,13 @@ describe('tokenLimit with output type', () => {
-       expect(tokenLimit('gpt-5-mini', 'output')).toBe(131072);
+@@ -500,6 +507,13 @@ describe('tokenLimit with output type', () => {
+       expect(hasExplicitOutputLimit('gemini-4-neon')).toBe(true);
      });
  
 +    it('should return correct output limits for GPT-6.x', () => {
@@ -99,10 +99,10 @@ index 67e758e963..a16a369e85 100644
        expect(tokenLimit('gemini-3-pro-preview', 'output')).toBe(65536);
        expect(tokenLimit('gemini-3-flash-preview', 'output')).toBe(65536);
 diff --git a/packages/core/src/core/tokenLimits.ts b/packages/core/src/core/tokenLimits.ts
-index 750f28401c..f3a27716cc 100644
+index 0e414c614b..27a94c76fa 100644
 --- a/packages/core/src/core/tokenLimits.ts
 +++ b/packages/core/src/core/tokenLimits.ts
-@@ -136,6 +136,7 @@ const LIMITS = {
+@@ -137,6 +137,7 @@ const LIMITS = {
    '384k': 384_000, // vendor-declared decimal, DeepSeek V4 max output
    '400k': 400_000, // vendor-declared decimal, used by OpenAI GPT-5.x
    '512k': 524_288,
@@ -110,7 +110,7 @@ index 750f28401c..f3a27716cc 100644
    '1m': 1_000_000,
    // Output token limits (typically much smaller than input limits)
    '4k': 4_096,
-@@ -246,6 +247,7 @@ const PATTERNS: Array<[RegExp, TokenCount]> = [
+@@ -264,6 +265,7 @@ const PATTERNS: Array<[RegExp, TokenCount]> = [
    // -------------------
    // OpenAI
    // -------------------
@@ -118,7 +118,7 @@ index 750f28401c..f3a27716cc 100644
    [/^gpt-5/, LIMITS['272k']], // GPT-5.x: 272K input (400K total - 128K output)
    [/^gpt-/, LIMITS['128k']], // GPT fallback (4o, 4.1, etc.): 128K
    [/^o\d/, LIMITS['200k']], // o-series (o3, o4-mini, etc.): 200K
-@@ -331,6 +333,7 @@ const OUTPUT_PATTERNS: Array<[RegExp, TokenCount]> = [
+@@ -354,6 +356,7 @@ const OUTPUT_PATTERNS: Array<[RegExp, TokenCount]> = [
    [/^gemini-/, LIMITS['8k']], // Gemini fallback: 8K
  
    // OpenAI

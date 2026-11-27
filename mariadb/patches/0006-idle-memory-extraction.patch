@@ -15,10 +15,10 @@ agent loop (the default) start them through the client as well
 (scheduleManagedMemoryRun), and a fresh prompt cancels the pending start.
 
 diff --git a/packages/cli/src/acp-integration/session/Session.test.ts b/packages/cli/src/acp-integration/session/Session.test.ts
-index 8f3db8b2a5..33de86eae7 100644
+index 579964a012..1876ac1ae7 100644
 --- a/packages/cli/src/acp-integration/session/Session.test.ts
 +++ b/packages/cli/src/acp-integration/session/Session.test.ts
-@@ -658,6 +658,8 @@ describe('Session', () => {
+@@ -672,6 +672,8 @@ describe('Session', () => {
      discardManagedAutoMemoryRecallDelivery: ReturnType<typeof vi.fn>;
      finishManagedAutoMemoryRecall: ReturnType<typeof vi.fn>;
      runManagedAutoMemoryBackgroundTasks: ReturnType<typeof vi.fn>;
@@ -27,7 +27,7 @@ index 8f3db8b2a5..33de86eae7 100644
      consumePendingMemoryTaskPromises: ReturnType<typeof vi.fn>;
      captureCacheSafeParams: ReturnType<typeof vi.fn>;
      recordCompletedToolCall: ReturnType<typeof vi.fn>;
-@@ -933,6 +935,8 @@ describe('Session', () => {
+@@ -945,6 +947,8 @@ describe('Session', () => {
        discardManagedAutoMemoryRecallDelivery: vi.fn(),
        finishManagedAutoMemoryRecall: vi.fn(),
        runManagedAutoMemoryBackgroundTasks: vi.fn(),
@@ -36,7 +36,7 @@ index 8f3db8b2a5..33de86eae7 100644
        consumePendingMemoryTaskPromises: vi.fn().mockReturnValue([]),
        captureCacheSafeParams: vi.fn(),
        recordCompletedToolCall: vi.fn(),
-@@ -5575,27 +5579,25 @@ describe('Session', () => {
+@@ -8368,27 +8372,25 @@ describe('Session', () => {
        });
  
        // Captured twice: once inside `#recordPromptCompletionEffects` (before
@@ -77,7 +77,7 @@ index 8f3db8b2a5..33de86eae7 100644
        expect(
          mockLlmClient.finishManagedAutoMemoryRecall,
        ).toHaveBeenCalledOnce();
-@@ -5708,8 +5710,8 @@ describe('Session', () => {
+@@ -8531,8 +8533,8 @@ describe('Session', () => {
        expect(
          mockMemoryManager.resetExhaustedBodyRefsForCurrentTurn,
        ).not.toHaveBeenCalled();
@@ -88,7 +88,7 @@ index 8f3db8b2a5..33de86eae7 100644
        // A retry skips managed auto-memory, but the turn still ends `end_turn`,
        // so the follow-up suggestion fires and reads the process-global
        // cache-safe slot. The turn boundary has to refresh it anyway, or the
-@@ -5727,8 +5729,9 @@ describe('Session', () => {
+@@ -8550,8 +8552,9 @@ describe('Session', () => {
        ).rejects.toThrow('provider failed');
  
        expect(mockLlmClient.beginManagedAutoMemoryRecall).toHaveBeenCalledOnce();
@@ -100,9 +100,9 @@ index 8f3db8b2a5..33de86eae7 100644
        // A failed turn never reaches the success path, so it must not publish
        // its partial transcript as cache-safe.
        expect(mockLlmClient.captureCacheSafeParams).toHaveBeenCalledOnce();
-@@ -32010,8 +32013,7 @@ describe('Session', () => {
+@@ -37229,8 +37232,7 @@ describe('Session', () => {
+             loop_type: core.LoopType.TURN_TOOL_CALL_CAP,
            }),
-           {},
          );
 -        expect(mockMemoryManager.scheduleExtract).not.toHaveBeenCalled();
 -        expect(mockMemoryManager.scheduleDream).not.toHaveBeenCalled();
@@ -110,7 +110,7 @@ index 8f3db8b2a5..33de86eae7 100644
        });
  
        it('keeps continuation retry text in the delivered prompt final', async () => {
-@@ -37235,8 +37237,7 @@ describe('Session', () => {
+@@ -42752,8 +42754,7 @@ describe('Session', () => {
            });
  
            expect(mockChat.sendMessageStream).toHaveBeenCalledOnce();
@@ -120,7 +120,7 @@ index 8f3db8b2a5..33de86eae7 100644
          });
  
          it('waits for a requested delivery final without a channel marker', async () => {
-@@ -43082,7 +43083,7 @@ describe('Session', () => {
+@@ -49069,7 +49070,7 @@ describe('Session', () => {
            expect(
              mockLlmClient.beginManagedAutoMemoryRecall,
            ).not.toHaveBeenCalled();
@@ -130,10 +130,10 @@ index 8f3db8b2a5..33de86eae7 100644
  
          it('wraps additionalContext in the reserved tag before sending', async () => {
 diff --git a/packages/cli/src/acp-integration/session/Session.ts b/packages/cli/src/acp-integration/session/Session.ts
-index 5e58b81498..ff4567b5af 100644
+index 11621644f5..e7951f6a5e 100644
 --- a/packages/cli/src/acp-integration/session/Session.ts
 +++ b/packages/cli/src/acp-integration/session/Session.ts
-@@ -324,8 +324,6 @@ import {
+@@ -335,8 +335,6 @@ import {
    decideNotificationAdmission,
    DroppedNotificationTally,
    MAX_BACKGROUND_NOTIFICATION_QUEUE,
@@ -142,7 +142,7 @@ index 5e58b81498..ff4567b5af 100644
  } from '@qwen-code/qwen-code-core';
  import {
    MANAGED_RUNTIME_OUTCOME_UNKNOWN,
-@@ -7303,6 +7301,10 @@ export class Session implements SessionContext {
+@@ -7678,6 +7676,10 @@ export class Session implements SessionContext {
                !isContinue &&
                !isRestoreAskUserQuestion &&
                !isRuntimeContinuation;
@@ -153,7 +153,7 @@ index 5e58b81498..ff4567b5af 100644
              const strippedPromptIds = (
                isRetry ? strippedRetryEntries : (strippedOrphanEntries ?? [])
              )
-@@ -10759,10 +10761,10 @@ export class Session implements SessionContext {
+@@ -11861,10 +11863,10 @@ export class Session implements SessionContext {
      if (!this.config.getManagedAutoMemoryEnabled()) {
        return;
      }
@@ -166,9 +166,9 @@ index 5e58b81498..ff4567b5af 100644
      for (const scope of ['project', 'user'] as const) {
        void memoryManager
          .scheduleMetadataMigration({
-@@ -10777,39 +10779,10 @@ export class Session implements SessionContext {
-           );
-         });
+@@ -11883,39 +11885,10 @@ export class Session implements SessionContext {
+     if (channelTurn) {
+       return;
      }
 -    void memoryManager
 -      .scheduleExtract({
@@ -211,10 +211,10 @@ index 5e58b81498..ff4567b5af 100644
  
    async #buildNextMessageAfterToolRun(
 diff --git a/packages/core/src/core/client.test.ts b/packages/core/src/core/client.test.ts
-index cb567e4b66..57ab8af24b 100644
+index bba818dde8..4910e59f6b 100644
 --- a/packages/core/src/core/client.test.ts
 +++ b/packages/core/src/core/client.test.ts
-@@ -1041,6 +1041,9 @@ describe('Gemini Client (client.ts)', () => {
+@@ -1069,6 +1069,9 @@ describe('Gemini Client (client.ts)', () => {
    });
  
    afterEach(() => {
@@ -224,7 +224,7 @@ index cb567e4b66..57ab8af24b 100644
      vi.useRealTimers();
      vi.restoreAllMocks();
    });
-@@ -15583,6 +15586,109 @@ Other open files:
+@@ -16607,6 +16610,109 @@ Other open files:
        expect(scheduleDreamSpy).not.toHaveBeenCalled();
      });
  
@@ -334,7 +334,7 @@ index cb567e4b66..57ab8af24b 100644
      /**
       * C2: requestShutdown() is idempotent — calling it multiple times
       * should not throw or have side effects.
-@@ -15758,6 +15864,7 @@ function makeMockConfigForShutdown(
+@@ -16782,6 +16888,7 @@ function makeMockConfigForShutdown(
      isBareMode: vi.fn().mockReturnValue(false),
      getLlmClient: vi.fn().mockReturnValue(undefined),
      getProjectRoot: vi.fn().mockReturnValue('/project'),
@@ -343,13 +343,19 @@ index cb567e4b66..57ab8af24b 100644
      getMemoryManager: vi.fn().mockReturnValue(mgr),
      getManagedAutoMemoryEnabled: vi.fn().mockReturnValue(true),
 diff --git a/packages/core/src/core/client.ts b/packages/core/src/core/client.ts
-index e57b72c781..9e9a0d32a2 100644
+index 49fbcfd0ec..91a64a6f0f 100644
 --- a/packages/core/src/core/client.ts
 +++ b/packages/core/src/core/client.ts
-@@ -3368,6 +3368,19 @@ export class LlmClient {
+@@ -3673,71 +3673,135 @@ export class LlmClient {
      if (messageType !== SendMessageType.UserQuery) {
        return;
      }
++    // A relayed message is often not the person's own: extracting at its stop
++    // would add model calls to every relayed event, learning from turns the
++    // person did not take.
++    if (skipMemoryExtraction) {
++      return;
++    }
 +    this.scheduleManagedMemoryRun();
 +  }
 +
@@ -366,36 +372,13 @@ index e57b72c781..9e9a0d32a2 100644
      // A session agent's hidden session is agent-to-agent work, not the
      // person's conversation: extracting from it would add a model call to
      // every agent turn and feed agent chatter into the person's memory.
-@@ -3375,58 +3388,110 @@ export class LlmClient {
+     if (this.config.isSessionAgentSession?.() === true) {
        return;
      }
- 
--    const sessionId = this.config.getSessionId();
--    const history = this.getHistoryShallow();
--    const extractPromise = mgr
--      .scheduleExtract({
--        projectRoot,
--        sessionId,
--        history,
--        config: this.config,
--        ...(getExtractNoopSkipTurns() > 0 && {
--          // The next prompt's known base; see isBelowCompactionWarn.
--          belowCompactionWarn: isBelowCompactionWarn(
--            this.config,
--            this.getChat().getLastPromptTokenCount() +
--              this.getChat().getLastOutputTokenCount(),
--          ),
--        }),
--      })
--      .then((result) => result.touchedTopics.length)
--      .catch((error: unknown) => {
--        debugLogger.warn(
--          'Failed to schedule managed auto-memory extraction.',
--          error,
--        );
--        return 0;
--      });
--    this.pendingMemoryTaskPromises.push(extractPromise);
+-    // A relayed message is often not the person's own: extracting at its stop
+-    // would add model calls to every relayed event, learning from turns the
+-    // person did not take.
+-    if (skipMemoryExtraction) {
 +    const projectRoot = this.config.getProjectRoot();
 +    const mgr = this.config.getMemoryManager();
 +    const run = () => {
@@ -425,32 +408,7 @@ index e57b72c781..9e9a0d32a2 100644
 +          return 0;
 +        });
 +      this.pendingMemoryTaskPromises.push(extractPromise);
- 
--    const dreamPromise = mgr
--      .scheduleDream({
--        projectRoot,
--        sessionId,
--        config: this.config,
--      })
--      .then((schedResult) => {
--        if (schedResult.status === 'scheduled' && schedResult.promise) {
--          return schedResult.promise.then((state) => {
--            const topics = state.metadata?.['touchedTopics'] as
--              | string[]
--              | undefined;
--            return topics ? topics.length : 0;
--          });
--        }
--        return 0;
--      })
--      .catch((error: unknown) => {
--        debugLogger.warn(
--          'Failed to schedule managed auto-memory dream.',
--          error,
--        );
--        return 0;
--      });
--    this.pendingMemoryTaskPromises.push(dreamPromise);
++
 +      const dreamPromise = mgr
 +        .scheduleDream({
 +          projectRoot,
@@ -488,17 +446,68 @@ index e57b72c781..9e9a0d32a2 100644
 +    this.clearPendingManagedMemoryRun();
 +    if (idleMs <= 0) {
 +      run();
-+      return;
-+    }
+       return;
+     }
 +    this.pendingManagedMemoryRun = setTimeout(() => {
 +      this.pendingManagedMemoryRun = undefined;
 +      if (!this.shutdownRequested) run();
 +    }, idleMs);
 +    this.pendingManagedMemoryRun.unref?.();
 +  }
-+
+ 
+-    const sessionId = this.config.getSessionId();
+-    const history = this.getHistoryShallow();
+-    const extractPromise = mgr
+-      .scheduleExtract({
+-        projectRoot,
+-        sessionId,
+-        history,
+-        config: this.config,
+-        ...(getExtractNoopSkipTurns() > 0 && {
+-          // The next prompt's known base; see isBelowCompactionWarn.
+-          belowCompactionWarn: isBelowCompactionWarn(
+-            this.config,
+-            this.getChat().getLastPromptTokenCount() +
+-              this.getChat().getLastOutputTokenCount(),
+-          ),
+-        }),
+-      })
+-      .then((result) => result.touchedTopics.length)
+-      .catch((error: unknown) => {
+-        debugLogger.warn(
+-          'Failed to schedule managed auto-memory extraction.',
+-          error,
+-        );
+-        return 0;
+-      });
+-    this.pendingMemoryTaskPromises.push(extractPromise);
 +  private pendingManagedMemoryRun: ReturnType<typeof setTimeout> | undefined;
-+
+ 
+-    const dreamPromise = mgr
+-      .scheduleDream({
+-        projectRoot,
+-        sessionId,
+-        config: this.config,
+-      })
+-      .then((schedResult) => {
+-        if (schedResult.status === 'scheduled' && schedResult.promise) {
+-          return schedResult.promise.then((state) => {
+-            const topics = state.metadata?.['touchedTopics'] as
+-              | string[]
+-              | undefined;
+-            return topics ? topics.length : 0;
+-          });
+-        }
+-        return 0;
+-      })
+-      .catch((error: unknown) => {
+-        debugLogger.warn(
+-          'Failed to schedule managed auto-memory dream.',
+-          error,
+-        );
+-        return 0;
+-      });
+-    this.pendingMemoryTaskPromises.push(dreamPromise);
 +  /**
 +   * Drops a pending idle start of extraction and dream: a new question makes
 +   * the session busy again. Hosts that send a question without
@@ -528,7 +537,7 @@ index e57b72c781..9e9a0d32a2 100644
    }
  
    /**
-@@ -3790,6 +3855,10 @@ export class LlmClient {
+@@ -4078,6 +4142,10 @@ export class LlmClient {
        SendMessageType.UserQuery,
    ): AsyncGenerator<ServerLlmStreamEvent, Turn> {
      const messageType = options?.type ?? SendMessageType.UserQuery;
