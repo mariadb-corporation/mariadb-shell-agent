@@ -193,10 +193,10 @@ index 0e8e7b6bf6..02b0f03c3d 100644
    // The provider registers itself as a singleton in the constructor
 diff --git a/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
 new file mode 100644
-index 0000000000..f512653d3b
+index 0000000000..f050bfbf2b
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
-@@ -0,0 +1,184 @@
+@@ -0,0 +1,187 @@
 +/**
 + * @license
 + * Copyright (c) 2026, MariaDB plc.
@@ -261,9 +261,12 @@ index 0000000000..f512653d3b
 +      (_key: string, fallback: unknown) => fallback,
 +    );
 +    execFileMock.mockReset();
-+    execFileMock.mockImplementation((_file, _args, _options, callback) =>
-+      callback(null, { stdout: '', stderr: '' }),
-+    );
++    execFileMock.mockImplementation((_file, args, _options, callback) => {
++      const dir = path.join(home, 'extensions', 'dev');
++      if (args[2] === 'uninstall') fs.rmSync(dir, { recursive: true });
++      if (args[2] === 'install') installExtension('dev', { type: 'local' });
++      callback(null, { stdout: '', stderr: '' });
++    });
 +  });
 +
 +  afterEach(() => {
