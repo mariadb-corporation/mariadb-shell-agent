@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -587,7 +588,13 @@ export async function checkForExtensionUpdate(
         signal?.throwIfAborted();
         extensionDir = tempDir;
       }
-      if (tempDir !== undefined || installMetadata.originSource === 'Qoder') {
+      if (
+        tempDir !== undefined ||
+        installMetadata.originSource === 'Qoder' ||
+        // A Claude plugin directory; a marketplace checkout names its plugin.
+        (installMetadata.originSource === 'Claude' &&
+          !installMetadata.pluginName)
+      ) {
         const sourceBeforeConversion = extensionDir;
         const converted = await convertCompatibleExtension(
           sourceBeforeConversion,

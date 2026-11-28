@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1579,6 +1580,24 @@ describe('git extension helpers', () => {
 
         expect(result).toBe(UPDATE_AVAILABLE);
         expect(await fs.readdir(tempDir)).toEqual(['.qoder-plugin']);
+      });
+    });
+
+    it('should convert a local Claude plugin directory before checking for updates', async () => {
+      await withTempDir('local-claude-update-test-', async (tempDir) => {
+        await fs.mkdir(path.join(tempDir, '.claude-plugin'));
+        await fs.writeFile(
+          path.join(tempDir, '.claude-plugin', 'plugin.json'),
+          JSON.stringify({ name: 'sample-claude-plugin', version: '2.0.0' }),
+        );
+
+        const result = await check(
+          { type: 'local', source: tempDir, originSource: 'Claude' },
+          readingManager(),
+        );
+
+        expect(result).toBe(UPDATE_AVAILABLE);
+        expect(await fs.readdir(tempDir)).toEqual(['.claude-plugin']);
       });
     });
 

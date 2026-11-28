@@ -10,7 +10,11 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { promisify } from 'node:util';
 import * as vscode from 'vscode';
-import { INSTALL_METADATA_FILENAME, Storage } from '@qwen-code/qwen-code-core';
+import {
+  EXTENSIONS_CONFIG_FILENAME,
+  INSTALL_METADATA_FILENAME,
+  Storage,
+} from '@qwen-code/qwen-code-core';
 import { getErrorMessage } from '../utils/errorMessage.js';
 import { logger } from '../utils/logger.js';
 
@@ -19,6 +23,8 @@ const PLUGIN_NAME = 'dev';
 const PLUGIN_REPOSITORY = 'https://github.com/mariadb/ai-plugins';
 // Filled by mariadb/build-vsix.sh from mariadb/AI_PLUGINS; missing in a dev build.
 const BUNDLED_PLUGIN_DIR = path.join('dist', 'mariadb-dev-plugin');
+// The copy in the extension's global storage the plugin is installed from.
+const PLUGIN_COPY_DIR = 'mariadb-dev-plugin';
 export const PLUGIN_VERSION_KEY = 'mariadbDevPluginVersion';
 // Set by 26.11.2, which installed the plugin from GitHub.
 const LEGACY_INSTALLED_KEY = 'mariadbDevPluginInstalled';
@@ -57,52 +63,89 @@ function readJson(file: string): Record<string, unknown> | null {
   }
 }
 
+function pluginVersion(dir: string): unknown {
+  return readJson(path.join(dir, '.claude-plugin', 'plugin.json'))?.['version'];
+}
+
+/** Replaces `to` with a copy of `from`, which appears there all at once. */
+function replaceDir(from: string, to: string): void {
+  const tmp = `${to}.${process.pid}`;
+  fs.rmSync(tmp, { recursive: true, force: true });
+  fs.cpSync(from, tmp, { recursive: true });
+  fs.rmSync(to, { recursive: true, force: true });
+  fs.renameSync(tmp, to);
+}
+
 /**
- * Installs the plugin bundled with this extension when its version differs
- * from the one installed last, replacing an installed copy. A plugin the user
- * uninstalled stays uninstalled.
+ * Brings the plugin bundled with this extension into the user's extensions
+ * when its version differs from the one recorded last. The bundled copy goes
+ * to the extension's global storage first: installed from there, the plugin
+ * keeps a source that outlives this extension version, so a new version is an
+ * in-place `extensions update`, which keeps the user's settings for it. A
+ * plugin the user uninstalled, and a `dev` extension from elsewhere, stay.
  */
 async function installBundled(
   context: vscode.ExtensionContext,
   cliEntryPath: string,
 ): Promise<void> {
   const bundledDir = path.join(context.extensionPath, BUNDLED_PLUGIN_DIR);
-  const bundled = readJson(
-    path.join(bundledDir, '.claude-plugin', 'plugin.json'),
-  )?.['version'];
-  const installedVersion = context.globalState.get<string>(PLUGIN_VERSION_KEY);
-  if (typeof bundled !== 'string' || installedVersion === bundled) return;
+  const bundled = pluginVersion(bundledDir);
+  const recorded = context.globalState.get<string>(PLUGIN_VERSION_KEY);
+  if (typeof bundled !== 'string' || recorded === bundled) return;
+  const source = path.join(context.globalStorageUri.fsPath, PLUGIN_COPY_DIR);
   const dir = path.join(userExtensionsDir(), PLUGIN_NAME);
-  const exists = fs.existsSync(dir);
-  const installedBefore =
-    installedVersion !== undefined ||
-    context.globalState.get(LEGACY_INSTALLED_KEY) === true;
-  if (installedBefore && !exists) return;
-  const source = readJson(path.join(dir, INSTALL_METADATA_FILENAME))?.[
+  const installedSource = readJson(path.join(dir, INSTALL_METADATA_FILENAME))?.[
     'source'
   ];
-  // A `dev` extension from elsewhere (a link, another repository) stays.
-  if (
-    exists &&
-    source !== PLUGIN_REPOSITORY &&
-    (typeof source !== 'string' ||
-      path.basename(source) !== path.basename(BUNDLED_PLUGIN_DIR))
+  if (!fs.existsSync(dir)) {
+    if (
+      recorded !== undefined ||
+      context.globalState.get(LEGACY_INSTALLED_KEY) === true
+    ) {
+      return;
+    }
+  } else if (
+    installedSource !== source &&
+    installedSource !== PLUGIN_REPOSITORY
   ) {
     return;
   }
   try {
-    if (exists) await runCli(cliEntryPath, ['uninstall', PLUGIN_NAME]);
-    await runCli(cliEntryPath, ['install', bundledDir, '--consent']);
-    logger.info(`Installed the MariaDB dev plugin ${bundled}`);
+    if (pluginVersion(source) !== bundled) {
+      fs.mkdirSync(path.dirname(source), { recursive: true });
+      replaceDir(bundledDir, source);
+    }
+    if (installedSource === source) {
+      logger.info(
+        await runCli(cliEntryPath, ['update', PLUGIN_NAME, '--consent']),
+      );
+    } else {
+      if (installedSource === PLUGIN_REPOSITORY) {
+        // Until the install below succeeds, the next start installs afresh.
+        await context.globalState.update(PLUGIN_VERSION_KEY, undefined);
+        await context.globalState.update(LEGACY_INSTALLED_KEY, undefined);
+        await runCli(cliEntryPath, ['uninstall', PLUGIN_NAME]);
+      }
+      await runCli(cliEntryPath, ['install', source, '--consent']);
+    }
   } catch (error) {
     logger.warn(
       `Installing the MariaDB dev plugin failed; retrying on the next start: ${getErrorMessage(error)}`,
     );
-    // A copy uninstalled above must not count as uninstalled by the user.
-    await context.globalState.update(PLUGIN_VERSION_KEY, undefined);
-    await context.globalState.update(LEGACY_INSTALLED_KEY, undefined);
     return;
   }
+  // `extensions update` reports a failure on stderr only; the installed
+  // version tells.
+  const installed = readJson(path.join(dir, EXTENSIONS_CONFIG_FILENAME))?.[
+    'version'
+  ];
+  if (installed !== bundled) {
+    logger.warn(
+      `The MariaDB dev plugin is at ${String(installed)}, not ${bundled}; retrying on the next start`,
+    );
+    return;
+  }
+  logger.info(`Installed the MariaDB dev plugin ${bundled}`);
   await context.globalState.update(PLUGIN_VERSION_KEY, bundled);
 }
 

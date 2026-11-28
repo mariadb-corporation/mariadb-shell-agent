@@ -33,24 +33,22 @@ import {
 
 describe('installAndUpdateMariaDbPlugin', () => {
   let home: string;
-  let extensionPath: string;
   let bundledDir: string;
+  let copyDir: string;
   let state: Map<string, unknown>;
   let context: vscode.ExtensionContext;
 
   beforeEach(() => {
     home = fs.mkdtempSync(path.join(os.tmpdir(), 'mariadb-plugin-'));
     vi.stubEnv('MARIADB_SHELL_AGENT_HOME', home);
-    extensionPath = path.join(home, 'vsix');
+    const extensionPath = path.join(home, 'vsix');
     bundledDir = path.join(extensionPath, 'dist', 'mariadb-dev-plugin');
-    fs.mkdirSync(path.join(bundledDir, '.claude-plugin'), { recursive: true });
-    fs.writeFileSync(
-      path.join(bundledDir, '.claude-plugin', 'plugin.json'),
-      JSON.stringify({ name: 'dev', version: '26.11.0' }),
-    );
+    copyDir = path.join(home, 'storage', 'mariadb-dev-plugin');
+    bundle('26.11.1');
     state = new Map();
     context = {
       extensionPath,
+      globalStorageUri: { fsPath: path.join(home, 'storage') },
       globalState: {
         get: (key: string) => state.get(key),
         update: async (key: string, value: unknown) => {
@@ -70,28 +68,57 @@ describe('installAndUpdateMariaDbPlugin', () => {
     fs.rmSync(home, { recursive: true, force: true });
   });
 
-  function installExtension(name: string, metadata: object) {
+  function bundle(version: string) {
+    fs.mkdirSync(path.join(bundledDir, '.claude-plugin'), { recursive: true });
+    fs.writeFileSync(
+      path.join(bundledDir, '.claude-plugin', 'plugin.json'),
+      JSON.stringify({ name: 'dev', version }),
+    );
+  }
+
+  function readJsonFile(file: string) {
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
+  }
+
+  function installExtension(name: string, metadata: object, version = '1') {
     const dir = path.join(home, 'extensions', name);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(
       path.join(dir, '.qwen-extension-install.json'),
       JSON.stringify(metadata),
     );
+    fs.writeFileSync(
+      path.join(dir, 'qwen-extension.json'),
+      JSON.stringify({ name, version }),
+    );
   }
 
-  /** Uninstalls and installs like the CLI; `failInstall` makes install fail. */
-  function fakeCli(failInstall = false) {
+  /** The CLI's install, update and uninstall of `dev`; `fail` makes one fail. */
+  function fakeCli(fail?: string) {
+    const dir = path.join(home, 'extensions', 'dev');
+    const versionOf = (source: string) =>
+      readJsonFile(path.join(source, '.claude-plugin', 'plugin.json')).version;
     return (
       _file: string,
       args: string[],
       _options: unknown,
       callback: (error: Error | null, result?: object) => void,
     ) => {
-      if (args[2] === 'uninstall') {
-        fs.rmSync(path.join(home, 'extensions', 'dev'), { recursive: true });
-      } else if (args[2] === 'install') {
-        if (failInstall) return callback(new Error('failed'));
-        installExtension('dev', { type: 'local', source: bundledDir });
+      const [, , command, target] = args;
+      if (command === fail) return callback(new Error('failed'));
+      if (command === 'uninstall') fs.rmSync(dir, { recursive: true });
+      if (command === 'install') {
+        installExtension(
+          'dev',
+          { type: 'local', source: target },
+          versionOf(target),
+        );
+      }
+      if (command === 'update' && target === 'dev') {
+        const { source } = readJsonFile(
+          path.join(dir, '.qwen-extension-install.json'),
+        );
+        installExtension('dev', { type: 'local', source }, versionOf(source));
       }
       callback(null, { stdout: '', stderr: '' });
     };
@@ -106,60 +133,84 @@ describe('installAndUpdateMariaDbPlugin', () => {
     await mariaDbPluginSettled();
   }
 
-  it('installs the bundled plugin through the bundled CLI and records its version', async () => {
+  it('installs a copy of the bundled plugin through the bundled CLI and records its version', async () => {
     await run();
     expect(execFileMock).toHaveBeenCalledWith(
       process.execPath,
-      ['cli.js', 'extensions', 'install', bundledDir, '--consent'],
+      ['cli.js', 'extensions', 'install', copyDir, '--consent'],
       expect.anything(),
       expect.any(Function),
     );
-    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.0');
+    expect(
+      readJsonFile(path.join(copyDir, '.claude-plugin', 'plugin.json')).version,
+    ).toBe('26.11.1');
+    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.1');
   });
 
-  it.each([
-    ['a copy of an older bundled version', PLUGIN_VERSION_KEY, '26.10.6'],
-    [
-      'the copy 26.11.2 installed from GitHub',
-      'mariadbDevPluginInstalled',
-      true,
-    ],
-  ])('replaces %s', async (_name, key, value) => {
-    state.set(key, value);
+  it('updates its copy in place when the bundled version is new', async () => {
+    bundle('26.11.0');
+    await run();
+    bundle('26.11.1');
+    execFileMock.mockClear();
+    await run();
+    expect(cliCalls()).toEqual([['extensions', 'update', 'dev', '--consent']]);
+    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.1');
+  });
+
+  it('replaces the copy 26.11.2 installed from GitHub', async () => {
+    state.set('mariadbDevPluginInstalled', true);
     installExtension('dev', {
-      source: 'https://github.com/mariadb/ai-plugins',
       type: 'git',
+      source: 'https://github.com/mariadb/ai-plugins',
       autoUpdate: true,
     });
     await run();
     expect(cliCalls()).toEqual([
       ['extensions', 'uninstall', 'dev'],
-      ['extensions', 'install', bundledDir, '--consent'],
+      ['extensions', 'install', copyDir, '--consent'],
     ]);
-    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.0');
+    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.1');
   });
 
-  it('does not reinstall a plugin the user uninstalled', async () => {
-    state.set(PLUGIN_VERSION_KEY, '26.10.6');
-    await run();
-    state.clear();
+  it('installs afresh on the next start when replacing the GitHub copy failed', async () => {
     state.set('mariadbDevPluginInstalled', true);
+    installExtension('dev', {
+      type: 'git',
+      source: 'https://github.com/mariadb/ai-plugins',
+    });
+    execFileMock.mockImplementation(fakeCli('install'));
     await run();
-    expect(execFileMock).not.toHaveBeenCalled();
+    execFileMock.mockImplementation(fakeCli());
+    execFileMock.mockClear();
+    await run();
+    expect(cliCalls()).toEqual([
+      ['extensions', 'install', copyDir, '--consent'],
+    ]);
   });
 
-  it('does not reinstall the version it installed last', async () => {
-    state.set(PLUGIN_VERSION_KEY, '26.11.0');
-    installExtension('dev', { type: 'local' });
+  it.each([
+    ['a link', { type: 'link', source: '/src/ai-plugins/claude/dev-plugin' }],
+    ['another source', { type: 'git', source: 'https://example.com/dev' }],
+  ])('leaves a dev extension from %s alone', async (_name, metadata) => {
+    installExtension('dev', metadata);
     await run();
     expect(execFileMock).not.toHaveBeenCalled();
   });
 
   it.each([
-    ['a linked copy', { type: 'link', source: '/src/ai-plugins/claude/dev' }],
-    ['an extension from elsewhere', { type: 'git', source: 'https://x/dev' }],
-  ])('leaves %s named dev alone', async (_name, metadata) => {
-    installExtension('dev', metadata);
+    [PLUGIN_VERSION_KEY, '26.11.0'],
+    ['mariadbDevPluginInstalled', true],
+  ])(
+    'does not reinstall a plugin the user uninstalled (%s)',
+    async (key, value) => {
+      state.set(key, value);
+      await run();
+      expect(execFileMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it('does not reinstall the version it recorded last', async () => {
+    state.set(PLUGIN_VERSION_KEY, '26.11.1');
     await run();
     expect(execFileMock).not.toHaveBeenCalled();
   });
@@ -172,28 +223,24 @@ describe('installAndUpdateMariaDbPlugin', () => {
   });
 
   it('does not record a failed install, so the next start retries', async () => {
-    execFileMock.mockImplementation(fakeCli(true));
+    execFileMock.mockImplementation(fakeCli('install'));
     await run();
     expect(state.get(PLUGIN_VERSION_KEY)).toBeUndefined();
   });
 
-  it('retries on the next start when replacing a copy failed after uninstalling it', async () => {
-    state.set(PLUGIN_VERSION_KEY, '26.10.6');
-    installExtension('dev', {
-      type: 'local',
-      source: '/old/vsix/dist/mariadb-dev-plugin',
-    });
-    execFileMock.mockImplementation(fakeCli(true));
+  it('does not record an update that left the old version in place', async () => {
+    bundle('26.11.0');
     await run();
-    execFileMock.mockClear();
+    bundle('26.11.1');
+    execFileMock.mockImplementation((_file, _args, _options, callback) =>
+      callback(null, { stdout: 'already up to date', stderr: '' }),
+    );
     await run();
-    expect(cliCalls()).toEqual([
-      ['extensions', 'install', bundledDir, '--consent'],
-    ]);
+    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.0');
   });
 
   it('updates the extensions with auto-update', async () => {
-    state.set(PLUGIN_VERSION_KEY, '26.11.0');
+    state.set(PLUGIN_VERSION_KEY, '26.11.1');
     installExtension('other', { source: 'x', autoUpdate: true });
     installExtension('manual', { source: 'y' });
     await run();
@@ -203,7 +250,7 @@ describe('installAndUpdateMariaDbPlugin', () => {
   });
 
   it('keeps going when an update fails', async () => {
-    state.set(PLUGIN_VERSION_KEY, '26.11.0');
+    state.set(PLUGIN_VERSION_KEY, '26.11.1');
     installExtension('a', { autoUpdate: true });
     installExtension('b', { autoUpdate: true });
     execFileMock.mockImplementationOnce((_file, _args, _options, callback) =>
