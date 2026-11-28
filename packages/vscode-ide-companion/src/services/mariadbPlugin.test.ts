@@ -28,21 +28,29 @@ vi.mock('vscode', () => ({
 import {
   installAndUpdateMariaDbPlugin,
   mariaDbPluginSettled,
-  PLUGIN_INSTALLED_KEY,
+  PLUGIN_VERSION_KEY,
 } from './mariadbPlugin.js';
-
-const SOURCE = 'https://github.com/mariadb/ai-plugins';
 
 describe('installAndUpdateMariaDbPlugin', () => {
   let home: string;
+  let extensionPath: string;
+  let bundledDir: string;
   let state: Map<string, unknown>;
   let context: vscode.ExtensionContext;
 
   beforeEach(() => {
     home = fs.mkdtempSync(path.join(os.tmpdir(), 'mariadb-plugin-'));
     vi.stubEnv('MARIADB_SHELL_AGENT_HOME', home);
+    extensionPath = path.join(home, 'vsix');
+    bundledDir = path.join(extensionPath, 'dist', 'mariadb-dev-plugin');
+    fs.mkdirSync(path.join(bundledDir, '.claude-plugin'), { recursive: true });
+    fs.writeFileSync(
+      path.join(bundledDir, '.claude-plugin', 'plugin.json'),
+      JSON.stringify({ name: 'dev', version: '26.11.0' }),
+    );
     state = new Map();
     context = {
+      extensionPath,
       globalState: {
         get: (key: string) => state.get(key),
         update: async (key: string, value: unknown) => {
@@ -73,15 +81,6 @@ describe('installAndUpdateMariaDbPlugin', () => {
     );
   }
 
-  function metadataOf(name: string) {
-    return JSON.parse(
-      fs.readFileSync(
-        path.join(home, 'extensions', name, '.qwen-extension-install.json'),
-        'utf8',
-      ),
-    );
-  }
-
   function cliCalls() {
     return execFileMock.mock.calls.map(([, args]) => args.slice(1));
   }
@@ -91,53 +90,71 @@ describe('installAndUpdateMariaDbPlugin', () => {
     await mariaDbPluginSettled();
   }
 
-  it('installs the plugin with auto-update through the bundled CLI and records it', async () => {
+  it('installs the bundled plugin through the bundled CLI and records its version', async () => {
     await run();
     expect(execFileMock).toHaveBeenCalledWith(
       process.execPath,
-      [
-        'cli.js',
-        'extensions',
-        'install',
-        `${SOURCE}:dev`,
-        '--consent',
-        '--auto-update',
-      ],
+      ['cli.js', 'extensions', 'install', bundledDir, '--consent'],
       expect.anything(),
       expect.any(Function),
     );
-    expect(state.get(PLUGIN_INSTALLED_KEY)).toBe(true);
+    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.0');
   });
 
-  it('turns on auto-update for an installed plugin without reinstalling it', async () => {
-    installExtension('dev', { source: SOURCE, type: 'git' });
+  it('replaces an installed copy when the bundled version is new', async () => {
+    state.set(PLUGIN_VERSION_KEY, '26.10.6');
+    installExtension('dev', { type: 'local' });
     await run();
-    expect(metadataOf('dev')).toEqual({
-      source: SOURCE,
-      type: 'git',
-      autoUpdate: true,
-    });
-    expect(cliCalls()).toEqual([['extensions', 'update', 'dev', '--consent']]);
-    expect(state.get(PLUGIN_INSTALLED_KEY)).toBe(true);
+    expect(cliCalls()).toEqual([
+      ['extensions', 'uninstall', 'dev'],
+      ['extensions', 'install', bundledDir, '--consent'],
+    ]);
+    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.0');
   });
 
-  it('keeps auto-update off when it was turned off', async () => {
-    installExtension('dev', { source: SOURCE, autoUpdate: false });
+  it('replaces the plugin 26.11.2 installed from GitHub, which then is no longer updated', async () => {
+    state.set('mariadbDevPluginInstalled', true);
+    installExtension('dev', { type: 'git', autoUpdate: true });
     await run();
-    expect(metadataOf('dev').autoUpdate).toBe(false);
+    expect(cliCalls()).toEqual([
+      ['extensions', 'uninstall', 'dev'],
+      ['extensions', 'install', bundledDir, '--consent'],
+    ]);
+  });
+
+  it('does not reinstall a plugin the user uninstalled', async () => {
+    state.set(PLUGIN_VERSION_KEY, '26.10.6');
+    await run();
+    state.clear();
+    state.set('mariadbDevPluginInstalled', true);
+    await run();
     expect(execFileMock).not.toHaveBeenCalled();
+  });
+
+  it('does not reinstall the version it installed last', async () => {
+    state.set(PLUGIN_VERSION_KEY, '26.11.0');
+    installExtension('dev', { type: 'local' });
+    await run();
+    expect(execFileMock).not.toHaveBeenCalled();
+  });
+
+  it('installs nothing without a bundled plugin', async () => {
+    fs.rmSync(bundledDir, { recursive: true });
+    await run();
+    expect(execFileMock).not.toHaveBeenCalled();
+    expect(state.has(PLUGIN_VERSION_KEY)).toBe(false);
   });
 
   it('does not record a failed install, so the next start retries', async () => {
     execFileMock.mockImplementation((_file, _args, _options, callback) =>
-      callback(new Error('offline')),
+      callback(new Error('failed')),
     );
     await run();
-    expect(state.has(PLUGIN_INSTALLED_KEY)).toBe(false);
+    expect(state.has(PLUGIN_VERSION_KEY)).toBe(false);
   });
 
-  it('only updates on later starts, also when the plugin was uninstalled', async () => {
-    state.set(PLUGIN_INSTALLED_KEY, true);
+  it('updates the extensions with auto-update', async () => {
+    state.set(PLUGIN_VERSION_KEY, '26.11.0');
     installExtension('other', { source: 'x', autoUpdate: true });
     installExtension('manual', { source: 'y' });
     await run();
@@ -147,7 +164,7 @@ describe('installAndUpdateMariaDbPlugin', () => {
   });
 
   it('keeps going when an update fails', async () => {
-    state.set(PLUGIN_INSTALLED_KEY, true);
+    state.set(PLUGIN_VERSION_KEY, '26.11.0');
     installExtension('a', { autoUpdate: true });
     installExtension('b', { autoUpdate: true });
     execFileMock.mockImplementationOnce((_file, _args, _options, callback) =>
@@ -159,9 +176,9 @@ describe('installAndUpdateMariaDbPlugin', () => {
 
   it('does nothing when the setting is off', async () => {
     getSetting.mockReturnValue(false);
-    installExtension('dev', { source: SOURCE, autoUpdate: true });
+    installExtension('other', { autoUpdate: true });
     await run();
     expect(execFileMock).not.toHaveBeenCalled();
-    expect(state.has(PLUGIN_INSTALLED_KEY)).toBe(false);
+    expect(state.has(PLUGIN_VERSION_KEY)).toBe(false);
   });
 });

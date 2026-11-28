@@ -14,10 +14,13 @@ import { Storage } from '@qwen-code/qwen-code-core';
 import { getErrorMessage } from '../utils/errorMessage.js';
 import { logger } from '../utils/logger.js';
 
-const PLUGIN_REPOSITORY = 'https://github.com/mariadb/ai-plugins';
 const PLUGIN_NAME = 'dev';
+// Filled by mariadb/build-vsix.sh from mariadb/AI_PLUGINS; missing in a dev build.
+const BUNDLED_PLUGIN_DIR = path.join('dist', 'mariadb-dev-plugin');
 const INSTALL_METADATA_FILE = '.qwen-extension-install.json';
-export const PLUGIN_INSTALLED_KEY = 'mariadbDevPluginInstalled';
+export const PLUGIN_VERSION_KEY = 'mariadbDevPluginVersion';
+// Set by 26.11.2, which installed the plugin from GitHub.
+const LEGACY_INSTALLED_KEY = 'mariadbDevPluginInstalled';
 const CLI_TIMEOUT_MS = 60_000;
 
 let pending: Promise<void> = Promise.resolve();
@@ -55,38 +58,51 @@ function readInstallMetadata(dir: string): Record<string, unknown> | null {
   }
 }
 
-/** Installs the plugin, or turns on auto-update for one installed without it. */
-async function installOnce(
+function readPluginVersion(dir: string): string | undefined {
+  try {
+    return (
+      JSON.parse(
+        fs.readFileSync(
+          path.join(dir, '.claude-plugin', 'plugin.json'),
+          'utf8',
+        ),
+      ) as { version?: string }
+    ).version;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Installs the plugin bundled with this extension when its version differs
+ * from the one installed last, replacing an installed copy. A plugin the user
+ * uninstalled stays uninstalled.
+ */
+async function installBundled(
   context: vscode.ExtensionContext,
   cliEntryPath: string,
 ): Promise<void> {
+  const bundledDir = path.join(context.extensionPath, BUNDLED_PLUGIN_DIR);
+  const bundled = readPluginVersion(bundledDir);
+  const installedVersion = context.globalState.get<string>(PLUGIN_VERSION_KEY);
+  if (!bundled || installedVersion === bundled) return;
   const dir = path.join(userExtensionsDir(), PLUGIN_NAME);
-  const metadata = readInstallMetadata(dir);
-  if (!fs.existsSync(dir)) {
-    try {
-      await runCli(cliEntryPath, [
-        'install',
-        `${PLUGIN_REPOSITORY}:${PLUGIN_NAME}`,
-        '--consent',
-        '--auto-update',
-      ]);
-      logger.info('Installed the MariaDB dev plugin');
-    } catch (error) {
-      logger.warn(
-        `Installing the MariaDB dev plugin failed; retrying on the next start: ${getErrorMessage(error)}`,
-      );
-      return;
-    }
-  } else if (
-    metadata?.['source'] === PLUGIN_REPOSITORY &&
-    metadata['autoUpdate'] === undefined
-  ) {
-    fs.writeFileSync(
-      path.join(dir, INSTALL_METADATA_FILE),
-      JSON.stringify({ ...metadata, autoUpdate: true }, null, 2),
+  const exists = fs.existsSync(dir);
+  const installedBefore =
+    installedVersion !== undefined ||
+    context.globalState.get(LEGACY_INSTALLED_KEY) === true;
+  if (installedBefore && !exists) return;
+  try {
+    if (exists) await runCli(cliEntryPath, ['uninstall', PLUGIN_NAME]);
+    await runCli(cliEntryPath, ['install', bundledDir, '--consent']);
+    logger.info(`Installed the MariaDB dev plugin ${bundled}`);
+  } catch (error) {
+    logger.warn(
+      `Installing the MariaDB dev plugin failed; retrying on the next start: ${getErrorMessage(error)}`,
     );
+    return;
   }
-  await context.globalState.update(PLUGIN_INSTALLED_KEY, true);
+  await context.globalState.update(PLUGIN_VERSION_KEY, bundled);
 }
 
 /** Updates the user's extensions that have auto-update turned on. */
@@ -108,9 +124,9 @@ async function updateAutoUpdating(cliEntryPath: string): Promise<void> {
 }
 
 /**
- * In the background: installs MariaDB's dev plugin on the first start (a
- * plugin already there counts; a failed install is retried on the next start),
- * then updates the extensions that have auto-update turned on.
+ * In the background: installs the MariaDB dev plugin bundled with this
+ * extension (a failed install is retried on the next start), then updates the
+ * extensions that have auto-update turned on.
  */
 export function installAndUpdateMariaDbPlugin(
   context: vscode.ExtensionContext,
@@ -124,9 +140,7 @@ export function installAndUpdateMariaDbPlugin(
     return;
   }
   pending = (async () => {
-    if (!context.globalState.get(PLUGIN_INSTALLED_KEY)) {
-      await installOnce(context, cliEntryPath);
-    }
+    await installBundled(context, cliEntryPath);
     await updateAutoUpdating(cliEntryPath);
   })().catch((error: unknown) =>
     logger.warn(
