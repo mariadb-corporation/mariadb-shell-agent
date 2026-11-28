@@ -133,16 +133,19 @@ explanation on top) and commit the new patch.
   sanitized
 - `0019-install-bundled-mariadb-dev-plugin.patch`: the extension comes with MariaDB's `dev` plugin
   (`claude/dev-plugin` of https://github.com/mariadb/ai-plugins at the tag in `mariadb/AI_PLUGINS`,
-  which `mariadb/build-vsix.sh` puts into `dist/mariadb-dev-plugin`) and installs it with the
-  bundled CLI on a start where the bundled version differs from the one it installed last
-  (`globalState` `mariadbDevPluginVersion`), replacing a copy it or 26.11.2 installed (a `dev`
-  extension from elsewhere, such as a link, stays). A plugin the user
-  uninstalled stays uninstalled (also when 26.11.2, which installed it from GitHub, recorded
-  `mariadbDevPluginInstalled`); a failed install is logged and retried on the next activation. On
-  every activation the extension then runs `extensions update <name> --consent` for each user
-  extension with `autoUpdate: true` (the patch adds `--consent` to `extensions update`); the bundled
-  plugin is a local install without it, so it only changes with the extension. All of it runs in
-  the background; the daemon and the ACP process wait for it before they start, so they load the
+  which `mariadb/build-vsix.sh` puts into `dist/mariadb-dev-plugin`). On a start where the bundled
+  version differs from the one recorded last (`globalState` `mariadbDevPluginVersion`), it copies
+  the plugin into its global storage (a source that outlives the extension version) and, with the
+  bundled CLI, installs it from there, updates the copy installed from there in place (keeping the
+  user's preferences and enablement for it), or once replaces the copy 26.11.2 installed from
+  GitHub. A `dev` extension from elsewhere (such as a link) stays, and a plugin the user
+  uninstalled stays uninstalled (also when 26.11.2 recorded `mariadbDevPluginInstalled`). The
+  version is recorded only once the installed plugin has it, so a failure is logged and retried on
+  the next activation. The update check of a local Claude plugin directory now converts it first,
+  as for a Qoder plugin (it reported such a plugin as not updatable). On every activation the
+  extension then runs `extensions update <name> --consent` for each user extension with
+  `autoUpdate: true` (the patch adds `--consent` to `extensions update`). All of it runs in the
+  background; the daemon and the ACP process wait for it before they start, so they load the
   installed or updated plugin. Setting `mariadb-shell-agent.installMariaDbPlugin` (on by default)
   turns off install and updates. To ship a newer plugin, change the tag in `mariadb/AI_PLUGINS`
 

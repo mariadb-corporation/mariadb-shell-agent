@@ -3,15 +3,27 @@ Install the bundled MariaDB dev plugin, update extensions with auto-update
 The extension ships MariaDB's dev plugin (github.com/mariadb/ai-plugins,
 claude/dev-plugin at the tag in mariadb/AI_PLUGINS), which
 mariadb/build-vsix.sh puts into dist/mariadb-dev-plugin. On a start where
-that plugin's version differs from the one the extension installed last
-(globalState mariadbDevPluginVersion), the extension installs it with the
-bundled CLI: `extensions uninstall dev` when a copy it or 26.11.2 installed
-(source: a bundled dir, or the ai-plugins repository) is there, then
-`extensions install <bundled dir> --consent`. A `dev` extension from
-elsewhere (a link, another source) is left alone. A plugin the user uninstalled
-stays uninstalled (also when 26.11.2, which installed it from GitHub, set
-mariadbDevPluginInstalled). A failed install is only logged and retried on
-the next start; a build without the bundled plugin installs nothing.
+that plugin's version differs from the one recorded last (globalState
+mariadbDevPluginVersion), the extension copies it to
+<globalStorage>/mariadb-dev-plugin, a source that outlives the extension
+version, and with the bundled CLI:
+- installs it from there (`extensions install <copy> --consent`) when no dev
+  extension is installed;
+- updates the copy installed from there in place (`extensions update dev
+  --consent`), which keeps the user's preferences and enablement for it;
+- replaces the copy 26.11.2 installed from https://github.com/mariadb/ai-plugins
+  (`extensions uninstall dev`, then install), once.
+A dev extension from elsewhere (a link, another source) is left alone, and a
+plugin the user uninstalled stays uninstalled (also when 26.11.2 recorded
+mariadbDevPluginInstalled). The version is recorded only when the installed
+plugin has it, so a failure (also one `extensions update` only reports on
+stderr) is logged and retried on the next start; windows starting at once
+then just update an up-to-date copy.
+
+The update check of a local Claude plugin directory (originSource Claude, no
+pluginName) converts it first, as for a Qoder plugin; it loaded the raw
+directory, found no qwen-extension.json and reported the plugin as not
+updatable, so `extensions update` never updated it.
 
 On every start the extension then runs `extensions update <name> --consent`
 for each user extension whose install metadata has autoUpdate: true (as the
@@ -119,6 +131,54 @@ index 80cba6cb44..334c699c6e 100644
      requestChoicePlugin: requestChoicePluginNonInteractive,
      isWorkspaceTrusted: isWorkspaceTrusted(settings).isTrusted ?? true,
      usageStatisticsEnabled: resolveUsageStatisticsEnabled(
+diff --git a/packages/core/src/extension/github.test.ts b/packages/core/src/extension/github.test.ts
+index 9a6bee8bdd..fdfb62142e 100644
+--- a/packages/core/src/extension/github.test.ts
++++ b/packages/core/src/extension/github.test.ts
+@@ -1582,6 +1582,24 @@ describe('git extension helpers', () => {
+       });
+     });
+ 
++    it('should convert a local Claude plugin directory before checking for updates', async () => {
++      await withTempDir('local-claude-update-test-', async (tempDir) => {
++        await fs.mkdir(path.join(tempDir, '.claude-plugin'));
++        await fs.writeFile(
++          path.join(tempDir, '.claude-plugin', 'plugin.json'),
++          JSON.stringify({ name: 'sample-claude-plugin', version: '2.0.0' }),
++        );
++
++        const result = await check(
++          { type: 'local', source: tempDir, originSource: 'Claude' },
++          readingManager(),
++        );
++
++        expect(result).toBe(UPDATE_AVAILABLE);
++        expect(await fs.readdir(tempDir)).toEqual(['.claude-plugin']);
++      });
++    });
++
+     it('does not convert a local marketplace checkout during update checks', async () => {
+       await withTempDir('local-marketplace-update-test-', async (tempDir) => {
+         const manager = managerReturning({
+diff --git a/packages/core/src/extension/github.ts b/packages/core/src/extension/github.ts
+index a337f2ac3b..9e1c73aff2 100644
+--- a/packages/core/src/extension/github.ts
++++ b/packages/core/src/extension/github.ts
+@@ -587,7 +587,13 @@ export async function checkForExtensionUpdate(
+         signal?.throwIfAborted();
+         extensionDir = tempDir;
+       }
+-      if (tempDir !== undefined || installMetadata.originSource === 'Qoder') {
++      if (
++        tempDir !== undefined ||
++        installMetadata.originSource === 'Qoder' ||
++        // A Claude plugin directory; a marketplace checkout names its plugin.
++        (installMetadata.originSource === 'Claude' &&
++          !installMetadata.pluginName)
++      ) {
+         const sourceBeforeConversion = extensionDir;
+         const converted = await convertCompatibleExtension(
+           sourceBeforeConversion,
 diff --git a/packages/vscode-ide-companion/package.json b/packages/vscode-ide-companion/package.json
 index b32ae884eb..1201f9d390 100644
 --- a/packages/vscode-ide-companion/package.json
@@ -195,10 +255,10 @@ index 0e8e7b6bf6..02b0f03c3d 100644
    // The provider registers itself as a singleton in the constructor
 diff --git a/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
 new file mode 100644
-index 0000000000..e1e1decd3d
+index 0000000000..62c56b647b
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
-@@ -0,0 +1,223 @@
+@@ -0,0 +1,270 @@
 +/**
 + * @license
 + * Copyright (c) 2026, MariaDB plc.
@@ -234,24 +294,22 @@ index 0000000000..e1e1decd3d
 +
 +describe('installAndUpdateMariaDbPlugin', () => {
 +  let home: string;
-+  let extensionPath: string;
 +  let bundledDir: string;
++  let copyDir: string;
 +  let state: Map<string, unknown>;
 +  let context: vscode.ExtensionContext;
 +
 +  beforeEach(() => {
 +    home = fs.mkdtempSync(path.join(os.tmpdir(), 'mariadb-plugin-'));
 +    vi.stubEnv('MARIADB_SHELL_AGENT_HOME', home);
-+    extensionPath = path.join(home, 'vsix');
++    const extensionPath = path.join(home, 'vsix');
 +    bundledDir = path.join(extensionPath, 'dist', 'mariadb-dev-plugin');
-+    fs.mkdirSync(path.join(bundledDir, '.claude-plugin'), { recursive: true });
-+    fs.writeFileSync(
-+      path.join(bundledDir, '.claude-plugin', 'plugin.json'),
-+      JSON.stringify({ name: 'dev', version: '26.11.0' }),
-+    );
++    copyDir = path.join(home, 'storage', 'mariadb-dev-plugin');
++    bundle('26.11.1');
 +    state = new Map();
 +    context = {
 +      extensionPath,
++      globalStorageUri: { fsPath: path.join(home, 'storage') },
 +      globalState: {
 +        get: (key: string) => state.get(key),
 +        update: async (key: string, value: unknown) => {
@@ -271,28 +329,57 @@ index 0000000000..e1e1decd3d
 +    fs.rmSync(home, { recursive: true, force: true });
 +  });
 +
-+  function installExtension(name: string, metadata: object) {
++  function bundle(version: string) {
++    fs.mkdirSync(path.join(bundledDir, '.claude-plugin'), { recursive: true });
++    fs.writeFileSync(
++      path.join(bundledDir, '.claude-plugin', 'plugin.json'),
++      JSON.stringify({ name: 'dev', version }),
++    );
++  }
++
++  function readJsonFile(file: string) {
++    return JSON.parse(fs.readFileSync(file, 'utf8'));
++  }
++
++  function installExtension(name: string, metadata: object, version = '1') {
 +    const dir = path.join(home, 'extensions', name);
 +    fs.mkdirSync(dir, { recursive: true });
 +    fs.writeFileSync(
 +      path.join(dir, '.qwen-extension-install.json'),
 +      JSON.stringify(metadata),
 +    );
++    fs.writeFileSync(
++      path.join(dir, 'qwen-extension.json'),
++      JSON.stringify({ name, version }),
++    );
 +  }
 +
-+  /** Uninstalls and installs like the CLI; `failInstall` makes install fail. */
-+  function fakeCli(failInstall = false) {
++  /** The CLI's install, update and uninstall of `dev`; `fail` makes one fail. */
++  function fakeCli(fail?: string) {
++    const dir = path.join(home, 'extensions', 'dev');
++    const versionOf = (source: string) =>
++      readJsonFile(path.join(source, '.claude-plugin', 'plugin.json')).version;
 +    return (
 +      _file: string,
 +      args: string[],
 +      _options: unknown,
 +      callback: (error: Error | null, result?: object) => void,
 +    ) => {
-+      if (args[2] === 'uninstall') {
-+        fs.rmSync(path.join(home, 'extensions', 'dev'), { recursive: true });
-+      } else if (args[2] === 'install') {
-+        if (failInstall) return callback(new Error('failed'));
-+        installExtension('dev', { type: 'local', source: bundledDir });
++      const [, , command, target] = args;
++      if (command === fail) return callback(new Error('failed'));
++      if (command === 'uninstall') fs.rmSync(dir, { recursive: true });
++      if (command === 'install') {
++        installExtension(
++          'dev',
++          { type: 'local', source: target },
++          versionOf(target),
++        );
++      }
++      if (command === 'update' && target === 'dev') {
++        const { source } = readJsonFile(
++          path.join(dir, '.qwen-extension-install.json'),
++        );
++        installExtension('dev', { type: 'local', source }, versionOf(source));
 +      }
 +      callback(null, { stdout: '', stderr: '' });
 +    };
@@ -307,60 +394,84 @@ index 0000000000..e1e1decd3d
 +    await mariaDbPluginSettled();
 +  }
 +
-+  it('installs the bundled plugin through the bundled CLI and records its version', async () => {
++  it('installs a copy of the bundled plugin through the bundled CLI and records its version', async () => {
 +    await run();
 +    expect(execFileMock).toHaveBeenCalledWith(
 +      process.execPath,
-+      ['cli.js', 'extensions', 'install', bundledDir, '--consent'],
++      ['cli.js', 'extensions', 'install', copyDir, '--consent'],
 +      expect.anything(),
 +      expect.any(Function),
 +    );
-+    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.0');
++    expect(
++      readJsonFile(path.join(copyDir, '.claude-plugin', 'plugin.json')).version,
++    ).toBe('26.11.1');
++    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.1');
 +  });
 +
-+  it.each([
-+    ['a copy of an older bundled version', PLUGIN_VERSION_KEY, '26.10.6'],
-+    [
-+      'the copy 26.11.2 installed from GitHub',
-+      'mariadbDevPluginInstalled',
-+      true,
-+    ],
-+  ])('replaces %s', async (_name, key, value) => {
-+    state.set(key, value);
++  it('updates its copy in place when the bundled version is new', async () => {
++    bundle('26.11.0');
++    await run();
++    bundle('26.11.1');
++    execFileMock.mockClear();
++    await run();
++    expect(cliCalls()).toEqual([['extensions', 'update', 'dev', '--consent']]);
++    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.1');
++  });
++
++  it('replaces the copy 26.11.2 installed from GitHub', async () => {
++    state.set('mariadbDevPluginInstalled', true);
 +    installExtension('dev', {
-+      source: 'https://github.com/mariadb/ai-plugins',
 +      type: 'git',
++      source: 'https://github.com/mariadb/ai-plugins',
 +      autoUpdate: true,
 +    });
 +    await run();
 +    expect(cliCalls()).toEqual([
 +      ['extensions', 'uninstall', 'dev'],
-+      ['extensions', 'install', bundledDir, '--consent'],
++      ['extensions', 'install', copyDir, '--consent'],
 +    ]);
-+    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.0');
++    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.1');
 +  });
 +
-+  it('does not reinstall a plugin the user uninstalled', async () => {
-+    state.set(PLUGIN_VERSION_KEY, '26.10.6');
-+    await run();
-+    state.clear();
++  it('installs afresh on the next start when replacing the GitHub copy failed', async () => {
 +    state.set('mariadbDevPluginInstalled', true);
++    installExtension('dev', {
++      type: 'git',
++      source: 'https://github.com/mariadb/ai-plugins',
++    });
++    execFileMock.mockImplementation(fakeCli('install'));
 +    await run();
-+    expect(execFileMock).not.toHaveBeenCalled();
++    execFileMock.mockImplementation(fakeCli());
++    execFileMock.mockClear();
++    await run();
++    expect(cliCalls()).toEqual([
++      ['extensions', 'install', copyDir, '--consent'],
++    ]);
 +  });
 +
-+  it('does not reinstall the version it installed last', async () => {
-+    state.set(PLUGIN_VERSION_KEY, '26.11.0');
-+    installExtension('dev', { type: 'local' });
++  it.each([
++    ['a link', { type: 'link', source: '/src/ai-plugins/claude/dev-plugin' }],
++    ['another source', { type: 'git', source: 'https://example.com/dev' }],
++  ])('leaves a dev extension from %s alone', async (_name, metadata) => {
++    installExtension('dev', metadata);
 +    await run();
 +    expect(execFileMock).not.toHaveBeenCalled();
 +  });
 +
 +  it.each([
-+    ['a linked copy', { type: 'link', source: '/src/ai-plugins/claude/dev' }],
-+    ['an extension from elsewhere', { type: 'git', source: 'https://x/dev' }],
-+  ])('leaves %s named dev alone', async (_name, metadata) => {
-+    installExtension('dev', metadata);
++    [PLUGIN_VERSION_KEY, '26.11.0'],
++    ['mariadbDevPluginInstalled', true],
++  ])(
++    'does not reinstall a plugin the user uninstalled (%s)',
++    async (key, value) => {
++      state.set(key, value);
++      await run();
++      expect(execFileMock).not.toHaveBeenCalled();
++    },
++  );
++
++  it('does not reinstall the version it recorded last', async () => {
++    state.set(PLUGIN_VERSION_KEY, '26.11.1');
 +    await run();
 +    expect(execFileMock).not.toHaveBeenCalled();
 +  });
@@ -373,28 +484,24 @@ index 0000000000..e1e1decd3d
 +  });
 +
 +  it('does not record a failed install, so the next start retries', async () => {
-+    execFileMock.mockImplementation(fakeCli(true));
++    execFileMock.mockImplementation(fakeCli('install'));
 +    await run();
 +    expect(state.get(PLUGIN_VERSION_KEY)).toBeUndefined();
 +  });
 +
-+  it('retries on the next start when replacing a copy failed after uninstalling it', async () => {
-+    state.set(PLUGIN_VERSION_KEY, '26.10.6');
-+    installExtension('dev', {
-+      type: 'local',
-+      source: '/old/vsix/dist/mariadb-dev-plugin',
-+    });
-+    execFileMock.mockImplementation(fakeCli(true));
++  it('does not record an update that left the old version in place', async () => {
++    bundle('26.11.0');
 +    await run();
-+    execFileMock.mockClear();
++    bundle('26.11.1');
++    execFileMock.mockImplementation((_file, _args, _options, callback) =>
++      callback(null, { stdout: 'already up to date', stderr: '' }),
++    );
 +    await run();
-+    expect(cliCalls()).toEqual([
-+      ['extensions', 'install', bundledDir, '--consent'],
-+    ]);
++    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.0');
 +  });
 +
 +  it('updates the extensions with auto-update', async () => {
-+    state.set(PLUGIN_VERSION_KEY, '26.11.0');
++    state.set(PLUGIN_VERSION_KEY, '26.11.1');
 +    installExtension('other', { source: 'x', autoUpdate: true });
 +    installExtension('manual', { source: 'y' });
 +    await run();
@@ -404,7 +511,7 @@ index 0000000000..e1e1decd3d
 +  });
 +
 +  it('keeps going when an update fails', async () => {
-+    state.set(PLUGIN_VERSION_KEY, '26.11.0');
++    state.set(PLUGIN_VERSION_KEY, '26.11.1');
 +    installExtension('a', { autoUpdate: true });
 +    installExtension('b', { autoUpdate: true });
 +    execFileMock.mockImplementationOnce((_file, _args, _options, callback) =>
@@ -424,10 +531,10 @@ index 0000000000..e1e1decd3d
 +});
 diff --git a/packages/vscode-ide-companion/src/services/mariadbPlugin.ts b/packages/vscode-ide-companion/src/services/mariadbPlugin.ts
 new file mode 100644
-index 0000000000..825aeba146
+index 0000000000..4927ecf235
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/services/mariadbPlugin.ts
-@@ -0,0 +1,163 @@
+@@ -0,0 +1,206 @@
 +/**
 + * @license
 + * Copyright (c) 2026, MariaDB plc.
@@ -440,7 +547,11 @@ index 0000000000..825aeba146
 +import * as path from 'node:path';
 +import { promisify } from 'node:util';
 +import * as vscode from 'vscode';
-+import { INSTALL_METADATA_FILENAME, Storage } from '@qwen-code/qwen-code-core';
++import {
++  EXTENSIONS_CONFIG_FILENAME,
++  INSTALL_METADATA_FILENAME,
++  Storage,
++} from '@qwen-code/qwen-code-core';
 +import { getErrorMessage } from '../utils/errorMessage.js';
 +import { logger } from '../utils/logger.js';
 +
@@ -449,6 +560,8 @@ index 0000000000..825aeba146
 +const PLUGIN_REPOSITORY = 'https://github.com/mariadb/ai-plugins';
 +// Filled by mariadb/build-vsix.sh from mariadb/AI_PLUGINS; missing in a dev build.
 +const BUNDLED_PLUGIN_DIR = path.join('dist', 'mariadb-dev-plugin');
++// The copy in the extension's global storage the plugin is installed from.
++const PLUGIN_COPY_DIR = 'mariadb-dev-plugin';
 +export const PLUGIN_VERSION_KEY = 'mariadbDevPluginVersion';
 +// Set by 26.11.2, which installed the plugin from GitHub.
 +const LEGACY_INSTALLED_KEY = 'mariadbDevPluginInstalled';
@@ -487,52 +600,89 @@ index 0000000000..825aeba146
 +  }
 +}
 +
++function pluginVersion(dir: string): unknown {
++  return readJson(path.join(dir, '.claude-plugin', 'plugin.json'))?.['version'];
++}
++
++/** Replaces `to` with a copy of `from`, which appears there all at once. */
++function replaceDir(from: string, to: string): void {
++  const tmp = `${to}.${process.pid}`;
++  fs.rmSync(tmp, { recursive: true, force: true });
++  fs.cpSync(from, tmp, { recursive: true });
++  fs.rmSync(to, { recursive: true, force: true });
++  fs.renameSync(tmp, to);
++}
++
 +/**
-+ * Installs the plugin bundled with this extension when its version differs
-+ * from the one installed last, replacing an installed copy. A plugin the user
-+ * uninstalled stays uninstalled.
++ * Brings the plugin bundled with this extension into the user's extensions
++ * when its version differs from the one recorded last. The bundled copy goes
++ * to the extension's global storage first: installed from there, the plugin
++ * keeps a source that outlives this extension version, so a new version is an
++ * in-place `extensions update`, which keeps the user's settings for it. A
++ * plugin the user uninstalled, and a `dev` extension from elsewhere, stay.
 + */
 +async function installBundled(
 +  context: vscode.ExtensionContext,
 +  cliEntryPath: string,
 +): Promise<void> {
 +  const bundledDir = path.join(context.extensionPath, BUNDLED_PLUGIN_DIR);
-+  const bundled = readJson(
-+    path.join(bundledDir, '.claude-plugin', 'plugin.json'),
-+  )?.['version'];
-+  const installedVersion = context.globalState.get<string>(PLUGIN_VERSION_KEY);
-+  if (typeof bundled !== 'string' || installedVersion === bundled) return;
++  const bundled = pluginVersion(bundledDir);
++  const recorded = context.globalState.get<string>(PLUGIN_VERSION_KEY);
++  if (typeof bundled !== 'string' || recorded === bundled) return;
++  const source = path.join(context.globalStorageUri.fsPath, PLUGIN_COPY_DIR);
 +  const dir = path.join(userExtensionsDir(), PLUGIN_NAME);
-+  const exists = fs.existsSync(dir);
-+  const installedBefore =
-+    installedVersion !== undefined ||
-+    context.globalState.get(LEGACY_INSTALLED_KEY) === true;
-+  if (installedBefore && !exists) return;
-+  const source = readJson(path.join(dir, INSTALL_METADATA_FILENAME))?.[
++  const installedSource = readJson(path.join(dir, INSTALL_METADATA_FILENAME))?.[
 +    'source'
 +  ];
-+  // A `dev` extension from elsewhere (a link, another repository) stays.
-+  if (
-+    exists &&
-+    source !== PLUGIN_REPOSITORY &&
-+    (typeof source !== 'string' ||
-+      path.basename(source) !== path.basename(BUNDLED_PLUGIN_DIR))
++  if (!fs.existsSync(dir)) {
++    if (
++      recorded !== undefined ||
++      context.globalState.get(LEGACY_INSTALLED_KEY) === true
++    ) {
++      return;
++    }
++  } else if (
++    installedSource !== source &&
++    installedSource !== PLUGIN_REPOSITORY
 +  ) {
 +    return;
 +  }
 +  try {
-+    if (exists) await runCli(cliEntryPath, ['uninstall', PLUGIN_NAME]);
-+    await runCli(cliEntryPath, ['install', bundledDir, '--consent']);
-+    logger.info(`Installed the MariaDB dev plugin ${bundled}`);
++    if (pluginVersion(source) !== bundled) {
++      fs.mkdirSync(path.dirname(source), { recursive: true });
++      replaceDir(bundledDir, source);
++    }
++    if (installedSource === source) {
++      logger.info(
++        await runCli(cliEntryPath, ['update', PLUGIN_NAME, '--consent']),
++      );
++    } else {
++      if (installedSource === PLUGIN_REPOSITORY) {
++        // Until the install below succeeds, the next start installs afresh.
++        await context.globalState.update(PLUGIN_VERSION_KEY, undefined);
++        await context.globalState.update(LEGACY_INSTALLED_KEY, undefined);
++        await runCli(cliEntryPath, ['uninstall', PLUGIN_NAME]);
++      }
++      await runCli(cliEntryPath, ['install', source, '--consent']);
++    }
 +  } catch (error) {
 +    logger.warn(
 +      `Installing the MariaDB dev plugin failed; retrying on the next start: ${getErrorMessage(error)}`,
 +    );
-+    // A copy uninstalled above must not count as uninstalled by the user.
-+    await context.globalState.update(PLUGIN_VERSION_KEY, undefined);
-+    await context.globalState.update(LEGACY_INSTALLED_KEY, undefined);
 +    return;
 +  }
++  // `extensions update` reports a failure on stderr only; the installed
++  // version tells.
++  const installed = readJson(path.join(dir, EXTENSIONS_CONFIG_FILENAME))?.[
++    'version'
++  ];
++  if (installed !== bundled) {
++    logger.warn(
++      `The MariaDB dev plugin is at ${String(installed)}, not ${bundled}; retrying on the next start`,
++    );
++    return;
++  }
++  logger.info(`Installed the MariaDB dev plugin ${bundled}`);
 +  await context.globalState.update(PLUGIN_VERSION_KEY, bundled);
 +}
 +
