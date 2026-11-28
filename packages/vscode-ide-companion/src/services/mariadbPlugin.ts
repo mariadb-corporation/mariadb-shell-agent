@@ -100,6 +100,9 @@ async function installBundled(
     logger.warn(
       `Installing the MariaDB dev plugin failed; retrying on the next start: ${getErrorMessage(error)}`,
     );
+    // A copy uninstalled above must not count as uninstalled by the user.
+    await context.globalState.update(PLUGIN_VERSION_KEY, undefined);
+    await context.globalState.update(LEGACY_INSTALLED_KEY, undefined);
     return;
   }
   await context.globalState.update(PLUGIN_VERSION_KEY, bundled);

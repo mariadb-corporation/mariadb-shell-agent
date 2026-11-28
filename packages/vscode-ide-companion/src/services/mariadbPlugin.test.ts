@@ -156,6 +156,23 @@ describe('installAndUpdateMariaDbPlugin', () => {
     expect(state.has(PLUGIN_VERSION_KEY)).toBe(false);
   });
 
+  it('retries on the next start when replacing a copy failed after uninstalling it', async () => {
+    state.set(PLUGIN_VERSION_KEY, '26.10.6');
+    installExtension('dev', { type: 'local' });
+    execFileMock.mockImplementation((_file, args, _options, callback) => {
+      if (args[2] === 'uninstall') {
+        fs.rmSync(path.join(home, 'extensions', 'dev'), { recursive: true });
+        callback(null, { stdout: '', stderr: '' });
+      } else callback(new Error('failed'));
+    });
+    await run();
+    execFileMock.mockClear();
+    await run();
+    expect(cliCalls()).toEqual([
+      ['extensions', 'install', bundledDir, '--consent'],
+    ]);
+  });
+
   it('updates the extensions with auto-update', async () => {
     state.set(PLUGIN_VERSION_KEY, '26.11.0');
     installExtension('other', { source: 'x', autoUpdate: true });
