@@ -193,10 +193,10 @@ index 0e8e7b6bf6..02b0f03c3d 100644
    // The provider registers itself as a singleton in the constructor
 diff --git a/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
 new file mode 100644
-index 0000000000..f050bfbf2b
+index 0000000000..94ca94bbcc
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
-@@ -0,0 +1,187 @@
+@@ -0,0 +1,204 @@
 +/**
 + * @license
 + * Copyright (c) 2026, MariaDB plc.
@@ -355,6 +355,23 @@ index 0000000000..f050bfbf2b
 +    expect(state.has(PLUGIN_VERSION_KEY)).toBe(false);
 +  });
 +
++  it('retries on the next start when replacing a copy failed after uninstalling it', async () => {
++    state.set(PLUGIN_VERSION_KEY, '26.10.6');
++    installExtension('dev', { type: 'local' });
++    execFileMock.mockImplementation((_file, args, _options, callback) => {
++      if (args[2] === 'uninstall') {
++        fs.rmSync(path.join(home, 'extensions', 'dev'), { recursive: true });
++        callback(null, { stdout: '', stderr: '' });
++      } else callback(new Error('failed'));
++    });
++    await run();
++    execFileMock.mockClear();
++    await run();
++    expect(cliCalls()).toEqual([
++      ['extensions', 'install', bundledDir, '--consent'],
++    ]);
++  });
++
 +  it('updates the extensions with auto-update', async () => {
 +    state.set(PLUGIN_VERSION_KEY, '26.11.0');
 +    installExtension('other', { source: 'x', autoUpdate: true });
@@ -386,10 +403,10 @@ index 0000000000..f050bfbf2b
 +});
 diff --git a/packages/vscode-ide-companion/src/services/mariadbPlugin.ts b/packages/vscode-ide-companion/src/services/mariadbPlugin.ts
 new file mode 100644
-index 0000000000..5b7597e481
+index 0000000000..1769a0f140
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/services/mariadbPlugin.ts
-@@ -0,0 +1,155 @@
+@@ -0,0 +1,161 @@
 +/**
 + * @license
 + * Copyright (c) 2026, MariaDB plc.
@@ -454,7 +471,10 @@ index 0000000000..5b7597e481
 +  try {
 +    return (
 +      JSON.parse(
-+        fs.readFileSync(path.join(dir, '.claude-plugin', 'plugin.json'), 'utf8'),
++        fs.readFileSync(
++          path.join(dir, '.claude-plugin', 'plugin.json'),
++          'utf8',
++        ),
 +      ) as { version?: string }
 +    ).version;
 +  } catch {
@@ -489,6 +509,9 @@ index 0000000000..5b7597e481
 +    logger.warn(
 +      `Installing the MariaDB dev plugin failed; retrying on the next start: ${getErrorMessage(error)}`,
 +    );
++    // A copy uninstalled above must not count as uninstalled by the user.
++    await context.globalState.update(PLUGIN_VERSION_KEY, undefined);
++    await context.globalState.update(LEGACY_INSTALLED_KEY, undefined);
 +    return;
 +  }
 +  await context.globalState.update(PLUGIN_VERSION_KEY, bundled);
