@@ -153,7 +153,7 @@ describe('installAndUpdateMariaDbPlugin', () => {
       callback(new Error('failed')),
     );
     await run();
-    expect(state.has(PLUGIN_VERSION_KEY)).toBe(false);
+    expect(state.get(PLUGIN_VERSION_KEY)).toBeUndefined();
   });
 
   it('retries on the next start when replacing a copy failed after uninstalling it', async () => {
