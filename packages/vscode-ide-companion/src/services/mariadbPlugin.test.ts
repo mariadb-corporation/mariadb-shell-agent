@@ -62,9 +62,12 @@ describe('installAndUpdateMariaDbPlugin', () => {
       (_key: string, fallback: unknown) => fallback,
     );
     execFileMock.mockReset();
-    execFileMock.mockImplementation((_file, _args, _options, callback) =>
-      callback(null, { stdout: '', stderr: '' }),
-    );
+    execFileMock.mockImplementation((_file, args, _options, callback) => {
+      const dir = path.join(home, 'extensions', 'dev');
+      if (args[2] === 'uninstall') fs.rmSync(dir, { recursive: true });
+      if (args[2] === 'install') installExtension('dev', { type: 'local' });
+      callback(null, { stdout: '', stderr: '' });
+    });
   });
 
   afterEach(() => {
