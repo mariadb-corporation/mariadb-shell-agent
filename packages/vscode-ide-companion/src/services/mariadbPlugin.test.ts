@@ -91,7 +91,7 @@ describe('installAndUpdateMariaDbPlugin', () => {
         fs.rmSync(path.join(home, 'extensions', 'dev'), { recursive: true });
       } else if (args[2] === 'install') {
         if (failInstall) return callback(new Error('failed'));
-        installExtension('dev', { type: 'local' });
+        installExtension('dev', { type: 'local', source: bundledDir });
       }
       callback(null, { stdout: '', stderr: '' });
     };
@@ -126,7 +126,11 @@ describe('installAndUpdateMariaDbPlugin', () => {
     ],
   ])('replaces %s', async (_name, key, value) => {
     state.set(key, value);
-    installExtension('dev', { type: 'git', autoUpdate: true });
+    installExtension('dev', {
+      source: 'https://github.com/mariadb/ai-plugins',
+      type: 'git',
+      autoUpdate: true,
+    });
     await run();
     expect(cliCalls()).toEqual([
       ['extensions', 'uninstall', 'dev'],
@@ -151,6 +155,15 @@ describe('installAndUpdateMariaDbPlugin', () => {
     expect(execFileMock).not.toHaveBeenCalled();
   });
 
+  it.each([
+    ['a linked copy', { type: 'link', source: '/src/ai-plugins/claude/dev' }],
+    ['an extension from elsewhere', { type: 'git', source: 'https://x/dev' }],
+  ])('leaves %s named dev alone', async (_name, metadata) => {
+    installExtension('dev', metadata);
+    await run();
+    expect(execFileMock).not.toHaveBeenCalled();
+  });
+
   it('installs nothing without a bundled plugin', async () => {
     fs.rmSync(bundledDir, { recursive: true });
     await run();
@@ -166,7 +179,10 @@ describe('installAndUpdateMariaDbPlugin', () => {
 
   it('retries on the next start when replacing a copy failed after uninstalling it', async () => {
     state.set(PLUGIN_VERSION_KEY, '26.10.6');
-    installExtension('dev', { type: 'local' });
+    installExtension('dev', {
+      type: 'local',
+      source: '/old/vsix/dist/mariadb-dev-plugin',
+    });
     execFileMock.mockImplementation(fakeCli(true));
     await run();
     execFileMock.mockClear();

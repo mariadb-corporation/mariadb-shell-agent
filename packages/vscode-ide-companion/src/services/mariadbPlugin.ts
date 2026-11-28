@@ -15,6 +15,8 @@ import { getErrorMessage } from '../utils/errorMessage.js';
 import { logger } from '../utils/logger.js';
 
 const PLUGIN_NAME = 'dev';
+// Where 26.11.2 installed the plugin from.
+const PLUGIN_REPOSITORY = 'https://github.com/mariadb/ai-plugins';
 // Filled by mariadb/build-vsix.sh from mariadb/AI_PLUGINS; missing in a dev build.
 const BUNDLED_PLUGIN_DIR = path.join('dist', 'mariadb-dev-plugin');
 export const PLUGIN_VERSION_KEY = 'mariadbDevPluginVersion';
@@ -76,6 +78,18 @@ async function installBundled(
     installedVersion !== undefined ||
     context.globalState.get(LEGACY_INSTALLED_KEY) === true;
   if (installedBefore && !exists) return;
+  const source = readJson(path.join(dir, INSTALL_METADATA_FILENAME))?.[
+    'source'
+  ];
+  // A `dev` extension from elsewhere (a link, another repository) stays.
+  if (
+    exists &&
+    source !== PLUGIN_REPOSITORY &&
+    (typeof source !== 'string' ||
+      path.basename(source) !== path.basename(BUNDLED_PLUGIN_DIR))
+  ) {
+    return;
+  }
   try {
     if (exists) await runCli(cliEntryPath, ['uninstall', PLUGIN_NAME]);
     await runCli(cliEntryPath, ['install', bundledDir, '--consent']);
