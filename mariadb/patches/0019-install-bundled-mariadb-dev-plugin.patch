@@ -193,7 +193,7 @@ index 0e8e7b6bf6..02b0f03c3d 100644
    // The provider registers itself as a singleton in the constructor
 diff --git a/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
 new file mode 100644
-index 0000000000..94ca94bbcc
+index 0000000000..3de9c8c16e
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
 @@ -0,0 +1,204 @@
@@ -352,7 +352,7 @@ index 0000000000..94ca94bbcc
 +      callback(new Error('failed')),
 +    );
 +    await run();
-+    expect(state.has(PLUGIN_VERSION_KEY)).toBe(false);
++    expect(state.get(PLUGIN_VERSION_KEY)).toBeUndefined();
 +  });
 +
 +  it('retries on the next start when replacing a copy failed after uninstalling it', async () => {
