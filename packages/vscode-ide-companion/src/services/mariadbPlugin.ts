@@ -10,14 +10,13 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { promisify } from 'node:util';
 import * as vscode from 'vscode';
-import { Storage } from '@qwen-code/qwen-code-core';
+import { INSTALL_METADATA_FILENAME, Storage } from '@qwen-code/qwen-code-core';
 import { getErrorMessage } from '../utils/errorMessage.js';
 import { logger } from '../utils/logger.js';
 
 const PLUGIN_NAME = 'dev';
 // Filled by mariadb/build-vsix.sh from mariadb/AI_PLUGINS; missing in a dev build.
 const BUNDLED_PLUGIN_DIR = path.join('dist', 'mariadb-dev-plugin');
-const INSTALL_METADATA_FILE = '.qwen-extension-install.json';
 export const PLUGIN_VERSION_KEY = 'mariadbDevPluginVersion';
 // Set by 26.11.2, which installed the plugin from GitHub.
 const LEGACY_INSTALLED_KEY = 'mariadbDevPluginInstalled';
@@ -48,28 +47,11 @@ async function runCli(cliEntryPath: string, args: string[]): Promise<string> {
   return `${stdout}${stderr}`.trim();
 }
 
-function readInstallMetadata(dir: string): Record<string, unknown> | null {
+function readJson(file: string): Record<string, unknown> | null {
   try {
-    return JSON.parse(
-      fs.readFileSync(path.join(dir, INSTALL_METADATA_FILE), 'utf8'),
-    ) as Record<string, unknown>;
+    return JSON.parse(fs.readFileSync(file, 'utf8')) as Record<string, unknown>;
   } catch {
     return null;
-  }
-}
-
-function readPluginVersion(dir: string): string | undefined {
-  try {
-    return (
-      JSON.parse(
-        fs.readFileSync(
-          path.join(dir, '.claude-plugin', 'plugin.json'),
-          'utf8',
-        ),
-      ) as { version?: string }
-    ).version;
-  } catch {
-    return undefined;
   }
 }
 
@@ -83,9 +65,11 @@ async function installBundled(
   cliEntryPath: string,
 ): Promise<void> {
   const bundledDir = path.join(context.extensionPath, BUNDLED_PLUGIN_DIR);
-  const bundled = readPluginVersion(bundledDir);
+  const bundled = readJson(
+    path.join(bundledDir, '.claude-plugin', 'plugin.json'),
+  )?.['version'];
   const installedVersion = context.globalState.get<string>(PLUGIN_VERSION_KEY);
-  if (!bundled || installedVersion === bundled) return;
+  if (typeof bundled !== 'string' || installedVersion === bundled) return;
   const dir = path.join(userExtensionsDir(), PLUGIN_NAME);
   const exists = fs.existsSync(dir);
   const installedBefore =
@@ -113,7 +97,11 @@ async function updateAutoUpdating(cliEntryPath: string): Promise<void> {
   const root = userExtensionsDir();
   if (!fs.existsSync(root)) return;
   for (const name of fs.readdirSync(root)) {
-    if (readInstallMetadata(path.join(root, name))?.['autoUpdate'] !== true) {
+    if (
+      readJson(path.join(root, name, INSTALL_METADATA_FILENAME))?.[
+        'autoUpdate'
+      ] !== true
+    ) {
       continue;
     }
     try {

@@ -62,12 +62,7 @@ describe('installAndUpdateMariaDbPlugin', () => {
       (_key: string, fallback: unknown) => fallback,
     );
     execFileMock.mockReset();
-    execFileMock.mockImplementation((_file, args, _options, callback) => {
-      const dir = path.join(home, 'extensions', 'dev');
-      if (args[2] === 'uninstall') fs.rmSync(dir, { recursive: true });
-      if (args[2] === 'install') installExtension('dev', { type: 'local' });
-      callback(null, { stdout: '', stderr: '' });
-    });
+    execFileMock.mockImplementation(fakeCli());
   });
 
   afterEach(() => {
@@ -82,6 +77,24 @@ describe('installAndUpdateMariaDbPlugin', () => {
       path.join(dir, '.qwen-extension-install.json'),
       JSON.stringify(metadata),
     );
+  }
+
+  /** Uninstalls and installs like the CLI; `failInstall` makes install fail. */
+  function fakeCli(failInstall = false) {
+    return (
+      _file: string,
+      args: string[],
+      _options: unknown,
+      callback: (error: Error | null, result?: object) => void,
+    ) => {
+      if (args[2] === 'uninstall') {
+        fs.rmSync(path.join(home, 'extensions', 'dev'), { recursive: true });
+      } else if (args[2] === 'install') {
+        if (failInstall) return callback(new Error('failed'));
+        installExtension('dev', { type: 'local' });
+      }
+      callback(null, { stdout: '', stderr: '' });
+    };
   }
 
   function cliCalls() {
@@ -104,25 +117,22 @@ describe('installAndUpdateMariaDbPlugin', () => {
     expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.0');
   });
 
-  it('replaces an installed copy when the bundled version is new', async () => {
-    state.set(PLUGIN_VERSION_KEY, '26.10.6');
-    installExtension('dev', { type: 'local' });
-    await run();
-    expect(cliCalls()).toEqual([
-      ['extensions', 'uninstall', 'dev'],
-      ['extensions', 'install', bundledDir, '--consent'],
-    ]);
-    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.0');
-  });
-
-  it('replaces the plugin 26.11.2 installed from GitHub, which then is no longer updated', async () => {
-    state.set('mariadbDevPluginInstalled', true);
+  it.each([
+    ['a copy of an older bundled version', PLUGIN_VERSION_KEY, '26.10.6'],
+    [
+      'the copy 26.11.2 installed from GitHub',
+      'mariadbDevPluginInstalled',
+      true,
+    ],
+  ])('replaces %s', async (_name, key, value) => {
+    state.set(key, value);
     installExtension('dev', { type: 'git', autoUpdate: true });
     await run();
     expect(cliCalls()).toEqual([
       ['extensions', 'uninstall', 'dev'],
       ['extensions', 'install', bundledDir, '--consent'],
     ]);
+    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.0');
   });
 
   it('does not reinstall a plugin the user uninstalled', async () => {
@@ -149,9 +159,7 @@ describe('installAndUpdateMariaDbPlugin', () => {
   });
 
   it('does not record a failed install, so the next start retries', async () => {
-    execFileMock.mockImplementation((_file, _args, _options, callback) =>
-      callback(new Error('failed')),
-    );
+    execFileMock.mockImplementation(fakeCli(true));
     await run();
     expect(state.get(PLUGIN_VERSION_KEY)).toBeUndefined();
   });
@@ -159,12 +167,7 @@ describe('installAndUpdateMariaDbPlugin', () => {
   it('retries on the next start when replacing a copy failed after uninstalling it', async () => {
     state.set(PLUGIN_VERSION_KEY, '26.10.6');
     installExtension('dev', { type: 'local' });
-    execFileMock.mockImplementation((_file, args, _options, callback) => {
-      if (args[2] === 'uninstall') {
-        fs.rmSync(path.join(home, 'extensions', 'dev'), { recursive: true });
-        callback(null, { stdout: '', stderr: '' });
-      } else callback(new Error('failed'));
-    });
+    execFileMock.mockImplementation(fakeCli(true));
     await run();
     execFileMock.mockClear();
     await run();
