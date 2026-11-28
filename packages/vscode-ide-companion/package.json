@@ -217,7 +217,7 @@
           "order": 6,
           "type": "boolean",
           "default": true,
-          "description": "Install MariaDB's dev plugin (https://github.com/mariadb/ai-plugins) on the first start (only once: an uninstalled plugin stays uninstalled), and update extensions with auto-update on each start."
+          "description": "Install the MariaDB dev plugin (https://github.com/mariadb/ai-plugins) that comes with this extension, again when an extension update brings a new version of it (an uninstalled plugin stays uninstalled), and update extensions with auto-update on each start."
         }
       }
     },

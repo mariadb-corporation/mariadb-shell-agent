@@ -53,6 +53,13 @@ mkdir -p mariadb/dist
 # esbuild never empties dist/: chunks of earlier builds would end up in the package.
 rm -rf packages/vscode-ide-companion/dist
 
+# MariaDB's dev plugin at the pinned tag; the extension installs it on its first start (patch 0019).
+AI_PLUGINS=$(tr -d '[:space:]' < mariadb/AI_PLUGINS)
+mkdir -p packages/vscode-ide-companion/dist/mariadb-dev-plugin
+curl -fsSL "https://codeload.github.com/mariadb/ai-plugins/tar.gz/refs/tags/$AI_PLUGINS" |
+  tar -xz -C packages/vscode-ide-companion/dist/mariadb-dev-plugin --strip-components=3 \
+    "ai-plugins-${AI_PLUGINS#v}/claude/dev-plugin"
+
 # The extension's prepackage step bundles the CLI and Web Shell into dist/ first.
 npm --workspace=mariadb-shell-agent run package -- ${TARGET_ARGS[@]+"${TARGET_ARGS[@]}"} --out "$OUT"
 node mariadb/check-leaks.mjs "$OUT"

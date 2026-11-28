@@ -181,7 +181,9 @@ fork of Qwen Code (https://github.com/QwenLM/qwen-code, Apache-2.0) and ships
 the third-party npm packages below, each under its own license: the packages
 bundled into the command-line interface (dist/qwen-cli/cli.js and its chunks),
 the Web Shell and the VS Code extension. The Generated UI runtime the CLI
-carries (generated-ui/) comes with its own THIRD_PARTY_NOTICES.txt. A build for
+carries (generated-ui/) comes with its own THIRD_PARTY_NOTICES.txt, and the
+MariaDB dev plugin the extension installs (dist/mariadb-dev-plugin, from
+https://github.com/mariadb/ai-plugins, GPL-2.0) with its own LICENSE. A build for
 one host installs its optional native packages (node-pty, audio capture,
 clipboard, sharp) into dist/qwen-cli/node_modules with their own license files;
 the universal build leaves them out.
