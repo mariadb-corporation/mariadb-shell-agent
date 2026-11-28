@@ -5,8 +5,10 @@ claude/dev-plugin at the tag in mariadb/AI_PLUGINS), which
 mariadb/build-vsix.sh puts into dist/mariadb-dev-plugin. On a start where
 that plugin's version differs from the one the extension installed last
 (globalState mariadbDevPluginVersion), the extension installs it with the
-bundled CLI: `extensions uninstall dev` when a copy is installed, then
-`extensions install <bundled dir> --consent`. A plugin the user uninstalled
+bundled CLI: `extensions uninstall dev` when a copy it or 26.11.2 installed
+(source: a bundled dir, or the ai-plugins repository) is there, then
+`extensions install <bundled dir> --consent`. A `dev` extension from
+elsewhere (a link, another source) is left alone. A plugin the user uninstalled
 stays uninstalled (also when 26.11.2, which installed it from GitHub, set
 mariadbDevPluginInstalled). A failed install is only logged and retried on
 the next start; a build without the bundled plugin installs nothing.
@@ -193,10 +195,10 @@ index 0e8e7b6bf6..02b0f03c3d 100644
    // The provider registers itself as a singleton in the constructor
 diff --git a/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
 new file mode 100644
-index 0000000000..4a27895e57
+index 0000000000..e1e1decd3d
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
-@@ -0,0 +1,207 @@
+@@ -0,0 +1,223 @@
 +/**
 + * @license
 + * Copyright (c) 2026, MariaDB plc.
@@ -290,7 +292,7 @@ index 0000000000..4a27895e57
 +        fs.rmSync(path.join(home, 'extensions', 'dev'), { recursive: true });
 +      } else if (args[2] === 'install') {
 +        if (failInstall) return callback(new Error('failed'));
-+        installExtension('dev', { type: 'local' });
++        installExtension('dev', { type: 'local', source: bundledDir });
 +      }
 +      callback(null, { stdout: '', stderr: '' });
 +    };
@@ -325,7 +327,11 @@ index 0000000000..4a27895e57
 +    ],
 +  ])('replaces %s', async (_name, key, value) => {
 +    state.set(key, value);
-+    installExtension('dev', { type: 'git', autoUpdate: true });
++    installExtension('dev', {
++      source: 'https://github.com/mariadb/ai-plugins',
++      type: 'git',
++      autoUpdate: true,
++    });
 +    await run();
 +    expect(cliCalls()).toEqual([
 +      ['extensions', 'uninstall', 'dev'],
@@ -350,6 +356,15 @@ index 0000000000..4a27895e57
 +    expect(execFileMock).not.toHaveBeenCalled();
 +  });
 +
++  it.each([
++    ['a linked copy', { type: 'link', source: '/src/ai-plugins/claude/dev' }],
++    ['an extension from elsewhere', { type: 'git', source: 'https://x/dev' }],
++  ])('leaves %s named dev alone', async (_name, metadata) => {
++    installExtension('dev', metadata);
++    await run();
++    expect(execFileMock).not.toHaveBeenCalled();
++  });
++
 +  it('installs nothing without a bundled plugin', async () => {
 +    fs.rmSync(bundledDir, { recursive: true });
 +    await run();
@@ -365,7 +380,10 @@ index 0000000000..4a27895e57
 +
 +  it('retries on the next start when replacing a copy failed after uninstalling it', async () => {
 +    state.set(PLUGIN_VERSION_KEY, '26.10.6');
-+    installExtension('dev', { type: 'local' });
++    installExtension('dev', {
++      type: 'local',
++      source: '/old/vsix/dist/mariadb-dev-plugin',
++    });
 +    execFileMock.mockImplementation(fakeCli(true));
 +    await run();
 +    execFileMock.mockClear();
@@ -406,10 +424,10 @@ index 0000000000..4a27895e57
 +});
 diff --git a/packages/vscode-ide-companion/src/services/mariadbPlugin.ts b/packages/vscode-ide-companion/src/services/mariadbPlugin.ts
 new file mode 100644
-index 0000000000..1597e08f3b
+index 0000000000..825aeba146
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/services/mariadbPlugin.ts
-@@ -0,0 +1,149 @@
+@@ -0,0 +1,163 @@
 +/**
 + * @license
 + * Copyright (c) 2026, MariaDB plc.
@@ -427,6 +445,8 @@ index 0000000000..1597e08f3b
 +import { logger } from '../utils/logger.js';
 +
 +const PLUGIN_NAME = 'dev';
++// Where 26.11.2 installed the plugin from.
++const PLUGIN_REPOSITORY = 'https://github.com/mariadb/ai-plugins';
 +// Filled by mariadb/build-vsix.sh from mariadb/AI_PLUGINS; missing in a dev build.
 +const BUNDLED_PLUGIN_DIR = path.join('dist', 'mariadb-dev-plugin');
 +export const PLUGIN_VERSION_KEY = 'mariadbDevPluginVersion';
@@ -488,6 +508,18 @@ index 0000000000..1597e08f3b
 +    installedVersion !== undefined ||
 +    context.globalState.get(LEGACY_INSTALLED_KEY) === true;
 +  if (installedBefore && !exists) return;
++  const source = readJson(path.join(dir, INSTALL_METADATA_FILENAME))?.[
++    'source'
++  ];
++  // A `dev` extension from elsewhere (a link, another repository) stays.
++  if (
++    exists &&
++    source !== PLUGIN_REPOSITORY &&
++    (typeof source !== 'string' ||
++      path.basename(source) !== path.basename(BUNDLED_PLUGIN_DIR))
++  ) {
++    return;
++  }
 +  try {
 +    if (exists) await runCli(cliEntryPath, ['uninstall', PLUGIN_NAME]);
 +    await runCli(cliEntryPath, ['install', bundledDir, '--consent']);

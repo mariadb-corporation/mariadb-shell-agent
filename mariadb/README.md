@@ -135,7 +135,8 @@ explanation on top) and commit the new patch.
   (`claude/dev-plugin` of https://github.com/mariadb/ai-plugins at the tag in `mariadb/AI_PLUGINS`,
   which `mariadb/build-vsix.sh` puts into `dist/mariadb-dev-plugin`) and installs it with the
   bundled CLI on a start where the bundled version differs from the one it installed last
-  (`globalState` `mariadbDevPluginVersion`), replacing an installed copy. A plugin the user
+  (`globalState` `mariadbDevPluginVersion`), replacing a copy it or 26.11.2 installed (a `dev`
+  extension from elsewhere, such as a link, stays). A plugin the user
   uninstalled stays uninstalled (also when 26.11.2, which installed it from GitHub, recorded
   `mariadbDevPluginInstalled`); a failed install is logged and retried on the next activation. On
   every activation the extension then runs `extensions update <name> --consent` for each user
