@@ -1,13 +1,15 @@
-Install and update MariaDB's dev plugin
+Install the bundled MariaDB dev plugin, update extensions with auto-update
 
-On its first start the extension installs MariaDB's dev plugin
-(github.com/mariadb/ai-plugins, folder dev) with the bundled CLI:
-`extensions install https://github.com/mariadb/ai-plugins:dev --consent
---auto-update`. A plugin already in <QWEN_HOME or ~/.qwen>/extensions/dev
-counts as installed; if it came from that repository without an autoUpdate
-field, it gets autoUpdate: true once. Done is recorded in globalState
-(mariadbDevPluginInstalled), so an uninstalled plugin stays uninstalled; a
-failed install (offline) is only logged and retried on the next start.
+The extension ships MariaDB's dev plugin (github.com/mariadb/ai-plugins,
+claude/dev-plugin at the tag in mariadb/AI_PLUGINS), which
+mariadb/build-vsix.sh puts into dist/mariadb-dev-plugin. On a start where
+that plugin's version differs from the one the extension installed last
+(globalState mariadbDevPluginVersion), the extension installs it with the
+bundled CLI: `extensions uninstall dev` when a copy is installed, then
+`extensions install <bundled dir> --consent`. A plugin the user uninstalled
+stays uninstalled (also when 26.11.2, which installed it from GitHub, set
+mariadbDevPluginInstalled). A failed install is only logged and retried on
+the next start; a build without the bundled plugin installs nothing.
 
 On every start the extension then runs `extensions update <name> --consent`
 for each user extension whose install metadata has autoUpdate: true (as the
@@ -116,7 +118,7 @@ index 80cba6cb44..334c699c6e 100644
      isWorkspaceTrusted: isWorkspaceTrusted(settings).isTrusted ?? true,
      usageStatisticsEnabled: resolveUsageStatisticsEnabled(
 diff --git a/packages/vscode-ide-companion/package.json b/packages/vscode-ide-companion/package.json
-index b32ae884eb..a01913fbc4 100644
+index b32ae884eb..1201f9d390 100644
 --- a/packages/vscode-ide-companion/package.json
 +++ b/packages/vscode-ide-companion/package.json
 @@ -246,6 +246,12 @@
@@ -128,7 +130,7 @@ index b32ae884eb..a01913fbc4 100644
 +          "order": 6,
 +          "type": "boolean",
 +          "default": true,
-+          "description": "Install MariaDB's dev plugin (https://github.com/mariadb/ai-plugins) on the first start (only once: an uninstalled plugin stays uninstalled), and update extensions with auto-update on each start."
++          "description": "Install the MariaDB dev plugin (https://github.com/mariadb/ai-plugins) that comes with this extension, again when an extension update brings a new version of it (an uninstalled plugin stays uninstalled), and update extensions with auto-update on each start."
          }
        }
      },
@@ -191,10 +193,10 @@ index 0e8e7b6bf6..02b0f03c3d 100644
    // The provider registers itself as a singleton in the constructor
 diff --git a/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
 new file mode 100644
-index 0000000000..68d18e2657
+index 0000000000..f512653d3b
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/services/mariadbPlugin.test.ts
-@@ -0,0 +1,167 @@
+@@ -0,0 +1,184 @@
 +/**
 + * @license
 + * Copyright (c) 2026, MariaDB plc.
@@ -225,21 +227,29 @@ index 0000000000..68d18e2657
 +import {
 +  installAndUpdateMariaDbPlugin,
 +  mariaDbPluginSettled,
-+  PLUGIN_INSTALLED_KEY,
++  PLUGIN_VERSION_KEY,
 +} from './mariadbPlugin.js';
-+
-+const SOURCE = 'https://github.com/mariadb/ai-plugins';
 +
 +describe('installAndUpdateMariaDbPlugin', () => {
 +  let home: string;
++  let extensionPath: string;
++  let bundledDir: string;
 +  let state: Map<string, unknown>;
 +  let context: vscode.ExtensionContext;
 +
 +  beforeEach(() => {
 +    home = fs.mkdtempSync(path.join(os.tmpdir(), 'mariadb-plugin-'));
 +    vi.stubEnv('MARIADB_SHELL_AGENT_HOME', home);
++    extensionPath = path.join(home, 'vsix');
++    bundledDir = path.join(extensionPath, 'dist', 'mariadb-dev-plugin');
++    fs.mkdirSync(path.join(bundledDir, '.claude-plugin'), { recursive: true });
++    fs.writeFileSync(
++      path.join(bundledDir, '.claude-plugin', 'plugin.json'),
++      JSON.stringify({ name: 'dev', version: '26.11.0' }),
++    );
 +    state = new Map();
 +    context = {
++      extensionPath,
 +      globalState: {
 +        get: (key: string) => state.get(key),
 +        update: async (key: string, value: unknown) => {
@@ -270,15 +280,6 @@ index 0000000000..68d18e2657
 +    );
 +  }
 +
-+  function metadataOf(name: string) {
-+    return JSON.parse(
-+      fs.readFileSync(
-+        path.join(home, 'extensions', name, '.qwen-extension-install.json'),
-+        'utf8',
-+      ),
-+    );
-+  }
-+
 +  function cliCalls() {
 +    return execFileMock.mock.calls.map(([, args]) => args.slice(1));
 +  }
@@ -288,53 +289,71 @@ index 0000000000..68d18e2657
 +    await mariaDbPluginSettled();
 +  }
 +
-+  it('installs the plugin with auto-update through the bundled CLI and records it', async () => {
++  it('installs the bundled plugin through the bundled CLI and records its version', async () => {
 +    await run();
 +    expect(execFileMock).toHaveBeenCalledWith(
 +      process.execPath,
-+      [
-+        'cli.js',
-+        'extensions',
-+        'install',
-+        `${SOURCE}:dev`,
-+        '--consent',
-+        '--auto-update',
-+      ],
++      ['cli.js', 'extensions', 'install', bundledDir, '--consent'],
 +      expect.anything(),
 +      expect.any(Function),
 +    );
-+    expect(state.get(PLUGIN_INSTALLED_KEY)).toBe(true);
++    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.0');
 +  });
 +
-+  it('turns on auto-update for an installed plugin without reinstalling it', async () => {
-+    installExtension('dev', { source: SOURCE, type: 'git' });
++  it('replaces an installed copy when the bundled version is new', async () => {
++    state.set(PLUGIN_VERSION_KEY, '26.10.6');
++    installExtension('dev', { type: 'local' });
 +    await run();
-+    expect(metadataOf('dev')).toEqual({
-+      source: SOURCE,
-+      type: 'git',
-+      autoUpdate: true,
-+    });
-+    expect(cliCalls()).toEqual([['extensions', 'update', 'dev', '--consent']]);
-+    expect(state.get(PLUGIN_INSTALLED_KEY)).toBe(true);
++    expect(cliCalls()).toEqual([
++      ['extensions', 'uninstall', 'dev'],
++      ['extensions', 'install', bundledDir, '--consent'],
++    ]);
++    expect(state.get(PLUGIN_VERSION_KEY)).toBe('26.11.0');
 +  });
 +
-+  it('keeps auto-update off when it was turned off', async () => {
-+    installExtension('dev', { source: SOURCE, autoUpdate: false });
++  it('replaces the plugin 26.11.2 installed from GitHub, which then is no longer updated', async () => {
++    state.set('mariadbDevPluginInstalled', true);
++    installExtension('dev', { type: 'git', autoUpdate: true });
 +    await run();
-+    expect(metadataOf('dev').autoUpdate).toBe(false);
++    expect(cliCalls()).toEqual([
++      ['extensions', 'uninstall', 'dev'],
++      ['extensions', 'install', bundledDir, '--consent'],
++    ]);
++  });
++
++  it('does not reinstall a plugin the user uninstalled', async () => {
++    state.set(PLUGIN_VERSION_KEY, '26.10.6');
++    await run();
++    state.clear();
++    state.set('mariadbDevPluginInstalled', true);
++    await run();
 +    expect(execFileMock).not.toHaveBeenCalled();
++  });
++
++  it('does not reinstall the version it installed last', async () => {
++    state.set(PLUGIN_VERSION_KEY, '26.11.0');
++    installExtension('dev', { type: 'local' });
++    await run();
++    expect(execFileMock).not.toHaveBeenCalled();
++  });
++
++  it('installs nothing without a bundled plugin', async () => {
++    fs.rmSync(bundledDir, { recursive: true });
++    await run();
++    expect(execFileMock).not.toHaveBeenCalled();
++    expect(state.has(PLUGIN_VERSION_KEY)).toBe(false);
 +  });
 +
 +  it('does not record a failed install, so the next start retries', async () => {
 +    execFileMock.mockImplementation((_file, _args, _options, callback) =>
-+      callback(new Error('offline')),
++      callback(new Error('failed')),
 +    );
 +    await run();
-+    expect(state.has(PLUGIN_INSTALLED_KEY)).toBe(false);
++    expect(state.has(PLUGIN_VERSION_KEY)).toBe(false);
 +  });
 +
-+  it('only updates on later starts, also when the plugin was uninstalled', async () => {
-+    state.set(PLUGIN_INSTALLED_KEY, true);
++  it('updates the extensions with auto-update', async () => {
++    state.set(PLUGIN_VERSION_KEY, '26.11.0');
 +    installExtension('other', { source: 'x', autoUpdate: true });
 +    installExtension('manual', { source: 'y' });
 +    await run();
@@ -344,7 +363,7 @@ index 0000000000..68d18e2657
 +  });
 +
 +  it('keeps going when an update fails', async () => {
-+    state.set(PLUGIN_INSTALLED_KEY, true);
++    state.set(PLUGIN_VERSION_KEY, '26.11.0');
 +    installExtension('a', { autoUpdate: true });
 +    installExtension('b', { autoUpdate: true });
 +    execFileMock.mockImplementationOnce((_file, _args, _options, callback) =>
@@ -356,18 +375,18 @@ index 0000000000..68d18e2657
 +
 +  it('does nothing when the setting is off', async () => {
 +    getSetting.mockReturnValue(false);
-+    installExtension('dev', { source: SOURCE, autoUpdate: true });
++    installExtension('other', { autoUpdate: true });
 +    await run();
 +    expect(execFileMock).not.toHaveBeenCalled();
-+    expect(state.has(PLUGIN_INSTALLED_KEY)).toBe(false);
++    expect(state.has(PLUGIN_VERSION_KEY)).toBe(false);
 +  });
 +});
 diff --git a/packages/vscode-ide-companion/src/services/mariadbPlugin.ts b/packages/vscode-ide-companion/src/services/mariadbPlugin.ts
 new file mode 100644
-index 0000000000..1789884796
+index 0000000000..5b7597e481
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/services/mariadbPlugin.ts
-@@ -0,0 +1,144 @@
+@@ -0,0 +1,155 @@
 +/**
 + * @license
 + * Copyright (c) 2026, MariaDB plc.
@@ -384,10 +403,13 @@ index 0000000000..1789884796
 +import { getErrorMessage } from '../utils/errorMessage.js';
 +import { logger } from '../utils/logger.js';
 +
-+const PLUGIN_REPOSITORY = 'https://github.com/mariadb/ai-plugins';
 +const PLUGIN_NAME = 'dev';
++// Filled by mariadb/build-vsix.sh from mariadb/AI_PLUGINS; missing in a dev build.
++const BUNDLED_PLUGIN_DIR = path.join('dist', 'mariadb-dev-plugin');
 +const INSTALL_METADATA_FILE = '.qwen-extension-install.json';
-+export const PLUGIN_INSTALLED_KEY = 'mariadbDevPluginInstalled';
++export const PLUGIN_VERSION_KEY = 'mariadbDevPluginVersion';
++// Set by 26.11.2, which installed the plugin from GitHub.
++const LEGACY_INSTALLED_KEY = 'mariadbDevPluginInstalled';
 +const CLI_TIMEOUT_MS = 60_000;
 +
 +let pending: Promise<void> = Promise.resolve();
@@ -425,38 +447,48 @@ index 0000000000..1789884796
 +  }
 +}
 +
-+/** Installs the plugin, or turns on auto-update for one installed without it. */
-+async function installOnce(
++function readPluginVersion(dir: string): string | undefined {
++  try {
++    return (
++      JSON.parse(
++        fs.readFileSync(path.join(dir, '.claude-plugin', 'plugin.json'), 'utf8'),
++      ) as { version?: string }
++    ).version;
++  } catch {
++    return undefined;
++  }
++}
++
++/**
++ * Installs the plugin bundled with this extension when its version differs
++ * from the one installed last, replacing an installed copy. A plugin the user
++ * uninstalled stays uninstalled.
++ */
++async function installBundled(
 +  context: vscode.ExtensionContext,
 +  cliEntryPath: string,
 +): Promise<void> {
++  const bundledDir = path.join(context.extensionPath, BUNDLED_PLUGIN_DIR);
++  const bundled = readPluginVersion(bundledDir);
++  const installedVersion = context.globalState.get<string>(PLUGIN_VERSION_KEY);
++  if (!bundled || installedVersion === bundled) return;
 +  const dir = path.join(userExtensionsDir(), PLUGIN_NAME);
-+  const metadata = readInstallMetadata(dir);
-+  if (!fs.existsSync(dir)) {
-+    try {
-+      await runCli(cliEntryPath, [
-+        'install',
-+        `${PLUGIN_REPOSITORY}:${PLUGIN_NAME}`,
-+        '--consent',
-+        '--auto-update',
-+      ]);
-+      logger.info('Installed the MariaDB dev plugin');
-+    } catch (error) {
-+      logger.warn(
-+        `Installing the MariaDB dev plugin failed; retrying on the next start: ${getErrorMessage(error)}`,
-+      );
-+      return;
-+    }
-+  } else if (
-+    metadata?.['source'] === PLUGIN_REPOSITORY &&
-+    metadata['autoUpdate'] === undefined
-+  ) {
-+    fs.writeFileSync(
-+      path.join(dir, INSTALL_METADATA_FILE),
-+      JSON.stringify({ ...metadata, autoUpdate: true }, null, 2),
++  const exists = fs.existsSync(dir);
++  const installedBefore =
++    installedVersion !== undefined ||
++    context.globalState.get(LEGACY_INSTALLED_KEY) === true;
++  if (installedBefore && !exists) return;
++  try {
++    if (exists) await runCli(cliEntryPath, ['uninstall', PLUGIN_NAME]);
++    await runCli(cliEntryPath, ['install', bundledDir, '--consent']);
++    logger.info(`Installed the MariaDB dev plugin ${bundled}`);
++  } catch (error) {
++    logger.warn(
++      `Installing the MariaDB dev plugin failed; retrying on the next start: ${getErrorMessage(error)}`,
 +    );
++    return;
 +  }
-+  await context.globalState.update(PLUGIN_INSTALLED_KEY, true);
++  await context.globalState.update(PLUGIN_VERSION_KEY, bundled);
 +}
 +
 +/** Updates the user's extensions that have auto-update turned on. */
@@ -478,9 +510,9 @@ index 0000000000..1789884796
 +}
 +
 +/**
-+ * In the background: installs MariaDB's dev plugin on the first start (a
-+ * plugin already there counts; a failed install is retried on the next start),
-+ * then updates the extensions that have auto-update turned on.
++ * In the background: installs the MariaDB dev plugin bundled with this
++ * extension (a failed install is retried on the next start), then updates the
++ * extensions that have auto-update turned on.
 + */
 +export function installAndUpdateMariaDbPlugin(
 +  context: vscode.ExtensionContext,
@@ -494,9 +526,7 @@ index 0000000000..1789884796
 +    return;
 +  }
 +  pending = (async () => {
-+    if (!context.globalState.get(PLUGIN_INSTALLED_KEY)) {
-+      await installOnce(context, cliEntryPath);
-+    }
++    await installBundled(context, cliEntryPath);
 +    await updateAutoUpdating(cliEntryPath);
 +  })().catch((error: unknown) =>
 +    logger.warn(
