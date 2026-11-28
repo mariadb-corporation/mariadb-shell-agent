@@ -135,6 +135,14 @@ describe('HookPlanner', () => {
       });
     });
 
+    it('matches FileChanged using the basename without the watched directory', () => {
+      expect(
+        getHookMatcherTarget(HookEventName.FileChanged, {
+          filePath: '/outside/memory/topic.md',
+        }),
+      ).toEqual({ kind: 'filePath', target: 'topic.md' });
+    });
+
     it('returns command name targets for user prompt expansion events', () => {
       expect(
         getHookMatcherTarget(UserPromptExpansion, { commandName: 'goal' }),

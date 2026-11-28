@@ -147,6 +147,7 @@ interface PrMetadata {
   deletions: number;
   changedFiles: number;
   isCrossRepository: boolean;
+  authorAssociation?: string;
   /** The PR description, fetched only to detect the author's language. */
   body?: string;
 }
@@ -220,6 +221,7 @@ type FetchPrResult = PlanReport & {
   baseRefName: string;
   headRefName: string;
   isCrossRepository: boolean;
+  authorAssociation?: string;
   diffStat: { files: number; additions: number; deletions: number };
   /**
    * The merge-base diff is EMPTY: the branch tree is byte-identical to its
@@ -1214,6 +1216,9 @@ async function runFetchPr(args: FetchPrArgs): Promise<void> {
         deletions: fetchMeta.deletions ?? 0,
         changedFiles: fetchMeta.changedFiles ?? 0,
         isCrossRepository: fetchMeta.isCrossRepository,
+        ...(fetchMeta.authorAssociation !== undefined
+          ? { authorAssociation: fetchMeta.authorAssociation }
+          : {}),
         body: fetchMeta.body,
       };
       // The base ref is server-controlled metadata reaching git's argv through
@@ -2141,6 +2146,9 @@ async function runFetchPr(args: FetchPrArgs): Promise<void> {
       baseRefName: meta.baseRefName,
       headRefName: meta.headRefName,
       isCrossRepository: meta.isCrossRepository,
+      ...(meta.authorAssociation !== undefined
+        ? { authorAssociation: meta.authorAssociation }
+        : {}),
       // Two gates, because the SKILL acts on this by recommending the PR be
       // closed as superseded — the one ruling here that is expensive to get
       // wrong. `diffPath` (set only on a SUCCESSFUL capture): a capture that

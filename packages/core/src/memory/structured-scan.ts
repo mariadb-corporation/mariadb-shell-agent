@@ -6,6 +6,7 @@
  */
 
 import * as fs from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import * as path from 'node:path';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import { isMap, isScalar, isSeq, parseDocument } from 'yaml';
@@ -26,6 +27,7 @@ import {
   getMemoryRootTrustedAnchor,
   getTeamAutoMemoryRoot,
   getUserAutoMemoryRoot,
+  type ProjectMemoryOwner,
 } from './paths.js';
 import {
   listTrustedMemoryMarkdownFiles,
@@ -103,6 +105,7 @@ export interface ScannedAutoMemoryDocument {
   usageScenarios: string[];
   body: string;
   mtimeMs: number;
+  sourceHash?: string;
 }
 
 export interface StructuredAutoMemoryValidation {
@@ -428,6 +431,9 @@ export function parseAutoMemoryTopicDocument(
     ),
     body: bodyContent.trim(),
     mtimeMs,
+    ...(scope === 'project'
+      ? { sourceHash: createHash('sha256').update(content).digest('hex') }
+      : {}),
   };
 }
 
@@ -435,10 +441,11 @@ async function listMarkdownFiles(
   root: string,
   scope: AutoMemoryScope,
   onUnreadableDir?: (relativeDir: string) => void,
+  owner?: ProjectMemoryOwner,
 ) {
   return listTrustedMemoryMarkdownFiles(
     root,
-    getMemoryRootTrustedAnchor(root),
+    getMemoryRootTrustedAnchor(root, owner),
     AUTO_MEMORY_INDEX_FILENAME,
     // Only the user-owned root may itself be a symlink (dotfiles layout).
     // Project and team roots can live INSIDE the repository
@@ -490,6 +497,7 @@ async function scanAutoMemoryDocumentsFromRootWithStatus(
     deterministic?: boolean;
     uncapped?: boolean;
     documentCache?: AutoMemoryDocumentCache;
+    projectMemoryOwner?: ProjectMemoryOwner;
   },
 ): Promise<{
   docs: ScannedAutoMemoryDocument[];
@@ -501,9 +509,14 @@ async function scanAutoMemoryDocumentsFromRootWithStatus(
   // count them here: a partially scanned root must not report complete.
   let unreadableDirs = 0;
   try {
-    files = await listMarkdownFiles(root, opts.scope, () => {
-      unreadableDirs += 1;
-    });
+    files = await listMarkdownFiles(
+      root,
+      opts.scope,
+      () => {
+        unreadableDirs += 1;
+      },
+      opts.projectMemoryOwner,
+    );
   } catch (error) {
     debugLogger.debug(`failed to list memory root ${root}`, error);
     return {
@@ -597,6 +610,8 @@ async function scanAutoMemoryDocumentsFromRootWithStatus(
   return { docs: returnedDocs, incompleteScopes };
 }
 
+export class UnreadableProjectMemoryTopicError extends Error {}
+
 async function scanAutoMemoryDocumentsFromRoot(
   root: string,
   opts: {
@@ -604,6 +619,8 @@ async function scanAutoMemoryDocumentsFromRoot(
     deterministic?: boolean;
     uncapped?: boolean;
     documentCache?: AutoMemoryDocumentCache;
+    requireComplete?: boolean;
+    projectMemoryOwner?: ProjectMemoryOwner;
   },
 ): Promise<ScannedAutoMemoryDocument[]> {
   const result = await scanAutoMemoryDocumentsFromRootWithStatus(root, opts);
@@ -618,6 +635,11 @@ async function scanAutoMemoryDocumentsFromRoot(
       // turn one unreadable subdirectory into lost index entries.
       throw new Error(
         `memory scan of ${root} is incomplete: a subdirectory could not be read`,
+      );
+    }
+    if (opts.requireComplete && incomplete.reason === 'file_read_failed') {
+      throw new UnreadableProjectMemoryTopicError(
+        `memory scan of ${root} is incomplete: a topic file could not be read`,
       );
     }
   }
@@ -635,6 +657,7 @@ export async function scanAutoMemoryIndexDocumentsFromRoot(
   root: string,
   scope: AutoMemoryScope,
   deterministic = scope === 'team',
+  owner?: ProjectMemoryOwner,
 ): Promise<{
   docs: ScannedAutoMemoryDocument[];
   omitted: ScannedAutoMemoryDocument[];
@@ -643,6 +666,8 @@ export async function scanAutoMemoryIndexDocumentsFromRoot(
     scope,
     deterministic,
     uncapped: true,
+    requireComplete: scope === 'project',
+    projectMemoryOwner: owner,
   });
   return {
     docs: docs.slice(0, MAX_SCANNED_MEMORY_FILES),
@@ -671,17 +696,19 @@ async function scanProjectAutoMemoryWithStatus(
   trustedProject: boolean,
   uncapped = false,
   documentCache?: AutoMemoryDocumentCache,
+  owner?: ProjectMemoryOwner,
 ): Promise<{
   docs: ScannedAutoMemoryDocument[];
   incompleteScopes: AutoMemoryIncompleteScope[];
 }> {
-  const roots = getProjectAutoMemoryRoots(projectRoot, trustedProject);
+  const roots = getProjectAutoMemoryRoots(projectRoot, trustedProject, owner);
   const results = await Promise.all(
     roots.map((root) =>
       scanAutoMemoryDocumentsFromRootWithStatus(root, {
         scope: 'project',
         uncapped: true,
         documentCache,
+        projectMemoryOwner: owner,
       }),
     ),
   );
@@ -721,6 +748,7 @@ export async function scanAutoMemorySnapshot(
     trustedProject?: boolean;
     uncapped?: boolean;
     documentCache?: AutoMemoryDocumentCache;
+    projectMemoryOwner?: ProjectMemoryOwner;
   } = {},
 ): Promise<AutoMemoryScanSnapshot> {
   const requestedScopes = [...(options.scopes ?? ['project', 'user'])];
@@ -738,6 +766,7 @@ export async function scanAutoMemorySnapshot(
       const projectRoots = getProjectAutoMemoryRoots(
         projectRoot,
         options.trustedProject !== false,
+        options.projectMemoryOwner,
       );
       if (projectRoots.length === 0) {
         unavailableScopes.push({ scope, reason: 'untrusted' });
@@ -750,6 +779,7 @@ export async function scanAutoMemorySnapshot(
           options.trustedProject !== false,
           options.uncapped,
           options.documentCache,
+          options.projectMemoryOwner,
         ),
       );
     } else if (scope === 'user') {
@@ -799,10 +829,15 @@ export async function scanAutoMemorySnapshot(
 
 export async function scanAutoMemoryTopicDocuments(
   projectRoot: string,
+  owner?: ProjectMemoryOwner,
 ): Promise<ScannedAutoMemoryDocument[]> {
-  return scanAutoMemoryDocumentsFromRoot(getAutoMemoryRoot(projectRoot), {
-    scope: 'project',
-  });
+  return scanAutoMemoryDocumentsFromRoot(
+    getAutoMemoryRoot(projectRoot, owner),
+    {
+      scope: 'project',
+      projectMemoryOwner: owner,
+    },
+  );
 }
 
 export async function scanAllAutoMemoryTopicDocuments(
@@ -810,6 +845,7 @@ export async function scanAllAutoMemoryTopicDocuments(
   documentCache?: AutoMemoryDocumentCache,
   trustedProject = true,
   bestEffort = false,
+  owner?: ProjectMemoryOwner,
 ): Promise<ScannedAutoMemoryDocument[]> {
   // ponytail: reuse the existing O(n) parsed scan; add a catalog only if
   // measured topic counts make recall scanning too slow.
@@ -821,7 +857,7 @@ export async function scanAllAutoMemoryTopicDocuments(
   // repo-local document injectable by recall yet impossible to forget.
   // Dedupe on the same scope:relativePath key the snapshot uses so two
   // files sharing one relative path collapse to a single candidate id.
-  const roots = getProjectAutoMemoryRoots(projectRoot, trustedProject);
+  const roots = getProjectAutoMemoryRoots(projectRoot, trustedProject, owner);
   // An untrusted project in local-memory mode has no trusted root at all —
   // getProjectAutoMemoryRoots already excluded the repo-local root, and
   // falling back to it here would re-admit exactly what the gate removed,
@@ -838,6 +874,7 @@ export async function scanAllAutoMemoryTopicDocuments(
           scope: 'project',
           uncapped: true,
           documentCache,
+          projectMemoryOwner: owner,
         }),
       ),
     );
@@ -851,6 +888,7 @@ export async function scanAllAutoMemoryTopicDocuments(
         scope: 'project',
         uncapped: true,
         documentCache,
+        projectMemoryOwner: owner,
       }),
     ),
   );
@@ -897,6 +935,7 @@ export async function scanTeamAutoMemoryTopicDocuments(
 
 export async function rereadAutoMemoryDocument(
   doc: ScannedAutoMemoryDocument,
+  owner?: ProjectMemoryOwner,
 ): Promise<ScannedAutoMemoryDocument | null> {
   try {
     const root = doc.relativePath
@@ -904,7 +943,7 @@ export async function rereadAutoMemoryDocument(
       .reduce((current) => path.dirname(current), doc.filePath);
     const trustedFile = await resolveTrustedMemoryFile(
       root,
-      getMemoryRootTrustedAnchor(root),
+      getMemoryRootTrustedAnchor(root, owner),
       doc.relativePath,
       { followRootSymlink: doc.scope === 'user' },
     );

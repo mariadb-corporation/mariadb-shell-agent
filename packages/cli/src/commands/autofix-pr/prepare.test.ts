@@ -25,6 +25,7 @@ import {
   mkdtempSync,
   readdirSync,
   realpathSync,
+  renameSync,
   rmSync,
   utimesSync,
   writeFileSync,
@@ -95,6 +96,7 @@ import {
   type PrView,
 } from './prepare.js';
 import { runCleanup } from './cleanup.js';
+import { runSchedule } from './schedule.js';
 import {
   anchorPath,
   autofixPrPaths,
@@ -108,6 +110,11 @@ import {
   writeState,
 } from './state.js';
 import { requireWorktree } from './worktree.js';
+import { refusalOf, type RefusalCode } from './refusal.js';
+
+/** A refusal with its code: what the skill acts on. */
+const refused = (code: RefusalCode, message: RegExp) =>
+  expect.objectContaining({ code, message: expect.stringMatching(message) });
 
 function prView(overrides: Partial<PrView> = {}): PrView {
   return {
@@ -1082,9 +1089,18 @@ describe('runPrepare (real git)', () => {
           )
         : answer(...args),
     );
-    expect(() => runPrepare({ pr: 7, repo: 'o/r' })).toThrow(
-      /head repository no longer exists/,
-    );
+    // An open PR: `failed`, never the `pr_closed` a resume stops a watch
+    // on.
+    let thrown: unknown;
+    try {
+      runPrepare({ pr: 7, repo: 'o/r' });
+    } catch (err) {
+      thrown = err;
+    }
+    expect(refusalOf('prepare', thrown)).toMatchObject({
+      refused: 'failed',
+      message: expect.stringMatching(/head repository no longer exists/),
+    });
   });
 
   it("derives a resumed watch's remotes from the clone, not from its state file", () => {
@@ -1533,7 +1549,7 @@ describe('runPrepare (real git)', () => {
     runPrepare({ pr: 7, repo: 'o/r' });
     process.env['QWEN_CODE_SESSION_ID'] = 'session-b';
     expect(() => runPrepare({ pr: 7, repo: 'o/r' })).toThrow(
-      /watched by another session \(session-a\)/,
+      refused('watched_elsewhere', /watched by another session \(session-a\)/),
     );
   });
 
@@ -1684,12 +1700,25 @@ describe('runPrepare (real git)', () => {
     expect(existsSync(autofixPrPaths(clone, 7).statePath)).toBe(false);
   });
 
+  it('refuses an open PR it may not push to as failed, not pr_closed', () => {
+    mocks.gh.mockImplementation((...args: string[]) => {
+      if (args[0] === 'pr') return JSON.stringify(prView());
+      return JSON.stringify({ ...writable, viewerPermission: 'READ' });
+    });
+    expect(() => runPrepare({ pr: 7, repo: 'o/r' })).toThrow(
+      refused('failed', /cannot push to this repository \(permission: READ\)/),
+    );
+    expect(existsSync(autofixPrPaths(clone, 7).statePath)).toBe(false);
+  });
+
   it('refuses an ineligible PR before creating anything', () => {
     mocks.gh.mockImplementation((...args: string[]) => {
       if (args[0] === 'pr') return JSON.stringify(prView({ state: 'MERGED' }));
       return JSON.stringify(writable);
     });
-    expect(() => runPrepare({ pr: 7, repo: 'o/r' })).toThrow(/is merged/);
+    expect(() => runPrepare({ pr: 7, repo: 'o/r' })).toThrow(
+      refused('pr_closed', /is merged/),
+    );
     expect(existsSync(autofixPrPaths(clone, 7).worktreePath)).toBe(false);
   });
 
@@ -1909,6 +1938,299 @@ describe('runPrepare (real git)', () => {
       } finally {
         delete process.env['QWEN_CODE_SERVE'];
       }
+    });
+
+    it('resumes an existing in-place watch owned by this session without touching dirty or ahead work', () => {
+      runPrepare({ pr: 7, repo: 'o/r', inPlace: true });
+      const first = readState(statePath())!;
+      // Preserve recorded watch options and history across resume.
+      writeFileSync(
+        statePath(),
+        JSON.stringify({
+          ...first,
+          watch: {
+            every: 5,
+            reply: false,
+            instructions: 'keep API',
+            task: 'aaaaaaaaaaaa',
+          },
+          handledCommentIds: ['IC_1'],
+        }),
+      );
+      writeFileSync(join(clone, 'wip.txt'), 'draft');
+      run(clone, 'commit', '-q', '--allow-empty', '-m', 'local wip');
+      const localTip = run(clone, 'rev-parse', 'HEAD');
+
+      runPrepare({ pr: 7, repo: 'o/r', inPlace: true });
+      expect(lastReport()).toMatchObject({
+        inPlace: true,
+        resumed: true,
+        worktreePath: clone,
+        preparedAt: first.preparedAt,
+        localUnpushedCommits: 1,
+        localUncommittedChanges: true,
+      });
+      expect(readState(statePath())!).toMatchObject({
+        inPlace: true,
+        sessionId: 'session-a',
+        preparedAt: first.preparedAt,
+        watch: {
+          every: 5,
+          reply: false,
+          instructions: 'keep API',
+          task: 'aaaaaaaaaaaa',
+        },
+        handledCommentIds: ['IC_1'],
+      });
+      // Neither HEAD nor the uncommitted file was touched.
+      expect(run(clone, 'rev-parse', 'HEAD')).toBe(localTip);
+      expect(existsSync(join(clone, 'wip.txt'))).toBe(true);
+    });
+
+    it('refuses another session without --take-over (watched_elsewhere), and takes over with --take-over', () => {
+      runPrepare({ pr: 7, repo: 'o/r', inPlace: true });
+      const first = readState(statePath())!;
+      process.env['QWEN_CODE_SESSION_ID'] = 'session-b';
+
+      expect(() => runPrepare({ pr: 7, repo: 'o/r', inPlace: true })).toThrow(
+        /watched by another session/,
+      );
+      expect(readState(statePath())!.sessionId).toBe('session-a');
+
+      runPrepare({ pr: 7, repo: 'o/r', inPlace: true, takeOver: true });
+      expect(lastReport()).toMatchObject({
+        inPlace: true,
+        resumed: true,
+        tookOver: true,
+        preparedAt: first.preparedAt,
+      });
+      expect(readState(statePath())!).toMatchObject({
+        inPlace: true,
+        sessionId: 'session-b',
+        preparedAt: first.preparedAt,
+      });
+    });
+
+    it('refuses resuming an in-place watch when the PR is closed (pr_closed)', () => {
+      runPrepare({ pr: 7, repo: 'o/r', inPlace: true });
+      mocks.gh.mockImplementation((...args: string[]) => {
+        if (args[0] === 'pr')
+          return JSON.stringify(
+            prView({ state: 'MERGED', headRefOid: headSha }),
+          );
+        if (args[0] === 'repo') return JSON.stringify(writable);
+        throw new Error(`unexpected gh ${args.join(' ')}`);
+      });
+      let caught: unknown;
+      try {
+        runPrepare({ pr: 7, repo: 'o/r', inPlace: true, takeOver: true });
+      } catch (err) {
+        caught = err;
+      }
+      expect(caught).toMatchObject({ code: 'pr_closed' });
+    });
+
+    it('refuses resuming an in-place watch of another repository or another checkout', () => {
+      runPrepare({ pr: 7, repo: 'o/r', inPlace: true });
+      expect(() =>
+        runPrepare({ pr: 7, repo: 'other/repo', inPlace: true }),
+      ).toThrow(/watch of github\.com\/o\/r/);
+
+      // A linked worktree of the same clone cannot hijack the main checkout's in-place watch.
+      const linked = join(dir, 'linked');
+      run(clone, 'worktree', 'add', '-q', linked, 'main');
+      process.chdir(linked);
+      try {
+        expect(() => runPrepare({ pr: 7, repo: 'o/r', inPlace: true })).toThrow(
+          /already has an in-place watch in/,
+        );
+      } finally {
+        process.chdir(clone);
+      }
+    });
+
+    it('refreshes headRefName and branch when resuming after a PR head-branch rename', () => {
+      runPrepare({ pr: 7, repo: 'o/r', inPlace: true });
+      // Rename the PR head branch on remote and locally to feat2.
+      const bare = join(dir, 'bare.git');
+      run(bare, 'branch', '-m', 'feat', 'feat2');
+      run(clone, 'fetch', '-q', 'origin', '--prune');
+      run(clone, 'branch', '-m', 'feat', 'feat2');
+      run(clone, 'branch', '-u', 'origin/feat2', 'feat2');
+      mocks.gh.mockImplementation((...args: string[]) => {
+        if (args[0] === 'pr') {
+          return JSON.stringify(
+            prView({
+              headRefName: 'feat2',
+              baseRefName: 'main2',
+              headRefOid: headSha,
+            }),
+          );
+        }
+        if (args[0] === 'repo') return JSON.stringify(writable);
+        throw new Error(`unexpected gh ${args.join(' ')}`);
+      });
+
+      runPrepare({ pr: 7, repo: 'o/r', inPlace: true });
+      expect(lastReport()).toMatchObject({
+        inPlace: true,
+        resumed: true,
+        headRefName: 'feat2',
+      });
+      const updated = readState(statePath())!;
+      expect(updated).toMatchObject({
+        inPlace: true,
+        headRefName: 'feat2',
+        baseRefName: 'main2',
+        branch: 'feat2',
+      });
+      // Subsequent worktree/branch verification matches the renamed branch.
+      expect(() =>
+        requireWorktree(
+          {
+            ...autofixPrPaths(clone, 7),
+            worktreePath: updated.worktreePath,
+            branch: updated.branch,
+          },
+          7,
+          clone,
+          false,
+          trustAnchor(updated),
+          true,
+        ),
+      ).not.toThrow();
+    });
+
+    it('refreshes authorCanPush on in-place resume and refuses scheduling after access is lost', () => {
+      runPrepare({ pr: 7, repo: 'o/r', inPlace: true });
+      expect(readState(statePath())!.authorCanPush).toBe(true);
+      // PR author is now an external contributor without write access.
+      mocks.gh.mockImplementation((...args: string[]) => {
+        if (args[0] === 'pr') {
+          return JSON.stringify(
+            prView({ author: { login: 'outsider' }, headRefOid: headSha }),
+          );
+        }
+        if (args[0] === 'repo') return JSON.stringify(writable);
+        if (
+          args[0] === 'api' &&
+          args[1]?.includes('/collaborators/outsider/permission')
+        ) {
+          return JSON.stringify({ permission: 'read' });
+        }
+        throw new Error(`unexpected gh ${args.join(' ')}`);
+      });
+
+      runPrepare({ pr: 7, repo: 'o/r', inPlace: true });
+      expect(lastReport()).toMatchObject({
+        inPlace: true,
+        resumed: true,
+        authorCanPush: false,
+      });
+      expect(readState(statePath())!.authorCanPush).toBe(false);
+      expect(() => runSchedule({ pr: 7, every: 5 })).toThrow(/only --once/);
+    });
+
+    it('refuses under the lock when a watch lands in a sibling worktree during in-place prepare', () => {
+      // Switch main checkout off feat so a linked worktree can hold feat.
+      run(clone, 'checkout', '-q', 'main');
+      const linked = join(dir, 'linked-race');
+      run(clone, 'worktree', 'add', '-q', linked, 'feat');
+      process.chdir(linked);
+      const mainStatePath = autofixPrPaths(clone, 7).statePath;
+      let planted = false;
+      mocks.gh.mockImplementation((...args: string[]) => {
+        if (args[0] === 'pr') {
+          if (!planted) {
+            planted = true;
+            // Another process starts a watch in the main worktree mid-flight.
+            mkdirSync(dirname(mainStatePath), { recursive: true });
+            writeState(mainStatePath, {
+              version: 1,
+              sessionId: 'session-other',
+              host: 'github.com',
+              owner: 'o',
+              repo: 'r',
+              prNumber: 7,
+              remote: 'origin',
+              pushTarget: 'origin',
+              headRefName: 'feat',
+              baseRefName: 'main',
+              branch: 'qwen-autofix/pr-7',
+              worktreePath: autofixPrPaths(clone, 7).worktreePath,
+              viewer: 'me',
+              prAuthor: 'me',
+              authorCanPush: true,
+              lastKnownHeadSha: headSha,
+              pushedShas: [],
+              handledCommentIds: [],
+              postedCommentIds: [],
+            });
+          }
+          return JSON.stringify(prView({ headRefOid: headSha }));
+        }
+        if (args[0] === 'repo') return JSON.stringify(writable);
+        throw new Error(`unexpected gh ${args.join(' ')}`);
+      });
+      try {
+        expect(() => runPrepare({ pr: 7, repo: 'o/r', inPlace: true })).toThrow(
+          /already has a watch/,
+        );
+        expect(existsSync(autofixPrPaths(linked, 7).statePath)).toBe(false);
+        expect(readState(mainStatePath)!.sessionId).toBe('session-other');
+      } finally {
+        process.chdir(clone);
+      }
+    });
+
+    it('re-confirms the trust anchor and refreshes worktreePath on resume after a clone move', () => {
+      const bare = join(dir, 'bare.git');
+      const movedBase = join(dir, 'clone-before-move');
+      const movedDest = join(dir, 'clone-after-move');
+      run(dir, 'clone', '-q', '-b', 'feat', bare, movedBase);
+      process.chdir(movedBase);
+      const repository = { host: 'github.com', owner: 'o', repo: 'r' };
+      try {
+        runPrepare({ pr: 7, repo: 'o/r', inPlace: true });
+        expect(readAnchor(repository, 7)?.trustRoot).toBe(
+          realpathSync(movedBase),
+        );
+
+        // Move the checkout directory: the old anchor key no longer matches.
+        process.chdir(dir);
+        renameSync(movedBase, movedDest);
+        process.chdir(movedDest);
+        expect(readAnchor(repository, 7)).toBeNull();
+        const staleState = readState(autofixPrPaths(movedDest, 7).statePath)!;
+        expect(() => trustAnchor(staleState)).toThrow(
+          /no confirmed trust anchor/,
+        );
+
+        runPrepare({ pr: 7, repo: 'o/r', inPlace: true });
+        const expectedRoot = realpathSync(movedDest);
+        expect(lastReport()).toMatchObject({
+          inPlace: true,
+          resumed: true,
+          worktreePath: expectedRoot,
+        });
+        const refreshed = readState(autofixPrPaths(movedDest, 7).statePath)!;
+        expect(refreshed.worktreePath).toBe(expectedRoot);
+        expect(readAnchor(repository, 7)?.trustRoot).toBe(expectedRoot);
+        expect(trustAnchor(refreshed)).toBe(expectedRoot);
+      } finally {
+        process.chdir(clone);
+      }
+    });
+
+    it('refuses --in-place when .mariadb-shell-agent/tmp inside the checkout is a symlink', () => {
+      const outside = join(dir, 'outside-tmp');
+      mkdirSync(outside, { recursive: true });
+      mkdirSync(join(clone, '.mariadb-shell-agent'), { recursive: true });
+      symlinkSync(outside, join(clone, '.mariadb-shell-agent', 'tmp'));
+      expect(() => runPrepare({ pr: 7, repo: 'o/r', inPlace: true })).toThrow(
+        /is a symlink/,
+      );
+      expect(readdirSync(outside)).toEqual([]);
     });
   });
 });

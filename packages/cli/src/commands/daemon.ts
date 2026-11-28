@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { DaemonStatusResponse } from '../serve/daemon-status.js';
+import { commandMetadata } from './command-metadata.js';
 import { spawn, spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as fsp from 'node:fs/promises';
@@ -57,7 +59,15 @@ interface StatusArgs {
   detail?: boolean;
 }
 
-interface DaemonDetailSummary {
+type PartialMemory<T> = T extends object
+  ? { [K in keyof T]?: PartialMemory<T[K]> }
+  : T;
+type DaemonMemoryDetail = PartialMemory<{
+  runtime: Pick<DaemonStatusResponse['runtime'], 'process' | 'memory'>;
+  limits: Pick<DaemonStatusResponse['limits'], 'memory'>;
+}>;
+
+interface DaemonDetailSummary extends DaemonMemoryDetail {
   status: string;
   version?: string;
   uptimeMs?: number;
@@ -90,6 +100,7 @@ interface StartArgs {
   port?: number;
   hostname: string;
   workspace?: string | string[];
+  'conversations-dir'?: string | string[];
   web: boolean;
   'require-auth': boolean;
   token?: string;
@@ -332,6 +343,17 @@ export async function probeHealth(
   }
 }
 
+function nonemptyStatusObject(
+  value: unknown,
+): Record<string, unknown> | undefined {
+  return value !== null &&
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    Object.keys(value).length > 0
+    ? (value as Record<string, unknown>)
+    : undefined;
+}
+
 export function summarizeDaemonStatus(
   value: unknown,
 ): DaemonDetailSummary | undefined {
@@ -365,11 +387,32 @@ export function summarizeDaemonStatus(
   const starting = issueRecords.some(
     (issue) => issue['code'] === 'daemon_runtime_starting',
   );
+  // Preserve only the endpoint's established memory subtrees, not the rest
+  // of the runtime/limits diagnostics. Older daemons may omit any of them.
+  const process = nonemptyStatusObject(runtime?.['process']);
+  const memory = nonemptyStatusObject(runtime?.['memory']);
+  const limits = nonemptyStatusObject(response['limits']);
+  const memoryLimits =
+    limits?.['memory'] === null
+      ? null
+      : nonemptyStatusObject(limits?.['memory']);
+  const memoryDetail = {
+    ...(process || memory
+      ? {
+          runtime: {
+            ...(process ? { process } : {}),
+            ...(memory ? { memory } : {}),
+          },
+        }
+      : {}),
+    ...(memoryLimits !== undefined ? { limits: { memory: memoryLimits } } : {}),
+  } as DaemonMemoryDetail;
   const version = daemon?.['qwenCodeVersion'];
   const uptimeMs = daemon?.['uptimeMs'];
   const active = sessions?.['active'];
   const admissionInFlight = sessions?.['admissionInFlight'];
   return {
+    ...memoryDetail,
     status: response['status'],
     ...(typeof version === 'string' ? { version } : {}),
     ...(typeof uptimeMs === 'number' ? { uptimeMs } : {}),
@@ -567,6 +610,7 @@ export function buildDaemonStartArgs(options: {
   port: number;
   hostname: string;
   workspaces: readonly string[];
+  conversationsDir?: string;
   web: boolean;
   requireAuth: boolean;
 }): { command: string; args: string[] } {
@@ -580,6 +624,9 @@ export function buildDaemonStartArgs(options: {
   ];
   if (!options.web) childArgs.push('--no-web');
   if (options.requireAuth) childArgs.push('--require-auth');
+  if (options.conversationsDir !== undefined) {
+    childArgs.push('--conversations-dir', options.conversationsDir);
+  }
   for (const workspace of options.workspaces) {
     childArgs.push('--workspace', workspace);
   }
@@ -609,6 +656,9 @@ const START_ENV_DROP = [
   'QWEN_CODE_PROMPT_ID',
   'QWEN_CODE_PROJECT_DIR',
   'QWEN_CODE_SERVE',
+  // A daemon started from inside a Managed session is a new independent
+  // daemon, not a Hosted Harness worker; it must not inherit the attribution.
+  'QWEN_CODE_MANAGED_RUNTIME',
   'QWEN_CODE_AGENT_ID',
   'QWEN_DAEMON_TOKEN',
   'QWEN_CODE_MESSAGING_TOKEN',
@@ -718,6 +768,14 @@ async function printStartLogTail(file: string): Promise<void> {
 
 async function handleStart(argv: StartArgs): Promise<void> {
   ignoreBrokenPipe();
+  const conversationsDir = argv['conversations-dir'];
+  if (Array.isArray(conversationsDir)) {
+    writeStderrLine(
+      'mariadb-shell-agent daemon: pass --conversations-dir once.',
+    );
+    process.exitCode = 1;
+    return;
+  }
   const entry = resolveCliEntry();
   if (!entry) {
     writeStderrLine(
@@ -803,6 +861,7 @@ async function handleStart(argv: StartArgs): Promise<void> {
     port,
     hostname,
     workspaces,
+    conversationsDir,
     web: argv.web,
     requireAuth: argv['require-auth'],
   });
@@ -1465,6 +1524,9 @@ export function buildDaemonRestartPlan(
     record.hostname,
     '--wait',
   ];
+  if (record.conversationsDir !== undefined) {
+    startArgs.push('--conversations-dir', record.conversationsDir);
+  }
   for (const workspace of workspaces) {
     startArgs.push('--workspace', workspace);
   }
@@ -1728,6 +1790,12 @@ const startCommand: CommandModule<unknown, StartArgs> = {
         describe:
           'Workspace path; repeat for multiple; defaults to the current directory',
       })
+      .option('conversations-dir', {
+        type: 'string',
+        requiresArg: true,
+        describe:
+          'Absolute Conversations working-directory root (overrides QWEN_CONVERSATIONS_DIR)',
+      })
       .option('web', {
         type: 'boolean',
         default: true,
@@ -1899,8 +1967,7 @@ const tokenCommand: CommandModule<unknown, TokenArgs> = {
 };
 
 export const daemonCommand: CommandModule = {
-  command: 'daemon',
-  describe: 'Inspect and control local mariadb-shell-agent serve daemons',
+  ...commandMetadata.daemon,
   builder: (yargs: Argv) =>
     yargs
       .command(startCommand)

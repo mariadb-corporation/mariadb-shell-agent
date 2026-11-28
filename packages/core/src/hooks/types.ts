@@ -67,6 +67,7 @@ export enum HookEventName {
   TodoCompleted = 'TodoCompleted',
   // InstructionsLoaded - When an instruction or context file is loaded
   InstructionsLoaded = 'InstructionsLoaded',
+  FileChanged = 'FileChanged',
 }
 
 /**
@@ -293,6 +294,13 @@ export interface InstructionsLoadedInput extends HookInput {
   parent_file_path?: string;
 }
 
+export type FileChangeEvent = 'add' | 'change' | 'unlink';
+
+export interface FileChangedInput extends HookInput {
+  file_path: string;
+  event: FileChangeEvent;
+}
+
 /**
  * Base hook output - common fields for all events
  */
@@ -455,7 +463,10 @@ export class DefaultHookOutput implements HookOutput {
    * Get the effective reason for blocking or stopping
    */
   getEffectiveReason(): string {
-    return this.stopReason || this.reason || 'No reason provided';
+    for (const reason of [this.stopReason, this.reason]) {
+      if (typeof reason === 'string' && reason.trim()) return reason;
+    }
+    return 'No reason provided';
   }
 
   protected getRawAdditionalContext(): string | undefined {
@@ -740,7 +751,7 @@ export interface PermissionDeniedInput extends HookInput {
 export interface PermissionRequestDecision {
   behavior: 'allow' | 'deny';
   updatedInput?: Record<string, unknown>;
-  updatedPermissions?: PermissionSuggestion[];
+  updatedPermissions?: unknown[];
   message?: string;
   interrupt?: boolean;
 }
@@ -801,9 +812,9 @@ export class PermissionRequestHookOutput extends DefaultHookOutput {
   /**
    * Get updated permissions if permission was allowed with permission updates
    */
-  getUpdatedPermissions(): PermissionSuggestion[] | undefined {
-    const decision = this.getPermissionDecision();
-    return decision?.updatedPermissions;
+  getUpdatedPermissions(): unknown[] | undefined {
+    const updates = this.getPermissionDecision()?.updatedPermissions;
+    return Array.isArray(updates) ? updates : undefined;
   }
 }
 
@@ -927,6 +938,13 @@ export interface PostToolBatchOutput extends HookOutput {
 export interface UserPromptSubmitInput extends HookInput {
   prompt: string;
   submitted_prompt?: string;
+  /** The session that sent this prompt from another session. */
+  source?: UserPromptSource;
+}
+
+export interface UserPromptSource {
+  session_id: string;
+  cwd: string;
 }
 
 /**
@@ -1108,6 +1126,7 @@ export interface SessionStartOutput extends HookOutput {
   hookSpecificOutput?: {
     hookEventName: 'SessionStart';
     additionalContext?: string;
+    watchPaths?: string[];
   };
 }
 
@@ -1424,6 +1443,7 @@ export interface HookExecutionResult {
 export interface HookExecutionPlan {
   eventName: HookEventName;
   hookConfigs: HookConfig[];
+  hookSources?: HooksConfigSource[];
   sequential: boolean;
 }
 

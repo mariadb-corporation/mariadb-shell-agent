@@ -306,6 +306,7 @@ export type {
   DaemonWorkspaceActions,
   DaemonChannelPairingActions,
   DaemonChannelsResource,
+  DaemonChannelObservedContacts,
   /** Internal workspace context value (client + actions + status + error). */
   DaemonWorkspaceContextValue,
   /** Props accepted by `<DaemonWorkspaceProvider>`. */

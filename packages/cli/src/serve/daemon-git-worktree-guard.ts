@@ -11,6 +11,7 @@ import { parse } from 'shell-quote';
 import {
   getShellConfiguration,
   GitWorktreeService,
+  hasByteValuedAnsiCEscape,
   isWithinRoot,
   realpathNearestExistingAsync,
   splitCommands,
@@ -695,6 +696,10 @@ function tokenizeSegment(
   } catch {
     return null;
   }
+  // ANSI-C byte and Unicode escapes can parse to different path bytes than
+  // bash executes. The parsed tokens cannot establish the actual target,
+  // so these segments fail closed.
+  if (hasByteValuedAnsiCEscape(segment)) return null;
   let depth = startDepth;
   const runs: GuardRun[] = [{ tokens: [], depth }];
   let redirectOperand = false;

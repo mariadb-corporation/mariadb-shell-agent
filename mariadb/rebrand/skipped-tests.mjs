@@ -75,19 +75,16 @@ const SKIPPED = [
     reason:
       'No Alibaba providers in the pickers (alibaba.mjs): no QwenCloud / Alibaba ModelStudio groups or menu entries.',
     tests: {
-      // Navigates the CLI auth menu by position through the QwenCloud and ModelStudio entries.
+      // Navigate the CLI auth menus by position through the subscription, QwenCloud and ModelStudio
+      // entries.
       'packages/cli/src/ui/auth/AuthDialog.test.tsx': '*',
-      'packages/cli/src/ui/opentui/dialogs-auth.test.tsx': [
-        'renders the main menu with the four top-level options',
-        'navigates main → sub-menu and back with Esc',
-        'wraps the main-menu cursor from the last row to the first (#160)',
-        'renders QwenCloud flow title in Chinese when locale is zh (T1)',
-        'shows Token Plan and Standard API Key in QwenCloud sub-menu but not Coding Plan (T3+T4)',
-        'sheds the rule and terms block before the main list loses its last row',
-        'sheds the main list margin row before the list loses its last row',
-      ],
+      'packages/cli/src/ui/opentui/dialogs-auth.test.tsx': '*',
       'packages/cli/src/serve/server/auth-provider-helpers.test.ts': [
         'lists QwenCloud first and pins every group membership',
+      ],
+      // The provider menu they pin starts with QwenCloud.
+      'packages/cli/src/ui/components/DialogManager.test.tsx': [
+        'keeps the full provider menu at %i rows',
       ],
       'packages/core/src/providers/__tests__/presets/qwencloud-standard.test.ts':
         ['is registered, and the qwencloud group excludes Coding Plan'],
@@ -154,6 +151,42 @@ const SKIPPED = [
       ],
       'packages/cli/src/commands/review/lib/deadline.test.ts': [
         'the workflow exports the exact env names the gate reads',
+      ],
+    },
+  },
+  {
+    reason:
+      "The Web Shell sidebar shows the MariaDB Shell Agent icon in both themes (artwork.mjs): these tests pin upstream's dark and light Qwen marks.",
+    tests: {
+      'packages/web-shell/client/components/sidebar/WebShellSidebar.brand.test.tsx':
+        [
+          'uses the compact dark-theme artwork with theme-aware color',
+          'keeps the original blue mark in the light theme',
+          'falls back after a logo decode failure in $theme',
+        ],
+    },
+  },
+  {
+    reason:
+      'The daemon reports the Qwen subscription as disabled (alibaba.mjs): its hosts (qwen.ai) do not resolve here.',
+    tests: {
+      'packages/cli/src/serve/routes/subscription-auth.test.ts': [
+        'reports account login independently of the subscription capability',
+        'enables login when DEV=%s',
+        'enables login without OAuth environment configuration',
+        'returns production links for %s and never exposes the device secret',
+      ],
+    },
+  },
+  {
+    reason:
+      'No Qwen subscription sign-in (alibaba.mjs, patch 0016): the extension opens the setup wizard without asking the daemon for the subscription, and never shows the subscription panel.',
+    tests: {
+      'packages/vscode-ide-companion/src/webview/EmbeddedApp.test.tsx': [
+        'shows selected Qwen in the sidebar with VS Code theme tokens and host-owned activation',
+        'opens the native provider picker from %s even when subscription OAuth is enabled',
+        'waits for capability before opening auth and never falls back to a preview',
+        'shows the existing error on capability failure and allows another attempt',
       ],
     },
   },

@@ -85,9 +85,14 @@ vi.mock('./acp-output.js', () => ({
   }),
 }));
 
-vi.mock('@qwen-code/acp-bridge/ndJsonStream', () => ({
-  ndJsonStream: vi.fn().mockReturnValue({}),
-}));
+vi.mock('@qwen-code/acp-bridge/ndJsonStream', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@qwen-code/acp-bridge/ndJsonStream')>();
+  return {
+    ...actual,
+    ndJsonStream: vi.fn().mockReturnValue({}),
+  };
+});
 
 vi.mock('node:stream', async (importOriginal) => {
   const actual = await importOriginal<typeof import('node:stream')>();
@@ -122,6 +127,7 @@ vi.mock('../peerMessaging/peer-messaging.js', () => ({
   PeerMessaging: { start: vi.fn() },
 }));
 vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => ({
+  QWEN_DIR: '.mariadb-shell-agent',
   registerSession: vi.fn(),
   createDebugLogger: () => ({
     debug: vi.fn(),
@@ -173,7 +179,6 @@ vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => ({
   ).parseModelReasoningCapabilities,
   DEFAULT_STOP_HOOK_BLOCK_CAP: 8,
   DEFAULT_MAX_SUBAGENT_DEPTH: 5,
-  DEFAULT_MAX_TOOL_CALLS_PER_TURN: 100,
   DEFAULT_SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH: 1024 * 1024,
   SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH_LIMIT: 100 * 1024 * 1024,
   DEFAULT_TOOL_RESULTS_TOTAL_CHARS_THRESHOLD: 500_000,
@@ -522,7 +527,7 @@ describe('QwenAgent loadSession — Phase C worktree context restore', () => {
         getConfig: vi.fn().mockReturnValue(innerConfig),
         sendAvailableCommandsUpdate: vi.fn().mockResolvedValue(undefined),
         replayHistory: vi.fn().mockResolvedValue(undefined),
-        installRewriter: vi.fn(),
+        installMods: vi.fn(),
         startCronScheduler: vi.fn(),
         dispose: vi.fn(),
         pendingWorktreeNotice: null as string | null,

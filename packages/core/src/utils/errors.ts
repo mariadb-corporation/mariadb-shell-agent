@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2025 Google LLC
+ * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,6 +15,51 @@ const MAX_STRINGIFIED_ERROR_MESSAGE_LENGTH = 1000;
 
 export function isNodeError(error: unknown): error is NodeJS.ErrnoException {
   return error instanceof Error && 'code' in error;
+}
+
+/**
+ * Returns the `ERR_MODULE_NOT_FOUND` error in `error`'s cause chain, if any.
+ * A lazily imported bundle chunk fails this way when a background update
+ * replaced `dist` under the running process.
+ */
+export function getModuleNotFoundError(
+  error: unknown,
+): NodeJS.ErrnoException | undefined {
+  let current = error;
+
+  while (current instanceof Error) {
+    if (
+      'code' in current &&
+      (current as NodeJS.ErrnoException).code === 'ERR_MODULE_NOT_FOUND'
+    ) {
+      return current as NodeJS.ErrnoException;
+    }
+    current = current.cause;
+  }
+
+  return undefined;
+}
+
+/**
+ * Turns a missing lazily loaded chunk into an instruction to restart, keeping
+ * the original error as `cause`. Any other error is returned unchanged.
+ *
+ * @param feature what the chunk provides, completing "to use …".
+ */
+export function wrapLazyModuleLoadError(
+  error: unknown,
+  feature: string,
+): unknown {
+  const moduleNotFoundError = getModuleNotFoundError(error);
+  if (!moduleNotFoundError) {
+    return error;
+  }
+
+  return new Error(
+    `MariaDB Shell Agent was updated in the background and needs to be restarted.\n` +
+      `Please exit and restart MariaDB Shell Agent to use ${feature}.`,
+    { cause: moduleNotFoundError },
+  );
 }
 
 /**

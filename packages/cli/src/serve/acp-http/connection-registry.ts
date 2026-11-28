@@ -118,6 +118,8 @@ export interface SessionBinding {
    * the agent burning model quota on a result nobody will read.
    */
   promptAbort?: AbortController;
+  suspendWorkflowApprovals?: () => (() => void) | undefined;
+  resumeWorkflowApprovals?: () => void;
   /**
    * Armed by `detachSessionStream` when the session stream closes at the
    * transport level (proxy idle-close, network blip) WITHOUT an explicit
@@ -160,6 +162,8 @@ export interface PendingClientRequest {
   /** Maps the JSON-RPC id we issued back to the bridge's permission id. */
   bridgeRequestId: string;
   kind: 'permission';
+  /** This connection holds a delivery copy of a workflow-owned request. */
+  backgroundWorkflowApproval?: { originatorClientId?: string };
 }
 
 export interface SessionOwnershipIdentity {
@@ -336,16 +340,11 @@ export class AcpConnection {
     return this.ownedSessions.has(sessionId);
   }
 
-  /**
-   * True when a client request (a permission vote) is still outstanding for
-   * this session. Such a prompt cannot make progress without the client: once
-   * the entrance is revoked the vote can never arrive, so it must not be
-   * preserved across disconnect — it has to go through teardown, which
-   * abandons the pending request and releases the connection.
-   */
-  hasPendingClientRequest(sessionId: string): boolean {
+  private hasPendingPromptPermission(sessionId: string): boolean {
     for (const req of this.pending.values()) {
-      if (req.sessionId === sessionId) return true;
+      if (req.sessionId === sessionId && !req.backgroundWorkflowApproval) {
+        return true;
+      }
     }
     return false;
   }
@@ -704,6 +703,8 @@ export class AcpConnection {
     // must stay in lockstep.
     binding.stream = stream;
     binding.usesConnectionStream = stream === this.connStream;
+    binding.resumeWorkflowApprovals?.();
+    binding.resumeWorkflowApprovals = undefined;
     if (prevStream && prevStream !== stream && prevStream !== this.connStream) {
       if (!this.requeuePendingSessionReplies(binding, prevStream)) {
         prevStream.close();
@@ -899,9 +900,11 @@ export class AcpConnection {
         this.preserveRunningPromptsOnDisconnect &&
         binding.promptAbort &&
         !binding.promptAbort.signal.aborted &&
-        !this.hasPendingClientRequest(sessionId)
-      )
+        !this.hasPendingPromptPermission(sessionId)
+      ) {
+        binding.resumeWorkflowApprovals = binding.suspendWorkflowApprovals?.();
         return;
+      }
       // Grace expired with no reconnect → full teardown (aborts the prompt,
       // releases ownership, detaches the bridge client). Log it so an operator
       // debugging a vanished session can tell grace-expiry teardown apart from
@@ -1010,6 +1013,7 @@ export class AcpConnection {
       binding.stream.close();
     }
     this.abandonPendingForSession(binding.sessionId, binding.clientId);
+    binding.resumeWorkflowApprovals?.();
     this.onDetachSession?.(binding.sessionId, binding.clientId);
   }
 
@@ -1512,7 +1516,8 @@ export class AcpConnection {
   }
 
   /**
-   * Cancel + drop any pending agent→client requests for a closing session.
+   * Drop this binding's pending agent→client requests for a closing session.
+   * Prompt-scoped requests also get cancelled on the bridge.
    * This is the LAST-RESORT recovery path: `resolveClientResponse` retains a
    * pending entry on double-failure (vote AND cancel both threw) precisely so
    * this teardown sweep can retry the cancel. We always drop the entry here

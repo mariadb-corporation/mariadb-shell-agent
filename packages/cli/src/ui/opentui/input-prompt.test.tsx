@@ -35,6 +35,11 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { ApprovalMode, Storage, type Config } from '@qwen-code/qwen-code-core';
 import { t } from '../../i18n/index.js';
+import { AuthType } from '@qwen-code/qwen-code-core/utils/auth-type.js';
+import {
+  logoutCommand,
+  upgradeCommand,
+} from '../commands/subscription-commands.js';
 import type { LoadedSettings } from '../../config/settings.js';
 import {
   VimModeProvider,
@@ -311,7 +316,10 @@ const mocks = vi.hoisted(() => {
       if (type === 'box' || type === 'text') {
         return React.createElement(
           type === 'box' ? 'div' : 'span',
-          key === undefined ? null : { key },
+          {
+            ...(key === undefined ? {} : { key }),
+            'data-id': (config as { id?: string } | null)?.id,
+          },
           children,
         );
       }
@@ -423,6 +431,13 @@ vi.mock('./theme.js', () => ({
 vi.mock('./slash-dispatch.js', () => ({
   loadInteractiveCommands: async () => mocks.state.slashCommands,
 }));
+const isSubscriptionSignedIn = vi.hoisted(() => vi.fn(() => false));
+vi.mock('@qwen-code/qwen-code-core/qwen/subscription-session.js', () => ({
+  QwenSubscriptionSession: class {
+    isSignedIn = isSubscriptionSignedIn;
+    onChange = () => () => {};
+  },
+}));
 vi.mock('./live-session.js', () => ({
   nextLivePromptId: () => `source-test-${mocks.state.liveTurns.length}`,
   async *livePromptEvents(
@@ -447,8 +462,22 @@ vi.mock('../utils/clipboardUtils.js', () => ({
   saveClipboardImage: () => mocks.state.saveClipboardImage(),
   cleanupOldClipboardImages: async () => {},
 }));
+const voiceOverride = vi.hoisted(() => ({
+  current: {} as Record<string, unknown>,
+}));
+vi.mock('../hooks/use-prompt-voice-input.js', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('../hooks/use-prompt-voice-input.js')>();
+  return {
+    ...actual,
+    usePromptVoiceInput: (
+      options: Parameters<typeof actual.usePromptVoiceInput>[0],
+    ) => ({ ...actual.usePromptVoiceInput(options), ...voiceOverride.current }),
+  };
+});
 
 beforeEach(() => {
+  isSubscriptionSignedIn.mockReturnValue(false);
   vi.mocked(execFile).mockReset();
   vi.mocked(execFileSync).mockReset().mockReturnValue('');
   mocks.state.shellHistory = [];
@@ -942,6 +971,32 @@ describe('OpenTuiInputPrompt printable fallback', () => {
     expect(editor.plainText).toBe('abcd');
     expect(editor.cursorOffset).toBe(4);
     expect(editor.insertCalls).toEqual([]);
+  });
+
+  it('leaves a Shift+Ctrl+C decoded key to its owner without clearing the composer', async () => {
+    const onSubmit = vi.fn((text: string) => text.length > 0);
+    render(<OpenTuiInputPrompt onSubmit={onSubmit} userMessages={[]} />);
+    await typeText('keep draft');
+    const preventDefault = vi.fn();
+    const stopPropagation = vi.fn();
+    await act(async () =>
+      lastKeyboardHandler()(
+        baseKeyEvent({
+          name: 'c',
+          ctrl: true,
+          shift: true,
+          sequence: '\x1b[27;6;99~',
+          preventDefault,
+          stopPropagation,
+        }),
+      ),
+    );
+    expect(currentBuffer().text).toBe('keep draft');
+    expect(currentEditor().plainText).toBe('keep draft');
+    expect(preventDefault).not.toHaveBeenCalled();
+    expect(stopPropagation).not.toHaveBeenCalled();
+    await pressKey('return');
+    expect(onSubmit.mock.calls.map(([text]) => text)).toEqual(['keep draft']);
   });
 
   it('rejects release events', async () => {
@@ -2076,6 +2131,41 @@ describe('OpenTuiInputPrompt Enter accepts completions (G-13)', () => {
     await act(async () => {});
   }
 
+  it.each([logoutCommand, upgradeCommand])(
+    'updates /$name completion when switching connections',
+    async (command) => {
+      isSubscriptionSignedIn.mockReturnValue(true);
+      let authType = AuthType.QWEN_SUBSCRIPTION;
+      let notify: (model: string) => void = () => {};
+      const config = {
+        getTargetDir: () => '/tmp/project',
+        getAuthType: () => authType,
+        setSubscriptionPlan: () => {},
+        onModelChange: (listener: typeof notify) => {
+          notify = listener;
+          return () => {};
+        },
+      } as unknown as Config;
+      mocks.state.slashCommands = [command];
+      renderPrompt({ config });
+      await act(async () => {});
+      await typeText(`/${command.name.slice(0, 2)}`);
+      expect(screen.getByText(command.description)).toBeTruthy();
+
+      act(() => {
+        authType = AuthType.USE_OPENAI;
+        notify('same-model');
+      });
+      expect(screen.queryByText(command.description)).toBeNull();
+
+      act(() => {
+        authType = AuthType.QWEN_SUBSCRIPTION;
+        notify('same-model');
+      });
+      expect(screen.getByText(command.description)).toBeTruthy();
+    },
+  );
+
   it('publishes completion-list visibility so the shell can hide the footer', async () => {
     const seen: boolean[] = [];
     await renderWithCommands(
@@ -2301,6 +2391,42 @@ describe('OpenTuiInputPrompt Enter accepts completions (G-13)', () => {
     });
     expect(editor.plainText).toBe('/cd /tmp/a ');
   });
+
+  it.each(['/', '@'])(
+    'marks the actual active ordinary %s completion',
+    async (prefix) => {
+      mocks.state.fileSearchResults = ['first.txt', 'second.txt'];
+      mocks.state.fileSearchDelay = Promise.resolve();
+      mocks.state.sessionSuggestions = [];
+      mocks.state.extensionSuggestions = [];
+      await renderWithCommands([
+        { name: 'model', description: 'First', kind: 'built-in' },
+        { name: 'theme', description: 'Second', kind: 'built-in' },
+      ]);
+      await typeText(prefix);
+      await act(async () => {});
+      await act(async () => {});
+      expect(document.body.textContent).toContain(
+        prefix === '/' ? 'model' : 'first.txt',
+      );
+      const selected = document.querySelector(
+        '[data-id="screen-reader-selected-suggestion"]',
+      );
+      expect(selected).not.toBeNull();
+      expect(selected?.textContent).toContain(
+        prefix === '/' ? 'model' : 'first.txt',
+      );
+      const previous = selected?.textContent;
+      await pressKey('down');
+      expect(selected?.getAttribute('data-id')).toBe(
+        'screen-reader-unselected-suggestion',
+      );
+      expect(
+        document.querySelector('[data-id="screen-reader-selected-suggestion"]')
+          ?.textContent,
+      ).not.toBe(previous);
+    },
+  );
 
   it('submitOnAccept suggestions submit `/<value>` on Enter', async () => {
     const submitted: string[] = [];
@@ -3162,6 +3288,25 @@ describe('composer admission and attachment ownership', () => {
     expect(screen.getByText('> clipboard-test.png')).toBeTruthy();
     expect(currentEditor().plainText).toBe('/mod');
     expect(submit).not.toHaveBeenCalled();
+  });
+
+  it('provides actual attachment state with the unchanged filename', async () => {
+    const { container } = renderPrompt({ screenReader: true });
+    await press('v', true);
+    const attachment = container.querySelector(
+      '[data-id="screen-reader-unselected-attachment"]',
+    );
+    expect(attachment?.textContent).toBe('📎 clipboard-test.png');
+    await press('up');
+    expect(attachment?.getAttribute('data-id')).toBe(
+      'screen-reader-selected-attachment',
+    );
+    expect(attachment?.textContent).toBe('> clipboard-test.png');
+    await press('return');
+    expect(attachment?.getAttribute('data-id')).toBe(
+      'screen-reader-unselected-attachment',
+    );
+    expect(attachment?.textContent).toBe('📎 clipboard-test.png');
   });
 
   it('selects an attachment without completion and Enter only deselects it', async () => {
@@ -5319,4 +5464,101 @@ describe('clipboard model framing and raw source through the actual composer', (
       }
     },
   );
+});
+
+describe('OpenTuiInputPrompt screen-reader history scrolling', () => {
+  beforeEach(() => {
+    mocks.state.inputHandlers.length = 0;
+    mocks.state.keyboardHandlers.length = 0;
+    mocks.state.editors.length = 0;
+    mocks.state.pasteHandlers.length = 0;
+    mocks.state.slashCommands = [];
+  });
+
+  it.each([
+    { name: 'up', sequence: '\x1b[1;2A' },
+    { name: 'down', sequence: '\x1b[1;2B' },
+  ])(
+    'leaves Shift+$name to the history scroll handler without selecting the draft',
+    async ({ name, sequence }) => {
+      renderPrompt({ screenReader: true });
+      await typeText('abc');
+      const editor = currentEditor();
+      const native = editor as unknown as {
+        getSelection: () => { start: number; end: number } | null;
+      };
+      // The real native editor answers Shift+Up/Down by selecting the draft.
+      vi.mocked(editor.handleKeyPress).mockImplementation(() => {
+        native.getSelection = () => ({ start: 0, end: 3 });
+        return true;
+      });
+      const preventDefault = vi.fn();
+      await act(async () =>
+        lastKeyboardHandler()(
+          baseKeyEvent({ name, sequence, shift: true, preventDefault }),
+        ),
+      );
+      expect(preventDefault).not.toHaveBeenCalled();
+      await typeText('X');
+      expect(currentBuffer().text).toBe('abcX');
+    },
+  );
+
+  it('routes the screen-reader voice row to the live lane without the meter', () => {
+    voiceOverride.current = {
+      status: 'recording',
+      interimText: 'hello world',
+      audioLevel: 1,
+    };
+    try {
+      renderPrompt({ screenReader: true });
+      const row = document.querySelector(
+        '[data-id="screen-reader-live-voice"]',
+      );
+      expect(row?.textContent).toBe('listening…\nhello world');
+      expect(row?.textContent).not.toContain('█');
+    } finally {
+      voiceOverride.current = {};
+    }
+  });
+
+  it('keeps the graphical voice meter off the screen-reader lane', () => {
+    voiceOverride.current = {
+      status: 'recording',
+      interimText: 'hello world',
+      audioLevel: 1,
+    };
+    try {
+      renderPrompt();
+      expect(
+        document.querySelector('[data-id="screen-reader-live-voice"]'),
+      ).toBeNull();
+      expect(document.body.textContent).toContain('█');
+    } finally {
+      voiceOverride.current = {};
+    }
+  });
+
+  it('keeps Shift+Left native selection in screen-reader mode', async () => {
+    renderPrompt({ screenReader: true });
+    await typeText('abcd');
+    const editor = currentEditor();
+    vi.mocked(editor.handleKeyPress).mockImplementationOnce(() => {
+      editor.cursorOffset = 2;
+      return true;
+    });
+    const preventDefault = vi.fn();
+    await act(async () =>
+      lastKeyboardHandler()(
+        baseKeyEvent({
+          name: 'left',
+          sequence: '\x1b[1;2D',
+          shift: true,
+          preventDefault,
+        }),
+      ),
+    );
+    expect(preventDefault).toHaveBeenCalledTimes(1);
+    expect(currentBuffer().cursor).toEqual([0, 2]);
+  });
 });

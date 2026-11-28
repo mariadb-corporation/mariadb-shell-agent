@@ -27,10 +27,14 @@ import { createMockWorkspaceContext } from '../test-utils/mockWorkspaceContext.j
 import { GlobTool } from './glob.js';
 import { ToolErrorType } from './tool-error.js';
 
-const globWorkerAssets = vi.hoisted(() => ({ directory: '' }));
+const globWorkerAssets = vi.hoisted(() => ({ directory: '', stalled: false }));
 vi.mock('../utils/bundlePaths.js', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../utils/bundlePaths.js')>()),
-  resolveBundleDir: () => globWorkerAssets.directory,
+  resolveBundleDir: () =>
+    path.join(
+      globWorkerAssets.directory,
+      globWorkerAssets.stalled ? 'stalled' : '',
+    ),
 }));
 
 describe('bounded Glob search (real worker)', () => {
@@ -54,6 +58,13 @@ describe('bounded Glob search (real worker)', () => {
         js: "import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);",
       },
     });
+    const stalled = path.join(globWorkerAssets.directory, 'stalled');
+    await fs.mkdir(stalled);
+    // Exercise deadlines independently of matcher optimizations.
+    await fs.writeFile(
+      path.join(stalled, 'glob-search-worker.js'),
+      'setInterval(() => {}, 1000);',
+    );
   }, 30_000);
 
   afterAll(async () => {
@@ -83,6 +94,7 @@ describe('bounded Glob search (real worker)', () => {
   });
 
   afterEach(async () => {
+    globWorkerAssets.stalled = false;
     await fs.rm(temporary, { recursive: true, force: true });
   });
 
@@ -119,7 +131,7 @@ describe('bounded Glob search (real worker)', () => {
   });
 
   it.each(['+(?|?|?)Z', '*?'.repeat(20) + 'Z'])(
-    'terminates expensive matching for %s and permits the next search',
+    'finishes formerly expensive matching for %s and permits the next search',
     async (pattern) => {
       const controller = new AbortController();
       // Keeps a missing-deadline regression bounded while retaining its wrong outcome.
@@ -127,22 +139,12 @@ describe('bounded Glob search (real worker)', () => {
         () => controller.abort(new Error('outer test deadline')),
         5_000,
       );
-      let responded = false;
-      let responsiveBeforeResult = false;
-      const heartbeat = setTimeout(() => {
-        responsiveBeforeResult = !responded;
-      }, 50);
       try {
         const result = await tool(500)
           .build({ pattern })
           .execute(controller.signal);
-        responded = true;
-        expect(responsiveBeforeResult).toBe(true);
-        expect(result.error?.type).toBe(ToolErrorType.GLOB_EXECUTION_ERROR);
-        expect(result.llmContent).toContain(
-          'Glob search exceeded 0.5 seconds.',
-        );
-        expect(result.llmContent).not.toContain(root);
+        expect(result.error).toBeUndefined();
+        expect(result.returnDisplay).toBe('No files found');
         const next = await tool()
           .build({ pattern: 'safe.ts' })
           .execute(new AbortController().signal);
@@ -150,11 +152,42 @@ describe('bounded Glob search (real worker)', () => {
         expect(next.collectedFilePaths).toEqual([path.join(root, 'safe.ts')]);
       } finally {
         clearTimeout(fallback);
-        clearTimeout(heartbeat);
       }
     },
     15_000,
   );
+
+  it('terminates an unresponsive worker and permits the next search', async () => {
+    globWorkerAssets.stalled = true;
+    const controller = new AbortController();
+    const fallback = setTimeout(
+      () => controller.abort(new Error('outer test deadline')),
+      5_000,
+    );
+    let responsiveBeforeResult = false;
+    const heartbeat = setTimeout(() => {
+      responsiveBeforeResult = true;
+    }, 50);
+    try {
+      const result = await tool(500)
+        .build({ pattern: 'safe.ts' })
+        .execute(controller.signal);
+      expect(responsiveBeforeResult).toBe(true);
+      expect(result.error?.type).toBe(ToolErrorType.GLOB_EXECUTION_ERROR);
+      expect(result.llmContent).toContain('Glob search exceeded 0.5 seconds.');
+      expect(result.llmContent).not.toContain(root);
+      globWorkerAssets.stalled = false;
+      const next = await tool()
+        .build({ pattern: 'safe.ts' })
+        .execute(new AbortController().signal);
+      expect(next.error).toBeUndefined();
+      expect(next.collectedFilePaths).toEqual([path.join(root, 'safe.ts')]);
+    } finally {
+      globWorkerAssets.stalled = false;
+      clearTimeout(fallback);
+      clearTimeout(heartbeat);
+    }
+  }, 15_000);
 
   it('loads the TypeScript worker in source development mode', async () => {
     const script = `
@@ -189,7 +222,8 @@ describe('bounded Glob search (real worker)', () => {
     expect(result.collectedFilePaths).toEqual([path.join(root, 'safe.ts')]);
   }, 35_000);
 
-  it('cancels a matching worker and permits the next search', async () => {
+  it('cancels an unresponsive worker and permits the next search', async () => {
+    globWorkerAssets.stalled = true;
     const controller = new AbortController();
     const cancel = setTimeout(
       () => controller.abort(new Error('test cancellation')),
@@ -201,12 +235,14 @@ describe('bounded Glob search (real worker)', () => {
         .execute(controller.signal);
       expect(result.error?.type).toBe(ToolErrorType.GLOB_EXECUTION_ERROR);
       expect(result.llmContent).toContain('test cancellation');
+      globWorkerAssets.stalled = false;
       const next = await tool()
         .build({ pattern: 'safe.ts' })
         .execute(new AbortController().signal);
       expect(next.error).toBeUndefined();
       expect(next.collectedFilePaths).toEqual([path.join(root, 'safe.ts')]);
     } finally {
+      globWorkerAssets.stalled = false;
       clearTimeout(cancel);
     }
   }, 15_000);

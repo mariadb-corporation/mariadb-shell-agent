@@ -72,4 +72,14 @@ export function apply() {
     'const BUNDLED_LISTING_BUDGET = 6_900;',
     (t) => t.includes('const BUNDLED_LISTING_BUDGET = 6_900;'),
   );
+
+  // The resident memory policy names the config directory and the product: its per-turn budget
+  // grows by 50 characters too.
+  patch(
+    'name length',
+    'packages/core/src/memory/prompt.test.ts',
+    'expect(solo.length).toBeLessThanOrEqual(3_000);',
+    'expect(solo.length).toBeLessThanOrEqual(3_050);',
+    (t) => t.includes('expect(solo.length).toBeLessThanOrEqual(3_050);'),
+  );
 }

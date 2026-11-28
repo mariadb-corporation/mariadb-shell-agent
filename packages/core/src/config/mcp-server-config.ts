@@ -160,6 +160,8 @@ export class MCPServerConfig {
     readonly versionNegotiation?: 'auto' | 'legacy',
     readonly appResourceMaxBytes?: number,
     readonly appResourceTimeoutMs?: number,
+    /** Internal artifact identity of an extension-provided transport. */
+    readonly extensionArtifactRevision?: string,
   ) {}
 }
 

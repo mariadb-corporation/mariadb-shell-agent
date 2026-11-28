@@ -32,6 +32,7 @@ import {
   ToolErrorType,
 } from '@qwen-code/qwen-code-core';
 import type { ResolvedGeneratorForModel } from '@qwen-code/qwen-code-core/core/baseLlmClient.js';
+import type { ProjectMemoryOwner } from '@qwen-code/qwen-code-core/memory/paths.js';
 import * as path from 'node:path';
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type {
@@ -61,6 +62,13 @@ export type ScheduleFn = (
   request: ToolCallRequestInfo | ToolCallRequestInfo[],
   signal: AbortSignal,
   modelOverride?: string,
+  /**
+   * Receives this batch's completed calls in place of the hook's
+   * `onComplete`, for a caller that awaits the batch.
+   */
+  onBatchComplete?: (tools: InteractiveToolCall[]) => Promise<void>,
+  /** Fires when the kernel stops waiting for this cancelled batch. */
+  abandoned?: AbortSignal,
 ) => void;
 export type MarkToolsAsSubmittedFn = (callIds: string[]) => void;
 
@@ -182,9 +190,22 @@ export function useReactToolScheduler(
     [],
   );
 
+  // The batches whose caller takes their completion, by call id.
+  const batchCompletionsRef = useRef(
+    new Map<string, (tools: InteractiveToolCall[]) => Promise<void>>(),
+  );
   const allToolCallsCompleteHandler = useCallback(
     async (completedToolCalls: InteractiveToolCall[]) => {
-      await onCompleteRef.current(completedToolCalls);
+      const completions = batchCompletionsRef.current;
+      const onBatchComplete = completedToolCalls
+        .map(({ request }) => completions.get(request.callId))
+        .find((completion) => completion !== undefined);
+      for (const { request } of completedToolCalls) {
+        if (completions.get(request.callId) === onBatchComplete) {
+          completions.delete(request.callId);
+        }
+      }
+      await (onBatchComplete ?? onCompleteRef.current)(completedToolCalls);
     },
     [],
   );
@@ -239,15 +260,30 @@ export function useReactToolScheduler(
     [setToolCallsForDisplay],
   );
 
+  const clearToolCallDisplay = useCallback((callIds: ReadonlySet<string>) => {
+    setToolCallsForDisplay((calls) =>
+      calls.filter(
+        ({ request }) =>
+          !callIds.has(request.callId) &&
+          (request.parentCallId === undefined ||
+            !callIds.has(request.parentCallId)),
+      ),
+    );
+  }, []);
+
   const scheduler = useMemo(
     () =>
       new InteractiveModToolScheduler({
         config,
+        waitForNestedToolSettlement:
+          config.isUnifiedAgentLoopEnabled?.('ink') === true &&
+          config.isEventBusAgentLoopEnabled?.('ink') === true,
         onNativeAttempt: (call) =>
           onNativeAttemptRef.current?.(call) ?? Promise.resolve(),
         outputUpdateHandler,
         onAllToolCallsComplete: allToolCallsCompleteHandler,
         onToolCallsUpdate: toolCallsUpdateHandler,
+        onNestedToolsAbandoned: clearToolCallDisplay,
         getPreferredEditor: () => getPreferredEditorRef.current(),
         onEditorClose: () => onEditorCloseRef.current(),
         // Always wrap: Core treats a missing callback as false, and a later
@@ -260,6 +296,7 @@ export function useReactToolScheduler(
       outputUpdateHandler,
       allToolCallsCompleteHandler,
       toolCallsUpdateHandler,
+      clearToolCallDisplay,
     ],
   );
 
@@ -268,18 +305,49 @@ export function useReactToolScheduler(
       request: ToolCallRequestInfo | ToolCallRequestInfo[],
       signal: AbortSignal,
       modelOverride?: string,
+      onBatchComplete?: (tools: InteractiveToolCall[]) => Promise<void>,
+      abandoned?: AbortSignal,
     ) => {
       const owner = captureHookExecutionOwner(config);
       const sessionSignal =
         getInteractiveModSession(config)?.captureToolSignal();
       if (sessionSignal) signal = AbortSignal.any([signal, sessionSignal]);
       const requests = Array.isArray(request) ? request : [request];
+      if (onBatchComplete) {
+        for (const { callId } of requests) {
+          batchCompletionsRef.current.set(callId, onBatchComplete);
+        }
+      }
+      // A batch that ends without completing still releases its callback,
+      // with no calls, so its caller stops waiting and a later batch that
+      // reuses a call id is not routed to it.
+      const abandonBatchCompletion = (clearDisplay = false) => {
+        if (!onBatchComplete) return;
+        const released = new Set<string>();
+        for (const { callId } of requests) {
+          if (batchCompletionsRef.current.get(callId) === onBatchComplete) {
+            batchCompletionsRef.current.delete(callId);
+            released.add(callId);
+          }
+        }
+        if (released.size === 0) return;
+        if (clearDisplay) clearToolCallDisplay(released);
+        void onBatchComplete([]).catch((error: unknown) => {
+          debugLogger.error('Tool batch release failed:', error);
+        });
+      };
+      abandoned?.addEventListener('abort', () => abandonBatchCompletion(true), {
+        once: true,
+      });
       const isQueuedCancellation = (error: unknown) =>
         signal.aborted &&
         error instanceof Error &&
         error.message === 'Tool call cancelled while in queue.';
       const completeAsCancelled = async () => {
-        if (sessionSignal?.aborted) return;
+        if (sessionSignal?.aborted) {
+          abandonBatchCompletion();
+          return;
+        }
         const reason =
           '[Operation Cancelled] Reason: Tool call cancelled before execution.';
         const cancelledCalls: CompletedToolCall[] = requests.map(
@@ -314,8 +382,9 @@ export function useReactToolScheduler(
 
       if (!modelOverride?.endsWith('\0')) {
         void runWithHookExecutionOwner(owner, () =>
-          scheduler.schedule(request, signal),
+          scheduler.schedule(request, signal, undefined, abandoned),
         ).catch((error: unknown) => {
+          if (abandoned?.aborted) return;
           if (isQueuedCancellation(error)) {
             void completeAsCancelled().catch((completionError: unknown) => {
               debugLogger.error(
@@ -325,6 +394,7 @@ export function useReactToolScheduler(
             });
             return;
           }
+          abandonBatchCompletion();
           if (signal.aborted) return;
           debugLogger.error(
             `Tool scheduling failed: ${
@@ -338,7 +408,10 @@ export function useReactToolScheduler(
       // name the batch it failed to complete.
       void (async () => {
         const completeAsSchedulingError = async (error: unknown) => {
-          if (sessionSignal?.aborted) return;
+          if (sessionSignal?.aborted || abandoned?.aborted) {
+            abandonBatchCompletion();
+            return;
+          }
           debugLogger.error(
             `Full-turn tool scheduling failed: ${
               error instanceof Error ? error.message : String(error)
@@ -397,9 +470,10 @@ export function useReactToolScheduler(
 
         try {
           await runWithHookExecutionOwner(owner, () =>
-            scheduler.schedule(request, signal, runtimeView),
+            scheduler.schedule(request, signal, runtimeView, abandoned),
           );
         } catch (error) {
+          if (abandoned?.aborted) return;
           // The busy scheduler rejects a queued request once its signal
           // aborts, which is a cancellation rather than a scheduling failure.
           // Completing it as `cancelled` — instead of returning early — still
@@ -433,7 +507,7 @@ export function useReactToolScheduler(
         );
       });
     },
-    [allToolCallsCompleteHandler, config, scheduler],
+    [allToolCallsCompleteHandler, clearToolCallDisplay, config, scheduler],
   );
 
   const markToolsAsSubmitted: MarkToolsAsSubmittedFn = useCallback(
@@ -487,13 +561,14 @@ function detectMemoryOp(
   toolName: string,
   args: Record<string, unknown>,
   projectRoot: string,
+  owner?: ProjectMemoryOwner,
 ): 'read' | 'write' | undefined {
   const WRITE_TOOLS = new Set(['write_file', 'edit']);
   const READ_TOOLS = new Set(['read_file']);
   const filePath = args?.['file_path'] as string | undefined;
   if (!filePath) return undefined;
   const resolved = path.resolve(filePath);
-  if (!isAnyAutoMemPath(resolved, projectRoot)) return undefined;
+  if (!isAnyAutoMemPath(resolved, projectRoot, owner)) return undefined;
   if (WRITE_TOOLS.has(toolName)) return 'write';
   if (READ_TOOLS.has(toolName)) return 'read';
   return undefined;
@@ -505,6 +580,7 @@ function detectMemoryOp(
 export function mapToDisplay(
   toolOrTools: TrackedToolCall[] | TrackedToolCall,
   projectRoot?: string,
+  owner?: ProjectMemoryOwner,
 ): HistoryItemToolGroup {
   const toolCalls = Array.isArray(toolOrTools) ? toolOrTools : [toolOrTools];
 
@@ -549,6 +625,7 @@ export function mapToDisplay(
                 trackedCall.request.name,
                 trackedCall.request.args as Record<string, unknown>,
                 projectRoot,
+                owner,
               )
             : undefined,
       };

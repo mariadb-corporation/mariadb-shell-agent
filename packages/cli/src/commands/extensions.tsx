@@ -1,10 +1,10 @@
 /**
  * @license
  * Copyright 2025 Google LLC
- * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { commandMetadata } from './command-metadata.js';
 import type { CommandModule } from 'yargs';
 import { installCommand } from './extensions/install.js';
 import { uninstallCommand } from './extensions/uninstall.js';
@@ -18,8 +18,7 @@ import { settingsCommand } from './extensions/settings.js';
 import { sourcesCommand } from './extensions/sources.js';
 
 export const extensionsCommand: CommandModule = {
-  command: 'extensions <command>',
-  describe: 'Manage MariaDB Shell Agent extensions.',
+  ...commandMetadata.extensions,
   builder: (yargs) =>
     yargs
       .command(installCommand)

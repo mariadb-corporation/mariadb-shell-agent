@@ -10,6 +10,7 @@ import type { CSSProperties } from 'react';
 import {
   EXTENSION_LINK_EVENT,
   WebShellWithProviders,
+  QwenSubscriptionPanel,
   type ComposerToolbarAction,
   type TurnOutputOpenRequest,
   type WebShellApi,
@@ -102,7 +103,10 @@ const isVsCodeModelVisible = (model: { id: string }) =>
   !isDiscontinuedModel(model.id);
 
 /** Host-only slash entries. Built per language so the menu is not half-English. */
-function buildVsCodeSlashCommands(t: ChromeStrings) {
+function buildVsCodeSlashCommands(
+  t: ChromeStrings,
+  subscriptionEnabled: boolean,
+) {
   return [
     {
       name: 'model',
@@ -119,6 +123,15 @@ function buildVsCodeSlashCommands(t: ChromeStrings) {
       completionPriority: -100,
       autoSubmit: true,
     },
+    ...(subscriptionEnabled ? (['logout', 'upgrade'] as const) : []).map(
+      (name) => ({
+        name,
+        description: t(`cmd.${name}.description`),
+        completionSection: t('cmd.section.account'),
+        completionPriority: -100,
+        autoSubmit: true,
+      }),
+    ),
     {
       name: 'account',
       description: t('cmd.account.description'),
@@ -264,6 +277,7 @@ interface RuntimeConfig {
   token?: string;
   clientId?: string;
   workspaceCwd?: string;
+  subscriptionEnabled?: boolean;
   /**
    * The workspace path as VS Code spells it, sent only when it differs from
    * the canonical `workspaceCwd` (a symlinked folder). Every
@@ -282,6 +296,8 @@ function readRuntimeConfig(): RuntimeConfig | null {
     baseUrl,
     token: document.body.dataset.qwenDaemonToken || undefined,
     clientId: document.body.dataset.qwenDaemonClientId || undefined,
+    subscriptionEnabled:
+      document.body.dataset.qwenSubscriptionEnabled === 'true',
     workspaceCwd: document.body.dataset.qwenWorkspaceCwd || undefined,
     sessionId: document.body.dataset.qwenSessionId || undefined,
     hostKind:
@@ -362,16 +378,34 @@ export function EmbeddedApp() {
   const vscode = useVSCode();
   const language = useMemo(readLanguage, []);
   const t = useMemo(() => createChromeStrings(language), [language]);
-  const slashCommands = useMemo(() => buildVsCodeSlashCommands(t), [t]);
   const [theme, setTheme] = useState<WebShellTheme>(readTheme);
   const initialRuntime = useMemo(readRuntimeConfig, []);
   const [runtime, setRuntime] = useState(initialRuntime);
+  const slashCommands = useMemo(
+    () => buildVsCodeSlashCommands(t, runtime?.subscriptionEnabled === true),
+    [t, runtime?.subscriptionEnabled],
+  );
+
   const runtimeRef = useRef(runtime);
   runtimeRef.current = runtime;
   const [runtimeError, setRuntimeError] = useState<string>();
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const [signedOut, setSignedOut] = useState(false);
+  const authStateRef = useRef({ authenticated, signedOut });
+  authStateRef.current = { authenticated, signedOut };
   const [authConnecting, setAuthConnecting] = useState(false);
   const [authError, setAuthError] = useState<string>();
+  const [subscriptionFlowId, setSubscriptionFlowId] = useState<string>();
+  const subscriptionFlowRef = useRef<string | undefined>(undefined);
+  subscriptionFlowRef.current = subscriptionFlowId;
+  const subscriptionActivation = useRef<
+    | {
+        requestId: string;
+        resolve: (modelId: string) => void;
+        reject: (error: unknown) => void;
+      }
+    | undefined
+  >(undefined);
   // The provider setup wizard (open while set), started by Get Started,
   // /auth or the auth command.
   const [authWizard, setAuthWizard] = useState<AuthWizardProvider[]>();
@@ -411,6 +445,9 @@ export function EmbeddedApp() {
   const historyButtonRef = useRef<HTMLButtonElement>(null);
   const appRootRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<WebShellApi | null>(null);
+  const [subscriptionDraft, setSubscriptionDraft] = useState<
+    { modelId: string } | undefined
+  >(undefined);
   const composerRef = useRef<WebShellComposerApi | null>(null);
   const currentModelIdRef = useRef<string | undefined>(undefined);
   const transcriptBlocksRef = useRef<readonly DaemonTranscriptBlock[]>([]);
@@ -428,10 +465,93 @@ export function EmbeddedApp() {
   const daemonClient = useMemo(
     () =>
       daemonBaseUrl
-        ? new DaemonClient({ baseUrl: daemonBaseUrl, token: daemonToken })
+        ? new DaemonClient({
+            baseUrl: daemonBaseUrl,
+            token: daemonToken,
+            subscriptionPaywallScene: 'plugin',
+          })
         : null,
     [daemonBaseUrl, daemonToken],
   );
+
+  const subscriptionTransport = useMemo(
+    () =>
+      daemonClient && {
+        getSubscriptionConfig:
+          daemonClient.getSubscriptionConfig.bind(daemonClient),
+        startSubscriptionLogin:
+          daemonClient.startSubscriptionLogin.bind(daemonClient),
+        getSubscriptionLogin:
+          daemonClient.getSubscriptionLogin.bind(daemonClient),
+        cancelSubscriptionLogin:
+          daemonClient.cancelSubscriptionLogin.bind(daemonClient),
+        getSubscriptionUserInfo:
+          daemonClient.getSubscriptionUserInfo.bind(daemonClient),
+        signOutSubscription:
+          daemonClient.signOutSubscription.bind(daemonClient),
+      },
+    [daemonClient],
+  );
+  useEffect(() => {
+    setAuthConnecting(false);
+    setSignedOut(false);
+    setSubscriptionFlowId(undefined);
+    setSubscriptionDraft(undefined);
+    return () => {
+      subscriptionActivation.current?.reject(
+        new DOMException('Cancelled', 'AbortError'),
+      );
+      subscriptionActivation.current = undefined;
+      const flowId = subscriptionFlowRef.current;
+      if (flowId)
+        vscode.postMessage({
+          type: 'qwenSubscriptionCancel',
+          data: { flowId },
+        });
+    };
+  }, [daemonClient, runtime?.workspaceCwd, vscode]);
+
+  // Opens the provider setup wizard: the host answers with authWizard.
+  const openAuthentication = () => {
+    setAuthError(undefined);
+    vscode.postMessage({ type: 'auth', data: {} });
+  };
+
+  const activateSubscription = (signal: AbortSignal) =>
+    new Promise<string>((resolve, reject) => {
+      signal.throwIfAborted();
+      if (subscriptionActivation.current)
+        throw new Error('Subscription activation is already running.');
+      const flowId = subscriptionFlowRef.current;
+      if (!flowId) throw new DOMException('Cancelled', 'AbortError');
+      const requestId = crypto.randomUUID();
+      const cancel = () => {
+        if (subscriptionActivation.current?.requestId === requestId) {
+          subscriptionActivation.current = undefined;
+          vscode.postMessage({
+            type: 'qwenSubscriptionCancel',
+            data: { flowId },
+          });
+        }
+        reject(signal.reason);
+      };
+      subscriptionActivation.current = {
+        requestId,
+        resolve: (modelId) => {
+          signal.removeEventListener('abort', cancel);
+          resolve(modelId);
+        },
+        reject: (error) => {
+          signal.removeEventListener('abort', cancel);
+          reject(error);
+        },
+      };
+      signal.addEventListener('abort', cancel, { once: true });
+      vscode.postMessage({
+        type: 'qwenSubscriptionActivate',
+        data: { flowId, requestId },
+      });
+    });
 
   const clearInsight = useCallback(() => {
     setInsightProgress(undefined);
@@ -820,6 +940,9 @@ export function EmbeddedApp() {
         type?: string;
         data?: Record<string, unknown> | ReturnType<typeof readRuntimeConfig>;
       };
+      const subscriptionData = message.data as
+        | Record<string, unknown>
+        | undefined;
       if (
         message.type === 'webShellBootstrap' &&
         typeof message.data?.baseUrl === 'string'
@@ -913,6 +1036,46 @@ export function EmbeddedApp() {
       } else if (message.type === 'error') {
         const text = (message.data as { message?: unknown } | null)?.message;
         if (typeof text === 'string') setHostNotice({ tone: 'error', text });
+      } else if (
+        message.type === 'qwenSubscriptionAuth' &&
+        typeof subscriptionData?.flowId === 'string'
+      ) {
+        setAuthError(undefined);
+        setAuthConnecting(false);
+        setSubscriptionFlowId(subscriptionData.flowId);
+      } else if (
+        message.type === 'qwenSubscriptionClosed' &&
+        subscriptionData?.flowId === subscriptionFlowRef.current
+      ) {
+        setSubscriptionFlowId(undefined);
+        subscriptionActivation.current?.reject(
+          new DOMException('Cancelled', 'AbortError'),
+        );
+        subscriptionActivation.current = undefined;
+      } else if (
+        message.type === 'qwenSubscriptionActivationResult' &&
+        subscriptionData?.flowId === subscriptionFlowRef.current
+      ) {
+        const pending = subscriptionActivation.current;
+        if (pending && pending.requestId === subscriptionData?.requestId) {
+          subscriptionActivation.current = undefined;
+          if (subscriptionData?.error) {
+            pending.reject(
+              Object.assign(new Error('Subscription activation failed.'), {
+                body: subscriptionData.body,
+              }),
+            );
+          } else if (typeof subscriptionData.modelId === 'string') {
+            if (subscriptionData.draft === true) {
+              setSubscriptionDraft({ modelId: subscriptionData.modelId });
+            }
+            pending.resolve(subscriptionData.modelId);
+          } else {
+            pending.reject(
+              new Error('Subscription activation did not return a model.'),
+            );
+          }
+        }
       } else if (message.type === 'accountInfo' && message.data) {
         setAccountInfo(message.data as AccountInfo);
       } else if (message.type === 'authWizard') {
@@ -942,19 +1105,45 @@ export function EmbeddedApp() {
           setAuthConnecting(false);
           clearInsight();
         } else if (state === true) {
+          setSignedOut(false);
           setAuthConnecting(false);
           setAuthError(undefined);
         }
+      } else if (message.type === 'authSignedOut') {
+        setAuthenticated(false);
+        setSignedOut(true);
+        setAuthConnecting(false);
+        setAuthError(undefined);
+        setSubscriptionFlowId(undefined);
+        setHostNotice(undefined);
+        setSubscriptionDraft(undefined);
+        void shellRef.current?.refreshModels().catch((error: unknown) => {
+          console.error('Unable to refresh models after sign-out', error);
+        });
+        clearInsight();
       } else if (
         message.type === 'authSuccess' ||
         message.type === 'agentConnected'
       ) {
         setAuthenticated(true);
+        setSignedOut(false);
         setAuthConnecting(false);
         setAuthError(undefined);
         if (message.type === 'authSuccess') {
           setAuthWizard(undefined);
-          setHostNotice({ tone: 'info', text: t('auth.signedIn') });
+          if (subscriptionData?.chatProviderConfigured === true) {
+            setSubscriptionDraft(undefined);
+          }
+          void shellRef.current?.refreshModels().catch((error: unknown) => {
+            console.error('Unable to refresh models after sign-in', error);
+          });
+          setHostNotice({
+            tone: 'info',
+            text:
+              typeof subscriptionData?.['message'] === 'string'
+                ? subscriptionData['message']
+                : t('auth.signedIn'),
+          });
         }
       } else if (message.type === 'authCancelled') {
         // A cancelled auth flow must not hide an already-authenticated
@@ -979,7 +1168,16 @@ export function EmbeddedApp() {
             : typeof data?.error === 'string'
               ? data.error
               : t('auth.failed');
-        setAuthenticated(false);
+        if (
+          message.type === 'authError' &&
+          (authStateRef.current.authenticated === true ||
+            authStateRef.current.signedOut)
+        ) {
+          setHostNotice({ tone: 'error', text });
+        } else {
+          setAuthenticated(false);
+          setSignedOut(false);
+        }
         setAuthConnecting(false);
         setAuthError(text);
         // An open wizard stays open with the error, so the answers can be
@@ -1565,17 +1763,80 @@ export function EmbeddedApp() {
           )}
         </div>
       )}
-      {authenticated === false ? (
+      {subscriptionFlowId && subscriptionTransport ? (
         <QwenOnboarding
-          connecting={authConnecting}
-          error={authError}
+          connecting={false}
           t={t}
           theme={theme}
           onGetStarted={() => {
-            setAuthError(undefined);
-            vscode.postMessage({ type: 'auth', data: {} });
+            void openAuthentication();
           }}
-        />
+        >
+          <QwenSubscriptionPanel
+            key={subscriptionFlowId}
+            transport={subscriptionTransport}
+            language={language}
+            theme={theme}
+            style={
+              {
+                ...SHELL_STYLE,
+                '--font-mono': 'var(--vscode-font-family)',
+                height: 'auto',
+                padding: 0,
+                overflow: 'visible',
+                background: 'transparent',
+              } as CSSProperties
+            }
+            onOpenExternal={(url) =>
+              vscode.postMessage({ type: 'openExternalUrl', data: { url } })
+            }
+            onSignedOut={() =>
+              vscode.postMessage({
+                type: 'qwenSubscriptionSignedOut',
+                data: { flowId: subscriptionFlowId },
+              })
+            }
+            onClose={() =>
+              vscode.postMessage({
+                type: 'qwenSubscriptionCancel',
+                data: { flowId: subscriptionFlowId },
+              })
+            }
+            onOtherProviders={() =>
+              vscode.postMessage({
+                type: 'qwenSubscriptionOtherProviders',
+                data: { flowId: subscriptionFlowId },
+              })
+            }
+            onAuthError={(message) =>
+              vscode.postMessage({
+                type: 'qwenSubscriptionError',
+                data: { flowId: subscriptionFlowId, message },
+              })
+            }
+            onActivate={activateSubscription}
+            onActivated={(message) =>
+              vscode.postMessage({
+                type: 'qwenSubscriptionComplete',
+                data: { flowId: subscriptionFlowId, message },
+              })
+            }
+          />
+        </QwenOnboarding>
+      ) : null}
+      {/* Keep the session providers mounted when subscription login replaces the view. */}
+      {authenticated === false && !signedOut ? (
+        subscriptionFlowId ? null : (
+          <QwenOnboarding
+            connecting={authConnecting}
+            error={authError}
+            t={t}
+            theme={theme}
+            onGetStarted={() => {
+              void openAuthentication();
+            }}
+          />
+        )
       ) : (
         <WebShellWithProviders
           baseUrl={runtime.baseUrl}
@@ -1585,6 +1846,7 @@ export function EmbeddedApp() {
           sessionId={runtime.sessionId}
           className="qwen-code-vscode-web-shell"
           style={SHELL_STYLE}
+          viewHidden={Boolean(subscriptionFlowId)}
           theme={theme}
           // No `language` prop on purpose: the shell resolves its own UI
           // language (daemon setting, then browser locale), so a pick in its
@@ -1594,9 +1856,11 @@ export function EmbeddedApp() {
             runtime.sessionId ? undefined : VSCODE_SESSION_SOURCE_TYPE
           }
           shellRef={shellRef}
+          subscriptionDraft={subscriptionDraft}
           header={{ items: [] }}
           onSessionIdChange={(sessionId) => {
             if (switchingSessionId && sessionId !== switchingSessionId) return;
+            if (sessionId) setSubscriptionDraft(undefined);
             webShellPermissionRequestIdRef.current = undefined;
             clearInsight();
             setEditingMessage(undefined);
@@ -1639,6 +1903,12 @@ export function EmbeddedApp() {
               }
             }
           }}
+          onModelChange={(modelId, authType) => {
+            vscode.postMessage({
+              type: 'webShellModelChanged',
+              data: { workspaceCwd: runtime.workspaceCwd, modelId, authType },
+            });
+          }}
           onError={handleShellError}
           sidebar={false}
           compactThinking
@@ -1653,7 +1923,11 @@ export function EmbeddedApp() {
           hiddenSlashCommands={[...VSCODE_HIDDEN_SLASH_COMMANDS]}
           onSlashCommand={({ command, input }) => {
             if (command === 'auth' || command === 'login') {
-              vscode.postMessage({ type: 'auth', data: {} });
+              void openAuthentication();
+              return true;
+            }
+            if (command === 'logout' || command === 'upgrade') {
+              vscode.postMessage({ type: command, data: {} });
               return true;
             }
             if (command === 'account') {

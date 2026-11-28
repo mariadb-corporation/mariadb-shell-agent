@@ -6,10 +6,10 @@ starts its daemon and ACP process without CLI options of the user's. The new
 setting qwen-code.experimentalLsp (off by default) adds the flag to both.
 
 diff --git a/packages/vscode-ide-companion/package.json b/packages/vscode-ide-companion/package.json
-index f66edff823..985f8215ff 100644
+index 890a643b9b..b32ae884eb 100644
 --- a/packages/vscode-ide-companion/package.json
 +++ b/packages/vscode-ide-companion/package.json
-@@ -224,6 +224,12 @@
+@@ -240,6 +240,12 @@
            "type": "boolean",
            "default": true,
            "description": "Show notifications with sound when a task completes (at least 20 seconds) or needs your attention, while you are not actively viewing the Qwen Code panel."
@@ -92,10 +92,10 @@ index 321c97f43d..2c3d053fad 100644
          {
            cwd: workspaceCwd,
 diff --git a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
-index f452d5e3c3..97ef7f5203 100644
+index f70e0b5191..89d07420ca 100644
 --- a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
 +++ b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
-@@ -1838,6 +1838,11 @@ export class WebViewProvider {
+@@ -2157,6 +2157,11 @@ export class WebViewProvider {
              this.context.extensionMode,
            ),
            canonicalWorkspaceCwd,

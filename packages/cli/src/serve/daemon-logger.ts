@@ -166,17 +166,55 @@ export interface BuildDaemonLogLineArgs {
   now: Date;
   ctx?: DaemonLogContext;
   err?: Error;
+  pid?: number;
+  port?: number;
 }
 
 interface BuildDaemonLogRecordArgs extends BuildDaemonLogLineArgs {
   traceContext?: DaemonTraceContext;
 }
 
+// The daemon's own log identity, shared by reference so the late-bound port
+// (set once listening) reaches every stderr line — including the bare
+// diagnostics that bypass the tee — without each sink keeping its own copy.
+interface DaemonLogIdentity {
+  pid: number;
+  port?: number;
+}
+
+function renderIdentityPrefix(identity: DaemonLogIdentity): string {
+  return identity.port === undefined
+    ? `pid=${identity.pid} `
+    : `pid=${identity.pid} port=${identity.port} `;
+}
+
+// Identity keys belong to the daemon prefix, never to caller context: a
+// worker pid travels as `childPid`, so a stray `pid`/`port`/`runId` in ctx
+// must not produce a second, conflicting key in either sink.
+const IDENTITY_CTX_KEYS: ReadonlySet<string> = new Set([
+  'runId',
+  'pid',
+  'port',
+]);
+
+function stripIdentityCtx(
+  ctx: DaemonLogContext | undefined,
+): DaemonLogContext | undefined {
+  if (!ctx) return undefined;
+  return Object.fromEntries(
+    Object.entries(ctx).filter(([key]) => !IDENTITY_CTX_KEYS.has(key)),
+  );
+}
+
 function formatDaemonLogLine(args: BuildDaemonLogRecordArgs): string {
   const ts = args.now.toISOString();
+  const identityStr =
+    args.pid === undefined
+      ? ''
+      : renderIdentityPrefix({ pid: args.pid, port: args.port });
   const traceStr = renderTraceContext(args.traceContext);
-  const ctxStr = renderCtx(args.ctx);
-  return `${ts} [${args.level}] [DAEMON] ${traceStr}${ctxStr}${args.message}\n${renderErr(args.err)}`;
+  const ctxStr = renderCtx(stripIdentityCtx(args.ctx));
+  return `${ts} [${args.level}] [DAEMON] ${identityStr}${traceStr}${ctxStr}${args.message}\n${renderErr(args.err)}`;
 }
 
 export function buildDaemonLogLine(args: BuildDaemonLogLineArgs): string {
@@ -187,17 +225,13 @@ function buildDaemonFileLogLine(
   args: BuildDaemonLogRecordArgs,
   runId: string,
   pid: number,
+  port?: number,
 ): string {
-  const callerCtx = args.ctx
-    ? Object.fromEntries(
-        Object.entries(args.ctx).filter(
-          ([key]) => key !== 'runId' && key !== 'pid',
-        ),
-      )
-    : undefined;
+  const callerCtx = stripIdentityCtx(args.ctx);
   const traceStr = renderTraceContext(args.traceContext);
   const ctxStr = renderCtx(callerCtx);
-  return `${args.now.toISOString()} [${args.level}] [DAEMON] runId=${runId} pid=${pid} ${traceStr}${ctxStr}${args.message}\n${renderErr(args.err)}`;
+  const portStr = port === undefined ? '' : ` port=${port}`;
+  return `${args.now.toISOString()} [${args.level}] [DAEMON] runId=${runId} pid=${pid}${portStr} ${traceStr}${ctxStr}${args.message}\n${renderErr(args.err)}`;
 }
 
 export interface DaemonLogger {
@@ -205,6 +239,9 @@ export interface DaemonLogger {
   warn(message: string, ctx?: DaemonLogContext): void;
   error(message: string, err?: Error | null, ctx?: DaemonLogContext): void;
   raw(line: string, level?: 'info' | 'warn' | 'error'): void;
+  // The listening port is only known after listen succeeds (ephemeral port 0,
+  // EADDRINUSE fallback), so it cannot be an init option.
+  setPort(port: number): void;
   getLogPath(): string;
   getDaemonId(): string;
   getStatus(): DaemonLoggerStatus;
@@ -386,6 +423,7 @@ function statusSnapshot(
 
 function createStderrOnlyLogger(input: {
   runId: string;
+  identity: DaemonLogIdentity;
   daemonId: string;
   now: () => Date;
   stderr: (line: string) => void;
@@ -406,6 +444,8 @@ function createStderrOnlyLogger(input: {
         ctx,
         err,
         traceContext,
+        pid: input.identity.pid,
+        port: input.identity.port,
       }).trimEnd(),
     );
   };
@@ -414,6 +454,9 @@ function createStderrOnlyLogger(input: {
     warn: (message, ctx) => tee('WARN', message, ctx),
     error: (message, err, ctx) => tee('ERROR', message, ctx, err ?? undefined),
     raw: () => {},
+    setPort: (value) => {
+      input.identity.port = value;
+    },
     getLogPath: () => '',
     getDaemonId: () => input.daemonId,
     getStatus: () =>
@@ -1024,7 +1067,7 @@ function createConcreteLogger(input: {
   family: DaemonLogFamily;
   state: FileSinkState;
   runId: string;
-  pid: number;
+  identity: DaemonLogIdentity;
   daemonId: string;
   now: () => Date;
   monotonicNow: () => number;
@@ -1051,7 +1094,7 @@ function createConcreteLogger(input: {
       if (!overflowEpisode) {
         overflowEpisode = true;
         input.stderr(
-          'mariadb-shell-agent serve: daemon log queue limit reached; dropping file copies until capacity recovers',
+          `${renderIdentityPrefix(input.identity)}mariadb-shell-agent serve: daemon log queue limit reached; dropping file copies until capacity recovers`,
         );
       }
     }
@@ -1249,7 +1292,8 @@ function createConcreteLogger(input: {
           ctx: { droppedRecords: records, droppedBytes: bytes },
         },
         input.runId,
-        input.pid,
+        input.identity.pid,
+        input.identity.port,
       ),
       input.policy.maxRecordBytes,
     );
@@ -1339,6 +1383,8 @@ function createConcreteLogger(input: {
         ctx,
         err,
         traceContext,
+        pid: input.identity.pid,
+        port: input.identity.port,
       }).trimEnd(),
     );
     submitFileRecord(
@@ -1346,7 +1392,8 @@ function createConcreteLogger(input: {
         buildDaemonFileLogLine(
           { level, message, now: timestamp, ctx, err, traceContext },
           input.runId,
-          input.pid,
+          input.identity.pid,
+          input.identity.port,
         ),
         input.policy.maxRecordBytes,
       ),
@@ -1393,11 +1440,15 @@ function createConcreteLogger(input: {
               now: input.now(),
             },
             input.runId,
-            input.pid,
+            input.identity.pid,
+            input.identity.port,
           ),
           input.policy.maxRecordBytes,
         ),
       );
+    },
+    setPort: (value) => {
+      input.identity.port = value;
     },
     getLogPath: () => input.family.activePath,
     getDaemonId: () => input.daemonId,
@@ -1454,6 +1505,7 @@ export async function initDaemonLogger(
   opts: InitDaemonLoggerOptions,
 ): Promise<DaemonLogger> {
   const pid = opts.pid ?? process.pid;
+  const identity: DaemonLogIdentity = { pid };
   const now = opts.now ?? (() => new Date());
   const monotonicNow = opts.monotonicNow ?? (() => performance.now());
   const stderr = opts.stderr ?? writeStderrLine;
@@ -1468,7 +1520,9 @@ export async function initDaemonLogger(
     if (warned.has(key)) return;
     warned.add(key);
     try {
-      stderr(message);
+      // Bare diagnostics bypass the tee, so they carry the identity here —
+      // the write-failure line is the one an operator greps in a shared sink.
+      stderr(`${renderIdentityPrefix(identity)}${message}`);
     } catch {
       // Internal diagnostics must not bypass lease cleanup paths.
     }
@@ -1477,6 +1531,7 @@ export async function initDaemonLogger(
   if (isOptedOut()) {
     return createStderrOnlyLogger({
       runId,
+      identity,
       daemonId: computeDaemonId(pid),
       now,
       stderr,
@@ -1497,6 +1552,7 @@ export async function initDaemonLogger(
     );
     return createStderrOnlyLogger({
       runId,
+      identity,
       daemonId: computeDaemonId(pid),
       now,
       stderr,
@@ -1571,7 +1627,7 @@ export async function initDaemonLogger(
         family,
         state,
         runId,
-        pid,
+        identity,
         daemonId: computeDaemonId(pid),
         now,
         monotonicNow,
@@ -1768,6 +1824,7 @@ export async function initDaemonLogger(
       });
       return createStderrOnlyLogger({
         runId,
+        identity,
         daemonId: computeDaemonId(pid),
         now,
         stderr,
@@ -1819,6 +1876,7 @@ export async function initDaemonLogger(
     );
     return createStderrOnlyLogger({
       runId,
+      identity,
       daemonId: computeDaemonId(pid),
       now,
       stderr,

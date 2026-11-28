@@ -11,10 +11,10 @@ reminder in the system prompt; a configured or QWEN_SYSTEM_MD prompt gets
 none, as before.
 
 diff --git a/packages/core/src/core/client.test.ts b/packages/core/src/core/client.test.ts
-index 5bffc28268..a5fa560c02 100644
+index 9050f45874..bba818dde8 100644
 --- a/packages/core/src/core/client.test.ts
 +++ b/packages/core/src/core/client.test.ts
-@@ -3937,7 +3937,7 @@ describe('Gemini Client (client.ts)', () => {
+@@ -5120,7 +5120,7 @@ describe('Gemini Client (client.ts)', () => {
        expect(getInitialChatHistory).toHaveBeenLastCalledWith(
          expect.anything(),
          undefined,
@@ -23,7 +23,7 @@ index 5bffc28268..a5fa560c02 100644
        );
  
        await client.addWorkingDirectoryChangedContext(
-@@ -3979,7 +3979,7 @@ describe('Gemini Client (client.ts)', () => {
+@@ -5162,7 +5162,7 @@ describe('Gemini Client (client.ts)', () => {
        expect(getInitialChatHistory).toHaveBeenLastCalledWith(
          expect.anything(),
          undefined,
@@ -32,41 +32,52 @@ index 5bffc28268..a5fa560c02 100644
        );
        expect(client['getCachedGitStatus']()).toBe('Git snapshot B');
        expect(getRecentGitStatus).toHaveBeenCalledTimes(2);
-@@ -13442,6 +13442,7 @@ Other open files:
-           agentReachable: false,
-           executionSandboxFilesystem: undefined,
+@@ -15653,6 +15653,7 @@ Other open files:
            executionSandboxBackend: undefined,
+           executionSandboxNetwork: undefined,
+           source: expect.objectContaining({ identity: null }),
 +          interactionModeReminderInPrelude: true,
          },
        ] as const;
      /** generateContent args whose config carries `systemInstruction`. */
 diff --git a/packages/core/src/core/client.ts b/packages/core/src/core/client.ts
-index 5155ced8a5..a39998a680 100644
+index b8e5b1c166..49fbcfd0ec 100644
 --- a/packages/core/src/core/client.ts
 +++ b/packages/core/src/core/client.ts
-@@ -89,6 +89,7 @@ import {
+@@ -99,6 +99,7 @@ import {
    getArenaSystemReminder,
    getCoreSystemPrompt,
    getCustomSystemPrompt,
 +  getMainSessionInteractionModeReminder,
    getPlanModeSystemReminder,
+   loadCoreSystemPromptSource,
    resolveInteractionMode,
-   resolveMainSessionOutputStyle,
-@@ -489,6 +490,7 @@ export function getMainSessionBaseSystemPrompt(
-           executionSandboxBackend:
+@@ -714,6 +715,7 @@ export function getMainSessionBaseSystemPrompt(
              config.getShellExecutionSandbox?.()?.effectiveBackend,
            executionSandboxNetwork: config.getShellExecutionSandbox?.()?.network,
+           ...(source && { source }),
 +          interactionModeReminderInPrelude: true,
          },
        );
  }
-@@ -2126,7 +2128,12 @@ export class LlmClient {
+@@ -2501,6 +2503,9 @@ export class LlmClient {
+             ? (findLastAnnouncedDate(currentHistory.slice(0, startupLength)) ??
+               null)
+             : undefined,
++        interactionModeReminder: getMainSessionInteractionModeReminder(
++          this.config,
++        ),
+       },
+     );
+     this.seedSkillReminderDedupFromSnapshot(snapshotEntries);
+@@ -2542,7 +2547,13 @@ export class LlmClient {
      const [[startupContext], snapshotEntries] = await getInitialChatHistory(
        this.config,
        undefined,
--      { gitStatus: this.getCachedGitStatus() },
+-      { gitStatus: this.getCachedGitStatus(), announcedDate: null },
 +      {
 +        gitStatus: this.getCachedGitStatus(),
++        announcedDate: null,
 +        interactionModeReminder: getMainSessionInteractionModeReminder(
 +          this.config,
 +        ),
@@ -74,21 +85,7 @@ index 5155ced8a5..a39998a680 100644
      );
      this.seedSkillReminderDedupFromSnapshot(snapshotEntries);
      await this.seedAgentReminderDedupFromCurrent();
-@@ -2166,7 +2173,12 @@ export class LlmClient {
-     const [[startupContext], snapshotEntries] = await getInitialChatHistory(
-       this.config,
-       undefined,
--      { gitStatus: this.getCachedGitStatus() },
-+      {
-+        gitStatus: this.getCachedGitStatus(),
-+        interactionModeReminder: getMainSessionInteractionModeReminder(
-+          this.config,
-+        ),
-+      },
-     );
-     this.seedSkillReminderDedupFromSnapshot(snapshotEntries);
-     await this.seedAgentReminderDedupFromCurrent();
-@@ -2852,6 +2864,9 @@ export class LlmClient {
+@@ -3245,6 +3256,9 @@ export class LlmClient {
          () =>
            getInitialChatHistory(this.config, extraHistory, {
              gitStatus: this.getCachedGitStatus(),
@@ -99,10 +96,10 @@ index 5155ced8a5..a39998a680 100644
        );
        this.config
 diff --git a/packages/core/src/core/environmentContext.test.ts b/packages/core/src/core/environmentContext.test.ts
-index 3e9a765a98..2e2741856f 100644
+index feb6518447..e50a147071 100644
 --- a/packages/core/src/core/environmentContext.test.ts
 +++ b/packages/core/src/core/environmentContext.test.ts
-@@ -422,6 +422,19 @@ describe('getInitialChatHistory', () => {
+@@ -661,6 +661,19 @@ describe('getInitialChatHistory', () => {
      expect(history).toEqual([]);
    });
  
@@ -123,31 +120,33 @@ index 3e9a765a98..2e2741856f 100644
      mockToolRegistry.getDeferredToolSummary.mockReturnValue([
        { name: 'web_fetch', description: 'Fetches web pages' },
 diff --git a/packages/core/src/core/environmentContext.ts b/packages/core/src/core/environmentContext.ts
-index 15f891916c..2987491522 100644
+index 7edae2d9a3..7ebb7db945 100644
 --- a/packages/core/src/core/environmentContext.ts
 +++ b/packages/core/src/core/environmentContext.ts
-@@ -589,6 +589,9 @@ export interface InitialChatHistoryOptions {
-   // prompt so a repository change between sessions does not invalidate the
-   // provider-cached system prompt. Subagents leave it unset.
-   gitStatus?: string | null;
+@@ -698,6 +698,9 @@ export interface InitialChatHistoryOptions {
+   // date is unknown. A caller that puts the startup context in front of turns
+   // whose date it knows passes that date; null records none.
+   announcedDate?: string | null;
 +  // Main session: its interaction-mode reminder, sent here instead of in the
 +  // system prompt so the system prompt is the same in every mode.
 +  interactionModeReminder?: string | null;
  }
  
  /**
-@@ -634,6 +637,9 @@ export async function getInitialChatHistory(
-   // parts. Deferred-tools is last because progressive MCP discovery can
-   // change it — only the tail recomputes.
+@@ -752,6 +755,11 @@ export async function getInitialChatHistory(
+   const asPart = (text: string | null): Part | null =>
+     text === null ? null : { text };
    const reminderParts = [
-+    options.interactionModeReminder
-+      ? wrapSystemReminder(options.interactionModeReminder)
-+      : null,
-     buildMcpServerInstructionsReminder(toolRegistry),
-     skillsResult?.reminder ?? null,
-     startupReminder,
++    asPart(
++      options.interactionModeReminder
++        ? wrapSystemReminder(options.interactionModeReminder)
++        : null,
++    ),
+     asPart(buildMcpServerInstructionsReminder(toolRegistry)),
+     asPart(skillsResult?.reminder ?? null),
+     startupReminder === null
 diff --git a/packages/core/src/core/prompts.test.ts b/packages/core/src/core/prompts.test.ts
-index 0e859ef2a9..398ad84a25 100644
+index 5ce4b11de7..9e42e2334a 100644
 --- a/packages/core/src/core/prompts.test.ts
 +++ b/packages/core/src/core/prompts.test.ts
 @@ -9,6 +9,7 @@ import {
@@ -157,8 +156,8 @@ index 0e859ef2a9..398ad84a25 100644
 +  getMainSessionInteractionModeReminder,
    getManualPlanExitSystemReminder,
    getPlanModeSystemReminder,
-   resolvePathFromEnv,
-@@ -150,10 +151,7 @@ describe('Core System Prompt (prompts.ts)', () => {
+   loadCoreSystemPromptSource,
+@@ -151,10 +152,7 @@ describe('Core System Prompt (prompts.ts)', () => {
    /** No memory separator, the default identity (plus `more`), snapshot. */
    function expectBasePrompt(prompt: string, ...more: string[]) {
      expect(prompt).not.toContain('---\n\n');
@@ -170,7 +169,7 @@ index 0e859ef2a9..398ad84a25 100644
      expect(prompt).toMatchSnapshot();
    }
  
-@@ -914,12 +912,32 @@ describe('main-session style: reminder decision matches prompt section', () => {
+@@ -969,12 +967,32 @@ describe('main-session style: reminder decision matches prompt section', () => {
          headless: 'a non-interactive CLI agent',
          acp: 'a CLI agent operating through an ACP host',
        } as const;
@@ -206,7 +205,7 @@ index 0e859ef2a9..398ad84a25 100644
      name: string;
      customPrompt?: string;
 diff --git a/packages/core/src/core/prompts.ts b/packages/core/src/core/prompts.ts
-index be75f936c0..401144750b 100644
+index f8428abbd1..24f92dec00 100644
 --- a/packages/core/src/core/prompts.ts
 +++ b/packages/core/src/core/prompts.ts
 @@ -78,6 +78,30 @@ function getInteractionModePrompt(mode: SystemPromptInteractionMode): {
@@ -254,7 +253,7 @@ index be75f936c0..401144750b 100644
  }
  
  /**
-@@ -685,7 +716,7 @@ ${codeModeOnly ? codeModeToolCallExamples : filterToolCallExamples(getToolCallEx
+@@ -686,7 +717,7 @@ ${codeModeOnly ? codeModeToolCallExamples : filterToolCallExamples(getToolCallEx
  # Final Reminder
  Keep going until the user's query is completely resolved, or report the specific blocker that prevents completion.
  

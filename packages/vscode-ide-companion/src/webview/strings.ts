@@ -14,12 +14,22 @@
  * without this the panel renders a Chinese transcript under an English header.
  */
 
-export type ChromeLanguage = 'en' | 'zh-CN';
+export type ChromeLanguage = 'en' | 'zh-CN' | 'zh-TW';
 
 /** Resolve the webview language the same way Web Shell's `language` prop does. */
 export function readLanguage(): ChromeLanguage {
-  const language = document.documentElement.lang || navigator.language;
-  return language.toLowerCase().startsWith('zh') ? 'zh-CN' : 'en';
+  const language = (
+    document.documentElement.lang || navigator.language
+  ).toLowerCase();
+  if (
+    language.startsWith('zh-tw') ||
+    language.startsWith('zh-hk') ||
+    language.startsWith('zh-mo') ||
+    language.startsWith('zh-hant')
+  ) {
+    return 'zh-TW';
+  }
+  return language.startsWith('zh') ? 'zh-CN' : 'en';
 }
 
 const EN = {
@@ -68,8 +78,6 @@ const EN = {
   'onboarding.subtitle': 'Connect a model provider to get started.',
   'onboarding.cta': 'Get Started',
   'onboarding.connecting': 'Connecting…',
-  'onboarding.providers':
-    'Supports OpenRouter, Requesty, OpenAI, Grok (xAI) and custom providers.',
   'wizard.title': 'Provider Setup Wizard',
   'wizard.step': 'Step {current} of {total}',
   'wizard.back': 'Back',
@@ -100,6 +108,7 @@ const EN = {
   'wizard.error.baseUrl': 'Base URL must start with http:// or https://.',
   'wizard.error.models': 'Model IDs cannot be empty.',
   'auth.signedIn': 'Signed in successfully.',
+  'auth.signedOut': 'Signed out of Qwen. Use /auth to sign in again.',
   'auth.failed': 'Failed to connect to MariaDB Shell Agent.',
   'account.title': 'Account Information',
   'account.authType': 'Auth Method',
@@ -131,6 +140,8 @@ const EN = {
   'cmd.model.label': 'Switch model...',
   'cmd.model.description': 'Switch the active model',
   'cmd.auth.description': 'Configure Coding Plan or API Key',
+  'cmd.logout.description': 'Sign out of your Qwen account',
+  'cmd.upgrade.description': 'Open Qwen subscription plans',
   'cmd.account.label': 'Account',
   'cmd.account.description': 'Show current account and authentication info',
   'cmd.export.description': 'Export the current conversation',
@@ -187,8 +198,6 @@ const ZH: Record<ChromeStringKey, string> = {
   'onboarding.subtitle': '连接一个模型服务商即可开始使用。',
   'onboarding.cta': '开始使用',
   'onboarding.connecting': '连接中…',
-  'onboarding.providers':
-    '支持 OpenRouter、Requesty、OpenAI、Grok (xAI) 及自定义服务商。',
   'wizard.title': '模型服务商设置向导',
   'wizard.step': '第 {current} 步，共 {total} 步',
   'wizard.back': '上一步',
@@ -219,6 +228,7 @@ const ZH: Record<ChromeStringKey, string> = {
   'wizard.error.baseUrl': 'Base URL 必须以 http:// 或 https:// 开头。',
   'wizard.error.models': '模型 ID 不能为空。',
   'auth.signedIn': '登录成功。',
+  'auth.signedOut': '已退出 Qwen 登录。使用 /auth 重新登录。',
   'auth.failed': '连接 MariaDB Shell Agent 失败。',
   'account.title': '账号信息',
   'account.authType': '认证方式',
@@ -247,6 +257,8 @@ const ZH: Record<ChromeStringKey, string> = {
   'cmd.model.label': '切换模型…',
   'cmd.model.description': '切换当前使用的模型',
   'cmd.auth.description': '配置 Coding Plan 或 API Key',
+  'cmd.logout.description': '退出 Qwen 账号',
+  'cmd.upgrade.description': '打开 Qwen 订阅套餐',
   'cmd.account.label': '账号',
   'cmd.account.description': '查看当前账号与认证信息',
   'cmd.export.description': '导出当前对话',
@@ -256,10 +268,125 @@ const ZH: Record<ChromeStringKey, string> = {
   'common.close': '关闭',
 };
 
+const ZH_TW: Record<ChromeStringKey, string> = {
+  'header.history': '歷史會話',
+  'header.newSession': '新建會話',
+  'session.new': '新會話',
+  'session.untitled': '未命名',
+  'session.past': '歷史會話',
+  'session.searchPlaceholder': '搜尋會話…',
+  'session.searchLabel': '搜尋會話',
+  'session.listLabel': '會話列表',
+  'session.closeHistory': '關閉歷史會話',
+  'session.rename': '重新命名',
+  'session.renameLabel': '重新命名會話',
+  'session.delete': '刪除',
+  'session.deleteLabel': '刪除會話',
+  'session.deleteConfirm': '確認刪除？',
+  'session.deleteConfirmLabel': '確認刪除該會話',
+  'session.empty': '暫無會話',
+  'session.emptyFiltered': '沒有匹配的會話',
+  'session.loading': '載入中…',
+  'session.loadMore': '載入更多',
+  'session.historyIncomplete': '部分會話未能載入。',
+  'askUser.other': '其他...',
+  'session.loadFailed': '載入會話列表失敗。',
+  'session.renameFailed': '重新命名會話失敗。',
+  'session.deleteFailed': '刪除會話失敗。',
+  'session.switching': '正在載入會話…',
+  'session.creating': '正在建立新會話…',
+  'session.createFailed': '建立新會話失敗。',
+  'session.loadError': '載入 MariaDB Shell Agent 會話失敗。',
+  'session.switchTimeout': '會話切換超時，請重試。',
+  'permission.voteNotApplied': '審批決定未能應用，請求可能已在其他地方處理。',
+  'group.today': '今天',
+  'group.yesterday': '昨天',
+  'group.thisWeek': '本週',
+  'group.older': '更早',
+  'time.now': '剛剛',
+  'boot.starting': '正在啟動 MariaDB Shell Agent…',
+  'boot.failed': 'MariaDB Shell Agent 啟動失敗。',
+  'boot.noFolder': '請先開啟一個資料夾以使用 MariaDB Shell Agent。',
+  'boot.preAuthHostGate':
+    '你連線所用的本地轉發埠必須與 Qwen 守護程序實際監聽的埠號一致（例如 ssh -L 4170:localhost:4170）。守護程序的預鑑權 Host 檢查只接受攜帶其自身繫結埠的 Host 頭，--allow-origin 無法繞過。也可以改為讓守護程序繫結到非 loopback 地址。',
+  'onboarding.title': 'MariaDB Shell Agent',
+  'onboarding.subtitle': '連線一個模型服務商，開始使用 Qwen 編碼。',
+  'onboarding.cta': '開始使用',
+  'onboarding.connecting': '連線中…',
+  'wizard.title': '模型服務商設定精靈',
+  'wizard.step': '第 {current} 步，共 {total} 步',
+  'wizard.back': '上一步',
+  'wizard.next': '下一步',
+  'wizard.cancel': '取消',
+  'wizard.connect': '連線',
+  'wizard.connecting': '連線中…',
+  'wizard.provider.title': '服務商',
+  'wizard.provider.prompt': '選擇連線方式',
+  'wizard.protocol.title': '協定',
+  'wizard.protocol.prompt': '選擇 API 協定',
+  'wizard.wireApi.title': 'API',
+  'wizard.wireApi.prompt': '選擇 OpenAI API',
+  'wizard.endpoint.prompt': '選擇接入點',
+  'wizard.baseUrl.title': 'Base URL',
+  'wizard.baseUrl.prompt': '輸入 API Base URL',
+  'wizard.apiKey.title': 'API Key',
+  'wizard.apiKey.prompt': '輸入你的 API Key',
+  'wizard.models.title': '模型',
+  'wizard.models.prompt': '輸入模型 ID（以逗號分隔）',
+  'wizard.advanced.title': '進階設定',
+  'wizard.advanced.prompt': '啟用思考模式？',
+  'wizard.advanced.yes': '是',
+  'wizard.advanced.yesDescription': '啟用延伸思考模式',
+  'wizard.advanced.no': '否',
+  'wizard.advanced.noDescription': '標準模式',
+  'wizard.error.required': '此項為必填項',
+  'wizard.error.baseUrl': 'Base URL 必須以 http:// 或 https:// 開頭。',
+  'wizard.error.models': '模型 ID 不能為空。',
+  'auth.signedIn': '登入成功。',
+  'auth.signedOut': '已退出 Qwen 登入。使用 /auth 重新登入。',
+  'auth.failed': '連線 MariaDB Shell Agent 失敗。',
+  'account.title': '帳號資訊',
+  'account.authType': '認證方式',
+  'account.envKey': 'API Key 環境變數',
+  'account.baseUrl': 'Base URL',
+  'account.model': '當前模型',
+  'account.unknown': '未知',
+  'account.error': '錯誤',
+  'composer.addContext': '新增上下文',
+  'composer.placeholder': '向 MariaDB Shell Agent 提問，或用 @ 引用檔案',
+  'composer.editing': '正在編輯訊息',
+  'composer.cancelEditing': '取消編輯',
+  'composer.editUnavailable': '會話尚未就緒，暫時無法編輯該訊息。',
+  'composer.editExpired': '該訊息已無法再編輯。',
+  'composer.editIdentityUnavailable': '該檢查點沒有可用於回退的 prompt 身份。',
+  'composer.editFailed': '編輯訊息失敗，請重試。',
+  'composer.editSyncFailed': '未能確認回退，請重新傳送該訊息。',
+  'context.included': '已包含',
+  'context.excluded': '已排除',
+  'context.include': '包含當前檔案上下文',
+  'context.exclude': '排除當前檔案上下文',
+  'insight.progressDetail': '正在分析你的對話歷史…',
+  'insight.ready': '洞察報告已生成：',
+  'notice.open': '開啟',
+  'notice.dismiss': '關閉',
+  'cmd.model.label': '切換模型…',
+  'cmd.model.description': '切換當前使用的模型',
+  'cmd.auth.description': '配置 Coding Plan 或 API Key',
+  'cmd.logout.description': '退出 Qwen 帳號',
+  'cmd.upgrade.description': '開啟 Qwen 訂閱套餐',
+  'cmd.account.label': '帳號',
+  'cmd.account.description': '檢視當前帳號與認證資訊',
+  'cmd.export.description': '匯出當前對話',
+  'cmd.section.model': '模型',
+  'cmd.section.account': '帳號',
+  'cmd.section.session': '會話',
+  'common.close': '關閉',
+};
+
 export type ChromeStrings = (key: ChromeStringKey) => string;
 
 /** Build the lookup for one language. Falls back to English for any gap. */
 export function createChromeStrings(language: ChromeLanguage): ChromeStrings {
-  const table = language === 'zh-CN' ? ZH : EN;
+  const table = language === 'zh-TW' ? ZH_TW : language === 'zh-CN' ? ZH : EN;
   return (key) => table[key] || EN[key];
 }

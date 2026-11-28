@@ -37,7 +37,7 @@ const LOCAL_READ_FALLBACK_ERROR_KINDS = new Set([
 const debugLogger = createDebugLogger('ACP_FILE_SYSTEM');
 
 interface AcpFileSystemServiceOptions {
-  localReadRoots?: readonly string[];
+  localReadRoots?: readonly string[] | (() => readonly string[]);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -248,8 +248,13 @@ export class AcpFileSystemService implements FileSystemService {
   }
 
   private async getResolvedLocalReadRoots(): Promise<string[]> {
+    const configuredRoots = this.options.localReadRoots;
+    const localReadRoots =
+      typeof configuredRoots === 'function'
+        ? configuredRoots()
+        : configuredRoots;
     const roots = await Promise.all(
-      (this.options.localReadRoots ?? []).map(resolveRealPath),
+      (localReadRoots ?? []).map(resolveRealPath),
     );
     return roots.filter((root): root is string => Boolean(root));
   }

@@ -165,9 +165,21 @@ export class AuthMessageHandler extends BaseMessageHandler {
     | ((config: ProviderConfig, inputs: ProviderSetupInputs) => Promise<void>)
     | null = null;
 
+  private subscriptionAuthHandler?: (
+    action?: 'logout' | 'upgrade',
+  ) => Promise<void>;
+
+  setSubscriptionAuthHandler(
+    handler: (action?: 'logout' | 'upgrade') => Promise<void>,
+  ): void {
+    this.subscriptionAuthHandler = handler;
+  }
+
   canHandle(messageType: string): boolean {
     return [
       'auth',
+      'logout',
+      'upgrade',
       'authWizardSubmit',
       'authWizardCancel',
       'getAccountInfo',
@@ -186,6 +198,12 @@ export class AuthMessageHandler extends BaseMessageHandler {
 
       case 'authWizardCancel':
         this.sendToWebView({ type: 'authCancelled' });
+        break;
+
+      case 'logout':
+      case 'upgrade':
+        if (this.subscriptionAuthHandler)
+          await this.subscriptionAuthHandler(message.type);
         break;
 
       case 'getAccountInfo':

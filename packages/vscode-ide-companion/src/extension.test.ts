@@ -120,6 +120,30 @@ describe('activate', () => {
     vi.restoreAllMocks();
   });
 
+  it.each([
+    [vscode.ExtensionMode.Development, true],
+    [vscode.ExtensionMode.Production, true],
+  ] as const)(
+    'sets subscription command visibility at cold activation for mode %s',
+    async (extensionMode, enabled) => {
+      Object.assign(context, { extensionMode });
+      const execute = vi.mocked(vscode.commands.executeCommand);
+      execute.mockClear();
+      const createEditor = vi.spyOn(
+        ChatProviderRegistry.prototype,
+        'createEditorProvider',
+      );
+      await activate(context);
+      expect(execute).toHaveBeenNthCalledWith(
+        1,
+        'setContext',
+        'mariadb-shell-agent.subscriptionEnabled',
+        enabled,
+      );
+      expect(createEditor).not.toHaveBeenCalled();
+    },
+  );
+
   it('shows no installation message on first activation', async () => {
     vi.mocked(context.globalState.get).mockReturnValue(undefined);
     vi.mocked(vscode.extensions.getExtension).mockReturnValue({

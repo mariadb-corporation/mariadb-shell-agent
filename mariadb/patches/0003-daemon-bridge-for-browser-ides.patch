@@ -15,7 +15,7 @@ not bridged yet.
 
 diff --git a/packages/vscode-ide-companion/src/services/daemonFetchBridge.test.ts b/packages/vscode-ide-companion/src/services/daemonFetchBridge.test.ts
 new file mode 100644
-index 0000000000..c0680debd4
+index 0000000000..7ff30c0c83
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/services/daemonFetchBridge.test.ts
 @@ -0,0 +1,205 @@
@@ -226,7 +226,7 @@ index 0000000000..c0680debd4
 +});
 diff --git a/packages/vscode-ide-companion/src/services/daemonFetchBridge.ts b/packages/vscode-ide-companion/src/services/daemonFetchBridge.ts
 new file mode 100644
-index 0000000000..eeebd96cb1
+index 0000000000..1caf41ef70
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/services/daemonFetchBridge.ts
 @@ -0,0 +1,124 @@
@@ -356,7 +356,7 @@ index 0000000000..eeebd96cb1
 +}
 diff --git a/packages/vscode-ide-companion/src/webview/daemonFetchBridge.ts b/packages/vscode-ide-companion/src/webview/daemonFetchBridge.ts
 new file mode 100644
-index 0000000000..4dfeaf18fa
+index 0000000000..137d91ddc6
 --- /dev/null
 +++ b/packages/vscode-ide-companion/src/webview/daemonFetchBridge.ts
 @@ -0,0 +1,172 @@
@@ -559,10 +559,10 @@ index 308a43350d..c59849fe5e 100644
  import { EmbeddedApp } from './EmbeddedApp.js';
  import { initializeWebviewLogger } from './hooks/useVSCode.js';
 diff --git a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts
-index f89982fadb..d91a0381ae 100644
+index 992be0e16d..b5253131e6 100644
 --- a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts
 +++ b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.test.ts
-@@ -34,6 +34,7 @@ const {
+@@ -55,6 +55,7 @@ const {
    mockQwenAgentManagerInstances,
    mockClipboardWriteText,
    mockEnvRemoteName,
@@ -570,7 +570,7 @@ index f89982fadb..d91a0381ae 100644
    mockAsExternalUri,
    mockProbePreAuthHostGateRejection,
  } = vi.hoisted(() => ({
-@@ -114,6 +115,8 @@ const {
+@@ -135,6 +136,8 @@ const {
    // `vscode.env.remoteName` is undefined in a local window and a string
    // ('ssh-remote', 'dev-container', 'wsl', ...) in a remote one.
    mockEnvRemoteName: { current: undefined as string | undefined },
@@ -579,7 +579,7 @@ index f89982fadb..d91a0381ae 100644
    mockAsExternalUri: vi.fn(),
    mockProbePreAuthHostGateRejection: vi.fn<
      (daemonBaseUrl: string, externalAuthority: string) => Promise<boolean>
-@@ -213,10 +216,14 @@ vi.mock('vscode', () => ({
+@@ -239,10 +242,14 @@ vi.mock('vscode', () => ({
      file: vi.fn((filePath: string) => ({ fsPath: filePath })),
      parse: vi.fn((value: string) => ({ toString: () => value })),
    },
@@ -594,7 +594,7 @@ index f89982fadb..d91a0381ae 100644
      asExternalUri: mockAsExternalUri,
      openExternal: mockOpenExternal,
      clipboard: {
-@@ -526,6 +533,7 @@ beforeEach(() => {
+@@ -558,6 +565,7 @@ beforeEach(() => {
    mockClipboardWriteText.mockReset();
    mockClipboardWriteText.mockResolvedValue(undefined);
    mockEnvRemoteName.current = undefined;
@@ -602,7 +602,7 @@ index f89982fadb..d91a0381ae 100644
    mockAsExternalUri.mockReset();
    mockProbePreAuthHostGateRejection.mockReset();
    mockProbePreAuthHostGateRejection.mockResolvedValue(false);
-@@ -2650,6 +2658,25 @@ describe('WebViewProvider web-shell daemon bootstrap', () => {
+@@ -3377,6 +3385,25 @@ describe('WebViewProvider web-shell daemon bootstrap', () => {
      expect(mockAsExternalUri).not.toHaveBeenCalled();
    });
  
@@ -629,10 +629,10 @@ index f89982fadb..d91a0381ae 100644
      mockEnvRemoteName.current = 'dev-container';
      mockAsExternalUri
 diff --git a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
-index 2a720f5b9d..f452d5e3c3 100644
+index 7be6fe4624..f70e0b5191 100644
 --- a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
 +++ b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
-@@ -45,6 +45,10 @@ import {
+@@ -47,6 +47,10 @@ import {
  } from '../../services/qwenDaemonProcess.js';
  import { isLoopbackHostname } from '../../services/daemonIdeConnection.js';
  import { probePreAuthHostGateRejection } from './preAuthHostGateProbe.js';
@@ -643,7 +643,7 @@ index 2a720f5b9d..f452d5e3c3 100644
  
  /** Threshold (ms) before a completed task triggers a notification. */
  const LONG_TASK_THRESHOLD_MS = 20_000;
-@@ -145,6 +149,11 @@ export class WebViewProvider {
+@@ -163,6 +167,11 @@ export class WebViewProvider {
    private agentInitialized = false; // Track if agent has been initialized
    private isSyncingToVSCode = false; // Guard to prevent config change loop
    private readonly webShellPermissionOwners = new Map<vscode.Webview, string>();
@@ -655,17 +655,17 @@ index 2a720f5b9d..f452d5e3c3 100644
    // Track current ACP mode id to influence permission/diff behavior
    private currentModeId: ApprovalModeValue | null = null;
    private authState: boolean | null = null;
-@@ -1766,6 +1775,9 @@ export class WebViewProvider {
+@@ -1923,6 +1932,9 @@ export class WebViewProvider {
      message: { type: string; data?: unknown },
      webview: vscode.Webview,
    ): Promise<boolean> {
 +    if (this.daemonFetchBridge.handle(message, webview)) {
 +      return true;
 +    }
-     if (message.type === 'webShellPermissionState') {
+     if (message.type === 'auth') this.sidebarSubscription?.controller.abort();
+     if (message.type.startsWith('qwenSubscription')) {
        const data = message.data as
-         | { pending?: unknown; requestId?: unknown }
-@@ -1899,9 +1911,13 @@ export class WebViewProvider {
+@@ -2218,9 +2230,13 @@ export class WebViewProvider {
          const restoredSessionId = this.isViewHost
            ? viewSessionId
            : serializedSessionId;
@@ -682,7 +682,7 @@ index 2a720f5b9d..f452d5e3c3 100644
          // A remote window whose client-side forwarded port differs from the
          // daemon's bound port gets a pre-auth 403 from the Host gate on every
          // daemon call — bootstrapping would hand the shell a baseUrl whose
-@@ -1911,6 +1927,7 @@ export class WebViewProvider {
+@@ -2230,6 +2246,7 @@ export class WebViewProvider {
          // browser can never read the 403; the extension host can, and the
          // probe never rejects.
          if (
@@ -690,18 +690,18 @@ index 2a720f5b9d..f452d5e3c3 100644
            vscode.env.remoteName &&
            (await probePreAuthHostGateRejection(
              runtime.baseUrl,
-@@ -1928,6 +1945,7 @@ export class WebViewProvider {
+@@ -2261,6 +2278,7 @@ export class WebViewProvider {
            data: {
              ...runtime,
              baseUrl: webviewBaseUrl,
 +            daemonBridge,
              clientId: this.daemonClientId,
+             subscriptionEnabled: true,
              workspaceCwd: canonicalWorkspaceCwd,
-             // The daemon matches workspaces by canonical path, but every
-@@ -2610,6 +2628,7 @@ export class WebViewProvider {
-    * Dispose the WebView provider and clean up resources
-    */
-   dispose(): void {
+@@ -2953,6 +2971,7 @@ export class WebViewProvider {
+     this.subscriptionAuth?.abort();
+     this.subscriptionRuntime = undefined;
+     this.settleSubscriptionRuntime(new Error('Qwen Code view closed.'));
 +    this.daemonFetchBridge.dispose();
      if (WebViewProvider.lastContextMenuProvider === this) {
        WebViewProvider.lastContextMenuProvider = null;

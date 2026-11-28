@@ -35,12 +35,15 @@ const PAIRS = [
       `${name === 'QWEN' ? CONTEXT_FILE : CONTEXT_FILE.toLowerCase()}${rest}`,
   ],
   // Alternation members in regexes: `(AGENTS|CLAUDE|QWEN|GEMINI)\.md`, `(qwen|agents)\.md`,
-  // `\.(claude|qwen)\/`.
+  // `\.(claude|qwen)\/`, `\.(?:qwen|agents)\/`.
   [
     /(?<=\((?:[\w-]+\|)*)(qwen|QWEN)(?=(?:\|[\w-]+)*\)\\\.(?:md|MD))/g,
     (name) => (name === 'QWEN' ? CONTEXT_FILE : CONTEXT_FILE.toLowerCase()),
   ],
-  [/(?<=\\\.\((?:[\w-]+\|)*)qwen(?=(?:\|[\w-]+)*\))/g, CONFIG_DIR.slice(1)],
+  [
+    /(?<=\\\.\((?:\?:)?(?:[\w-]+\|)*)qwen(?=(?:\|[\w-]+)*\))/g,
+    CONFIG_DIR.slice(1),
+  ],
   // Whole-stem meta file names (`...|qwen|agents|claude)$/i`).
   ['|qwen|agents|', `|${CONTEXT_FILE.toLowerCase()}|agents|`],
   // ".qwen" as a whole path segment. Not a property (`manifest?.qwen`, `x!.qwen`), part of a
@@ -86,12 +89,13 @@ export function apply() {
     },
   );
 
-  // The longer directory name pushes two workflow tool descriptions past their size budgets.
+  // The longer directory and product names push three workflow tool descriptions past their
+  // size budgets.
   patch(
     'workflow description budgets',
     'packages/core/src/tools/workflow/workflow.test.ts',
-    /\['scriptPath', 950\]|toBeLessThanOrEqual\(29_500\)/g,
-    (m) => m.replace(/(950|29_500)/, '$1 + 64'),
-    (t) => t.includes("['scriptPath', 950 + 64]"),
+    /\['scriptPath', 950\]|\['the description', 4_800\]|toBeLessThanOrEqual\(29_500\)/g,
+    (m) => m.replace(/(950|4_800|29_500)/, '$1 + 128'),
+    (t) => t.includes("['scriptPath', 950 + 128]"),
   );
 }

@@ -116,10 +116,10 @@ index 80cba6cb44..334c699c6e 100644
      isWorkspaceTrusted: isWorkspaceTrusted(settings).isTrusted ?? true,
      usageStatisticsEnabled: resolveUsageStatisticsEnabled(
 diff --git a/packages/vscode-ide-companion/package.json b/packages/vscode-ide-companion/package.json
-index 8b026667c6..54741b181a 100644
+index b32ae884eb..a01913fbc4 100644
 --- a/packages/vscode-ide-companion/package.json
 +++ b/packages/vscode-ide-companion/package.json
-@@ -230,6 +230,12 @@
+@@ -246,6 +246,12 @@
            "type": "boolean",
            "default": false,
            "description": "Start language servers (from .lsp.json files and extensions) for the agent's code intelligence. Experimental; takes effect for newly started sessions (reload the window)."
@@ -133,7 +133,7 @@ index 8b026667c6..54741b181a 100644
        }
      },
 diff --git a/packages/vscode-ide-companion/src/extension.test.ts b/packages/vscode-ide-companion/src/extension.test.ts
-index 05cdd705c3..10e4cfe1f0 100644
+index 86f81b737b..0554ff61eb 100644
 --- a/packages/vscode-ide-companion/src/extension.test.ts
 +++ b/packages/vscode-ide-companion/src/extension.test.ts
 @@ -20,6 +20,10 @@ vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
@@ -157,7 +157,7 @@ index 05cdd705c3..10e4cfe1f0 100644
    ExtensionMode: {
      Development: 1,
 diff --git a/packages/vscode-ide-companion/src/extension.ts b/packages/vscode-ide-companion/src/extension.ts
-index 6b146623d8..ef6f28251a 100644
+index 0e8e7b6bf6..02b0f03c3d 100644
 --- a/packages/vscode-ide-companion/src/extension.ts
 +++ b/packages/vscode-ide-companion/src/extension.ts
 @@ -10,12 +10,16 @@ import semver from 'semver';
@@ -178,7 +178,7 @@ index 6b146623d8..ef6f28251a 100644
  
  // Keep the dormant daemon IDE adapter on the VSIX bundle path without wiring it
  // into the active extension flow yet.
-@@ -101,6 +105,10 @@ export async function activate(context: vscode.ExtensionContext) {
+@@ -106,6 +110,10 @@ export async function activate(context: vscode.ExtensionContext) {
    logger.info('Extension activated');
  
    checkForUpdates(context, logger.info);
@@ -534,10 +534,10 @@ index 83801f646f..29d5a04214 100644
      // (e.g., SIGTERM during the 1-second startup grace period)
      const maxConnectAttempts = 3;
 diff --git a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
-index d0bc5fc8ae..30782052bd 100644
+index cc698283fb..a2914b21d3 100644
 --- a/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
 +++ b/packages/vscode-ide-companion/src/webview/providers/WebViewProvider.ts
-@@ -44,6 +44,7 @@ import {
+@@ -46,6 +46,7 @@ import {
    type QwenDaemonListenerHandle,
  } from '../../services/qwenDaemonProcess.js';
  import { isLoopbackHostname } from '../../services/daemonIdeConnection.js';
@@ -545,7 +545,7 @@ index d0bc5fc8ae..30782052bd 100644
  import { probePreAuthHostGateRejection } from './preAuthHostGateProbe.js';
  import {
    DaemonFetchBridge,
-@@ -1822,6 +1823,7 @@ export class WebViewProvider {
+@@ -2125,6 +2126,7 @@ export class WebViewProvider {
          const canonicalWorkspaceCwd = existsSync(workspaceCwd)
            ? realpathSync.native(workspaceCwd)
            : workspaceCwd;

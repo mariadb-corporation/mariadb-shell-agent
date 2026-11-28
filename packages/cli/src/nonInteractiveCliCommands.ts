@@ -6,6 +6,7 @@
 
 import type { PartListUnion } from '@google/genai';
 import {
+  MAX_STACKED_SKILLS,
   parseSlashCommand,
   parseStackedSlashCommands,
 } from './ui/commands/commands.js';
@@ -100,6 +101,12 @@ export type NonInteractiveSlashCommandResult = (
       /** Per-turn model id (e.g. inline `/model <id> <prompt>`); no session change. */
       modelOverride?: string;
       refreshContextFilesOnWrite?: boolean;
+      /**
+       * Warning text when more `/skill` tokens were stacked than
+       * MAX_STACKED_SKILLS. The prompt still runs; consumers surface this as a
+       * warning, never as an error.
+       */
+      stackedSkillOverflow?: string;
     }
   | {
       type: 'message';
@@ -424,6 +431,7 @@ async function registerModelInvocableCommands(
 export interface NonInteractiveSlashCommandSessionHooks {
   /** @see CommandContext['session']['startNewSession'] */
   startNewSession?: (sessionId: string) => void;
+  confirmAction?: CommandContext['confirmAction'];
 }
 
 export const handleSlashCommand = async (
@@ -623,6 +631,11 @@ export const handleSlashCommand = async (
             },
           }
         : {}),
+      ...(stackedResult.exceededMax
+        ? {
+            stackedSkillOverflow: `Only the first ${MAX_STACKED_SKILLS} skills were loaded. Additional /skill tokens were treated as prompt text.`,
+          }
+        : {}),
     };
   }
 
@@ -689,6 +702,7 @@ export const handleSlashCommand = async (
       : uiTelemetryService.getMetrics(),
     lastPromptTokenCount: 0,
     promptCount: 1,
+    userPromptCount: 1,
   };
 
   const logger = new Logger(config?.getSessionId() || '', config?.storage);
@@ -704,7 +718,14 @@ export const handleSlashCommand = async (
     executionMode,
     ...(executionPolicy ? { executionPolicy } : {}),
     abortSignal:
-      commandToExecute.name === 'advisor' ? abortController.signal : undefined,
+      commandToExecute.name === 'advisor' ||
+      (commandToExecute.kind === CommandKind.BUILT_IN &&
+        commandToExecute.name === 'memory')
+        ? abortController.signal
+        : undefined,
+    ...(sessionHooks?.confirmAction
+      ? { confirmAction: sessionHooks.confirmAction }
+      : {}),
     services: {
       config,
       settings,

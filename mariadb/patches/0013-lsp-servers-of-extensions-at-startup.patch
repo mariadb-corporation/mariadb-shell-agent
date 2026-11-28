@@ -8,10 +8,10 @@ once the extensions are loaded, when one of them declares LSP servers; the
 discovery is not awaited, since starting a server can take long.
 
 diff --git a/packages/core/src/config/config.test.ts b/packages/core/src/config/config.test.ts
-index 4ccc878378..eb2d6f1778 100644
+index 8fae066885..fa179c3967 100644
 --- a/packages/core/src/config/config.test.ts
 +++ b/packages/core/src/config/config.test.ts
-@@ -5100,6 +5100,26 @@ describe('Server Config (config.ts)', () => {
+@@ -6035,6 +6035,26 @@ describe('Server Config (config.ts)', () => {
      await expect(lspConfig().reinitializeLsp()).resolves.toBeUndefined();
    });
  
@@ -39,10 +39,10 @@ index 4ccc878378..eb2d6f1778 100644
      const result = reconcile({ added: ['tsserver'] });
      const reinitialize = vi.fn().mockResolvedValue(result);
 diff --git a/packages/core/src/config/config.ts b/packages/core/src/config/config.ts
-index 3b86548abf..48f706aed9 100644
+index cf36172ecf..8cce74d81e 100644
 --- a/packages/core/src/config/config.ts
 +++ b/packages/core/src/config/config.ts
-@@ -4238,6 +4238,7 @@ export class Config {
+@@ -4473,6 +4473,7 @@ export class Config {
        });
      }
      recordStartupEvent('config_initialize_extensions_initial_end');
@@ -50,7 +50,7 @@ index 3b86548abf..48f706aed9 100644
      options?.signal?.throwIfAborted();
      this.debugLogger.debug('Extension manager initialized');
  
-@@ -9200,6 +9201,26 @@ export class Config {
+@@ -9967,6 +9968,26 @@ export class Config {
        error instanceof Error ? error.message : error;
    }
  

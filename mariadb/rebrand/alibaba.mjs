@@ -193,7 +193,23 @@ export function apply() {
       '',
       (t) => !/\n {4}key: '(?:QWENCLOUD|ALIBABA_MODELSTUDIO)',/.test(t),
     );
+    // The Qwen subscription sign-in (qwen.ai) cannot reach its hosts here.
+    patch(
+      'auth dialog subscription entry',
+      file,
+      /\n {4}\{\n {6}key: 'QWEN_SUBSCRIPTION',[\s\S]*?\n {4}\},/,
+      '',
+      (t) => !/\n {6}key: 'QWEN_SUBSCRIPTION',/.test(t),
+    );
   }
+  // ... nor in the daemon's clients (Web Shell, the extension): they offer it only when enabled.
+  patch(
+    'subscription disabled',
+    'packages/cli/src/serve/routes/subscription-auth.ts',
+    /(app\.get\('\/auth\/subscription', \(req, res\) => \{\n {4}res\.json\(\{\n {6}enabled: )!disposed,/,
+    '$1false,',
+    (t) => t.includes('      enabled: false,'),
+  );
 
   // The extension's Coding Plan settings (provider, API key, region) only drive the Alibaba
   // Coding Plan sync; without them in the manifest the sync never runs.
@@ -233,6 +249,15 @@ export function apply() {
     'telemetry default',
     ['packages/cli/src', 'packages/core/src'],
     [[/(usageStatisticsEnabled\s*\?\?\s*)true\b/g, '$1false']],
+  );
+  // The RocketMQ dev broker downloads from Apache only: no Aliyun mirror first. Its 5.5.1
+  // archive is still checked against the pinned SHA-512.
+  patch(
+    'rocketmq mirror',
+    'scripts/rocketmq-lite-broker.sh',
+    /\n {4}if \[ "\$\{RMQ_VERSION\}" = "5\.5\.1" \]; then\n {6}bases=\("https:\/\/mirrors\.aliyun\.com\/[^\n]*\n {4}fi/,
+    '',
+    (t) => !t.includes('mirrors.aliyun.com'),
   );
   // Standalone entry points resolve the default through their own helper.
   patch(

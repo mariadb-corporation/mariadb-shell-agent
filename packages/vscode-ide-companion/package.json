@@ -3,7 +3,7 @@
   "private": true,
   "displayName": "MariaDB Shell Agent",
   "description": "An AI agent for MariaDB, with direct access to your VS Code workspace.",
-  "version": "0.26.7",
+  "version": "0.28.7",
   "publisher": "MariaDB",
   "icon": "assets/icon.png",
   "repository": {
@@ -96,6 +96,14 @@
         "title": "MariaDB Shell Agent: Auth"
       },
       {
+        "command": "mariadb-shell-agent.logout",
+        "title": "MariaDB Shell Agent: Logout"
+      },
+      {
+        "command": "mariadb-shell-agent.upgrade",
+        "title": "MariaDB Shell Agent: Upgrade"
+      },
+      {
         "command": "mariadb-shell-agent.focusChat",
         "title": "MariaDB Shell Agent: Focus Chat View"
       },
@@ -132,6 +140,14 @@
         },
         {
           "command": "mariadb-shell-agent.auth"
+        },
+        {
+          "command": "mariadb-shell-agent.logout",
+          "when": "mariadb-shell-agent.subscriptionEnabled"
+        },
+        {
+          "command": "mariadb-shell-agent.upgrade",
+          "when": "mariadb-shell-agent.subscriptionEnabled"
         },
         {
           "command": "mariadb-shell-agent.copyMessage",
@@ -263,7 +279,7 @@
   },
   "dependencies": {
     "@agentclientprotocol/sdk": "^0.14.1",
-    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "@qwen-code/acp-bridge": "*",
     "@qwen-code/qwen-code-core": "*",
     "@qwen-code/sdk": "*",
@@ -272,11 +288,11 @@
     "dotenv": "^17.1.0",
     "express": "^5.1.0",
     "lucide-react": "^1.24.0",
-    "markdown-it": "^14.1.0",
+    "markdown-it": "^14.3.3",
     "punycode": "^2.3.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "semver": "^7.7.2",
-    "zod": "^3.25.76"
+    "zod": "^4.6.6"
   }
 }

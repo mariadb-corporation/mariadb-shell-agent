@@ -26,7 +26,6 @@ import type {
   FileOperationEvent,
   FlashFallbackEvent,
   LoopDetectedEvent,
-  LoopProtectionEvent,
   NextSpeakerCheckEvent,
   SlashCommandEvent,
   MalformedJsonResponseEvent,
@@ -1055,34 +1054,6 @@ export class QwenLogger {
           failure_kind: event.failure_kind,
         },
       },
-    );
-
-    this.enqueueLogEvent(rumEvent);
-    this.flushIfNeeded();
-  }
-
-  logLoopProtectionEvent(event: LoopProtectionEvent): void {
-    const rumEvent = this.createActionEvent('misc', 'loop_protection', {
-      properties: {
-        prompt_id: event.prompt_id,
-        loop_type: event.loop_type,
-        decision: event.decision,
-        mode: event.mode,
-        ...(event.loop_reason !== undefined
-          ? { loop_reason: event.loop_reason }
-          : {}),
-      },
-    });
-
-    this.enqueueLogEvent(rumEvent);
-    this.flushIfNeeded();
-  }
-
-  logLoopDetectionDisabledEvent(): void {
-    const rumEvent = this.createActionEvent(
-      'misc',
-      'loop_detection_disabled',
-      {},
     );
 
     this.enqueueLogEvent(rumEvent);

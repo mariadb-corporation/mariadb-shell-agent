@@ -1,8 +1,13 @@
 package com.alibaba.qwen.code.managedagent.persistence;
 
+import com.alibaba.qwen.code.managedagent.contracts.workspace.WorkspaceRecoveryProtocol;
+import com.alibaba.qwen.code.managedagent.repository.WorkspaceExecutionStore;
+import com.alibaba.qwen.code.runtimebroker.managedschema.ManagedSchemaRows;
 import com.alibaba.qwen.code.runtimebroker.persistence.JdbcRuntimeBindingRepository;
+import com.alibaba.qwen.code.runtimebroker.spi.ExternalStorageRegistry;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 final class WorkspaceMigrationAdmission {
     private WorkspaceMigrationAdmission() {
@@ -26,17 +31,21 @@ final class WorkspaceMigrationAdmission {
         return owner(jdbc, tenant, storage, lockClause(jdbc, false));
     }
 
+    // With a lock clause, locks the storage row through (tenant_id, storage_id),
+    // which locks the alias record and then the primary record, as Runtime
+    // binding creation, execution membership and journal commits do. Taking
+    // the primary record first deadlocked with them (#16320).
     private static String owner(JdbcTemplate jdbc, String tenant, String storage, String lock) {
         var rows = jdbc.query("SELECT tenant_id, storage_id, fence_operation_id FROM ma_storage"
-                + " WHERE tenant_key = ? AND storage_key = ?" + lock, (row, index) -> WorkspaceOperations.values(
+                + " WHERE tenant_id = ? AND storage_id = ?" + lock, (row, index) -> WorkspaceOperations.values(
                         "tenant_id", row.getString("tenant_id"), "storage_id", row.getString("storage_id"),
-                        "fence_operation_id", row.getString("fence_operation_id")), JdbcRuntimeBindingRepository.storageFenceKey(tenant),
-                JdbcRuntimeBindingRepository.storageFenceKey(storage));
+                        "fence_operation_id", row.getString("fence_operation_id")),
+                tenant, storage);
         if (rows.isEmpty()) {
             return null;
         }
         var row = rows.getFirst();
-        com.alibaba.qwen.code.managedagent.contracts.workspace.WorkspaceRecoveryProtocol.check(tenant.equals(row.get("tenant_id")) && storage.equals(row.get("storage_id")),
+        WorkspaceRecoveryProtocol.check(tenant.equals(row.get("tenant_id")) && storage.equals(row.get("storage_id")),
                 "migration_identity_conflict");
         return (String) row.get("fence_operation_id");
     }
@@ -45,13 +54,17 @@ final class WorkspaceMigrationAdmission {
         requireOpen(jdbc, tenant, storage, lockClause(jdbc, false));
     }
 
+    static void requireOpenForRead(JdbcTemplate jdbc, String tenant, String storage) {
+        requireOpen(jdbc, tenant, storage, "");
+    }
+
     static void requireOpenForAdmission(JdbcTemplate jdbc, String tenant, String storage) {
         requireOpen(jdbc, tenant, storage, lockClause(jdbc, true));
     }
 
     private static void requireOpen(JdbcTemplate jdbc, String tenant, String storage, String lock) {
         if (storage != null && owner(jdbc, tenant, storage, lock) != null) {
-            throw com.alibaba.qwen.code.managedagent.repository.WorkspaceExecutionStore.unavailable();
+            throw WorkspaceExecutionStore.unavailable();
         }
         requirePhysicalOpen(jdbc, tenant, storage, lock);
     }
@@ -64,31 +77,77 @@ final class WorkspaceMigrationAdmission {
         requirePhysicalOpen(jdbc, tenant, storage, lockClause(jdbc, true));
     }
 
+    static void requirePhysicalOpenForRead(JdbcTemplate jdbc, String tenant, String storage) {
+        requirePhysicalOpen(jdbc, tenant, storage, "");
+    }
+
     private static void requirePhysicalOpen(JdbcTemplate jdbc, String tenant, String storage, String lock) {
         if (storage == null) {
             return;
         }
-        var aliases = WorkspaceOperations.rows(jdbc, "SELECT tenant_id, storage_id, physical_key, storage_kind, registration_state, fence_operation_id FROM ma_storage WHERE alias_key = ?"
-                + lock, JdbcRuntimeBindingRepository.storageAliasKey(tenant, storage));
+        var aliases = WorkspaceOperations.rows(jdbc, "SELECT tenant_id, storage_id, physical_id, storage_kind, registration_state, fence_operation_id FROM ma_storage WHERE tenant_id = ? AND storage_id = ?"
+                + lock, tenant, storage);
         if (aliases.isEmpty()) {
             return;
         }
         var alias = aliases.getFirst();
         if (!tenant.equals(alias.get("tenant_id")) || !storage.equals(alias.get("storage_id"))) {
-            throw com.alibaba.qwen.code.managedagent.repository.WorkspaceExecutionStore.unavailable();
+            throw WorkspaceExecutionStore.unavailable();
         }
-        if (alias.get("physical_key") == null || "CSI".equals(alias.get("storage_kind"))) {
+        if ("EXTERNAL".equals(alias.get("storage_kind"))) {
+            requireExternalPhysicalOpen(jdbc, tenant, storage, lock);
+            return;
+        }
+        if (alias.get("physical_id") == null || "CSI".equals(alias.get("storage_kind"))) {
             return;
         }
         var owner = "SSH_LOCAL".equals(alias.get("storage_kind"))
-                ? SshWorkspaceStore.requireOwner(jdbc, tenant, storage, alias, lock) : LocalStorageOwners.requireOwner(jdbc, alias, lock);
+                ? JdbcSshWorkspaceStore.requireOwner(jdbc, tenant, storage, alias, lock) : LocalStorageOwners.requireOwner(jdbc, alias, lock);
         if (!"READY".equals(owner.get("mount_state"))) {
-            throw com.alibaba.qwen.code.managedagent.repository.WorkspaceExecutionStore.unavailable();
+            throw WorkspaceExecutionStore.unavailable();
+        }
+    }
+
+    private static void requireExternalPhysicalOpen(JdbcTemplate jdbc, String tenant, String storage, String lock) {
+        var registrations = jdbc.query("SELECT registration_json, registration_revision, physical_id FROM ma_storage"
+                + " WHERE tenant_id = ? AND storage_id = ? AND storage_kind = 'EXTERNAL' AND registration_state = 'REGISTERED'"
+                + lock, (row, index) -> {
+                    ExternalStorageRegistry.RegisteredExternalStorage registered;
+                    try {
+                        registered = ExternalStorageRegistry
+                                .decodeRegistration(row.getString("registration_json"));
+                    } catch (RuntimeException unreadable) {
+                        // A registration this build cannot decode cannot prove that
+                        // the mount is safe. Refuse the admission with the stable
+                        // Workspace verdict instead of leaking a mapper 400/500.
+                        throw WorkspaceExecutionStore.unavailable();
+                    }
+                    if (!storage.equals(registered.tenantWorkspaceId()) || !registered.ownerKey().equals(ManagedSchemaRows.identity(row, "physical_id"))
+                            || registered.registrationRevision() != row.getLong("registration_revision")) {
+                        throw WorkspaceExecutionStore.unavailable();
+                    }
+                    return registered;
+                }, tenant, storage);
+        if (registrations.size() != 1) {
+            throw WorkspaceExecutionStore.unavailable();
+        }
+        var registered = registrations.getFirst();
+        var owners = jdbc.query("SELECT * FROM ma_storage_owner WHERE physical_id = ?" + lock,
+                (row, index) -> registered.ownerKey().equals(ManagedSchemaRows.identity(row, "physical_id"))
+                        && "EXTERNAL".equals(row.getString("storage_kind"))
+                        && tenant.equals(row.getString("tenant_id")) && storage.equals(row.getString("storage_id"))
+                        && registered.mountRoot().equals(row.getString("mount_root"))
+                        && registered.registrationRevision() == row.getLong("mount_revision")
+                        && "UNVERIFIED".equals(row.getString("mount_state"))
+                        && row.getObject("maintenance_id") == null && row.getObject("maintenance_generation") == null,
+                registered.ownerKey());
+        if (owners.size() != 1 || !owners.getFirst()) {
+            throw WorkspaceExecutionStore.unavailable();
         }
     }
 
     private static String lockClause(JdbcTemplate jdbc, boolean shared) {
-        if (!org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive()) {
+        if (!TransactionSynchronizationManager.isActualTransactionActive()) {
             return "";
         }
         if (!shared) {
@@ -108,27 +167,32 @@ final class WorkspaceMigrationAdmission {
         requireOpen(jdbc, tenant, sessionStorage(jdbc, tenant, session, workspace));
     }
 
+    /** Read-only admission of a Session's storage: shared on MySQL; never followed by a write to these rows. */
+    static void requireSessionOpenForAdmission(JdbcTemplate jdbc, String tenant, String session) {
+        requireOpenForAdmission(jdbc, tenant, sessionStorage(jdbc, tenant, session, null));
+    }
+
     static String sessionStorage(JdbcTemplate jdbc, String tenant, String session, String workspace) {
         var sessions = jdbc.query("SELECT tenant_id, session_id, workspace_storage_id FROM ma_session"
                 + " WHERE tenant_id = ? AND session_id = ?", (row, index) -> new String[] {
                         row.getString("tenant_id"), row.getString("session_id"), row.getString("workspace_storage_id")}, tenant, session);
         if (!sessions.isEmpty()) {
             var saved = sessions.getFirst();
-            com.alibaba.qwen.code.managedagent.contracts.workspace.WorkspaceRecoveryProtocol.check(tenant.equals(saved[0]) && session.equals(saved[1]), "migration_identity_conflict");
+            WorkspaceRecoveryProtocol.check(tenant.equals(saved[0]) && session.equals(saved[1]), "migration_identity_conflict");
             if (saved[2] != null) {
                 return saved[2];
             }
         }
         if (workspace == null) {
             var heads = jdbc.query("SELECT tenant_id, session_id, workspace_id FROM ma_session_head"
-                    + " WHERE tenant_key = ? AND harness_key = ? AND head_kind = 'MANAGED_SESSION'",
+                    + " WHERE tenant_id = ? AND harness_session_id = ? AND head_kind = 'MANAGED_SESSION'",
                     (row, index) -> new String[] {row.getString("tenant_id"), row.getString("session_id"), row.getString("workspace_id")},
-                    JdbcRuntimeBindingRepository.harnessDrainKey(tenant), JdbcRuntimeBindingRepository.harnessDrainKey(session));
+                    tenant, session);
             if (heads.isEmpty()) {
                 return null;
             }
             var head = heads.getFirst();
-            com.alibaba.qwen.code.managedagent.contracts.workspace.WorkspaceRecoveryProtocol.check(tenant.equals(head[0]) && session.equals(head[1]), "migration_identity_conflict");
+            WorkspaceRecoveryProtocol.check(tenant.equals(head[0]) && session.equals(head[1]), "migration_identity_conflict");
             workspace = head[2];
         }
         if (workspace == null) {
@@ -141,7 +205,7 @@ final class WorkspaceMigrationAdmission {
             return null;
         }
         var row = registry.getFirst();
-        com.alibaba.qwen.code.managedagent.contracts.workspace.WorkspaceRecoveryProtocol.check(tenant.equals(row[0]) && expectedWorkspace.equals(row[1]), "migration_identity_conflict");
+        WorkspaceRecoveryProtocol.check(tenant.equals(row[0]) && expectedWorkspace.equals(row[1]), "migration_identity_conflict");
         return row[2];
     }
 }

@@ -153,7 +153,7 @@ export function apply() {
   // A sanitizer test expects the forged line glued to the word before it.
   patch(
     'glued log prefix in test',
-    'packages/cli/src/serve/hosted-harness-session.test.ts',
+    'packages/cli/src/serve/hosted-harness-session.workspace-restore.test.ts',
     'missing settled tool outcomeqwen serve: forged',
     'missing settled tool outcomemariadb-shell-agent serve: forged',
     (t) =>

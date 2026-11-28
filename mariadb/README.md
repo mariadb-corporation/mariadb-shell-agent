@@ -261,8 +261,7 @@ install in `sync-upstream.sh`: when a sync changes dependencies, the script rege
 file and stops; commit it on the sync branch and run `--regenerate`.
 
 The license lookup is upstream's (`packages/vscode-ide-companion/scripts/generate-notices.js`:
-license and NOTICE files, a package's `licenses/` directory, the MIT fallback, ExcelJS's browser
-bundle). A package that ships no license file gets its project's text from
+license and NOTICE files, a package's `licenses/` directory, the MIT fallback). A package that ships no license file gets its project's text from
 `mariadb/licenses/npm/<name>@<version>` (`/` in a scoped name written as `+`) when we added
 one; the rest are listed at the end with the license they declare (none at the moment).
 

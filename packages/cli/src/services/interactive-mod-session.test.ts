@@ -10,7 +10,7 @@ import type { LoadedSettings } from '../config/settings.js';
 import {
   ENGINE_NODE,
   type ModRenderElement,
-  type ModRenderInput,
+  type ModBandInput,
 } from '@qwen-code/qwen-code-core/mods/render-tree.js';
 import type { ModTerminalHost } from './mod-session.js';
 import {
@@ -68,6 +68,14 @@ describe('interactive Mod owner', () => {
       ),
     ).toBeUndefined();
     expect(mocks.create).not.toHaveBeenCalled();
+    // The display translation alone starts them.
+    mocks.create.mockReturnValueOnce({ close: vi.fn() });
+    const translated = createInteractiveModSession(
+      { isInteractive: () => true } as Config,
+      { merged: { general: { displayLanguage: 'zh-CN' } } } as LoadedSettings,
+    );
+    expect(translated).toBeDefined();
+    await translated!.close();
     const first = setup();
     expect(createInteractiveModSession(first.config, settings)).toBe(
       first.owner,
@@ -226,7 +234,7 @@ describe('interactive Mod owner', () => {
     await owner.initialize(['AbovePrompt']);
     await owner.initialize([]);
     expect(host.sites!()).toEqual(['AbovePrompt']);
-    const input = { component: 'AbovePrompt' } as ModRenderInput;
+    const input = { component: 'AbovePrompt' } as ModBandInput;
     owner.setRenderInput(input);
     expect(runtime.setRenderInput).toHaveBeenCalledExactlyOnceWith(input);
 
@@ -278,6 +286,48 @@ describe('interactive Mod owner', () => {
       text: 'Fix it',
     });
     expect(runtime.submitPrompt).toHaveBeenCalledOnce();
+  });
+
+  it('runs the Mods’ prompts only when its first initialize says so, until it closes', async () => {
+    const { owner, host, runtime } = setup();
+    const queued = { plugin: 'lint', text: 'Fix it' };
+    const queue = {
+      hasSubmittedPrompts: true,
+      takeSubmittedPrompt: vi.fn(() => queued),
+      returnSubmittedPrompt: vi.fn(),
+      notePersonPrompt: vi.fn(),
+      stopSubmittedPrompts: vi.fn(),
+    };
+    Object.assign(runtime, queue);
+    expect(host.runsPrompts!()).toBe(false);
+    await owner.initialize(['AbovePrompt'], {
+      prompts: true,
+      runsPrompts: true,
+    });
+    await owner.initialize(['AbovePrompt']);
+    expect(host.runsPrompts!()).toBe(true);
+    const listener = vi.fn();
+    const unsubscribe = owner.subscribePrompts(listener);
+    host.promptQueued!();
+    expect(listener).toHaveBeenCalledOnce();
+    unsubscribe();
+    host.promptQueued!();
+    expect(listener).toHaveBeenCalledOnce();
+    expect(owner.hasSubmittedPrompts).toBe(true);
+    expect(owner.takeSubmittedPrompt()).toBe(queued);
+    owner.returnSubmittedPrompt(queued);
+    expect(queue.returnSubmittedPrompt).toHaveBeenCalledWith(queued);
+    owner.notePersonPrompt();
+    owner.stopSubmittedPrompts();
+    expect(queue.notePersonPrompt).toHaveBeenCalledOnce();
+    expect(queue.stopSubmittedPrompts).toHaveBeenCalledOnce();
+    owner.subscribePrompts(listener);
+    await owner.close();
+    // A closed owner runs none, and its listeners hear no more.
+    expect(owner.hasSubmittedPrompts).toBe(false);
+    expect(owner.takeSubmittedPrompt()).toBeUndefined();
+    host.promptQueued!();
+    expect(listener).toHaveBeenCalledOnce();
   });
 
   it('closing before startup releases pending command loaders and removes the owner', async () => {

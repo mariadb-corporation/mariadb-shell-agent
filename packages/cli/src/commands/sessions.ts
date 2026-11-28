@@ -1,18 +1,17 @@
 /**
  * @license
  * Copyright 2025 Qwen Team
- * Copyright (c) 2026, MariaDB plc.
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { commandMetadata } from './command-metadata.js';
 import type { CommandModule, Argv } from 'yargs';
 import { controllersCommand } from './sessions/controllers.js';
 import { listCommand } from './sessions/list.js';
 import { psCommand } from './sessions/ps.js';
 
 export const sessionsCommand: CommandModule = {
-  command: 'sessions',
-  describe: 'Manage MariaDB Shell Agent sessions',
+  ...commandMetadata.sessions,
   builder: (yargs: Argv) =>
     yargs
       .command(listCommand)

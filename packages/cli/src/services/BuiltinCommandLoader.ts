@@ -15,6 +15,10 @@ import { workflowsCommand } from '../ui/commands/workflowsCommand.js';
 import { agentsCommand } from '../ui/commands/agentsCommand.js';
 import { arenaCommand } from '../ui/commands/arenaCommand.js';
 import { approvalModeCommand } from '../ui/commands/approvalModeCommand.js';
+import {
+  logoutCommand,
+  upgradeCommand,
+} from '../ui/commands/subscription-commands.js';
 import { authCommand } from '../ui/commands/authCommand.js';
 import { branchCommand } from '../ui/commands/branchCommand.js';
 import { peersCommand } from '../ui/commands/peers-command.js';
@@ -28,6 +32,7 @@ import { deleteCommand } from '../ui/commands/deleteCommand.js';
 import { compressCommand } from '../ui/commands/compressCommand.js';
 import { compressFastCommand } from '../ui/commands/compressFastCommand.js';
 import { contextCommand } from '../ui/commands/contextCommand.js';
+import { contextWindowCommand } from '../ui/commands/context-window-command.js';
 import { curatorCommand } from '../ui/commands/curator-command.js';
 import { copyCommand } from '../ui/commands/copyCommand.js';
 import { docsCommand } from '../ui/commands/docsCommand.js';
@@ -57,6 +62,7 @@ import { outputStyleCommand } from '../ui/commands/output-style-command.js';
 import { rememberCommand } from '../ui/commands/rememberCommand.js';
 import { planCommand } from '../ui/commands/planCommand.js';
 import { permissionsCommand } from '../ui/commands/permissionsCommand.js';
+import { prCommand } from '../ui/commands/pr-command.js';
 import { trustCommand } from '../ui/commands/trustCommand.js';
 import { quitCommand } from '../ui/commands/quitCommand.js';
 import { recapCommand } from '../ui/commands/recapCommand.js';
@@ -134,6 +140,8 @@ export class BuiltinCommandLoader implements ICommandLoader {
       arenaCommand,
       approvalModeCommand,
       authCommand,
+      upgradeCommand,
+      logoutCommand,
       branchCommand,
       peersCommand,
       btwCommand,
@@ -146,6 +154,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
       compressFastCommand,
       configCommand,
       contextCommand,
+      contextWindowCommand,
       curatorCommand,
       copyCommand,
       diffCommand,
@@ -176,6 +185,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
       rememberCommand,
       planCommand,
       permissionsCommand,
+      prCommand,
       ...(this.config?.getFolderTrust() ? [trustCommand] : []),
       quitCommand,
       recapCommand,

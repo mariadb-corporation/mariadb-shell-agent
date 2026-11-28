@@ -150,7 +150,11 @@ test('Home hover supports search and dismissal without persisting expansion', as
   await preview
     .getByRole('button', { name: 'Search sessions', exact: true })
     .click();
-  const search = preview.getByRole('textbox', {
+  const searchDialog = page.getByRole('dialog', {
+    name: 'Search sessions',
+    exact: true,
+  });
+  const search = searchDialog.getByRole('textbox', {
     name: 'Search sessions',
     exact: true,
   });
@@ -160,9 +164,10 @@ test('Home hover supports search and dismissal without persisting expansion', as
   await expect(preview).toBeVisible();
   await expect(search).toBeFocused();
   await page.keyboard.press('Escape');
-  await expect(preview).toHaveCount(0);
-  await expect(home).toBeFocused();
-  await home.hover();
+  await expect(searchDialog).toHaveCount(0);
+  await expect(
+    preview.getByRole('button', { name: 'Search sessions', exact: true }),
+  ).toBeFocused();
   await expect(preview).toBeVisible();
   await expect(
     preview.getByRole('textbox', { name: 'Search sessions', exact: true }),
@@ -230,7 +235,9 @@ test('narrow embedded container uses a contained drawer on a wide viewport @smok
     .locator(homeColumn)
     .getByText('MariaDB Shell Agent', { exact: true });
   await expect(brand).toBeVisible();
-  await expect(brand.locator('..').locator('svg')).toBeVisible();
+  await expect(
+    brand.locator('..').locator('span[aria-hidden="true"] svg'),
+  ).toBeVisible();
   const host = await page.getByTestId('host-shell').boundingBox();
   const bounds = await drawer.boundingBox();
   expect(bounds!.x).toBeGreaterThanOrEqual(host!.x);
@@ -363,10 +370,9 @@ test('Home-only hosts retain secondary collapse and hosts with another item show
   await page.getByTestId('host-shell').evaluate((element) => {
     element.style.width = '1100px';
   });
-  await expect(rail).toBeVisible();
-  await rail.getByRole('button', { name: 'More', exact: true }).click();
+  await expect(page.locator(railSelector)).toHaveCount(0);
   await expect(
-    page.getByRole('button', { name: 'Split View', exact: true }),
+    sidebar.getByRole('button', { name: 'Split View', exact: true }),
   ).toBeVisible();
 });
 

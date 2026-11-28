@@ -36,6 +36,7 @@ const AUTH_ENV_MODEL_VARS: Record<AuthType, string[]> = {
   [AuthType.USE_VERTEX_AI]: ['GOOGLE_MODEL'],
   [AuthType.USE_ANTHROPIC]: ['ANTHROPIC_MODEL'],
   [AuthType.QWEN_OAUTH]: [],
+  [AuthType.QWEN_SUBSCRIPTION]: [],
 };
 
 /**
@@ -192,6 +193,7 @@ export interface CliGenerationConfigInputs {
   };
   settings: Settings;
   selectedAuthType: AuthType | undefined;
+  deferReasoningEffort?: boolean;
   /**
    * Injectable env for testability. Defaults to process.env at callsites.
    */
@@ -458,10 +460,7 @@ export function resolveCliGenerationConfig(
     openAILoggingDir,
   };
 
-  // Apply the global reasoning-effort preference (settings.model.reasoningEffort,
-  // set via /effort) onto the unified reasoning config. Skip when thinking is
-  // explicitly disabled (reasoning === false) so effort never silently
-  // re-enables it; provider adapters clamp the tier to the active model.
+  // Local CLI resolves the global fallback after it knows the selected route.
   const rawReasoningEffort = settings.model?.reasoningEffort;
   const reasoningDisabled = rawReasoningEffort === 'none';
   const reasoningEffort = reasoningDisabled
@@ -474,7 +473,11 @@ export function resolveCliGenerationConfig(
     rawReasoningEffort && !reasoningDisabled && !reasoningEffort
       ? `Ignoring invalid model.reasoningEffort "${rawReasoningEffort}"; expected one of: none, ${REASONING_EFFORT_TIERS.join(', ')}.`
       : undefined;
-  if (reasoningDisabled && generationConfig.thinkingMandatory !== true) {
+  if (
+    !inputs.deferReasoningEffort &&
+    reasoningDisabled &&
+    generationConfig.thinkingMandatory !== true
+  ) {
     generationConfig.reasoning = false;
     if (getBuiltinDeepSeekReasoning({ ...generationConfig, authType })) {
       resolved.sources['reasoning'] = {
@@ -482,7 +485,11 @@ export function resolveCliGenerationConfig(
         settingsPath: 'model.reasoningEffort',
       };
     }
-  } else if (reasoningEffort && generationConfig.reasoning !== false) {
+  } else if (
+    !inputs.deferReasoningEffort &&
+    reasoningEffort &&
+    generationConfig.reasoning !== false
+  ) {
     generationConfig.reasoning = {
       ...(generationConfig.reasoning ?? {}),
       effort: reasoningEffort,

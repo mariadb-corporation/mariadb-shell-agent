@@ -3910,6 +3910,12 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     expect(p).toContain(
       `--out ${join(absTmp, 'qwen-review-pr-6766-build-test.json')}`,
     );
+    // The attribution measurement runs as its own process; under tiered it
+    // cannot classify the PR without the same plan the build-test call used.
+    expect(p).toContain(
+      'mariadb-shell-agent review test-delta --plan <the --plan path the build-test command above used>',
+    );
+    expect(p).toContain('refuses fail-closed and attributes nothing');
   });
 
   it('never emits a literal "undefined" in the build-test --out filename', () => {
